@@ -19,7 +19,10 @@ for device in devices:
     hardware = props.get('hardware', device.get('hardwareProperties', {}))
     state = props.get('state', device.get('deviceProperties', {}))
     connection = props.get('connection', device.get('connectionProperties', {}))
-    if hardware.get('platform') != 'tvOS' or hardware.get('reality') != 'physical':
+    if hardware.get('platform') != 'tvOS' or hardware.get('reality') == 'simulated':
+        continue
+    # Older physical TVs omit reality; require their hardware identity instead.
+    if hardware.get('reality') != 'physical' and not (hardware.get('deviceType') == 'appleTV' and hardware.get('ecid') and hardware.get('udid')):
         continue
     if connection.get('pairingState') != 'paired':
         continue

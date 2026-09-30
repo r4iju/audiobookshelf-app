@@ -62,6 +62,6 @@ Provisioning uses `python3` with `cryptography`, both already available here. Th
 
 The signed hardware app is at `tvos/build/Build/Products/Release-appletvos/AudiobookshelfTV.app`, and the packaged IPA is at `tvos/build/AudiobookshelfTV.ipa`.
 
-The prepared profile includes the **older “Living Room” Apple TV registered in the developer account**. The currently discovered Living Room TV is a second-generation Apple TV 4K and has not been paired with this Mac. **Use `deploy.sh` after pairing so its actual UDID is included before installation.** The script rebuilds with that device's profile; do not assume the prebuilt IPA is already provisioned for the current TV.
+On October 1, 2026, the second-generation **Living Room TV** running tvOS 18.6 was paired, registered, and provisioned. `deploy.sh` successfully built, installed, and launched the app on that physical TV. Run the script again for subsequent updates; it builds with the selected device's profile. The original packaged IPA predates this pairing, so use the script rather than assuming that IPA is provisioned for the current TV.
 
-See [QA.md](QA.md) for checks and simulator evidence. Physical-TV installation and your actual server's credentials/library must be verified after tomorrow's pairing; they have not been represented as already tested.
+See [QA.md](QA.md) for checks and simulator evidence. Physical-TV installation and process launch are verified. Remote navigation and playback against your actual server still need acceptance checks.

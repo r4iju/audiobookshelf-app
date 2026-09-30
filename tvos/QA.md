@@ -19,4 +19,4 @@ Simulator evidence uses synthetic titles and audio, not the user's library:
 
 ![Playback screen](evidence/player.png)
 
-Limits of verification: no physical-TV remote interaction or installation has occurred. The simulator smoke drives production methods directly; remote focus behavior was visually inspected, not exercised by an automated remote. The live Audiobookshelf server, production media codecs, and connection-loss recovery still need a device acceptance check. The current signed artifact must be reprovisioned for the actual TV after pairing; the installer does this.
+Limits of verification: physical installation and launch were verified on October 1, 2026, but physical-TV remote interaction has not been exercised by automation. The simulator smoke drives production methods directly; remote focus behavior was visually inspected, not exercised by an automated remote. The live Audiobookshelf server, production media codecs, and connection-loss recovery still need a device acceptance check. The installer registered and provisioned the actual paired TV before the successful install; the original pre-pairing IPA should not be used for that device.
