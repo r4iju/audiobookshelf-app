@@ -630,3 +630,72 @@ private final class CapturingSink: MigrationSecretSink {
         secrets.append(secret)
     }
 }
+
+/// The real job, with a hook that runs while a discard is under way.
+private final class InterleavingJob: LegacyExportPackaging {
+    let job: LegacyExportJob
+    var duringDiscard: (() -> Void)?
+    var failNextDiscard = false
+
+    init(_ job: LegacyExportJob) {
+        self.job = job
+    }
+
+    func run(webStorage: [String: String], copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)?) throws -> LegacyExportResult {
+        try job.run(webStorage: webStorage, copyRealm: copyRealm, progress: progress)
+    }
+
+    func discard() throws {
+        let hook = duringDiscard
+        duringDiscard = nil
+        hook?()
+        if failNextDiscard {
+            failNextDiscard = false
+            throw CocoaError(.fileWriteNoPermission)
+        }
+        try job.discard()
+    }
+}
+
+extension LegacyRealmExportTests {
+    func testAnExportStartedWhileADiscardIsUnderWayIsRefusedRatherThanDeleted() throws {
+        try seedLegacyRealm()
+        let job = InterleavingJob(job())
+        let session = LegacyExportSession(job: job)
+        _ = try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil)
+        var concurrent: Result<LegacyExportResult, Error>?
+        var concurrentSave: [Result<Bool, LegacyExportSessionError>] = []
+        job.duringDiscard = {
+            concurrent = Result { try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil) }
+            session.save(presentingWith: { _, _ in XCTFail("nothing may be saved while it is being removed") }) { concurrentSave.append($0) }
+        }
+
+        try session.discard()
+
+        switch concurrent {
+        case let .success(result)?:
+            XCTFail("an export that reported success was deleted by the discard: package exists \(FileManager.default.fileExists(atPath: result.url.path))")
+        case let .failure(error)?:
+            XCTAssertEqual(error as? LegacyExportSessionError, .busy)
+        case nil:
+            XCTFail("the hook did not run")
+        }
+        XCTAssertEqual(concurrentSave, [.failure(.busy)])
+        XCTAssertNoThrow(try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil),
+                         "the next export starts once the discard has finished")
+    }
+
+    func testAFailedDiscardReleasesTheSession() throws {
+        try seedLegacyRealm()
+        let job = InterleavingJob(job())
+        let session = LegacyExportSession(job: job)
+        _ = try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil)
+        job.failNextDiscard = true
+
+        XCTAssertThrowsError(try session.discard())
+
+        let result = try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: result.url.path))
+        XCTAssertNoThrow(try session.discard())
+    }
+}

@@ -6,6 +6,14 @@ public enum LegacyExportSessionError: Error, Equatable {
     case saveUnavailable
 }
 
+/// Writes and removes the export package; `LegacyExportJob` in the app.
+public protocol LegacyExportPackaging: AnyObject {
+    func run(webStorage: [String: String], copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)?) throws -> LegacyExportResult
+    func discard() throws
+}
+
+extension LegacyExportJob: LegacyExportPackaging {}
+
 /// The export and save lifecycle of the legacy app's export action. While a save dialog holds the
 /// package, nothing may replace or remove it, and every save resolves exactly once, so a dialog
 /// that never appeared cannot block later saves. Safe to call from any thread.
@@ -22,11 +30,11 @@ public final class LegacyExportSession {
         case saving(LegacyExportResult, UUID)
     }
 
-    private let job: LegacyExportJob
+    private let job: LegacyExportPackaging
     private let lock = NSLock()
     private var state = State.idle
 
-    public init(job: LegacyExportJob) {
+    public init(job: LegacyExportPackaging) {
         self.job = job
     }
 
