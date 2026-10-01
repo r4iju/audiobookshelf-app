@@ -45,9 +45,13 @@ on ports in 19880 to 19885, which are not shared with the Apple or Android QA fi
 | 19883 | Production image of this client, built for `/web` | `deploy/compose.yaml` |
 | 19884 | OpenID provider used by the server for OpenID sign-in | `qa/oidc.mjs` |
 | 19885 | Podcast feed the server downloads episodes from | `qa/feed.mjs` |
+| 19886 | SMTP sink the server sends e-reader mail to | `qa/mail.mjs` |
 
-Playwright starts the feed, the OpenID provider and the development server itself, and `e2e/global-setup.ts` starts
-the QA server. `e2e/deployment.spec.ts` runs `qa/deploy.mjs up` first. That spec opens the deployment as
+Playwright starts the development server, and `e2e/global-setup.ts` starts the QA server. `qa/server.mjs up` runs the
+OpenID provider, the feed and the SMTP sink as containers (`abs-web-qa-oidc`, `-feed`, `-mail`) in the QA server's
+own network, published on 19884-19886, and the server reaches them as `host.docker.internal`, mapped to its own
+loopback. Reaching them through colima's host gateway stalled under load (see `qa/fixture-network.mjs`, which checks
+it). A QA server created before this layout is refused: recreate it with `node qa/server.mjs up --fresh`. `e2e/deployment.spec.ts` runs `qa/deploy.mjs up` first. That spec opens the deployment as
 `http://abs-web.test`, a name that Chromium maps to 127.0.0.1:19882. The server only accepts OpenID return addresses
 without a port.
 

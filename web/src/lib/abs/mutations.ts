@@ -246,13 +246,17 @@ export function useClearDownloadQueue() {
   });
 }
 
-/** Deletes the episode's audio file too; the server also drops it from playlists and removes its progress. */
-export function useRemoveEpisode() {
+/**
+ * Deletes the episode's audio file too; the server also drops it from playlists and removes its progress.
+ * `onRemoved` runs even if the episode's page has already gone, as it does when the server's update arrives first.
+ */
+export function useRemoveEpisode(onRemoved: (itemId: string) => void) {
   const { client, connection } = useAbs();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ itemId, episodeId }: { itemId: string; episodeId: string }) =>
       client.command("DELETE", `/api/podcasts/${itemId}/episode/${episodeId}?hard=1`),
+    onSuccess: (_data, { itemId }) => onRemoved(itemId),
     onSettled: (_data, _error, { itemId }) =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: keys.item(connection.id, itemId) }),

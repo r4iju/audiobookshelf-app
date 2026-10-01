@@ -46,7 +46,7 @@ function EpisodeView({ item, episode }: { item: LibraryItem; episode: PodcastEpi
   const me = useMe().data;
   const progress = useEpisodeProgress(item.id).data?.get(episode.id);
   const player = usePlayer();
-  const remove = useRemoveEpisode();
+  const remove = useRemoveEpisode((itemId) => router.replace(`/item/${itemId}`));
   const [dialog, setDialog] = useState<"playlist" | "remove" | null>(null);
   const playing = isPlaying(player, { itemId: item.id, episodeId: episode.id });
   const duration = episodeDuration(episode);
@@ -156,10 +156,7 @@ function EpisodeView({ item, episode }: { item: LibraryItem; episode: PodcastEpi
         busy={remove.isPending}
         onClose={() => setDialog(null)}
         onConfirm={() =>
-          remove.mutate(
-            { itemId: item.id, episodeId: episode.id },
-            { onSuccess: () => router.replace(`/item/${item.id}`), onSettled: () => setDialog(null) },
-          )
+          remove.mutate({ itemId: item.id, episodeId: episode.id }, { onSettled: () => setDialog(null) })
         }
       />
     </article>

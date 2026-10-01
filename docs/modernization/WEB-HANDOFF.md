@@ -115,7 +115,8 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 - **Mobile-only settings are not ported.** The automatic sleep timer and the chime were Android-only in the legacy
   app, and haptics and cellular rules have no browser equivalent.
 - **Year in review** is HTML and CSS, not the legacy canvas image.
-- **Podcast fixtures.** The QA server reaches the loopback feed as `host.docker.internal`, which its SSRF filter
+- **QA fixtures.** The OpenID provider, podcast feed and SMTP sink run as containers in the QA server's own
+  network. The server reaches them as `host.docker.internal`, mapped to its own loopback, which its SSRF filter
   allows through `SSRF_REQUEST_FILTER_WHITELIST`.
 - **Latest episodes** lists the newest unfinished episodes across podcasts, from the server's `recent-episodes`
   endpoint.
