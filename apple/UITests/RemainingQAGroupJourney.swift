@@ -32,4 +32,19 @@ import XCTest
         let saved = try await collections().first { $0.id == "collection-evening" }
         XCTAssertEqual(saved?.books.map(\.id), ["book-2", "book-1"])
     }
+
+    /// Server 2.30 authorizes collection deletion by `permissions.delete` alone, and an admin's default is false, so an
+    /// admin without it must not be offered Delete collection. Editing stays, because the default admin can update.
+    func testAdminWithoutDeletePermissionIsNotOfferedCollectionDeletion() async throws {
+        try await configure("podcast-admin")
+        signIn()
+        let app = XCUIApplication()
+        openAccountMenu("Collections")
+        XCTAssertTrue(app.buttons["group-collection-evening"].waitForExistence(timeout: 10))
+        app.buttons["group-collection-evening"].tap()
+        XCTAssertTrue(app.buttons["Edit collection"].waitForExistence(timeout: 10))
+        app.buttons["Group actions"].tap()
+        XCTAssertTrue(app.buttons["Refresh"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Delete collection"].exists)
+    }
 }
