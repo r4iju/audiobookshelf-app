@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LibraryView: View {
+    @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     @StateObject private var browser: LibraryBrowser
 
@@ -16,7 +17,7 @@ struct LibraryView: View {
                     if let error = browser.error, browser.items.isEmpty {
                         StatusMessage(text: CatalogStore.recovery(for: error)) { Task { await browser.retry() } }
                     } else if browser.items.isEmpty && !browser.loading && browser.started {
-                        Text(browser.filter == nil ? "This library is empty." : "No titles match this filter.")
+                        Text(browser.filter == nil ? l10n("This library is empty.") : l10n("No titles match this filter."))
                             .font(.title3).foregroundStyle(.secondary).padding(60)
                     }
                     LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
@@ -47,28 +48,28 @@ struct LibraryView: View {
         HStack(spacing: 30) {
             Text(browser.library.name).font(.title2.bold())
             if browser.total > 0 {
-                Text("\(browser.total) \(browser.library.isPodcast ? "podcasts" : "titles")").foregroundStyle(.secondary)
+                Text(browser.library.isPodcast ? l10n("{0} podcasts", browser.total) : l10n("{0} titles", browser.total)).foregroundStyle(.secondary)
             }
             Spacer()
             Menu {
                 ForEach(LibrarySort.options(for: browser.library)) { option in
-                    Button(option.title) { Task { await browser.apply(sort: option) } }
+                    Button(l10n(option.title)) { Task { await browser.apply(sort: option) } }
                 }
-            } label: { Label("Sort: \(browser.sort.title)", systemImage: "arrow.up.arrow.down") }
+            } label: { Label(l10n("Sort: {0}", l10n(browser.sort.title)), systemImage: "arrow.up.arrow.down") }
                 .accessibilityIdentifier("library-sort")
-                .accessibilityLabel("Sort: \(browser.sort.title)")
+                .accessibilityLabel(l10n("Sort: {0}", l10n(browser.sort.title)))
             if !browser.library.isPodcast {
                 Menu {
-                    Button("All titles") { Task { await browser.apply(filter: nil) } }
-                    Section("Progress") { options(LibraryFilter.progress) }
+                    Button(l10n("All titles")) { Task { await browser.apply(filter: nil) } }
+                    Section(l10n("Progress")) { options(LibraryFilter.progress) }
                     if let genres = browser.filterData?.genres, !genres.isEmpty {
-                        Section("Genre") { options(genres.map { LibraryFilter(group: "genres", value: $0, title: $0) }) }
+                        Section(l10n("Genre")) { options(genres.map { LibraryFilter(group: "genres", value: $0, title: $0) }) }
                     }
                     if let narrators = browser.filterData?.narrators, !narrators.isEmpty {
-                        Section("Narrator") { options(narrators.map { LibraryFilter(group: "narrators", value: $0, title: $0) }) }
+                        Section(l10n("Narrator")) { options(narrators.map { LibraryFilter(group: "narrators", value: $0, title: $0) }) }
                     }
                     if let authors = browser.filterData?.authors, !authors.isEmpty {
-                        Section("Author") { options(authors.map { LibraryFilter(group: "authors", value: $0.id, title: $0.name) }) }
+                        Section(l10n("Author")) { options(authors.map { LibraryFilter(group: "authors", value: $0.id, title: $0.name) }) }
                     }
                 } label: { Label(filterTitle, systemImage: "line.3.horizontal.decrease") }
                     .accessibilityIdentifier("library-filter")
@@ -77,11 +78,12 @@ struct LibraryView: View {
         }
     }
 
-    private var filterTitle: String { browser.filter.map { "Filter: \($0.title)" } ?? "Filter" }
+    /// Progress filters are app wording; genre, narrator and author filters show the server's names.
+    private var filterTitle: String { browser.filter.map { l10n("Filter: {0}", $0.group == "progress" ? l10n($0.title) : $0.title) } ?? l10n("Filter") }
 
     private func options(_ filters: [LibraryFilter]) -> some View {
         ForEach(filters) { filter in
-            Button(filter.title) { Task { await browser.apply(filter: filter) } }
+            Button(filter.group == "progress" ? l10n(filter.title) : filter.title) { Task { await browser.apply(filter: filter) } }
         }
     }
 }

@@ -111,7 +111,7 @@ final class CatalogJourney: TVJourney {
         XCTAssertTrue(label("detail-title").hasSuffix("Forgotten Libraries"))
         capture("long-title")
         tab("Settings")
-        XCTAssertEqual(label("server-address"), secure)
+        XCTAssertEqual(app.staticTexts["server-address"].value as? String, secure, "VoiceOver reads it as the server address's value")
         XCTAssertTrue(label("auth-modes").contains("username and password"))
     }
 }

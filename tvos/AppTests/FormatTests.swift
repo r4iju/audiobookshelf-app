@@ -14,7 +14,7 @@ final class FormatTests: XCTestCase {
 
     func testDurationSaturatesHugeValues() {
         XCTAssertEqual(Format.duration(1e300), Format.duration(Format.longestTime))
-        XCTAssertEqual(Format.duration(5400), "1 h 30 min")
+        XCTAssertEqual(Format.duration(5400, locale: Locale(identifier: "en")), "1 hr, 30 min")
     }
 
     func testProgressWithHugeServerValuesStillFormats() throws {

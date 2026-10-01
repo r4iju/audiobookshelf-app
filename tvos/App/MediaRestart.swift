@@ -46,12 +46,13 @@ extension ApplePlayback: RestartablePlayback {}
             let item = try await fetch(failure.itemID)
             guard unchanged() else { return nil }
             let episode = failure.episodeID.flatMap { id in item.media.episodes?.first { $0.id == id } }
-            if failure.episodeID != nil, episode == nil { return "This episode is no longer on the server." }
+            if failure.episodeID != nil, episode == nil { return NativeStrings.current("This episode is no longer on the server.") }
             await player.start(item: item, episode: episode)
             return nil
         } catch {
             guard unchanged() else { return nil }
-            return "Playback could not be restarted: " + CatalogStore.recovery(for: error)
+            TVDiagnostics.shared.record(error, detail: "Restart playback")
+            return NativeStrings.current("Playback could not be restarted: {0}", CatalogStore.recovery(for: error))
         }
     }
 }
