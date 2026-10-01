@@ -40,7 +40,7 @@ struct StatisticsView: View {
         }
     }
     var body: some View {
-        List {
+        ShelfList {
             if store.loading { ProgressView("Opening your statistics…") }
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load() } } }
             if let stats = store.stats {

@@ -37,7 +37,7 @@ struct CatalogFilterOptions: View {
     @State private var error: String?
     var body: some View {
         NavigationView {
-            List {
+            ShelfList {
                 if let error { Text(error).foregroundColor(.red); Button("Retry filters") { load() } }
                 else if let data {
                     Button("All titles") { select(nil) }
@@ -48,13 +48,13 @@ struct CatalogFilterOptions: View {
                     group("Narrators", key: "narrators", values: data.narrators ?? [])
                     group("Languages", key: "languages", values: data.languages ?? [])
                     if catalog.library.mediaType == "book" {
-                        NavigationLink("Progress", destination: List {
+                        NavigationLink("Progress", destination: ShelfList {
                             option("Finished", group: "progress", value: "finished")
                             option("In progress", group: "progress", value: "in-progress")
                             option("Not started", group: "progress", value: "not-started")
                             option("Not finished", group: "progress", value: "not-finished")
                         }.navigationTitle("Progress"))
-                        NavigationLink("Ebooks", destination: List {
+                        NavigationLink("Ebooks", destination: ShelfList {
                             option("Has ebook", group: "ebooks", value: "ebook")
                             option("Has supplementary ebook", group: "ebooks", value: "supplementary")
                         }.navigationTitle("Ebooks"))
@@ -81,12 +81,12 @@ struct CatalogFilterOptions: View {
     }
     @ViewBuilder private func group(_ title: String, key: String, values: [String]) -> some View {
         if !values.isEmpty {
-            NavigationLink(title, destination: List { ForEach(values, id: \.self) { option($0, group: key, value: $0) } }.navigationTitle(title))
+            NavigationLink(title, destination: ShelfList { ForEach(values, id: \.self) { option($0, group: key, value: $0) } }.navigationTitle(title))
         }
     }
     @ViewBuilder private func namedGroup(_ title: String, key: String, values: [SearchResponse.AuthorMatch]) -> some View {
         if !values.isEmpty {
-            NavigationLink(title, destination: List { ForEach(values) { option($0.name, group: key, value: $0.id) } }.navigationTitle(title))
+            NavigationLink(title, destination: ShelfList { ForEach(values) { option($0.name, group: key, value: $0.id) } }.navigationTitle(title))
         }
     }
 }

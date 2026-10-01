@@ -26,6 +26,7 @@ import SwiftUI
 }
 
 struct LibrarySearch: View {
+    @Environment(\.shelfAppearance) private var appearance
     @StateObject private var search: LibrarySearchStore
     @State private var pending: Task<Void, Never>?
     init(catalog: CatalogStore) { _search = StateObject(wrappedValue: LibrarySearchStore(catalog: catalog)) }
@@ -36,7 +37,7 @@ struct LibrarySearch: View {
                 TextField("Books, podcasts, authors, series…", text: $search.query, onCommit: { submit() })
                     .accessibilityIdentifier("library-search")
                 if !search.query.isEmpty { Button { search.query = ""; submit() } label: { Image(systemName: "xmark.circle.fill") }.accessibilityLabel("Clear search") }
-            }.padding(14).background(ShelfStyle.card).cornerRadius(16).padding(20)
+            }.padding(14).background(appearance.card).cornerRadius(16).padding(20)
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 18) {
                     switch search.state {
@@ -57,7 +58,7 @@ struct LibrarySearch: View {
                                     VStack(alignment: .leading, spacing: 8) {
                                         Text(episode.title).font(.headline).foregroundColor(.primary)
                                         Text(result.libraryItem.title).font(.caption).foregroundColor(.secondary)
-                                    }.padding(18).frame(maxWidth: .infinity, alignment: .leading).background(ShelfStyle.card).cornerRadius(16)
+                                    }.padding(18).frame(maxWidth: .infinity, alignment: .leading).background(appearance.card).cornerRadius(16)
                                 }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("search-episode-\(episode.id)")
                             }
                         }
@@ -73,7 +74,7 @@ struct LibrarySearch: View {
                     }
                 }.padding(20).frame(maxWidth: 1000).frame(maxWidth: .infinity, alignment: .leading)
             }
-        }.background(ShelfStyle.background).navigationTitle("Search")
+        }.background(appearance.background).navigationTitle("Search")
             .onChange(of: search.query) { _ in
                 pending?.cancel()
                 pending = Task {
@@ -87,7 +88,7 @@ struct LibrarySearch: View {
     private func submit() { pending?.cancel(); pending = Task { await search.search() } }
     private func related(_ name: String, group: String, value: String) -> some View {
         NavigationLink(destination: CatalogShelf(api: search.catalog.api, library: search.catalog.library, filter: group + "." + Data(value.utf8).base64EncodedString())) {
-            HStack { Text(name); Spacer(); Image(systemName: "chevron.right") }.padding(18).background(ShelfStyle.card).cornerRadius(16)
+            HStack { Text(name); Spacer(); Image(systemName: "chevron.right") }.padding(18).background(appearance.card).cornerRadius(16)
         }.buttonStyle(PlainButtonStyle())
     }
 }

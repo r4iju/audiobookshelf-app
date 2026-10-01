@@ -5,7 +5,7 @@ struct DownloadsView: View {
     @EnvironmentObject private var player: ApplePlayback
     var body: some View {
         NavigationView {
-            List {
+            ShelfList {
                 Toggle("Download over cellular", isOn: $downloads.cellular)
                 if let error = downloads.error { Text(error).foregroundColor(.red) }
                 if downloads.visible.isEmpty { Text("Save books or episodes from your library to listen offline.").foregroundColor(.secondary) }
@@ -37,6 +37,7 @@ struct DownloadsView: View {
 }
 
 private struct OfflineDetails: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
     @EnvironmentObject private var readingStore: ReadingStore
@@ -67,7 +68,7 @@ private struct OfflineDetails: View {
                 if let error { Text(error).foregroundColor(.red) }
                 Button("Remove download") { Task { await downloads.remove(entry, player: player); presentation.wrappedValue.dismiss() } }.foregroundColor(.red)
             }.padding(24).frame(maxWidth: 800, alignment: .leading).frame(maxWidth: .infinity)
-        }.background(ShelfStyle.background).navigationTitle(entry.media.title).navigationBarTitleDisplayMode(.inline)
+        }.background(appearance.background).navigationTitle(entry.media.title).navigationBarTitleDisplayMode(.inline)
             .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: downloads.api, store: readingStore) }
     }
 }

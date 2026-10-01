@@ -15,7 +15,7 @@ struct FeedEpisodes: View {
     private var existing: Set<String> { Set((item.media.episodes ?? []).compactMap { $0.enclosure?.url }) }
     var body: some View {
         NavigationView {
-            List {
+            ShelfList {
                 if loading { ProgressView("Opening podcast feed…") }
                 if let error {
                     Text(error).foregroundColor(.red)
@@ -62,6 +62,7 @@ struct FeedEpisodes: View {
         guard !adding else { return }
         let choices = episodes.filter { selected.contains($0.id) }
         guard !choices.isEmpty else { return }
+        NativeHaptic.impact()
         adding = true; error = nil
         request = Task {
             defer { adding = false }

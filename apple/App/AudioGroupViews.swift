@@ -114,7 +114,7 @@ struct AudioGroupList: View {
     @State private var creating = false
     init(catalog: CatalogStore, kind: AudioGroupKind) { _store = StateObject(wrappedValue: AudioGroupStore(catalog: catalog, kind: kind)) }
     var body: some View {
-        List {
+        ShelfList {
             if store.loading { ProgressView("Opening \(store.kind.title.lowercased())…") }
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load() } } }
             ForEach(store.groups) { group in
@@ -154,7 +154,7 @@ struct AudioGroupDetails: View {
     var body: some View {
         let group = store.selected ?? initial
         let active = player.wantsPlayback && group.members.contains { $0.libraryItemId == player.itemID && $0.episodeId == player.episodeID }
-        List {
+        ShelfList {
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load(id: initial.id) } } }
             if let description = group.description, !description.isEmpty { Text(description).foregroundColor(.secondary) }
             Button("\(active ? "Pause" : "Play") \(store.kind.singular)") { Task { await store.play(group, player: player, downloads: downloads) } }
@@ -204,7 +204,7 @@ struct AudioGroupEditor: View {
     }
     var body: some View {
         NavigationView {
-            Form {
+            ShelfForm {
                 Section(header: Text("Details")) {
                     TextField("Name", text: $name).accessibilityIdentifier("group-name")
                     TextField("Description", text: $description).accessibilityIdentifier("group-description")
@@ -252,7 +252,7 @@ struct AudioGroupMemberPicker: View {
     }
     var body: some View {
         NavigationView {
-            List {
+            ShelfList {
                 switch catalog.state {
                 case .loading: ProgressView("Opening titles…")
                 case .failed(let error): RecoveryCard(message: error) { Task { await catalog.reload() } }
@@ -286,7 +286,7 @@ struct AudioGroupEpisodePicker: View {
     @State private var expanded: LibraryItem?
     @State private var error: String?
     var body: some View {
-        List {
+        ShelfList {
             if let error { RecoveryCard(message: error) { Task { await load() } } }
             if let expanded {
                 ForEach(expanded.media.episodes ?? []) { episode in

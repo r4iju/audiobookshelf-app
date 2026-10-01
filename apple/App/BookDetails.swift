@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 struct BookDetails: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var serverQueue: NativePodcastQueue
     @EnvironmentObject private var readingStore: ReadingStore
     @State private var reader: ReadingSource?
@@ -49,7 +50,7 @@ struct BookDetails: View {
                     }
                 }
                 if book.mediaType != "podcast" || episode != nil {
-                Button { playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
+                Button { NativeHaptic.impact(); playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
                     HStack {
                         Image(systemName: "play.fill")
                         Text((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening").fontWeight(.semibold)
@@ -119,7 +120,7 @@ struct BookDetails: View {
                 }
                 if let error { RecoveryCard(message: error) { load(monitorDownloads: true) } }
             }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
-        }.background(ShelfStyle.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
+        }.background(appearance.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
             .onAppear { load(monitorDownloads: true) }
             .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel() }
             .sheet(isPresented: $showingFeed) {
@@ -137,6 +138,7 @@ struct BookDetails: View {
     }
 
     private func toggleFinished() {
+        NativeHaptic.impact()
         guard !progressBusy, let episode else { return }
         let finished = selectedProgress?.isFinished != true
         request?.cancel()
@@ -244,7 +246,7 @@ struct BookDetails: View {
                             ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
                             Text(progress.isFinished == true ? "Finished" : ShelfTime.describe(progress.currentTime ?? 0) + " listened").font(.caption).foregroundColor(.secondary)
                         }
-                    }.frame(maxWidth: .infinity, alignment: .leading).padding(18).background(ShelfStyle.card).cornerRadius(16)
+                    }.frame(maxWidth: .infinity, alignment: .leading).padding(18).background(appearance.card).cornerRadius(16)
                 }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("episode-\(episode.id)")
             }
         }

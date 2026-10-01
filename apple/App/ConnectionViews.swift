@@ -2,11 +2,10 @@ import SwiftUI
 
 enum ShelfStyle {
     static let accent = Color(red: 0.80, green: 0.31, blue: 0.17)
-    static let background = Color(UIColor.systemGroupedBackground)
-    static let card = Color(UIColor.secondarySystemGroupedBackground)
 }
 
 struct ConnectionRoot: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     var body: some View {
@@ -19,20 +18,21 @@ struct ConnectionRoot: View {
             case .libraries(let libraries): LibraryChooser(libraries: libraries)
             case .shelf(let library): ConnectedLibrary(library: library)
             }
-        }.background(ShelfStyle.background.edgesIgnoringSafeArea(.all))
+        }.background(appearance.background.edgesIgnoringSafeArea(.all))
             .sheet(isPresented: $connection.savedConnectionsPresented) { SavedConnectionsView().environmentObject(connection) }
             .overlay(Group {
                 if let error = connection.managementError {
                     HStack {
                         Text(error).font(.callout)
                         Button("Dismiss") { connection.managementError = nil }
-                    }.padding().background(ShelfStyle.card).cornerRadius(16).padding()
+                    }.padding().background(appearance.card).cornerRadius(16).padding()
                 }
             }, alignment: .top)
     }
 }
 
 struct ConnectionForm: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     let error: String?
@@ -79,7 +79,7 @@ struct ConnectionForm: View {
                         password = ""
                         Task { await connection.connectWithOpenID() }
                     }.disabled(connection.server.isEmpty).accessibilityIdentifier("openid-sign-in")
-                }.padding(24).background(ShelfStyle.card).cornerRadius(26)
+                }.padding(24).background(appearance.card).cornerRadius(26)
                 Text("Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported.")
                     .font(.footnote).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
                 if connection.api.credentials != nil {
@@ -96,12 +96,13 @@ struct ConnectionForm: View {
     private func field<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 9) {
             Text(title).font(.caption).fontWeight(.semibold).foregroundColor(.secondary)
-            content().padding(14).background(ShelfStyle.background).cornerRadius(12)
+            content().padding(14).background(appearance.background).cornerRadius(12)
         }
     }
 }
 
 struct LibraryChooser: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     let libraries: [Library]
@@ -121,7 +122,7 @@ struct LibraryChooser: View {
                                     Text(library.mediaType == "podcast" ? "Podcasts" : "Audiobooks & reading").font(.caption).foregroundColor(.secondary)
                                 }
                                 Spacer(); Image(systemName: "chevron.right").foregroundColor(.secondary)
-                            }.padding(22).background(ShelfStyle.card).cornerRadius(20)
+                            }.padding(22).background(appearance.card).cornerRadius(20)
                         }.accessibilityIdentifier("library-\(library.id)")
                     }
                     if libraries.isEmpty { Text("No libraries are available to this account. Ask your server administrator for access.").foregroundColor(.secondary) }
@@ -143,7 +144,7 @@ struct SavedConnectionsView: View {
     @EnvironmentObject private var connection: ConnectionStore
     var body: some View {
         NavigationView {
-            List {
+            ShelfList {
                 ForEach(connection.savedConnections) { saved in
                     Button { Task { await connection.switchConnection(saved.id) } } label: {
                         VStack(alignment: .leading, spacing: 6) {

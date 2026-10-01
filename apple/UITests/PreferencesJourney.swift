@@ -1,6 +1,34 @@
 import XCTest
 
 @MainActor final class PreferencesJourney: NativeJourney {
+    func testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["account"].tap()
+        let settings = app.buttons["Settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 3))
+        guard settings.exists else { return }
+        settings.tap()
+        XCTAssertTrue(app.buttons["theme-black"].waitForExistence(timeout: 5))
+        app.buttons["theme-black"].tap()
+        app.buttons["haptic-off"].tap()
+        XCTAssertEqual(app.buttons["theme-black"].value as? String, "Selected")
+        XCTAssertEqual(app.buttons["haptic-off"].value as? String, "Selected")
+        capture("Native black appearance settings")
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["account"].tap(); app.buttons["Settings"].tap()
+        XCTAssertTrue(app.buttons["theme-black"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons["theme-black"].value as? String, "Selected")
+        XCTAssertEqual(app.buttons["haptic-off"].value as? String, "Selected")
+        app.buttons["theme-light"].tap(); app.buttons["haptic-heavy"].tap()
+        capture("Native light appearance settings")
+        app.terminate(); app.launch()
+        app.buttons["account"].tap(); app.buttons["Settings"].tap()
+        XCTAssertTrue(app.buttons["theme-light"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons["theme-light"].value as? String, "Selected")
+        XCTAssertEqual(app.buttons["haptic-heavy"].value as? String, "Selected")
+    }
     func testStatisticsShowServerListeningTotalsAndRecentSessions() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)

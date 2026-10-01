@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 struct PlaybackContainer<Content: View>: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var player: ApplePlayback
     @State private var expanded = false
     let content: Content
@@ -26,7 +27,7 @@ struct PlaybackContainer<Content: View>: View {
                             }
                         }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("mini-player")
                         playbackToggle(player)
-                    }.padding(18).background(ShelfStyle.card).cornerRadius(20).shadow(color: .black.opacity(0.08), radius: 16, y: 6)
+                    }.padding(18).background(appearance.card).cornerRadius(20).shadow(color: .black.opacity(0.08), radius: 16, y: 6)
                         .padding(.horizontal, 16).padding(.bottom, 8).frame(maxWidth: 900)
                 }
         }
@@ -34,6 +35,7 @@ struct PlaybackContainer<Content: View>: View {
 }
 
 struct NowListening: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var connection: ConnectionStore
     @EnvironmentObject private var player: ApplePlayback
     @Environment(\.presentationMode) private var presentation
@@ -76,9 +78,9 @@ struct NowListening: View {
                         }.font(.caption.monospacedDigit()).foregroundColor(.secondary)
                     }
                     HStack(spacing: 38) {
-                        Button { Task { await player.skip(-Double(player.backwardInterval)) } } label: { VStack { Image(systemName: "gobackward").font(.largeTitle); Text("\(player.backwardInterval)").font(.caption) } }.accessibilityLabel("Back \(player.backwardInterval) seconds")
+                        Button { NativeHaptic.impact(); Task { await player.skip(-Double(player.backwardInterval)) } } label: { VStack { Image(systemName: "gobackward").font(.largeTitle); Text("\(player.backwardInterval)").font(.caption) } }.accessibilityLabel("Back \(player.backwardInterval) seconds")
                         playbackToggle(player, large: true)
-                        Button { Task { await player.skip(Double(player.forwardInterval)) } } label: { VStack { Image(systemName: "goforward").font(.largeTitle); Text("\(player.forwardInterval)").font(.caption) } }.accessibilityLabel("Forward \(player.forwardInterval) seconds")
+                        Button { NativeHaptic.impact(); Task { await player.skip(Double(player.forwardInterval)) } } label: { VStack { Image(systemName: "goforward").font(.largeTitle); Text("\(player.forwardInterval)").font(.caption) } }.accessibilityLabel("Forward \(player.forwardInterval) seconds")
                     }.foregroundColor(ShelfStyle.accent)
                     HStack(spacing: 24) {
                         Button { panel = .chapters } label: { Label("Chapters", systemImage: "list.bullet") }.disabled(player.session?.chapters?.isEmpty != false)
@@ -97,7 +99,7 @@ struct NowListening: View {
                         }
                     }.font(.footnote).foregroundColor(.secondary)
                 }.padding(28).frame(maxWidth: 560).frame(maxWidth: .infinity)
-            }.background(ShelfStyle.background).navigationTitle("Now listening").navigationBarTitleDisplayMode(.inline)
+            }.background(appearance.background).navigationTitle("Now listening").navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button("Done") { presentation.wrappedValue.dismiss() } } }
         }.navigationViewStyle(StackNavigationViewStyle())
             .sheet(item: $panel) { _ in ListeningControls(panel: $panel).environmentObject(player) }
@@ -128,7 +130,7 @@ struct ListeningControls: View {
     @State private var seconds = ""
     var body: some View {
         NavigationView {
-            Form {
+            ShelfForm {
                 switch panel {
                 case .chapters:
                     ForEach(player.session?.chapters ?? []) { chapter in
@@ -215,7 +217,7 @@ struct ListeningControls: View {
 }
 
 @MainActor @ViewBuilder func playbackToggle(_ player: ApplePlayback, large: Bool = false, prefix: String? = nil) -> some View {
-    Button { player.toggle() } label: {
+    Button { NativeHaptic.impact(); player.toggle() } label: {
         Image(systemName: player.wantsPlayback ? "pause.fill" : "play.fill")
             .font(large ? .system(size: 34) : .title2)
             .frame(width: large ? 80 : 44, height: large ? 80 : 44)

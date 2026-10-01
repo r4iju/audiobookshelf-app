@@ -144,6 +144,7 @@ private struct NativePDFCanvas: UIViewRepresentable {
 }
 
 struct PDFReader: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var player: ApplePlayback
     @StateObject private var reading: PDFReading
     @State private var requestedPage = ""
@@ -197,7 +198,7 @@ struct PDFReader: View {
                     else if store.waitingForListening { Text("Page saved on this device. Sync follows when listening closes.").font(.caption).foregroundColor(.secondary).padding(.horizontal) }
                 } else if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding() }
                 else { ProgressView("Opening PDF…").frame(maxWidth: .infinity, maxHeight: .infinity) }
-            }.background(ShelfStyle.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
+            }.background(appearance.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button("Close reader") { presentation.wrappedValue.dismiss() } } }
         }.navigationViewStyle(StackNavigationViewStyle())
             .onAppear { reading.open() }

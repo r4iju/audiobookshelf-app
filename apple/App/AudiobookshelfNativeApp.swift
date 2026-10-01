@@ -1,6 +1,7 @@
 import SwiftUI
 
 @main struct AudiobookshelfNativeApp: App {
+    @AppStorage("previewTheme") private var theme = "system"
     @Environment(\.scenePhase) private var scenePhase
     @UIApplicationDelegateAdaptor(NativeDownloadAppDelegate.self) private var appDelegate
     @StateObject private var serverQueue: NativePodcastQueue
@@ -10,6 +11,7 @@ import SwiftUI
     @StateObject private var player: ApplePlayback
 
     init() {
+        UITableView.appearance().backgroundColor = .clear
         let vault = KeychainCredentials()
         #if DEBUG && targetEnvironment(simulator)
         if CommandLine.arguments.contains("--reset-preview-account") {
@@ -18,6 +20,8 @@ import SwiftUI
             try? FileManager.default.removeItem(at: NativePodcastQueue.file)
             try? FileManager.default.removeItem(at: ReadingStore.file)
             try? FileManager.default.removeItem(at: NativeDownloads.directory)
+            UserDefaults.standard.removeObject(forKey: "previewTheme")
+            UserDefaults.standard.removeObject(forKey: "previewHaptic")
             UserDefaults.standard.removeObject(forKey: "previewListLayout")
             UserDefaults.standard.removeObject(forKey: "previewLibrary")
             UserDefaults.standard.removeObject(forKey: "previewServer")
@@ -63,6 +67,8 @@ import SwiftUI
                 .onChange(of: player.canPublishReading) { available in if available { reading.sync(api: connection.api) } }
                 .onChange(of: connection.activeAccount) { _ in serverQueue.connect(); reading.sync(api: connection.api) }
                 .sheet(isPresented: $downloads.presented) { DownloadsView().environmentObject(downloads).environmentObject(player).environmentObject(reading) }
+                .environment(\.shelfAppearance, NativeAppearance(rawValue: theme) ?? .system)
+                .preferredColorScheme((NativeAppearance(rawValue: theme) ?? .system).scheme)
         }
     }
 }

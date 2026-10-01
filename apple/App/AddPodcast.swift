@@ -24,7 +24,7 @@ struct AddPodcast: View {
     }
     var body: some View {
         NavigationView {
-            Form {
+            ShelfForm {
                 if feed == nil {
                     Section(header: Text("Discover a podcast")) {
                         TextField("Podcast name", text: $query).accessibilityIdentifier("podcast-discovery-query").disabled(busy)

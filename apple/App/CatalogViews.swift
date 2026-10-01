@@ -25,7 +25,7 @@ struct LibrarySidebar: View {
     @EnvironmentObject private var connection: ConnectionStore
     let selected: Library
     var body: some View {
-        List {
+        ShelfList {
             Label("Audiobookshelf", systemImage: "books.vertical.fill").font(.title2.bold()).padding(.vertical, 18)
             Label(selected.name, systemImage: selected.mediaType == "podcast" ? "mic" : "books.vertical")
                 .foregroundColor(ShelfStyle.accent)
@@ -36,6 +36,7 @@ struct LibrarySidebar: View {
 }
 
 struct CatalogShelf: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     @StateObject private var catalog: CatalogStore
@@ -44,6 +45,7 @@ struct CatalogShelf: View {
     @State private var addingPodcast = false
     @State private var collectionsPresented = false
     @State private var playlistsPresented = false
+    @State private var settingsPresented = false
     @State private var statisticsPresented = false
     init(api: APIClient, library: Library, filter: String? = nil) {
         _catalog = StateObject(wrappedValue: CatalogStore(api: api, library: library, filter: filter))
@@ -103,7 +105,7 @@ struct CatalogShelf: View {
                     }
                 }.padding(24).frame(maxWidth: 1400).frame(maxWidth: .infinity)
             }
-        }.accessibilityIdentifier("catalog").background(ShelfStyle.background)
+        }.accessibilityIdentifier("catalog").background(appearance.background)
             .navigationTitle(catalog.library.name)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -127,6 +129,7 @@ struct CatalogShelf: View {
                         if catalog.library.mediaType == "podcast", case .content(let content) = catalog.state, content.user.canManagePodcasts {
                             Button("Add podcast") { addingPodcast = true }
                         }
+                        Button("Settings") { settingsPresented = true }
                         Button("Statistics") { statisticsPresented = true }
                         Button("Downloads") { downloads.presented = true }
                         if catalog.library.mediaType == "book" {
@@ -142,6 +145,7 @@ struct CatalogShelf: View {
             }.onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
             .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
             .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
+            .background(NavigationLink(destination: NativeSettings(), isActive: $settingsPresented) { EmptyView() }.hidden())
             .background(NavigationLink(destination: StatisticsView(api: catalog.api), isActive: $statisticsPresented) { EmptyView() }.hidden())
             .background(NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .collection), isActive: $collectionsPresented) { EmptyView() })
             .background(NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .playlist), isActive: $playlistsPresented) { EmptyView() })
@@ -153,13 +157,14 @@ struct CatalogShelf: View {
 }
 
 struct BookArtwork: View {
+    @Environment(\.shelfAppearance) private var appearance
     let item: LibraryItem
     let catalog: CatalogStore
     @State private var image: UIImage?
     @State private var request: Task<Void, Never>?
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16).fill(ShelfStyle.card)
+            RoundedRectangle(cornerRadius: 16).fill(appearance.card)
             if let image { Image(uiImage: image).resizable().scaledToFill() }
             else {
                 VStack(spacing: 10) {
@@ -175,6 +180,7 @@ struct BookArtwork: View {
 }
 
 struct BookCard: View {
+    @Environment(\.shelfAppearance) private var appearance
     let item: LibraryItem
     let catalog: CatalogStore
     let listLayout: Bool
@@ -182,7 +188,7 @@ struct BookCard: View {
         Group {
             if listLayout {
                 HStack(spacing: 18) { BookArtwork(item: item, catalog: catalog).frame(width: 62); labels; Spacer() }
-                    .padding(14).background(ShelfStyle.card).cornerRadius(18)
+                    .padding(14).background(appearance.card).cornerRadius(18)
             } else { VStack(alignment: .leading, spacing: 12) { BookArtwork(item: item, catalog: catalog); labels } }
         }
     }
@@ -196,6 +202,7 @@ struct BookCard: View {
 }
 
 struct ContinueCard: View {
+    @Environment(\.shelfAppearance) private var appearance
     let item: LibraryItem
     let catalog: CatalogStore
     let progress: MediaProgress?
@@ -208,11 +215,12 @@ struct ContinueCard: View {
                 ProgressView(value: progress?.fraction ?? 0).accentColor(ShelfStyle.accent)
                 Text("\(Int((progress?.fraction ?? 0) * 100))% listened").font(.caption).foregroundColor(.secondary)
             }.frame(width: 175, alignment: .leading)
-        }.padding(18).background(ShelfStyle.card).cornerRadius(24)
+        }.padding(18).background(appearance.card).cornerRadius(24)
     }
 }
 
 struct RecoveryCard: View {
+    @Environment(\.shelfAppearance) private var appearance
     let message: String
     let retry: () -> Void
     var body: some View {
@@ -220,7 +228,7 @@ struct RecoveryCard: View {
             Label("Couldn't open this part of your library", systemImage: "wifi.exclamationmark").font(.headline)
             Text(message).font(.callout).foregroundColor(.secondary)
             Button("Try again", action: retry)
-        }.padding(22).frame(maxWidth: .infinity, alignment: .leading).background(ShelfStyle.card).cornerRadius(20)
+        }.padding(22).frame(maxWidth: .infinity, alignment: .leading).background(appearance.card).cornerRadius(20)
     }
 }
 

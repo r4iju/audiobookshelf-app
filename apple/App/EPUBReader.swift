@@ -173,6 +173,7 @@ private struct EPUBCanvas: UIViewRepresentable {
 }
 
 struct EPUBReader: View {
+    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var player: ApplePlayback
     @Environment(\.presentationMode) private var presentation
     @Environment(\.scenePhase) private var scenePhase
@@ -189,8 +190,8 @@ struct EPUBReader: View {
             VStack(spacing: 0) {
                 ZStack {
                     EPUBCanvas(reading: reading)
-                    if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding().background(ShelfStyle.background) }
-                    else if !reading.ready { ProgressView("Opening EPUB…").padding().background(ShelfStyle.background) }
+                    if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding().background(appearance.background) }
+                    else if !reading.ready { ProgressView("Opening EPUB…").padding().background(appearance.background) }
                 }
                 HStack {
                     Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left") }.accessibilityLabel("Previous page")
@@ -217,11 +218,11 @@ struct EPUBReader: View {
             }.navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button("Close reader") { presentation.wrappedValue.dismiss() } } }
                 .sheet(isPresented: $contents) {
-                    NavigationView { List(reading.chapters) { chapter in Button(chapter.title) { reading.call("navigate", chapter.href); contents = false } }.navigationTitle("Contents").toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Done") { contents = false } } } }.navigationViewStyle(StackNavigationViewStyle())
+                    NavigationView { ShelfList { ForEach(reading.chapters) { chapter in Button(chapter.title) { reading.call("navigate", chapter.href); contents = false } } }.navigationTitle("Contents").toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Done") { contents = false } } } }.navigationViewStyle(StackNavigationViewStyle())
                 }
                 .sheet(isPresented: $settings) {
                     NavigationView {
-                        Form {
+                        ShelfForm {
                             Picker("Volume buttons", selection: $reading.preferences.volume) {
                                 Text("Enabled").tag("enabled"); Text("Mirrored").tag("mirrored"); Text("Off").tag("none")
                             }.accessibilityIdentifier("reader-volume-mode")
