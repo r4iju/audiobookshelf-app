@@ -21,7 +21,7 @@ def audio(seconds):
     return data.getvalue()
 
 
-def make_server(port=18765, prefix='/abs'):
+def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='modern'):
     tracks = [audio(8), audio(12)]
     chapters = [{'id': 0, 'title': 'Opening', 'start': 0, 'end': 8}, {'id': 1, 'title': 'Next chapter', 'start': 8, 'end': 20}]
     items = [{'id': f'book-{i}', 'mediaType': 'book', 'media': {
@@ -32,6 +32,7 @@ def make_server(port=18765, prefix='/abs'):
             'permissions': {'download': True, 'update': True, 'delete': False, 'upload': False},
             'mediaProgress': [], 'bookmarks': [], 'settings': {}}
     sessions = {}
+    progress = {}
     reports = []
     requests = []
     prefix = '/' + prefix.strip('/') if prefix.strip('/') else ''
@@ -80,7 +81,7 @@ def make_server(port=18765, prefix='/abs'):
                 return self.respond(200, {'libraries': [{'id': 'books', 'name': 'Audiobooks', 'mediaType': 'book'}, {'id': 'podcasts', 'name': 'Podcasts', 'mediaType': 'podcast'}]})
             if path == '/api/libraries/books/items':
                 page = max(0, int(query.get('page', ['0'])[0])); limit = min(100, max(1, int(query.get('limit', ['60'])[0])))
-                return self.respond(200, {'results': items[page * limit:(page + 1) * limit], 'total': len(items), 'limit': limit, 'page': page})
+                return self.respond(200, {'items' if scenario == 'library-schema-change' else 'results': items[page * limit:(page + 1) * limit], 'total': len(items), 'limit': limit, 'page': page})
             if path == '/api/libraries/books/personalized':
                 return self.respond(200, [{'id': 'recently-added', 'label': 'Recently Added', 'type': 'book', 'entities': items[:10], 'total': 61}])
             if path == '/api/me':
@@ -137,7 +138,7 @@ def make_server(port=18765, prefix='/abs'):
             if path == '/login':
                 if data != {'username': 'qa', 'password': 'qa'}:
                     return self.respond(401, {})
-                return self.respond(200, {'user': {**user, 'token': 'expired', 'accessToken': 'expired', 'refreshToken': 'refresh'},
+                return self.respond(200, {'user': {**user, **({'token': 'fresh'} if auth_mode == 'legacy' else {'token': 'expired', 'accessToken': 'expired', 'refreshToken': 'refresh'})},
                     'serverSettings': {'version': '2.30.0-fixture', 'language': 'en-us'}, 'userDefaultLibraryId': 'books', 'ereaderDevices': []})
             if path == '/auth/refresh':
                 if self.headers.get('x-refresh-token') != 'refresh':
@@ -158,7 +159,7 @@ def make_server(port=18765, prefix='/abs'):
                         return self.respond(404, {})
                     title = items[index]['media']['metadata']['title']
                 session_id = f'session-{len(sessions) + 1}'
-                result = {'id': session_id, 'libraryItemId': item_id, 'episodeId': episode_id, 'currentTime': 6, 'duration': 20, 'playMethod': 0,
+                result = {'id': session_id, 'libraryItemId': item_id, 'episodeId': episode_id, 'currentTime': progress.get((item_id, episode_id), {}).get('currentTime', 6), 'duration': 20, 'playMethod': 0,
                     'displayTitle': title, 'displayAuthor': 'QA Studio', 'audioTracks': [
                         {'contentUrl': '/audio/0', 'startOffset': 0, 'duration': 8, 'mimeType': 'audio/wav'},
                         {'contentUrl': '/audio/1', 'startOffset': 8, 'duration': 12, 'mimeType': 'audio/wav'}], 'chapters': chapters}
@@ -166,6 +167,10 @@ def make_server(port=18765, prefix='/abs'):
                 return self.respond(200, result)
             report = re.fullmatch(r'/api/session/([^/]+)/(sync|close)', path or '')
             if report and report.group(1) in sessions:
+                session = sessions[report.group(1)]
+                key = (session['libraryItemId'], session['episodeId'])
+                progress[key] = {'libraryItemId': key[0], 'episodeId': key[1], **data}
+                user['mediaProgress'] = list(progress.values())
                 reports.append({'path': path, **data})
                 return self.respond(200, {})
             self.respond(404, {})
@@ -177,8 +182,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=18765)
     parser.add_argument('--prefix', default='/abs')
+    parser.add_argument('--scenario', choices=['baseline', 'library-schema-change'], default='baseline')
+    parser.add_argument('--auth-mode', choices=['legacy', 'modern'], default='modern')
     args = parser.parse_args()
-    server, prefix = make_server(args.port, args.prefix)
+    server, prefix = make_server(args.port, args.prefix, args.scenario, args.auth_mode)
     print(f'http://127.0.0.1:{server.server_port}{prefix}', flush=True)
     try:
         server.serve_forever()

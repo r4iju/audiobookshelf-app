@@ -1,0 +1,7 @@
+{
+  "name": "abs-local-realtime-fixture",
+  "private": true,
+  "type": "module",
+  "scripts": {"test": "node --test *.test.mjs"},
+  "dependencies": {"socket.io": "4.7.4"}
+}
