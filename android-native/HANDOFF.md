@@ -174,6 +174,18 @@ Evidence: unit tests pass. In one run on `emulator-5584`: ListeningRecovery 1, L
 
 Evidence: core and app unit tests pass. On `emulator-5584`, MigrationSelectionJourney 2 of 2 and MigrationJourney 5 of 5 in one run.
 
+## Code review of b152be26..77cc455b
+
+Findings fixed in the next commit:
+- **Malformed sessions.** A legacy session with impossible values (negative or non-finite listening, no duration) made attachment throw, so that account's titles retried for ever without being saved as attached. The import now leaves such sessions out and reports them as `INVALID_RECORD`. RED first: `LegacyImportTest.listeningWithImpossibleValuesIsReportedAndLeftOutSoTheRestAttaches` (the session was imported).
+- **Location filter.** Only a positive page number becomes a PDF position. Other locations, such as an EPUB CFI, stay in the import instead of reaching the PDF reader's primary entry.
+- **Cancellation.** A cancelled import or attachment is no longer reported as a failure.
+- **Duplicated track selection.** `Attachment.Match` now carries the server tracks it matched, and `Downloads.adopt` uses those instead of choosing them again.
+- **Covers.** An adopted title's cover is fetched while it attaches, so finished titles show their cover offline.
+- **Error wording.** Refusal messages come from `MigrationError` alone.
+
+Not changed (judgement calls): long parameter lists on `ListeningJournal.adopt` and `LegacyImport.propose`, and a shared copy-loop helper.
+
 ## Migration from the legacy Android app (#52, #53)
 
 The preview keeps its own identity (`com.audiobookshelf.app.nativepreview`, debug key), as the Apple preview does. It cannot read the legacy app's private storage, so migration is a faithful export and import, not an in-place upgrade.
@@ -208,7 +220,26 @@ The import works in these stages:
   - Audio positions and PDF pages become this device's positions unless the server's are newer.
 - **Preserved, not yet used.** EPUB and other locations, and reader settings, stay in `outcome.json` until those readers exist (#65).
 
-**Rollback.** The legacy app and its data are never modified, and the export file is only read. Uninstalling the preview, or clearing its storage, removes everything the import added. The legacy app keeps working throughout.
+**Rollback.**
+- The legacy app and its data are never modified, and the export file is only read.
+- Uninstalling the preview, or clearing its storage, removes everything the import added on this device. The legacy app keeps working throughout.
+- **Not undone by uninstalling:**
+  - Unsent legacy listening that the preview already sent to the server stays there, under the legacy session IDs. The legacy app would have sent the same sessions itself.
+  - PDF pages and positions the preview later publishes also stay on the server.
+
+**Users of the public upstream app** cannot run this export, since it exists only in the locally built fork. For them:
+- sign in to the preview with the same server and account;
+- server-held progress, finished state, collections and playlists follow the account;
+- downloads are fetched again;
+- anything the upstream app never sent to the server stays in that app. Open it online once first so it sends what it holds.
+
+**Exported but not applied:**
+- `playerSettings` and `lang` (the preview is English only, see Localization).
+- `lastLibraryId`: the preview picks the library per account at sign-in.
+- EPUB and other non-page locations.
+- Reader settings.
+
+They are kept in `files/migration/outcome.json`. Legacy pages of supplementary PDFs are not in the legacy data model, so there is nothing to carry over for them.
 
 **In-place upgrade, not done.** Replacing the legacy app in place would need:
 - the same application ID `com.audiobookshelf.app`;
@@ -228,8 +259,41 @@ None of these are available or attempted here. The owner's device and key were n
   - the same export again says it was already imported.
 - **Gaps:**
   - The legacy export UI (plugin and Vue) is compiled but not driven on a device. Only the exporter itself ran.
-  - An adopted finished title has no cover until it is downloaded again.
   - Migration of the owner's real legacy installation is a physical gate.
+
+## Internal readiness (#54)
+
+**Identity:**
+- Application ID `com.audiobookshelf.app.nativepreview`, label "Audiobookshelf Preview".
+- The existing app's mark on a teal background, so it is told apart from the legacy `com.audiobookshelf.app` on the launcher.
+- `versionName` `0.15.0-native-preview`, `versionCode` 200.
+- It installs beside the legacy app and never reads or changes its data.
+
+**Packaging:** `android-native/scripts/package.sh` runs the unit tests and builds `app-release.apk`. It verifies the signature with `apksigner` and prints the package identity and SHA-256.
+- Signing uses the local debug key unless `ABS_ANDROID_KEYSTORE` (with `ABS_ANDROID_KEYSTORE_PASSWORD`, `ABS_ANDROID_KEY_ALIAS` and `ABS_ANDROID_KEY_PASSWORD`) names an owner keystore. The debug-key build is for internal installs only.
+- Nothing is uploaded. Install with `adb -s <device> install -r app/build/outputs/apk/release/app-release.apk`.
+
+**Backup and rollback:**
+- `allowBackup` is off, so Android cloud backup does not copy server credentials or listening state.
+- Credentials sit in `noBackupFilesDir`.
+- The backup of record stays the legacy app and the server. The preview's own state is listening and reading not yet sent, which it publishes when online.
+- Rollback is uninstalling the preview. The legacy app is untouched throughout.
+- Before uninstalling, open the preview online once so unsent listening reaches the server. Diagnostics shows anything still waiting.
+
+**Accessibility:** `AccessibilityJourney` runs the Accessibility Test Framework's checks on these screens and passes:
+- sign-in, library, item, player, downloads, search and settings.
+
+The checks cover speakable labels, touch target size and contrast. Removing the Settings button's label made it fail with `SpeakableTextPresentCheck`, so the check is live. The journey passed when first written, so it is a guard, not test-first evidence for a fix.
+
+Not covered:
+- TalkBack navigation by a person;
+- large font scales;
+- the reader and import screens.
+
+**Localization: not met.**
+- The legacy app ships 38 locales (`strings/*.json`).
+- The native preview is English only, and its strings are written inline in Compose.
+- Moving them to resources and carrying over the legacy translations is required before replacement.
 
 ## Known limits
 
@@ -240,6 +304,7 @@ None of these are available or attempted here. The owner's device and key were n
   - Bluetooth, lock screen and Android Auto controls, and a physical car or Desktop Head Unit.
   - Real metered networks.
   - Export and import of the owner's real legacy installation.
+  - TalkBack use by a person, and installing the packaged APK on the owner's phone.
 
 ## Running the checks
 

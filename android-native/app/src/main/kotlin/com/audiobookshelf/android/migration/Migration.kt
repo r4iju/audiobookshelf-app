@@ -87,7 +87,7 @@ class Migration(
 
     val interrupted get() = import.interrupted
 
-    /** Reads a chosen export, replacing any choice still being read. A choice made while importing waits for the import. */
+    /** Reads a chosen export, replacing any choice still being read. A choice made while an import runs is ignored. */
     fun open(uri: Uri) {
         if (importing) return
         release()
@@ -98,13 +98,7 @@ class Migration(
             val result = try {
                 withContext(Dispatchers.IO) { read(uri, mine) }
             } catch (refused: MigrationError) {
-                Step.Refused(when (refused) {
-                    is MigrationError.Unreadable, is MigrationError.Incomplete -> "This file is not a complete export from the Audiobookshelf app. Export again from the previous app and choose the new file."
-                    is MigrationError.Unsupported -> "This export was made by a newer version of the previous app. Update this app, then try again."
-                    is MigrationError.FromAnotherPlatform -> "This export was made on another kind of device. Choose an export from the Android app."
-                    is MigrationError.AnotherArchiveImported -> "Another export was already imported here. Clear this app's data first to import a different one."
-                    is MigrationError.InsufficientSpace -> refused.message.orEmpty()
-                })
+                Step.Refused(refused.message.orEmpty())
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (failure: Exception) {
@@ -161,6 +155,8 @@ class Migration(
                 }
                 state.value = Step.Done(outcome, outcome.accounts.filter { accounts.clientFor(it.identity) == null })
                 attachSignedIn()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (failure: Exception) {
                 report(Diagnostics.Area.STORAGE, "The import stopped", failure)
                 state.value = Step.Refused(when (failure) {
@@ -199,6 +195,8 @@ class Migration(
     private suspend fun attach(client: ApiClient) = lock.withLock {
         try {
             withContext(Dispatchers.IO) { attachNow(client) }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (failure: Exception) {
             accounts.handle(failure)
             report(Diagnostics.Area.STORAGE, "Imported titles for ${client.account.server} are not attached yet; they are tried again", failure)
@@ -224,7 +222,8 @@ class Migration(
                 return@map title.copy(attached = true)
             }
             val episode = title.episodeId?.let { id -> item.media.episodes.firstOrNull { it.id == id } }
-            downloads.adopt(account, item, episode, match.audio.map { it?.let(import::staged) }, match.ebook?.let(import::staged))
+            val cover = runCatching { client.bytes("api/items/${item.id}/cover") }.getOrNull()
+            downloads.adopt(account, item, episode, match.tracks, match.audio.map { it?.let(import::staged) }, match.ebook?.let(import::staged), cover)
             title.copy(attached = true)
         }
         val sessions = outcome.sessions.map { imported ->
@@ -244,8 +243,8 @@ class Migration(
             if (imported.account != account || imported.attached || itemId == null) return@map imported
             val updated = entry.lastUpdate.toDouble()
             if (entry.currentTime > 0) journal().adoptRemotePosition(account, itemId, entry.episodeId, entry.currentTime, updated)
-            // Other formats' locations stay in the import until their readers exist.
-            if (entry.episodeId == null && entry.ebookLocation != null) {
+            // Only a page number is a PDF position; other formats' locations stay in the import until their readers exist.
+            if (entry.episodeId == null && entry.ebookLocation?.toIntOrNull()?.let { it > 0 } == true) {
                 reading.adoptRemote(account, itemId, PRIMARY_EBOOK, MediaProgress(libraryItemId = itemId, ebookLocation = entry.ebookLocation, lastUpdate = updated))
             }
             imported.copy(attached = true)

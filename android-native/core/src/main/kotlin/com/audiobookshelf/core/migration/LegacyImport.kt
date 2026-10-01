@@ -10,7 +10,7 @@ import java.io.File
 import java.security.MessageDigest
 
 @Serializable data class Issue(val kind: Kind, val title: String? = null, val detail: String) {
-    enum class Kind { FILE_MISSING, FILE_CORRUPT, ACCOUNT_MISMATCH, UNSCOPED, UNREADABLE_CONNECTION, ITEM_CHANGED }
+    enum class Kind { FILE_MISSING, FILE_CORRUPT, ACCOUNT_MISMATCH, UNSCOPED, UNREADABLE_CONNECTION, ITEM_CHANGED, INVALID_RECORD }
 }
 
 @Serializable data class ImportedAccount(val identity: AccountIdentity, val name: String, val username: String)
@@ -80,7 +80,7 @@ class LegacyImport(private val root: File) {
 
     private class Resolution(val account: AccountIdentity?, val issue: Issue.Kind?)
 
-    private class Candidate(val title: ImportedTitle, val missing: Boolean)
+    private class Candidate(val title: ImportedTitle)
 
     private val stateFile get() = File(root, "state.json")
     private val outcomeFile get() = File(root, "outcome.json")
@@ -142,9 +142,16 @@ class LegacyImport(private val root: File) {
         val adopted = candidates - corrupt.toSet()
         val snapshot = archive.manifest.snapshot
         val resolver = resolver(snapshot)
+        val invalid = mutableListOf<Issue>()
         val sessions = snapshot.playbackSessions.mapNotNull { session ->
             val resolved = resolver(session.serverConnectionConfigId, session.serverAddress, session.userId)
-            resolved.account?.takeIf { session.libraryItemId != null }?.let { ImportedSession(it, session) }
+            val account = resolved.account?.takeIf { session.libraryItemId != null } ?: return@mapNotNull null
+            val values = listOf(session.duration, session.startTime, session.currentTime, session.timeListening)
+            if (values.any { !it.isFinite() || it < 0 } || session.duration <= 0) {
+                invalid += Issue(Issue.Kind.INVALID_RECORD, session.displayTitle, "Its listening record had impossible values, so it was not sent to the server.")
+                return@mapNotNull null
+            }
+            ImportedSession(account, session)
         }
         val progress = snapshot.localMediaProgress.mapNotNull { entry ->
             val resolved = resolver(entry.serverConnectionConfigId, entry.serverAddress, entry.serverUserId)
@@ -160,7 +167,7 @@ class LegacyImport(private val root: File) {
             preferences = snapshot.preferences,
             webStorage = snapshot.webStorage,
             deviceSettings = snapshot.device.deviceSettings,
-            issues = issues + corrupt.map { Issue(Issue.Kind.FILE_CORRUPT, it.title.title, "A file did not match the export, so this title is not adopted. Download it again.") },
+            issues = issues + invalid + corrupt.map { Issue(Issue.Kind.FILE_CORRUPT, it.title.title, "A file did not match the export, so this title is not adopted. Download it again.") },
         )
         save(outcome)
         stateFile.delete()
@@ -230,7 +237,7 @@ class LegacyImport(private val root: File) {
                         return
                     }
                     if (files.size < wanted.size) issues += Issue(Issue.Kind.FILE_MISSING, title, "Some files were missing from the export; they are downloaded again.")
-                    candidates += Candidate(ImportedTitle(account.account, itemId, episodeId, title, author, mediaType, files, partial || files.size < wanted.size), missing = files.size < wanted.size)
+                    candidates += Candidate(ImportedTitle(account.account, itemId, episodeId, title, author, mediaType, files, partial || files.size < wanted.size))
                 }
             }
         }

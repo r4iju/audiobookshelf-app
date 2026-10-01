@@ -225,4 +225,15 @@ class LegacyImportTest {
         assertTrue(match.audio.isEmpty())
         assertEquals("stories.pdf", match.ebook?.name)
     }
+
+    @Test
+    fun listeningWithImpossibleValuesIsReportedAndLeftOutSoTheRestAttaches() {
+        val archive = altered("negative.absmigration") { name, bytes ->
+            if (name == "archive.json") String(bytes).replace("\"timeListening\":7", "\"timeListening\":-7").toByteArray() else bytes
+        }
+        val outcome = importer().run(LegacyArchive.open(archive))
+        assertTrue(outcome.sessions.isEmpty())
+        assertTrue(outcome.issues.any { it.kind == Issue.Kind.INVALID_RECORD && it.title == "Stories for Tomorrow 01" })
+        assertEquals(3, outcome.titles.size)
+    }
 }

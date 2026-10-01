@@ -142,17 +142,18 @@ class Downloads(
 
     /**
      * Takes files another app downloaded as this item's download, in app storage. [audio] holds a file
-     * per server track (null where one is missing) and [ebook] the ebook; missing parts are downloaded.
-     * False when this item already has a download here, which is kept as it is.
+     * for each of [tracks] (null where one is missing) and [ebook] the ebook; missing parts are downloaded.
+     * [cover] is saved when given. False when this item already has a download here, which is kept as it is.
      */
-    fun adopt(account: AccountIdentity, item: LibraryItem, episode: Episode?, audio: List<File?>, ebook: File?): Boolean {
+    fun adopt(account: AccountIdentity, item: LibraryItem, episode: Episode?, tracks: List<com.audiobookshelf.core.AudioTrack>, audio: List<File?>, ebook: File?, cover: ByteArray?): Boolean {
+        require(audio.size == tracks.size)
         if (find(account, item.id, episode?.id) != null) return false
-        val tracks = if (episode != null) listOfNotNull(episode.audioTrack?.let { it.copy(duration = it.duration.takeIf { d -> d > 0 } ?: episode.playableDuration) })
-            else item.media.tracks.sortedBy { it.index ?: 0 }
+        val playable = if (episode != null) tracks.map { it.copy(duration = it.duration.takeIf { d -> d > 0 } ?: episode.playableDuration) } else tracks
         val ebookFile = item.media.ebookFile.takeIf { episode == null && ebook != null }
-        val fresh = record(account, item, episode, tracks.takeIf { audio.isNotEmpty() }.orEmpty(), ebookFile)
+        val fresh = record(account, item, episode, playable, ebookFile)
         val directory = File(fresh.directory).apply { mkdirs() }
-        val sources = audio.takeIf { it.isNotEmpty() }.orEmpty() + listOfNotNull(ebook.takeIf { ebookFile != null })
+        cover?.let { runCatching { File(directory, COVER).writeBytes(it) } }
+        val sources = audio + listOfNotNull(ebook.takeIf { ebookFile != null })
         val parts = fresh.parts.mapIndexed { index, part ->
             val source = sources.getOrNull(index) ?: return@mapIndexed part
             val staging = File(directory, part.name + ".part")
