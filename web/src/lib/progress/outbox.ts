@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { randomId } from "@/lib/random-id";
 
 // Listening progress is reported as "local sessions": one record per listening session with cumulative totals and a
 // client-chosen id. Re-sending the same record is harmless, so anything not confirmed is simply sent again later,
@@ -87,9 +88,20 @@ export type FlushResult =
   | { kind: "failed"; error: unknown };
 
 const queueSchema = z.array(listeningReportSchema);
+const holdsSchema = z.array(
+  z.object({
+    id: z.string(),
+    libraryItemId: z.string(),
+    episodeId: z.string().nullable(),
+    until: z.number(),
+  }),
+);
+/** Long enough for any discard to finish; a tab closed mid-discard must not hold listening back for good. */
+const HOLD_MS = 5 * 60_000;
 
 export function createOutbox(connectionId: string, storage: OutboxStorage) {
   const key = `abs-web:v1:outbox:${connectionId}`;
+  const holdsKey = `abs-web:v1:outbox-holds:${connectionId}`;
   const listeners = new Set<() => void>();
 
   const load = (): ListeningReport[] => {
@@ -104,6 +116,14 @@ export function createOutbox(connectionId: string, storage: OutboxStorage) {
     storage.write(key, JSON.stringify(queue));
     for (const listener of listeners) listener();
   };
+  const loadHolds = () => {
+    try {
+      const parsed = holdsSchema.safeParse(JSON.parse(storage.read(holdsKey) ?? "[]"));
+      return parsed.success ? parsed.data.filter((hold) => hold.until > Date.now()) : [];
+    } catch {
+      return [];
+    }
+  };
 
   return {
     pending: load,
@@ -113,8 +133,29 @@ export function createOutbox(connectionId: string, storage: OutboxStorage) {
     forget(libraryItemId: string, episodeId: string | null) {
       save(load().filter((entry) => entry.libraryItemId !== libraryItemId || entry.episodeId !== episodeId));
     },
+    /**
+     * Keeps a book's or episode's listening queued, in every tab, until the returned release is called. Used while
+     * its progress is being deleted, so listening recorded meanwhile is not deleted with it.
+     */
+    hold(libraryItemId: string, episodeId: string | null) {
+      const id = randomId();
+      storage.write(
+        holdsKey,
+        JSON.stringify([...loadHolds(), { id, libraryItemId, episodeId, until: Date.now() + HOLD_MS }]),
+      );
+      return () => {
+        storage.write(holdsKey, JSON.stringify(loadHolds().filter((hold) => hold.id !== id)));
+        for (const listener of listeners) listener();
+      };
+    },
     async flush(send: (sessions: ListeningReport[]) => Promise<DeliveryResult[]>): Promise<FlushResult> {
-      const sending = load();
+      const holds = loadHolds();
+      const sending = load().filter(
+        (entry) =>
+          !holds.some(
+            (hold) => hold.libraryItemId === entry.libraryItemId && hold.episodeId === entry.episodeId,
+          ),
+      );
       if (sending.length === 0) return { kind: "idle" };
       let results: DeliveryResult[];
       try {

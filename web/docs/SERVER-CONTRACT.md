@@ -89,6 +89,9 @@ server allows the development server's origins. OpenID cannot work cross-origin;
 - `DELETE /api/me/progress/:progressId`
   - Discard progress. Sent only after the session is closed and any `local-all` already sent is answered. The
     server creates progress afresh from a report that lands after the delete, bringing the old position back.
+    Listening for the same book recorded during the discard is held and sent after the delete, so it is not deleted
+    with the old position. Opening a playback session (`/play`) does not change progress, so playing again during a
+    discard is safe.
 - `POST` and `PATCH` on `/api/me/item/:id/bookmark`, `DELETE /api/me/item/:id/bookmark/:time` (bookmarks come with `/api/me`)
 - `GET /api/me/listening-stats`, `GET /api/me/stats/year/:year`, `GET /api/stats/year/:year` (administrators)
 

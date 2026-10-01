@@ -31,6 +31,41 @@ function slowClient(connectionId: string) {
   return { client, finishClose };
 }
 
+/** A client whose playback opens only when the test says so, and which logs the sessions it is asked to close. */
+function slowOpenClient(connectionId: string) {
+  const closed: string[] = [];
+  let open = (_session: { id: string; currentTime: number }) => {};
+  const opening = new Promise<{ id: string; currentTime: number }>((resolve) => {
+    open = resolve;
+  });
+  const client = {
+    connection: { id: connectionId, serverUrl: "https://abs.example", username: connectionId },
+    url: (path: string) => `https://abs.example${path}`,
+    send: vi.fn(async (_method: string, path: string) => {
+      const { id, currentTime } = await opening;
+      return {
+        id,
+        libraryItemId: path.split("/")[3],
+        episodeId: null,
+        mediaType: "book",
+        displayTitle: null,
+        displayAuthor: null,
+        duration: 60,
+        currentTime,
+        playMethod: 0,
+        chapters: [],
+        audioTracks: [
+          { index: 1, startOffset: 0, duration: 60, contentUrl: "/x.mp3", mimeType: "audio/mpeg" },
+        ],
+      };
+    }),
+    command: vi.fn(async (_method: string, path: string) => {
+      closed.push(path);
+    }),
+  } as unknown as AbsClient;
+  return { client, open, closed };
+}
+
 const media = (itemId: string): PlayerMedia => ({
   itemId,
   episodeId: null,
@@ -74,6 +109,7 @@ const report = (connectionSession: string, itemId: string) =>
 
 beforeEach(() => {
   vi.stubGlobal("localStorage", memoryStorage());
+  vi.stubGlobal("document", { createElement: () => ({ canPlayType: () => "probably" }) });
   usePlayerStore.setState({ player: { phase: "idle" }, client: null, connectionId: null, listening: null });
 });
 
@@ -160,5 +196,53 @@ describe("starting over after a discard", () => {
     expect(outboxFor("conn-a").pending()).toEqual([]);
     const player = usePlayerStore.getState().player;
     expect(player.phase === "active" ? player.currentTime : null).toBe(0);
+  });
+
+  it("keeps the reset when the book was still being prepared and its session opens afterwards", async () => {
+    const a = slowOpenClient("conn-a");
+    usePlayerStore.getState().attach(a.client);
+
+    const preparing = usePlayerStore.getState().play({ media: media("book-x") });
+    await usePlayerStore.getState().startOver({ connectionId: "conn-a", itemId: "book-x", episodeId: null });
+    a.open({ id: "s-old", currentTime: 42 });
+    await preparing;
+
+    const player = usePlayerStore.getState().player;
+    expect(
+      player.phase === "active" && { time: player.currentTime, source: player.source, status: player.status },
+    ).toEqual({
+      time: 0,
+      source: null,
+      status: "paused",
+    });
+    expect(usePlayerStore.getState().listening).toBeNull();
+    expect(a.closed).toEqual(["/api/session/s-old/close"]);
+  });
+
+  it("does not start a book prepared before switching accounts away and back", async () => {
+    const a = slowOpenClient("conn-a");
+    usePlayerStore.getState().attach(a.client);
+    localStorage.setItem(
+      "abs-web:v1:player:conn-a",
+      JSON.stringify({ media: media("book-x"), currentTime: 5 }),
+    );
+
+    const preparing = usePlayerStore.getState().play({ media: media("book-x") });
+    usePlayerStore.getState().detach();
+    usePlayerStore.getState().attach(slowOpenClient("conn-b").client);
+    usePlayerStore.getState().detach();
+    usePlayerStore.getState().attach(slowOpenClient("conn-a").client);
+    a.open({ id: "s-old", currentTime: 42 });
+    await preparing;
+
+    const player = usePlayerStore.getState().player;
+    expect(
+      player.phase === "active" && { time: player.currentTime, source: player.source, status: player.status },
+    ).toEqual({
+      time: 5,
+      source: null,
+      status: "paused",
+    });
+    expect(a.closed).toEqual(["/api/session/s-old/close"]);
   });
 });

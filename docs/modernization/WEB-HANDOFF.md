@@ -26,7 +26,8 @@ shared modernization documents. Issues #55 to #65.
 | `eef093ba` | Discarding progress resets this device too (player position and unsent listening) |
 | `e109644f` | RSS feeds (open, view, close) and send ebook to an e-reader |
 | `57ae6ae4` | README, deployment and server-contract docs, this handoff, formatting fix for `e109644f`'s spec |
-| (this commit) | Discard ordering: the reset belongs to the account it came from, survives switches and new playback during the close, and waits for listening already on its way |
+| `eb6980e3` | Discard ordering: the reset belongs to the account it came from, survives switches and new playback during the close, and waits for listening already on its way |
+| (this commit) | Discard barrier: a late session open cannot undo the reset, and listening begun after the reset is held until the delete is done |
 
 ## Checks
 
@@ -101,14 +102,23 @@ server, or a physical device. The production container `audiobookshelf` (port 13
   Opening needs an item with audio. The legacy slug cleaning is applied before opening, and the address shown is
   exactly the one used.
 - **Discarding progress** happens in this order, for the account the discard came from only:
-  1. this device drops its unsent listening for that book or episode, and the player (if it holds that book for
-     that account) stops at the start and stops recording;
-  2. the old playback session is closed without a final report;
-  3. any listening delivery already on its way is answered;
-  4. only then is the server's progress deleted.
+  1. that account's listening for the book or episode is held back from delivery, in every tab (for at most five
+     minutes, so a tab closed mid-discard cannot hold it for good);
+  2. this device drops its unsent listening for it, and the player (if it holds that book for that account) goes
+     back to the start, paused. A session still being opened for it is let go when it arrives;
+  3. the old playback session is closed without a final report;
+  4. deliveries already on their way for that account are answered: this tab's always, other tabs' where the browser
+     offers Web Locks (secure origins). On a plain-HTTP origin another tab's delivery already sent is not waited for;
+  5. the server's progress is deleted;
+  6. the hold is released, and listening recorded since step 2 is delivered as new progress.
 
-  Other books' unsent listening and other accounts' state are untouched. A storage or server refusal fails the
-  discard, which says so where it was asked; the client never reports a reset the server refused.
+  Other books and other accounts stay playable and keep delivering throughout. A storage refusal in steps 1 or 2, or
+  a server refusal of the delete, fails the discard, which says so where it was asked. In every such case the
+  server's progress is unchanged. A refusal part-way through step 2 can leave this device partly reset (the unsent
+  listening dropped but the saved player place not yet written); discarding again once storage accepts writes
+  finishes it. If the delete succeeds but its answer is lost, the device is already reset and the discard says it
+  failed. The server's own `user_updated` event then shows the progress gone, and deleting again is harmless: 2.30.0
+  answers 200 for progress that no longer exists.
 
 ## Ports
 

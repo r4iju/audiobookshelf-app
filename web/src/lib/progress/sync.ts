@@ -1,4 +1,4 @@
-import { type AbsClient, AbsError } from "@/lib/abs/client";
+import { type AbsClient, AbsError, withLock } from "@/lib/abs/client";
 import { localSyncResultSchema } from "@/lib/abs/schemas";
 import { deviceInfo } from "@/lib/device";
 import { createOutbox, type Outbox } from "./outbox";
@@ -20,23 +20,20 @@ export function outboxFor(connectionId: string) {
 }
 
 let inFlight: Promise<unknown> | null = null;
+const deliveryLock = (connectionId: string) => `abs-web:deliver:${connectionId}`;
 
-/** Resolves once a delivery already on its way has been answered, however it ended. */
-export function deliveriesSettled(): Promise<void> {
-  return inFlight
-    ? inFlight.then(
-        () => undefined,
-        () => undefined,
-      )
-    : Promise.resolve();
+/** Resolves once deliveries already on their way for this account, from any tab, have been answered. */
+export async function deliveriesSettled(connectionId: string) {
+  await inFlight?.catch(() => {});
+  await withLock(deliveryLock(connectionId), async () => {});
 }
 
 /** Sends queued listening reports; an unauthorized answer is surfaced so the shell can ask for a new sign-in. */
 export async function flushReports(client: AbsClient, onUnauthorized: () => void) {
   if (inFlight) return inFlight;
   const outbox = outboxFor(client.connection.id);
-  inFlight = outbox
-    .flush(async (sessions) => {
+  inFlight = withLock(deliveryLock(client.connection.id), () =>
+    outbox.flush(async (sessions) => {
       const response = await client.send(
         "POST",
         "/api/session/local-all",
@@ -44,7 +41,8 @@ export async function flushReports(client: AbsClient, onUnauthorized: () => void
         localSyncResultSchema,
       );
       return response.results;
-    })
+    }),
+  )
     .then((result) => {
       if (
         result.kind === "failed" &&

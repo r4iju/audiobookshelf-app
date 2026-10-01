@@ -184,7 +184,8 @@ export function createAbsClient({
   };
 }
 
-async function withLock<T>(name: string, task: () => Promise<T>): Promise<T> {
+/** Runs the task while holding a lock shared by this origin's tabs, where the browser offers one. */
+export async function withLock<T>(name: string, task: () => Promise<T>): Promise<T> {
   if (typeof navigator !== "undefined" && navigator.locks) return navigator.locks.request(name, task);
   return task();
 }

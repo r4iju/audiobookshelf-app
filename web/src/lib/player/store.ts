@@ -111,6 +111,9 @@ function round(value: number) {
 }
 
 export const usePlayerStore = create<PlayerStore>()((set, get) => {
+  /** Changes whenever what the player should hold is decided anew, so a session opened for an older decision is let go. */
+  let generation = 0;
+
   const persist = () => {
     const { player, connectionId } = get();
     if (!connectionId) return;
@@ -167,6 +170,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
   const start = async (media: PlayerMedia, startTime: number | undefined, recovery = false) => {
     const { client, player: previous } = get();
     if (!client) return;
+    const preparing = ++generation;
     if (previous.phase === "active" && previous.source) {
       report(true);
       void closePlayback(client, previous.source.serverSessionId);
@@ -187,11 +191,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
     try {
       const opened = await openPlayback(client, media.itemId, media.episodeId);
       const current = get().player;
-      if (
-        current.phase !== "active" ||
-        current.media.itemId !== media.itemId ||
-        current.media.episodeId !== media.episodeId
-      ) {
+      if (preparing !== generation || current.phase !== "active") {
         void closePlayback(client, opened.session.id);
         return;
       }
@@ -232,6 +232,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
       });
       persist();
     } catch (error) {
+      if (preparing !== generation) return;
       update(() => ({
         status: "paused",
         error: "start-failed",
@@ -252,6 +253,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
         set({ client });
         return;
       }
+      generation++;
       const snapshot = readStored(snapshotKey(client.connection.id), snapshotSchema);
       set({
         client,
@@ -276,6 +278,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
       report(true);
       if (player.phase === "active" && player.source && client)
         void closePlayback(client, player.source.serverSessionId);
+      generation++;
       set({ player: { phase: "idle" }, client: null, connectionId: null, listening: null });
     },
     play: async ({ media, startTime }) => {
@@ -332,6 +335,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
     stop: async () => {
       const { player, client } = get();
       report(true);
+      generation++;
       if (player.phase === "active" && player.source && client)
         await closePlayback(client, player.source.serverSessionId);
       set({ player: { phase: "idle" }, listening: null, sleep: { kind: "off" } });
@@ -350,6 +354,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
       }
       if (player.phase !== "active" || !isTarget(player.media)) return;
       // This device changes before the server is told, so a slow close cannot overwrite whatever happens meanwhile.
+      generation++;
       set({
         player: { ...player, source: null, status: "paused", currentTime: 0, seekTo: { time: 0 } },
         listening: null,
