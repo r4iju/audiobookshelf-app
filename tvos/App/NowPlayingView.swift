@@ -140,25 +140,10 @@ struct NowPlayingView: View {
         }
     }
 
-    /// Reopens the media that failed from its saved position, unless another title started meanwhile.
     private func restartMedia() async {
-        guard let itemID = player.itemID else { return }
-        let episodeID = player.episodeID
         restarting = true; restartError = nil
         defer { restarting = false }
-        do {
-            let item = try await catalog.api.item(id: itemID)
-            guard player.itemID == itemID, player.episodeID == episodeID else { return }
-            let episode = episodeID.flatMap { id in item.media.episodes?.first { $0.id == id } }
-            if episodeID != nil, episode == nil {
-                restartError = "This episode is no longer on the server."
-                return
-            }
-            await player.start(item: item, episode: episode)
-        } catch {
-            catalog.noteAuthentication(error)
-            restartError = "Playback could not be restarted: " + CatalogStore.recovery(for: error)
-        }
+        restartError = await MediaRestart.run(player, account: { catalog.accountID }, fetch: catalog.api.item(id:))
     }
 
     private var chapters: some View {

@@ -30,6 +30,8 @@ struct HomeShelf: Identifiable {
     @Published private(set) var progressRevision = 0
     private var generation = UUID()
     private var account = UUID()
+    /// Changes on sign-out, so work started for one account can tell it no longer applies.
+    var accountID: UUID { account }
     private var covers: [String: UIImage] = [:]
     private var missingCovers: Set<String> = []
 

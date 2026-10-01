@@ -7,7 +7,7 @@ Last verified October 2, 2026, integrated with shared commit `44011bc2`, on the 
 | Check | Command | Result |
 | --- | --- | --- |
 | TV core contracts | `swift test --package-path tvos/Core` | 21 passed |
-| TV app unit tests (`TVAppTests`) | run by `./tvos/scripts/verify-ui.sh` | 6 passed |
+| TV app unit tests (`TVAppTests`) | run by `./tvos/scripts/verify-ui.sh` | 10 passed |
 | Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 16 journeys passed, 0 failed (413 s) |
 | Signed device build and install | `./tvos/scripts/deploy.sh --no-launch a5ef39a5001ef59dec9c2fa15838447215252137` | Release build signed by team `C7X9BCC7LP`, `codesign --verify --deep --strict` passes, installed on Living Room TV (tvOS 18.6) |
 
@@ -32,7 +32,7 @@ The journeys run the Debug app with no test-only code paths beyond the launch-ti
 | #29 | `PodcastJourney.testPodcastResultTileShowsItsEpisodeProgress` | A finished episode's search tile reports Finished, from that episode's progress rather than the podcast's |
 | #26, #28 | `CatalogJourney.testProgressFilterDropsATitleMarkedFinishedOnReturn` | With the Not started filter, marking a title finished and pressing Back refetches the filter so the title is gone and the filter is kept |
 
-`TVAppTests` covers what the fixture cannot produce: formatting of absurd server times (for example `1e300` seconds) saturates instead of trapping, search keeps a podcast and each of its matching episodes as separate navigable results, and only an HTTP 404 marks a cover as absent (5xx, 429, timeouts and cancellations retry). Each of those tests and the new journeys failed first on October 1–2, 2026. The media-failure journey failed because Now Playing offered Save progress again; it then exposed two more TV defects that are now fixed: the error row was unreachable with the remote, and restarting dropped back to Home while the new session prepared. Other first failures: the formatting test crashed with `Double value cannot be converted to Int`, search returned one result instead of three, the cover policy cached 500/503/429, the filter kept the finished title, and the tile reported no progress.
+`TVAppTests` covers what the fixture cannot produce: formatting of absurd server times (for example `1e300` seconds) saturates instead of trapping, search keeps a podcast and each of its matching episodes as separate navigable results, only an HTTP 404 marks a cover as absent (5xx, 429, timeouts and cancellations retry), and Restart playback holds back while its item fetch is pending if a newer session for the same media, a pause, a recovering seek or a sign-out happens meanwhile, without showing the stale attempt's error. `MediaRestartTests` failed first against the earlier ID-only check: it restarted the newer session, overrode the pause and the recovery, ignored the account switch and published the old failure. Each of those tests and the new journeys failed first on October 1–2, 2026. The media-failure journey failed because Now Playing offered Save progress again; it then exposed two more TV defects that are now fixed: the error row was unreachable with the remote, and restarting dropped back to Home while the new session prepared. Other first failures: the formatting test crashed with `Double value cannot be converted to Int`, search returned one result instead of three, the cover policy cached 500/503/429, the filter kept the finished title, and the tile reported no progress.
 
 Screenshots captured by those journeys:
 
