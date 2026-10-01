@@ -18,9 +18,10 @@ struct BookDetails: View {
     let episode: Episode?
     @State private var expanded: LibraryItem?
     private enum DetailFailure {
-        case load(String), discard(String)
+        /// `unresolvedWrites`: the discard waits for the owner to confirm a server restart.
+        case load(String), discard(String), unresolvedWrites(String)
         var message: String {
-            switch self { case .load(let message), .discard(let message): return message }
+            switch self { case .load(let message), .discard(let message), .unresolvedWrites(let message): return message }
         }
     }
     @State private var error: DetailFailure?
@@ -31,7 +32,7 @@ struct BookDetails: View {
     @AppStorage("previewEpisodeDescending") private var episodeDescending = true
     @State private var episodeFilter = "all"
     private enum ProgressConfirmation: String, Identifiable {
-        case finish, discard
+        case finish, discard, serverRestarted
         var id: String { rawValue }
     }
     @State private var progressConfirmation: ProgressConfirmation?
@@ -134,6 +135,7 @@ struct BookDetails: View {
                         switch error {
                         case .load: load(monitorDownloads: true)
                         case .discard: discardProgress()
+                        case .unresolvedWrites: progressConfirmation = .serverRestarted
                         }
                     }
                 }
@@ -157,6 +159,8 @@ struct BookDetails: View {
                     return Alert(title: Text(l10n("Mark book finished?")), message: Text(l10n("Your saved progress will change when this book is marked finished.")), primaryButton: .default(Text(l10n("Mark finished"))) { applyFinished(true) }, secondaryButton: .cancel(Text(l10n("Cancel"))))
                 case .discard:
                     return Alert(title: Text(l10n("Confirm")), message: Text(l10n("Are you sure you want to reset your progress?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
+                case .serverRestarted:
+                    return Alert(title: Text(l10n("Has the server restarted?")), message: Text(l10n("Confirm only if the Audiobookshelf server was restarted after the save that got no answer. Otherwise that save may still bring the progress back.")), primaryButton: .destructive(Text(l10n("Server restarted")), action: confirmRestartAndDiscard), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 }
             }
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
@@ -232,7 +236,19 @@ struct BookDetails: View {
                 progressDiscarded = true
                 mediaProgress = user.mediaProgress
                 catalog.discardProgress(user, itemID: book.id, episodeID: episode?.id)
+            } catch is ApplePlayback.UnresolvedProgressWrites {
+                if !Task.isCancelled { self.error = .unresolvedWrites(l10n("Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Restart the Audiobookshelf server, then try again.")) }
             } catch { if !Task.isCancelled { self.error = .discard(ConnectionStore.recovery(for: error)) } }
+        }
+    }
+
+    private func confirmRestartAndDiscard() {
+        guard !progressBusy else { return }
+        Task {
+            do {
+                try player.confirmServerRestarted(account: try await catalog.api.currentAccount())
+                discardProgress()
+            } catch { self.error = .discard(ConnectionStore.recovery(for: error)) }
         }
     }
 
@@ -336,7 +352,7 @@ struct BookDetails: View {
     }
 
     private func recordLoadFailure(_ message: String) {
-        if case .discard? = error { return }
+        switch error { case .discard?, .unresolvedWrites?: return; default: break }
         error = .load(message)
     }
 

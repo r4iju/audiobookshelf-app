@@ -32,10 +32,13 @@ struct ProgressResetIntent: Codable, Equatable {
     private var request: Transfer?
     private let resetsFile: URL
     private var resets: Result<[ProgressResetIntent], Error>
+    /// Every progress write this app sends, listening, reading and carried-over data alike.
+    let publications: PublicationLedger
 
     init(api: APIClient, resets: URL? = nil) {
         self.api = api
         resetsFile = resets ?? Self.file.deletingLastPathComponent().appendingPathComponent("progress-resets.json")
+        publications = PublicationLedger(file: resetsFile.deletingLastPathComponent().appendingPathComponent("publications.json"))
         do {
             self.resets = .success(FileManager.default.fileExists(atPath: resetsFile.path)
                 ? try JSONDecoder().decode([ProgressResetIntent].self, from: Data(contentsOf: resetsFile)) : [])
@@ -126,7 +129,10 @@ struct ProgressResetIntent: Codable, Equatable {
         let transfer = Task { @MainActor in
             while let next = journal.pending(account: account).first {
                 try Task.checkCancellation()
-                try await api.syncListening(next)
+                try await publications.deliver(account: account, itemID: next.media.libraryItemID, episodeID: next.media.episodeID) {
+                    try await api.syncListening(next, issuing: $0)
+                }
+                // Acknowledges only the revision sent, never later listening.
                 try journal.acknowledge(next)
             }
             let user = try await api.me()

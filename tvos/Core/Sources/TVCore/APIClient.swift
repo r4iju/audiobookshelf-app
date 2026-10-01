@@ -69,9 +69,10 @@ import Foundation
 
     public func me() async throws -> CurrentUser { try await get("api/me") }
 
-    public func setFinished(itemID: String, episodeID: String?, finished: Bool) async throws {
+    /// `issuing` as in `syncListening`.
+    public func setFinished(itemID: String, episodeID: String?, finished: Bool, issuing: IssuingHook? = nil) async throws {
         let path = "api/me/progress/\(itemID)" + (episodeID.map { "/" + $0 } ?? "")
-        _ = try await request(path, method: "PATCH", body: ["isFinished": finished])
+        _ = try await request(path, method: "PATCH", body: ["isFinished": finished], issuing: issuing)
     }
 
     public func audioGroups(libraryID: String, kind: AudioGroupKind) async throws -> AudioGroupPage {
@@ -182,11 +183,12 @@ import Foundation
         return try AccountIdentity(server: identified.server, userID: user.id)
     }
 
-    public func syncListening(_ record: ListeningRecord) async throws {
+    /// `issuing` runs right before each transmission of the request, and nothing is sent when it throws.
+    public func syncListening(_ record: ListeningRecord, issuing: IssuingHook? = nil) async throws {
         guard try await currentAccount() == record.account else { throw APIError.signInRequired }
         let response = try await request("api/session/local-all", method: "POST", body: [
             "sessions": [record.payload], "deviceInfo": Self.deviceInfo(id: record.deviceID)
-        ])
+        ], issuing: issuing)
         struct Result: Decodable { let id: String; let success: Bool }
         struct Response: Decodable { let results: [Result] }
         let acknowledged = try JSONDecoder().decode(Response.self, from: response)
@@ -321,9 +323,10 @@ import Foundation
         _ = try await request("api/me/progress/\(rowID)", method: "DELETE", pinned: authorization)
     }
 
-    public func saveReading(account: AccountIdentity, itemID: String, location: String, progress: Double) async throws {
+    /// `issuing` as in `syncListening`.
+    public func saveReading(account: AccountIdentity, itemID: String, location: String, progress: Double, issuing: IssuingHook? = nil) async throws {
         guard try await currentAccount() == account else { throw APIError.signInRequired }
-        _ = try await request("api/me/progress/\(itemID)", method: "PATCH", body: ["ebookLocation": location, "ebookProgress": progress])
+        _ = try await request("api/me/progress/\(itemID)", method: "PATCH", body: ["ebookLocation": location, "ebookProgress": progress], issuing: issuing)
     }
 
     public func coverData(itemID: String) async throws -> Data {
@@ -361,7 +364,9 @@ import Foundation
         try JSONDecoder().decode(T.self, from: await request(path, query: query, pinned: pinned))
     }
 
-    private func request(_ path: String, method: String = "GET", query: [URLQueryItem] = [], body: [String: Any]? = nil, bodyData: Data? = nil, retry: Bool = true, pinned: UUID? = nil) async throws -> Data {
+    public typealias IssuingHook = @MainActor (URLRequest) throws -> Void
+
+    private func request(_ path: String, method: String = "GET", query: [URLQueryItem] = [], body: [String: Any]? = nil, bodyData: Data? = nil, retry: Bool = true, pinned: UUID? = nil, issuing: IssuingHook? = nil) async throws -> Data {
         if let pinned, pinned != authGeneration { throw CancellationError() }
         guard let credentials else { throw APIError.signInRequired }
         let generation = authGeneration
@@ -372,6 +377,7 @@ import Foundation
         if let body { request.httpBody = try JSONSerialization.data(withJSONObject: body) }
         else { request.httpBody = bodyData }
         if request.httpBody != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
+        try issuing?(request)
         do {
             let data = try await send(request)
             guard authGeneration == generation else { throw CancellationError() }
@@ -382,7 +388,7 @@ import Foundation
             guard retry, credentials.refreshToken != nil else { throw APIError.signInRequired }
             // Concurrent cover and library requests share one refresh; a completed refresh also satisfies an older 401.
             if self.credentials?.accessToken == credentials.accessToken { try await refresh() }
-            return try await self.request(path, method: method, query: query, body: body, bodyData: bodyData, retry: false, pinned: pinned)
+            return try await self.request(path, method: method, query: query, body: body, bodyData: bodyData, retry: false, pinned: pinned, issuing: issuing)
         }
     }
 

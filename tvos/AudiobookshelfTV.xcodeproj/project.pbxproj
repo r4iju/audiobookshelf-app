@@ -22,6 +22,7 @@
 		3B95AC7609006D67C4F509AC /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FE311F10522D8719513EB5 /* NowPlayingView.swift */; };
 		409D41253AE8E8455CD512EE /* RelatedAuthorSeries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FFE7452AE233275CAC0A16 /* RelatedAuthorSeries.swift */; };
 		455B1DED70536CD8CAE6CA62 /* ListeningSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77211B9092343716C550B622 /* ListeningSync.swift */; };
+		9596847B31FB2BD3C1093327 /* PublicationLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FB18054DDB4D825A08D267 /* PublicationLedger.swift */; };
 		470B841E12FA752EAB3C4D81 /* ItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C7FA52BC8C86AB78FD34E /* ItemDetailView.swift */; };
 		4755673A3393723E50F062C9 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DFEB1C064A24D44B3F15CE /* APIClient.swift */; };
 		4F1C481495CEBE8D7A3EB5C2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11495E1C66F7E695A1F3872 /* RootView.swift */; };
@@ -115,6 +116,7 @@
 		708A33C0CF3EA4C21FA352A1 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/NativeStrings.strings"; sourceTree = "<group>"; };
 		715D7E78790E973158A68378 /* ServerEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerEvents.swift; sourceTree = "<group>"; };
 		77211B9092343716C550B622 /* ListeningSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningSync.swift; sourceTree = "<group>"; };
+		F9FB18054DDB4D825A08D267 /* PublicationLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicationLedger.swift; sourceTree = "<group>"; };
 		7B9472E7E35E51A76197DDA4 /* AudioGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioGroups.swift; sourceTree = "<group>"; };
 		7CADF70A698F318EFF42CF0B /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		7E2E0854D7852B77BD273E15 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/NativeStrings.strings; sourceTree = "<group>"; };
@@ -345,6 +347,7 @@
 				2F821B738CECC840557CD9C4 /* AppleNetworkPolicy.swift */,
 				4B22541F586398D60ABB592A /* ApplePlayback.swift */,
 				77211B9092343716C550B622 /* ListeningSync.swift */,
+				F9FB18054DDB4D825A08D267 /* PublicationLedger.swift */,
 			);
 			path = Playback;
 			sourceTree = "<group>";
@@ -539,6 +542,7 @@
 				E8F9CBE05B9C920FB22A7C05 /* ListeningJournal.swift in Sources */,
 				3518B88C73C31C85709E1C85 /* ListeningStats.swift in Sources */,
 				455B1DED70536CD8CAE6CA62 /* ListeningSync.swift in Sources */,
+				9596847B31FB2BD3C1093327 /* PublicationLedger.swift in Sources */,
 				A00ADDE49FE9507689823D66 /* MediaRestart.swift in Sources */,
 				B5588A53439584F39D4D3E82 /* Models.swift in Sources */,
 				F919D566EA883D6D1075CA1B /* NativeLanguage.swift in Sources */,

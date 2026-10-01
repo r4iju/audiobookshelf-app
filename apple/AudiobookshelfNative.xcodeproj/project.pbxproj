@@ -56,6 +56,7 @@
 		5E3420D9B864D407CD1D6C6A /* ReadingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FE9972E1A212CD4A7EB8F13 /* ReadingStore.swift */; };
 		60BDB51148A28C77C5C37B26 /* EPUBReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6A81DC2F5CF1266F848703 /* EPUBReader.swift */; };
 		640246064D30A2B99B75C693 /* ListeningSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E779620640E22D9796AD5963 /* ListeningSync.swift */; };
+		67F55D1C0E9BE795F804ED39 /* PublicationLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472E025713DDAC4E2D5352A /* PublicationLedger.swift */; };
 		650E3F49EA3757D73F3B19F7 /* PlaybackJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF3CA957F3D1E05712729DB /* PlaybackJourney.swift */; };
 		65A2760E4F628EAB8AF34C94 /* LegacySource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51D83D6FBDB04A93870E968 /* LegacySource.swift */; };
 		679B9F65C646C15911BC5393 /* YearExportCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD27B1008D8A87AD6F323D13 /* YearExportCopy.swift */; };
@@ -128,6 +129,7 @@
 		E5086F9B19216BD7283F0FD6 /* ConnectionJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CAC9658FF3F40EF409324C /* ConnectionJourney.swift */; };
 		E77230DAD2534160FF71F3B7 /* NativeDownloads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555E32B34297E5993C20AE0B /* NativeDownloads.swift */; };
 		E7868F696560654E9E242357 /* ListeningSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E779620640E22D9796AD5963 /* ListeningSync.swift */; };
+		E90AAFD0CFD7BF8528B12ACC /* PublicationLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472E025713DDAC4E2D5352A /* PublicationLedger.swift */; };
 		E80A0DAD58E8C3A9998C01BF /* AuthorSeries.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ABAEE9FB33D8277E63B719 /* AuthorSeries.swift */; };
 		E81A987945C2C18BD154A1C9 /* PodcastJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA18B9C7D52A542335C9F63 /* PodcastJourney.swift */; };
 		E8A8F809633B70FD907D53AD /* NativeMigrationAdoption.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A62E4884402D009495E16F /* NativeMigrationAdoption.swift */; };
@@ -276,6 +278,7 @@
 		E5F45BB91A0C3E846DE8BC60 /* AdoptionHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdoptionHarness.swift; sourceTree = "<group>"; };
 		E68218E980A9A3BCD1318329 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/NativeStrings.strings; sourceTree = "<group>"; };
 		E779620640E22D9796AD5963 /* ListeningSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningSync.swift; sourceTree = "<group>"; };
+		4472E025713DDAC4E2D5352A /* PublicationLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicationLedger.swift; sourceTree = "<group>"; };
 		E7CAC9658FF3F40EF409324C /* ConnectionJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionJourney.swift; sourceTree = "<group>"; };
 		E9D7C95D6B1E65AC2D9B844A /* MigrationPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationPlan.swift; sourceTree = "<group>"; };
 		EAF3CA957F3D1E05712729DB /* PlaybackJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackJourney.swift; sourceTree = "<group>"; };
@@ -322,6 +325,7 @@
 				0598B9375D2B2544F76738FF /* AppleNetworkPolicy.swift */,
 				075B4B8D355897463125028F /* ApplePlayback.swift */,
 				E779620640E22D9796AD5963 /* ListeningSync.swift */,
+				4472E025713DDAC4E2D5352A /* PublicationLedger.swift */,
 			);
 			path = Playback;
 			sourceTree = "<group>";
@@ -828,6 +832,7 @@
 				1D66062FDA962E553446B110 /* ListeningJournal.swift in Sources */,
 				A2EE48A07480805D177D1CA9 /* ListeningStats.swift in Sources */,
 				E7868F696560654E9E242357 /* ListeningSync.swift in Sources */,
+				E90AAFD0CFD7BF8528B12ACC /* PublicationLedger.swift in Sources */,
 				BC1C2C12F22C32E2B7259576 /* MigrationFileSystem.swift in Sources */,
 				F66BD2E379E9A6CE581BC768 /* MigrationJSON.swift in Sources */,
 				45113F1CDC6F9943B411EA36 /* MigrationOutcome.swift in Sources */,
@@ -893,6 +898,7 @@
 				E9DA80BDD760CD6B95D24CC0 /* ListeningJournal.swift in Sources */,
 				72CDA00B447DFB17AEE1A26C /* ListeningStats.swift in Sources */,
 				640246064D30A2B99B75C693 /* ListeningSync.swift in Sources */,
+				67F55D1C0E9BE795F804ED39 /* PublicationLedger.swift in Sources */,
 				8C128B2CC20089FB1E14403D /* MigrationFileSystem.swift in Sources */,
 				8E035AD7550CF1A2A9C63719 /* MigrationJSON.swift in Sources */,
 				BEEFDE65647A64207F7BBE3E /* MigrationOutcome.swift in Sources */,

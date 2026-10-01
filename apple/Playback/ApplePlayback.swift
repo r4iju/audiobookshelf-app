@@ -579,7 +579,9 @@ import UIKit
             try await listening.flush()
             guard try await api.currentAccount() == account else { throw CancellationError() }
             try beforePublication()
-            try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction)
+            try await listening.publications.deliver(account: account, itemID: itemID, episodeID: nil) {
+                try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction, issuing: $0)
+            }
         }
         readingPublication = publication
         defer { readingPublication = nil }
@@ -611,7 +613,9 @@ import UIKit
         try await prepareProgressEdit(itemID: itemID, episodeID: episodeID)
         try Task.checkCancellation()
         guard try await api.currentAccount() == owner else { throw CancellationError() }
-        try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished)
+        try await listening.publications.deliver(account: owner, itemID: itemID, episodeID: episodeID) {
+            try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished, issuing: $0)
+        }
         let user = try await api.me()
         guard try await api.currentAccount() == owner else { throw CancellationError() }
         try listening.rememberRemoteProgress(user, account: owner)
@@ -647,6 +651,8 @@ import UIKit
                 try await prepare()
                 try await owned()
                 guard try !listening.hasLocalListening(account: account, itemID: itemID, episodeID: episodeID, newerThan: nil) else { throw ProgressResetFailure.busy }
+                // A write the server may still apply would recreate the row after the delete.
+                guard !listening.publications.unresolved(account: account, itemID: itemID, episodeID: episodeID) else { throw UnresolvedProgressWrites() }
                 let rowID = try await api.progressRowID(itemID: itemID, episodeID: episodeID, authorization: authorization)
                 try await owned()
                 let confirmed = ProgressResetIntent(account: account, itemID: itemID, episodeID: episodeID, rowID: rowID, requestedAt: Date().timeIntervalSince1970 * 1_000)
@@ -678,7 +684,14 @@ import UIKit
         return resets.contains { $0.covers(account: account, itemID: itemID, episodeID: episodeID) }
     }
 
-    func confirmServerRestarted(account: AccountIdentity) throws {}
+    /// The progress writes this app sends; see `PublicationLedger`.
+    var publications: PublicationLedger { listening.publications }
+
+    /// Records the owner's confirmation that the account's server restarted after the writes a
+    /// reset is waiting for, which lets it go ahead.
+    func confirmServerRestarted(account: AccountIdentity) throws {
+        try listening.publications.confirmRestart(server: account.server)
+    }
 
     /// Finishes the signed-in account's resets that a failure or relaunch left unfinished.
     func resumeProgressResets() async {
@@ -709,6 +722,15 @@ import UIKit
             try listening.finishReset(intent)
         } catch is CancellationError { throw CancellationError() }
         catch { throw ProgressResetFailure.unfinished(error) }
+    }
+
+    /// Thrown by `resetProgress` while the server may still apply an earlier write for the media.
+    /// Nothing was changed. Server 2.30 cannot confirm when such a write has finished; restarting
+    /// it ends the write, and `confirmServerRestarted` records that.
+    struct UnresolvedProgressWrites: LocalizedError {
+        var errorDescription: String? {
+            "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Restart the Audiobookshelf server, confirm the restart here, then discard again."
+        }
     }
 
     private enum ProgressResetFailure: LocalizedError {
