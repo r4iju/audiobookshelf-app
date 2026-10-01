@@ -84,7 +84,14 @@ object LenientDoubleSerializer : KSerializer<Double> {
     val bearerToken get() = accessToken?.takeIf { it.isNotEmpty() } ?: token
 }
 
-@Serializable data class AuthResponse(val user: User, val userDefaultLibraryId: String? = null)
+@Serializable data class AuthResponse(val user: User, val userDefaultLibraryId: String? = null, val ereaderDevices: List<EreaderDevice> = emptyList())
+
+/** An e-reader the server administrator configured for email delivery and made available to this user. */
+@Serializable data class EreaderDevice(val name: String)
+
+@Serializable data class RssFeedMeta(val preventIndexing: Boolean = true, val ownerName: String? = null, val ownerEmail: String? = null)
+
+@Serializable data class RssFeed(val id: String, val slug: String? = null, val feedUrl: String, val meta: RssFeedMeta = RssFeedMeta())
 
 @Serializable data class LibraryFolder(val id: String, val fullPath: String = "")
 
@@ -207,6 +214,7 @@ object LenientDoubleSerializer : KSerializer<Double> {
     val updatedAt: Double? = null,
     val isMissing: Boolean = false,
     val isInvalid: Boolean = false,
+    val rssFeed: RssFeed? = null,
 ) {
     val isPodcast get() = mediaType == "podcast"
     val title get() = media.metadata.title?.takeIf { it.isNotBlank() } ?: "Untitled"

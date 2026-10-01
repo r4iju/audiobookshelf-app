@@ -12,7 +12,7 @@ import ssl
 import sys
 import time
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from verification.fixture import make_server  # noqa: E402
@@ -32,6 +32,17 @@ def android_server(port, prefix, bind='127.0.0.1'):
         return probe.progress
     accounts = [progress_of(None), progress_of('Bearer fresh-other')]
     originals = [copy.deepcopy(entries) for entries in accounts]
+    # Server 2.30 item actions the shared fixture does not model. Nothing is sent anywhere: feeds and
+    # e-reader deliveries are only recorded for journeys to observe.
+    actions = {'feeds': {}, 'devices': [], 'sent': [], 'ebook': False}
+
+    def reset_actions(mode):
+        actions.update(feeds={}, devices=[], sent=[], ebook=mode.startswith('pdf-') or mode.startswith('epub-'))
+
+    def feed_for(item_id, slug, meta):
+        return {'id': 'feed-' + slug, 'slug': slug, 'entityType': 'libraryItem', 'entityId': item_id, 'feedUrl': '/feed/' + slug,
+                'meta': {'title': item_id, 'preventIndexing': bool(meta.get('preventIndexing', True)),
+                         'ownerName': meta.get('ownerName') or None, 'ownerEmail': meta.get('ownerEmail') or None}}
 
     class AndroidHandler(base):
         def own_path(self):
@@ -43,7 +54,27 @@ def android_server(port, prefix, bind='127.0.0.1'):
             for entry in self.progress.values():
                 entry.setdefault('id', 'progress-' + entry['libraryItemId'] + ('-' + entry['episodeId'] if entry.get('episodeId') else ''))
 
+        def respond(self, status, value, *args, **kwargs):
+            item_id = getattr(self, 'feed_item', None)
+            if item_id and status == 200 and isinstance(value, dict):
+                value = {**value, 'rssFeed': actions['feeds'].get(item_id)}
+            return super().respond(status, value, *args, **kwargs)
+
+        def is_admin(self):
+            return self.account.get('type') in ('admin', 'root')
+
+        def body(self):
+            return json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
+
         def do_GET(self):
+            # Handlers are reused across keep-alive requests, so the marker is cleared for each one.
+            self.feed_item = None
+            if self.own_path() == '/__android__/actions':
+                self.route()
+                return self.respond(200, {'feeds': list(actions['feeds'].values()), 'sentEbooks': actions['sent']})
+            item = re.fullmatch(r'/api/items/([^/]+)', self.own_path() or '')
+            if item and 'rssfeed' in parse_qs(urlparse(self.path).query).get('include', [''])[0].split(','):
+                self.feed_item = item[1]
             if self.own_path() == '/__android__/progress':
                 self.route()
                 return self.respond(200, {'progress': list(self.progress.values())})
@@ -83,12 +114,70 @@ def android_server(port, prefix, bind='127.0.0.1'):
 
         def do_POST(self):
             path = self.own_path()
+            if path == '/__android__/ereader-devices':
+                actions['devices'] = [{'name': name} for name in self.body().get('names', [])]
+                self.route()
+                return self.respond(200, {})
+            if path == '/__android__/open-feed':
+                data = self.body()
+                actions['feeds'][data['itemId']] = feed_for(data['itemId'], data['slug'], {})
+                self.route()
+                return self.respond(200, {})
+            if path == '/api/authorize':
+                self.route()
+                if not self.authorized():
+                    return self.respond(401, {})
+                return self.respond(200, {'user': self.account, 'userDefaultLibraryId': 'books', 'ereaderDevices': actions['devices'],
+                                          'serverSettings': {'version': '2.30.0-fixture', 'language': 'en-us'}})
+            if path == '/api/emails/send-ebook-to-device':
+                data = self.body()
+                self.route()
+                if not self.authorized():
+                    return self.respond(401, {})
+                if not any(device['name'] == data.get('deviceName') for device in actions['devices']):
+                    return self.respond(404, {})
+                if data.get('libraryItemId') != 'book-0' or not actions['ebook']:
+                    return self.respond(404, {})
+                actions['sent'].append({'libraryItemId': data['libraryItemId'], 'deviceName': data['deviceName']})
+                return self.respond(200, {})
+            opening = re.fullmatch(r'/api/feeds/item/([^/]+)/open', path or '')
+            if opening:
+                data = self.body()
+                self.route()
+                if not self.authorized():
+                    return self.respond(401, {})
+                if not self.is_admin():
+                    return self.respond(403, {})
+                slug = data.get('slug')
+                if not slug or not data.get('serverAddress'):
+                    return self.respond(400, 'Invalid request body', 'text/plain')
+                if any(feed['slug'] == slug for feed in actions['feeds'].values()):
+                    return self.respond(400, 'Slug already in use', 'text/plain')
+                feed = feed_for(opening[1], slug, data.get('metadataDetails') or {})
+                actions['feeds'][opening[1]] = feed
+                return self.respond(200, {'feed': feed})
+            closing = re.fullmatch(r'/api/feeds/([^/]+)/close', path or '')
+            if closing:
+                self.rfile.read(int(self.headers.get('Content-Length', 0)))
+                self.route()
+                if not self.authorized():
+                    return self.respond(401, {})
+                if not self.is_admin():
+                    return self.respond(403, {})
+                item_id = next((key for key, feed in actions['feeds'].items() if feed['id'] == closing[1]), None)
+                if item_id is None:
+                    return self.respond(404, {})
+                del actions['feeds'][item_id]
+                return self.respond(200, {})
             if path == '/__android__/refuse-listening':
                 data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
                 refusal['listening'] = bool(data.get('refuse'))
                 self.route()
                 return self.respond(200, refusal)
             if path == '/__fixture__/configure':
+                body = self.rfile.read(int(self.headers.get('Content-Length', 0)))
+                self.rfile = io.BytesIO(body)
+                reset_actions(json.loads(body or b'{}').get('mode', ''))
                 refusal['listening'] = False
                 for entries, original in zip(accounts, originals):
                     for key, entry in original.items():

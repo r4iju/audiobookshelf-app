@@ -149,6 +149,7 @@ fun PodcastDetail(item: LibraryItem, reload: () -> Unit, active: SessionState.Ac
 
     ItemDetail(item, cover, null, padding, actions, primary = {}, extra = {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            FeedButton(item, active, catalog)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Episodes", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).semantics { heading() })
                 if (canManage) TextButton(onClick = { feedSheet = true }, modifier = Modifier.testTag("feed-episodes")) {

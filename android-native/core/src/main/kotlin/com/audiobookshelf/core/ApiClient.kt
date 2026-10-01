@@ -92,7 +92,7 @@ class ApiClient(
     suspend fun filterData(libraryId: String): FilterData = get("api/libraries/$libraryId/filterdata", FilterData.serializer())
     suspend fun search(libraryId: String, query: String, limit: Int = 12): SearchResponse =
         get("api/libraries/$libraryId/search", SearchResponse.serializer(), listOf("q" to query, "limit" to "$limit"))
-    suspend fun item(id: String): LibraryItem = get("api/items/$id", LibraryItem.serializer(), listOf("expanded" to "1", "include" to "progress"))
+    suspend fun item(id: String): LibraryItem = get("api/items/$id", LibraryItem.serializer(), listOf("expanded" to "1", "include" to "progress,rssfeed"))
     suspend fun author(id: String): AuthorDetail = get("api/authors/$id", AuthorDetail.serializer(), listOf("include" to "items,series"))
     // endregion
 
@@ -157,6 +157,26 @@ class ApiClient(
         val response = raw("api/me/progress/$itemId" + (episodeId?.let { "/$it" } ?: ""), "PATCH", buildJsonObject { put("isFinished", finished) })
         return runCatching { AbsJson.decodeFromString(MediaProgress.serializer(), response) }.getOrNull()
     }
+
+    /** The signed-in user together with what the server lets them do, such as the e-readers they may send to. */
+    suspend fun authorize(): AuthResponse = send("api/authorize", "POST", null, AuthResponse.serializer())
+
+    suspend fun sendEbook(itemId: String, deviceName: String) {
+        raw("api/emails/send-ebook-to-device", "POST", buildJsonObject { put("libraryItemId", itemId); put("deviceName", deviceName) })
+    }
+
+    suspend fun openFeed(itemId: String, slug: String, meta: RssFeedMeta): RssFeed =
+        send("api/feeds/item/$itemId/open", "POST", buildJsonObject {
+            put("serverAddress", address.canonical)
+            put("slug", slug)
+            put("metadataDetails", AbsJson.encodeToJsonElement(RssFeedMeta.serializer(), meta))
+        }, FeedResponse.serializer()).feed
+
+    suspend fun closeFeed(feedId: String) { raw("api/feeds/$feedId/close", "POST", null) }
+
+    /** Feed URLs are relative to the server address the feed was opened with. */
+    fun feedUrl(feed: RssFeed): String =
+        if (feed.feedUrl.startsWith("/")) address.canonical.trimEnd('/') + feed.feedUrl else feed.feedUrl
 
     suspend fun removeProgress(progressId: String) { raw("api/me/progress/$progressId", "DELETE", null) }
 
@@ -274,6 +294,7 @@ class ApiClient(
         }
     }
 
+    @kotlinx.serialization.Serializable private data class FeedResponse(val feed: RssFeed)
     @kotlinx.serialization.Serializable private data class LocalSyncResult(val id: String, val success: Boolean = false)
     @kotlinx.serialization.Serializable private data class LocalSyncResponse(val results: List<LocalSyncResult> = emptyList())
 

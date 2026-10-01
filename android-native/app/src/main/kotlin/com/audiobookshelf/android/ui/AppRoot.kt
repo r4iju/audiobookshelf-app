@@ -116,6 +116,8 @@ private fun SignedIn(active: SessionState.Active) {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 DownloadButton(item, null, active, catalog)
                                 AddToGroupButton(item.id, null, active, catalog)
+                                SendEbookButton(item, active)
+                                FeedButton(item, active, catalog)
                                 ProgressActions(item.id, null, active, catalog)
                             }
                         })
