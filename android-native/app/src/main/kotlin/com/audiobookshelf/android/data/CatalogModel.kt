@@ -121,6 +121,13 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
 
     fun retryPage() { pageError = null; loadMore() }
 
+    /** Shows a confirmed server progress change before the next full refresh. */
+    fun applyProgress(progress: MediaProgress) {
+        val current = user ?: return
+        val others = current.mediaProgress.filterNot { it.libraryItemId == progress.libraryItemId && it.episodeId == progress.episodeId }
+        user = current.copy(mediaProgress = others + progress)
+    }
+
     fun refreshUser() {
         scope.launch { runCatching { client.me() }.onSuccess { user = it }.onFailure { accounts.handle(it) } }
     }

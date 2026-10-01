@@ -188,6 +188,13 @@ class ApiClient(
         return credentials.accessToken
     }
 
+    /** Refreshes after another channel, such as the realtime socket, rejected [token]; returns the token to retry with. */
+    suspend fun bearerAfterRejection(token: String): String {
+        val current = credentials
+        if (current.accessToken == token) refresh(current)
+        return credentials.accessToken
+    }
+
     suspend fun bytes(path: String): ByteArray = authorized(path) { token ->
         http.executeBytes(Request.Builder().url(address.url(path)).header("Authorization", "Bearer $token").build())
     }

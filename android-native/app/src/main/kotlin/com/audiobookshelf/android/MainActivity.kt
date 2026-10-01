@@ -13,6 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         graph.playback
+        graph.serverEvents
         if (savedInstanceState == null) route(intent)
         setContent { AppRoot() }
     }

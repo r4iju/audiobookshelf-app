@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
@@ -78,6 +79,7 @@ fun ItemDetail(
     actions: ItemActions,
     primary: @Composable () -> Unit,
     extra: @Composable () -> Unit = {},
+    more: LazyListScope.() -> Unit = {},
 ) {
     val metadata = item.media.metadata
     val description = remember(metadata.description) {
@@ -151,6 +153,7 @@ fun ItemDetail(
                 }
             }
             description?.let { text -> item { ExpandableText(text) } }
+            more()
             val chapters = item.media.chapters
             if (chapters.isNotEmpty()) {
                 item { Text("Chapters", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) }

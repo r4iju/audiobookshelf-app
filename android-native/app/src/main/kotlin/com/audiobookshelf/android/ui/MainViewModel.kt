@@ -48,6 +48,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             graph.progressSync.published.collect { account -> catalog?.takeIf { it.client.account == account }?.refreshUser() }
         }
+        viewModelScope.launch {
+            graph.serverEvents.events.collect { event ->
+                if (event.name == "user_item_progress_updated") catalog?.takeIf { it.client.account == event.account }?.refreshUser()
+            }
+        }
     }
 
     fun push(route: Route) { stack.add(route) }

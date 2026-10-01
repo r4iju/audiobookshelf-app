@@ -14,6 +14,7 @@ import com.audiobookshelf.android.playback.ProgressSync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import java.io.File
 import java.util.UUID
@@ -51,6 +52,22 @@ class AppGraph private constructor(val context: Context) {
     val playback by lazy {
         journal.finishRecoveredSessions()
         PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io).also { progressSync.publishAll() }
+    }
+
+    val podcastRequests by lazy { com.audiobookshelf.android.podcast.PodcastRequests(File(context.filesDir, "podcast-requests.json")) }
+    val serverEvents by lazy {
+        com.audiobookshelf.android.podcast.ServerEvents(scope, accounts, http).also { events ->
+            events.start()
+            scope.launch {
+                events.events.collect { event ->
+                    val data = event.data ?: return@collect
+                    if (event.name == "episode_download_finished" && data.optBoolean("failed")) {
+                        val itemId = data.optString("libraryItemId"); val url = data.optString("url")
+                        if (itemId.isNotEmpty() && url.isNotEmpty()) runCatching { podcastRequests.receiveFailure(event.account, itemId, url, data.optString("id")) }
+                    }
+                }
+            }
+        }
     }
 
     val accounts by lazy { AccountStore(CredentialVault(File(context.noBackupFilesDir, "vault/connections.bin")), http, deviceInfo).also { it.restore() } }

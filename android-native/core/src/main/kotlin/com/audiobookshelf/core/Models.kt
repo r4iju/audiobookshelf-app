@@ -158,6 +158,8 @@ object LenientDoubleSerializer : KSerializer<Double> {
 
 @Serializable data class AudioFile(val ino: String? = null, val duration: Double = 0.0, val metadata: FileMetadata? = null, val mimeType: String? = null)
 
+@Serializable data class Enclosure(val url: String? = null, val type: String? = null, val length: String? = null)
+
 @Serializable data class Episode(
     val id: String,
     val libraryItemId: String? = null,
@@ -173,6 +175,7 @@ object LenientDoubleSerializer : KSerializer<Double> {
     val audioTrack: AudioTrack? = null,
     val audioFile: AudioFile? = null,
     val chapters: List<Chapter> = emptyList(),
+    val enclosure: Enclosure? = null,
 ) {
     val playableDuration get() = duration.takeIf { it > 0 } ?: audioTrack?.duration?.takeIf { it > 0 } ?: audioFile?.duration ?: 0.0
 }

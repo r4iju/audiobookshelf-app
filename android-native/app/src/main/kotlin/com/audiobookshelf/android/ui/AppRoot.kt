@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.LibraryBooks
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -84,7 +85,11 @@ private fun SignedIn(active: SessionState.Active) {
                 Route.Player -> PlayerScreen(onCollapse = pop, onClosed = pop)
                 Route.Accounts -> RouteScaffold("Accounts", pop) { AccountsScreen(active, it) }
                 is Route.Item -> RouteScaffold("", pop) { padding ->
-                    LoadItem(active.client, route.id, padding, graph.accounts::handle) { item, _ ->
+                    LoadItem(active.client, route.id, padding, graph.accounts::handle) { item, reload ->
+                        if (item.isPodcast) {
+                            PodcastDetail(item, reload, active, catalog, padding, itemActions, onEpisode = { model.push(Route.Episode(item.id, it)) }, onPlayer = { model.push(Route.Player) })
+                            return@LoadItem
+                        }
                         val cover = active.client.coverUrl(item.id).toString()
                         val progress = catalog.progressFor(item.id)
                         ItemDetail(item, cover, progress, padding, itemActions, primary = {
@@ -92,6 +97,12 @@ private fun SignedIn(active: SessionState.Active) {
                         })
                     }
                 }
+                is Route.Episode -> RouteScaffold("", pop) { padding ->
+                    LoadItem(active.client, route.itemId, padding, graph.accounts::handle) { item, _ ->
+                        EpisodeScreen(item, route.episodeId, active, catalog, padding, onPlayer = { model.push(Route.Player) })
+                    }
+                }
+                Route.AddPodcast -> RouteScaffold("Add podcast", pop) { padding -> AddPodcastScreen(active, catalog, padding, onCreated = pop) }
                 is Route.Filtered -> RouteScaffold(route.label, pop) { padding ->
                     val libraryId = catalog.library?.id
                     if (libraryId != null) FilteredScreen(model.filtered(active, libraryId, route), padding, { catalog.progressFor(it) }, open)
@@ -113,6 +124,9 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
     Scaffold(
         topBar = {
             if (tab == Tab.Library) LibraryTopBar(catalog) {
+                if (catalog.library?.isPodcast == true && catalog.user?.isAdmin == true) {
+                    IconButton(onClick = { model.push(Route.AddPodcast) }, modifier = Modifier.testTag("add-podcast")) { Icon(Icons.Outlined.Add, "Add podcast") }
+                }
                 IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, "Accounts") }
                 IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, "Settings") }
             }
