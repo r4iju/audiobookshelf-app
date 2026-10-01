@@ -110,6 +110,9 @@ public final class LegacyExportJob {
         public static let databaseUnreadable = "The app's library database could not be read for the export. Nothing was changed; try again, or restart the app first."
         public static let unsupportedVersion = "This version of the library database cannot be exported. Nothing was changed."
         public static let failed = "The export could not be prepared. Nothing was changed; try again."
+        public static let busy = "The export is busy. Wait for it to finish, or close the save dialog, and try again."
+        public static let nothingToSave = "There is no export to save. Export again."
+        public static let saveUnavailable = "The save dialog could not be shown. Try again."
     }
 
     private let documents: URL
@@ -155,6 +158,12 @@ public final class LegacyExportJob {
             return Message.databaseUnreadable
         case LegacyMigrationError.unsupportedLegacySchema:
             return Message.unsupportedVersion
+        case LegacyExportSessionError.busy:
+            return Message.busy
+        case LegacyExportSessionError.nothingToSave:
+            return Message.nothingToSave
+        case LegacyExportSessionError.saveUnavailable:
+            return Message.saveUnavailable
         default:
             return isOutOfSpace(error as NSError) ? Message.insufficientSpace : Message.failed
         }
