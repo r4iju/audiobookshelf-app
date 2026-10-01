@@ -1,5 +1,6 @@
 package com.audiobookshelf.android.ui
 
+import androidx.compose.material.icons.outlined.DownloadForOffline
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -240,7 +241,7 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
         looked++
     }
     if (records.isEmpty()) {
-        MessageState("No downloads", "Download books or episodes from their page to listen without a connection.", Modifier.padding(padding), tag = "downloads-empty")
+        MessageState("No downloads", "Download books or episodes from their page to listen without a connection.", Modifier.padding(padding), icon = Icons.Outlined.DownloadForOffline, tag = "downloads-empty")
         return
     }
     // Notices stay above the list: an item inserted above the first visible row would be scrolled out of view.

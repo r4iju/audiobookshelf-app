@@ -100,7 +100,7 @@ fun ItemDetail(
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             val authors = metadata.authors.ifEmpty { item.author.takeIf { it.isNotEmpty() }?.let { listOf(com.audiobookshelf.core.NamedRef("", it)) } ?: emptyList() }
                             authors.forEach { author ->
-                                TextButton(onClick = { if (author.id.isNotEmpty()) actions.onAuthor(author.id, author.name) }, enabled = author.id.isNotEmpty(), modifier = Modifier.testTag("author-${author.id}")) {
+                                TextButton(onClick = { if (author.id.isNotEmpty()) actions.onAuthor(author.id, author.name) }, enabled = author.id.isNotEmpty(), contentPadding = PaddingValues(vertical = 8.dp), modifier = Modifier.testTag("author-${author.id}")) {
                                     Text(author.name, style = MaterialTheme.typography.titleMedium)
                                 }
                             }

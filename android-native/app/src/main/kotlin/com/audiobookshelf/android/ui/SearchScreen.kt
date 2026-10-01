@@ -62,9 +62,9 @@ fun SearchScreen(search: SearchModel, catalog: CatalogModel, padding: PaddingVal
         val error = search.error
         when {
             error != null -> item { MessageState("Search failed", error, tag = "search-error", action = "Retry", actionTag = "search-retry") { search.retry() } }
-            search.query.isBlank() -> item { MessageState("Find something to listen to", "Search titles, authors, series, narrators and episodes.", tag = "search-idle") }
+            search.query.isBlank() -> item { MessageState("Find something to listen to", "Search titles, authors, series, narrators and episodes.", icon = Icons.Outlined.Search, tag = "search-idle") }
             results == null -> Unit
-            results.isEmpty -> item { MessageState("No results", "Nothing matches \"${search.query}\". Try fewer words or another spelling.", tag = "search-empty") }
+            results.isEmpty -> item { MessageState("No results", "Nothing matches \"${search.query}\". Try fewer words or another spelling.", icon = Icons.Outlined.Search, tag = "search-empty") }
             else -> {
                 section("Books", results.book.map { it.libraryItem }) { ResultRow(it, client, "search-item-${it.id}") { open(it) } }
                 section("Podcasts", results.podcast.map { it.libraryItem }) { ResultRow(it, client, "search-item-${it.id}") { open(it) } }

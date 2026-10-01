@@ -1,5 +1,6 @@
 package com.audiobookshelf.android.ui
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Headphones
 import androidx.compose.material.icons.outlined.Podcasts
-import androidx.compose.material.icons.outlined.WifiOff
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -78,13 +79,13 @@ fun ProgressLine(fraction: Double, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MessageState(title: String, message: String?, modifier: Modifier = Modifier, tag: String? = null, action: String? = null, actionTag: String? = null, onAction: (() -> Unit)? = null) {
+fun MessageState(title: String, message: String?, modifier: Modifier = Modifier, icon: ImageVector = Icons.Outlined.Info, tag: String? = null, action: String? = null, actionTag: String? = null, onAction: (() -> Unit)? = null) {
     Column(
         modifier.fillMaxWidth().padding(32.dp).let { if (tag != null) it.testTag(tag) else it },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Icon(Icons.Outlined.WifiOff, null, Modifier.size(32.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Icon(icon, null, Modifier.size(32.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
         if (message != null) Text(message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         if (action != null && onAction != null) {

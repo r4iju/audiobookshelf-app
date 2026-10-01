@@ -1,5 +1,6 @@
 package com.audiobookshelf.android.ui
 
+import androidx.compose.foundation.layout.navigationBarsPadding
 import android.os.ParcelFileDescriptor
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -200,7 +201,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
             )
         },
         bottomBar = {
-            Column {
+            Column(Modifier.navigationBarsPadding()) {
                 if (document != null) PageControls(page, document.pageCount, onPage = { page = it })
                 LocalBottomAccessory.current()
             }

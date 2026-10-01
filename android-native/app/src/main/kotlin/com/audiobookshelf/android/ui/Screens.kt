@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
@@ -31,7 +33,7 @@ fun RouteScaffold(title: String, onBack: () -> Unit, actions: @Composable RowSco
                 actions = actions,
             )
         },
-        bottomBar = LocalBottomAccessory.current,
+        bottomBar = { Column(Modifier.navigationBarsPadding()) { LocalBottomAccessory.current() } },
         content = content,
     )
 }
