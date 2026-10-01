@@ -83,7 +83,7 @@ import UIKit
     private var networkEpoch = UUID()
     #endif
     private let api: APIClient
-    private let listening: ListeningSync
+    let listening: ListeningSync
     private var readingPublication: Task<Void, Error>?
     var canPublishReading: Bool { session == nil && !preparing && !closing && progressReset == nil }
     @Published private var progressReset: Task<CurrentUser, Error>?
@@ -686,6 +686,9 @@ import UIKit
 
     /// The progress writes this app sends; see `PublicationLedger`.
     var publications: PublicationLedger { listening.publications }
+
+    /// Records that the owner was asked to restart the account's server.
+    func requestServerRestart(account: AccountIdentity) throws {}
 
     /// Records the owner's confirmation that the account's server restarted after the writes a
     /// reset is waiting for, which lets it go ahead.

@@ -39,35 +39,52 @@ import XCTest
         /// Holds a later `/api/me` request, after letting `skipping` pass, until `release`.
         func holdUser(skipping: Int = 0) { lock.lock(); holdingUser = true; usersBeforeHold = skipping; lock.unlock() }
         /// Server 2.30 has no request barrier: a handler whose client timed out still runs to the
-        /// end. The next write taken here is answered with a client timeout while its handler
-        /// waits, before its progress lookup, until `releaseWrite`.
+        /// end. The next write taken here, for `item` when given, is answered with a client timeout
+        /// while its handler waits, at its first lookup, until `releaseWrite`.
         private var holdingWrite = false
+        private var holdingItem: String?
         private(set) var heldWrites = 0
-        private let writeReleased = DispatchSemaphore(value: 0)
-        private let writeApplied = DispatchSemaphore(value: 0)
-        func holdNextWrite() { lock.lock(); holdingWrite = true; lock.unlock() }
-        func takeWriteHold() -> Bool {
+        private var held: [() -> Void] = []
+        func holdNextWrite(item: String? = nil) { lock.lock(); holdingWrite = true; holdingItem = item; lock.unlock() }
+        func takeWriteHold(items: [String]) -> Bool {
             lock.lock(); defer { lock.unlock() }
-            guard holdingWrite else { return false }
+            guard holdingWrite, holdingItem.map(items.contains) ?? true else { return false }
             holdingWrite = false; heldWrites += 1
             return true
         }
-        func runHeld(_ work: @escaping () -> Void) {
-            DispatchQueue.global().async { self.writeReleased.wait(); work(); self.writeApplied.signal() }
-        }
-        /// Lets the held handler finish and waits until it has.
+        func runHeld(_ work: @escaping () -> Void) { lock.lock(); held.append(work); lock.unlock() }
+        /// Lets the oldest held handler run to the end.
         func releaseWrite() {
-            writeReleased.signal()
-            _ = writeApplied.wait(timeout: .now() + 5)
+            lock.lock(); let work = held.isEmpty ? nil : held.removeFirst(); lock.unlock()
+            work?()
         }
-        /// 2.30's progress step of a local session sync (`syncLocalSession`): a strictly newer row
-        /// is kept, an existing one updated, and a missing one created under a new ID.
-        func applySession(_ session: [String: Any], newRowID: Bool) {
+        /// A server restart ends every held handler before it writes anything.
+        func restart() { lock.lock(); held.removeAll(); lock.unlock() }
+        /// Listening sessions by ID, as `local-all` leaves them: it replaces a stored session's
+        /// position and total (`syncLocalSession`).
+        private var sessions: [String: (time: Double, listened: Double)] = [:]
+        /// Every replacement that lowered a session's total.
+        private(set) var lostListening: [String] = []
+        func session(_ id: String) -> (time: Double, listened: Double)? { lock.lock(); defer { lock.unlock() }; return sessions[id] }
+        func listened(_ item: String) -> Double { lock.lock(); defer { lock.unlock() }; return sessionItems.filter { $0.value == item }.keys.reduce(0) { $0 + (sessions[$1]?.listened ?? 0) } }
+        private var sessionItems: [String: String] = [:]
+        /// 2.30's local session sync (`syncLocalSession`): the session is stored or replaced, then
+        /// the progress step runs against `loaded`, the row as the request's user was loaded at its
+        /// start (`getUserByIdOrOldId` with `mediaProgress`): a strictly newer row is kept, otherwise
+        /// the current row is updated with no time check (`applyProgressUpdate`), or a missing one
+        /// created, under a new ID when `newRowID`.
+        func applySession(_ session: [String: Any], newRowID: Bool, loaded: Row?) {
             let item = session["libraryItemId"] as! String, episode = session["episodeId"] as? String
             let updated = session["updatedAt"] as! Double
-            if let row = self[item, episode], row.updatedAt > updated { return }
-            let id = self[item, episode]?.id ?? (newRowID ? recreatedID(item, episode) : self.id(item, episode))
-            self[item, episode] = Row(id: id, time: session["currentTime"] as! Double, updatedAt: updated, ebookLocation: self[item, episode]?.ebookLocation)
+            let sessionID = session["id"] as! String, listened = session["timeListening"] as! Double, time = session["currentTime"] as! Double
+            lock.lock()
+            if let before = sessions[sessionID], before.listened > listened { lostListening.append("\(sessionID): \(before.listened) -> \(listened)") }
+            sessions[sessionID] = (time, listened); sessionItems[sessionID] = item
+            lock.unlock()
+            if let loaded, loaded.updatedAt > updated { return }
+            let current = self[item, episode]
+            let id = current?.id ?? (newRowID ? recreatedID(item, episode) : self.id(item, episode))
+            self[item, episode] = Row(id: id, time: time, updatedAt: updated, ebookLocation: current?.ebookLocation)
         }
         func passUser() {
             lock.lock()
@@ -96,11 +113,12 @@ import XCTest
         harness.stub.route("POST", api + "/session/local-all") { request in
             guard server.acceptListening else { return .status(500) }
             let sessions = request.json?["sessions"] as? [[String: Any]] ?? []
-            if server.takeWriteHold() {
-                server.runHeld { sessions.forEach { server.applySession($0, newRowID: true) } }
+            let loaded = sessions.map { server[$0["libraryItemId"] as! String, $0["episodeId"] as? String] }
+            if server.takeWriteHold(items: sessions.compactMap { $0["libraryItemId"] as? String }) {
+                server.runHeld { zip(sessions, loaded).forEach { server.applySession($0, newRowID: true, loaded: $1) } }
                 return .timedOut
             }
-            sessions.forEach { server.applySession($0, newRowID: false) }
+            zip(sessions, loaded).forEach { server.applySession($0, newRowID: false, loaded: $1) }
             return .json(200, ["results": sessions.map { ["id": $0["id"] as! String, "success": true] }])
         }
         for (item, episode) in [(book, nil), (other, nil), (podcast, "ep-1"), (podcast, "ep-2")] as [(String, String?)] {
@@ -513,7 +531,7 @@ import XCTest
                 server[book, nil] = Row(id: server[book, nil]?.id ?? server.recreatedID(book, nil), time: server[book, nil]?.time ?? 0,
                                         updatedAt: Date().timeIntervalSince1970 * 1_000, ebookLocation: request.json?["ebookLocation"] as? String)
             }
-            if server.takeWriteHold() { server.runHeld(apply); return .timedOut }
+            if server.takeWriteHold(items: [book]) { server.runHeld(apply); return .timedOut }
             apply()
             return .status(200)
         }
@@ -556,6 +574,100 @@ import XCTest
         } else {
             XCTAssertEqual(deletes(), [])
             XCTAssertNotNil(server[book, nil])
+        }
+    }
+
+    private func media(_ item: String) -> ListeningMedia {
+        ListeningMedia(itemID: item, episodeID: nil, title: item, author: "Synthetic", mediaType: "book", duration: 200, startTime: 0)
+    }
+
+    func testASyncThatGotNoAnswerCannotReplaceLaterListeningOfItsSession() async throws {
+        let sync = harness.player.listening
+        let id = try await sync.begin(media: media(book), deviceID: "device-history")
+        try sync.record(id: id, position: 30, listened: 30)
+        server.holdNextWrite(item: book)
+        do { try await sync.flush(); XCTFail("Precondition: the first sync got no answer") } catch {}
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the first sync reached the server and was held")
+        try sync.record(id: id, position: 90, listened: 60)
+        try? await sync.flush()
+        // The held handler finishes after whatever was sent meanwhile.
+        server.releaseWrite()
+        XCTAssertEqual(server.lostListening, [], "The first sync replaced later listening of its session")
+        XCTAssertTrue(try sync.hasLocalListening(account: alice, itemID: book, episodeID: nil, newerThan: nil) || server.session(id)?.listened == 90,
+                      "Listening earned after the first sync was lost")
+
+        // Once the owner confirms a restart the server was asked for, the rest is sent, once.
+        try harness.player.requestServerRestart(account: alice)
+        server.restart()
+        try harness.player.confirmServerRestarted(account: alice)
+        try await sync.flush()
+        XCTAssertEqual(server.lostListening, [])
+        XCTAssertEqual(try XCTUnwrap(server.session(id), "The session never reached the server").listened, 90, "The server does not hold the session's listening")
+        XCTAssertEqual(server.listened(book), 90, "The book's listening was counted more than once")
+        XCTAssertEqual(server[book, nil]?.time, 90)
+        XCTAssertFalse(try sync.hasLocalListening(account: alice, itemID: book, episodeID: nil, newerThan: nil))
+    }
+
+    func testCarriedOverListeningThatGotNoAnswerCannotRewindLaterListening() async throws {
+        harness.addSession("legacy-\(UUID().uuidString)", item: book, account: AdoptionHarness.alice, streamed: true, listened: 30, position: 150)
+        _ = try await harness.adoption.apply(outcome: try harness.migrate(), migrator: harness.migrator)
+        harness.stub.route("GET", api + "/me/item/listening-sessions/" + book) { _ in .json(200, ["sessions": [], "numPages": 0]) }
+        server[book, nil] = Row(id: server.id(book, nil), time: 5, updatedAt: AdoptionHarness.legacyUpdate - 60_000)
+        server.holdNextWrite(item: book)
+        _ = await harness.adoption.sync()
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the carried-over session reached the server and was held")
+
+        // Listening on this device after the carried-over session.
+        let sync = harness.player.listening
+        let id = try await sync.begin(media: media(book), deviceID: "device-history")
+        try sync.record(id: id, position: 12, listened: 7)
+        try? await sync.flush()
+        server.releaseWrite()
+
+        try harness.player.requestServerRestart(account: alice)
+        server.restart()
+        try harness.player.confirmServerRestarted(account: alice)
+        try await sync.flush()
+        XCTAssertEqual(server[book, nil]?.time, 12, "The carried-over session rewound the position listened to after it")
+        XCTAssertEqual(server.session(id)?.listened, 7)
+        XCTAssertFalse(try sync.hasLocalListening(account: alice, itemID: book, episodeID: nil, newerThan: nil))
+    }
+
+    func testARestartConfirmationDoesNotSettleWritesSentAfterTheRestart() async throws {
+        server[book, nil] = Row(id: server.id(book, nil), time: 3, updatedAt: old)
+        let sync = harness.player.listening
+        let id = try await sync.begin(media: media(book), deviceID: "device-restart")
+        try sync.record(id: id, position: 12, listened: 12)
+        server.holdNextWrite(item: book)
+        try? await sync.flush()
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the first sync was held")
+
+        // The owner is asked to restart the server, and does.
+        try harness.player.requestServerRestart(account: alice)
+        server.restart()
+        // Before the owner confirms, a background retry reaches the restarted server and gets no answer,
+        server.holdNextWrite(item: book)
+        try? await sync.flush()
+        XCTAssertEqual(server.heldWrites, 2, "Precondition: the retry was held")
+        // and a later one is answered.
+        try await sync.flush()
+        XCTAssertFalse(try sync.hasLocalListening(account: alice, itemID: book, episodeID: nil, newerThan: nil), "Precondition: the listening was acknowledged")
+        try harness.player.confirmServerRestarted(account: alice)
+
+        var discarded = false
+        do { _ = try await reset(book); discarded = true; XCTFail("The confirmation settled a retry sent after the restart") } catch {}
+        server.releaseWrite()
+        if discarded {
+            XCTAssertNil(server[book, nil], "The retry recreated the discarded progress as \(server[book, nil]?.id ?? "")")
+        } else {
+            XCTAssertEqual(deletes(), [])
+            XCTAssertEqual(server[book, nil]?.time, 12)
+            // Another restart, asked for after the retry, settles it.
+            try harness.player.requestServerRestart(account: alice)
+            server.restart()
+            try harness.player.confirmServerRestarted(account: alice)
+            _ = try await reset(book)
+            XCTAssertNil(server[book, nil])
         }
     }
 }
