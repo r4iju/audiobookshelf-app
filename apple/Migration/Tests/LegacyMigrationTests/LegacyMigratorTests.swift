@@ -408,4 +408,62 @@ final class LegacyMigratorTests: XCTestCase {
         XCTAssertNil(try download(outcome, "li-audio").tracks.last?.file)
         XCTAssertNil(try download(outcome, "li-pdf").cover)
     }
+
+    // MARK: Review regressions
+
+    func testNonFiniteLegacyNumbersDoNotBlockTheMigration() throws {
+        fixture.snapshot.progress[0].duration = .nan
+        fixture.snapshot.progress[0].progress = .infinity
+        let finite = LegacySource(kind: .inPlace, snapshot: try LegacyFixture().snapshot, filesRoot: fixture.documents)
+        XCTAssertNotEqual(try fixture.inPlaceSource.fingerprint, try finite.fingerprint)
+
+        let migrator = LegacyMigrator(root: fixture.migrationRoot())
+        let outcome = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+
+        let audio = try XCTUnwrap(outcome.progress.first { $0.libraryItemID == "li-audio" })
+        XCTAssertTrue(audio.duration.isNaN)
+        XCTAssertEqual(audio.progress, .infinity)
+        XCTAssertTrue(try XCTUnwrap(migrator.committedOutcome()?.progress.first { $0.libraryItemID == "li-audio" }).duration.isNaN)
+
+        let archive = try LegacyArchive.write(fixture.snapshot, documents: fixture.documents, to: fixture.directory.appendingPathComponent("Audiobookshelf.abslegacy"))
+        XCTAssertTrue(try XCTUnwrap(LegacyArchive.open(archive).snapshot.progress.first).duration.isNaN)
+    }
+
+    func testProgressAndListeningWithoutAnAccountAreShownToTheUser() throws {
+        fixture.snapshot.progress.append(LegacyProgress(id: "local_li-lost", localLibraryItemId: "local_li-lost", libraryItemId: "li-lost", serverConnectionConfigId: nil, serverAddress: nil, serverUserId: nil,
+                                                        duration: 100, progress: 0.5, currentTime: 50, lastUpdate: 1_759_300_000_000, startedAt: 1_759_200_000_000))
+        fixture.snapshot.sessions.append(LegacySession(id: "session-lost", userId: nil, libraryItemId: "li-lost-stream", localLibraryItemId: nil, mediaType: "book", duration: 10, playMethod: 0,
+                                                       startedAt: nil, updatedAt: nil, timeListening: 4, currentTime: 4, serverConnectionConfigId: nil, serverAddress: nil, isActiveSession: false))
+
+        let outcome = try LegacyMigrator(root: fixture.migrationRoot()).migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+
+        XCTAssertNil(try XCTUnwrap(outcome.progress.first { $0.libraryItemID == "li-lost" }).account)
+        XCTAssertNil(try XCTUnwrap(outcome.pendingSessions.first { $0.session.id == "session-lost" }).account)
+        let unscoped = Set(issues(outcome, .unscopedData).compactMap(\.libraryItemID))
+        XCTAssertTrue(unscoped.isSuperset(of: ["li-orphan", "li-lost", "li-lost-stream"]), "\(unscoped)")
+    }
+
+    func testALegacyFileSharedByTwoAccountsIsAdoptedIntoEachAccount() throws {
+        var bobsCopy = fixture.snapshot.localItems[0]
+        bobsCopy.id = "local_li-audio-bob"
+        bobsCopy.serverConnectionConfigId = "conn-a2"
+        bobsCopy.serverUserId = "user-2"
+        fixture.snapshot.localItems.append(bobsCopy)
+
+        let migrator = LegacyMigrator(root: fixture.migrationRoot())
+        let outcome = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+
+        let alice = try XCTUnwrap(outcome.downloads.first { $0.legacyLocalItemID == "local_li-audio" })
+        let bob = try XCTUnwrap(outcome.downloads.first { $0.legacyLocalItemID == "local_li-audio-bob" })
+        XCTAssertEqual(alice.account, homeAlice)
+        XCTAssertEqual(bob.account, homeBob)
+        XCTAssertTrue(bob.complete)
+        for (aliceTrack, bobTrack) in zip(alice.tracks, bob.tracks) {
+            let alicePath = try XCTUnwrap(aliceTrack.file?.path), bobPath = try XCTUnwrap(bobTrack.file?.path)
+            XCTAssertNotEqual(alicePath.split(separator: "/").first, bobPath.split(separator: "/").first)
+            XCTAssertEqual(try contents(migrator, aliceTrack.file), try contents(migrator, bobTrack.file))
+        }
+        XCTAssertNotEqual(alice.cover?.path.split(separator: "/").first, try XCTUnwrap(bob.cover).path.split(separator: "/").first)
+    }
 }
+

@@ -288,6 +288,18 @@ final class LegacyRealmExportTests: XCTestCase {
         XCTAssertTrue((try? FileManager.default.contentsOfDirectory(atPath: work.path))?.isEmpty ?? true, "the token-bearing Realm copy must be removed after reading")
     }
 
+    func testACredentialCopyLeftByAnInterruptedReadIsRemovedOnTheNextRead() throws {
+        try seedLegacyRealm()
+        let work = directory.appendingPathComponent("Work")
+        let stale = work.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: stale, withIntermediateDirectories: true)
+        try FileManager.default.copyItem(at: realmURL, to: stale.appendingPathComponent("legacy.realm"))
+
+        _ = try LegacyRealmReader.read(realmAt: realmURL, workDirectory: work)
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: stale.path))
+    }
+
     func testANewerLegacySchemaIsRefusedAndKept() throws {
         try seedLegacyRealm(schemaVersion: 22)
         let before = try digest()
