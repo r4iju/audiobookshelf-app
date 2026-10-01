@@ -73,9 +73,15 @@ final class LegacyExportJourneyUITests: XCTestCase {
         XCTAssertFalse(text(beginningWith: "The save dialog could not be shown").exists,
                        "an open save dialog is not reported as failed")
 
-        // Swiping the dialog away resolves the save, so it can be opened again.
+        // Past the plugin's presentation check, only the dialog can end the save: a swipe must not
+        // dismiss it without a decision, and Cancel releases the save so it can be opened again.
+        sleep(7)
         app.swipeDown(velocity: .fast)
-        XCTAssertTrue(pickerSave.waitForNonExistence(timeout: 10), "the save dialog was dismissed")
+        sleep(2)
+        XCTAssertTrue(pickerSave.exists, "a swipe does not dismiss the save dialog")
+        tapWhenReady(app.buttons["Cancel"].firstMatch)
+        XCTAssertTrue(pickerSave.waitForNonExistence(timeout: 10), "Cancel dismissed the save dialog")
+        XCTAssertFalse(text(beginningWith: "Saved.").exists, "a cancelled save is not reported as saved")
         tapWhenReady(save)
         XCTAssertTrue(pickerSave.waitForExistence(timeout: 15), "the save dialog opens again after a dismissal")
         XCTAssertFalse(text(beginningWith: "The export is busy").exists)
