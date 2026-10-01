@@ -20,6 +20,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
 import com.audiobookshelf.android.data.AccountStore
+import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.data.SettingsStore
 import com.audiobookshelf.core.AccountIdentity
 import com.audiobookshelf.core.ApiClient
@@ -37,6 +38,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -139,6 +142,8 @@ class PlaybackEngine(
         .also { controller -> controller.bind { Triple(globalPosition(), loaded?.now?.chapters.orEmpty(), player.playbackParameters.speed) } }
 
     private var queue: List<PlaySource> = emptyList()
+    /** Account of the most recent open request, which may still be in flight. */
+    private var opening: AccountIdentity? = null
     private val main = android.os.Handler(android.os.Looper.getMainLooper())
 
     /** The player only accepts its own thread; screens may call after a network result resumes elsewhere. */
@@ -163,12 +168,14 @@ class PlaybackEngine(
 
     private fun start(source: PlaySource) {
         val current = loaded
-        if (current != null && current.source.itemId == source.itemId && current.source.episodeId == source.episodeId && mutable.value.error == null) {
+        if (current != null && current.source.account == source.account && current.source.itemId == source.itemId &&
+            current.source.episodeId == source.episodeId && mutable.value.error == null) {
             if (mutable.value.finished) seekTo(0.0)
             resume()
             return
         }
         val request = ++generation
+        opening = source.account
         stopCurrent(closeStream = true)
         mutable.value = mutable.value.copy(now = null, loading = true, error = null, openError = null, finished = false, position = 0.0)
         startService()
@@ -292,7 +299,19 @@ class PlaybackEngine(
 
     fun allowSystemSeeking() = settings.current.allowSeekingOnMediaControls
 
-    fun isLoaded(itemId: String, episodeId: String?) = loaded?.let { it.source.itemId == itemId && it.source.episodeId == episodeId } == true
+    fun isLoaded(itemId: String, episodeId: String?) = loaded?.let {
+        it.source.account == accounts.activeClient?.account && it.source.itemId == itemId && it.source.episodeId == episodeId
+    } == true
+
+    init {
+        // Media of one account must not keep playing, or finish opening, under another account or after sign-out.
+        scope.launch {
+            accounts.session.map { (it as? SessionState.Active)?.client?.account }.distinctUntilChanged().collect { active ->
+                val owner = loaded?.source?.account ?: opening.takeIf { mutable.value.loading }
+                if (owner != null && owner != active) close()
+            }
+        }
+    }
     // endregion
 
     private suspend fun open(source: PlaySource, request: Int, transcode: Boolean, at: Double?) {
@@ -309,6 +328,13 @@ class PlaybackEngine(
             journal.begin(source.account, ListeningMedia(source.itemId, source.episodeId, media.now.title, media.now.author,
                 if (source.episodeId != null || media.now.isPodcast) "podcast" else "book", timeline.duration, media.start,
                 playMethod = if (source is PlaySource.Local) 3 else 0), device().deviceId)
+        }
+        if (request != generation) {
+            // Superseded while the journal was written: retire this session instead of installing it.
+            withContext(io) { journal.finish(recordId) }
+            sync.publish(source.account)
+            media.streamSessionId?.let { if (source is PlaySource.Stream) closeStream(source.client, it) }
+            return
         }
         val current = Loaded(source, media.now.copy(duration = timeline.duration), timeline, recordId, media.streamSessionId, transcode)
         if (source is PlaySource.Stream) settings.update { it.copy(lastPlayed = source.episodeId?.let { episode -> "episode/${source.itemId}/$episode" } ?: "item/${source.itemId}") }
@@ -437,10 +463,25 @@ class PlaybackEngine(
         current.unrecordedListening = 0.0
         current.lastRecord = SystemClock.elapsedRealtime()
         current.lastRecordedPosition = position
-        scope.launch(io) {
-            runCatching { journal.record(current.recordId, position, listened) }.onFailure { Log.w(TAG, "Listening not recorded", it) }
-        }
+        record(current, position, listened)
     }
+
+    /** A failed write gives the listening back to [current] so the next write retries it, and stops playback visibly. */
+    private fun record(current: Loaded, position: Double, listened: Double): Job =
+        scope.launch(io) {
+            runCatching { journal.record(current.recordId, position, listened) }.onFailure { failure ->
+                Log.e(TAG, "Listening not recorded", failure)
+                withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    current.unrecordedListening += listened
+                    current.lastRecordedPosition = -1.0
+                    if (loaded === current) {
+                        player.pause()
+                        mutable.value = mutable.value.copy(playing = false,
+                            error = "Listening could not be saved on this device, so playback paused. Free some storage and try again.")
+                    }
+                }
+            }
+        }
     // endregion
 
     private fun globalPosition(current: Loaded? = loaded): Double {
@@ -461,9 +502,10 @@ class PlaybackEngine(
         val current = loaded ?: return
         val end = current.timeline.duration
         mutable.value = mutable.value.copy(position = end, finished = true, playing = false)
-        current.lastRecordedPosition = -1.0
-        scope.launch(io) { runCatching { journal.record(current.recordId, end, current.unrecordedListening.also { current.unrecordedListening = 0.0 }) } }
-            .invokeOnCompletion { scope.launch { sync.publish(current.source.account) } }
+        current.lastRecordedPosition = end
+        val listened = current.unrecordedListening
+        current.unrecordedListening = 0.0
+        record(current, end, listened).invokeOnCompletion { scope.launch { sync.publish(current.source.account) } }
         val next = queue.firstOrNull()
         if (next == null) mutable.value = mutable.value.copy(queueId = null)
         else {

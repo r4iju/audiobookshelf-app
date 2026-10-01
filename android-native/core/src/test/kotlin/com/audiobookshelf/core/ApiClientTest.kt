@@ -70,6 +70,15 @@ class ApiClientTest {
     }
 
     @Test
+    fun rejectionNamesTheAccountAndCredentialsItCameFrom() = runBlocking {
+        refreshStatus = 401
+        val client = start()
+        val failure = runCatching { client.libraries() }.exceptionOrNull() as ApiError.SignInRequired
+        assertEquals(client.account, failure.account)
+        assertEquals("expired", failure.rejectedToken)
+    }
+
+    @Test
     fun unreachableServerIsOfflineNotSignedOut() = runBlocking {
         val client = start()
         server.shutdown()

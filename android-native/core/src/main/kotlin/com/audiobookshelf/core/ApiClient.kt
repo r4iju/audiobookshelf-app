@@ -230,13 +230,14 @@ class ApiClient(
             if (error.status != 401) throw error
         }
         val current = credentials
-        if (current.refreshToken == null) throw ApiError.SignInRequired()
+        if (current.refreshToken == null) throw ApiError.SignInRequired(account, used)
         // A refresh completed by a concurrent request also satisfies this older 401.
         if (current.accessToken == used) refresh(current)
+        val retried = credentials.accessToken
         try {
-            return call(credentials.accessToken)
+            return call(retried)
         } catch (error: ApiError.Http) {
-            if (error.status == 401) throw ApiError.SignInRequired()
+            if (error.status == 401) throw ApiError.SignInRequired(account, retried)
             throw error
         }
     }
@@ -246,18 +247,18 @@ class ApiClient(
         try {
             val current = credentials
             if (current.accessToken != seen.accessToken) return
-            val token = current.refreshToken ?: throw ApiError.SignInRequired()
+            val token = current.refreshToken ?: throw ApiError.SignInRequired(account, current.accessToken)
             val request = Request.Builder().url(address.url("auth/refresh")).header("x-refresh-token", token)
                 .post(ByteArray(0).toRequestBody(JsonType)).build()
             val response = try {
                 http.execute(request)
             } catch (error: ApiError.Http) {
-                if (error.status == 401 || error.status == 403) throw ApiError.SignInRequired()
+                if (error.status == 401 || error.status == 403) throw ApiError.SignInRequired(account, current.accessToken)
                 throw error
             }
             val user = runCatching { AbsJson.decodeFromString(AuthResponse.serializer(), response).user }.getOrElse { throw ApiError.InvalidResponse(it) }
-            val bearer = user.bearerToken?.takeIf { it.isNotEmpty() } ?: throw ApiError.SignInRequired()
-            if (user.id != current.userId) throw ApiError.SignInRequired()
+            val bearer = user.bearerToken?.takeIf { it.isNotEmpty() } ?: throw ApiError.SignInRequired(account, current.accessToken)
+            if (user.id != current.userId) throw ApiError.SignInRequired(account, current.accessToken)
             val next = current.copy(accessToken = bearer, refreshToken = user.refreshToken ?: token, username = user.username.ifEmpty { current.username })
             sink.rotated(current, next)
             credentials = next

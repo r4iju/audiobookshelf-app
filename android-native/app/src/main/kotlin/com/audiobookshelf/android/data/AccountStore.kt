@@ -95,17 +95,24 @@ class AccountStore(private val vault: CredentialVault, private val http: OkHttpC
         })
     }
 
-    /** Called whenever the server rejects the current session: route to reauthentication, keep everything. */
-    fun requireSignIn(account: AccountIdentity) {
-        val document = vault.update { saved ->
-            saved.copy(connections = saved.connections.map { if (it.credentials.account == account) it.copy(needsSignIn = true) else it })
+    /**
+     * Routes [account] to reauthentication, keeping everything. With [rejectedToken], a rejection that
+     * arrives after the account already signed in again with new credentials is ignored.
+     */
+    fun requireSignIn(account: AccountIdentity, rejectedToken: String? = null) {
+        val saved = runCatching { vault.load() }.getOrNull() ?: return
+        val target = saved.connections.firstOrNull { it.credentials.account == account } ?: return
+        if (target.needsSignIn || (rejectedToken != null && target.credentials.accessToken != rejectedToken)) return
+        val document = vault.update { current ->
+            current.copy(connections = current.connections.map { if (it.id == target.id) it.copy(needsSignIn = true) else it })
         }
-        clients.clear()
+        clients.remove(target.id)
         publish(document)
     }
 
+    /** Only the account whose request was refused is affected, whichever account is active by now. */
     fun handle(error: Throwable) {
-        if (error is ApiError.SignInRequired) activeClient?.let { requireSignIn(it.account) }
+        if (error is ApiError.SignInRequired) error.account?.let { requireSignIn(it, error.rejectedToken) }
     }
 
     private fun publish(document: VaultDocument) {

@@ -30,10 +30,10 @@ class PodcastRequests(private val file: File) {
 
     @Serializable private data class Document(val version: Int, val records: List<Record>)
 
+    /** False when the stored queue could not be read; the original file is left in place. Declared before [state], whose initializer sets it. */
+    var writable = true; private set
     private val state = MutableStateFlow(read())
     val records: StateFlow<List<Record>> = state
-    /** False when the stored queue could not be read; the original file is left in place. */
-    var writable = true; private set
 
     fun pending(account: AccountIdentity, itemId: String) = state.value.filter { it.account == account && it.itemId == itemId && it.state == State.PENDING }
     fun failures(account: AccountIdentity, itemId: String) = state.value.filter { it.account == account && it.itemId == itemId && it.state == State.FAILED }

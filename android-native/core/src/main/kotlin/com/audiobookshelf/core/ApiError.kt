@@ -7,7 +7,9 @@ package com.audiobookshelf.core
 sealed class ApiError(message: String, cause: Throwable? = null) : Exception(message, cause) {
     class InvalidServer : ApiError("Enter a server address starting with http:// or https://, for example https://books.example.com/abs.")
     class UnsafeMediaUrl : ApiError("The server returned a media address outside this server. It was not opened.")
-    class SignInRequired : ApiError("Your session is no longer accepted. Sign in again; unsent listening is kept.")
+    /** [account] and [rejectedToken] identify which saved session was refused, so a late failure cannot sign out another one. */
+    class SignInRequired(val account: AccountIdentity? = null, val rejectedToken: String? = null) :
+        ApiError("Your session is no longer accepted. Sign in again; unsent listening is kept.")
     class Untrusted(cause: Throwable) : ApiError(
         "The server's certificate is not trusted by this device. Install your server's certificate authority in Android Settings > Security > Encryption & credentials, then try again.",
         cause,

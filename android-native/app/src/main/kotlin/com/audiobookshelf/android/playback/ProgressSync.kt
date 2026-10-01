@@ -70,7 +70,7 @@ class ProgressSync(
         } catch (failure: Exception) {
             Log.i("AbsProgress", "Listening kept for retry: ${failure.javaClass.simpleName}")
             failing.value = true
-            if (failure is ApiError.SignInRequired) accounts.requireSignIn(account) else scheduleRetry()
+            if (failure is ApiError.SignInRequired) accounts.handle(failure) else scheduleRetry()
             false
         }
     }
