@@ -447,8 +447,6 @@ not exercised through the UI on a simulator. No export of owner data was run.
    package seen as one item by Files and the native picker (directory packages through
    `forExporting` are expected to work for a declared package type; not observed here). Needs a
    signed legacy build, which is the root's to install after review.
-10. Native import of a real `.absmigration` once the coordinator declares the imported type and
-    wires the picker.
 5. After coordinator wiring: offline playback of adopted audio, same-page PDF resume, EPUB/MOBI/
    AZW3/CBZ/CBR files present and associated, settings and accounts visible, pending sessions
    accepted by a server.
@@ -459,3 +457,5 @@ not exercised through the UI on a simulator. No export of owner data was run.
    opens with its pre-upgrade accounts, downloads and progress.
 9. Server handling of streamed (`sinceLastSync`) sessions posted through `local-all` when the
    server already holds the session id, against the supported server versions.
+10. Native import of a real `.absmigration` once the coordinator declares the imported type and
+    wires the picker.
