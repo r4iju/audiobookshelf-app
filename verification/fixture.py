@@ -110,7 +110,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if not state or not challenge or callback != 'audiobookshelf-native-preview://oauth' or query.get('code_challenge_method') != ['S256']:
                     return self.respond(400, {})
                 openid_sessions[state] = {'challenge': challenge, 'callback': callback}
-                provider_query = urlencode({'state': state, 'client_id': 'local-fixture', 'scope': 'openid profile', 'redirect_uri': f'http://{self.headers["Host"]}{prefix}/auth/openid/mobile-redirect'})
+                if configuration['mode'] == 'openid-invalid-provider-state':
+                    state = 'changed-provider-state'
+                    openid_sessions[state] = {'challenge': challenge, 'callback': callback}
+                provider_query = urlencode({'state': state, 'client_id': 'local-fixture', 'scope': 'openid profile', 'code_challenge': challenge, 'code_challenge_method': 'S256', 'redirect_uri': f'http://{self.headers["Host"]}{prefix}/auth/openid/mobile-redirect'})
                 return self.respond(302, {}, headers={'Location': f'http://{self.headers["Host"]}{prefix}/__fixture__/provider?{provider_query}', 'Set-Cookie': f'abs_oidc={state}; Path={prefix or "/"}; HttpOnly; SameSite=Lax'})
             if path == '/__fixture__/provider':
                 state = query.get('state', [''])[0]
@@ -216,7 +219,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(400, {})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False)
                 items[0]['media']['metadata']['title'] = 'A Very Long Story Title About Finding Your Way Home Through A City Of Unexpected Doors And Forgotten Libraries' if mode == 'edge-metadata' else 'Stories for Tomorrow 01'

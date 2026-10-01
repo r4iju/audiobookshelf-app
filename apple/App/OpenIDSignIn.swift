@@ -56,6 +56,9 @@ import UIKit
         }
         let providerParts = try validatedProvider(provider)
         let providerState = try Self.single("state", in: providerParts)
+        guard providerState == state,
+              try Self.single("code_challenge", in: providerParts) == challenge,
+              try Self.single("code_challenge_method", in: providerParts) == "S256" else { throw Failure.invalidResponse }
         let result = try await openBrowser(provider)
         guard let callback = URLComponents(url: result, resolvingAgainstBaseURL: false),
               callback.scheme == "audiobookshelf-native-preview", callback.host == "oauth",

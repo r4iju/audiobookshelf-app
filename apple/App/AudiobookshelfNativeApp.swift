@@ -14,6 +14,10 @@ import SwiftUI
             UserDefaults.standard.removeObject(forKey: "previewServer")
             UserDefaults.standard.removeObject(forKey: "previewUsername")
         }
+        if CommandLine.arguments.contains("--seed-legacy-preview-account") {
+            try? vault.seedLegacyPreviewAccount()
+            UserDefaults.standard.set("books", forKey: "previewLibrary")
+        }
         #endif
         let api = APIClient(store: vault)
         let playback = ApplePlayback(api: api)

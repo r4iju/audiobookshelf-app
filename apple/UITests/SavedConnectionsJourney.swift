@@ -1,6 +1,20 @@
 import XCTest
 
 @MainActor final class SavedConnectionsJourney: NativeJourney {
+    func testLegacyAccountRefreshRetainsSelectedLibraryWithoutDuplicatingConnection() async throws {
+        try await FixtureControl.configure("baseline")
+        let app = XCUIApplication()
+        app.launchArguments = ["--reset-preview-account", "--seed-legacy-preview-account"]
+        app.launch()
+        XCTAssertTrue(app.buttons["book-book-0"].waitForExistence(timeout: 10))
+        app.terminate()
+        app.launchArguments = []
+        app.launch()
+        XCTAssertTrue(app.buttons["book-book-0"].waitForExistence(timeout: 10))
+        app.buttons["account"].tap()
+        app.buttons["Saved connections"].tap()
+        XCTAssertEqual(app.buttons.matching(identifier: "connection-http://127.0.0.1:19765/abs").count, 1)
+    }
     func testAccountsOnTheSameServerKeepTheirOwnListeningPosition() async throws {
         try await FixtureControl.configure("baseline")
         addTeardownBlock { try await FixtureControl.configure("baseline") }

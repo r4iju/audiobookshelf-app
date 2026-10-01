@@ -63,7 +63,12 @@ public struct Credentials: Codable, Sendable {
 @MainActor public protocol CredentialStore {
     func load() throws -> Credentials?
     func save(_ credentials: Credentials) throws
+    func replace(_ credentials: Credentials, replacing original: Credentials) throws
     func clear() throws
+}
+
+public extension CredentialStore {
+    func replace(_ credentials: Credentials, replacing original: Credentials) throws { try save(credentials) }
 }
 
 public struct AuthResponse: Decodable {

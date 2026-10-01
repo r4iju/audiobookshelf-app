@@ -108,6 +108,17 @@ import Security
         } else if status != errSecSuccess { throw KeychainError(status: status) }
     }
 
+    func replace(_ credentials: Credentials, replacing original: Credentials) throws {
+        var saved = try document()
+        guard let index = saved.connections.firstIndex(where: { $0.id == saved.activeID }),
+              saved.connections[index].credentials.accessToken == original.accessToken,
+              try ServerAddress(saved.connections[index].credentials.server).base == ServerAddress(original.server).base,
+              try ServerAddress(credentials.server).base == ServerAddress(original.server).base,
+              original.userID == nil || credentials.userID == original.userID else { throw APIError.signInRequired }
+        saved.connections[index].credentials = credentials
+        try write(saved)
+    }
+
     func clear() throws {
         var saved = try document()
         saved.connections.removeAll { $0.id == saved.activeID }
@@ -119,6 +130,18 @@ import Security
         let status = SecItemDelete(query as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else { throw KeychainError(status: status) }
     }
+
+    #if DEBUG && targetEnvironment(simulator)
+    func seedLegacyPreviewAccount() throws {
+        try resetPreviewAccounts()
+        let credentials = Credentials(server: "http://127.0.0.1:19765/abs", accessToken: "expired", refreshToken: "refresh")
+        var insertion = query
+        insertion[kSecValueData as String] = try JSONEncoder().encode(credentials)
+        insertion[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        let status = SecItemAdd(insertion as CFDictionary, nil)
+        guard status == errSecSuccess else { throw KeychainError(status: status) }
+    }
+    #endif
 
     struct KeychainError: LocalizedError {
         let status: OSStatus

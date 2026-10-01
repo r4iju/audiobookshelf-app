@@ -61,7 +61,7 @@ import Foundation
         let user = try await me()
         guard generation == authGeneration, let current = credentials else { throw CancellationError() }
         let identified = Credentials(server: current.server, accessToken: current.accessToken, refreshToken: current.refreshToken, userID: user.id, username: user.username)
-        try store.save(identified)
+        try store.replace(identified, replacing: current)
         credentials = identified
         return try AccountIdentity(server: identified.server, userID: user.id)
     }
@@ -206,7 +206,7 @@ import Foundation
                   authGeneration == generation else { throw APIError.signInRequired }
             guard original.userID == nil || response.user.id == nil || original.userID == response.user.id else { throw APIError.signInRequired }
             let updated = Credentials(server: original.server, accessToken: bearer, refreshToken: response.user.refreshToken ?? token, userID: original.userID ?? response.user.id, username: response.user.username ?? original.username)
-            try store.save(updated)
+            try store.replace(updated, replacing: original)
             credentials = updated
         }
         refreshTask = task

@@ -1,6 +1,21 @@
 import XCTest
 
 @MainActor final class OpenIDJourney: NativeJourney {
+    func testChangedAuthorizationStateIsRejectedBeforeOpeningBrowser() async throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--reset-preview-account"]
+        app.launch()
+        let server = app.textFields["server"]
+        XCTAssertTrue(server.waitForExistence(timeout: 10))
+        server.tap()
+        server.typeText("http://127.0.0.1:19765/abs")
+        try await FixtureControl.configure("openid-invalid-provider-state")
+        addTeardownBlock { try await FixtureControl.configure("baseline") }
+        app.buttons["openid-sign-in"].tap()
+        XCTAssertTrue(app.staticTexts["connection-error"].waitForExistence(timeout: 8))
+        XCTAssertFalse(XCUIApplication(bundleIdentifier: "com.apple.SafariViewService").webViews.links["Approve sign-in"].exists)
+    }
+
     func testBrowserCancellationRetainsTheExistingSavedAccount() async throws {
         try await FixtureControl.configure("baseline")
         addTeardownBlock { try await FixtureControl.configure("baseline") }
