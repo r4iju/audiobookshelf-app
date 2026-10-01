@@ -78,7 +78,7 @@ struct BookDetails: View {
                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
                     if writesWaiting {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text(l10n("An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.")).font(.callout).foregroundColor(.secondary)
+                            Text(l10n("An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.")).font(.callout).foregroundColor(ShelfStyle.secondaryText)
                             Button(l10n("Restart the server")) { askForRestart(thenDiscard: false) }.disabled(progressBusy).accessibilityIdentifier("restart-server")
                         }
                     }
