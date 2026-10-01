@@ -23,7 +23,7 @@ for port in [26765, 26769]:
         except OSError:
             raise SystemExit(f'Fixture port {port} is already in use. Finish the previous owned realtime verification first.')
 PY
-(cd "$repo_root" && exec python3 -m verification.fixture --port 26769) > "$fixture_dir/http.log" 2>&1 &
+(cd "$repo_root" && exec python3 apple/scripts/item_actions_fixture.py --port 26769) > "$fixture_dir/http.log" 2>&1 &
 fixture_pids+=("$!")
 (cd "$repo_root" && exec node verification/realtime/native-fixture.mjs 26765 26769) > "$fixture_dir/realtime.log" 2>&1 &
 fixture_pids+=("$!")

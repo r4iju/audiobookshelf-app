@@ -4,8 +4,8 @@ import XCTest
 final class RealtimeChangeTests: XCTestCase {
     private let owner = try! AccountIdentity(server: "https://books.example/abs", userID: "user-a")
 
-    private func change(_ name: String, _ json: String, resumed: Bool = false) -> RealtimeChange? {
-        RealtimeChange(ServerEvent(name: name, data: Data(json.utf8)), owner: owner, resumed: resumed)
+    private func change(_ name: String, _ json: String) -> RealtimeChange? {
+        RealtimeChange(ServerEvent(name: name, data: Data(json.utf8)), owner: owner)
     }
 
     func testServer230ProgressFromAnotherSessionNamesTheChangedMedia() {
@@ -42,6 +42,16 @@ final class RealtimeChangeTests: XCTestCase {
         XCTAssertEqual(kind, .playlist); XCTAssertEqual(id, "playlist-1"); XCTAssertTrue(removed)
         guard case .group(let collection, "collection-1", false)? = change("collection_updated", #"{"id":"collection-1","libraryId":"books","name":"Shared"}"#) else { return XCTFail("Collection update was not recognised") }
         XCTAssertEqual(collection, .collection)
+    }
+
+    func testItemFeedEventsCarryTheFeedOrItsClosing() {
+        let feed = #"{"id":"saga-feed","entityType":"libraryItem","entityId":"book-1","feedUrl":"/feed/saga-feed","meta":{"title":"Saga","description":null,"preventIndexing":true,"ownerName":"Owner","ownerEmail":null}}"#
+        guard case .itemFeed(let opened, let current)? = change("rss_feed_open", feed) else { return XCTFail("Feed opening was not recognised") }
+        XCTAssertEqual(opened, "book-1"); XCTAssertEqual(current?.feedUrl, "/feed/saga-feed"); XCTAssertEqual(current?.meta?.ownerName, "Owner")
+        guard case .itemFeed(let closed, nil)? = change("rss_feed_closed", feed) else { return XCTFail("Feed closing was not recognised") }
+        XCTAssertEqual(closed, "book-1")
+        XCTAssertNil(change("rss_feed_open", feed.replacingOccurrences(of: "libraryItem", with: "collection")), "Collection and series feeds are not an item's")
+        XCTAssertNil(change("rss_feed_open", #"{"entityType":"libraryItem","entityId":"book-1"}"#))
     }
 
     func testPodcastDownloadResultsStillReachTheQueue() {

@@ -60,3 +60,30 @@ Baseline `layouts/default.vue` moves a paused player to another session's positi
 - Paused-player position follow (paused-player worker, above).
 - Events missed while suspended or terminated, or before the first `init`, are not replayed; server 2.30 has no replay.
 - TV adoption of `RealtimeChange`.
+
+## Item feeds and the gap before `init` (base `315183c1`)
+
+The item page ignored `rss_feed_open` and `rss_feed_closed`, and only a resumed `init` refreshed visible screens. Server 2.30 emits to the `authenticated` room only and keeps no replay, so changes made between a screen's HTTP load and the first `init` stayed hidden.
+
+- `RealtimeChange.itemFeed(itemID:feed:)` decodes `Feed.toOldJSONMinified` for `libraryItem` feeds. `authenticated` no longer carries `resumed`, and `NativeRealtime` no longer tracks it.
+- `ItemServerActions.feedChanged(_:)` applies a feed change for the current sign-in. A load that started before a change does not undo it. `ItemServerActionsSection` subscribes through `catalog.owns(event)` and reloads on `init`.
+- Catalog, book details, group list and details, and the root's `refreshPausedProgress` call now run on every `init`. The paused-player call site keeps its `event.isCurrent(on:)` guard, and `followPausedProgress` still skips unacknowledged listening.
+- A catalog whose first load is superseded by an `init` refresh that fails now shows the failure instead of loading forever.
+- `verify-realtime.sh` serves `apple/scripts/item_actions_fixture.py` on 26769. Its listen backlog is raised, because an `init` refresh bursts about seven requests and item reads loop back into the same server. With the default backlog of five, the Node proxy returned 503 to part of the burst. A failing iPad run traced to this, and a 40-request burst reproduced it before the change and not after.
+
+Evidence, simulators `Audiobookshelf Realtime Sync QA` (iPhone 17) and `Audiobookshelf Realtime Sync iPad QA` (iPad Pro 11-inch M5), iOS 27, logs in `/tmp/realtime-sync-qa/`:
+
+- Red first, all on behaviour:
+  - Core: the feed event was not recognised, a feed change was ignored, and an older load reopened a closed feed. The sign-in guard case passed vacuously against the stub and stays as a guard.
+  - NativeTests: `testAnInitDuringTheFirstLoadThatFailsShowsTheFailure` stayed loading.
+  - Journeys on the unchanged app (iPhone): the feed opened elsewhere never appeared; the playlist list and Continue Listening missed changes made before the first `init`; open details missed progress and the feed.
+  - `testUnsentListeningSurvivesAReconnectionRefresh` passed before the fix as intended, since it is a guard.
+- Green:
+  - `swift test` in `tvos/Core`: all pass.
+  - NativeTests: 51/51 on iPhone and on iPad.
+  - RealtimeJourney 9/9 plus PausedRealtimeJourney 2/2: iPhone 11/11 twice, iPad 11/11 twice after the backlog fix.
+  - iOS 14 minimum source typecheck of the app, Playback, packages and TVCore: 0 errors.
+  - Python fixture and item actions fixture tests pass.
+- Not run: `verification/realtime` Node tests need the root `socket.io-client`, which is not installed in this worktree. They do not load `native-fixture.mjs`.
+
+Remaining gates: a live-server feed opened and closed by another client (needs owner approval); physical iPhone/iPad realtime with a second client, Wi-Fi loss and suspension; and TV adoption of `itemFeed`.

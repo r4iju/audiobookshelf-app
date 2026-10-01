@@ -177,7 +177,7 @@ enum CatalogSort: String, CaseIterable {
     func receive(_ event: NativeRealtime.Event) {
         guard owns(event) else { return }
         switch event.change {
-        case .authenticated(resumed: true): refresh(items: true, for: event)
+        case .authenticated: refresh(items: true, for: event)
         case .progress, .user: refresh(items: filter?.hasPrefix("progress.") == true, for: event)
         case .itemsAdded(let libraries) where libraries.contains(library.id): refresh(items: true, for: event)
         case .itemsUpdated(let updated): change(updated.map { ($0.id, $0) }, for: event)
@@ -243,7 +243,10 @@ enum CatalogSort: String, CaseIterable {
             }
             state = .content(content)
         } catch {
-            // The visible catalog stays usable; the next change, reconnection or manual refresh retries.
+            // A visible catalog stays usable; the next change, reconnection or manual refresh retries. One that this
+            // refresh superseded while loading has nothing to show.
+            guard reloadItems, generation == pages, owns(event), case .loading = state else { return }
+            state = .failed(ConnectionStore.recovery(for: error))
         }
     }
 

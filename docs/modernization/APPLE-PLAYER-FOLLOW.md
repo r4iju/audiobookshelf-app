@@ -5,7 +5,7 @@ The baseline player (`layouts/default.vue`, `AudioPlayerContainer.vue`) moves a 
 ```swift
 // RealtimeChange.progress(itemID, episodeID, session) for the event's account
 await playback.followRemoteProgress(account: account, itemID: itemID, episodeID: episodeID, sessionID: session)
-// authenticated(resumed: true) after a reconnect, for the signed-in account
+// authenticated, on every init, for the signed-in account
 await playback.refreshPausedProgress(account: account)
 ```
 
@@ -24,7 +24,7 @@ The pending check lives in `ListeningSync.hasLocalListening`, a read-only journa
 
 ## Root wiring
 
-Call `followRemoteProgress` for each `RealtimeChange.progress` of the active account, and `refreshPausedProgress` on `authenticated(resumed: true)`. Root owns those call sites and the `NativeRealtime` stream. Because the follow skips while own listening is unacknowledged, an event arriving right after a pause can be skipped. The reconnect refresh, or the next event once sync has acknowledged, will apply it.
+Call `followRemoteProgress` for each `RealtimeChange.progress` of the active account, and `refreshPausedProgress` on every `authenticated` (each `init`, since server 2.30 keeps no replay). Root owns those call sites and the `NativeRealtime` stream. Because the follow skips while own listening is unacknowledged, an event arriving right after a pause can be skipped. The next `init` refresh, or the next event once sync has acknowledged, will apply it.
 
 ## Verification
 

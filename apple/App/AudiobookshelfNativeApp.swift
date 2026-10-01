@@ -89,7 +89,7 @@ import SwiftUI
                         switch event.change {
                         case .progress(let itemID, let episodeID, let sessionID):
                             await player.followRemoteProgress(account: event.account, itemID: itemID, episodeID: episodeID, sessionID: sessionID)
-                        case .authenticated(resumed: true), .user:
+                        case .authenticated, .user:
                             await player.refreshPausedProgress(account: event.account)
                         default: break
                         }

@@ -287,6 +287,41 @@ import XCTest
         XCTAssertTrue(actions.devices.isEmpty)
     }
 
+    func testAFeedOpenedOrClosedElsewhereReplacesTheItemsFeed() async throws {
+        serve(type: "user")
+        let actions = ItemServerActions(api: api, itemID: "book-1")
+        await actions.load()
+        XCTAssertFalse(actions.showsFeed)
+        actions.feedChanged(try JSONDecoder().decode(RSSFeed.self, from: Data(Self.openFeed.utf8)))
+        XCTAssertEqual(actions.feed?.id, "saga-feed")
+        XCTAssertTrue(actions.showsFeed, "Anyone sees a feed another client opened, as on the baseline item page")
+        actions.feedChanged(nil)
+        XCTAssertNil(actions.feed)
+        XCTAssertFalse(actions.showsFeed)
+    }
+
+    func testAFeedClosedWhileTheItemLoadsIsNotReopenedByTheOlderResponse() async throws {
+        var actions: ItemServerActions!
+        serve(feed: Self.openFeed) { entry in
+            guard entry.path == "/abs/api/items/book-1" else { return nil }
+            DispatchQueue.main.sync { MainActor.assumeIsolated { actions.feedChanged(nil) } }
+            return nil
+        }
+        actions = ItemServerActions(api: api, itemID: "book-1")
+        await actions.load()
+        XCTAssertTrue(actions.loaded)
+        XCTAssertNil(actions.feed, "The item was read before the feed closed, so its open feed is stale")
+    }
+
+    func testAFeedChangeAfterASignInChangeIsIgnored() async throws {
+        serve(feed: Self.openFeed)
+        let actions = ItemServerActions(api: api, itemID: "book-1")
+        await actions.load()
+        try signIn("https://books.example/abs", user: "a")
+        actions.feedChanged(nil)
+        XCTAssertEqual(actions.feed?.id, "saga-feed", "A change received by another sign-in does not belong to these actions")
+    }
+
     func testAPodcastFeedWarnsWhenEpisodesHaveNoPublishedDate() async throws {
         serve(media: #""episodes":[{"id":"e1","pubDate":"Mon, 01 Jan 2024 00:00:00 GMT"},{"id":"e2","pubDate":null}]"#)
         let podcast = ItemServerActions(api: api, itemID: "book-1")

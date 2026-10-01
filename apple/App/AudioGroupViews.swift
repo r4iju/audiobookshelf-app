@@ -147,7 +147,7 @@ struct AudioGroupList: View {
             .onAppear { Task { await store.load() } }
             .onReceive(realtime.events) { event in
                 switch event.change {
-                case .authenticated(resumed: true): Task { await store.load(for: event) }
+                case .authenticated: Task { await store.load(for: event) }
                 case .group(let kind, _, _) where kind == store.kind: Task { await store.load(for: event) }
                 default: break
                 }
@@ -209,7 +209,7 @@ struct AudioGroupDetails: View {
                 switch event.change {
                 case .group(let kind, let id, true) where kind == store.kind && id == initial.id: presentation.wrappedValue.dismiss()
                 case .group(let kind, let id, false) where kind == store.kind && id == initial.id: Task { await store.load(id: initial.id, for: event) }
-                case .authenticated(resumed: true), .progress, .user: Task { await store.load(id: initial.id, for: event) }
+                case .authenticated, .progress, .user: Task { await store.load(id: initial.id, for: event) }
                 default: break
                 }
             }

@@ -66,6 +66,8 @@ public enum ItemServerActionError: Error, Equatable {
     private var hasAudio = false
     private var hasEbook = false
     private var isBook = false
+    /// Counts feed changes from realtime events, so a load that started before one does not undo it.
+    private var feedChanges = 0
 
     public init(api: APIClient, itemID: String) {
         self.api = api
@@ -107,6 +109,7 @@ public enum ItemServerActionError: Error, Equatable {
 
     public func load() async {
         let authorization = signIn.revision
+        let changes = feedChanges
         do {
             try await signIn.confirm()
             async let session = api.sessionAuthorization(authorization: authorization)
@@ -119,12 +122,19 @@ public enum ItemServerActionError: Error, Equatable {
             hasEbook = item.media.ebookFile != nil
             hasAudio = !(item.media.tracks ?? []).isEmpty || !(item.media.episodes ?? []).isEmpty
             hasEpisodesWithoutPubDate = (item.media.episodes ?? []).contains { ($0.pubDate ?? "").isEmpty }
-            feed = item.rssFeed
+            if feedChanges == changes { feed = item.rssFeed }
             error = nil
             loaded = true
         } catch {
             report(error)
         }
+    }
+
+    /// Another client opened (`feed`) or closed (`nil`) this item's feed, as received by this sign-in.
+    public func feedChanged(_ feed: RSSFeed?) {
+        guard signIn.isCurrent else { return }
+        feedChanges += 1
+        self.feed = feed
     }
 
     public func openFeed(slug: String, preventIndexing: Bool, ownerName: String, ownerEmail: String) async {

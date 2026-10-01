@@ -6,11 +6,14 @@ Shapes and checks follow the 2.30 server source:
 - POST /api/feeds/item/:id/open and POST /api/feeds/:id/close: RSSFeedController with its admin-only middleware (403),
   body validation, audio and slug checks, and RssFeedManager.getFeedOptionsFromReqOptions.
 - POST /api/emails/send-ebook-to-device: EmailController.sendEBookToDevice checks, in the same order.
+- POST /__actions__/remote-feed opens or closes a feed as another client would. RssFeedManager then emits rss_feed_open or
+  rss_feed_closed with Feed.toOldJSONMinified to every authenticated socket; the realtime proxy reads them from realtime-events.
 Feeds live in memory and no email is sent: a successful send is only recorded for the journeys to observe.
 """
 import argparse
 import copy
 import json
+import re
 import sys
 import urllib.error
 import urllib.request
@@ -46,11 +49,14 @@ def can_access(device, user):
 
 def make_item_actions_server(port, prefix='/abs', bind='127.0.0.1'):
     server, prefix = make_related_server(port, prefix, bind=bind)
+    # A realtime init refreshes every visible screen at once, and each item read loops back here; the default backlog of
+    # five refuses part of that burst.
+    server.socket.listen(128)
     base = server.RequestHandlerClass
-    state = {'role': 'user', 'ebook': True, 'fail': None, 'feeds': {}, 'sent': [], 'requests': []}
+    state = {'role': 'user', 'ebook': True, 'fail': None, 'feeds': {}, 'sent': [], 'requests': [], 'events': []}
 
     def reset(role='user', ebook=True, fail=None, feed=False):
-        state.update(role=role, ebook=ebook, fail=fail, feeds={}, sent=[], requests=[])
+        state.update(role=role, ebook=ebook, fail=fail, feeds={}, sent=[], requests=[], events=[])
         if feed:
             state['feeds']['qa-feed'] = {'id': 'qa-feed', 'entityType': 'libraryItem', 'entityId': 'book-0', 'feedUrl': '/feed/qa-feed',
                                          'meta': {'title': 'Stories for Tomorrow 01', 'description': None, 'preventIndexing': True,
@@ -91,6 +97,14 @@ def make_item_actions_server(port, prefix='/abs', bind='127.0.0.1'):
             self.respond(status, text.encode(), 'text/plain; charset=utf-8')
 
         def actions_get(self, path, query):
+            if path == '/__fixture__/realtime-events' and not self.headers.get('X-Actions-Loopback'):
+                status, events = self.own_loopback(path)
+                if status != 200:
+                    self.respond(status, {})
+                    return True
+                self.respond(200, events + state['events'])
+                state['events'].clear()
+                return True
             if path == '/__actions__/observations':
                 self.respond(200, {'requests': state['requests'], 'feeds': list(state['feeds'].values()), 'sent': state['sent']})
                 return True
@@ -118,6 +132,8 @@ def make_item_actions_server(port, prefix='/abs', bind='127.0.0.1'):
                 reset(role=options.get('role', 'user'), ebook=options.get('ebook', True), fail=options.get('fail'), feed=options.get('feed', False))
                 self.respond(200, {})
                 return True
+            if path == '/__actions__/remote-feed':
+                return self.remote_feed(self.body())
             handled = path == '/api/authorize' or path == '/api/emails/send-ebook-to-device' or path.startswith('/api/feeds/')
             if not handled:
                 return False
@@ -134,6 +150,27 @@ def make_item_actions_server(port, prefix='/abs', bind='127.0.0.1'):
             if path.startswith('/api/feeds/'):
                 return self.feeds(path, body, user)
             return self.send_ebook(body, user)
+
+        def remote_feed(self, options):
+            item_id = options.get('itemId')
+            if not isinstance(item_id, str) or not re.fullmatch(r'book-[0-9]+', item_id) or not isinstance(options.get('open'), bool):
+                self.respond(400, {})
+                return True
+            if options['open']:
+                feed = {'id': 'remote-feed', 'entityType': 'libraryItem', 'entityId': item_id, 'feedUrl': '/feed/remote-feed',
+                        'meta': {'title': 'Opened elsewhere', 'description': None, 'preventIndexing': True,
+                                 'ownerName': 'Remote Owner', 'ownerEmail': None}}
+                state['feeds'][feed['id']] = feed
+                state['events'].append({'name': 'rss_feed_open', 'data': feed})
+            else:
+                feed = next((feed for feed in state['feeds'].values() if feed['entityId'] == item_id), None)
+                if feed is None:
+                    self.respond(404, {})
+                    return True
+                del state['feeds'][feed['id']]
+                state['events'].append({'name': 'rss_feed_closed', 'data': feed})
+            self.respond(200, {})
+            return True
 
         def failing(self, kind):
             if state['fail'] == kind:

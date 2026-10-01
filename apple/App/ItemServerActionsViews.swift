@@ -5,13 +5,16 @@ import UIKit
 /// Each action appears only when the server would allow it; see `ItemServerActions`.
 struct ItemServerActionsSection: View {
     @Environment(\.nativeStrings) private var l10n
+    @EnvironmentObject private var realtime: NativeRealtime
     @StateObject private var actions: ItemServerActions
+    private let catalog: CatalogStore
     @State private var started = false
     @State private var showingFeed = false
     @State private var choosingDevice = false
 
     init(itemID: String, catalog: CatalogStore) {
         _actions = StateObject(wrappedValue: ItemServerActions(api: catalog.api, itemID: itemID))
+        self.catalog = catalog
     }
 
     var body: some View {
@@ -40,6 +43,14 @@ struct ItemServerActionsSection: View {
             }
         }
         .onAppear { if !started { started = true; Task { await actions.load() } } }
+        .onReceive(realtime.events) { event in
+            guard catalog.owns(event) else { return }
+            switch event.change {
+            case .itemFeed(let itemID, let feed) where itemID == actions.itemID: actions.feedChanged(feed)
+            case .authenticated where started: Task { await actions.load() }
+            default: break
+            }
+        }
         .sheet(isPresented: $showingFeed) { RSSFeedSheet(actions: actions, presented: $showingFeed).nativeLocalization() }
         .actionSheet(isPresented: $choosingDevice) {
             ActionSheet(title: Text(l10n("Select a device")), buttons: actions.devices.map { device in

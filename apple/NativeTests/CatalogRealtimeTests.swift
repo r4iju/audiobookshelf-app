@@ -14,17 +14,20 @@ final class CatalogServer: URLProtocol {
     private static var listening: [String: [String]] = [:]
     private static var holding: [String] = []
     private static var held: [String: () -> Void] = [:]
+    private static var failing: [String] = []
 
     static func reset() {
         locked {
             titles = (0..<120).map { ("book-\($0)", "Title \($0)") }
             listening = ["user-a": ["book-0"], "user-b": ["book-1"]]
-            holding = []; held = [:]
+            holding = []; held = [:]; failing = []
         }
     }
     static func rename(_ id: String, _ title: String) { locked { titles = titles.map { $0.id == id ? ($0.id, title) : $0 } } }
     static func remove(_ id: String) { locked { titles.removeAll { $0.id == id } } }
     static func listen(_ user: String, to id: String) { locked { listening[user, default: []].append(id) } }
+    /// Fails every request whose path and query contain `key`.
+    static func fail(_ key: String) { locked { failing.append(key) } }
     /// Holds the next request whose path and query contain `key`.
     static func hold(_ key: String) { locked { holding.append(key) } }
     static func isHeld(_ key: String) -> Bool { locked { held[key] != nil } }
@@ -43,7 +46,7 @@ final class CatalogServer: URLProtocol {
         let url = request.url!
         let target = url.path + "?" + (url.query ?? "")
         let user = request.value(forHTTPHeaderField: "Authorization") == "Bearer token-b" ? "user-b" : "user-a"
-        let body = Self.locked { Self.answer(target, user: user) }
+        let body = Self.locked { Self.failing.contains { target.contains($0) } ? nil : Self.answer(target, user: user) }
         let deliver = { [self] in
             guard let body else { return client!.urlProtocol(self, didFailWithError: URLError(.badURL)) }
             let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: ["Content-Type": "application/json"])!
@@ -98,7 +101,7 @@ final class CatalogServer: URLProtocol {
         try await until { CatalogServer.isHeld("page=1") }
         CatalogServer.rename("book-0", "Changed while disconnected")
         CatalogServer.hold("page=0")
-        store.receive(event(.authenticated(resumed: true)))
+        store.receive(event(.authenticated))
         try await until { CatalogServer.isHeld("page=0") }
         CatalogServer.listen("user-a", to: "book-5")
         store.receive(event(.progress(itemID: "book-5", episodeID: nil, sessionID: "web")))
@@ -178,6 +181,18 @@ final class CatalogServer: URLProtocol {
         store.receive(event(.progress(itemID: "book-0", episodeID: nil, sessionID: "web")))
         try await until { self.content?.items.first?.id == "book-1" }
         XCTAssertEqual(content?.loadingMore, false)
+    }
+
+    func testAnInitDuringTheFirstLoadThatFailsShowsTheFailure() async throws {
+        CatalogServer.hold("page=0")
+        let loading = Task { await store.reload() }
+        try await until { CatalogServer.isHeld("page=0") }
+        CatalogServer.fail("personalized")
+        store.receive(event(.authenticated))
+        try await Task.sleep(nanoseconds: 300_000_000)
+        CatalogServer.release("page=0")
+        await loading.value
+        try await until { if case .failed = self.store.state { return true } else { return false } }
     }
 
     private var content: CatalogStore.Catalog? {
