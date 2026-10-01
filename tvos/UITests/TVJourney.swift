@@ -90,6 +90,21 @@ import XCTest
         select(app.buttons["connect"])
     }
 
+    /// Every field, button and hint of the sign-in form lies on screen, inside the presentation that shows it,
+    /// so the remote reaches each one and nothing is cut off.
+    func assertSignInFormFits(_ step: String, file: StaticString = #filePath, line: UInt = #line) {
+        let window = app.windows.firstMatch
+        let layer = window.children(matching: .other).allElementsBoundByIndex.last ?? window
+        let presented = layer.children(matching: .other).matching(NSPredicate(format: "identifier != %@", "PopoverDismissRegion")).firstMatch
+        let visible = (presented.exists ? presented.frame : layer.frame).intersection(window.frame).insetBy(dx: -1, dy: -1)
+        let form = [app.textFields["serverURL"], app.textFields["username"], app.secureTextFields["password"], app.buttons["connect"],
+                    app.staticTexts["The Apple TV Remote on an iPhone offers a keyboard for easier typing."], app.buttons["sign-in-diagnostics"]]
+        for element in form {
+            XCTAssertTrue(element.waitForExistence(timeout: 10), "\(step): missing \(element)", file: file, line: line)
+            XCTAssertTrue(visible.contains(element.frame), "\(step): \(element.identifier.isEmpty ? element.label : element.identifier) at \(element.frame) is outside the visible \(visible)", file: file, line: line)
+        }
+    }
+
     func tab(_ name: String, file: StaticString = #filePath, line: UInt = #line) {
         select(app.tabBars.buttons[name], file: file, line: line)
     }
@@ -125,12 +140,35 @@ enum Fixture {
     }
 
     struct Request: Decodable { let method: String?; let path: String; let page: String? }
-    struct Report: Decodable { let path: String; let currentTime: Double; let timeListened: Double; let sessionId: String? }
+    struct Report: Decodable { let path: String; let currentTime: Double; let timeListened: Double; let sessionId: String?; let userId: String? }
     struct LocalSession: Decodable { let id: String; let currentTime: Double; let timeListening: Double; let libraryItemId: String; let episodeId: String? }
+    struct Restart: Decodable { let endedHandlers: Int }
     struct Observations: Decodable {
         let requests: [Request]
         let reports: [Report]
         let localSessions: [LocalSession]
+        /// `held-sync` handlers still running after a gateway gave up on them.
+        let heldHandlers: Int
+        let serverRestarts: [Restart]
+    }
+
+    /// Makes the server refuse the account's tokens until it signs in again.
+    static func revoke(_ username: String, base: String = TVJourney.fixture) async throws {
+        var request = URLRequest(url: URL(string: base + "/__fixture__/revoke")!)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(["username": username])
+        let (_, response) = try await URLSession.shared.data(for: request)
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+    }
+
+    /// Restarts the synthetic server, ending its running handlers unapplied.
+    static func restartServer(base: String = TVJourney.fixture) async throws {
+        var request = URLRequest(url: URL(string: base + "/__fixture__/restart")!)
+        request.httpMethod = "POST"
+        request.httpBody = Data("{}".utf8)
+        let (_, response) = try await URLSession.shared.data(for: request)
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
     }
 
     static func observations(base: String = TVJourney.fixture) async throws -> Observations {

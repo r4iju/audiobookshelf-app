@@ -21,8 +21,10 @@ struct RootView: View {
             if catalog.signedIn { tabs } else { SignInView() }
         }
         .environmentObject(navigator)
-        .sheet(isPresented: $reauthenticating) {
+        // Full screen like the first sign-in: a sheet is too narrow for the form. Back closes it with the book paused.
+        .fullScreenCover(isPresented: $reauthenticating) {
             SignInView(reauthenticating: true) { player.authenticationRestored() }.tvLocalization()
+                .background(Color(red: 0.06, green: 0.07, blue: 0.09).ignoresSafeArea())
         }
         .onChange(of: player.needsSignIn) { _, needed in if needed { catalog.needsSignIn = true } }
         .onChange(of: player.error) { _, error in

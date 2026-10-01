@@ -80,7 +80,7 @@ Files changed outside `ApplePlayback.swift`:
 - **Never resolved** by a replay being accepted, a later `GET`, a heartbeat or elapsed time. Each replay is its own write. The listening journal acknowledges only the revision a request carried, and reading clears its pending page only when the revision sent is still current, so a replay never acknowledges a newer payload.
 - **Reset gate:** after the flush and `prepare`, `resetProgress` throws `UnresolvedProgressWrites` while any unresolved write covers the account's media. Nothing is deleted, the intent is not saved, and local positions and history stay. Other titles are unaffected.
 - **Relaunch:** writes are on disk; one saved but never answered (the app stopped mid-request) stays unresolved.
-- **Unreadable record:** the file is renamed to `publications-unreadable-<ms>.json`, kept for recovery, and a new record marks every earlier write to every server unknown. Every write waits and all resets refuse until a restart is confirmed. If it cannot even be read from disk or replaced, nothing is sent and every reset refuses.
+- **Unreadable record:** the file is copied to `publications-unreadable-<ms>.json`, kept for recovery, then atomically replaced by a new record that marks every earlier write to every server unknown. Every write waits and all resets refuse until a restart is confirmed. If it cannot even be read from disk, copied or replaced, nothing is sent and every reset refuses, and the unreadable record stays in place, so a later launch sets it aside again rather than starting an empty record. `PublicationStorageTests` checks this on a full volume (`apple/scripts/verify-download-storage.sh -only-testing:NativeTests/PublicationStorageTests`).
 - **Resolution:** server 2.30 offers no way to learn that a held handler finished. A server restart ends them all, so recovery has two steps:
   1. `ApplePlayback.requestServerRestart(account:)` records the server's unresolved write IDs before the owner is told to restart.
   2. `confirmServerRestarted(account:)` then resolves only those IDs, and the unreadable-record marker set before the request. It throws when no restart was requested.
@@ -111,7 +111,20 @@ Root also owns realtime: the server's `user_updated` after the delete reaches ot
 - An unreadable intent file counts as pending for every media: playback refuses, and reading and carried-over positions wait, rather than risking a recreated row.
 - Pages read after the confirmation while the reset is pending are kept and published once it finishes. No test distinguishes this rule; see the mutation results.
 - A write can stay unresolved for good until the owner confirms a server restart. Until then, all later progress for that media (listening, pages, finished, carried-over) waits on this device. A single timeout therefore holds a title's progress back until a restart, which is the cost of not inventing a server guarantee. Exact replays still go out.
-- tvOS has no restart action. A TV title with an unresolved write keeps its later progress on the device indefinitely, and the existing progress recovery does not explain why. Root owns any TV UI for this.
+- tvOS recovers in Settings rather than at a reset (TV has no reset).
+  - **Notice:** a "Saves waiting" section appears while the account has an unresolved write or an unreadable record. It counts the titles and names the server and signed-in account. Now Playing says when the current title's newer listening waits.
+  - **Step 1:** "Start server restart" calls `requestServerRestart` before the owner restarts.
+  - **Step 2:** "The server has restarted" confirms and sends what waited. "Start again" takes a new snapshot. The step survives a relaunch.
+  - **Refresh:** both views refresh on `PublicationLedger.changed`, which the ledger posts after every change, so the state never expires on its own.
+  - **Reset:** `--reset-tv-state` clears the ledger, so journeys cannot inherit an earlier run's unanswered writes.
+  - **Evidence:** the remote-driven `RecoveryJourney.testLaterListeningWaitsForARequestedAndConfirmedServerRestart` runs against the fixture's `held-sync` mode:
+    - the first book-0 `local-all` gets a 504 while the fixture keeps its handler;
+    - `/__fixture__/restart` ends kept handlers unapplied;
+    - `/__fixture__/release-held` applies them.
+
+    The journey checks that newer listening stays on the TV, that a manual resend does not send it, that the request survives a relaunch, and that after the fixture restart and the confirmation the session reaches the server once with both plays' listening.
+    - RED: `b1ddd70e`, run on a fresh simulator, where the notice is missing.
+    - Source: `d4d68b62`.
 - Requests sent by builds before the ledger left no record, so they cannot hold back a reset.
 - tvOS keeps the same rule with the ledger in Application Support, next to the intents, which the system may purge. TV has no reset, so the ledger only gates resets on the device that sent the writes, and a ledger write that fails stops TV listening from being sent until it succeeds, shown through the existing progress recovery.
 - Simulator and fixture evidence only. No live server, physical device or cross-device acceptance is claimed, and the reset was never run against the owner's server.
@@ -174,7 +187,7 @@ Root also owns realtime: the server's `user_updated` after the delete reaches ot
   - `testAPrimaryPDFPageWhosePublicationGotNoAnswerKeepsTheResetRefusedAfterItsReplayIsAccepted`: the reset ran, and the released first PATCH recreated the row at page 7.
   - `testCarriedOverListeningWhoseFirstSendGotNoAnswerKeepsTheResetRefusedAfterItsReplayIsAccepted`: the reset ran after the carried-over replay was accepted, and the released first send recreated the row at 400 s.
 - **GREEN:** the 17 reset tests pass, and the full `NativeTests` passes 67/67 (`/tmp/pubsafe-full-final.log`).
-- **Mutations** that each failed a test: no reset gate; a timeout counted as answered; an accepted replay resolving the media's earlier writes; no marker for an unreadable record; a restart confirmation that resolves nothing; adoption writes not recorded; reading published outside the ledger; a ledger kept only in memory.
+- **Mutations** that each failed a test: no reset gate; a timeout counted as answered; an accepted replay resolving the media's earlier writes; no marker for an unreadable record; an unreadable record moved aside before its replacement was written; a restart confirmation that resolves nothing; adoption writes not recorded; reading published outside the ledger; a ledger kept only in memory.
 - **Survivors:** a gateway status counted as answered, and `URLError.cancelled` counted as never sent. No test drives either. Mark finished goes through the ledger, and the "Has the server restarted?" alert in `BookDetails` was added; neither has a test.
 - **Builds:** the `AudiobookshelfNative` app builds; the TV app builds for the tvOS simulator; `tvos/Core` passes 63/63; and every app-target source typechecks for `arm64-apple-ios14.0-simulator`. `generate.py --check` passes after the new strings. No server, device or owner data was used.
 

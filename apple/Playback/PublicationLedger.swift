@@ -85,11 +85,12 @@ import Foundation
             document = saved
             return
         }
-        // Set aside rather than discarded, and every earlier write counts as unknown.
+        // Set aside rather than discarded, and every earlier write counts as unknown. Copied, not moved:
+        // until the fresh record replaces it, the unreadable one stays in place for the next launch.
         let now = Self.now
         let aside = file.deletingLastPathComponent().appendingPathComponent("publications-unreadable-\(Int(now)).json")
         do {
-            try FileManager.default.moveItem(at: file, to: aside)
+            try FileManager.default.copyItem(at: file, to: aside)
             let fresh = Document(version: 1, writes: [], unreadableBefore: now, restarts: [:])
             try Self.write(fresh, to: file)
             document = fresh
@@ -104,6 +105,24 @@ import Foundation
         guard let document else { return true }
         if let unreadable = document.unreadableBefore, (document.restarts[account.server] ?? 0) < unreadable { return true }
         return document.writes.contains { $0.account == account && $0.itemID == itemID && $0.episodeID == episodeID }
+    }
+
+    /// What waits for an account, for showing it.
+    struct Waiting: Equatable {
+        /// Titles of the account with a write that may still be applied.
+        var titles = 0
+        /// Whether earlier writes of any title are unknown because the record could not be read.
+        var unreadable = false
+        /// Whether a restart of the account's server was asked for and not confirmed yet.
+        var restartRequested = false
+        var isEmpty: Bool { titles == 0 && !unreadable }
+    }
+
+    func waiting(account: AccountIdentity) -> Waiting {
+        guard let document else { return Waiting(unreadable: true) }
+        let titles = Set(document.writes.filter { $0.account == account }.map { [$0.itemID, $0.episodeID ?? ""] }).count
+        let unreadable = document.unreadableBefore.map { (document.restarts[account.server] ?? 0) < $0 } ?? false
+        return Waiting(titles: titles, unreadable: unreadable, restartRequested: document.requests?[account.server] != nil)
     }
 
     /// Records that the owner is asked to restart the server now. Only the writes unresolved at
@@ -171,9 +190,13 @@ import Foundation
                 .secureConnectionFailed, .appTransportSecurityRequiresSecureConnection].contains(error.code)
     }
 
+    /// Posted on the main actor after the record changed.
+    static let changed = Notification.Name("PublicationLedgerChanged")
+
     private func save(_ next: Document) throws {
         try Self.write(next, to: file)
         document = next
+        NotificationCenter.default.post(name: Self.changed, object: self)
     }
 
     private static func write(_ document: Document, to file: URL) throws {

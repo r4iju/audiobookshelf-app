@@ -16,18 +16,46 @@ final class NativeStringsTests: XCTestCase {
         XCTAssertEqual(strings("ar")("Haptic feedback"), "ردود الفعل اللمسية")
     }
 
+    /// Native texts whose legacy screen showed the same thing under other English wording, such as the reader settings
+    /// sheet, the podcast form, the bookmarks panel and the server download queue, keep the legacy translation.
+    func testNativeWordingOfALegacyLabelShowsTheLegacyTranslation() {
+        XCTAssertEqual(strings("de")("Reading settings"), "E-Reader Einstellungen")
+        XCTAssertEqual(strings("de")("Show server address"), "Server Adresse anzeigen")
+        XCTAssertEqual(strings("ar")("No playlists yet."), "ليس لديك أي قوائم تشغيل")
+        XCTAssertEqual(strings("fr")("Waiting for {0} episode(s) from your server", 3), "3 épisode(s) mis en file pour téléchargement")
+    }
+
+    /// Actions and states the legacy app named differently: Disconnect signed out (it cleared the active login and
+    /// returned to the connection screen, as Sign out does), and the attempt to reach the server.
+    func testSameActionUnderTheLegacyNameShowsTheLegacyTranslation() {
+        XCTAssertEqual(strings("de")("Sign out"), "Trennen")
+        XCTAssertEqual(strings("fr")("Connecting…"), "Tentative de connexion...")
+        XCTAssertEqual(strings("ar")("Not connected"), "خادم Audiobookshelf غير متصل")
+        XCTAssertEqual(strings("de")("Mark book finished?"), "Bist du sicher, dass du diesen Artikel als beendet markieren willst?")
+    }
+
+    /// "Light" is both a theme and a haptic strength. Languages that name them differently must show each meaning's own
+    /// legacy translation, and English keeps the one wording for both.
+    func testSharedEnglishWordingIsTranslatedByItsMeaning() {
+        XCTAssertEqual(strings("de")("Light", context: .theme), "Hell")
+        XCTAssertEqual(strings("de")("Light", context: .hapticStrength), "Leicht")
+        XCTAssertEqual(strings("ar")("Light", context: .theme), "فاتح")
+        XCTAssertEqual(strings("en-us")("Light", context: .theme), "Light")
+        XCTAssertEqual(strings("en-us")("Light", context: .hapticStrength), "Light")
+    }
+
     func testEnglishKeepsTheNativeWording() {
         XCTAssertEqual(strings("en-us")("Continue listening"), "Continue listening")
     }
 
     func testTextWithoutALegacyEquivalentFallsBackToEnglish() {
-        XCTAssertEqual(strings("de")("Network preferences"), "Network preferences")
+        XCTAssertEqual(strings("de")("Diagnostics"), "Diagnostics")
     }
 
     /// Renderers outside the app, such as the year export, receive an immutable copy of only the translated texts, so
     /// anything untranslated keeps their own English default and nothing reads app resources while drawing.
     func testCopyForAnotherRendererCarriesOnlyTranslatedText() {
-        XCTAssertEqual(strings("de").copy(["Settings", "Network preferences", "Not a native text"]), ["Settings": "Einstellungen"])
+        XCTAssertEqual(strings("de").copy(["Settings", "Diagnostics", "Not a native text"]), ["Settings": "Einstellungen"])
         XCTAssertEqual(strings("en-us").copy(["Settings"]), [:])
     }
 
@@ -47,7 +75,9 @@ final class NativeStringsTests: XCTestCase {
                 let candidate = legacy[key] ?? ""
                 let usable = !candidate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !candidate.contains("<")
                     && NativeStrings.placeholders(in: candidate) == NativeStrings.placeholders(in: english)
-                XCTAssertEqual(native(english), usable ? candidate : english, "\(language.code): \(english)")
+                let parts = english.components(separatedBy: "::")
+                let shown = parts.count == 2 ? native(parts[1], context: try XCTUnwrap(NativeTextContext(rawValue: parts[0]))) : native(english)
+                XCTAssertEqual(shown, usable ? candidate : parts.last!, "\(language.code): \(english)")
             }
         }
     }

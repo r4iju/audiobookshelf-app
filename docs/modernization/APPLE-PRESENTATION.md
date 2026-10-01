@@ -12,9 +12,67 @@ then English. A change applies to open screens without relaunch, and Arabic and 
 
 Native text is keyed by its English wording. A language shows a translation only where `legacy-equivalents.json` names a
 legacy key with the same meaning and that language's legacy file has a usable value (non-empty, no markup, same
-placeholders). Native screens show 358 distinct texts and 98 have such a key, so each language is between 18% (`lt`) and
-27% translated (`COVERAGE.md`). The rest stays English, and the Language screen shows each language's share and says so.
-System controls follow the device language. Dates and durations use the chosen locale.
+placeholders). Native screens, tvOS and the year export together show 638 distinct texts, and 167 have such a key, so
+each language is between 19% (`lt`) and 26% translated (`COVERAGE.md`). The rest stays English, and the Language screen
+shows each language's share and says so. System controls follow the device language. Dates and durations use the chosen
+locale. This is partial localization, not parity with the legacy app's coverage.
+
+### Audit of reusable legacy translations
+
+On October 2 every one of the 502 then unmapped texts was compared with the 381 legacy English strings
+(`strings/en-us.json`), and each candidate was checked against the legacy screen that showed it. 26 were added, each the
+label a legacy screen used for the same control or message (RED `c42f43c5`, fix `e5697339`):
+
+| Native text | Legacy key | Legacy screen |
+| --- | --- | --- |
+| Reading settings, Font size, Text weight, Line spacing | `HeaderEreaderSettings`, `LabelFontScale`, `LabelFontBoldness`, `LabelLineSpacing` | `components/readers/Reader.vue` settings |
+| Appearance | `LabelTheme` | `pages/settings.vue` theme |
+| Network preferences | `HeaderDataSettings` | `pages/settings.vue`, the cellular streaming and download section |
+| Show server address | `ButtonUnmaskServerAddress` | `pages/logs.vue` |
+| Add server | `ButtonAddNewServer` | `ServerConnectForm.vue` |
+| Your libraries | `HeaderLibraries` | `LibrariesModal.vue` |
+| Statistics, Your listening | `ButtonUserStats`, `HeaderYourStats` | side drawer entry and `pages/stats.vue` |
+| minutes, minutes listening | `LabelStatsMinutes`, `LabelStatsMinutesListening` | `pages/stats.vue` and the daily chart |
+| Bookmarks, Add a bookmark here | `LabelYourBookmarks`, `ButtonCreateBookmark` | `BookmarksModal.vue` |
+| Sleep (player panel) | `LabelSleepTimer` | sleep timer, as `Sleep timer` already was |
+| New playlist, No playlists yet. | `HeaderNewPlaylist`, `MessageNoUserPlaylists` | `playlists/AddCreateModal.vue` |
+| No collections yet. | `MessageNoCollections` | `LazyBookshelf.vue` |
+| Open RSS feeds | `LabelRSSFeedOpen` | `FilterModal.vue` filter |
+| Server folder, Automatically download new episodes | `LabelFolder`, `LabelAutoDownloadEpisodes` | `NewPodcastForm.vue` |
+| Waiting for {0} episode(s) from your server | `MessageEpisodesQueuedForDownload` | episodes queued on the server |
+| Loading (tvOS player state) | `MessageLoading` | loading indicators |
+| Yes, No (RSS feed values) | `ButtonYes`, `LabelNo` | |
+
+A second pass (RED `0217f5b1`, fix `31176905`) added five texts the legacy app named differently for the same action or
+state:
+
+- Sign out uses `ButtonDisconnect`. The legacy Disconnect (`SideDrawer.vue`) ran `user/logout`, which cleared the active
+  server login (`AbsDatabase.logout`) without asking the server, and returned to the connection screen with saved servers
+  kept, as native Sign out does.
+- Connecting… (the tvOS sign-in button) and Connecting (the Diagnostics connection state) use
+  `MessageAttemptingServerConnection`, the legacy text shown during the same attempt.
+- Not connected (the Diagnostics server value) uses `MessageAudiobookshelfServerNotConnected`.
+- Mark book finished? uses `MessageConfirmMarkAsFinished`, the legacy confirmation for the same action.
+
+**Wording with several meanings.** `Light` names both a theme and a haptic strength, and the legacy app has a key for each
+(`LabelThemeLight`, `LabelLight`), which 17 of the 29 translated languages word differently (de *Hell* and *Leicht*). Native
+text with such wording is looked up with a `NativeTextContext`: `l10n(choice.name, context: .theme)` reads the table key
+`theme::Light`, and `.hapticStrength` reads `hapticStrength::Light`. The English table maps both back to `Light`, so English
+labels and accessibility selectors are unchanged, and a meaning without a translation stays English rather than borrowing
+the other's. The theme names in Settings and the reader, and the haptic strengths, use it. Theme `System` still has no
+legacy key.
+
+Considered and left English, because the legacy text means something else in at least one language or names a different
+action:
+
+- Diagnostics (Logs), No problems recorded (No logs): the native screen lists failures and status, not the app log.
+- Podcast feed (`HeaderRSSFeed` is a feed the server publishes for an item), Mark as not finished (the legacy
+  has only the failure toast), and the year headings Top authors and Top genres (as `HANDOFF.md` explains).
+
+The other 471 texts have no legacy equivalent and stay English in every language: connection, sign-in and certificate
+recovery, migration import, diagnostics, downloads and storage states, collection and podcast management, PDF and EPUB
+reader messages, 71 tvOS-only texts and 78 year export templates. They need translators; no machine translation or
+generic fallback is presented as complete.
 
 Migration keeps any supported legacy `languageCode`, `en-us` included, only when no native choice exists. The legacy app
 always showed the saved code's language, whatever the device language, so adopting it preserves what the person saw. The

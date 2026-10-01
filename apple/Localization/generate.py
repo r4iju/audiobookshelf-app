@@ -5,6 +5,10 @@ English text is the key, so the English table is the identity. Other languages c
 `strings/<code>.json` only where `legacy-equivalents.json` names a key with the same meaning and the translation is
 usable: present, without markup, and with the same `{n}` placeholders. Everything else stays in English.
 
+English wording with more than one meaning is looked up with a `NativeTextContext`, as in `l10n("Light", context: .theme)`.
+Its key is `theme::Light`, in the sources, `dynamic-keys.json`, `legacy-equivalents.json` and the tables alike, and the
+English table maps it back to `Light`.
+
     python3 apple/Localization/generate.py          # rewrite tables and COVERAGE.md
     python3 apple/Localization/generate.py --check  # fail when they are stale
 """
@@ -23,12 +27,35 @@ TABLE = 'NativeStrings.strings'
 # `copy("…")` marks English templates in renderers that receive `NativeStrings.copy` instead of looking text up.
 CALL = re.compile(r'(?<![\w.])(?:l10n|strings|copy|NativeStrings\.current)\(')
 PLACEHOLDER = re.compile(r'\{\d+\}')
+SEPARATOR = '::'
 
 
 def languages():
     """The legacy selectable languages, in order, with their `.lproj` names from NativeLanguage.swift."""
     source = (LOCALIZATION / 'Sources' / 'NativeLocalization' / 'NativeLanguage.swift').read_text()
     return re.findall(r'\(code: "([^"]+)", name: "[^"]+", localization: "([^"]+)"\)', source)
+
+
+def contexts():
+    """The `NativeTextContext` cases declared in NativeStrings.swift."""
+    source = (LOCALIZATION / 'Sources' / 'NativeLocalization' / 'NativeStrings.swift').read_text()
+    body = re.search(r'enum NativeTextContext\b[^{]*\{(.*?)\n\}', source, re.S).group(1)
+    return set(re.findall(r'^\s*case (\w+)', body, re.M))
+
+
+def english(key):
+    """The English wording of a key, without its context."""
+    return key.split(SEPARATOR, 1)[-1]
+
+
+def checked(key, origin):
+    """A key whose context, if any, is a declared `NativeTextContext` case, and whose English carries no separator."""
+    context, _, text = key.rpartition(SEPARATOR)
+    if context and context not in contexts():
+        raise SystemExit(f'{origin}: "{key}" names an unknown NativeTextContext')
+    if SEPARATOR in text or not text:
+        raise SystemExit(f'{origin}: "{key}" is not English text with at most one context')
+    return key
 
 
 def literals(expression):
@@ -53,9 +80,9 @@ def literals(expression):
     return found
 
 
-def first_argument(text, start):
-    """The source of the first argument of the call whose parenthesis opens at `start`."""
-    depth, index, quoted = 0, start, False
+def arguments(text, start):
+    """The source of each top-level argument of the call whose parenthesis opens at `start`."""
+    depth, index, quoted, begin, found = 0, start, False, start + 1, []
     while True:
         character = text[index]
         if quoted:
@@ -70,9 +97,10 @@ def first_argument(text, start):
         elif character in ')]}':
             depth -= 1
             if depth == 0:
-                return text[start + 1:index]
+                return found + [text[begin:index]]
         elif character == ',' and depth == 1:
-            return text[start + 1:index]
+            found.append(text[begin:index])
+            begin = index + 1
         index += 1
 
 
@@ -82,20 +110,24 @@ def english_keys():
         for path in sorted(root.rglob('*.swift')) if root.exists() else []:
             text = path.read_text()
             for match in CALL.finditer(text):
-                keys.update(literals(first_argument(text, match.end() - 1)))
+                first, *rest = arguments(text, match.end() - 1)
+                named = [re.fullmatch(r'\s*context:\s*\.(\w+)\s*', argument) for argument in rest]
+                prefix = next((found.group(1) + SEPARATOR for found in named if found), '')
+                keys.update(checked(prefix + value, path.name) for value in literals(first))
     dynamic = json.loads((LOCALIZATION / 'dynamic-keys.json').read_text())
     everything = '\n'.join(path.read_text() for root in SOURCES if root.exists() for path in root.rglob('*.swift'))
     for origin, values in dynamic.items():
-        for value in values:
+        for key in values:
+            value = english(checked(key, origin))
             if f'"{value}"' not in everything and f'"{value.lower()}"' not in everything and f' {value.lower()}' not in everything:
                 raise SystemExit(f'{origin}: "{value}" no longer appears in the sources')
-            keys.add(value)
+            keys.add(key)
     return sorted(keys)
 
 
-def usable(candidate, english):
+def usable(candidate, key):
     return bool(candidate and candidate.strip()) and '<' not in candidate and \
-        set(PLACEHOLDER.findall(candidate)) == set(PLACEHOLDER.findall(english))
+        set(PLACEHOLDER.findall(candidate)) == set(PLACEHOLDER.findall(english(key)))
 
 
 def escape(value):
@@ -115,17 +147,18 @@ def outputs():
     files, rows = {}, []
     for code, localization in languages():
         if code == 'en-us':
-            table = {key: key for key in keys}
+            table = {key: english(key) for key in keys}
         else:
             legacy = json.loads((REPOSITORY / 'strings' / f'{code}.json').read_text())
-            table = {english: legacy[key] for english, key in mapping.items() if usable(legacy.get(key, ''), english)}
+            table = {native: legacy[key] for native, key in mapping.items() if usable(legacy.get(key, ''), native)}
         body = ''.join(f'"{escape(key)}" = "{escape(table[key])}";\n' for key in sorted(table))
         files[RESOURCES / f'{localization}.lproj' / TABLE] = '/* Generated by apple/Localization/generate.py. */\n' + body
         rows.append((code, localization, len(table)))
     report = ['# Native localization coverage', '',
               'Generated by `apple/Localization/generate.py`. Native screens show {0} distinct texts. {1} of them have a legacy '
               'key with the same meaning (`legacy-equivalents.json`); a language shows a translation only where its legacy '
-              'file has a usable value for that key. All other text stays in English, and the Language screen says so.'
+              'file has a usable value for that key. All other text stays in English, and the Language screen says so. '
+              'Wording with several meanings counts once per meaning (`theme::Light`, `hapticStrength::Light`).'
               .format(len(keys), len(mapping)), '',
               '| Language | Resources | Translated texts | Share |', '| --- | --- | ---: | ---: |']
     for code, localization, count in rows:

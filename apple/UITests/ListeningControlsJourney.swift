@@ -7,12 +7,14 @@ import XCTest
         app.textFields["timer-seconds"].tap()
         app.textFields["timer-seconds"].typeText("3")
         app.buttons["Start timer"].tap()
+        waitForPanelToClose(app, "Sleep")
         app.buttons["Sleep timer"].tap()
         let extend = app.buttons["Add 5 minutes"]
         XCTAssertTrue(extend.waitForExistence(timeout: 3))
         guard extend.exists else { return }
         extend.tap()
         app.navigationBars["Sleep"].buttons["Done"].tap()
+        waitForPanelToClose(app, "Sleep")
         app.buttons["resume-playback"].tap()
         try await Task.sleep(nanoseconds: 4_000_000_000)
         XCTAssertTrue(app.buttons["pause-playback"].exists)
@@ -79,6 +81,7 @@ import XCTest
         app.textFields["timer-seconds"].tap()
         app.textFields["timer-seconds"].typeText("10")
         app.buttons["Start timer"].tap()
+        waitForPanelToClose(app, "Sleep")
         app.buttons["resume-playback"].tap()
         app.buttons["Sleep timer"].tap()
         let volume = app.staticTexts["fade-volume"]
@@ -104,16 +107,20 @@ import XCTest
 
     func testChapterSeekAndSpeedSurviveSessionRestoration() async throws {
         let app = try await openPlayer()
+        // Resuming after a pause of ten seconds or more rewinds, and the iPad steps to here take that long.
+        playerSettings(app, [("Rewind after a pause", false)])
         let chapters = app.buttons["Chapters"]
         XCTAssertTrue(chapters.waitForExistence(timeout: 3))
         guard chapters.exists else { return }
         chapters.tap()
         app.buttons["chapter-1"].tap()
+        waitForPanelToClose(app, "Chapters")
         XCTAssertTrue(app.staticTexts["File 2 of 2"].waitForExistence(timeout: 5))
         XCTAssertEqual(bookElapsed(app).label, "8 sec")
         XCTAssertEqual(app.staticTexts["chapter-elapsed"].label, "0 sec of 12 sec")
         app.buttons["Playback speed"].tap()
         app.buttons["speed-2"].tap()
+        waitForPanelToClose(app, "Speed")
         app.buttons["resume-playback"].tap()
         try await Task.sleep(nanoseconds: 2_000_000_000)
         app.buttons["pause-playback"].tap()

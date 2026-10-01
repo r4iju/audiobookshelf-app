@@ -12,6 +12,8 @@ import SwiftUI
             try? KeychainCredentials().clear()
             for key in [CatalogStore.lastServerKey, CatalogStore.lastUsernameKey, "NativeListeningJournal", NativeStrings.savedKey] { UserDefaults.standard.removeObject(forKey: key) }
             try? FileManager.default.removeItem(at: ListeningSync.file)
+            // Uncertain writes of an earlier journey would hold back this one's progress.
+            try? FileManager.default.removeItem(at: ListeningSync.publicationsFile)
             try? FileManager.default.removeItem(at: TVDiagnostics.file)
         }
         #endif

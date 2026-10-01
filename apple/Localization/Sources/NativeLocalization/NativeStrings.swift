@@ -1,5 +1,17 @@
 import Foundation
 
+/// The meaning of English wording that names more than one thing, so a language can translate each one differently. Such
+/// text is keyed `<context>::<English>` in the tables; the English table maps the key back to the plain wording, so English
+/// display and accessibility labels are unchanged. `generate.py` reads these cases.
+public enum NativeTextContext: String, CaseIterable, Sendable {
+    /// A color theme, for the app or the reader.
+    case theme
+    /// A haptic feedback strength.
+    case hapticStrength
+
+    public func key(_ english: String) -> String { rawValue + "::" + english }
+}
+
 /// Looks up native text by its English wording. `apple/Localization/generate.py` writes the tables, carrying a legacy
 /// translation only where its meaning matches; anything else stays in English. The table name keeps SwiftUI's own
 /// `Text` lookup from translating literals that were never reviewed.
@@ -24,7 +36,16 @@ public struct NativeStrings {
     }
 
     public func callAsFunction(_ english: String, _ arguments: CustomStringConvertible...) -> String {
-        let template = table[english] ?? english
+        Self.substitute(table[english] ?? english, arguments)
+    }
+
+    /// Text whose English wording is shared by several meanings, translated for the one named. Without a translation
+    /// for that meaning it stays English, never borrowing another meaning's translation.
+    public func callAsFunction(_ english: String, context: NativeTextContext, _ arguments: CustomStringConvertible...) -> String {
+        Self.substitute(table[context.key(english)] ?? english, arguments)
+    }
+
+    private static func substitute(_ template: String, _ arguments: [CustomStringConvertible]) -> String {
         guard !arguments.isEmpty else { return template }
         // One pass, so a title that itself contains "{1}" is never substituted again.
         var text = ""

@@ -133,6 +133,9 @@ Paths (all compile into the app target, no `import`):
 
 App API:
 
+- `l10n("Light", context: .theme)`: wording with more than one meaning names it with a `NativeTextContext` case, keyed
+  `theme::Light` in the tables and in `legacy-equivalents.json`. Add a case to `NativeTextContext` before using a new one;
+  `generate.py` rejects unknown contexts.
 - `.nativeLocalization()`: sets `\.nativeStrings`, `\.locale` and `\.layoutDirection` from the saved or device language and
   updates live when the choice changes. Apply it once to the window content (the patch does) and to any separately presented
   root. Views read `@Environment(\.nativeStrings) private var l10n` and call `l10n("English {0}", value)`; non-view code uses

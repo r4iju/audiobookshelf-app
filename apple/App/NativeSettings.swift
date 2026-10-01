@@ -90,14 +90,14 @@ struct NativeSettings: View {
             }
             Section(header: Text(l10n("Appearance")).foregroundColor(ShelfStyle.secondaryText)) {
                 ForEach(NativeAppearance.allCases, id: \.self) { choice in
-                    option(l10n(choice.name), selected: theme == choice.rawValue, id: "theme-" + choice.rawValue) {
+                    option(l10n(choice.name, context: .theme), selected: theme == choice.rawValue, id: "theme-" + choice.rawValue) {
                         theme = choice.rawValue; NativeHaptic.impact("settings")
                     }
                 }
             }
             Section(header: Text(l10n("Haptic feedback")).foregroundColor(ShelfStyle.secondaryText), footer: Text(l10n("Choose the feedback for playback controls and library actions.")).foregroundColor(ShelfStyle.secondaryText)) {
                 ForEach(NativeHaptic.allCases, id: \.self) { choice in
-                    option(l10n(choice.name), selected: haptic == choice.rawValue, id: "haptic-" + choice.rawValue) {
+                    option(l10n(choice.name, context: .hapticStrength), selected: haptic == choice.rawValue, id: "haptic-" + choice.rawValue) {
                         haptic = choice.rawValue; NativeHaptic.impact("settings")
                     }
                 }

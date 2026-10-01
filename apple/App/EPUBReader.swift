@@ -237,7 +237,7 @@ struct EPUBReader: View {
                                 Spacer()
                                 Toggle(l10n("Keep screen awake"), isOn: $reading.preferences.keepAwake).labelsHidden().accessibilityLabel(l10n("Keep screen awake")).fixedSize()
                             }
-                            Picker(l10n("Theme"), selection: $reading.preferences.theme) { Text(l10n("Light")).tag("light"); Text(l10n("Dark")).tag("dark"); Text(l10n("Black")).tag("black") }
+                            Picker(l10n("Theme"), selection: $reading.preferences.theme) { Text(l10n("Light", context: .theme)).tag("light"); Text(l10n("Dark", context: .theme)).tag("dark"); Text(l10n("Black", context: .theme)).tag("black") }
                             Picker(l10n("Font"), selection: $reading.preferences.font) { Text(l10n("Serif")).tag("serif"); Text(l10n("Sans serif")).tag("sans-serif"); Text(l10n("Monospace")).tag("monospace") }
                             Text(l10n("Font size {0}%", Int(reading.preferences.scale)))
                             Slider(value: $reading.preferences.scale, in: 5...300, step: 5).accessibilityLabel(l10n("Font size"))

@@ -60,12 +60,20 @@ import XCTest
             XCTAssertEqual(toggle.value as? String, on ? "1" : "0", identifier)
         }
         app.buttons["panel-done"].tap()
+        waitForPanelToClose(app, "Settings")
         app.swipeDown(); app.swipeDown()
     }
 
     /// The whole-book position. iOS starts with the chapter track on, where playback-elapsed is the time within the
     /// chapter and the total track beside it shows the book. Both are divided by the playback speed unless that is turned off.
     func bookElapsed(_ app: XCUIApplication) -> XCUIElement { app.staticTexts["total-elapsed"] }
+    /// Waits for a dismissed listening panel to leave the screen. On iPad the panel is a form sheet that is still
+    /// animating out when the next tap arrives, and UIKit drops a tap made during that transition.
+    func waitForPanelToClose(_ app: XCUIApplication, _ title: String, file: StaticString = #filePath, line: UInt = #line) {
+        let closed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: app.navigationBars[title])
+        XCTAssertEqual(XCTWaiter().wait(for: [closed], timeout: 5), .completed, "The \(title) panel is still open", file: file, line: line)
+    }
+
 
     struct ObservedRequest: Decodable {
         let method: String?
