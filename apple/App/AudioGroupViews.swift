@@ -25,7 +25,14 @@ import SwiftUI
             selected = result
             if let index = groups.firstIndex(where: { $0.id == result.id }) { groups[index] = result } else { groups.append(result) }
             return true
-        } catch { if generation == request { self.error = NativeStrings.current("Changes could not be completed. Some membership changes may already be saved. {0}", ConnectionStore.recovery(for: error)) }; return false }
+        } catch { if generation == request { self.error = Self.saveFailure(error) }; return false }
+    }
+    private static func saveFailure(_ error: Error) -> String {
+        guard let partial = error as? AudioGroupPartialSave else { return refusal(error) }
+        return NativeStrings.current("Changes could not be completed. Some membership changes may already be saved. {0}", refusal(partial.underlying))
+    }
+    private static func refusal(_ error: Error) -> String {
+        error as? APIError == .http(403) ? NativeStrings.current("Your account is not allowed to do this on the server.") : ConnectionStore.recovery(for: error)
     }
     func delete(id: String) async -> Bool {
         guard !saving, canDelete, let owner else { return false }
@@ -35,7 +42,7 @@ import SwiftUI
             try await catalog.api.deleteAudioGroup(id: id, kind: kind, account: owner)
             guard generation == request, try await catalog.api.currentAccount() == owner else { return false }
             groups.removeAll { $0.id == id }; selected = nil; return true
-        } catch { if generation == request { self.error = ConnectionStore.recovery(for: error) }; return false }
+        } catch { if generation == request { self.error = Self.refusal(error) }; return false }
     }
     /// `event` is the realtime change that asked for this load; nothing is fetched or shown unless the catalog owns it.
     func load(id: String? = nil, for event: NativeRealtime.Event? = nil) async {

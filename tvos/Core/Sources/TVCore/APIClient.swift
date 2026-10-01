@@ -100,17 +100,24 @@ import Foundation
             let desired = Set(members.map(\.id)), existing = Set(original.members.map(\.id))
             let added = members.filter { !existing.contains($0.id) }
             let removed = original.members.filter { !desired.contains($0.id) }
-            if !added.isEmpty {
-                _ = try await request("api/\(kind.rawValue)/\(id)/batch/add", method: "POST", body: [key: payload(added)])
+            var saved = false
+            do {
+                if !added.isEmpty {
+                    _ = try await request("api/\(kind.rawValue)/\(id)/batch/add", method: "POST", body: [key: payload(added)])
+                    saved = true
+                }
+                guard try await currentAccount() == account else { throw APIError.signInRequired }
+                if !removed.isEmpty {
+                    _ = try await request("api/\(kind.rawValue)/\(id)/batch/remove", method: "POST", body: [key: payload(removed)])
+                    saved = true
+                }
+                guard try await currentAccount() == account else { throw APIError.signInRequired }
+                let data = try await request("api/\(kind.rawValue)/\(id)", method: "PATCH", body: ["name": name, "description": description, key: payload(members)])
+                guard try await currentAccount() == account else { throw AudioGroupPartialSave(underlying: APIError.signInRequired) }
+                return try JSONDecoder().decode(AudioGroup.self, from: data)
+            } catch let error where saved && !(error is AudioGroupPartialSave) {
+                throw AudioGroupPartialSave(underlying: error)
             }
-            guard try await currentAccount() == account else { throw APIError.signInRequired }
-            if !removed.isEmpty {
-                _ = try await request("api/\(kind.rawValue)/\(id)/batch/remove", method: "POST", body: [key: payload(removed)])
-            }
-            guard try await currentAccount() == account else { throw APIError.signInRequired }
-            let data = try await request("api/\(kind.rawValue)/\(id)", method: "PATCH", body: ["name": name, "description": description, key: payload(members)])
-            guard try await currentAccount() == account else { throw APIError.signInRequired }
-            return try JSONDecoder().decode(AudioGroup.self, from: data)
         }
         let data = try await request("api/\(kind.rawValue)", method: "POST", body: ["libraryId": libraryID, "name": name, "description": description, key: payload(members)])
         guard try await currentAccount() == account else { throw APIError.signInRequired }
