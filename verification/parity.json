@@ -1,0 +1,1646 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "upstreamCommit": "7014e04e",
+    "appVersion": "0.14.2-beta",
+    "liveServerVersion": "2.30.0",
+    "liveServerVersionEvidence": "Read only /app/package.json in the running internal server container; /status does not expose its version.",
+    "configuredMinimums": {
+      "iOS": "14.0 (Podfile; some project configurations retain 13.0)",
+      "android": 24,
+      "tvOS": "17.0"
+    },
+    "capabilityEvidence": "Source inventory; rows are not replacement acceptance passes."
+  },
+  "settings": {
+    "apple": [
+      "disableAutoRewind",
+      "enableAltView",
+      "allowSeekingOnMediaControls",
+      "jumpBackwardsTime",
+      "jumpForwardTime",
+      "lockOrientation",
+      "hapticFeedback",
+      "languageCode",
+      "downloadUsingCellular",
+      "streamingUsingCellular",
+      "disableSleepTimerFadeOut"
+    ],
+    "android": [
+      "disableAutoRewind",
+      "enableAltView",
+      "allowSeekingOnMediaControls",
+      "jumpBackwardsTime",
+      "jumpForwardTime",
+      "enableMp3IndexSeeking",
+      "disableShakeToResetSleepTimer",
+      "shakeSensitivity",
+      "lockOrientation",
+      "hapticFeedback",
+      "autoSleepTimer",
+      "autoSleepTimerStartTime",
+      "autoSleepTimerEndTime",
+      "autoSleepTimerAutoRewind",
+      "autoSleepTimerAutoRewindTime",
+      "sleepTimerLength",
+      "disableSleepTimerFadeOut",
+      "disableSleepTimerResetFeedback",
+      "enableSleepTimerAlmostDoneChime",
+      "languageCode",
+      "downloadUsingCellular",
+      "streamingUsingCellular",
+      "androidAutoBrowseLimitForGrouping",
+      "androidAutoBrowseSeriesSequenceOrder"
+    ],
+    "capacitorPreferences": [
+      "userSettings",
+      "userSettings",
+      "serverSettings",
+      "serverSettings",
+      "playerSettings",
+      "playerSettings",
+      "bookshelfListView",
+      "bookshelfListView",
+      "lastLibraryId",
+      "lastLibraryId",
+      "lastLibraryId",
+      "theme",
+      "theme",
+      "lang",
+      "lang"
+    ],
+    "webViewStorage": [
+      "device",
+      "refresh_token_<connectionId>",
+      "absDeviceId",
+      "ereaderSettings",
+      "ebookLocations-<contentIdentity>"
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "story-01",
+      "story": 1,
+      "requirement": "As a returning listener, I want a modern, coherent app on my devices, so that browsing and listening feel comfortable and current.",
+      "baselineSources": [
+        "components/app/Appbar.vue",
+        "components/app/SideDrawer.vue",
+        "tvos/App/Views.swift"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-02",
+      "story": 2,
+      "requirement": "As an iPhone user, I want native navigation and controls, so that the app behaves naturally on my phone.",
+      "baselineSources": [
+        "components/app/Appbar.vue",
+        "components/app/SideDrawer.vue",
+        "tvos/App/Views.swift"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-03",
+      "story": 3,
+      "requirement": "As an iPad user, I want layouts that use the available space, so that my library and reading experience do not feel like a stretched phone screen.",
+      "baselineSources": [
+        "components/app/Appbar.vue",
+        "components/app/SideDrawer.vue",
+        "tvos/App/Views.swift"
+      ],
+      "platforms": [
+        "apple-mobile"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": []
+      }
+    },
+    {
+      "id": "story-04",
+      "story": 4,
+      "requirement": "As an Android user, I want a native interface and platform navigation, so that the app fits my device.",
+      "baselineSources": [
+        "components/app/Appbar.vue",
+        "components/app/SideDrawer.vue",
+        "tvos/App/Views.swift"
+      ],
+      "platforms": [
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "android": []
+      }
+    },
+    {
+      "id": "story-05",
+      "story": 5,
+      "requirement": "As an Apple TV listener, I want a native app controlled entirely with the remote, so that I can listen from the sofa.",
+      "baselineSources": [
+        "components/app/Appbar.vue",
+        "components/app/SideDrawer.vue",
+        "tvos/App/Views.swift"
+      ],
+      "platforms": [
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "tv": []
+      }
+    },
+    {
+      "id": "story-06",
+      "story": 6,
+      "requirement": "As a self-hosting user, I want to connect directly to my existing Audiobookshelf server, so that I do not need to migrate my server or add a mandatory intermediary.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-07",
+      "story": 7,
+      "requirement": "As a listener with multiple servers, I want to save and switch server connections, so that I can access each library without losing its account context.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-08",
+      "story": 8,
+      "requirement": "As a local-network user, I want supported local HTTP connections as well as HTTPS, so that my existing server configuration remains usable.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-09",
+      "story": 9,
+      "requirement": "As a reverse-proxy user, I want server addresses with subpaths to work, so that I can keep my current deployment.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-10",
+      "story": 10,
+      "requirement": "As a password-authenticated user, I want to sign in and restore my session securely, so that I do not repeatedly enter credentials.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-11",
+      "story": 11,
+      "requirement": "As a mobile user of OpenID authentication, I want the existing browser sign-in flow to remain available, so that my account setup continues to work.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-12",
+      "story": 12,
+      "requirement": "As a listener with an expiring session, I want token renewal to happen without interrupting playback, so that listening does not stop unnecessarily.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-13",
+      "story": 13,
+      "requirement": "As a listener experiencing a temporary network failure, I want the app to retain my account and explain recovery, so that a connection problem does not become a forced sign-out.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-14",
+      "story": 14,
+      "requirement": "As a listener whose account is no longer authorized, I want a clear reauthentication path, so that I can regain access without losing recoverable progress.",
+      "baselineSources": [
+        "components/connection/ServerConnectForm.vue",
+        "plugins/nativeHttp.js",
+        "store/user.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-15",
+      "story": 15,
+      "requirement": "As a listener with several libraries, I want to select the correct audiobook or podcast library, so that I can find the content I want.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-16",
+      "story": 16,
+      "requirement": "As a returning listener, I want Continue Listening to be prominent, so that I can resume quickly.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-17",
+      "story": 17,
+      "requirement": "As a browsing listener, I want clean cover grids and readable lists, so that I can explore my library comfortably.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-18",
+      "story": 18,
+      "requirement": "As a listener with a large library, I want paginated browsing and responsive scrolling, so that the app does not load the entire library at once.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-19",
+      "story": 19,
+      "requirement": "As a listener looking for a specific item, I want search across the server's supported results, so that I can find books, authors, series, and podcasts.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-20",
+      "story": 20,
+      "requirement": "As a browsing listener, I want the existing sorting and filtering capabilities, so that modernization does not reduce how I organize my library.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-21",
+      "story": 21,
+      "requirement": "As a listener following an author or series, I want its related items and metadata, so that I can choose what to listen to next.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-22",
+      "story": 22,
+      "requirement": "As a listener using collections and playlists, I want the existing browse and permitted management actions, so that my established organization remains useful.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-23",
+      "story": 23,
+      "requirement": "As a listener selecting a book, I want its cover, description, author, narrator, duration, chapters, and progress, so that I can make an informed choice.",
+      "baselineSources": [
+        "store/libraries.js",
+        "pages/bookshelf/library.vue",
+        "pages/search.vue",
+        "pages/item/_id/index.vue",
+        "pages/collection/_id.vue",
+        "pages/playlist/_id.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-24",
+      "story": 24,
+      "requirement": "As a listener, I want to play and pause with clear controls, so that the main action is always easy to reach.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-25",
+      "story": 25,
+      "requirement": "As a listener, I want to seek and skip by my configured intervals, so that I can move through the content accurately.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-26",
+      "story": 26,
+      "requirement": "As a listener of multi-file audiobooks, I want uninterrupted transitions and correct seeking across files, so that file boundaries do not change the experience.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-27",
+      "story": 27,
+      "requirement": "As a listener, I want to select chapters and distinguish chapter progress from total progress, so that I know where I am in the book.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-28",
+      "story": 28,
+      "requirement": "As a listener, I want the existing playback-speed capabilities, so that I can listen at my preferred pace.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-29",
+      "story": 29,
+      "requirement": "As a listener, I want bookmarks and the existing permitted bookmark actions, so that I can return to meaningful passages.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-30",
+      "story": 30,
+      "requirement": "As a bedtime listener, I want sleep timers and end-of-chapter stopping, so that playback ends when I expect.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-31",
+      "story": 31,
+      "requirement": "As a listener using advanced timer and playback preferences, I want the settings currently supported on my platform, so that fade-out, rewind, reset, and media-control behaviour remain familiar.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-32",
+      "story": 32,
+      "requirement": "As a multitasking mobile listener, I want playback to continue while I navigate, lock the screen, or background the app, so that the screen does not own the listening session.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-33",
+      "story": 33,
+      "requirement": "As a mobile listener, I want lock-screen, notification, headset, and Bluetooth controls, so that I can control playback without reopening the app.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-34",
+      "story": 34,
+      "requirement": "As a listener receiving a call or changing audio routes, I want appropriate interruption and resume behaviour, so that audio does not resume unexpectedly or lose its position.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-35",
+      "story": 35,
+      "requirement": "As a listener using the existing Android Auto integration, I want equivalent browsing and playback support, so that the new Android app remains useful in the car.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "android": []
+      }
+    },
+    {
+      "id": "story-36",
+      "story": 36,
+      "requirement": "As a listener using casting where currently supported, I want equivalent cast-session control and progress handling, so that migration does not remove my listening route.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "android": []
+      }
+    },
+    {
+      "id": "story-37",
+      "story": 37,
+      "requirement": "As a listener moving between devices, I want listening progress and finished status to synchronize, so that I can continue from the correct point.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-38",
+      "story": 38,
+      "requirement": "As a listener with an unreliable connection, I want unsent progress to survive application termination and retry safely, so that listening history is not silently discarded.",
+      "baselineSources": [
+        "components/app/AudioPlayer.vue",
+        "ios/App/App/plugins/AbsAudioPlayer.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/media/MediaProgressSyncer.kt",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-39",
+      "story": 39,
+      "requirement": "As a podcast listener, I want episode browsing, existing sort options, details, streaming, and downloads, so that podcasts remain first-class content.",
+      "baselineSources": [
+        "pages/item/_id/_episode/index.vue",
+        "pages/bookshelf/add-podcast.vue",
+        "components/forms/NewPodcastForm.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-40",
+      "story": 40,
+      "requirement": "As a podcast user with the required server permissions, I want the existing add-podcast and related supported actions, so that the native replacement retains those capabilities.",
+      "baselineSources": [
+        "pages/item/_id/_episode/index.vue",
+        "pages/bookshelf/add-podcast.vue",
+        "components/forms/NewPodcastForm.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-41",
+      "story": 41,
+      "requirement": "As a traveller, I want to download content and play it without a network connection, so that offline listening remains reliable.",
+      "baselineSources": [
+        "pages/downloads.vue",
+        "pages/downloading.vue",
+        "pages/localMedia/folders/index.vue",
+        "ios/App/App/plugins/AbsDownloader.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/DownloadItemManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": []
+      }
+    },
+    {
+      "id": "story-42",
+      "story": 42,
+      "requirement": "As a listener managing downloads, I want queue visibility, progress, cancellation, retry, and recovery after interruption, so that I understand and control local storage.",
+      "baselineSources": [
+        "pages/downloads.vue",
+        "pages/downloading.vue",
+        "pages/localMedia/folders/index.vue",
+        "ios/App/App/plugins/AbsDownloader.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/DownloadItemManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": []
+      }
+    },
+    {
+      "id": "story-43",
+      "story": 43,
+      "requirement": "As a listener whose device restarts or app closes, I want downloaded content and its progress to remain available, so that I can resume offline.",
+      "baselineSources": [
+        "pages/downloads.vue",
+        "pages/downloading.vue",
+        "pages/localMedia/folders/index.vue",
+        "ios/App/App/plugins/AbsDownloader.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/DownloadItemManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": []
+      }
+    },
+    {
+      "id": "story-44",
+      "story": 44,
+      "requirement": "As a listener on a metered connection, I want the existing streaming and download permission settings, so that I control cellular usage.",
+      "baselineSources": [
+        "pages/downloads.vue",
+        "pages/downloading.vue",
+        "pages/localMedia/folders/index.vue",
+        "ios/App/App/plugins/AbsDownloader.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/DownloadItemManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": []
+      }
+    },
+    {
+      "id": "story-45",
+      "story": 45,
+      "requirement": "As a listener using local media folders or shared storage on supported platforms, I want those workflows retained, so that the replacement does not strand my files.",
+      "baselineSources": [
+        "pages/downloads.vue",
+        "pages/downloading.vue",
+        "pages/localMedia/folders/index.vue",
+        "ios/App/App/plugins/AbsDownloader.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/DownloadItemManager.kt"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": []
+      }
+    },
+    {
+      "id": "story-46",
+      "story": 46,
+      "requirement": "As a reader, I want every ebook format and opening mode supported by the current mobile app, so that choosing a native replacement does not reduce reading support.",
+      "baselineSources": [
+        "components/readers/Reader.vue",
+        "components/readers/EpubReader.vue",
+        "components/readers/PdfReader.vue",
+        "components/readers/MobiReader.vue",
+        "components/readers/ComicReader.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-47",
+      "story": 47,
+      "requirement": "As a reader, I want the existing typography, colour, layout, navigation, and other reader settings, so that reading remains comfortable.",
+      "baselineSources": [
+        "components/readers/Reader.vue",
+        "components/readers/EpubReader.vue",
+        "components/readers/PdfReader.vue",
+        "components/readers/MobiReader.vue",
+        "components/readers/ComicReader.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-48",
+      "story": 48,
+      "requirement": "As a returning reader, I want my reading location and supported reading progress to survive upgrades and synchronize, so that I do not lose my place.",
+      "baselineSources": [
+        "components/readers/Reader.vue",
+        "components/readers/EpubReader.vue",
+        "components/readers/PdfReader.vue",
+        "components/readers/MobiReader.vue",
+        "components/readers/ComicReader.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-49",
+      "story": 49,
+      "requirement": "As a reader who also listens, I want the existing combined reading and playback workflows, so that I can use both without conflicting controls.",
+      "baselineSources": [
+        "components/readers/Reader.vue",
+        "components/readers/EpubReader.vue",
+        "components/readers/PdfReader.vue",
+        "components/readers/MobiReader.vue",
+        "components/readers/ComicReader.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-50",
+      "story": 50,
+      "requirement": "As a user with an established setup, I want account, display, language, haptic, orientation, playback, and platform-specific settings preserved where applicable, so that upgrading does not reset my preferences.",
+      "baselineSources": [
+        "pages/settings.vue",
+        "pages/account.vue",
+        "pages/stats.vue",
+        "pages/logs.vue",
+        "plugins/i18n.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-51",
+      "story": 51,
+      "requirement": "As a listener tracking activity, I want the existing statistics and progress-management capabilities, so that the replacement retains my useful information.",
+      "baselineSources": [
+        "pages/settings.vue",
+        "pages/account.vue",
+        "pages/stats.vue",
+        "pages/logs.vue",
+        "plugins/i18n.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-52",
+      "story": 52,
+      "requirement": "As a user troubleshooting a problem, I want accessible diagnostics that avoid exposing credentials, so that I can understand failures safely.",
+      "baselineSources": [
+        "pages/settings.vue",
+        "pages/account.vue",
+        "pages/stats.vue",
+        "pages/logs.vue",
+        "plugins/i18n.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-53",
+      "story": 53,
+      "requirement": "As a user of assistive technology, I want labelled controls, sensible reading order, sufficient contrast, scalable text, and reduced-motion behaviour, so that the redesigned app is accessible.",
+      "baselineSources": [
+        "pages/settings.vue",
+        "pages/account.vue",
+        "pages/stats.vue",
+        "pages/logs.vue",
+        "plugins/i18n.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-54",
+      "story": 54,
+      "requirement": "As a user in a supported language, I want localization and appropriate text layout, so that the rewrite does not silently become English-only.",
+      "baselineSources": [
+        "pages/settings.vue",
+        "pages/account.vue",
+        "pages/stats.vue",
+        "pages/logs.vue",
+        "plugins/i18n.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "story-55",
+      "story": 55,
+      "requirement": "As an Apple TV user, I want visible focus, predictable directional movement, and a reliable Back action, so that I can operate every supported screen with the remote.",
+      "baselineSources": [
+        "tvos/App/Views.swift",
+        "tvos/App/TVPlayer.swift",
+        "tvos/Core/Sources/TVCore/APIClient.swift"
+      ],
+      "platforms": [
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "tv": []
+      }
+    },
+    {
+      "id": "story-56",
+      "story": 56,
+      "requirement": "As an Apple TV user, I want artwork and text readable across the room, so that selecting and controlling content is effortless.",
+      "baselineSources": [
+        "tvos/App/Views.swift",
+        "tvos/App/TVPlayer.swift",
+        "tvos/Core/Sources/TVCore/APIClient.swift"
+      ],
+      "platforms": [
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "tv": []
+      }
+    },
+    {
+      "id": "story-57",
+      "story": 57,
+      "requirement": "As an Apple TV listener, I want library browsing, audiobook resume, episode selection, chapters, speed, and progress synchronization, so that the television is a useful listening device.",
+      "baselineSources": [
+        "tvos/App/Views.swift",
+        "tvos/App/TVPlayer.swift",
+        "tvos/Core/Sources/TVCore/APIClient.swift"
+      ],
+      "platforms": [
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "tv": []
+      }
+    },
+    {
+      "id": "story-58",
+      "story": 58,
+      "requirement": "As an existing mobile user upgrading in place, I want downloaded files, account settings, and unsent progress preserved, so that modernization does not cost me my content or history.",
+      "baselineSources": [
+        "ios/App/Shared/util/Database.swift",
+        "ios/App/Shared/util/SecureStorage.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/DbManager.kt",
+        "plugins/localStore.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": []
+      }
+    },
+    {
+      "id": "story-59",
+      "story": 59,
+      "requirement": "As a user installing under a different app identity, I want clear import or reauthentication instructions where direct transfer is unavailable, so that sandbox limitations are not mistaken for successful migration.",
+      "baselineSources": [
+        "ios/App/Shared/util/Database.swift",
+        "ios/App/Shared/util/SecureStorage.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/DbManager.kt",
+        "plugins/localStore.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": []
+      }
+    },
+    {
+      "id": "story-60",
+      "story": 60,
+      "requirement": "As a user trying the replacement, I want a safe transition while the current app remains available, so that I do not have to accept an incomplete replacement.",
+      "baselineSources": [
+        "ios/App/Shared/util/Database.swift",
+        "ios/App/Shared/util/SecureStorage.swift",
+        "android/app/src/main/java/com/audiobookshelf/app/managers/DbManager.kt",
+        "plugins/localStore.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": []
+      }
+    },
+    {
+      "id": "story-61",
+      "story": 61,
+      "requirement": "As a browser listener in phase 2, I want a modern Next.js client for my existing server, so that the browser experience matches the native apps' visual identity.",
+      "baselineSources": [
+        "package.json",
+        "nuxt.config.js",
+        "tvos/QA.md"
+      ],
+      "platforms": [
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "browser": []
+      }
+    },
+    {
+      "id": "story-62",
+      "story": 62,
+      "requirement": "As a browser user in phase 2, I want supported sign-in, browsing, search, playback, podcasts, reading, and progress workflows, so that the new browser client is a useful replacement rather than a static mockup.",
+      "baselineSources": [
+        "package.json",
+        "nuxt.config.js",
+        "tvos/QA.md"
+      ],
+      "platforms": [
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "browser": []
+      }
+    },
+    {
+      "id": "story-63",
+      "story": 63,
+      "requirement": "As a self-hosting browser user, I want a documented deployment and connection model, so that I can use the Next.js client with my own server without sending credentials or media through an undisclosed service.",
+      "baselineSources": [
+        "package.json",
+        "nuxt.config.js",
+        "tvos/QA.md"
+      ],
+      "platforms": [
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "browser": []
+      }
+    },
+    {
+      "id": "story-64",
+      "story": 64,
+      "requirement": "As a browser user, I want capability limitations explained when an operation requires native platform support, so that unsupported behaviour is not presented as working.",
+      "baselineSources": [
+        "package.json",
+        "nuxt.config.js",
+        "tvos/QA.md"
+      ],
+      "platforms": [
+        "browser"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "browser": []
+      }
+    },
+    {
+      "id": "story-65",
+      "story": 65,
+      "requirement": "As a maintainer of the fork, I want a documented parity matrix and reproducible verification, so that release readiness is based on evidence rather than how finished the screens look.",
+      "baselineSources": [
+        "package.json",
+        "nuxt.config.js",
+        "tvos/QA.md"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser",
+        "tv"
+      ],
+      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "replacementEvidence": {
+        "apple-mobile": [],
+        "android": [],
+        "browser": [],
+        "tv": []
+      }
+    },
+    {
+      "id": "reader-epub",
+      "story": null,
+      "requirement": "EPUB rendering, CFI location, typography, navigation and combined audio",
+      "baselineSources": [
+        "components/readers/EpubReader.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "reader-mobi-azw3",
+      "story": null,
+      "requirement": "MOBI and AZW3 rendering and supported locations/opening modes",
+      "baselineSources": [
+        "components/readers/MobiReader.vue",
+        "assets/ebooks/mobi.js"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "reader-pdf",
+      "story": null,
+      "requirement": "PDF pages, rotation, links and supported location behavior",
+      "baselineSources": [
+        "components/readers/PdfReader.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "reader-cbz-cbr",
+      "story": null,
+      "requirement": "CBZ and CBR comic extraction, images and page navigation",
+      "baselineSources": [
+        "components/readers/ComicReader.vue"
+      ],
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "settings-android-auto",
+      "story": null,
+      "requirement": "Car browsing group limits and series sequence order",
+      "baselineSources": [
+        "android/app/src/main/java/com/audiobookshelf/app/data/DeviceClasses.kt"
+      ],
+      "platforms": [],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "settings-sleep",
+      "story": null,
+      "requirement": "Auto-sleep window, rewind, shake reset sensitivity, chime, fade and reset feedback where supported",
+      "baselineSources": [
+        "android/app/src/main/java/com/audiobookshelf/app/data/DeviceClasses.kt",
+        "ios/App/Shared/models/DeviceSettings.swift"
+      ],
+      "platforms": [],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "upstream-realtime",
+      "story": null,
+      "requirement": "Realtime initialization, user/item progress updates, playlists and reconnect semantics",
+      "baselineSources": [
+        "plugins/server.js"
+      ],
+      "platforms": [],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "local-builds",
+      "story": null,
+      "requirement": "Build, verify, sign and package on Studio without hosted compute",
+      "baselineSources": [
+        "package.json",
+        "tvos/scripts/deploy.sh"
+      ],
+      "platforms": [],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "internal-distribution",
+      "story": null,
+      "requirement": "Direct native installation and self-hosted browser distribution without public stores",
+      "baselineSources": [
+        "tvos/scripts/deploy.sh"
+      ],
+      "platforms": [],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "sequential-delivery",
+      "story": null,
+      "requirement": "Apple mobile and TV acceptance gates Android; Android acceptance gates Next.js",
+      "baselineSources": [
+        "tvos/README.md"
+      ],
+      "platforms": [],
+      "replacementEvidence": {}
+    },
+    {
+      "id": "server-upgrade-gate",
+      "story": null,
+      "requirement": "Test every completed client before adopting a candidate server; align affected clients locally",
+      "baselineSources": [
+        "plugins/nativeHttp.js",
+        "tvos/Core/Sources/TVCore/APIClient.swift"
+      ],
+      "platforms": [],
+      "replacementEvidence": {}
+    }
+  ]
+}
