@@ -62,10 +62,15 @@ struct LegacyAppSeed {
             track.duration = 10
             track.mimeType = "audio/mpeg"
             track.localFileId = audio.id
+            let ebookMetadata = FileMetadata()
+            ebookMetadata.filename = "book.epub"
+            ebookMetadata.ext = ".epub"
             let ebook = EBookFile()
             ebook.ino = "ino-epub"
             ebook.ebookFormat = "epub"
-            ebook.localFileId = epub.id
+            ebook.metadata = ebookMetadata
+            // As the app links a downloaded ebook (LocalLibraryItem.linkLocalFiles).
+            _ = ebook.setLocalInfo(localFile: epub)
             let media = MediaType()
             media.libraryItemId = "li-1"
             media.metadata = metadata
@@ -76,6 +81,7 @@ struct LegacyAppSeed {
             item.libraryItemId = "li-1"
             item.mediaType = "book"
             item.basePath = "li-1"
+            item._contentUrl = "li-1"
             item.serverConnectionConfigId = "conn-1"
             item.serverAddress = address
             item.serverUserId = "user-1"
