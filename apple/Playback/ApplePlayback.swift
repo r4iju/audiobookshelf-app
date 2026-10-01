@@ -80,7 +80,7 @@ import SwiftUI
     }
 
     func start(item: LibraryItem, episode: Episode? = nil) async {
-        guard !preparing, !seeking else { return }
+        guard !preparing, !seeking, !closing else { return }
         preparing = true
         wantsPlayback = true
         error = nil
@@ -103,7 +103,7 @@ import SwiftUI
             }
             let result = try await api.play(itemID: item.id, episodeID: episode?.id, deviceID: deviceID)
             guard requestGeneration == generation else {
-                try await api.report(sessionID: result.id, report: ProgressReport(currentTime: result.currentTime, timeListened: 0, duration: result.duration), close: true)
+                try await api.closeStream(sessionID: result.id)
                 return
             }
             session = result
@@ -150,7 +150,7 @@ import SwiftUI
         catch { failed(error) }
     }
     func seek(to time: Double, autoplay: Bool) async throws {
-        guard let session, session.position(at: time) != nil else { return }
+        guard !closing, let session, session.position(at: time) != nil else { return }
         wantsPlayback = autoplay
         pendingSeek = SeekRequest(time: min(max(time.isFinite ? time : 0, 0), session.duration), generation: generation)
         if let seekLoop { return try await seekLoop.value }
@@ -163,15 +163,15 @@ import SwiftUI
             while let request = pendingSeek {
                 pendingSeek = nil
                 try Task.checkCancellation()
-                guard request.generation == generation, let session = self.session,
+                guard !closing, request.generation == generation, let session = self.session,
                       let position = session.position(at: request.time) else { throw CancellationError() }
                 if player.currentItem == nil || trackIndex != position.trackIndex {
                     try await loadTrack(position.trackIndex)
                 }
-                guard request.generation == generation else { throw CancellationError() }
+                guard !closing, request.generation == generation else { throw CancellationError() }
                 if pendingSeek != nil { continue }
                 let finished = await player.seek(to: CMTime(seconds: position.localTime, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
-                guard request.generation == generation else { throw CancellationError() }
+                guard !closing, request.generation == generation else { throw CancellationError() }
                 if pendingSeek != nil { continue }
                 guard finished else { throw PlaybackFailure.seekFailed }
                 if let listeningID { try listening.record(id: listeningID, position: request.time, listened: 0) }

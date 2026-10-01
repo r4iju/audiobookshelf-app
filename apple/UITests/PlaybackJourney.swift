@@ -1,6 +1,26 @@
 import XCTest
 
 @MainActor final class PlaybackJourney: NativeJourney {
+    func testSeekWhileClosingDoesNotJumpOrResumeOldItem() async throws {
+        try await FixtureControl.configure("slow-close")
+        addTeardownBlock { try await FixtureControl.configure("baseline") }
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs")
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        app.buttons["play-book"].tap()
+        app.buttons["mini-player"].tap()
+        XCTAssertTrue(app.buttons["pause-playback"].waitForExistence(timeout: 10))
+        app.buttons["Close playback"].tap()
+        app.buttons["Forward 30 seconds"].tap()
+        let seconds = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        XCTAssertLessThan(seconds, 20)
+        XCTAssertTrue(app.buttons["resume-playback"].exists)
+        let closed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: app.buttons["mini-player"])
+        await fulfillment(of: [closed], timeout: 12)
+        XCTAssertTrue(app.buttons["play-book"].exists)
+        XCTAssertFalse(app.buttons["mini-player"].exists)
+    }
+
     func testPauseWhileReplacingSessionPreventsNewBookAutoplay() async throws {
         try await FixtureControl.configure("slow-close")
         addTeardownBlock { try await FixtureControl.configure("baseline") }

@@ -209,8 +209,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'results': results})
             play = re.fullmatch(r'/api/items/(book-[0-9]+|podcast)/play(?:/(episode))?', path or '')
             if play:
-                if configuration['mode'] == 'slow-session':
-                    time.sleep(4)
+                delay_response = configuration['mode'] == 'slow-session'
                 item_id, episode_id = play.groups()
                 if item_id == 'podcast':
                     if episode_id != 'episode':
@@ -229,13 +228,15 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 sessions[session_id] = result
                 if configuration['mode'] == 'no-audio':
                     result['audioTracks'] = []
+                if delay_response:
+                    time.sleep(8)
                 return self.respond(200, result)
             report = re.fullmatch(r'/api/session/([^/]+)/(sync|close)', path or '')
             if report and report.group(1) in sessions:
                 if configuration['mode'] == 'offline-progress':
                     return self.respond(503, {})
                 if configuration['mode'] == 'slow-close' and report.group(2) == 'close':
-                    time.sleep(4)
+                    time.sleep(8)
                 session = sessions[report.group(1)]
                 if not data:
                     return self.respond(200, {})

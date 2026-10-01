@@ -1,6 +1,23 @@
 import XCTest
 
 @MainActor final class DurableProgressJourney: NativeJourney {
+    func testCanceledPreparationCannotOverwriteAnotherClientsNewerPosition() async throws {
+        try await FixtureControl.configure("slow-session")
+        addTeardownBlock { try await FixtureControl.configure("baseline") }
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs")
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        app.buttons["play-book"].tap()
+        app.buttons["mini-player"].tap()
+        app.buttons["Close playback"].tap()
+        XCTAssertTrue(app.buttons["play-book"].waitForExistence(timeout: 3))
+        try await FixtureControl.configure("newer-remote")
+        let finished = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: app.buttons["play-book"])
+        await fulfillment(of: [finished], timeout: 12)
+        let resumed = try await independentlyResumedPosition()
+        XCTAssertEqual(resumed, 19)
+    }
+
     func testRecoveredListeningPreservesNewerProgressAndANewClientResumesIt() async throws {
         try await FixtureControl.configure("offline-progress")
         addTeardownBlock { try await FixtureControl.configure("baseline") }
