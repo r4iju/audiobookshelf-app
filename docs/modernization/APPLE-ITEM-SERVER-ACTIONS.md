@@ -181,5 +181,19 @@ Screenshots (synthetic fixture):
 ## Not verified here
 
 - **Real server.** Opening or closing a real feed, and sending a real e-mail through configured SMTP and e-reader devices, were deliberately not done against the owner's server. They need an owner-approved test item and device.
-- **iPad.** iPad layout of the section and the device action sheet was not run separately. The journeys ran on iPhone 17 Pro, iOS 27.
+- **Hardware.** Automated iPhone and iPad simulator journeys do not establish physical-device acceptance.
 - **Collection and series feeds.** The server also has `POST /api/feeds/collection/:id/open` and `/series/:id/open`, but the baseline item menu does not offer them, so they are not added.
+
+## Production integration
+
+The actual `BookDetails` section and 30 generated language tables are wired in the final Apple integration checkout. No temporary production patch was used for the root run.
+
+- Shared core: 63/63 pass, `/tmp/abs-root-item-actions-core.log`.
+- iPhone: `ItemServerActionsJourney` 4/4 pass, `/tmp/abs-root-item-actions-ui.log`, `apple/build-related/ItemActions-20261002-035949.xcresult`. The isolated root fixture uses port 41765; the committed journey keeps its documented worker port 27765.
+- iOS 14 source compatibility: typecheck passes, `/tmp/abs-root-realtime-items-minimum.log`.
+
+These checks use synthetic feeds and recorded sends. They do not send owner email or create owner feeds.
+
+- iPad Pro 13-inch M4, iOS 27: all four production journeys pass, `/tmp/abs-root-item-actions-ipad.log`, `apple/build-related/ItemActions-20261002-040811.xcresult`. Exported screenshots were inspected: the RSS sheet fits and the device picker anchors to the send action.
+
+![iPad RSS sheet](evidence/apple-item-rss-admin-ipad.png) ![iPad device picker](evidence/apple-item-send-devices-ipad.png)

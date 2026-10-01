@@ -96,5 +96,19 @@
   "Unlock player": "LabelUnlockPlayer",
   "Volume buttons": "LabelNavigateWithVolume",
   "Volume navigation while listening": "LabelNavigateWithVolumeWhilePlaying",
-  "Year in review": "LabelYearReviewShow"
+  "Year in review": "LabelYearReviewShow",
+  "Send ebook to device": "ButtonSendEbookToDevice",
+  "RSS feed": "HeaderRSSFeed",
+  "Open RSS feed": "HeaderOpenRSSFeed",
+  "RSS feed is open": "HeaderRSSFeedIsOpen",
+  "Prevent indexing": "LabelRSSFeedPreventIndexing",
+  "Custom owner name": "LabelRSSFeedCustomOwnerName",
+  "Custom owner email": "LabelRSSFeedCustomOwnerEmail",
+  "Feed slug": "LabelRSSFeedSlug",
+  "The feed URL will be {0}": "MessageFeedURLWillBe",
+  "Close feed": "ButtonCloseFeed",
+  "Open feed": "ButtonOpenFeed",
+  "Select a device": "LabelSelectADevice",
+  "Important: most podcast apps require the RSS feed URL to use HTTPS.": "NoteRSSFeedPodcastAppsHttps",
+  "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this.": "NoteRSSFeedPodcastAppsPubDate"
 }

@@ -83,6 +83,7 @@ struct BookDetails: View {
                     Button(l10n("Download for offline")) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: episode) } }
                     if let error = localDownloads.error { Text(error).foregroundColor(.red) }
                 }
+                if episode == nil { ItemServerActionsSection(itemID: book.id, catalog: catalog) }
                 if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
                     VStack(alignment: .leading, spacing: 10) {
                         ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
