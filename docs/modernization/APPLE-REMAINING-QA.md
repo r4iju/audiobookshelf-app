@@ -238,3 +238,19 @@ All under `/tmp/abs-remaining-qa-evidence`:
   - `nativetests-68` and `groups-green` (iPhone only; the admin journey was not run on iPad).
   - `background-probe/`: the probe source, `slow-download-fixture.patch`, `probe.log`, `fixture-http.log`, the
     result bundle and screenshots.
+
+## Integrated verification, 2026-10-02
+
+Source `23abaa51`, on top of merged realtime integration `39609d08`, passes:
+
+- NativeTests: 70 of 70, zero skipped, including the owned 8 MiB full-volume case. Result: `apple/build-remaining-qa/results/storage-Audiobookshelf-Root-Related-QA-20261002-063820.xcresult`; log `/tmp/abs-root-polish-final-native-tests.log`.
+- Core: 72 of 72; log `/tmp/abs-root-polish-final-core.log`.
+- Default remaining-QA UI invocation: all three light/dark/black contrast audits and both collection-permission journeys, 5 of 5. Result: `apple/build-remaining-qa/results/Audiobookshelf-Root-Related-QA-20261002-064337.xcresult`; log `/tmp/abs-root-polish-final-ui.log`.
+- Synthetic fixture tests: 10 passed; log `/tmp/abs-root-polish-fixture-tests.log`.
+- iOS 14 source typecheck, localization generation check, project generation and diff check passed. Runtime compatibility on iOS 14 remains unverified.
+
+The earlier integrated light-theme run failed while opening the player because the synthetic realtime proxy returned HTTP 503. A separate RED experiment suspended only the owned fixture and queued 40 connections: the previous five-connection listen queue rejected 35 connections. The fixture factory now queues 128 connections; the final default UI invocation passed all five cases. This changes synthetic fixture capacity, not production retry or error handling.
+
+The runner previously selected a base journey class containing no test methods. Its default now selects both concrete journey classes; the final invocation used those defaults. The root run used owned temporary ports 64765/64769, restored to the documented defaults afterward.
+
+These results cover local synthetic simulators. They do not establish owner-device acceptance, whole-device storage exhaustion, iOS 14 runtime compatibility, or user force-quit background-transfer behavior. The metadata truncation test proves the audio rejection path; its sibling PDF is cancelled by that audio failure, so it is not an independent PDF-size rejection proof.
