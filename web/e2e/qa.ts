@@ -40,7 +40,11 @@ export async function serverApi(account: Account) {
       body: init.body ? JSON.stringify(init.body) : undefined,
     });
     const text = await response.text();
-    return { status: response.status, body: text && text !== "OK" ? JSON.parse(text) : null };
+    let body = null;
+    try {
+      body = text ? JSON.parse(text) : null;
+    } catch {}
+    return { status: response.status, body };
   }
   return { token, call };
 }

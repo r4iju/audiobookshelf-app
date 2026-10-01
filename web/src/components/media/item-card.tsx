@@ -1,5 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { CoverShape } from "@/lib/abs/media";
 import { Cover, ProgressBar } from "./cover";
 
@@ -19,6 +20,7 @@ export function MediaCard({
   progress,
   progressLabel,
   finishedLabel,
+  missingCoverLabel,
 }: {
   href: string;
   title: string;
@@ -29,11 +31,13 @@ export function MediaCard({
   progress?: CardProgress;
   progressLabel: string;
   finishedLabel: string;
+  missingCoverLabel: string;
 }) {
   return (
     <Link href={href} className="group flex w-full flex-col gap-2 rounded-xl focus-ring">
       <div className="relative">
         <Cover
+          missingLabel={missingCoverLabel}
           src={cover}
           title={title}
           subtitle={subtitle}
@@ -56,7 +60,7 @@ export function MediaCard({
       ) : (
         <div aria-hidden className="h-1" />
       )}
-      <div className="min-h-[2.75rem]">
+      <div className="h-14 overflow-hidden">
         <p className="line-clamp-2 text-sm font-semibold leading-snug break-words">{title}</p>
         {subtitle ? <p className="truncate text-xs text-muted">{subtitle}</p> : null}
       </div>
@@ -72,7 +76,7 @@ export function CardGrid({
   label,
 }: {
   shape: CoverShape;
-  children: React.ReactNode;
+  children: ReactNode;
   label?: string;
 }) {
   return (

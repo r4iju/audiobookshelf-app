@@ -165,7 +165,8 @@ export const bookMetadataSchema = z.looseObject({
   narratorName: nullableString,
   narrators: z.array(z.string()).nullish(),
   seriesName: nullableString,
-  series: z.array(seriesRefSchema).nullish(),
+  // Minified items filtered by one series carry just that series as an object.
+  series: z.union([z.array(seriesRefSchema), seriesRefSchema.transform((one) => [one])]).nullish(),
   genres: z.array(z.string()).default([]),
   publishedYear: nullableString,
   publisher: nullableString,

@@ -15,6 +15,8 @@ const config: NextConfig = {
   turbopack: { root: fileURLToPath(new URL(".", import.meta.url)) },
   outputFileTracingRoot: fileURLToPath(new URL(".", import.meta.url)),
   allowedDevOrigins: ["127.0.0.1", "localhost"],
+  // The dev tools button is the first tab stop otherwise, which hides keyboard-order problems during development.
+  devIndicators: false,
 };
 
 export default config;

@@ -18,11 +18,14 @@ import {
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useEffect } from "react";
+import { AudioEngine } from "@/components/player/audio-engine";
+import { PlayerDock } from "@/components/player/player-dock";
 import { ButtonLink } from "@/components/ui/button";
 import { Alert, Spinner } from "@/components/ui/status";
 import { type StringKey, useI18n } from "@/i18n/i18n";
 import { useLibraries } from "@/lib/abs/queries";
 import type { Library } from "@/lib/abs/schemas";
+import { usePlayer } from "@/lib/player/store";
 import * as registry from "@/lib/session/registry";
 import { useSession, useSessionStore } from "@/lib/session/store";
 import { errorMessage } from "./errors";
@@ -104,6 +107,7 @@ function Shell({ children }: { children: ReactNode }) {
   const params = useParams<{ libraryId?: string }>();
   const libraries = useLibraries();
   const online = useOnline();
+  const playerActive = usePlayer().phase === "active";
 
   if (session.phase !== "signed-in") return null;
   const { connection } = session;
@@ -228,7 +232,7 @@ function Shell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-col pb-24 lg:pb-8">
+      <div className={`flex min-w-0 flex-col ${playerActive ? "pb-56 lg:pb-44" : "pb-24 lg:pb-8"}`}>
         <div className="flex flex-col gap-2 px-4 pt-4 empty:hidden lg:px-8">
           {session.reauthRequired ? (
             <Alert
@@ -254,6 +258,8 @@ function Shell({ children }: { children: ReactNode }) {
           {children}
         </main>
       </div>
+      <AudioEngine />
+      <PlayerDock />
     </div>
   );
 }

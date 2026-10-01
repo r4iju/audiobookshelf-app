@@ -24,6 +24,7 @@ export function ItemCard({ item, shape }: { item: LibraryItem; shape: CoverShape
         badge={String(collapsed.numBooks)}
         progressLabel={t("LabelProgress")}
         finishedLabel={t("LabelFinished")}
+        missingCoverLabel={t("WebNoCover")}
       />
     );
   }
@@ -50,6 +51,7 @@ export function ItemCard({ item, shape }: { item: LibraryItem; shape: CoverShape
       }
       progressLabel={t("LabelProgress")}
       finishedLabel={t("LabelFinished")}
+      missingCoverLabel={t("WebNoCover")}
     />
   );
 }
@@ -76,6 +78,7 @@ export function SeriesCard({
       badge={String(series.books.length)}
       progressLabel={t("LabelProgress")}
       finishedLabel={t("LabelFinished")}
+      missingCoverLabel={t("WebNoCover")}
     />
   );
 }
@@ -92,6 +95,7 @@ export function AuthorCard({ author, libraryId }: { author: Author; libraryId: s
       shape="square"
       progressLabel={t("LabelProgress")}
       finishedLabel={t("LabelFinished")}
+      missingCoverLabel={t("WebNoCover")}
     />
   );
 }

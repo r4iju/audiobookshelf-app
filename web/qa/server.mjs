@@ -147,6 +147,9 @@ async function up({ fresh }) {
       `127.0.0.1:${QA_PORT}:80`,
       "-e",
       "TZ=UTC",
+      // Test journeys sign in far more often than people do; only this QA server disables the login rate limit.
+      "-e",
+      "RATE_LIMIT_AUTH_MAX=0",
       "-v",
       `${join(runtime, "library")}:/library:ro`,
       // Named volumes: SQLite on a bind mount through the VM's file sharing fails to open after the directory is recreated.
