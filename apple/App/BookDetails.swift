@@ -9,6 +9,7 @@ struct BookDetails: View {
     @State private var reader: ReadingSource?
     @EnvironmentObject private var localDownloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
+    @EnvironmentObject private var migration: NativeMigrationStore
     @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var realtime: NativeRealtime
     let item: LibraryItem
@@ -16,14 +17,25 @@ struct BookDetails: View {
     let progress: MediaProgress?
     let episode: Episode?
     @State private var expanded: LibraryItem?
-    @State private var error: String?
+    private enum DetailFailure {
+        case load(String), discard(String)
+        var message: String {
+            switch self { case .load(let message), .discard(let message): return message }
+        }
+    }
+    @State private var error: DetailFailure?
     @State private var request: Task<Void, Never>?
     @State private var playAttempted = false
     @State private var mediaProgress: [MediaProgress] = []
     @AppStorage("previewEpisodeSort") private var episodeSort = "publishedAt"
     @AppStorage("previewEpisodeDescending") private var episodeDescending = true
     @State private var episodeFilter = "all"
-    @State private var confirmCompletion = false
+    private enum ProgressConfirmation: String, Identifiable {
+        case finish, discard
+        var id: String { rawValue }
+    }
+    @State private var progressConfirmation: ProgressConfirmation?
+    @State private var progressDiscarded = false
     @State private var progressBusy = false
     @State private var progressRequest: Task<Void, Never>?
     @State private var canManagePodcasts = false
@@ -53,6 +65,11 @@ struct BookDetails: View {
                 }
                 if episode != nil || book.mediaType == "book" {
                     Button(l10n(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished"), action: toggleFinished).disabled(progressBusy)
+                    if let progress = selectedProgress, (progress.progress ?? 0) > 0 || (progress.ebookProgress ?? 0) > 0 {
+                        Button(l10n("Discard progress")) { NativeHaptic.impact("discard-progress"); progressConfirmation = .discard }
+                            .disabled(progressBusy).accessibilityIdentifier("discard-progress")
+
+                    }
                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
                 }
                 if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
@@ -60,7 +77,7 @@ struct BookDetails: View {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         Task {
                             do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil) }
-                            catch { self.error = error.localizedDescription }
+                            catch { recordLoadFailure(error.localizedDescription) }
                         }
                     }
                 }
@@ -71,7 +88,7 @@ struct BookDetails: View {
                                 Button(l10n("Read {0}", file.metadata?.filename ?? l10n("supplementary PDF"))) {
                                     Task {
                                         do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: file.metadata?.filename ?? book.title, ebook: ebook, file: nil, fileID: file.ino) }
-                                        catch { self.error = error.localizedDescription }
+                                        catch { recordLoadFailure(error.localizedDescription) }
                                     }
                                 }
                                 Button(l10n("Download {0}", file.metadata?.filename ?? l10n("supplementary PDF"))) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: nil, supplementaryID: file.ino) } }
@@ -112,7 +129,14 @@ struct BookDetails: View {
                         }
                     }
                 }
-                if let error { RecoveryCard(message: error) { load(monitorDownloads: true) } }
+                if let error {
+                    RecoveryCard(message: error.message) {
+                        switch error {
+                        case .load: load(monitorDownloads: true)
+                        case .discard: discardProgress()
+                        }
+                    }
+                }
             }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
         }.background(appearance.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
             .onAppear { load(monitorDownloads: true) }
@@ -127,8 +151,13 @@ struct BookDetails: View {
                 }
             }
             .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: catalog.api, store: readingStore) }
-            .alert(isPresented: $confirmCompletion) {
-                Alert(title: Text(l10n("Mark book finished?")), message: Text(l10n("Your saved progress will change when this book is marked finished.")), primaryButton: .default(Text(l10n("Mark finished"))) { applyFinished(true) }, secondaryButton: .cancel(Text(l10n("Cancel"))))
+            .alert(item: $progressConfirmation) { confirmation in
+                switch confirmation {
+                case .finish:
+                    return Alert(title: Text(l10n("Mark book finished?")), message: Text(l10n("Your saved progress will change when this book is marked finished.")), primaryButton: .default(Text(l10n("Mark finished"))) { applyFinished(true) }, secondaryButton: .cancel(Text(l10n("Cancel"))))
+                case .discard:
+                    return Alert(title: Text(l10n("Confirm")), message: Text(l10n("Are you sure you want to reset your progress?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
+                }
             }
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
@@ -168,10 +197,27 @@ struct BookDetails: View {
         let finished = selectedProgress?.isFinished != true
         let livePosition = player.itemID == book.id && player.episodeID == nil ? player.currentTime : 0
         if episode == nil, finished, (selectedProgress?.currentTime ?? 0) > 0 || (selectedProgress?.ebookProgress ?? 0) > 0 || livePosition > 0 {
-            confirmCompletion = true
+            progressConfirmation = .finish
         } else { applyFinished(finished) }
     }
     private func applyFinished(_ finished: Bool) {
+        guard !progressBusy else { return }
+        request?.cancel()
+        detailRevision = UUID()
+        progressBusy = true
+        clearLoadFailure()
+        progressRequest = Task {
+            defer { progressBusy = false }
+            do {
+                let user = try await player.setFinished(itemID: book.id, episodeID: episode?.id, finished: finished)
+                guard !Task.isCancelled else { return }
+                mediaProgress = user.mediaProgress
+                catalog.applyProgress(user)
+            } catch { if !Task.isCancelled { recordLoadFailure(ConnectionStore.recovery(for: error)) } }
+        }
+    }
+
+    private func discardProgress() {
         guard !progressBusy else { return }
         request?.cancel()
         detailRevision = UUID()
@@ -180,16 +226,19 @@ struct BookDetails: View {
         progressRequest = Task {
             defer { progressBusy = false }
             do {
-                let user = try await player.setFinished(itemID: book.id, episodeID: episode?.id, finished: finished)
+                let account = try await catalog.api.currentAccount()
+                let user = try await migration.resetProgress(account: account, itemID: book.id, episodeID: episode?.id)
                 guard !Task.isCancelled else { return }
+                progressDiscarded = true
                 mediaProgress = user.mediaProgress
-                catalog.applyProgress(user)
-            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+                catalog.discardProgress(user, itemID: book.id, episodeID: episode?.id)
+            } catch { if !Task.isCancelled { self.error = .discard(ConnectionStore.recovery(for: error)) } }
         }
     }
 
+    // After a discard the progress this view was opened with is stale.
     private var selectedProgress: MediaProgress? {
-        mediaProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? progress
+        mediaProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? (progressDiscarded ? nil : progress)
     }
     private var listeningDuration: Double? {
         if let episode { return episode.duration ?? episode.audioFile?.duration }
@@ -282,6 +331,15 @@ struct BookDetails: View {
         }
     }
 
+    private func clearLoadFailure() {
+        if case .load? = error { error = nil }
+    }
+
+    private func recordLoadFailure(_ message: String) {
+        if case .discard? = error { return }
+        error = .load(message)
+    }
+
     private func watchDownloads() {
         downloadRequest?.cancel()
         downloadRequest = Task {
@@ -299,7 +357,7 @@ struct BookDetails: View {
                     if requestedDownloads.isEmpty, jobs.allSatisfy({ $0.isFinished || $0.failed }) { return }
                     try await Task.sleep(nanoseconds: 2_000_000_000)
                 }
-            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+            } catch { if !Task.isCancelled { recordLoadFailure(ConnectionStore.recovery(for: error)) } }
         }
     }
 
@@ -333,11 +391,11 @@ struct BookDetails: View {
                     try serverQueue.adoptLegacy(itemID: item.id)
                     try serverQueue.reconcile(itemID: item.id, episodes: book.media.episodes ?? [])
                 }
-                error = nil
+                clearLoadFailure()
                 if monitorDownloads, book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() }
             } catch {
                 guard !Task.isCancelled, detailRevision == revision, event.map(catalog.owns) != false else { return }
-                self.error = ConnectionStore.recovery(for: error)
+                recordLoadFailure(ConnectionStore.recovery(for: error))
             }
         }
     }

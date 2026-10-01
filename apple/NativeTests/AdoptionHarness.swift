@@ -64,7 +64,7 @@ import XCTest
     /// Constructs the stores from what is on disk, as a relaunch does.
     func openStores() {
         downloads = NativeDownloads(api: api, directory: downloadsDirectory, configuration: .ephemeral)
-        player = ApplePlayback(api: api)
+        player = ApplePlayback(api: api, progressResets: base.appendingPathComponent("Native/NativeListening/progress-resets.json"))
         reading = ReadingStore(player: player, file: readingFile)
         adoption = NativeMigrationAdoption(downloads: downloads, reading: reading, api: api, defaults: defaults, directory: adoptionDirectory, session: session)
     }

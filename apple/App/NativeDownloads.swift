@@ -206,7 +206,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         do {
             let identity = try await api.currentAccount()
             let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey)
-            let consent = await AppleNetworkPolicy.request(AppleNetworkPolicy.downloadsKey, title: "this download")
+            let consent = await AppleNetworkPolicy.request(AppleNetworkPolicy.downloadsKey, title: NativeStrings.current("this download"))
             guard account == identity, policy == AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey) else { throw CancellationError() }
             let user = try await api.me()
             guard account == identity else { throw CancellationError() }
@@ -361,7 +361,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     func retry(_ entry: Entry) async {
         let identity = account
         let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey)
-        let consent = await AppleNetworkPolicy.request(AppleNetworkPolicy.downloadsKey, title: "this download")
+        let consent = await AppleNetworkPolicy.request(AppleNetworkPolicy.downloadsKey, title: NativeStrings.current("this download"))
         guard identity == account, policy == AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey) else { return }
         do {
             var next = entries

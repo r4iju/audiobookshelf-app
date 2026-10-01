@@ -24,9 +24,10 @@ enum AppleNetworkPolicy: String, CaseIterable {
             while let presented = presenter.presentedViewController { presenter = presented }
             guard !(presenter is UIAlertController), !presenter.isBeingDismissed else { return false }
             return await withCheckedContinuation { continuation in
-                let alert = UIAlertController(title: "Use cellular data?", message: "Allow cellular data for \(title), including if Wi-Fi disconnects? Wi-Fi only will wait for Wi-Fi when needed.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Wi-Fi only", style: .cancel) { _ in continuation.resume(returning: false) })
-                alert.addAction(UIAlertAction(title: "Allow cellular", style: .default) { _ in continuation.resume(returning: true) })
+                let strings = NativeStrings.current
+                let alert = UIAlertController(title: strings("Use cellular data?"), message: strings("Allow cellular data for {0}, including if Wi-Fi disconnects? Wi-Fi only will wait for Wi-Fi when needed.", title), preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: strings("Wi-Fi only"), style: .cancel) { _ in continuation.resume(returning: false) })
+                alert.addAction(UIAlertAction(title: strings("Allow cellular"), style: .default) { _ in continuation.resume(returning: true) })
                 presenter.present(alert, animated: true)
             }
         }

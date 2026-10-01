@@ -1,5 +1,22 @@
 import Foundation
 
+/// A confirmed progress reset. It is saved before the server row is deleted and removed once this
+/// device's copies are discarded, so a failure or relaunch in between finishes it instead of
+/// letting those copies recreate the progress.
+struct ProgressResetIntent: Codable, Equatable {
+    let account: AccountIdentity
+    let itemID: String
+    let episodeID: String?
+    /// The row seen before the delete, or nil when the server held none. Server 2.30 gives a
+    /// recreated row a new ID, so deleting this one again never removes later progress.
+    let rowID: String?
+    /// When the reset was confirmed; copies dated later are newer progress and are kept.
+    let requestedAt: Double
+    func covers(account: AccountIdentity, itemID: String, episodeID: String?) -> Bool {
+        self.account == account && self.itemID == itemID && self.episodeID == episodeID
+    }
+}
+
 @MainActor final class ListeningSync {
     static var file: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -13,9 +30,16 @@ import Foundation
         let task: Task<Void, Error>
     }
     private var request: Transfer?
+    private let resetsFile: URL
+    private var resets: Result<[ProgressResetIntent], Error>
 
-    init(api: APIClient) {
+    init(api: APIClient, resets: URL? = nil) {
         self.api = api
+        resetsFile = resets ?? Self.file.deletingLastPathComponent().appendingPathComponent("progress-resets.json")
+        do {
+            self.resets = .success(FileManager.default.fileExists(atPath: resetsFile.path)
+                ? try JSONDecoder().decode([ProgressResetIntent].self, from: Data(contentsOf: resetsFile)) : [])
+        } catch { self.resets = .failure(error) }
         do {
             #if os(tvOS)
             let journal = try ListeningJournal(file: Self.file, persistentDefaults: .standard)
@@ -59,6 +83,33 @@ import Foundation
         if journal.pending(account: account).contains(where: { $0.media.libraryItemID == itemID && $0.media.episodeID == episodeID }) { return true }
         guard let remoteUpdatedAt else { return false }
         return journal.cachedPosition(account: account, itemID: itemID, episodeID: episodeID, newerThan: remoteUpdatedAt.nextUp) != nil
+    }
+
+    /// Records that the server held no progress for the media at `time`, so older snapshots cannot
+    /// bring back a reset position.
+    func forgetPosition(account: AccountIdentity, itemID: String, episodeID: String?, at time: Double) throws {
+        try loaded().rememberRemotePosition(account: account, itemID: itemID, episodeID: episodeID, time: 0, updatedAt: time)
+    }
+
+    /// Resets confirmed but not finished; throws when they cannot be read.
+    func pendingResets() throws -> [ProgressResetIntent] { try resets.get() }
+
+    func beginReset(_ intent: ProgressResetIntent) throws {
+        try saveResets(pendingResets().filter { !$0.covers(account: intent.account, itemID: intent.itemID, episodeID: intent.episodeID) } + [intent])
+    }
+
+    func finishReset(_ intent: ProgressResetIntent) throws {
+        try saveResets(pendingResets().filter { $0 != intent })
+    }
+
+    private func saveResets(_ next: [ProgressResetIntent]) throws {
+        try FileManager.default.createDirectory(at: resetsFile.deletingLastPathComponent(), withIntermediateDirectories: true)
+        var options: Data.WritingOptions = .atomic
+        #if os(iOS) || os(tvOS)
+        options.insert(.completeFileProtectionUntilFirstUserAuthentication)
+        #endif
+        try JSONEncoder().encode(next).write(to: resetsFile, options: options)
+        resets = .success(next)
     }
 
     func record(id: String, position: Double, listened: Double) throws {

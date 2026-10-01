@@ -2,7 +2,7 @@
 
 Reconciled on October 2, 2026, against `8c1e94a5`, the Apple docs in this directory, `apple/README.md`, `tvos/QA.md` and the local logs they cite. The evidence is recorded per row in `verification/parity.json`. Nearly all of it comes from simulators, unit tests or a signed local install against synthetic fixtures. No row has hardware or live-server acceptance, and no row is claimed complete.
 
-This does not include results from work still running at reconciliation: the progress-reset durability worker and the UI QA worker. Root's item-actions iPad run finished 4/4 (`/tmp/abs-root-item-actions-ipad.log`, committed as `315183c1`) and is recorded.
+Progress reset was still running at the initial reconciliation; its final simulator evidence is now in `APPLE-PROGRESS-RESET.md`. Root's item-actions iPad run finished 4/4 (`/tmp/abs-root-item-actions-ipad.log`, committed as `315183c1`) and is recorded.
 
 ## Code or automation root still needs
 
@@ -27,7 +27,7 @@ This does not include results from work still running at reconciliation: the pro
    - device restart
    - insufficient storage
    - actual cellular transitions
-7. **Localization (story-54).** Non-English coverage at `315183c1` is 15–21%. Playback controls have semantic mappings, with English fallback for unmapped text. Cellular consent constructs UIKit text directly in `AppleNetworkPolicy.swift`; it still needs the shared localization lookup.
+7. **Localization (story-54).** Non-English coverage at `315183c1` is 15–21%. Playback controls have semantic mappings, with English fallback for unmapped text. Cellular consent now uses the shared lookup and generated English templates, with honest English fallback where no equivalent legacy translation exists. It does not claim new translations.
 8. **Accessibility (story-53).** Untested:
    - VoiceOver walkthroughs
    - contrast

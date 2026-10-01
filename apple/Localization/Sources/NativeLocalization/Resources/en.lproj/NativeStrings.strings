@@ -20,11 +20,14 @@
 "All episodes" = "All episodes";
 "All podcasts" = "All podcasts";
 "All titles" = "All titles";
+"Allow cellular" = "Allow cellular";
+"Allow cellular data for {0}, including if Wi-Fi disconnects? Wi-Fi only will wait for Wi-Fi when needed." = "Allow cellular data for {0}, including if Wi-Fi disconnects? Wi-Fi only will wait for Wi-Fi when needed.";
 "Allow seeking from system media controls" = "Allow seeking from system media controls";
 "Already on server" = "Already on server";
 "Always" = "Always";
 "An earlier import is already saved. Choose its original export to retry or repair it." = "An earlier import is already saved. Choose its original export to retry or repair it.";
 "Appearance" = "Appearance";
+"Are you sure you want to reset your progress?" = "Are you sure you want to reset your progress?";
 "Ascending order" = "Ascending order";
 "Ask" = "Ask";
 "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions." = "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions.";
@@ -73,6 +76,7 @@
 "Collections" = "Collections";
 "Compact" = "Compact";
 "Complete" = "Complete";
+"Confirm" = "Confirm";
 "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported.";
 "Connect to your library" = "Connect to your library";
 "Connecting" = "Connecting";
@@ -106,6 +110,7 @@
 "Details" = "Details";
 "Diagnostics" = "Diagnostics";
 "Diagnostics storage" = "Diagnostics storage";
+"Discard progress" = "Discard progress";
 "Discover a podcast" = "Discover a podcast";
 "Dismiss" = "Dismiss";
 "Done" = "Done";
@@ -453,12 +458,14 @@
 "Unlock player" = "Unlock player";
 "Unreadable" = "Unreadable";
 "Up to {0} of additional space" = "Up to {0} of additional space";
+"Use cellular data?" = "Use cellular data?";
 "Username" = "Username";
 "Version" = "Version";
 "Volume buttons" = "Volume buttons";
 "Volume navigation while listening" = "Volume navigation while listening";
 "Waiting for {0} episode(s) from your server" = "Waiting for {0} episode(s) from your server";
 "While listening" = "While listening";
+"Wi-Fi only" = "Wi-Fi only";
 "Working on your import…" = "Working on your import…";
 "Year in review" = "Year in review";
 "Yes" = "Yes";
@@ -491,6 +498,8 @@
 "session" = "session";
 "sessions" = "sessions";
 "supplementary PDF" = "supplementary PDF";
+"this download" = "this download";
+"this listening session" = "this listening session";
 "{0} accounts" = "{0} accounts";
 "{0} audiobook minutes" = "{0} audiobook minutes";
 "{0} author added" = "{0} author added";

@@ -58,6 +58,7 @@ struct AdoptionProgress: Equatable {
         self.defaults = defaults
         root = directory
         self.session = session
+        reading.player.registerProgressResetCleanup("carried-over") { [weak self] in try self?.retireProgress($0) }
     }
 
     func identity(_ account: MigrationAccount) -> AccountIdentity? { try? AccountIdentity(server: account.server, userID: account.userID) }

@@ -580,6 +580,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(401, {})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
                 return self.respond(503, {})
+            if path == '/api/authorize':
+                return self.respond(200, {'user': self.account, 'ereaderDevices': [],
+                    'serverSettings': {'version': '2.30.0-fixture', 'language': 'en-us'}, 'userDefaultLibraryId': 'books'})
             if self.mutate_group(path, data):
                 return
             if path == '/api/podcasts/feed':
