@@ -39,15 +39,23 @@ Run from `web/` on the Studio, against the isolated QA server only:
 npm run lint && npm run typecheck && npm test && npx playwright test
 ```
 
-Last full run, on the code of the commit that adds this file (Studio, Chromium):
+Last full run, on `c68e6c1e` (Studio, Chromium; the commit after it changes only this file). The chain was
+`npm run lint && npm run typecheck && npm test && npm run build && npm run qa:deploy -- up && npx playwright test`:
 
 - Biome clean (1 info: the `recommended` field in `biome.json` is deprecated);
 - `tsc` clean;
-- vitest: 58 passed in 15 files;
-- Playwright: 58 passed in 4.4 minutes, including the 5 deployment journeys against the production image.
+- vitest: 72 passed in 17 files;
+- production build and deployment image built;
+- Playwright: 59 passed in 4.3 minutes, including the 5 deployment journeys against the image built from that commit.
 
-One AZW3 reader journey failed once in an earlier full run (a `toBeInViewport` check). It passed 5 of 5 times on
-its own and passed in this run. Its cause is not diagnosed.
+Intermittent failures seen in earlier full runs on `df948480` and `f4e8d15f`, none reproduced on retry:
+
+- Three journeys failed once each because the QA server's request to a loopback fixture on the host stalled: the
+  OpenID token exchange (19884, "outgoing request timed out after 10000ms"), the SMTP sink (19886, 36 seconds to
+  send) and the podcast feed (19885, "timeout of 30000ms exceeded"). Each is the server container reaching the Mac
+  through colima's `host.docker.internal` (192.168.5.2, resolved from `/etc/hosts`, so not DNS). The deployment
+  journeys then passed 5 of 5 alone and 50 of 50 repeated.
+- The AZW3 reader journey's `toBeInViewport` check failed again once. Its cause is still not diagnosed.
 
 Every behaviour change since the first commit started from a failing test that was observed failing, then made to
 pass. The browser journeys drive the production UI in Chromium. They check results on the server (its API and files)
