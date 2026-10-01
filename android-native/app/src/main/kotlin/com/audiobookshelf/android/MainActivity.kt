@@ -15,6 +15,7 @@ class MainActivity : ComponentActivity() {
         graph.playback
         graph.serverEvents
         graph.downloads.resumeInterrupted()
+        graph.readingSync
         if (savedInstanceState == null) route(intent)
         setContent { AppRoot() }
     }

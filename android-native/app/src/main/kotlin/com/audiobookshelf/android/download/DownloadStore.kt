@@ -13,7 +13,8 @@ import java.io.File
 class DownloadStore(private val file: File) {
     enum class State { QUEUED, RUNNING, FAILED, COMPLETE }
 
-    @Serializable data class Part(val path: String, val name: String, val size: Long? = null, val mimeType: String? = null, val done: Boolean = false)
+    /** [ebookFileId] marks the item's ebook, kept beside the audio so it opens without the server. */
+    @Serializable data class Part(val path: String, val name: String, val size: Long? = null, val mimeType: String? = null, val done: Boolean = false, val ebookFileId: String? = null, val ebookFormat: String? = null)
 
     @Serializable data class Record(
         val id: String,
@@ -38,6 +39,8 @@ class DownloadStore(private val file: File) {
     ) {
         /** Matches the UI's item key: the item id, or `item-episode` for an episode. */
         val key get() = if (episodeId == null) itemId else "$itemId-$episodeId"
+        val audio get() = parts.filter { it.ebookFileId == null }
+        val ebook get() = parts.firstOrNull { it.ebookFileId != null }
         val total get() = parts.mapNotNull { it.size }.takeIf { it.size == parts.size }?.sum()
     }
 

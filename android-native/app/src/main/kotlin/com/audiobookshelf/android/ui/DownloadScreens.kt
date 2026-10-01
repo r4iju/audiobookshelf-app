@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
@@ -132,7 +133,7 @@ private fun RemoveDialog(title: String, onDismiss: () -> Unit, onConfirm: () -> 
 
 /** Everything downloaded for the active account; works without the server. */
 @Composable
-fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues) {
+fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues, onRead: (Route) -> Unit) {
     val graph = LocalContext.current.graph
     val all by graph.downloads.records.collectAsState()
     val records = all.filter { it.account == active.client.account }.sortedByDescending { it.createdAt }
@@ -164,8 +165,13 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
                         }
                     }
                 }
+                val readable = record.ebook?.takeIf { record.state == DownloadStore.State.COMPLETE && it.ebookFormat == "pdf" }
+                if (readable != null) IconButton(
+                    onClick = { onRead(Route.Reader(record.itemId, readable.ebookFileId!!, supplementary = false, title = record.title, downloadId = record.id)) },
+                    modifier = Modifier.testTag("read-offline-$key"),
+                ) { Icon(Icons.AutoMirrored.Outlined.MenuBook, "Read ${record.title}") }
                 when (record.state) {
-                    DownloadStore.State.COMPLETE -> IconButton(
+                    DownloadStore.State.COMPLETE -> if (record.audio.isNotEmpty()) IconButton(
                         onClick = { graph.playback.play(graph.downloads.localSource(record, catalog.progressFor(record.itemId, record.episodeId))) },
                         modifier = Modifier.testTag("play-offline-$key"),
                     ) { Icon(Icons.Filled.PlayArrow, "Play ${record.title}") }

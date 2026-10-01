@@ -29,7 +29,8 @@ sealed interface Route {
     data class Series(val id: String, val name: String) : Route
     data class Filtered(val filter: String, val label: String) : Route
     data object AddPodcast : Route
-    data class Reader(val itemId: String, val ino: String, val supplementary: Boolean, val title: String) : Route
+    /** [downloadId] opens the copy on this device instead of the server's. */
+    data class Reader(val itemId: String, val ino: String, val supplementary: Boolean, val title: String, val downloadId: String? = null) : Route
     data class LocalItem(val id: String) : Route
 }
 

@@ -25,15 +25,22 @@ cleanup() {
 }
 trap 'status=$?; cleanup; exit $status' EXIT
 
+# Never take over a port another worker holds: anything accepting a connection, or any listener on
+# loopback or the wildcard address, means the port is occupied and this run stops without touching it.
 python3 - <<'PY'
 import socket
 for port in [28765, 28766, 28767, 28769]:
-    with socket.socket() as listener:
-        listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        try:
-            listener.bind(('127.0.0.1', port))
-        except OSError:
-            raise SystemExit(f'Android fixture port {port} is already in use.')
+    try:
+        with socket.create_connection(('127.0.0.1', port), timeout=0.3):
+            raise SystemExit(f'Android fixture port {port} is already in use; choose a free emulator run or stop only your own fixture.')
+    except OSError:
+        pass
+    for host in ('0.0.0.0', '127.0.0.1'):
+        with socket.socket() as listener:
+            try:
+                listener.bind((host, port))
+            except OSError:
+                raise SystemExit(f'Android fixture port {port} is already in use; choose a free emulator run or stop only your own fixture.')
 PY
 
 if [[ ! -d "$repo_root/verification/realtime/node_modules/socket.io" ]]; then
@@ -55,6 +62,10 @@ for port in [28765, 28766, 28767, 28769]:
         except OSError: time.sleep(0.1)
     else: raise SystemExit(f'Fixture on {port} did not start.')
 PY
+# A listener that appeared meanwhile could answer the probe above; the fixtures must be this run's own.
+for pid in "${pids[@]}"; do
+    kill -0 "$pid" 2>/dev/null || { echo "A fixture process this run started ($pid) exited; its port may have been taken." >&2; exit 1; }
+done
 for port in 28765 28766 28767; do "$adb" -s "$serial" reverse tcp:$port tcp:$port >/dev/null; done
 # Unrelated system notification sounds take audio focus, which pauses spoken-word playback mid-journey.
 "$adb" -s "$serial" shell cmd notification set_dnd priority >/dev/null 2>&1 || true

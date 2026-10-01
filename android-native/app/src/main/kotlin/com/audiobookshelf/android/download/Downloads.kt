@@ -77,8 +77,9 @@ class Downloads(
         if (!canDownload) return Request.NotAllowed
         val tracks = if (episode != null) listOfNotNull(episode.audioTrack?.let { it.copy(duration = it.duration.takeIf { d -> d > 0 } ?: episode.playableDuration) })
             else item.media.tracks.sortedBy { it.index ?: 0 }
-        if (tracks.isEmpty() || tracks.any { it.contentUrl == null }) return Request.NoAudio
-        val sizes = tracks.map { it.metadata?.size }
+        val ebook = item.media.ebookFile.takeIf { episode == null }
+        if (tracks.isEmpty() && ebook == null || tracks.any { it.contentUrl == null }) return Request.NoAudio
+        val sizes = tracks.map { it.metadata?.size } + listOfNotNull(ebook?.metadata?.size)
         val needed = sizes.filterNotNull().sum()
         val free = StatFs(context.filesDir.path)
         val reserve = maxOf(MIN_FREE_BYTES, free.totalBytes / 20)
@@ -90,7 +91,9 @@ class Downloads(
         val parts = tracks.mapIndexed { index, track ->
             val ext = track.metadata?.ext?.takeIf { it.isNotBlank() }?.let { if (it.startsWith(".")) it else ".$it" } ?: extension(track.mimeType)
             DownloadStore.Part(track.contentUrl!! + "/download", "track-${index + 1}$ext", track.metadata?.size, track.mimeType)
-        }
+        } + listOfNotNull(ebook?.let {
+            DownloadStore.Part("/api/items/${item.id}/file/${it.ino}/download", "ebook.${it.format ?: "bin"}", it.metadata?.size, null, ebookFileId = it.ino, ebookFormat = it.format)
+        })
         val previous = store.get(id)
         store.put(DownloadStore.Record(
             id = id, account = client.account, itemId = item.id, episodeId = episode?.id,
@@ -136,7 +139,7 @@ class Downloads(
             val remote = progress.firstOrNull { it.libraryItemId == record.itemId && it.episodeId == record.episodeId } ?: continue
             val updated = remote.lastUpdate ?: continue
             val known = journal.cachedUpdatedAt(account, record.itemId, record.episodeId)
-            if (known == null || updated > known) runCatching { journal.rememberRemotePosition(account, record.itemId, record.episodeId, remote.currentTime, updated) }
+            if (record.audio.isNotEmpty() && (known == null || updated > known)) runCatching { journal.rememberRemotePosition(account, record.itemId, record.episodeId, remote.currentTime, updated) }
         }
     }
 
@@ -146,7 +149,7 @@ class Downloads(
         val cover = File(directory, COVER).takeIf { it.exists() }?.let { Uri.fromFile(it).toString() }
         return PlaySource.Local(
             record.account, record.itemId, record.episodeId, record.title, record.author, cover, record.mediaType,
-            record.tracks, record.parts.map { Uri.fromFile(File(directory, it.name)) }, record.chapters,
+            record.tracks, record.audio.map { Uri.fromFile(File(directory, it.name)) }, record.chapters,
             startTime = journal.cachedPosition(record.account, record.itemId, record.episodeId, newerThan = Double.NEGATIVE_INFINITY) ?: 0.0,
         )
     }
@@ -220,7 +223,7 @@ class Downloads(
                     !response.isSuccessful -> throw ApiError.Http(response.code)
                 }
                 val type = response.header("Content-Type")?.substringBefore(";")?.trim()?.lowercase()
-                if (!acceptable(type, part.mimeType)) {
+                if (if (part.ebookFileId != null) type == "text/html" || type == "application/json" else !acceptable(type, part.mimeType)) {
                     staging.delete()
                     throw Rejected("The server sent ${type ?: "an unknown response"} instead of audio, so nothing was saved. Check your server or proxy and retry.")
                 }
@@ -245,6 +248,10 @@ class Downloads(
                 if (expected != null && written != expected) {
                     staging.delete()
                     throw Rejected("The downloaded file was ${written} bytes but the server listed $expected, so it was discarded. Retry to download it again.")
+                }
+                if (part.ebookFormat == "pdf" && !staging.inputStream().use { input -> ByteArray(5).also { input.read(it) } }.contentEquals("%PDF-".toByteArray())) {
+                    staging.delete()
+                    throw Rejected("The server sent something other than the PDF, so nothing was saved. Check your server or proxy and retry.")
                 }
                 target.delete()
                 if (!staging.renameTo(target)) throw IOException("Could not move the finished file into place")

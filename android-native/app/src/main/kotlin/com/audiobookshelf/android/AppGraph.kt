@@ -58,6 +58,16 @@ class AppGraph private constructor(val context: Context) {
         com.audiobookshelf.android.download.Downloads(context, com.audiobookshelf.android.download.DownloadStore(File(context.filesDir, "downloads.json")), accounts, settings, journal, http)
     }
 
+    val reading by lazy { com.audiobookshelf.android.reader.ReadingStore(File(context.filesDir, "reading-positions.json")) }
+    val readingSync by lazy {
+        com.audiobookshelf.android.reader.ReadingSync(scope, reading, accounts).also { sync ->
+            context.getSystemService(ConnectivityManager::class.java)?.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) = sync.publishAll()
+            })
+            sync.publishAll()
+        }
+    }
+
     val podcastRequests by lazy { com.audiobookshelf.android.podcast.PodcastRequests(File(context.filesDir, "podcast-requests.json")) }
     val serverEvents by lazy {
         com.audiobookshelf.android.podcast.ServerEvents(scope, accounts, http).also { events ->

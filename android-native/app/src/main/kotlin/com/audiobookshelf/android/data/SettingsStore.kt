@@ -52,6 +52,8 @@ enum class SeriesOrder { ASC, DESC }
     val episodeDescending: Boolean = true,
     /** Browse media ID of the last opened title, for resuming from Bluetooth or the system media controls. */
     val lastPlayed: String? = null,
+    /** PDF pages scroll as one continuous column instead of one page at a time. */
+    val pdfContinuous: Boolean = false,
 )
 
 class SettingsStore(private val file: File) {

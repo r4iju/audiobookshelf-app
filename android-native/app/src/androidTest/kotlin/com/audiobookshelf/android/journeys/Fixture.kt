@@ -204,3 +204,10 @@ object Device {
 
     fun mediaKey(code: Int) { device.pressKeyCode(code) }
 }
+
+/** Saves the screen as visual evidence in `/data/local/tmp/abs-journeys`, which outlives the app's uninstall after a run. */
+fun ComposeTestRule.capture(name: String) {
+    waitForIdle()
+    Device.device.executeShellCommand("mkdir -p /data/local/tmp/abs-journeys")
+    Device.device.executeShellCommand("screencap -p /data/local/tmp/abs-journeys/$name.png")
+}

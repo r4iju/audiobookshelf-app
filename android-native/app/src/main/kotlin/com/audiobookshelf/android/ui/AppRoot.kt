@@ -80,7 +80,12 @@ private fun SignedIn(active: SessionState.Active) {
     )
 
     LaunchedEffect(catalog.user) {
-        catalog.user?.let { user -> graph.downloads.adoptRemote(active.client.account, user.mediaProgress) }
+        catalog.user?.let { user ->
+            graph.downloads.adoptRemote(active.client.account, user.mediaProgress)
+            user.mediaProgress.filter { it.ebookLocation != null && it.episodeId == null }.forEach { progress ->
+                runCatching { graph.reading.adoptRemote(active.client.account, progress.libraryItemId, PRIMARY_EBOOK, progress) }
+            }
+        }
     }
     LaunchedEffect(Unit) {
         graph.openPlayerRequests.collect { if (graph.playback.state.value.now != null && model.stack.lastOrNull() != Route.Player) model.push(Route.Player) }
@@ -102,8 +107,11 @@ private fun SignedIn(active: SessionState.Active) {
                         val cover = active.client.coverUrl(item.id).toString()
                         val progress = catalog.progressFor(item.id)
                         ItemDetail(item, cover, progress, padding, itemActions, primary = {
-                            PlayButton({ preferDownloaded(graph, active, item.id, null, progress) ?: PlaySource.Stream(active.client, item.id, null, cover, progress?.lastUpdate) },
-                                item.id, null, onOpened = { model.push(Route.Player) })
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                if (item.media.tracks.isNotEmpty()) PlayButton({ preferDownloaded(graph, active, item.id, null, progress) ?: PlaySource.Stream(active.client, item.id, null, cover, progress?.lastUpdate) },
+                                    item.id, null, onOpened = { model.push(Route.Player) })
+                                ReadButtons(item, onRead = model::push)
+                            }
                         }, extra = {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 DownloadButton(item, null, active, catalog)
@@ -134,6 +142,7 @@ private fun SignedIn(active: SessionState.Active) {
                         if (route.id == null) model.push(Route.Group(route.kind, id))
                     })
                 }
+                is Route.Reader -> PdfReaderScreen(route, active, catalog, onClose = pop)
                 Route.AddPodcast -> RouteScaffold("Add podcast", pop) { padding -> AddPodcastScreen(active, catalog, padding, onCreated = pop) }
                 is Route.Filtered -> RouteScaffold(route.label, pop) { padding ->
                     val libraryId = catalog.library?.id
@@ -178,7 +187,7 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
         when (tab) {
             Tab.Library -> LibraryScreen(catalog, padding, open, onFilter = { sheet = "filter" }, onSort = { sheet = "sort" })
             Tab.Search -> SearchScreen(model.search(active), catalog, padding, open, openFiltered)
-            Tab.Downloads -> DownloadsScreen(active, catalog, padding)
+            Tab.Downloads -> DownloadsScreen(active, catalog, padding, onRead = model::push)
         }
     }
     when (sheet) {
