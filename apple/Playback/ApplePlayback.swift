@@ -642,17 +642,27 @@ import UIKit
                 // A reset left unfinished is finished, not confirmed again.
                 intent = pending
             } else {
+                // A write the server may still apply would recreate the row after the delete, and
+                // holds back every other write for the media, so only a restart lets this go on.
+                @MainActor func unresolved() -> Bool { listening.publications.unresolved(account: account, itemID: itemID, episodeID: episodeID) }
+                guard !unresolved() else { throw UnresolvedProgressWrites() }
                 // A 2.30 local session sync recreates deleted progress, so unsent listening is
                 // published before the delete; if it cannot be, nothing is deleted.
-                try await listening.flush()
-                try await owned()
-                try await prepare()
-                try await owned()
+                do {
+                    try await listening.flush()
+                    try await owned()
+                    try await prepare()
+                    try await owned()
+                } catch where !(error is CancellationError) {
+                    // Publishing may have left a write unanswered, or been held back by one.
+                    if unresolved() { throw UnresolvedProgressWrites() }
+                    throw error
+                }
+                guard !unresolved() else { throw UnresolvedProgressWrites() }
                 guard try !listening.hasLocalListening(account: account, itemID: itemID, episodeID: episodeID, newerThan: nil) else { throw ProgressResetFailure.busy }
-                // A write the server may still apply would recreate the row after the delete.
-                guard !listening.publications.unresolved(account: account, itemID: itemID, episodeID: episodeID) else { throw UnresolvedProgressWrites() }
                 let rowID = try await api.progressRowID(itemID: itemID, episodeID: episodeID, authorization: authorization)
                 try await owned()
+                guard !unresolved() else { throw UnresolvedProgressWrites() }
                 let confirmed = ProgressResetIntent(account: account, itemID: itemID, episodeID: episodeID, rowID: rowID, requestedAt: Date().timeIntervalSince1970 * 1_000)
                 try listening.beginReset(confirmed)
                 intent = confirmed
