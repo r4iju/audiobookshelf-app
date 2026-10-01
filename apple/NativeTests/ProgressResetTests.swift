@@ -137,6 +137,13 @@ import XCTest
     override func tearDown() async throws {
         server.release()
         server.releaseWrite()
+        // The listening journal is shared by every test and run: what a test held back, or left
+        // after failing, is sent here rather than to a later test's server.
+        server.restart()
+        server.acceptListening = true
+        try? harness.player.requestServerRestart(account: alice)
+        try? harness.player.confirmServerRestarted(account: alice)
+        try? await harness.player.listening.flush()
         try? await harness.player.stop()
         harness.cleanUp()
     }
@@ -759,5 +766,19 @@ import XCTest
         let sent = await harness.adoption.sync()
         XCTAssertEqual(sent.sessionsPending, 0, "The carried-over listening was not sent before the delete")
         XCTAssertNil(server[book, nil])
+    }
+
+    func testAResetWhoseOwnSyncGetsNoAnswerAsksForARestart() async throws {
+        server[book, nil] = Row(id: server.id(book, nil), time: 3, updatedAt: old)
+        let sync = harness.player.listening
+        let id = try await sync.begin(media: media(book), deviceID: "device-own")
+        try sync.record(id: id, position: 12, listened: 12)
+        server.holdNextWrite(item: book)
+        await expectRestartAsked("The reset did not ask for the restart after its own sync got no answer")
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the reset's sync was held")
+        XCTAssertTrue(try sync.hasLocalListening(account: alice, itemID: book, episodeID: nil, newerThan: nil), "Unsent listening was dropped")
+        server.releaseWrite()
+        XCTAssertEqual(deletes(), [])
+        XCTAssertEqual(server[book, nil]?.time, 12)
     }
 }
