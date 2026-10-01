@@ -184,7 +184,12 @@ public struct AudioTrack: Codable, Sendable {
     public let contentUrl: String
     public var mimeType: String? = nil
     public let metadata: TrackMetadata?
-    public struct TrackMetadata: Codable, Sendable { public let filename: String?; public let ext: String? }
+    public struct TrackMetadata: Codable, Sendable {
+        public let filename: String?
+        public let ext: String?
+        /// The file's size on the server in bytes, when the server lists it (2.30 does for audio and ebook files).
+        public var size: Int64? = nil
+    }
     public let startOffset: Double
     public let duration: Double
 }

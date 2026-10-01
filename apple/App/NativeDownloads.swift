@@ -338,7 +338,11 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             let valid = ebook ? ["application/pdf", "application/epub+zip", "application/zip", "application/vnd.amazon.ebook", "application/x-mobipocket-ebook", "application/x-cbz", "application/x-cbr", "application/x-rar-compressed"].contains(type) : type.hasPrefix("audio/") || type == "video/mp4"
             guard valid || type == "application/octet-stream" else { throw Failure.invalidContent }
             let size = try file.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-            guard size > 0, response.expectedContentLength < 0 || response.expectedContentLength == size else { throw ListeningJournal.Failure.invalidData }
+            // Without a Content-Length, as behind a streaming proxy, the size the server listed for the file is the
+            // only way to tell a body that ended early from a complete one.
+            let listed = ebook ? entries[entry].ebook?.metadata?.size : entries[entry].tracks[index].metadata?.size
+            guard size > 0, response.expectedContentLength < 0 || response.expectedContentLength == size,
+                  response.expectedContentLength >= 0 || listed.map({ $0 <= 0 || $0 == Int64(size) }) ?? true else { throw ListeningJournal.Failure.invalidData }
             let target = localFile(entries[entry], index)
             if FileManager.default.fileExists(atPath: target.path) { try FileManager.default.removeItem(at: target) }
             try FileManager.default.moveItem(at: file, to: target)
