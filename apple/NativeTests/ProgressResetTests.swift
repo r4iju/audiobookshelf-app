@@ -705,4 +705,59 @@ import XCTest
         try await sync.flush()
         XCTAssertEqual(server.session(id)?.listened, 12)
     }
+
+    /// The detail screen offers the restart only for `UnresolvedProgressWrites`.
+    private func expectRestartAsked(_ message: String, file: StaticString = #filePath, line: UInt = #line) async {
+        do { _ = try await reset(book); XCTFail(message, file: file, line: line) }
+        catch is ApplePlayback.UnresolvedProgressWrites {}
+        catch { XCTFail("\(message): \(error.localizedDescription)", file: file, line: line) }
+    }
+
+    func testAResetWithListeningHeldBackByAnUnansweredSyncAsksForARestart() async throws {
+        server[book, nil] = Row(id: server.id(book, nil), time: 3, updatedAt: old)
+        let sync = harness.player.listening
+        let id = try await sync.begin(media: media(book), deviceID: "device-held")
+        try sync.record(id: id, position: 30, listened: 30)
+        server.holdNextWrite(item: book)
+        try? await sync.flush()
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the first sync was held")
+        try sync.record(id: id, position: 90, listened: 60)
+
+        await expectRestartAsked("The reset did not ask for the restart that lets held-back listening be sent")
+        XCTAssertTrue(try sync.hasLocalListening(account: alice, itemID: book, episodeID: nil, newerThan: nil), "Held-back listening was dropped")
+        XCTAssertEqual(deletes(), [])
+
+        try harness.player.requestServerRestart(account: alice)
+        server.restart()
+        try harness.player.confirmServerRestarted(account: alice)
+        _ = try await reset(book)
+        XCTAssertEqual(server.session(id)?.listened, 90, "The held-back listening was not sent before the delete")
+        XCTAssertNil(server[book, nil])
+    }
+
+    func testAResetWithCarriedOverListeningHeldBackAsksForARestart() async throws {
+        harness.addSession("legacy-\(UUID().uuidString)", item: book, account: AdoptionHarness.alice, streamed: true, listened: 30, position: 150)
+        _ = try await harness.adoption.apply(outcome: try harness.migrate(), migrator: harness.migrator)
+        harness.stub.route("GET", api + "/me/item/listening-sessions/" + book) { _ in .json(200, ["sessions": [], "numPages": 0]) }
+        server[book, nil] = Row(id: server.id(book, nil), time: 3, updatedAt: old)
+        let sync = harness.player.listening
+        let id = try await sync.begin(media: media(book), deviceID: "device-held")
+        try sync.record(id: id, position: 12, listened: 12)
+        server.holdNextWrite(item: book)
+        try? await sync.flush()
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the sync was held")
+
+        await expectRestartAsked("The reset did not ask for the restart that lets carried-over listening be sent")
+        let waiting = await harness.adoption.sync()
+        XCTAssertEqual(waiting.sessionsPending, 1, "Carried-over listening was dropped")
+        XCTAssertEqual(deletes(), [])
+
+        try harness.player.requestServerRestart(account: alice)
+        server.restart()
+        try harness.player.confirmServerRestarted(account: alice)
+        _ = try await reset(book)
+        let sent = await harness.adoption.sync()
+        XCTAssertEqual(sent.sessionsPending, 0, "The carried-over listening was not sent before the delete")
+        XCTAssertNil(server[book, nil])
+    }
 }
