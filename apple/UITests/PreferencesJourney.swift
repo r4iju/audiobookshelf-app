@@ -1,6 +1,30 @@
 import XCTest
 
 @MainActor final class PreferencesJourney: NativeJourney {
+    func testSeparateStreamingAndDownloadNetworkChoicesPersist() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["account"].tap(); app.buttons["Settings"].tap()
+        app.swipeUp()
+        let network = app.buttons["Network preferences"]
+        XCTAssertTrue(network.waitForExistence(timeout: 3))
+        guard network.exists else { return }
+        network.tap()
+        app.buttons["streaming-ask"].tap(); app.buttons["downloads-never"].tap()
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["account"].tap(); app.buttons["Settings"].tap(); app.swipeUp()
+        app.buttons["Network preferences"].tap()
+        XCTAssertEqual(app.buttons["streaming-ask"].value as? String, "Selected")
+        XCTAssertEqual(app.buttons["downloads-never"].value as? String, "Selected")
+        app.buttons["streaming-never"].tap(); app.buttons["downloads-always"].tap()
+        app.terminate(); app.launch()
+        app.buttons["account"].tap(); app.buttons["Settings"].tap(); app.swipeUp()
+        app.buttons["Network preferences"].tap()
+        XCTAssertEqual(app.buttons["streaming-never"].value as? String, "Selected")
+        XCTAssertEqual(app.buttons["downloads-always"].value as? String, "Selected")
+        capture("Native network preferences")
+    }
     func testYearReviewUsesServerCalendarWithBuddhistDeviceLocale() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false, arguments: ["-AppleLocale", "en_US@calendar=buddhist"])

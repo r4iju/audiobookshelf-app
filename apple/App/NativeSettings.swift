@@ -66,11 +66,36 @@ struct NativeSettings: View {
                     }
                 }
             }
+            Section { NavigationLink("Network preferences", destination: NativeNetworkSettings()) }
         }.listStyle(InsetGroupedListStyle()).navigationTitle("Settings")
     }
     private func option(_ title: String, selected: Bool, id: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack { Text(title).foregroundColor(.primary); Spacer(); if selected { Image(systemName: "checkmark").foregroundColor(ShelfStyle.accent) } }
         }.accessibilityIdentifier(id).accessibilityValue(selected ? "Selected" : "Not selected")
+    }
+}
+
+struct NativeNetworkSettings: View {
+    @State private var streaming = AppleNetworkPolicy.read(AppleNetworkPolicy.streamingKey)
+    @State private var downloads = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey)
+    var body: some View {
+        ShelfList {
+            choices("Streaming", key: AppleNetworkPolicy.streamingKey, selected: $streaming, id: "streaming")
+            choices("Downloads", key: AppleNetworkPolicy.downloadsKey, selected: $downloads, id: "downloads")
+        }.listStyle(InsetGroupedListStyle()).navigationTitle("Network preferences")
+    }
+    private func choices(_ title: String, key: String, selected: Binding<AppleNetworkPolicy>, id: String) -> some View {
+        Section(header: Text(title), footer: Text("Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions.")) {
+            ForEach(AppleNetworkPolicy.allCases, id: \.self) { choice in
+                Button {
+                    selected.wrappedValue = choice
+                    UserDefaults.standard.set(choice.rawValue, forKey: key)
+                    NotificationCenter.default.post(name: AppleNetworkPolicy.changed, object: key)
+                } label: {
+                    HStack { Text(choice.title).foregroundColor(.primary); Spacer(); if selected.wrappedValue == choice { Image(systemName: "checkmark").foregroundColor(ShelfStyle.accent) } }
+                }.accessibilityIdentifier(id + "-" + choice.rawValue).accessibilityValue(selected.wrappedValue == choice ? "Selected" : "Not selected")
+            }
+        }
     }
 }

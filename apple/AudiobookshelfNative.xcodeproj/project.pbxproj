@@ -42,6 +42,7 @@
 		994506014AC88B1940D1F095 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27172291A78804715DCC8B07 /* DownloadsView.swift */; };
 		9E87AA39139252A49A463254 /* CatalogOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5AD9145C4C2A8FFC022546 /* CatalogOptions.swift */; };
 		A7FCD96A6AB282197446E404 /* NativeJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3269F2BF0A79D70A7DDA479 /* NativeJourney.swift */; };
+		AB3B9BA29A74A55D8FE28880 /* AppleNetworkPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598B9375D2B2544F76738FF /* AppleNetworkPolicy.swift */; };
 		B7087685B20CC875DDF2759C /* NativePodcastQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66117F51540A95F01ED0EAA3 /* NativePodcastQueue.swift */; };
 		B86C69E5D15DA92377A9859B /* BookDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A19219CBB98F877315C1125 /* BookDetails.swift */; };
 		C08750A2C00D9DEEBC6B545D /* PodcastFeedEpisode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED963E2BB67CF0C2512E188 /* PodcastFeedEpisode.swift */; };
@@ -71,6 +72,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0598B9375D2B2544F76738FF /* AppleNetworkPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleNetworkPolicy.swift; sourceTree = "<group>"; };
 		075B4B8D355897463125028F /* ApplePlayback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePlayback.swift; sourceTree = "<group>"; };
 		09843D6B0B597927B04CA0F0 /* CatalogViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogViews.swift; sourceTree = "<group>"; };
 		16B6CC0E695DC31E590D3C2B /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 		18289CF518C968E5378A71D3 /* Playback */ = {
 			isa = PBXGroup;
 			children = (
+				0598B9375D2B2544F76738FF /* AppleNetworkPolicy.swift */,
 				075B4B8D355897463125028F /* ApplePlayback.swift */,
 				E779620640E22D9796AD5963 /* ListeningSync.swift */,
 			);
@@ -381,6 +384,7 @@
 			files = (
 				CE49EB3F1C6A1C10E099D2DC /* APIClient.swift in Sources */,
 				F9F1B408637165176D9D502D /* AddPodcast.swift in Sources */,
+				AB3B9BA29A74A55D8FE28880 /* AppleNetworkPolicy.swift in Sources */,
 				16B506D69F61400FEDB72C1D /* ApplePlayback.swift in Sources */,
 				67BF8A96FB9999FE7E0A07D7 /* AudioGroupViews.swift in Sources */,
 				EDEBC347AF6701CE9A3ECE5B /* AudioGroups.swift in Sources */,
