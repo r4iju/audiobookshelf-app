@@ -4,11 +4,13 @@ Last verified October 2, 2026, integrated with shared commits `44011bc2`, `d81ad
 
 ## Automated evidence
 
+Coordinator integration reran the complete suite from `feat/apple-tv-completion` on October 2: 22 core tests, 11 app unit tests and 16 remote journeys passed. The run includes the shared playback changes already merged for cellular preferences. Local result: `tvos/build/TVJourneys-20261002-012452.xcresult`; the generic tvOS simulator build also passed.
+
 | Check | Command | Result |
 | --- | --- | --- |
 | TV core contracts | `swift test --package-path tvos/Core` | 22 passed |
 | TV app unit tests (`TVAppTests`) | run by `./tvos/scripts/verify-ui.sh` | 11 passed |
-| Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 16 journeys passed, 0 failed (425 s) |
+| Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 16 journeys passed, 0 failed (411 s) |
 | Signed device build and install | `./tvos/scripts/deploy.sh --no-launch a5ef39a5001ef59dec9c2fa15838447215252137` | Release build signed by team `C7X9BCC7LP`, `codesign --verify --deep --strict` passes, installed on Living Room TV (tvOS 18.6) |
 
 The journeys run the Debug app with no test-only code paths beyond the launch-time reset. They operate it only through `XCUIRemote` presses (directions, Select, Menu, Play/Pause) and keyboard entry. They then assert what the screen shows and what the fixture server observed. Every journey was written first. The red run on October 1, 2026 against the previous TV app failed all 13 journeys before any implementation.
