@@ -30,6 +30,9 @@ target 'Audiobookshelf' do
   # Add your Pods here
   
   pod 'RealmSwift', '~> 10'
+  # Legacy library export for the new app (local pods from apple/Migration).
+  pod 'LegacyMigration', :path => '../../apple/Migration'
+  pod 'LegacyRealmExport', :path => '../../apple/Migration'
   pod 'Alamofire', '~> 5.5'
 end
 

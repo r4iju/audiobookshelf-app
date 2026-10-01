@@ -437,4 +437,16 @@ public enum LegacyStorageAllowlist {
     public static func webStorage(_ values: [String: String]) -> [String: String] {
         values.filter { key, _ in webStorageKeys.contains(key) || webStoragePrefixes.contains { key.hasPrefix($0) } }
     }
+
+    /// An archive leaves the device, so it also omits the server settings cache (fetched again at
+    /// sign-in) and the device identity (the receiving app is another installation).
+    public static let archiveExclusions: Set<String> = ["serverSettings", "absDeviceId"]
+
+    public static func archivePreferences(_ values: [String: String]) -> [String: String] {
+        preferences(values).filter { !archiveExclusions.contains($0.key) }
+    }
+
+    public static func archiveWebStorage(_ values: [String: String]) -> [String: String] {
+        webStorage(values).filter { !archiveExclusions.contains($0.key) }
+    }
 }
