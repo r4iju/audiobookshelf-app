@@ -106,6 +106,24 @@ import Foundation
         return document.writes.contains { $0.account == account && $0.itemID == itemID && $0.episodeID == episodeID }
     }
 
+    /// What waits for an account, for showing it.
+    struct Waiting: Equatable {
+        /// Titles of the account with a write that may still be applied.
+        var titles = 0
+        /// Whether earlier writes of any title are unknown because the record could not be read.
+        var unreadable = false
+        /// Whether a restart of the account's server was asked for and not confirmed yet.
+        var restartRequested = false
+        var isEmpty: Bool { titles == 0 && !unreadable }
+    }
+
+    func waiting(account: AccountIdentity) -> Waiting {
+        guard let document else { return Waiting(unreadable: true) }
+        let titles = Set(document.writes.filter { $0.account == account }.map { [$0.itemID, $0.episodeID ?? ""] }).count
+        let unreadable = document.unreadableBefore.map { (document.restarts[account.server] ?? 0) < $0 } ?? false
+        return Waiting(titles: titles, unreadable: unreadable, restartRequested: document.requests?[account.server] != nil)
+    }
+
     /// Records that the owner is asked to restart the server now. Only the writes unresolved at
     /// this moment, and an unreadable record set aside before it, are resolved by confirming it.
     func requestRestart(server: String) throws {
@@ -171,9 +189,13 @@ import Foundation
                 .secureConnectionFailed, .appTransportSecurityRequiresSecureConnection].contains(error.code)
     }
 
+    /// Posted on the main actor after the record changed.
+    static let changed = Notification.Name("PublicationLedgerChanged")
+
     private func save(_ next: Document) throws {
         try Self.write(next, to: file)
         document = next
+        NotificationCenter.default.post(name: Self.changed, object: self)
     }
 
     private static func write(_ document: Document, to file: URL) throws {

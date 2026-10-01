@@ -6,6 +6,10 @@ struct SettingsView: View {
     @Environment(\.nativeStrings) private var l10n
     @State private var failure: String?
     @State private var syncing = false
+    @State private var waiting = PublicationLedger.Waiting()
+    @State private var recoveryFailure: String?
+    @State private var confirming = false
+    @FocusState private var confirmFocused: Bool
     @State private var path: [ReturnFocus] = []
     @FocusState private var focus: ReturnFocus?
     private static let intervals = [10, 15, 30, 45, 60]
@@ -21,10 +25,11 @@ struct SettingsView: View {
                         Text(SignInView.supportedSignIn(l10n)).font(.callout).foregroundStyle(.secondary)
                             .accessibilityIdentifier("auth-modes")
                     }
+                    if !waiting.isEmpty { savesWaiting }
                     section(l10n("Listening")) {
                         Text(syncStatus).accessibilityIdentifier("sync-status")
                         Button {
-                            Task { syncing = true; await player.restoreListening(); syncing = false }
+                            Task { syncing = true; await player.restoreListening(); syncing = false; await refreshWaiting() }
                         } label: { Label(syncing ? l10n("Sending…") : l10n("Send saved listening now"), systemImage: "arrow.triangle.2.circlepath") }
                             .accessibilityIdentifier("send-listening").disabled(syncing)
                         HStack(spacing: 30) {
@@ -68,6 +73,66 @@ struct SettingsView: View {
             }
         }
         .restoresFocus(path: path, to: $focus)
+        .task { await refreshWaiting() }
+        .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in Task { await refreshWaiting() } }
+    }
+
+    /// Server 2.30 cannot tell when a save it never answered has finished; a restart ends it. The
+    /// restart is asked for here first, so only one that happens afterwards is confirmed.
+    private var savesWaiting: some View {
+        section(l10n("Saves waiting")) {
+            Text(waiting.unreadable
+                 ? l10n("The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed.")
+                 : waiting.titles == 1
+                 ? l10n("The server never answered a save for one title and may still apply it, which would replace anything newer. Newer listening for that title stays on this TV. Other titles sync as usual.")
+                 : l10n("The server never answered saves for {0} titles and may still apply them, which would replace anything newer. Newer listening for those titles stays on this TV. Other titles sync as usual.", waiting.titles))
+                .accessibilityIdentifier("publications-waiting")
+            Text(l10n("Server {0}, signed in as {1}", catalog.serverAddress, catalog.username)).foregroundStyle(.secondary)
+                .accessibilityIdentifier("publications-account")
+            if waiting.restartRequested {
+                Text(l10n("Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here."))
+                    .accessibilityIdentifier("restart-instructions")
+                HStack(spacing: 30) {
+                    Button { confirmRestart() } label: { Label(confirming ? l10n("Sending…") : l10n("The server has restarted"), systemImage: "checkmark.circle") }
+                        .focused($confirmFocused).accessibilityIdentifier("confirm-server-restarted").disabled(confirming)
+                    Button(l10n("Start again")) { requestRestart() }.accessibilityIdentifier("request-server-restart-again").disabled(confirming)
+                }
+            } else {
+                Text(l10n("Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server."))
+                Button { requestRestart() } label: { Label(l10n("Start server restart"), systemImage: "arrow.clockwise.circle") }
+                    .accessibilityIdentifier("request-server-restart")
+            }
+            if let recoveryFailure { Text(recoveryFailure).foregroundStyle(.orange) }
+        }
+    }
+
+    private func refreshWaiting() async {
+        guard let account = try? await catalog.api.currentAccount() else { waiting = PublicationLedger.Waiting(); return }
+        waiting = player.publications.waiting(account: account)
+    }
+
+    private func requestRestart() {
+        Task {
+            do {
+                try player.requestServerRestart(account: try await catalog.api.currentAccount())
+                recoveryFailure = nil
+            } catch { recoveryFailure = CatalogStore.recovery(for: error, in: l10n) }
+            await refreshWaiting()
+            confirmFocused = waiting.restartRequested
+        }
+    }
+
+    private func confirmRestart() {
+        Task {
+            confirming = true
+            do {
+                try player.confirmServerRestarted(account: try await catalog.api.currentAccount())
+                recoveryFailure = nil
+                await player.restoreListening()
+            } catch { recoveryFailure = CatalogStore.recovery(for: error, in: l10n) }
+            confirming = false
+            await refreshWaiting()
+        }
     }
 
     private var syncStatus: String {

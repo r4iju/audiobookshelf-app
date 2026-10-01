@@ -81,7 +81,8 @@ final class RecoveryJourney: TVJourney {
             try await Task.sleep(nanoseconds: 500_000_000)
             held = try await observations().heldHandlers
         }
-        XCTAssertEqual(held, 1, "Precondition: the first save was held by the fixture")
+        let seen = try await observations()
+        XCTAssertEqual(held, 1, "Precondition: the first save was held by the fixture; requests: \(seen.requests.filter { !$0.path.hasPrefix("/__fixture__") }.map { ($0.method ?? "") + " " + $0.path }.suffix(25)), sessions: \(seen.localSessions.map(\.id))")
 
         remote.press(.playPause)
         wait(app.staticTexts["playback-status"], label: "Playing")
@@ -89,6 +90,7 @@ final class RecoveryJourney: TVJourney {
         remote.press(.playPause)
         wait(app.staticTexts["playback-status"], label: "Paused")
         let listenedTo = seconds("now-playing-elapsed")
+        XCTAssertTrue(app.staticTexts["now-playing-saves-waiting"].waitForExistence(timeout: 10), "Now Playing should say that newer listening waits")
 
         tab("Settings")
         let notice = app.staticTexts["publications-waiting"]

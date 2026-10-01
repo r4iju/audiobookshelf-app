@@ -28,6 +28,7 @@
 "Already on server" = "Already on server";
 "Always" = "Always";
 "An earlier import is already saved. Choose its original export to retry or repair it." = "An earlier import is already saved. Choose its original export to retry or repair it.";
+"An earlier save of this title got no answer, so newer listening stays on this TV. Settings shows how to send it." = "An earlier save of this title got no answer, so newer listening stays on this TV. Settings shows how to send it.";
 "An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed." = "An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.";
 "Appearance" = "Appearance";
 "Apple TV" = "Apple TV";
@@ -277,6 +278,7 @@
 "Nothing to continue yet. Choose a library above to start listening." = "Nothing to continue yet. Choose a library above to start listening.";
 "Now Playing" = "Now Playing";
 "Now listening" = "Now listening";
+"Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here.";
 "Number of episodes" = "Number of episodes";
 "Off" = "Off";
 "Oldest first" = "Oldest first";
@@ -365,6 +367,7 @@
 "Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.";
 "Restart the server" = "Restart the server";
 "Restart the server now" = "Restart the server now";
+"Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server." = "Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server.";
 "Restarting…" = "Restarting…";
 "Resume" = "Resume";
 "Resume listening" = "Resume listening";
@@ -387,6 +390,7 @@
 "Save progress again" = "Save progress again";
 "Saved connections" = "Saved connections";
 "Saved import" = "Saved import";
+"Saves waiting" = "Saves waiting";
 "Saving changes…" = "Saving changes…";
 "Saving your progress…" = "Saving your progress…";
 "Scale elapsed time by speed" = "Scale elapsed time by speed";
@@ -413,6 +417,7 @@
 "Server totals with covers of books added this year." = "Server totals with covers of books added this year.";
 "Server totals with top authors and genres." = "Server totals with top authors and genres.";
 "Server totals with top authors and narrators." = "Server totals with top authors and narrators.";
+"Server {0}, signed in as {1}" = "Server {0}, signed in as {1}";
 "Settings" = "Settings";
 "Share Image" = "Share Image";
 "Share My Year" = "Share My Year";
@@ -456,8 +461,10 @@
 "Speed {0}" = "Speed {0}";
 "Spread" = "Spread";
 "Square" = "Square";
+"Start again" = "Start again";
 "Start episode" = "Start episode";
 "Start listening" = "Start listening";
+"Start server restart" = "Start server restart";
 "Start timer" = "Start timer";
 "Statistics" = "Statistics";
 "Status" = "Status";
@@ -485,12 +492,16 @@
 "The local reader resources are missing." = "The local reader resources are missing.";
 "The reader could not continue: {0}" = "The reader could not continue: {0}";
 "The reader stopped. Close and reopen the book to restore your passage." = "The reader stopped. Close and reopen the book to restore your passage.";
+"The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed.";
 "The recorded problems are removed from this device." = "The recorded problems are removed from this device.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "The server address could not be found. Check the host name and that the TV is on the same network.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained.";
 "The server could not be reached. Check that it is running and that the TV is on the network, then try again." = "The server could not be reached. Check that it is running and that the TV is on the network, then try again.";
 "The server could not find this item, feed or device." = "The server could not find this item, feed or device.";
 "The server download result could not be saved: {0}" = "The server download result could not be saved: {0}";
+"The server has restarted" = "The server has restarted";
+"The server never answered a save for one title and may still apply it, which would replace anything newer. Newer listening for that title stays on this TV. Other titles sync as usual." = "The server never answered a save for one title and may still apply it, which would replace anything newer. Newer listening for that title stays on this TV. Other titles sync as usual.";
+"The server never answered saves for {0} titles and may still apply them, which would replace anything newer. Newer listening for those titles stays on this TV. Other titles sync as usual." = "The server never answered saves for {0} titles and may still apply them, which would replace anything newer. Newer listening for those titles stays on this TV. Other titles sync as usual.";
 "The server no longer accepts this login. Listening saved on this TV is kept and sent after you sign in." = "The server no longer accepts this login. Listening saved on this TV is kept and sent after you sign in.";
 "The server no longer accepts this login. Listening saved on this device is kept and sent after you sign in." = "The server no longer accepts this login. Listening saved on this device is kept and sent after you sign in.";
 "The server no longer accepts this login. Sign in again to continue." = "The server no longer accepts this login. Sign in again to continue.";

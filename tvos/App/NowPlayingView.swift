@@ -7,6 +7,7 @@ struct NowPlayingView: View {
     @Environment(\.nativeStrings) private var l10n
     @State private var showChapters = false
     @State private var stopError: String?
+    @State private var savesWaiting = false
     @State private var restartError: String?
     @State private var restarting = false
     static let speeds: [Float] = [0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
@@ -50,6 +51,10 @@ struct NowPlayingView: View {
             }
             transport.focusSection()
             options.focusSection()
+            if savesWaiting {
+                Text(l10n("An earlier save of this title got no answer, so newer listening stays on this TV. Settings shows how to send it."))
+                    .foregroundStyle(.secondary).accessibilityIdentifier("now-playing-saves-waiting")
+            }
             if let error = stopError ?? restartError ?? player.error {
                 HStack(spacing: 30) {
                     Text(error).foregroundStyle(.orange).accessibilityIdentifier("playback-error")
@@ -70,6 +75,13 @@ struct NowPlayingView: View {
         .padding(.vertical, 50)
         .sheet(isPresented: $showChapters) { chapters.tvLocalization() }
         .onChange(of: player.session?.id) { stopError = nil; restartError = nil }
+        .task(id: [player.itemID ?? "", player.episodeID ?? ""]) { await refreshWaiting() }
+        .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in Task { await refreshWaiting() } }
+    }
+
+    private func refreshWaiting() async {
+        guard let itemID = player.itemID, let account = try? await catalog.api.currentAccount() else { savesWaiting = false; return }
+        savesWaiting = player.publications.unresolved(account: account, itemID: itemID, episodeID: player.episodeID)
     }
 
     private var status: String {
