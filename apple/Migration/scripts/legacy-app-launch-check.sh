@@ -42,21 +42,24 @@ fi
 
 xcrun simctl terminate "$udid" "$bundle" > /dev/null 2>&1 || true
 xcrun simctl install "$udid" "$app"
-touch "$logs/stdout.log" "$logs/stderr.log"
 started=$(date '+%Y-%m-%d %H:%M:%S')
-xcrun simctl launch --stdout="$logs/stdout.log" --stderr="$logs/stderr.log" "$udid" "$bundle" > /dev/null
+# A terminal keeps the app's stdout line-buffered, so Capacitor's log lines arrive while it runs.
+xcrun simctl launch --console-pty "$udid" "$bundle" > "$logs/console.log" 2>&1 &
+console=$!
 sleep 15
 
 xcrun simctl spawn "$udid" log show --start "$started" --style compact \
   --predicate 'process == "Audiobookshelf"' > "$logs/system.log" 2>/dev/null || true
 failed=0
-if ! xcrun simctl spawn "$udid" launchctl list | grep -q "UIKitApplication:$bundle"; then
+running=$(xcrun simctl spawn "$udid" launchctl list)
+kill $console 2> /dev/null || true
+if [[ $running != *"UIKitApplication:$bundle"* ]]; then
   echo "FAIL: the app is not running 15 seconds after launch"; failed=1
 fi
 if grep -q "UIScene life cycle is required" "$logs/system.log"; then
   echo "FAIL: UIKit refused the launch: UIScene life cycle is required"; failed=1
 fi
-if ! grep -q "WebView loaded" "$logs/stdout.log" "$logs/stderr.log"; then
+if ! grep -q "WebView loaded" "$logs/console.log"; then
   echo "FAIL: the Capacitor web view did not load"; failed=1
 fi
 xcrun simctl io "$udid" screenshot "$logs/launch.png" > /dev/null 2>&1 || true
