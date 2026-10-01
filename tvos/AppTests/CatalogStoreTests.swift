@@ -25,6 +25,15 @@ final class CatalogStoreTests: XCTestCase {
         XCTAssertEqual(CatalogStore.merge([first, again]).map(\.episodeID), ["one", "two"])
     }
 
+    func testSearchKeepsAuthorsAndSeriesWithTheLibraryThatFoundThem() throws {
+        let books = try response(#"{"authors":[{"id":"author","name":"Writer"}],"series":[{"series":{"id":"saga","name":"Saga"},"books":[]}]}"#)
+        let stories = try response(#"{"authors":[{"id":"author","name":"Writer"},{"id":"poet","name":"Poet"}]}"#)
+        let related = CatalogStore.related([(libraryID: "books", response: books), (libraryID: "stories", response: stories)])
+        XCTAssertEqual(related, [.author(RelatedLink(id: "author", name: "Writer", libraryID: "books")),
+                                 .author(RelatedLink(id: "poet", name: "Poet", libraryID: "stories")),
+                                 .series(RelatedLink(id: "saga", name: "Saga", libraryID: "books"))])
+    }
+
     func testOnlyAnAbsentCoverIsRemembered() {
         XCTAssertTrue(CatalogStore.coverIsAbsent(after: APIError.http(404)))
         XCTAssertFalse(CatalogStore.coverIsAbsent(after: APIError.http(503)))

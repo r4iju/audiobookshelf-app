@@ -151,6 +151,8 @@ enum TileGrid {
 enum Route: Hashable {
     case item(LibraryItem)
     case episode(LibraryItem, episodeID: String)
+    case author(RelatedLink)
+    case series(RelatedLink)
 
     /// Search and shelf results for podcasts carry the matched episode; open it directly.
     static func to(_ item: LibraryItem) -> Route {
