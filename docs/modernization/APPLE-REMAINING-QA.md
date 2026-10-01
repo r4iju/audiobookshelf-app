@@ -112,12 +112,23 @@ results are kept with the evidence. Only the failing case became a committed tes
     by item. The probe used a fixture patch that matches episodes by `libraryItemId` and `episodeId`, as the server
     does. The patch was not committed because no committed test needs it.
 
-**Still open:**
+**Admin without delete permission: confirmed bug.** Checked against the server 2.30.0 source read locally, with no
+request to any server:
 
-- `CollectionJourney.testCreateReorderRemoveAndDeletePlaylistThroughRelaunch` was not rerun. It uses the coordinator's
-  fixture ports.
-- In `podcast-admin` mode the fixture's admin has `delete: false`, so the app offers Delete collection to an admin whom
-  the fixture refuses. Whether a real server admin can lack delete was not checked.
+- `CollectionController.middleware` refuses a `DELETE` of a collection unless `req.user.canDelete`, and a `PATCH` or
+  `POST` unless `req.user.canUpdate`.
+- Those getters read only `permissions.delete` and `permissions.update` (and `isActive`). The user type is not
+  consulted.
+- `User.getDefaultPermissionsForUserType` gives an admin `update: true` and `delete: false`; only root defaults to
+  `delete: true`. Permissions are stored per user and an admin can change them.
+- `PlaylistController.middleware` allows only the playlist's owner, so playlists are unaffected.
+
+The app also allowed both actions to any admin (`canManagePodcasts`), so a default admin was offered Delete collection
+and then refused with 403. RED: `9cc81daf`, in the fixture's `podcast-admin` mode (admin, `delete: false`).
+GREEN: `2d0154c8`, where collection edit and delete follow `permissions.update` and `permissions.delete` alone.
+
+**Still open:** `CollectionJourney.testCreateReorderRemoveAndDeletePlaylistThroughRelaunch` was not rerun. It uses the
+coordinator's fixture ports.
 
 ## Downloads (stories 42 and 43)
 
@@ -154,19 +165,54 @@ results are kept with the evidence. Only the failing case became a committed tes
 - Through the in-process stub the stored message was the generic `NSURLErrorDomain error -1005` text. A real session's
   wording was not observed.
 
-`NativeTests` result: 67 of 67 at `553fd012`.
+**Unsized transfer shorter than the listed size: confirmed bug.**
+
+- Server 2.30 contract:
+  - Track lists are clones of the AudioFile, so every track and podcast episode `audioTrack` carries
+    `metadata.size`. Ebook files carry it too.
+  - `downloadLibraryFile` serves the file with `res.download`, which sends its Content-Length. A reverse proxy that
+    streams the body can drop that header (or use `X-Accel-Redirect`), so an unknown length is legitimate.
+- Symptom: with no Content-Length, half of the audio file and 100 bytes of the PDF were saved as finished and the entry
+  became ready.
+- RED: `7e21dbc2`. GREEN: `a39281f1`.
+- Fix:
+  - `TrackMetadata` keeps the optional listed `size`.
+  - When the response has no Content-Length and the server listed a size, the body must match it.
+  - With neither a Content-Length nor a listed size, the transfer is accepted as before.
+  - Migrated entries list no size and are unchanged.
+- The same test checks the unknown-length case still becomes ready.
+- Wrong media with an HTML or JSON type was already refused by the MIME check (`OfflineJourney`).
+
+**Background transfer across a kill and relaunch** (ephemeral probe, passed on unchanged code):
+
+- Setup:
+  - A temporary `slow-download` fixture mode streamed each track of `book-1` over about 20 seconds, with
+    Content-Length, through the 57765 proxy. It logged whether each stream finished or was aborted.
+  - A temporary journey started "Download for offline" and waited until both parts were requested.
+  - It then killed the app with `XCUIApplication.terminate()`, once from the foreground and once after pressing Home.
+  - It waited 35 seconds and launched the app again.
+- Results, the same in both runs:
+  - Each part was requested exactly once.
+  - The fixture finished streaming both parts about 13 seconds after the kill, while the app was not running.
+  - After the relaunch, Downloads showed `book-1` as Available offline without any new request.
+- Conclusion: `nsurlsessiond` continued the transfer, and the relaunched store adopted the result.
+- Limits: the probe cannot tell whether the files were delivered by a background relaunch through
+  `handleEventsForBackgroundURLSession` or by the user relaunch. `terminate()` is a system kill, not a user
+  force-quit from the app switcher, which iOS documents as cancelling background transfers.
+- The probe source, fixture patch, logs, fixture log and screenshots are kept with the evidence. Neither the probe nor
+  the patch is committed.
+
+`NativeTests` result: 68 of 68 at `a39281f1`.
 
 **Still open:**
 
 - **Background transfers:**
-  - The background `URLSession` reattaches after a relaunch in source (`init`, `getAllTasks`).
-  - No local test covers it: hostless tests use an ephemeral session, and `XCUIApplication.terminate()` does not
-    reproduce the system relaunching a suspended app or a user force-quit.
+  - Behaviour after a user force-quit, and on a device, is unverified.
   - A device restart and real cellular transitions are untested.
 - **Storage limits:**
   - A whole-device full condition, where the system cannot even stage the transfer, was not reproduced. Only the
     app's own volume was full.
-  - From the source (not run): truncated bodies without a `Content-Length` are accepted as complete.
+  - A body cut short with neither a Content-Length nor a listed size still cannot be detected.
 - **Missing files** (from the source, not run):
   - A downloaded ebook removed while the app runs is only detected at the next launch.
   - A missing entry folder makes Retry fail, because only enqueue creates it. Neither has a realistic trigger: the
@@ -187,3 +233,8 @@ All under `/tmp/abs-remaining-qa-evidence`:
 - **`final/`:**
   - iPhone and iPad runs of the three contrast audits and the forbidden-edit journey, with exported screenshots.
   - These ran at `b405a805`. `553fd012` changes only the storage classification, which the 67-test run covers.
+- **`round2/`:**
+  - `truncation-red` and `admin-delete-red`.
+  - `nativetests-68` and `groups-green` (iPhone only; the admin journey was not run on iPad).
+  - `background-probe/`: the probe source, `slow-download-fixture.patch`, `probe.log`, `fixture-http.log`, the
+    result bundle and screenshots.
