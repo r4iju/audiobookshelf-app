@@ -6,7 +6,7 @@ struct DownloadsView: View {
     var body: some View {
         NavigationView {
             ShelfList {
-                Toggle("Download over cellular", isOn: $downloads.cellular)
+                NavigationLink("Network preferences", destination: NativeNetworkSettings())
                 if let error = downloads.error { Text(error).foregroundColor(.red) }
                 if downloads.visible.isEmpty { Text("Save books or episodes from your library to listen offline.").foregroundColor(.secondary) }
                 ForEach(downloads.visible) { entry in
@@ -25,7 +25,7 @@ struct DownloadsView: View {
                                 Text("\(entry.finished.count) of \(entry.parts.count) files saved").font(.caption)
                                 ProgressView(value: downloads.fraction(for: entry))
                                 Button("Cancel download") { downloads.cancel(entry) }
-                            } else { Button("Retry download") { downloads.retry(entry) } }
+                            } else { Button("Retry download") { Task { await downloads.retry(entry) } } }
                             Button("Remove download") { Task { await downloads.remove(entry, player: player) } }
                         }.padding(.vertical, 8)
                     }

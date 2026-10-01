@@ -63,6 +63,10 @@ import UIKit
     }
     @Published private(set) var offlineID: String?
     private var offlineFiles: [URL]?
+    #if os(iOS)
+    private var streamCellularConsent: Bool?
+    private var networkEpoch = UUID()
+    #endif
     private let api: APIClient
     private let listening: ListeningSync
     private var readingPublication: Task<Void, Error>?
@@ -104,6 +108,18 @@ import UIKit
         let savedSpeed = UserDefaults.standard.float(forKey: "previewPlaybackSpeed")
         speed = savedSpeed >= 0.5 && savedSpeed <= 10 ? savedSpeed : 1
         listening = ListeningSync(api: api)
+        #if os(iOS)
+        audioObservers.append(NotificationCenter.default.addObserver(forName: AppleNetworkPolicy.changed, object: nil, queue: .main) { [weak self] note in
+            guard note.object as? String == AppleNetworkPolicy.streamingKey else { return }
+            Task { @MainActor in
+                guard let self, self.offlineFiles == nil else { return }
+                self.networkEpoch = UUID()
+                self.pause()
+                self.streamCellularConsent = nil
+                self.player.replaceCurrentItem(with: nil)
+            }
+        })
+        #endif
         timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 600), queue: .main) { [weak self] time in
             Task { @MainActor in self?.tick(time) }
         }
@@ -145,6 +161,9 @@ import UIKit
 
     func start(item: LibraryItem, episode: Episode? = nil) async {
         guard !preparing, !seeking, !closing else { return }
+        #if os(iOS)
+        streamCellularConsent = nil
+        #endif
         let preparation = UUID()
         preparationID = preparation
         preparing = true
@@ -259,8 +278,8 @@ import UIKit
         let rewind: Double = !rewindAfterPause || pausedDuration < 10 ? 0 : pausedDuration < 60 ? 3 : pausedDuration < 300 ? 10 : pausedDuration < 1800 ? 20 : 30
         pausedAt = nil
         wantsPlayback = true
-        guard let session, !seeking, !closing, player.currentItem != nil else { return }
-        if rewind > 0 || currentTime >= session.duration - 0.1 || session.position(at: currentTime)?.trackIndex != trackIndex {
+        guard let session, !seeking, !closing else { return }
+        if player.currentItem == nil || rewind > 0 || currentTime >= session.duration - 0.1 || session.position(at: currentTime)?.trackIndex != trackIndex {
             let target = currentTime >= session.duration - 0.1 ? 0 : max(0, currentTime - rewind)
             Task { do { try await seek(to: target, autoplay: wantsPlayback) } catch { failed(error) } }
         } else {
@@ -347,6 +366,9 @@ import UIKit
     private func loadTrack(_ index: Int) async throws {
         guard let session else { return }
         let requestGeneration = generation
+        #if os(iOS)
+        let requestNetworkEpoch = networkEpoch
+        #endif
         let asset: AVURLAsset
         if let offlineFiles {
             guard offlineFiles.indices.contains(index), offlineFiles[index].isFileURL else { throw APIError.noAudio }
@@ -355,8 +377,22 @@ import UIKit
             let token = try await api.validToken()
             guard requestGeneration == generation, self.session?.id == session.id else { throw CancellationError() }
             let url = try api.mediaURL(session.audioTracks[index].contentUrl)
-            asset = AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": ["Authorization": "Bearer \(token)"]])
+            var options: [String: Any] = ["AVURLAssetHTTPHeaderFieldsKey": ["Authorization": "Bearer \(token)"]]
+            #if os(iOS)
+            if streamCellularConsent == nil {
+                let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.streamingKey)
+                let allowed = await AppleNetworkPolicy.request(AppleNetworkPolicy.streamingKey, title: "this listening session")
+                guard requestGeneration == generation, self.session?.id == session.id else { throw CancellationError() }
+                guard policy == AppleNetworkPolicy.read(AppleNetworkPolicy.streamingKey) else { throw CancellationError() }
+                streamCellularConsent = allowed
+            }
+            options[AVURLAssetAllowsCellularAccessKey] = streamCellularConsent == true
+            #endif
+            asset = AVURLAsset(url: url, options: options)
         }
+        #if os(iOS)
+        guard requestNetworkEpoch == networkEpoch else { throw CancellationError() }
+        #endif
         let item = AVPlayerItem(asset: asset)
         trackIndex = index
         itemStatus = nil

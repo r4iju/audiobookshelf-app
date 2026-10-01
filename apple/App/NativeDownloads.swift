@@ -52,6 +52,8 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         var ebook: EbookFile?
         var readingProgress: MediaProgress? = nil
         var supplementaryID: String? = nil
+        var cellularConsent: Bool? = nil
+        var networkPolicy: String? = nil
         var parts: Range<Int> { 0..<(tracks.count + (ebook == nil ? 0 : 1)) }
         let serverPosition: Double
         let serverUpdatedAt: Double
@@ -69,9 +71,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     @Published private(set) var error: String?
     @Published private var fractions: [String: Double] = [:]
     @Published var presented = false
-    @Published var cellular = UserDefaults.standard.bool(forKey: "previewDownloadCellular") {
-        didSet { UserDefaults.standard.set(cellular, forKey: "previewDownloadCellular"); applyCellularPolicy() }
-    }
+    private var networkObserver: NSObjectProtocol?
     let api: APIClient
     private let delegate = DownloadDelegate()
     private var session: URLSession!
@@ -79,9 +79,14 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     private var pumping = false
     private var recovered = false
     private var writable = true
+    private var policyBlocked = false
     private var manifest: URL { Self.directory.appendingPathComponent("manifest.json") }
     init(api: APIClient) {
         self.api = api
+        networkObserver = NotificationCenter.default.addObserver(forName: AppleNetworkPolicy.changed, object: nil, queue: .main) { [weak self] note in
+            guard note.object as? String == AppleNetworkPolicy.downloadsKey else { return }
+            Task { @MainActor in self?.applyCellularPolicy() }
+        }
         do {
             try FileManager.default.createDirectory(at: Self.directory, withIntermediateDirectories: true)
             var directory = Self.directory
@@ -109,7 +114,13 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                         recovered[index].error = "A downloaded file is missing. Retry to restore it; existing files are retained."
                     }
                 }
-                if recovered.map(\.finished) != entries.map(\.finished) { try save(recovered) }
+                let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey).rawValue
+                for index in recovered.indices where recovered[index].state == .queued && recovered[index].networkPolicy != policy {
+                    recovered[index].generation = UUID().uuidString
+                    recovered[index].cellularConsent = nil
+                    recovered[index].networkPolicy = policy
+                }
+                if recovered.map(\.finished) != entries.map(\.finished) || recovered.map(\.generation) != entries.map(\.generation) { try save(recovered) }
             }
             for file in try FileManager.default.contentsOfDirectory(at: Self.directory, includingPropertiesForKeys: nil) where file.lastPathComponent.hasPrefix("staging-") {
                 try? FileManager.default.removeItem(at: file)
@@ -123,10 +134,32 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         session.getAllTasks { [weak self] existing in
             Task { @MainActor in
                 guard let self else { return }
+                guard self.writable else { existing.forEach { $0.cancel() }; return }
+                var changedEntries = Set<String>()
+                var candidates: [(String, URLSessionDownloadTask)] = []
                 for task in existing {
                     guard let task = task as? URLSessionDownloadTask, task.state != .completed, task.state != .canceling, let key = task.taskDescription, let (entry, index) = self.part(for: key), !self.entries[entry].finished.contains(index) else { task.cancel(); continue }
-                    self.tasks[key] = task
+                    if task.originalRequest?.allowsCellularAccess != self.allowsCellular(self.entries[entry]) {
+                        task.cancel()
+                        changedEntries.insert(self.entries[entry].id)
+                    }
+                    candidates.append((key, task))
                 }
+                if !changedEntries.isEmpty {
+                    self.policyBlocked = true
+                    for (key, task) in candidates where changedEntries.contains(String(key.split(separator: ":")[0])) { task.cancel() }
+                    do {
+                        var next = self.entries
+                        for index in next.indices where changedEntries.contains(next[index].id) { next[index].generation = UUID().uuidString }
+                        try self.save(next)
+                        self.policyBlocked = false
+                    } catch {
+                        existing.forEach { $0.cancel() }
+                        self.error = "Downloads could not restore network permissions: " + error.localizedDescription
+                        return
+                    }
+                }
+                for (key, task) in candidates where !changedEntries.contains(String(key.split(separator: ":")[0])) { self.tasks[key] = task }
                 self.recovered = true
                 self.refresh()
             }
@@ -138,11 +171,13 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     }
     var visible: [Entry] { entries.filter { $0.account == account } }
     private func applyCellularPolicy() {
+        policyBlocked = true
+        for task in tasks.values { task.cancel() }
         do {
             var next = entries
-            for index in next.indices where next[index].state == .queued { next[index].generation = UUID().uuidString }
+            for index in next.indices where next[index].state == .queued { next[index].generation = UUID().uuidString; next[index].cellularConsent = nil; next[index].networkPolicy = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey).rawValue }
             try save(next)
-            for task in tasks.values { task.cancel() }
+            policyBlocked = false
             refresh()
         } catch { self.error = error.localizedDescription }
     }
@@ -159,6 +194,9 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     func enqueue(item: LibraryItem, episode: Episode?, supplementaryID: String? = nil) async {
         do {
             let identity = try await api.currentAccount()
+            let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey)
+            let consent = await AppleNetworkPolicy.request(AppleNetworkPolicy.downloadsKey, title: "this download")
+            guard account == identity, policy == AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey) else { throw CancellationError() }
             let user = try await api.me()
             guard account == identity else { throw CancellationError() }
             guard user.permissions.download == true else { throw APIError.http(403) }
@@ -178,11 +216,24 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                     _ = try downloadURL(path: "/api/items/" + item.id + "/file/" + ebook.ino, account: identity, itemID: item.id)
                     var next = entries
                     let oldGeneration = next[index].generation
+                    policyBlocked = true
+                    for (key, task) in tasks where key.hasPrefix(next[index].id + ":" + oldGeneration + ":") { task.cancel() }
                     next[index].ebook = ebook; next[index].generation = UUID().uuidString
                     next[index].readingProgress = progress
-                    next[index].state = .queued; next[index].error = nil
+                    next[index].state = .queued; next[index].error = nil; next[index].cellularConsent = policy == .ask ? consent : nil; next[index].networkPolicy = policy.rawValue
                     try save(next)
+                    policyBlocked = false
+                    refresh()
+                }
+                if entries[index].state != .ready {
+                    var next = entries
+                    let oldGeneration = next[index].generation
+                    policyBlocked = true
                     for (key, task) in tasks where key.hasPrefix(next[index].id + ":" + oldGeneration + ":") { task.cancel() }
+                    next[index].generation = UUID().uuidString
+                    next[index].cellularConsent = policy == .ask ? consent : nil; next[index].networkPolicy = policy.rawValue
+                    try save(next)
+                    policyBlocked = false
                     refresh()
                 }
                 presented = true
@@ -191,7 +242,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             if let ebook { _ = try downloadURL(path: "/api/items/" + item.id + "/file/" + ebook.ino, account: identity, itemID: item.id) }
             let duration = tracks.map { $0.startOffset + $0.duration }.max() ?? 0
             let media = ListeningMedia(itemID: item.id, episodeID: episode?.id, title: attachment?.metadata?.filename ?? selected?.title ?? item.title, author: item.author, mediaType: item.mediaType, duration: duration, startTime: progress?.currentTime ?? 0)
-            let entry = Entry(id: UUID().uuidString, account: identity, media: media, tracks: tracks, chapters: supplementaryID == nil ? (selected?.chapters ?? detail.media.chapters ?? []) : [], ebook: ebook, readingProgress: progress, supplementaryID: supplementaryID, serverPosition: progress?.currentTime ?? 0, serverUpdatedAt: progress?.lastUpdate ?? 0, generation: UUID().uuidString, finished: [], state: .queued, error: nil)
+            let entry = Entry(id: UUID().uuidString, account: identity, media: media, tracks: tracks, chapters: supplementaryID == nil ? (selected?.chapters ?? detail.media.chapters ?? []) : [], ebook: ebook, readingProgress: progress, supplementaryID: supplementaryID, cellularConsent: policy == .ask ? consent : nil, networkPolicy: policy.rawValue, serverPosition: progress?.currentTime ?? 0, serverUpdatedAt: progress?.lastUpdate ?? 0, generation: UUID().uuidString, finished: [], state: .queued, error: nil)
             try FileManager.default.createDirectory(at: Self.directory.appendingPathComponent(entry.id), withIntermediateDirectories: true)
             try save(entries + [entry])
             refresh()
@@ -226,13 +277,20 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         guard parts.count == 3, let index = Int(parts[2]), let entry = entries.firstIndex(where: { $0.id == parts[0] && $0.generation == parts[1] }), entries[entry].parts.contains(index), entries[entry].state == .queued else { return nil }
         return (entry, index)
     }
+    private func allowsCellular(_ entry: Entry) -> Bool {
+        switch AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey) {
+        case .always: return true
+        case .never: return false
+        case .ask: return entry.cellularConsent == true
+        }
+    }
     private func pump() async {
-        guard recovered, !pumping, writable else { return }
+        guard recovered, !pumping, writable, !policyBlocked else { return }
         pumping = true; defer { pumping = false }
         do {
             guard let identity = account else { return }
             let token = try await api.validToken()
-            guard identity == account else { return }
+            guard identity == account, !policyBlocked else { return }
             for entry in entries where entry.account == identity && entry.state == .queued {
                 for index in entry.parts where !entry.finished.contains(index) {
                     let key = key(entry, index)
@@ -241,7 +299,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                     let path = index < entry.tracks.count ? entry.tracks[index].contentUrl : "/api/items/" + entry.media.libraryItemID + "/file/" + entry.ebook!.ino
                     var request = URLRequest(url: try downloadURL(path: path, account: identity, itemID: entry.media.libraryItemID))
                     request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
-                    request.allowsCellularAccess = cellular
+                    request.allowsCellularAccess = allowsCellular(entry)
                     let task = session.downloadTask(with: request); task.taskDescription = key
                     tasks[key] = task; task.resume()
                 }
@@ -289,12 +347,19 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             for (key, task) in tasks where key.hasPrefix(entry.id + ":" + old + ":") { task.cancel() }
         } catch { self.error = error.localizedDescription }
     }
-    func retry(_ entry: Entry) {
+    func retry(_ entry: Entry) async {
+        let identity = account
+        let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey)
+        let consent = await AppleNetworkPolicy.request(AppleNetworkPolicy.downloadsKey, title: "this download")
+        guard identity == account, policy == AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey) else { return }
         do {
             var next = entries
             guard let index = next.firstIndex(where: { $0.id == entry.id && $0.account == account }) else { return }
-            next[index].generation = UUID().uuidString; next[index].state = .queued; next[index].error = nil
-            try save(next); refresh()
+            let oldGeneration = next[index].generation
+            policyBlocked = true
+            for (key, task) in tasks where key.hasPrefix(entry.id + ":" + oldGeneration + ":") { task.cancel() }
+            next[index].generation = UUID().uuidString; next[index].state = .queued; next[index].error = nil; next[index].cellularConsent = policy == .ask ? consent : nil; next[index].networkPolicy = policy.rawValue
+            try save(next); policyBlocked = false; refresh()
         } catch { self.error = error.localizedDescription }
     }
     func remove(_ entry: Entry, player: ApplePlayback) async {
