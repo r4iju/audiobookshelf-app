@@ -65,4 +65,6 @@ const server = createServer((socket) => {
 });
 
 if (process.argv[1] === fileURLToPath(import.meta.url))
-  server.listen(MAIL_PORT, "127.0.0.1", () => console.log(`QA mail sink on 127.0.0.1:${MAIL_PORT}`));
+  server.listen(MAIL_PORT, process.env.ABS_QA_FIXTURE_HOST ?? "127.0.0.1", () =>
+    console.log(`QA mail sink on 127.0.0.1:${MAIL_PORT}`),
+  );

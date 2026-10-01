@@ -180,4 +180,6 @@ const server = createServer(async (request, response) => {
 });
 
 if (process.argv[1] === fileURLToPath(import.meta.url))
-  server.listen(OIDC_PORT, "127.0.0.1", () => console.log(`QA OpenID provider on ${issuer}`));
+  server.listen(OIDC_PORT, process.env.ABS_QA_FIXTURE_HOST ?? "127.0.0.1", () =>
+    console.log(`QA OpenID provider on ${issuer}`),
+  );

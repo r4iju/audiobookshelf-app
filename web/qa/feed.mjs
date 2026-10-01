@@ -56,7 +56,7 @@ ${episodes
 </rss>`;
 };
 
-createServer(async (request, response) => {
+const server = createServer(async (request, response) => {
   const path = new URL(request.url ?? "/", base).pathname;
   if (Object.hasOwn(shows, path)) {
     response.writeHead(200, { "Content-Type": "application/rss+xml" });
@@ -78,4 +78,9 @@ createServer(async (request, response) => {
     return createReadStream(file).pipe(response);
   }
   response.writeHead(404).end();
-}).listen(FEED_PORT, "127.0.0.1", () => console.log(`QA feed on http://127.0.0.1:${FEED_PORT}/feed.xml`));
+});
+
+if (process.argv[1] === fileURLToPath(import.meta.url))
+  server.listen(FEED_PORT, process.env.ABS_QA_FIXTURE_HOST ?? "127.0.0.1", () =>
+    console.log(`QA feed on http://127.0.0.1:${FEED_PORT}/feed.xml`),
+  );
