@@ -15,7 +15,7 @@ From a legacy Capacitor/Realm installation (Realm 10.54.6, schema 21):
 | `ServerConnectionConfig` rows, active index | `MigratedAccount` per canonical server and user (duplicates merged, active one marked) |
 | `ServerConnectionConfig.token`, Keychain `AudiobookshelfRefreshTokens` / `refresh_token_<id>` | `LegacyAccountSecret`, handed only to `MigrationSecretSink.adopt`; never written to disk by the module |
 | `DeviceSettings`, `PlayerSettings`, Capacitor Preferences (`CapacitorStorage.*`, allowlisted) | `MigratedSettings` |
-| WebView `ereaderSettings`, `ebookLocations-<id>`, `absDeviceId` (allowlisted) | `MigratedSettings.webStorage` |
+| WebView `ereaderSettings`, `ebookLocations-<id>`, `absDeviceId` (allowlisted; archives leave out `absDeviceId`) | `MigratedSettings.webStorage` |
 | `LocalLibraryItem` and every one of its `LocalFile`s (audio, PDF, EPUB, MOBI, AZW3, CBZ, CBR, covers, podcast episodes, supplementary files) | Hard link or verified copy under `<root>/Files/<account digest>/<item digest>/<legacy path digest>/<file name>`; `MigratedDownload` with tracks, chapters, ebook, episodes, a `files` record of every legacy file with its role (`track`, `episodeTrack`, `ebook`, `cover`, `supplementary`) and the unchanged credential-free `legacyItem` (full metadata, tags, `isInvalid`, episode details) |
 | `LocalMediaProgress` (audio position, finished state, `ebookLocation`, `ebookProgress`) | `MigratedProgress`, with `MigratedReadingLocation` (`page` for PDF/CBZ/CBR, `cfi` for EPUB, `opaque` for MOBI/AZW3; the raw legacy value is always kept) |
 | `PlaybackSession` rows (unsynced listening), with chapters, media metadata and cover path | `MigratedSession` with `sessionTotal` (local playback) or `sinceLastSync` (streamed) semantics |
@@ -266,34 +266,91 @@ in UserDefaults), so it runs once per outcome.
 | `LegacyPlayerSettings` | `previewPlaybackSpeed` (`playbackRate`) |
 | Preferences `theme`, `bookshelfListView`, `lastLibraryId` | `previewTheme`, `previewListLayout` (Bool, `"1"` is true; the legacy app stores `'1'`/`'0'`), `previewLibrary` |
 | `webStorage["ereaderSettings"]` | `previewEPUBPreferences` (font scale, theme, spacing where equivalent) |
-| `webStorage["absDeviceId"]` | `nativeDeviceID`, so the server sees the same device |
+| `webStorage["absDeviceId"]` (route 1 only; archives exclude it) | `nativeDeviceID`, so the server sees the same device |
 | `issues` | A "Migration needs attention" list in Settings, grouped by account with an "Other" group for issues with no account (`unscopedData`, `accountMismatch`, `unreadableConnection`), each showing its `message`. |
 
 Kept in the outcome without a native target yet (the coordinator decides when a native setting
 exists): `languageCode` and `lang`, `lockOrientation`, `streamingUsingCellular`, `chapterTrack`,
-`enableAltView`, and the `userSettings`/`serverSettings` preference blobs.
+`enableAltView`, and the `userSettings` preference blob (plus `serverSettings` on route 1;
+archives exclude it and the native app fetches it again at sign-in).
 
 Media duration for `ListeningMedia` is `legacyItem.mediaDuration` when finite, else the sum of
 finite track durations; the native manifest rejects non-finite durations.
 
-## Legacy export adapter (route 2), integration patch
+## Legacy export route (route 2), built into the legacy app
 
-The legacy app (`ios/App`, reference only, not edited) needs a Capacitor plugin to produce the
-archive. Patch for the legacy owner:
+The legacy app in this worktree carries the export. Signing, team, bundle identifiers and
+entitlements are unchanged; the iOS 14 minimum is unchanged.
 
-1. Add `apple/Migration/Sources/LegacyMigration` and
-   `apple/Migration/LegacyRealm/Sources/LegacyRealmExport` to the `App` target (the app already
-   links RealmSwift 10.54.6 through CocoaPods; the mirror classes are excluded from its default
-   schema).
-2. Add a plugin `AbsMigrationExport` with one method `exportForNativeApp`:
-   - read `ereaderSettings`, `ebookLocations-*` and `absDeviceId` from WebView `localStorage` in
-     JavaScript and pass them as the call's `webStorage` argument;
-   - `try Realm().writeCopy(toFile: tmp/legacy.realm)` for a consistent copy of the open database;
-   - `LegacyArchiveExporter.export(documents:realmCopy:defaults:.standard, webStorage:workDirectory:to:)`
-     to `tmp/Audiobookshelf Migration.absmigration`;
-   - present `UIDocumentPickerViewController(forExporting:)` so the user saves it in Files.
-3. The native app presents `UIDocumentPickerViewController(forOpeningContentTypes: [.folder])`,
-   starts security-scoped access and calls `LegacyArchive.open(url)` then `migrate`.
+- `apple/Migration/LegacyMigration.podspec` and `LegacyRealmExport.podspec`: local pods, consumed
+  by path from `ios/App/Podfile`, so the export links against the app's own RealmSwift 10.54.6
+  pod (no second Realm binary).
+- `ios/App/App/LegacyMigrationExport/LegacyMigrationExportPlugin.swift`, registered in
+  `MyViewController.capacitorDidLoad`. Methods:
+  - `exportArchive({ webStorage })`: `LegacyExportJob.run` takes `Realm().writeCopy(toFile:)` of
+    the open database into a work directory in `tmp`, reads the copy, writes
+    `tmp/LegacyMigrationExport/Audiobookshelf Export <yyyy-MM-dd HHmm>.absmigration` and removes
+    the work directory (with the credential-bearing database copy) whatever the outcome. Earlier
+    exports are discarded first; a failed export leaves no package. Emits `exportProgress`
+    (`copyingDatabase`, `readingDatabase`, `copyingFiles` with file and byte counts). Rejects with
+    `LegacyExportJob.message(for:)`: out of space, unreadable database, unsupported version, or a
+    generic failure, none carrying a path or detail. Only counts are logged.
+  - `saveArchive()`: presents `UIDocumentPickerViewController(forExporting: [package], asCopy:
+    true)`; resolves `{ saved }`. No share sheet, no upload on the app's behalf. Refused with "The
+    save dialog could not be shown" when the bridge view controller has no window or is already
+    presenting or transitioning. The picker is its own presentation controller delegate: Save
+    calls `didPickDocumentsAt`, and Cancel or a swipe calls `documentPickerWasCancelled` (both
+    observed on iOS 26 and 27), each resolving the save. UIKit may defer the presentation and
+    refuses one it cannot perform without a callback, so 5 seconds after `present` a save whose
+    picker is neither presented nor in a window is resolved as `saveUnavailable`. That delay is a
+    heuristic: a presentation deferred for longer would be reported as failed while it shows.
+  - `discardArchive()`: removes the prepared package.
+- `LegacyExportSession` (in `LegacyRealmExport`, UIKit-free, one per plugin, created with it) owns
+  the package: `idle`, `exporting`, `ready`, `saving` and `discarding`. An export, save or discard
+  while another one runs is refused as busy (`EXPORT_BUSY`), so a package being saved or removed
+  is never replaced or deleted underneath it, and every save resolves exactly once. The Vue
+  component keeps offering the package after a failed or cancelled save.
+- Source Realm and Documents are only read: the database through Realm's own consistent copy,
+  downloads through `copyItem` (an APFS clone) into the package.
+- `ios/App/App/Info.plist` exports the type `org.audiobookshelf.legacy-migration` (extension
+  `absmigration`, conforming to `com.apple.package` and `public.composite-content`), so Files and
+  the document picker treat the package directory as one document.
+- `plugins/legacyMigrationExport.js`: plugin binding (the web build rejects as unavailable),
+  `collectReaderStorage` (only `ereaderSettings` and `ebookLocations-*` leave the WebView; the
+  native allowlist applies again), progress fraction and label.
+- `components/settings/LegacyMigrationExport.vue`, shown on iOS at the end of Settings: export with
+  a progress bar, then Save to Files or Remove export, errors shown with Try again. Copy tells the
+  user that passwords and sign-in tokens are not included, to choose On My iPhone to stay off cloud
+  storage, and that the app and its downloads stay as they are.
+
+The package carries no access or refresh token, Keychain item, `device` WebView blob, tokenized
+part URL, log, cached `serverSettings` or `absDeviceId`. The new app signs in again.
+
+### Scene life cycle in the legacy app
+
+Built with the iOS 27 SDK, an app without the UIScene life cycle is refused at launch, so the
+legacy app adopts it with one scene; Capacitor 7.2.0 has no scene support of its own.
+
+- `Info.plist` gains `UIApplicationSceneManifest`: one scene, `$(PRODUCT_MODULE_NAME).SceneDelegate`,
+  storyboard `Main`, no multiple scenes.
+- `ios/App/App/SceneDelegate.swift` (registered in `project.pbxproj`) holds the window and hands it
+  to `AppDelegate.window` (now `UIWindow?`, set when the scene connects), so existing
+  `AppDelegate` window access keeps working. URLs and user activities, at connection and later,
+  go to `ApplicationDelegateProxy.shared` exactly as the app delegate did. The foreground and
+  background log lines moved here.
+- Unchanged: bundle identifier, signing, the iOS 14 minimum (scenes exist from iOS 13), the Realm
+  configuration and migration in `didFinishLaunching`, and the background URL session handler,
+  which stays on the app delegate where UIKit calls it.
+
+### Native import (coordinator-owned, not applied)
+
+1. Declare the type under `UTImportedTypeDeclarations` in the native Info.plist with the same
+   identifier, conformance and extension, so the picker offers the package as one item.
+2. Present `UIDocumentPickerViewController(forOpeningContentTypes: [UTType("org.audiobookshelf.legacy-migration")!], asCopy: true)`,
+   then `LegacyArchive.open(url)` and `migrate` (the archive is copied into the migration root,
+   so the picked copy can be deleted afterwards).
+3. Every account in an archive arrives as `reauthenticationRequired`; `nativeDeviceID` is not
+   seeded from an archive.
 
 ## Verification evidence (this machine, synthetic data only)
 
@@ -371,6 +428,110 @@ seam was never reached because hashing read the file directly. Then core 37 of 3
 adapter 7 of 7 passing, the legacy tree and fingerprint unchanged, and the iOS 14 device and
 simulator typecheck with no errors or warnings.
 
+Seventh round (the export route), each part committed red first:
+
+- `5410d46b`: 2 core tests (5 assertion failures: the server settings cache and device identity
+  were archived; no progress was reported) and Realm tests failing against neutral stubs (the
+  database copy survived a failed export; no export progress). `LegacyAppCompatibilityTests`
+  compiles the legacy app's own Realm model sources (`ios/App/Shared/models`, by symlink) next to
+  the export, seeds them with a synthetic token, a tokenized part URL and a log entry, exports
+  through `Realm().writeCopy` in the same process, and checks the archive holds none of them,
+  the downloads are untouched, the app's own classes still work, and the archive migrates with
+  accounts, settings, reader storage, files, the EPUB CFI and the interrupted part. Fixed in
+  `bb60b567`.
+- `c3d1ee64`: 3 `LegacyExportJob` failures (one dated package, earlier exports replaced, a failed
+  export leaves nothing, distinct detail-free messages). Fixed in `96f15a13`.
+- `3dfd03fb`: 3 web bridge tests failing (module missing). Fixed in `d69f261b`.
+
+At `d69f261b`: core 39 of 39, Realm adapter 10 of 10, legacy app compatibility 1 of 1, web bridge
+3 of 3 (`node --test apple/Migration/LegacyExportWebTests/`). `nuxt generate` succeeded with the
+component in the bundle. `npx cap sync ios` ran `pod install`, which resolved both local pods;
+the only tracked change was `Podfile.lock` (CocoaPods 1.17.0 wrote its version). Unsigned
+`xcodebuild -workspace App.xcworkspace -scheme App -destination 'generic/platform=iOS Simulator'
+CODE_SIGNING_ALLOWED=NO IPHONEOS_DEPLOYMENT_TARGET=15.0 build` succeeded with no warning in the
+new sources; the built app carries the exported type, both frameworks and the plugin, with bundle
+identifier `com.audiobookshelf.app.dev` unchanged. Xcode 27 refuses any target below 15 for device
+and simulator, so the iOS 14 minimum was checked by typechecking `LegacyRealmExport` and the
+plugin against the built pods with `-target arm64-apple-ios14.0-simulator -Xfrontend
+-disable-target-os-checking`: no errors (a control file calling an iOS 15 API fails at that target,
+so availability is enforced).
+
+Eighth round (export review, scene life cycle, real UI), each part committed red first:
+
+- `516e547c`: 3 `LegacyExportSession` tests, 9 assertion failures against a port of the plugin's
+  previous logic (a save dialog that could not be shown never resolved and blocked every later
+  save; export and discard deleted the package the dialog held). Fixed in `f0cb8475`, plugin and
+  Vue rewired in `9dea1a59`.
+- `0072a251` (corrected in `197d4206`): `apple/Migration/scripts/legacy-app-launch-check.sh`
+  builds the real app unsigned, installs it on its own simulator "ABS Legacy Export" (iPhone 17,
+  iOS 27; never a shared QA device) and fails unless it is running after 15 seconds, its console
+  lacks "UIScene life cycle is required" and Capacitor logs "WebView loaded". Red against the
+  pre-scene build; fixed in `79d679d8`.
+- `49f98aa8`: 4 failures (an export or save started while a discard was still removing the
+  package went ahead). Fixed in `ec1d6e9c` (`discarding` held through the removal). `b85e7502`
+  creates the plugin's session with the plugin instead of a `lazy var` first touched from
+  several queues.
+- `47f2b45d`: `apple/Migration/LegacyExportJourney/run.sh`, failing ("an open save dialog is not
+  reported as failed": on iOS 27 the picker presents later, so the immediate check released the
+  session while the dialog held the package). Fixed in `fc7dcdf3`; `1f0de46a` corrected the seed
+  so the app's reader opens the synthetic EPUB as it would a downloaded one.
+- `b735c94f` required the dialog to stay open on a swipe (`isModalInPresentation`). That failed
+  and stayed failing with the property set: the picker is presented directly as its own
+  presentation controller delegate and ignores it. A probe showed the swipe calls
+  `documentPickerWasCancelled`, resolving the save, on iOS 26 and 27. `5943737a` replaces the
+  expectation: swipe away after the 5 second check, reopen, Cancel, reopen, save. It passes
+  against the unchanged `fc7dcdf3` plugin, so it is not a red-first test of a fix. With
+  `documentPickerWasCancelled` made a no-op it fails at "the save dialog opens again after a
+  dismissal", so it catches a save left open.
+- `627c4dbf`: `apple/Migration/scripts/legacy-app-url-check.sh`, written after the scene change
+  as a check, not red first. A URL opened through the system while the app runs reaches
+  `appUrlOpen` exactly once; a URL opened while it is not running launches it. Delivery on a
+  launch by the system is not observed, because that console cannot be captured. `simctl openurl`
+  is not used: with its confirmation prompt the scene received the URL twice. Opened through the
+  system, the URL arrived once, for both the warm and the cold open (temporary `NSLog` probe).
+
+The journey (`apple/Migration/LegacyExportJourney/run.sh`, synthetic data only):
+
+1. Runs the launch check.
+2. Writes a library with the legacy app's own Realm models: a connection with
+   `SYNTHETIC-JOURNEY-ACCESS-TOKEN`, a downloaded book with a generated EPUB, progress, an
+   interrupted download and a log entry.
+3. Replaces the app's Documents and WebKit data.
+4. Drives the real app with XCUITest: opens the EPUB in the app's reader and picks Serif, so the
+   reader writes `ereaderSettings` and `ebookLocations-*` itself. Then Settings, Export for the
+   new app, Save to Files, the dialog swipe and Cancel steps, On My iPhone, Save, "Saved.",
+   Remove export.
+5. Copies the package out of the simulator's File Provider Storage and checks it:
+   - no token or log text
+   - the reader keys are present and `absDeviceId` is absent
+   - it migrates: re-authentication required, settings, EPUB and audio bytes, the EPUB CFI and
+     the interrupted download
+6. Checks that the app's temporary export is gone.
+
+Options: `ABS_LEGACY_SIMULATOR`, `ABS_LEGACY_SKIP_BUILD=1`, `ABS_LEGACY_JOURNEY_OUT`.
+
+Results at `627c4dbf`:
+
+- The journey passed on "ABS Legacy Export" (iOS 27) and "ABS Legacy Export 26" (iOS 26). Each
+  saved `Audiobookshelf Export 2026-10-02 <HHmm>.absmigration` in On My iPhone, and the copies
+  at `/tmp/abs-journey/saved.absmigration` and `/tmp/abs-journey-26/saved.absmigration` were
+  verified and imported.
+- The URL check and the launch check passed on both simulators.
+- Suites: core 39 of 39, Realm export 15 of 15, legacy app compatibility 1 of 1 (2 journey
+  fixtures skipped without their environment), web bridge 3 of 3.
+- iOS 14 typecheck (`-target arm64-apple-ios14.0-simulator -Xfrontend
+  -disable-target-os-checking` against the built pods): no errors or warnings for
+  - the `LegacyRealmExport` sources
+  - the plugin and `SceneDelegate`, with stubs for `AbsLogger` and `AppDelegate`
+
+  The control (`UIWindowScene.keyWindow`, iOS 15) fails at that target.
+
+The legacy app prints its `serverConnectionConfigs`, tokens included, to the debug console when
+it loads device data. That is existing behaviour, not the export, and was seen here only with the
+synthetic token.
+
+No export of owner data was run.
+
 ## Remaining physical gates (open)
 
 1. A Realm written by an actual legacy app build (0.14.2-beta, schema 21) on device, read by
@@ -381,15 +542,20 @@ simulator typecheck with no errors or warnings.
 3. WebView localStorage in place: the native app cannot read the legacy WKWebView store; route 1
    carries no reader settings or EPUB location caches unless a reader for the WebKit store is
    added and proven on device.
-4. The legacy export plugin built into the legacy app, and the archive moved through the Files app
-   between two installed apps on a device.
+4. The export run from Settings in a signed legacy build on a device, saved through Files, and
+   the package seen as one item by Files and the native picker. On the iOS 26 and 27 simulators
+   the save completed to On My iPhone and the saved package imported, but that is not device or
+   iCloud Drive acceptance. The root installs the signed build after review.
 5. After coordinator wiring: offline playback of adopted audio, same-page PDF resume, EPUB/MOBI/
    AZW3/CBZ/CBR files present and associated, settings and accounts visible, pending sessions
    accepted by a server.
-6. iOS 14 runtime on a device or simulator (builds here target the iOS 14 minimum but run on the
-   Xcode 27 toolchain).
+6. iOS 14 runtime on a device or simulator (builds here typecheck for iOS 14 but run on the
+   Xcode 27 toolchain). The scene life cycle, URL delivery and the save dialog were exercised only
+   on iOS 26 and 27.
 7. Free-space and hard-link behaviour on a real device volume with a large library.
 8. Route 1 rollback: reinstall the legacy build over the upgraded app on a device and confirm it
    opens with its pre-upgrade accounts, downloads and progress.
 9. Server handling of streamed (`sinceLastSync`) sessions posted through `local-all` when the
    server already holds the session id, against the supported server versions.
+10. Native import of a real `.absmigration` once the coordinator declares the imported type and
+    wires the picker.

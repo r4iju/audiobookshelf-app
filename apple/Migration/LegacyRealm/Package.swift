@@ -17,5 +17,6 @@ let package = Package(
             .product(name: "RealmSwift", package: "realm-swift"),
         ]),
         .testTarget(name: "LegacyRealmExportTests", dependencies: ["LegacyRealmExport"]),
+        .testTarget(name: "LegacyAppCompatibilityTests", dependencies: ["LegacyRealmExport", .product(name: "RealmSwift", package: "realm-swift")]),
     ]
 )

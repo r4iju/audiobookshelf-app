@@ -29,8 +29,10 @@
 		4DF6C7172DB58ABF004059F1 /* AbsLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF6C7162DB58ABF004059F1 /* AbsLogger.swift */; };
 		4DF74912287105C600AC7814 /* DeviceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF74911287105C600AC7814 /* DeviceSettings.swift */; };
 		4DFE2DA32D345C390000B204 /* MyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DFE2DA22D345C390000B204 /* MyViewController.swift */; };
+		AB5E1A0001A0000000000003 /* LegacyMigrationExportPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5E1A0001A0000000000002 /* LegacyMigrationExportPlugin.swift */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
+		AB5E1A0001A0000000000005 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5E1A0001A0000000000004 /* SceneDelegate.swift */; };
 		504EC30D1FED79650016851F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30B1FED79650016851F /* Main.storyboard */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
@@ -104,9 +106,11 @@
 		4DF6C7162DB58ABF004059F1 /* AbsLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbsLogger.swift; sourceTree = "<group>"; };
 		4DF74911287105C600AC7814 /* DeviceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSettings.swift; sourceTree = "<group>"; };
 		4DFE2DA22D345C390000B204 /* MyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyViewController.swift; sourceTree = "<group>"; };
+		AB5E1A0001A0000000000002 /* LegacyMigrationExportPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyMigrationExportPlugin.swift; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* Audiobookshelf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Audiobookshelf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AB5E1A0001A0000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		504EC30C1FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -211,6 +215,14 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		AB5E1A0001A0000000000001 /* LegacyMigrationExport */ = {
+			isa = PBXGroup;
+			children = (
+				AB5E1A0001A0000000000002 /* LegacyMigrationExportPlugin.swift */,
+			);
+			path = LegacyMigrationExport;
+			sourceTree = "<group>";
+		};
 		3AFCB5E427EA231D00ECCC05 /* plugins */ = {
 			isa = PBXGroup;
 			children = (
@@ -282,8 +294,10 @@
 			isa = PBXGroup;
 			children = (
 				3AFCB5E427EA231D00ECCC05 /* plugins */,
+				AB5E1A0001A0000000000001 /* LegacyMigrationExport */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
+				AB5E1A0001A0000000000004 /* SceneDelegate.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -529,6 +543,7 @@
 				E9D5507328AC218300C746DD /* DaoExtensions.swift in Sources */,
 				E9D5506228AC1CC900C746DD /* PlayerState.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				AB5E1A0001A0000000000005 /* SceneDelegate.swift in Sources */,
 				EACB38122BCCA1330060DA4A /* AudioPlayerRateManager.swift in Sources */,
 				E9FA07E328C82848005520B0 /* Logger.swift in Sources */,
 				3A90295F280968E700E1D427 /* PlaybackReport.swift in Sources */,
@@ -550,6 +565,7 @@
 				E9D5505E28AC1C8500C746DD /* MediaProgress.swift in Sources */,
 				3A200C1527D64D7E00CBF02E /* AudioPlayer.swift in Sources */,
 				4DFE2DA32D345C390000B204 /* MyViewController.swift in Sources */,
+				AB5E1A0001A0000000000003 /* LegacyMigrationExportPlugin.swift in Sources */,
 				E9D5507128AC1EC700C746DD /* DownloadItemPart.swift in Sources */,
 				EACB38142BCCA1410060DA4A /* LegacyAudioPlayerRateManager.swift in Sources */,
 				3AFCB5E827EA240D00ECCC05 /* NowPlayingInfo.swift in Sources */,

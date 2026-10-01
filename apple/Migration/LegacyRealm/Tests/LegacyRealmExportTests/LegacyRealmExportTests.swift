@@ -439,15 +439,22 @@ final class LegacyRealmExportTests: XCTestCase {
     func testLegacyExportArchiveImportsIntoASeparatelyIdentifiedApp() throws {
         try seedLegacyRealm()
         defaults.set("dark", forKey: "CapacitorStorage.theme")
-        let copy = directory.appendingPathComponent("export-copy.realm")
-        try FileManager.default.copyItem(at: realmURL, to: copy)
         let before = try digest()
+        let work = directory.appendingPathComponent("Work")
+        var phases: [LegacyExportProgress] = []
 
-        let archive = try LegacyArchiveExporter.export(documents: documents, realmCopy: copy, defaults: defaults,
+        let archive = try LegacyArchiveExporter.export(documents: documents, defaults: defaults,
                                                        webStorage: ["ereaderSettings": "{}", "device": #"{"token":"\#(Self.accessToken)"}"#],
-                                                       workDirectory: directory.appendingPathComponent("Work"),
-                                                       to: directory.appendingPathComponent("Export/Audiobookshelf.abslegacy"))
+                                                       workDirectory: work, to: directory.appendingPathComponent("Export/Audiobookshelf.absmigration"),
+                                                       copyRealm: { try FileManager.default.copyItem(at: realmURL, to: $0) },
+                                                       progress: { phases.append($0) })
         XCTAssertEqual(try digest(), before)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: work.path), "the credential-bearing database copy is removed")
+        XCTAssertEqual(phases.first, .copyingDatabase)
+        XCTAssertEqual(phases.dropFirst().first, .readingDatabase)
+        guard case let .copyingFiles(last)? = phases.last else { return XCTFail("no file progress: \(phases)") }
+        XCTAssertEqual(last.completedFiles, last.totalFiles)
+        XCTAssertGreaterThan(last.totalFiles, 0)
         for case let url as URL in FileManager.default.enumerator(at: archive, includingPropertiesForKeys: nil)! {
             guard let data = try? Data(contentsOf: url) else { continue }
             XCTAssertFalse(String(decoding: data, as: UTF8.self).contains("SYNTHETIC-"), "credential exported in \(url.lastPathComponent)")
@@ -464,6 +471,151 @@ final class LegacyRealmExportTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: migrator.fileURL(for: XCTUnwrap(podcast.episodes.first?.track?.file))), Data("legacy-episode".utf8))
         XCTAssertEqual(outcome.progress.first { $0.episodeID == "ep-7" }?.currentTime, 30)
     }
+
+    func testAFailedExportRemovesTheDatabaseCopyAndLeavesNoArchive() throws {
+        try seedLegacyRealm()
+        let before = try digest()
+        let work = directory.appendingPathComponent("Work")
+        let destination = directory.appendingPathComponent("Export/Audiobookshelf.absmigration")
+
+        XCTAssertThrowsError(try LegacyArchiveExporter.export(documents: documents, defaults: defaults, webStorage: [:], workDirectory: work, to: destination,
+                                                              copyRealm: { try Data("\(Self.accessToken) torn copy".utf8).write(to: $0) })) { error in
+            guard case .legacyDatabaseUnreadable? = error as? LegacyMigrationError else { return XCTFail("unexpected \(error)") }
+        }
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: work.path), "the credential-bearing database copy is removed after a failure")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: destination.path))
+        XCTAssertEqual(try digest(), before)
+        XCTAssertNoThrow(try LegacyArchiveExporter.export(documents: documents, defaults: defaults, webStorage: [:], workDirectory: work, to: destination,
+                                                          copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }),
+                         "a retry after a failure succeeds")
+    }
+
+    private func job(at date: Date = Date(timeIntervalSince1970: 1_790_000_000)) -> LegacyExportJob {
+        LegacyExportJob(documents: documents, exportsDirectory: directory.appendingPathComponent("Exports"),
+                        workDirectory: directory.appendingPathComponent("ExportWork"), defaults: defaults, now: { date })
+    }
+
+    func testAnExportJobWritesOneDatedMigrationPackageAndReplacesEarlierOnes() throws {
+        try seedLegacyRealm()
+        let before = try digest()
+        let exports = directory.appendingPathComponent("Exports")
+        try FileManager.default.createDirectory(at: exports.appendingPathComponent("Old.absmigration"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: exports.appendingPathComponent("Torn.absmigration.partial"), withIntermediateDirectories: true)
+        var last: LegacyExportProgress?
+
+        let result = try job().run(webStorage: ["ereaderSettings": "{}", "absDeviceId": "device-1"],
+                                   copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: { last = $0 })
+
+        XCTAssertEqual(result.url.pathExtension, "absmigration")
+        XCTAssertTrue(result.url.lastPathComponent.hasPrefix("Audiobookshelf Export "))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: exports.path), [result.url.lastPathComponent],
+                       "earlier and torn exports are replaced, so only one package is offered")
+        guard case let .copyingFiles(files)? = last else { return XCTFail("no file progress") }
+        XCTAssertEqual(result.files, files.totalFiles)
+        XCTAssertEqual(result.bytes, files.totalBytes)
+        XCTAssertEqual(try LegacyArchive.open(result.url).snapshot.webStorage, ["ereaderSettings": "{}"])
+        XCTAssertEqual(try digest(), before)
+
+        try job().discard()
+        XCTAssertFalse(FileManager.default.fileExists(atPath: exports.path))
+        XCTAssertEqual(try digest(), before)
+    }
+
+    func testAnExportJobFailureLeavesNoPackageAndExplainsItWithoutDetails() throws {
+        try seedLegacyRealm()
+        let messages = [LegacyExportJob.Message.insufficientSpace, LegacyExportJob.Message.databaseUnreadable,
+                        LegacyExportJob.Message.unsupportedVersion, LegacyExportJob.Message.failed]
+        XCTAssertEqual(Set(messages).count, messages.count, "each failure has its own explanation")
+        XCTAssertFalse(messages.contains { $0.isEmpty })
+        let exports = directory.appendingPathComponent("Exports")
+
+        XCTAssertThrowsError(try job().run(webStorage: [:], copyRealm: { _ in throw CocoaError(.fileWriteOutOfSpace) }, progress: nil)) { error in
+            XCTAssertEqual(LegacyExportJob.message(for: error), LegacyExportJob.Message.insufficientSpace)
+        }
+        XCTAssertEqual((try? FileManager.default.contentsOfDirectory(atPath: exports.path)) ?? [], [])
+        XCTAssertFalse(FileManager.default.fileExists(atPath: directory.appendingPathComponent("ExportWork").path))
+
+        XCTAssertThrowsError(try job().run(webStorage: [:], copyRealm: { try Data("\(Self.accessToken) torn".utf8).write(to: $0) }, progress: nil)) { error in
+            let message = LegacyExportJob.message(for: error)
+            XCTAssertEqual(message, LegacyExportJob.Message.databaseUnreadable)
+            XCTAssertFalse(message.contains(Self.accessToken))
+        }
+        XCTAssertEqual(LegacyExportJob.message(for: LegacyMigrationError.unsupportedLegacySchema(22)), LegacyExportJob.Message.unsupportedVersion)
+        XCTAssertEqual(LegacyExportJob.message(for: CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: "/private/\(Self.accessToken)"])),
+                       LegacyExportJob.Message.failed, "unexpected errors are described generically, never with their paths")
+    }
+
+    private typealias SaveOutcome = Result<Bool, LegacyExportSessionError>
+
+    private func copyRealm(_ url: URL) throws {
+        try FileManager.default.copyItem(at: realmURL, to: url)
+    }
+
+    func testASaveDialogThatCannotBeShownRejectsTheSaveAndTheNextSaveStillOpens() throws {
+        try seedLegacyRealm()
+        let session = LegacyExportSession(job: job())
+        let result = try session.export(webStorage: [:], copyRealm: copyRealm, progress: nil)
+        var outcomes: [SaveOutcome] = []
+
+        session.save(presentingWith: { _, done in done(.failure(.saveUnavailable)) }) { outcomes.append($0) }
+
+        XCTAssertEqual(outcomes, [.failure(.saveUnavailable)], "a dialog that was never shown rejects the call instead of leaving it pending")
+        var presented: [URL] = []
+        session.save(presentingWith: { url, done in
+            presented.append(url)
+            done(.success(true))
+        }) { outcomes.append($0) }
+        XCTAssertEqual(presented, [result.url], "a failed presentation leaves nothing behind that blocks the next save")
+        XCTAssertEqual(outcomes.last, .success(true))
+    }
+
+    func testThePackageCannotBeReplacedOrRemovedWhileItsSaveDialogIsOpen() throws {
+        try seedLegacyRealm()
+        let session = LegacyExportSession(job: job())
+        let result = try session.export(webStorage: [:], copyRealm: copyRealm, progress: nil)
+        var finish: LegacyExportSession.SaveCompletion?
+        var outcomes: [SaveOutcome] = []
+        session.save(presentingWith: { _, done in finish = done }) { outcomes.append($0) }
+
+        XCTAssertThrowsError(try session.discard()) { XCTAssertEqual($0 as? LegacyExportSessionError, .busy) }
+        XCTAssertThrowsError(try session.export(webStorage: [:], copyRealm: copyRealm, progress: nil)) {
+            XCTAssertEqual($0 as? LegacyExportSessionError, .busy)
+        }
+        XCTAssertNoThrow(try LegacyArchive.open(result.url), "the package the dialog is saving stays whole")
+        var second: [SaveOutcome] = []
+        session.save(presentingWith: { _, _ in XCTFail("a second dialog must not open") }) { second.append($0) }
+        XCTAssertEqual(second, [.failure(.busy)])
+        XCTAssertEqual(outcomes, [])
+
+        finish?(.success(false))
+        finish?(.success(true))
+
+        XCTAssertEqual(outcomes, [.success(false)], "the save resolves exactly once")
+        XCTAssertNoThrow(try session.discard())
+        XCTAssertFalse(FileManager.default.fileExists(atPath: result.url.path))
+    }
+
+    func testNothingIsSavedOrDiscardedBeforeOrDuringAnExport() throws {
+        try seedLegacyRealm()
+        let session = LegacyExportSession(job: job())
+        var outcomes: [SaveOutcome] = []
+        session.save(presentingWith: { _, _ in XCTFail("nothing to show yet") }) { outcomes.append($0) }
+        XCTAssertEqual(outcomes, [.failure(.nothingToSave)])
+        var discardError: Error?
+
+        _ = try session.export(webStorage: [:], copyRealm: { url in
+            session.save(presentingWith: { _, _ in XCTFail("the package is still being written") }) { outcomes.append($0) }
+            do { try session.discard() } catch { discardError = error }
+            try self.copyRealm(url)
+        }, progress: nil)
+
+        XCTAssertEqual(outcomes, [.failure(.nothingToSave), .failure(.busy)])
+        XCTAssertEqual(discardError as? LegacyExportSessionError, .busy)
+        let messages = [LegacyExportSessionError.busy, .nothingToSave, .saveUnavailable].map { LegacyExportJob.message(for: $0) }
+        XCTAssertEqual(Set(messages).count, 3, "each refusal is explained in its own words")
+        XCTAssertFalse(messages.contains(LegacyExportJob.Message.failed))
+    }
 }
 
 private struct FakeRefreshTokens: LegacyRefreshTokenReading {
@@ -476,5 +628,74 @@ private final class CapturingSink: MigrationSecretSink {
     var secrets: [LegacyAccountSecret] = []
     func adopt(_ secret: LegacyAccountSecret, for account: MigratedAccount) throws {
         secrets.append(secret)
+    }
+}
+
+/// The real job, with a hook that runs while a discard is under way.
+private final class InterleavingJob: LegacyExportPackaging {
+    let job: LegacyExportJob
+    var duringDiscard: (() -> Void)?
+    var failNextDiscard = false
+
+    init(_ job: LegacyExportJob) {
+        self.job = job
+    }
+
+    func run(webStorage: [String: String], copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)?) throws -> LegacyExportResult {
+        try job.run(webStorage: webStorage, copyRealm: copyRealm, progress: progress)
+    }
+
+    func discard() throws {
+        let hook = duringDiscard
+        duringDiscard = nil
+        hook?()
+        if failNextDiscard {
+            failNextDiscard = false
+            throw CocoaError(.fileWriteNoPermission)
+        }
+        try job.discard()
+    }
+}
+
+extension LegacyRealmExportTests {
+    func testAnExportStartedWhileADiscardIsUnderWayIsRefusedRatherThanDeleted() throws {
+        try seedLegacyRealm()
+        let job = InterleavingJob(job())
+        let session = LegacyExportSession(job: job)
+        _ = try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil)
+        var concurrent: Result<LegacyExportResult, Error>?
+        var concurrentSave: [Result<Bool, LegacyExportSessionError>] = []
+        job.duringDiscard = {
+            concurrent = Result { try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil) }
+            session.save(presentingWith: { _, _ in XCTFail("nothing may be saved while it is being removed") }) { concurrentSave.append($0) }
+        }
+
+        try session.discard()
+
+        switch concurrent {
+        case let .success(result)?:
+            XCTFail("an export that reported success was deleted by the discard: package exists \(FileManager.default.fileExists(atPath: result.url.path))")
+        case let .failure(error)?:
+            XCTAssertEqual(error as? LegacyExportSessionError, .busy)
+        case nil:
+            XCTFail("the hook did not run")
+        }
+        XCTAssertEqual(concurrentSave, [.failure(.busy)])
+        XCTAssertNoThrow(try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil),
+                         "the next export starts once the discard has finished")
+    }
+
+    func testAFailedDiscardReleasesTheSession() throws {
+        try seedLegacyRealm()
+        let job = InterleavingJob(job())
+        let session = LegacyExportSession(job: job)
+        _ = try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil)
+        job.failNextDiscard = true
+
+        XCTAssertThrowsError(try session.discard())
+
+        let result = try session.export(webStorage: [:], copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: nil)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: result.url.path))
+        XCTAssertNoThrow(try session.discard())
     }
 }

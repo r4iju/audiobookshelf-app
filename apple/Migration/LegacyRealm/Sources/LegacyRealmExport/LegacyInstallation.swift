@@ -51,18 +51,134 @@ private struct InstallationSecrets: LegacySecretSource {
     }
 }
 
+public enum LegacyExportProgress: Equatable {
+    case copyingDatabase
+    case readingDatabase
+    case copyingFiles(LegacyArchiveProgress)
+}
+
 /// Runs inside the legacy app: writes a credential-free archive the user carries to a separately
 /// identified app (such as the native preview) through the Files app.
 public enum LegacyArchiveExporter {
-    /// - Parameter realmCopy: a consistent copy of the open legacy Realm, made by the legacy app
-    ///   with `Realm.writeCopy(toFile:)`; it is read, never modified.
+    /// - Parameters:
+    ///   - workDirectory: belongs to the exporter. It holds the database copy, which contains
+    ///     access tokens, and is removed before returning or throwing; copies left by an export the
+    ///     system interrupted are removed first.
+    ///   - copyRealm: writes a consistent copy of the open legacy Realm to the given URL, normally
+    ///     `Realm.writeCopy(toFile:)`. The copy is read, never the live database.
+    ///   - webStorage: WebView `localStorage` entries; only reader settings and location caches cross.
     @discardableResult
-    public static func export(documents: URL, realmCopy: URL, defaults: UserDefaults, webStorage: [String: String], workDirectory: URL, to destination: URL) throws -> URL {
-        let contents = try LegacyRealmReader.read(realmAt: realmCopy, workDirectory: workDirectory)
+    public static func export(documents: URL, defaults: UserDefaults, webStorage: [String: String], workDirectory: URL, to destination: URL,
+                              copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)? = nil) throws -> URL {
+        try? FileManager.default.removeItem(at: workDirectory)
+        defer { try? FileManager.default.removeItem(at: workDirectory) }
+        let databaseDirectory = workDirectory.appendingPathComponent("Database")
+        #if os(iOS)
+        let attributes: [FileAttributeKey: Any] = [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication]
+        #else
+        let attributes: [FileAttributeKey: Any] = [:]
+        #endif
+        try FileManager.default.createDirectory(at: databaseDirectory, withIntermediateDirectories: true, attributes: attributes)
+        let copy = databaseDirectory.appendingPathComponent("legacy.realm")
+
+        progress?(.copyingDatabase)
+        try copyRealm(copy)
+        progress?(.readingDatabase)
+        let contents = try LegacyRealmReader.read(realmAt: copy, workDirectory: workDirectory.appendingPathComponent("Reader"))
+        try? FileManager.default.removeItem(at: databaseDirectory)
+
         var snapshot = contents.snapshot
         snapshot.preferences = LegacyInstallation.capacitorPreferences(defaults)
         snapshot.webStorage = webStorage
         try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
-        return try LegacyArchive.write(snapshot, documents: documents, to: destination)
+        return try LegacyArchive.write(snapshot, documents: documents, to: destination) { progress?(.copyingFiles($0)) }
+    }
+}
+
+public struct LegacyExportResult: Equatable {
+    public let url: URL
+    public let files: Int
+    public let bytes: Int64
+}
+
+/// The legacy app's export action: one dated `.absmigration` package in `exportsDirectory`,
+/// replacing earlier ones, ready to hand to the system document exporter.
+public final class LegacyExportJob {
+    /// Shown to the user; they never include paths or values from the failed operation.
+    public enum Message {
+        public static let insufficientSpace = "There is not enough free space to prepare the export. Free some space and try again; nothing was changed."
+        public static let databaseUnreadable = "The app's library database could not be read for the export. Nothing was changed; try again, or restart the app first."
+        public static let unsupportedVersion = "This version of the library database cannot be exported. Nothing was changed."
+        public static let failed = "The export could not be prepared. Nothing was changed; try again."
+        public static let busy = "The export is busy. Wait for it to finish, or close the save dialog, and try again."
+        public static let nothingToSave = "There is no export to save. Export again."
+        public static let saveUnavailable = "The save dialog could not be shown. Try again."
+    }
+
+    private let documents: URL
+    private let exportsDirectory: URL
+    private let workDirectory: URL
+    private let defaults: UserDefaults
+    private let now: () -> Date
+
+    public init(documents: URL, exportsDirectory: URL, workDirectory: URL, defaults: UserDefaults, now: @escaping () -> Date = Date.init) {
+        self.documents = documents
+        self.exportsDirectory = exportsDirectory
+        self.workDirectory = workDirectory
+        self.defaults = defaults
+        self.now = now
+    }
+
+    public func run(webStorage: [String: String], copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)?) throws -> LegacyExportResult {
+        try discard()
+        var copied: LegacyArchiveProgress?
+        do {
+            let url = try LegacyArchiveExporter.export(documents: documents, defaults: defaults, webStorage: webStorage, workDirectory: workDirectory,
+                                                       to: exportsDirectory.appendingPathComponent("\(name()).absmigration"), copyRealm: copyRealm) { report in
+                if case let .copyingFiles(files) = report { copied = files }
+                progress?(report)
+            }
+            return LegacyExportResult(url: url, files: copied?.totalFiles ?? 0, bytes: copied?.totalBytes ?? 0)
+        } catch {
+            try? discard()
+            throw error
+        }
+    }
+
+    /// Removes every package this job wrote; the legacy data itself is never touched.
+    public func discard() throws {
+        if FileManager.default.fileExists(atPath: exportsDirectory.path) {
+            try FileManager.default.removeItem(at: exportsDirectory)
+        }
+    }
+
+    public static func message(for error: Error) -> String {
+        switch error {
+        case LegacyMigrationError.legacyDatabaseUnreadable:
+            return Message.databaseUnreadable
+        case LegacyMigrationError.unsupportedLegacySchema:
+            return Message.unsupportedVersion
+        case LegacyExportSessionError.busy:
+            return Message.busy
+        case LegacyExportSessionError.nothingToSave:
+            return Message.nothingToSave
+        case LegacyExportSessionError.saveUnavailable:
+            return Message.saveUnavailable
+        default:
+            return isOutOfSpace(error as NSError) ? Message.insufficientSpace : Message.failed
+        }
+    }
+
+    private static func isOutOfSpace(_ error: NSError) -> Bool {
+        if error.domain == NSCocoaErrorDomain && error.code == NSFileWriteOutOfSpaceError { return true }
+        if error.domain == NSPOSIXErrorDomain && error.code == Int(ENOSPC) { return true }
+        return (error.userInfo[NSUnderlyingErrorKey] as? NSError).map(isOutOfSpace) ?? false
+    }
+
+    private func name() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HHmm"
+        return "Audiobookshelf Export \(formatter.string(from: now()))"
     }
 }
