@@ -135,23 +135,66 @@ private struct ComposerContent: View {
     }
 }
 
-private struct ShareRequest: Identifiable {
-    let id = UUID()
-    let items: [Any]
-    let directory: URL?
+/// One exported PNG in its own temporary folder. The folder is removed when the share sheet
+/// reports completion, or when the last holder (the pending request or the share sheet) releases
+/// it, so a share consumer never loses the file while it can still read it.
+final class YearExportShareFile {
+    let url: URL
+    private let directory: URL
 
-    init(artifact: YearExportArtifact) {
-        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("YearExport", isDirectory: true).appendingPathComponent(UUID().uuidString, isDirectory: true)
-        let file = directory.appendingPathComponent(artifact.fileName)
+    init(artifact: YearExportArtifact, root: URL) throws {
+        directory = root.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        url = directory.appendingPathComponent(artifact.fileName)
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            try artifact.pngData.write(to: file, options: .completeFileProtection)
-            items = [file, artifact.shareText]
-            self.directory = directory
+            try artifact.pngData.write(to: url, options: .completeFileProtection)
         } catch {
-            items = [UIImage(data: artifact.pngData) as Any, artifact.shareText]
-            self.directory = nil
+            try? FileManager.default.removeItem(at: directory)
+            throw error
         }
+    }
+
+    func remove() { try? FileManager.default.removeItem(at: directory) }
+    deinit { remove() }
+}
+
+struct ShareRequest: Identifiable {
+    let id = UUID()
+    let items: [Any]
+    let file: YearExportShareFile?
+
+    init(artifact: YearExportArtifact, root: URL = FileManager.default.temporaryDirectory.appendingPathComponent("YearExport", isDirectory: true)) {
+        if let file = try? YearExportShareFile(artifact: artifact, root: root) {
+            items = [file.url, artifact.shareText]
+            self.file = file
+        } else {
+            items = [UIImage(data: artifact.pngData) as Any, artifact.shareText]
+            file = nil
+        }
+    }
+}
+
+enum YearExportActivity {
+    /// The completion handler holds the file, tying its lifetime to the share sheet itself.
+    static func controller(for request: ShareRequest, onFinish: @escaping () -> Void) -> UIActivityViewController {
+        let activity = UIActivityViewController(activityItems: request.items, applicationActivities: nil)
+        let file = request.file
+        activity.completionWithItemsHandler = { _, _, _, _ in
+            file?.remove()
+            onFinish()
+        }
+        return activity
+    }
+
+    /// Returns false, leaving nothing presented, when the composer is no longer on screen or is
+    /// already presenting; releasing the request then removes its file.
+    static func present(_ request: ShareRequest, from controller: UIViewController, onFinish: @escaping () -> Void) -> Bool {
+        guard controller.view.window != nil, controller.presentedViewController == nil else { return false }
+        let activity = Self.controller(for: request, onFinish: onFinish)
+        activity.popoverPresentationController?.sourceView = controller.view
+        activity.popoverPresentationController?.sourceRect = controller.view.bounds
+        controller.present(activity, animated: true)
+        return activity.presentingViewController != nil
     }
 }
 
@@ -160,21 +203,21 @@ private struct ShareRequest: Identifiable {
 private struct ActivityPresenter: UIViewControllerRepresentable {
     @Binding var request: ShareRequest?
 
-    final class Coordinator { var presented: UUID? }
+    final class Coordinator { var scheduled: UUID? }
     func makeCoordinator() -> Coordinator { Coordinator() }
     func makeUIViewController(context: Context) -> UIViewController { UIViewController() }
 
     func updateUIViewController(_ controller: UIViewController, context: Context) {
-        guard let request, context.coordinator.presented != request.id else { return }
-        context.coordinator.presented = request.id
-        let activity = UIActivityViewController(activityItems: request.items, applicationActivities: nil)
-        activity.popoverPresentationController?.sourceView = controller.view
-        activity.popoverPresentationController?.sourceRect = controller.view.bounds
+        guard let request, context.coordinator.scheduled != request.id else { return }
+        context.coordinator.scheduled = request.id
         let binding = $request
-        activity.completionWithItemsHandler = { _, _, _, _ in
-            if let directory = request.directory { try? FileManager.default.removeItem(at: directory) }
-            if binding.wrappedValue?.id == request.id { binding.wrappedValue = nil }
+        // Presenting is deferred out of the SwiftUI update; by then the composer may be gone.
+        DispatchQueue.main.async { [weak controller] in
+            guard let controller, binding.wrappedValue?.id == request.id else { return }
+            let presented = YearExportActivity.present(request, from: controller) {
+                if binding.wrappedValue?.id == request.id { binding.wrappedValue = nil }
+            }
+            if !presented { binding.wrappedValue = nil }
         }
-        DispatchQueue.main.async { controller.present(activity, animated: true) }
     }
 }

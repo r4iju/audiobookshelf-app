@@ -125,16 +125,20 @@ public struct YearExportSnapshot: Identifiable, Sendable {
 
     var listeningTime: (value: String, unit: String) {
         let hours = (listeningSeconds / 3600).rounded(.down)
-        if hours >= 1 { return (number(Int(hours)), hours == 1 ? "hour" : "hours") }
-        let minutes = Int((listeningSeconds / 60).rounded(.down))
+        if hours >= 1 { return (number(hours), hours == 1 ? "hour" : "hours") }
+        let minutes = (listeningSeconds / 60).rounded(.down)
         return (number(minutes), minutes == 1 ? "minute" : "minutes")
     }
 
-    func number(_ value: Int) -> String {
+    func number(_ value: Int) -> String { number(Double(value)) }
+
+    /// Formats without converting to Int: decoded durations can be finite yet beyond Int.max.
+    func number(_ value: Double) -> String {
         let formatter = NumberFormatter()
         formatter.locale = locale
         formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: value)) ?? String(value)
+        formatter.maximumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.0f", value)
     }
 
     func count(_ value: Int, _ singular: String, _ plural: String) -> String {

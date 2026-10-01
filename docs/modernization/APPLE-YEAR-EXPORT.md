@@ -29,11 +29,21 @@ File names keep the legacy `audiobookshelf_my_<year>.png` / `_short.png` scheme,
 - `YearExportRenderer.render(_:layout:)` is a pure function from snapshot and layout to PNG bytes, the file name,
   the share text and an accessibility label. It uses `UIGraphicsImageRenderer` and Core Graphics, not SwiftUI
   `ImageRenderer` (iOS 16). Every API it uses is available on iOS 14.
-- Sharing always re-renders when the cached preview is for another layout. It shares a PNG file
-  (temporary directory, complete file protection, removed when the activity finishes) plus the text summary
-  through `UIActivityViewController`, anchored to the button for the iPad popover.
+- Sharing always re-renders when the cached preview is for another layout. It shares a PNG file plus the
+  text summary through `UIActivityViewController`, anchored to the button for the iPad popover.
+- Temporary file lifetime: each share writes into its own folder with complete file protection, owned by a
+  `YearExportShareFile`. The folder is deleted in these cases:
+  - Failed write: deleted at once, and the share falls back to an in-memory image.
+  - Completion (shared, cancelled or dismissed): deleted by the completion handler, after the consumer has finished.
+  - Share sheet released without a completion (for example parent teardown): deleted when the last holder lets go.
+    The holders are the pending request in composer state and the share sheet's completion closure, so the file is
+    never removed while the sheet can still hand it out.
+  - Presentation: deferred out of the SwiftUI update. It is skipped if the request was superseded or the presenter
+    was released. It fails, releasing the file, if the composer is detached from a window or already presenting.
+  - Not covered: a process kill leaves the folder for the system's temporary-directory purge.
 - Zero statistics render as zeros with a "No listening recorded" panel. Long names truncate with an
-  ellipsis, and large numbers shrink to fit and then truncate.
+  ellipsis, and large numbers shrink to fit and then truncate. Durations are formatted as `Double`, never
+  converted to `Int`, so finite values beyond `Int.max` (for example `1e100` seconds) cannot trap.
 
 ## Root integration
 
@@ -88,6 +98,14 @@ A server-year mode needs a separate snapshot type fed by a root-owned, admin-gat
   decode the PNG and check pixel size and drawn text pixels for every layout, that pixels change with the data, that
   snapshot identity, year, file name and share text match, year validation, empty-year layouts, layout validation, that
   sharing never reuses a preview for another layout, and that very long names stay bounded.
+- Review fixes on top of `6463c23c`, also red first:
+  - `testFiniteButEnormousDurationsRenderAndShareWithoutTrapping` crashed the test process with
+    "Double value cannot be converted to Int because the result would be greater than Int.max" before the fix.
+  - `YearExportShareTests` failed in 3 of 4 cases against the original share behaviour, moved unchanged behind the
+    testable seams: failed-write cleanup, release without completion, and presenting from a detached composer.
+    Completion cleanup already worked and passed.
+  - A mutation check (removing `deinit`) makes the release and detached-presentation tests fail again.
+  - All 13 tests pass.
 - A throwaway XCUITest host outside the repository drove the composer on a dedicated "Audiobookshelf Year Export QA"
   simulator (iPhone 17, iOS 27) with synthetic data only. It covered switching style and format, presenting the share
   sheet (it showed `audiobookshelf_my_2025_short` as a PNG image) and the empty year hiding Top Lists. Screenshots stay local.

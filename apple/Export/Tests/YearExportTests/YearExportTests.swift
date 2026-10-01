@@ -78,20 +78,30 @@ final class YearExportTests: XCTestCase {
         }
     }
 
+    func testFiniteButEnormousDurationsRenderAndShareWithoutTrapping() throws {
+        let huge = 1e100
+        let snapshot = try XCTUnwrap(YearExportSnapshot(stats: stats(seconds: huge, authorSeconds: huge, narratorSeconds: huge), year: 2025, locale: locale))
+        XCTAssertTrue(snapshot.shareText.contains("hours of listening"))
+        for layout in snapshot.availableLayouts {
+            XCTAssertFalse(YearExportRenderer.render(snapshot, layout: layout).pngData.isEmpty, "\(layout)")
+        }
+    }
+
     private func stats(
         finished: Int = 12, listened: Int = 19, sessions: Int = 240, seconds: Double = 512_400,
         authors: [String] = ["Brandon Sanderson", "Ursula K. Le Guin", "Terry Pratchett"],
         genres: [String] = ["Fantasy", "Science Fiction"],
-        narrator: String? = "Kate Reading", month: Int? = 10, longest: String? = "The Way of Kings"
+        narrator: String? = "Kate Reading", month: Int? = 10, longest: String? = "The Way of Kings",
+        authorSeconds: Double = 10_000, narratorSeconds: Double = 40_000
     ) -> YearListeningStats {
         var json: [String: Any] = [
             "totalListeningSessions": sessions, "totalListeningTime": seconds,
             "totalBookListeningTime": seconds * 0.8, "totalPodcastListeningTime": seconds * 0.2,
             "numBooksFinished": finished, "numBooksListened": listened,
-            "topAuthors": authors.enumerated().map { ["name": $1, "time": Double(10_000 - $0 * 1000)] },
+            "topAuthors": authors.enumerated().map { ["name": $1, "time": authorSeconds - Double($0 * 1000)] },
             "topGenres": genres.enumerated().map { ["genre": $1, "time": Double(9_000 - $0 * 1000)] }
         ]
-        if let narrator { json["mostListenedNarrator"] = ["name": narrator, "time": 40_000] }
+        if let narrator { json["mostListenedNarrator"] = ["name": narrator, "time": narratorSeconds] }
         if let month { json["mostListenedMonth"] = ["month": month, "time": 80_000] }
         if let longest { json["longestAudiobookFinished"] = ["title": longest, "duration": 160_000] }
         let data = try! JSONSerialization.data(withJSONObject: json)
