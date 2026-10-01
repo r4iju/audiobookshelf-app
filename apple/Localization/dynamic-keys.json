@@ -1,0 +1,10 @@
+{
+  "NativeAppearance.name": ["System", "Light", "Dark", "Black"],
+  "NativeHaptic.name": ["Off", "Light", "Medium", "Heavy"],
+  "AppleNetworkPolicy.title": ["Ask", "Always", "Never"],
+  "AudioGroupKind.title": ["Collections", "Playlists"],
+  "NativeDownloads.Entry.State": ["Queued", "Ready", "Failed", "Cancelled"],
+  "ListeningPanel.title": ["Chapters", "Speed", "Bookmarks", "Sleep", "Settings"],
+  "DiagnosticCategory.title": ["Connection", "Server", "Media", "Sync", "Downloads", "Reading", "Podcasts"],
+  "CatalogSort.name": ["Title", "Author, first name", "Author, last name", "Published year", "Date added", "File size", "Duration", "File created", "File modified", "Listening progress", "Date started", "Date finished", "Random", "Author", "Number of episodes"]
+}

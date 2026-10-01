@@ -25,6 +25,8 @@ import SwiftUI
 
 struct StatisticsView: View {
     @StateObject private var store: StatisticsStore
+    @Environment(\.nativeStrings) private var l10n
+    @Environment(\.sizeCategory) private var sizeCategory
     init(api: APIClient) { _store = StateObject(wrappedValue: StatisticsStore(api: api)) }
     private func minutes(_ seconds: Double) -> String {
         let formatter = NumberFormatter(); formatter.numberStyle = .decimal; formatter.maximumFractionDigits = 0
@@ -39,43 +41,50 @@ struct StatisticsView: View {
             return (key, store.stats?.days[key] ?? 0)
         }
     }
+    /// The fixed date column would truncate at accessibility text sizes, so the bar moves below the date there.
+    @ViewBuilder private func dayRow(_ day: (date: String, time: Double)) -> some View {
+        let bar = GeometryReader { geometry in
+            RoundedRectangle(cornerRadius: 4).fill(ShelfStyle.accent)
+                .frame(width: geometry.size.width * min(max(day.time / max(recentDays.map(\.time).max() ?? 0, 1), 0), 1))
+        }.frame(height: 10).accessibilityHidden(true)
+        let date = Text(day.date).font(.caption.monospacedDigit())
+        let total = Text(minutes(day.time)).font(.caption.monospacedDigit())
+        if sizeCategory.isAccessibilityCategory {
+            VStack(alignment: .leading, spacing: 6) { HStack { date; Spacer(); total }; bar }
+        } else {
+            HStack { date.frame(width: 90, alignment: .leading); bar; total.frame(minWidth: 32, alignment: .trailing) }
+        }
+    }
     var body: some View {
         ShelfList {
-            if store.loading { ProgressView("Opening your statistics…") }
+            if store.loading { ProgressView(l10n("Opening your statistics…")) }
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load() } } }
             if let stats = store.stats {
-                NavigationLink(destination: YearReviewView(api: store.api)) { Text("Year in review") }
-                Section(header: Text("Your listening")) {
-                    Text("\(minutes(stats.totalTime)) minutes listened").font(.title2.bold())
-                    Text("\(stats.days.count) days listened")
-                    Text("\(store.finished) \(store.finished == 1 ? "title" : "titles") finished")
+                NavigationLink(destination: YearReviewView(api: store.api)) { Text(l10n("Year in review")) }
+                Section(header: Text(l10n("Your listening"))) {
+                    Text(l10n("{0} minutes listened", minutes(stats.totalTime))).font(.title2.bold())
+                    Text(l10n("{0} days listened", stats.days.count))
+                    Text(l10n(store.finished == 1 ? "{0} title finished" : "{0} titles finished", store.finished))
                 }
-                Section(header: Text("Minutes listened in the last 7 days")) {
+                Section(header: Text(l10n("Minutes listened in the last 7 days"))) {
                     ForEach(recentDays, id: \.date) { day in
-                        HStack {
-                            Text(day.date).font(.caption.monospacedDigit()).frame(width: 90, alignment: .leading)
-                            GeometryReader { geometry in
-                                RoundedRectangle(cornerRadius: 4).fill(ShelfStyle.accent)
-                                    .frame(width: geometry.size.width * min(max(day.time / max(recentDays.map(\.time).max() ?? 0, 1), 0), 1))
-                            }.frame(height: 10).accessibilityHidden(true)
-                            Text(minutes(day.time)).font(.caption.monospacedDigit()).frame(minWidth: 32, alignment: .trailing)
-                        }.accessibilityElement(children: .ignore).accessibilityLabel("\(day.date), \(minutes(day.time)) minutes listened")
+                        dayRow(day).accessibilityElement(children: .ignore).accessibilityLabel(l10n("{0}, {1} minutes listened", day.date, minutes(day.time)))
                     }
                 }
-                Section(header: Text("Recent sessions")) {
-                    if stats.recentSessions.isEmpty { Text("No listening sessions yet.").foregroundColor(.secondary) }
+                Section(header: Text(l10n("Recent sessions"))) {
+                    if stats.recentSessions.isEmpty { Text(l10n("No listening sessions yet.")).foregroundColor(.secondary) }
                     ForEach(stats.recentSessions) { session in
                         VStack(alignment: .leading, spacing: 6) {
-                            Text(session.mediaMetadata?.title ?? "Unavailable title").font(.headline)
+                            Text(session.mediaMetadata?.title ?? l10n("Unavailable title")).font(.headline)
                             if let author = session.mediaMetadata?.authorName, !author.isEmpty { Text(author).foregroundColor(.secondary) }
-                            Text("\(minutes(session.timeListening)) minutes listened").font(.caption)
+                            Text(l10n("{0} minutes listened", minutes(session.timeListening))).font(.caption)
                             Text(Date(timeIntervalSince1970: session.updatedAt / 1000), style: .date).font(.caption).foregroundColor(.secondary)
                         }.padding(.vertical, 6)
                     }
                 }
             }
-        }.listStyle(InsetGroupedListStyle()).navigationTitle("Statistics")
-            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Refresh") { Task { await store.load() } }.disabled(store.loading) } }
+        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Statistics"))
+            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Refresh")) { Task { await store.load() } }.disabled(store.loading) } }
             .onAppear { Task { await store.load() } }
     }
 }

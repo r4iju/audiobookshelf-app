@@ -12,16 +12,17 @@ struct FeedEpisodes: View {
     @State private var adding = false
     @State private var error: String?
     @State private var request: Task<Void, Never>?
+    @Environment(\.nativeStrings) private var l10n
     private var existing: Set<String> { Set((item.media.episodes ?? []).compactMap { $0.enclosure?.url }) }
     var body: some View {
         NavigationView {
             ShelfList {
-                if loading { ProgressView("Opening podcast feed…") }
+                if loading { ProgressView(l10n("Opening podcast feed…")) }
                 if let error {
                     Text(error).foregroundColor(.red)
-                    Button("Retry feed", action: load).disabled(adding)
+                    Button(l10n("Retry feed"), action: load).disabled(adding)
                 }
-                if !loading, episodes.isEmpty { Text("No feed episodes found").foregroundColor(.secondary) }
+                if !loading, episodes.isEmpty { Text(l10n("No feed episodes found")).foregroundColor(.secondary) }
                 ForEach(episodes) { episode in
                     Button {
                         if selected.contains(episode.id) { selected.remove(episode.id) }
@@ -31,17 +32,17 @@ struct FeedEpisodes: View {
                             Image(systemName: existing.contains(episode.enclosureURL ?? "") ? "checkmark.circle.fill" : selected.contains(episode.id) ? "checkmark.circle.fill" : "circle")
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(episode.title)
-                                if existing.contains(episode.enclosureURL ?? "") { Text("Already on server").font(.caption).foregroundColor(.secondary) }
-                                else if episode.enclosureURL == nil { Text("No audio enclosure").font(.caption).foregroundColor(.secondary) }
+                                if existing.contains(episode.enclosureURL ?? "") { Text(l10n("Already on server")).font(.caption).foregroundColor(.secondary) }
+                                else if episode.enclosureURL == nil { Text(l10n("No audio enclosure")).font(.caption).foregroundColor(.secondary) }
                             }
                         }
                     }.disabled(adding || episode.enclosureURL == nil || existing.contains(episode.enclosureURL ?? ""))
-                        .accessibilityLabel(episode.title).accessibilityValue(selected.contains(episode.id) ? "Selected" : "Not selected")
+                        .accessibilityLabel(episode.title).accessibilityValue(l10n(selected.contains(episode.id) ? "Selected" : "Not selected"))
                 }
-                Button("Add selected episodes to server", action: queue).disabled(selected.isEmpty || adding || loading)
-                if adding { ProgressView("Queueing on your server…") }
-            }.navigationTitle("Feed episodes").navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button("Done") { request?.cancel(); presented = false } } }
+                Button(l10n("Add selected episodes to server"), action: queue).disabled(selected.isEmpty || adding || loading)
+                if adding { ProgressView(l10n("Queueing on your server…")) }
+            }.navigationTitle(l10n("Feed episodes")).navigationBarTitleDisplayMode(.inline)
+                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Done")) { request?.cancel(); presented = false } } }
         }.navigationViewStyle(StackNavigationViewStyle()).onAppear(perform: load).onDisappear { request?.cancel() }
     }
     private func load() {
@@ -62,7 +63,7 @@ struct FeedEpisodes: View {
         guard !adding else { return }
         let choices = episodes.filter { selected.contains($0.id) }
         guard !choices.isEmpty else { return }
-        NativeHaptic.impact()
+        NativeHaptic.impact("episodes-queue")
         adding = true; error = nil
         request = Task {
             defer { adding = false }

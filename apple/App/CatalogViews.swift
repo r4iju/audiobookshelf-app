@@ -23,15 +23,16 @@ struct ConnectedLibrary: View {
 struct LibrarySidebar: View {
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
+    @Environment(\.nativeStrings) private var l10n
     let selected: Library
     var body: some View {
         ShelfList {
             Label("Audiobookshelf", systemImage: "books.vertical.fill").font(.title2.bold()).padding(.vertical, 18)
             Label(selected.name, systemImage: selected.mediaType == "podcast" ? "mic" : "books.vertical")
                 .foregroundColor(ShelfStyle.accent)
-            Button("Change library") { Task { await connection.openLibrariesForSelection() } }
-            Button("Sign out") { connection.signOut() }
-        }.listStyle(SidebarListStyle()).navigationTitle("Library")
+            Button(l10n("Change library")) { NativeHaptic.impact("library"); Task { await connection.openLibrariesForSelection() } }
+            Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }
+        }.listStyle(SidebarListStyle()).navigationTitle(l10n("Library"))
     }
 }
 
@@ -47,6 +48,8 @@ struct CatalogShelf: View {
     @State private var playlistsPresented = false
     @State private var settingsPresented = false
     @State private var statisticsPresented = false
+    @State private var diagnosticsPresented = false
+    @Environment(\.nativeStrings) private var l10n
     init(api: APIClient, library: Library, filter: String? = nil) {
         _catalog = StateObject(wrappedValue: CatalogStore(api: api, library: library, filter: filter))
     }
@@ -54,14 +57,14 @@ struct CatalogShelf: View {
         ScrollView {
             switch catalog.state {
             case .loading:
-                ProgressView("Opening your books…").frame(maxWidth: .infinity).padding(60)
+                ProgressView(l10n("Opening your books…")).frame(maxWidth: .infinity).padding(60)
             case .failed(let error):
                 RecoveryCard(message: error) { Task { await catalog.reload() } }.padding(24)
             case .content(let content):
                 VStack(alignment: .leading, spacing: 30) {
                     if !content.continuing.isEmpty {
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Continue listening").font(.headline)
+                            Text(l10n("Continue listening")).font(.headline)
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
                                     ForEach(content.continuing) { item in
@@ -74,14 +77,14 @@ struct CatalogShelf: View {
                         }
                     }
                     HStack {
-                        Text("All \(catalog.library.mediaType == "podcast" ? "podcasts" : "books")").font(.title3.weight(.semibold))
+                        Text(l10n(catalog.library.mediaType == "podcast" ? "All podcasts" : "All books")).font(.title3.weight(.semibold))
                         Text("\(content.total)").font(.subheadline).foregroundColor(.secondary)
                         Spacer()
-                        Button { listLayout.toggle() } label: { Image(systemName: listLayout ? "square.grid.2x2" : "list.bullet").padding(10) }
-                            .accessibilityLabel(listLayout ? "Show covers" : "Show list")
+                        Button { NativeHaptic.impact("layout"); listLayout.toggle() } label: { Image(systemName: listLayout ? "square.grid.2x2" : "list.bullet").padding(10) }
+                            .accessibilityLabel(l10n(listLayout ? "Show covers" : "Show list"))
                     }
                     if content.items.isEmpty {
-                        Text(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.").foregroundColor(.secondary)
+                        Text(l10n(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.")).foregroundColor(.secondary)
                     }
                     LazyVGrid(columns: listLayout ? [GridItem(.flexible(), alignment: .top)] : [GridItem(.adaptive(minimum: 140, maximum: 210), spacing: 16, alignment: .top)], spacing: 22) {
                         ForEach(content.items) { item in
@@ -105,37 +108,38 @@ struct CatalogShelf: View {
             .navigationTitle(catalog.library.name)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    NavigationLink(destination: LibrarySearch(catalog: catalog)) { Image(systemName: "magnifyingglass") }.accessibilityLabel("Search library")
+                    NavigationLink(destination: LibrarySearch(catalog: catalog)) { Image(systemName: "magnifyingglass") }.accessibilityLabel(l10n("Search library"))
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
                         Menu {
-                            Button("Title A–Z") { Task { await catalog.changeSort(.title, descending: false) } }
-                            Button("Title Z–A") { Task { await catalog.changeSort(.title, descending: true) } }
-                            Button("Newest first") { Task { await catalog.changeSort(.added, descending: true) } }
+                            Button(l10n("Title A–Z")) { sort(.title, descending: false) }
+                            Button(l10n("Title Z–A")) { sort(.title, descending: true) }
+                            Button(l10n("Newest first")) { sort(.added, descending: true) }
                             Divider()
-                            ForEach(CatalogSort.available(for: catalog.library.mediaType), id: \.self) { sort in Button(sort.name) { Task { await catalog.changeSort(sort, descending: catalog.descending) } } }
-                            Button(catalog.descending ? "Ascending order" : "Descending order") { Task { await catalog.changeSort(catalog.sort, descending: !catalog.descending) } }
-                        } label: { Image(systemName: "arrow.up.arrow.down").font(.body) }.accessibilityLabel("Sort library")
-                        Button { filterOptions = true } label: { Image(systemName: catalog.filter == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill") }.accessibilityLabel("Filter library")
+                            ForEach(CatalogSort.available(for: catalog.library.mediaType), id: \.self) { choice in Button(l10n(choice.name)) { sort(choice, descending: catalog.descending) } }
+                            Button(l10n(catalog.descending ? "Ascending order" : "Descending order")) { sort(catalog.sort, descending: !catalog.descending) }
+                        } label: { Image(systemName: "arrow.up.arrow.down").font(.body) }.accessibilityLabel(l10n("Sort library"))
+                        Button { filterOptions = true } label: { Image(systemName: catalog.filter == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill") }.accessibilityLabel(l10n("Filter library"))
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         if catalog.library.mediaType == "podcast", case .content(let content) = catalog.state, content.user.canManagePodcasts {
-                            Button("Add podcast") { addingPodcast = true }
+                            Button(l10n("Add podcast")) { addingPodcast = true }
                         }
-                        Button("Settings") { settingsPresented = true }
-                        Button("Statistics") { statisticsPresented = true }
-                        Button("Downloads") { downloads.presented = true }
+                        Button(l10n("Settings")) { settingsPresented = true }
+                        Button(l10n("Statistics")) { statisticsPresented = true }
+                        Button(l10n("Downloads")) { downloads.presented = true }
                         if catalog.library.mediaType == "book" {
-                            Button("Collections") { collectionsPresented = true }
+                            Button(l10n("Collections")) { collectionsPresented = true }
                         }
-                        Button("Playlists") { playlistsPresented = true }
-                        Button("Refresh") { Task { await catalog.reload() } }
-                        Button("Change library") { Task { await connection.openLibrariesForSelection() } }
-                        Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
-                        Button("Sign out") { connection.signOut() }.accessibilityIdentifier("account-signout")
+                        Button(l10n("Playlists")) { playlistsPresented = true }
+                        Button(l10n("Diagnostics")) { diagnosticsPresented = true }
+                        Button(l10n("Refresh")) { Task { await catalog.reload() } }
+                        Button(l10n("Change library")) { NativeHaptic.impact("library"); Task { await connection.openLibrariesForSelection() } }
+                        Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+                        Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }.accessibilityIdentifier("account-signout")
                     } label: { Image(systemName: "person.crop.circle") }.accessibilityIdentifier("account")
                 }
             }.onAppear { Task { if case .loading = catalog.state { await catalog.reload() } else { await catalog.refreshProgressIfNeeded() } } }
@@ -143,8 +147,14 @@ struct CatalogShelf: View {
             .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
             .background(NavigationLink(destination: NativeSettings(), isActive: $settingsPresented) { EmptyView() }.hidden())
             .background(NavigationLink(destination: StatisticsView(api: catalog.api), isActive: $statisticsPresented) { EmptyView() }.hidden())
+            .background(NavigationLink(destination: NativeDiagnosticsView(), isActive: $diagnosticsPresented) { EmptyView() }.hidden())
             .background(NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .collection), isActive: $collectionsPresented) { EmptyView() })
             .background(NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .playlist), isActive: $playlistsPresented) { EmptyView() })
+    }
+
+    private func sort(_ choice: CatalogSort, descending: Bool) {
+        NativeHaptic.impact("sort")
+        Task { await catalog.changeSort(choice, descending: descending) }
     }
 
     private func progress(_ item: LibraryItem, _ content: CatalogStore.Catalog) -> MediaProgress? {
@@ -179,6 +189,7 @@ struct BookArtwork: View {
 
 struct BookCard: View {
     @Environment(\.shelfAppearance) private var appearance
+    @Environment(\.nativeStrings) private var l10n
     let item: LibraryItem
     let catalog: CatalogStore
     let listLayout: Bool
@@ -193,7 +204,7 @@ struct BookCard: View {
     private var labels: some View {
         VStack(alignment: .leading, spacing: 5) {
             metadata(item.title, font: .subheadline.weight(.semibold), color: .primary)
-            metadata(item.author.isEmpty ? "Unknown author" : item.author, font: .caption, color: .secondary)
+            metadata(item.author.isEmpty ? l10n("Unknown author") : item.author, font: .caption, color: .secondary)
             if let duration = item.media.duration { Text(ShelfTime.describe(duration)).font(.caption).foregroundColor(.secondary) }
         }
     }
@@ -209,6 +220,8 @@ struct BookCard: View {
 
 struct ContinueCard: View {
     @Environment(\.shelfAppearance) private var appearance
+    @Environment(\.nativeStrings) private var l10n
+    @Environment(\.sizeCategory) private var sizeCategory
     let item: LibraryItem
     let catalog: CatalogStore
     let progress: MediaProgress?
@@ -219,30 +232,43 @@ struct ContinueCard: View {
                 Text(item.title).font(.subheadline.weight(.semibold)).foregroundColor(.primary).lineLimit(2)
                 Text(item.author).font(.caption).foregroundColor(.secondary).lineLimit(1)
                 ProgressView(value: progress?.fraction ?? 0).accentColor(ShelfStyle.accent)
-                Text("\(Int((progress?.fraction ?? 0) * 100))% listened").font(.caption).foregroundColor(.secondary)
-            }.frame(width: 175, alignment: .leading)
+                Text(l10n("{0}% listened", Int((progress?.fraction ?? 0) * 100))).font(.caption).foregroundColor(.secondary)
+            }.frame(width: sizeCategory.isAccessibilityCategory ? 260 : 175, alignment: .leading)
         }.padding(16).background(appearance.card).cornerRadius(18)
     }
 }
 
 struct RecoveryCard: View {
     @Environment(\.shelfAppearance) private var appearance
+    @Environment(\.nativeStrings) private var l10n
     let message: String
     let retry: () -> Void
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Label("Couldn't open this part of your library", systemImage: "wifi.exclamationmark").font(.headline)
+            Label(l10n("Couldn't open this part of your library"), systemImage: "wifi.exclamationmark").font(.headline)
             Text(message).font(.callout).foregroundColor(.secondary)
-            Button("Try again", action: retry)
+            Button(l10n("Try again"), action: retry)
         }.padding(22).frame(maxWidth: .infinity, alignment: .leading).background(appearance.card).cornerRadius(20)
     }
 }
 
 enum ShelfTime {
-    static func describe(_ seconds: Double) -> String {
+    static func describe(_ seconds: Double, language: NativeLanguage = NativeStrings.current.language) -> String {
         let safe = seconds.isFinite ? Int(min(max(seconds, 0), Double(Int.max / 2))) : 0
+        if language != .english { return localized(safe, locale: language.locale) }
         if safe < 60 { return "\(safe) sec" }
         if safe < 3600 { return "\(safe / 60) min" }
         return "\(safe / 3600) hr \((safe % 3600) / 60) min"
+    }
+    /// Other languages use the system's abbreviated units, which follow the same seconds, minutes, then hours and minutes steps.
+    private static func localized(_ safe: Int, locale: Locale) -> String {
+        let formatter = DateComponentsFormatter()
+        var calendar = Calendar.current
+        calendar.locale = locale
+        formatter.calendar = calendar
+        formatter.unitsStyle = .short
+        formatter.allowedUnits = safe < 60 ? [.second] : safe < 3600 ? [.minute] : [.hour, .minute]
+        formatter.zeroFormattingBehavior = safe < 3600 ? .default : .dropLeading
+        return formatter.string(from: TimeInterval(safe - (safe >= 60 ? safe % 60 : 0))) ?? "\(safe)"
     }
 }

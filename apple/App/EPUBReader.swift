@@ -57,7 +57,7 @@ private struct EPUBPreferences: Codable {
         }
         configureVolume()
         web.navigationDelegate = self
-        guard let url = Bundle.main.url(forResource: "reader", withExtension: "html", subdirectory: "ReaderAssets") else { error = "The local reader resources are missing."; return }
+        guard let url = Bundle.main.url(forResource: "reader", withExtension: "html", subdirectory: "ReaderAssets") else { error = NativeStrings.current("The local reader resources are missing."); return }
         web.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         open()
     }
@@ -117,7 +117,7 @@ private struct EPUBPreferences: Codable {
                 try Data(cache.utf8).write(to: locationCache, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
             } catch { /* Derived locations can be regenerated without changing the saved passage. */ }
         }
-        if let failure = value["error"] as? String { error = "This EPUB could not be opened: " + failure }
+        if let failure = value["error"] as? String { error = NativeStrings.current("This EPUB could not be opened: {0}", failure) }
         if let items = value["chapters"] as? [[String: String]] {
             chapters = items.compactMap { item in guard let title = item["title"], let href = item["href"] else { return nil }; return Chapter(title: title, href: href) }
         }
@@ -126,14 +126,14 @@ private struct EPUBPreferences: Codable {
                 try store.update(account: source.account, itemID: source.itemID, format: "epub", location: location, fraction: fraction, rotation: 0, fileID: source.fileID)
                 store.sync(api: api)
                 savingError = nil
-            } catch { self.savingError = "Reading could not be saved: " + error.localizedDescription }
+            } catch { self.savingError = NativeStrings.current("Reading could not be saved: {0}", error.localizedDescription) }
         }
     }
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         let scheme = navigationAction.request.url?.scheme
         decisionHandler(["file", "blob", "about"].contains(scheme ?? "") ? .allow : .cancel)
     }
-    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) { ready = false; error = "The reader stopped. Close and reopen the book to restore your passage." }
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) { ready = false; error = NativeStrings.current("The reader stopped. Close and reopen the book to restore your passage.") }
     @objc func swiped(_ gesture: UISwipeGestureRecognizer) {
         guard ready else { return }
         call("turn", gesture.direction == .left)
@@ -141,12 +141,12 @@ private struct EPUBPreferences: Codable {
     func call<T: Encodable>(_ name: String, _ argument: T) {
         guard let data = try? JSONEncoder().encode(argument), let json = String(data: data, encoding: .utf8) else { return }
         web?.evaluateJavaScript(name + "(" + json + "); null;") { [weak self] _, error in
-            if let error { self?.error = "The reader could not continue: " + error.localizedDescription }
+            if let error { self?.error = NativeStrings.current("The reader could not continue: {0}", error.localizedDescription) }
         }
     }
     private enum ReaderFailure: LocalizedError {
         case invalid
-        var errorDescription: String? { "This EPUB is damaged or not a supported EPUB archive." }
+        var errorDescription: String? { NativeStrings.current("This EPUB is damaged or not a supported EPUB archive.") }
     }
 }
 
@@ -181,6 +181,7 @@ struct EPUBReader: View {
     @ObservedObject private var store: ReadingStore
     @State private var contents = false
     @State private var settings = false
+    @Environment(\.nativeStrings) private var l10n
     init(source: ReadingSource, api: APIClient, store: ReadingStore) {
         self.store = store
         _reading = StateObject(wrappedValue: EPUBReading(source: source, api: api, store: store))
@@ -191,15 +192,15 @@ struct EPUBReader: View {
                 ZStack {
                     EPUBCanvas(reading: reading)
                     if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding().background(appearance.background) }
-                    else if !reading.ready { ProgressView("Opening EPUB…").padding().background(appearance.background) }
+                    else if !reading.ready { ProgressView(l10n("Opening EPUB…")).padding().background(appearance.background) }
                 }
                 HStack {
-                    Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left") }.accessibilityLabel("Previous page")
+                    Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left") }.accessibilityLabel(l10n("Previous page"))
                     Spacer()
-                    Button { contents = true } label: { Image(systemName: "list.bullet") }.accessibilityLabel("Contents")
-                    Button { settings = true } label: { Image(systemName: "textformat.size") }.accessibilityLabel("Reading settings")
+                    Button { contents = true } label: { Image(systemName: "list.bullet") }.accessibilityLabel(l10n("Contents"))
+                    Button { settings = true } label: { Image(systemName: "textformat.size") }.accessibilityLabel(l10n("Reading settings"))
                     Spacer()
-                    Button { reading.call("turn", true) } label: { Image(systemName: "chevron.right") }.accessibilityLabel("Next page")
+                    Button { reading.call("turn", true) } label: { Image(systemName: "chevron.right") }.accessibilityLabel(l10n("Next page"))
                 }.padding().disabled(!reading.ready)
                 if player.session != nil {
                     HStack {
@@ -207,45 +208,45 @@ struct EPUBReader: View {
                         Text(String(Int(player.currentTime))).font(.caption.monospacedDigit()).accessibilityIdentifier("reader-audio-elapsed")
                         Spacer()
                         playbackToggle(player, prefix: "reader-")
-                        Button("Stop listening") { Task { do { try await player.stop() } catch { player.error = ConnectionStore.recovery(for: error) } } }
+                        Button(l10n("Stop listening")) { Task { do { try await player.stop() } catch { player.error = ConnectionStore.recovery(for: error) } } }
                     }.padding()
                 }
                 if let error = store.error ?? reading.savingError {
                     Text(error).font(.caption).foregroundColor(.red).padding(.horizontal).accessibilityIdentifier("reading-save-error")
                 } else if store.waitingForListening {
-                    Text("Passage saved on this device. Sync follows when listening closes.").font(.caption).foregroundColor(.secondary).padding(.horizontal)
+                    Text(l10n("Passage saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(.secondary).padding(.horizontal)
                 }
             }.navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button("Close reader") { presentation.wrappedValue.dismiss() } } }
+                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } } }
                 .sheet(isPresented: $contents) {
-                    NavigationView { ShelfList { ForEach(reading.chapters) { chapter in Button(chapter.title) { reading.call("navigate", chapter.href); contents = false } } }.navigationTitle("Contents").toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Done") { contents = false } } } }.navigationViewStyle(StackNavigationViewStyle())
+                    NavigationView { ShelfList { ForEach(reading.chapters) { chapter in Button(chapter.title) { reading.call("navigate", chapter.href); contents = false } } }.navigationTitle(l10n("Contents")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { contents = false } } } }.navigationViewStyle(StackNavigationViewStyle())
                 }
                 .sheet(isPresented: $settings) {
                     NavigationView {
                         ShelfForm {
-                            Picker("Volume buttons", selection: $reading.preferences.volume) {
-                                Text("Enabled").tag("enabled"); Text("Mirrored").tag("mirrored"); Text("Off").tag("none")
+                            Picker(l10n("Volume buttons"), selection: $reading.preferences.volume) {
+                                Text(l10n("Enabled")).tag("enabled"); Text(l10n("Mirrored")).tag("mirrored"); Text(l10n("Off")).tag("none")
                             }.accessibilityIdentifier("reader-volume-mode")
                             HStack {
-                                Text("While listening")
+                                Text(l10n("While listening"))
                                 Spacer()
-                                Toggle("Volume navigation while listening", isOn: $reading.preferences.volumeWhileListening).labelsHidden().accessibilityLabel("Volume navigation while listening").fixedSize()
+                                Toggle(l10n("Volume navigation while listening"), isOn: $reading.preferences.volumeWhileListening).labelsHidden().accessibilityLabel(l10n("Volume navigation while listening")).fixedSize()
                             }
                             HStack {
-                                Text("Keep screen awake")
+                                Text(l10n("Keep screen awake"))
                                 Spacer()
-                                Toggle("Keep screen awake", isOn: $reading.preferences.keepAwake).labelsHidden().accessibilityLabel("Keep screen awake").fixedSize()
+                                Toggle(l10n("Keep screen awake"), isOn: $reading.preferences.keepAwake).labelsHidden().accessibilityLabel(l10n("Keep screen awake")).fixedSize()
                             }
-                            Picker("Theme", selection: $reading.preferences.theme) { Text("Light").tag("light"); Text("Dark").tag("dark"); Text("Black").tag("black") }
-                            Picker("Font", selection: $reading.preferences.font) { Text("Serif").tag("serif"); Text("Sans serif").tag("sans-serif"); Text("Monospace").tag("monospace") }
-                            Text("Font size \(Int(reading.preferences.scale))%")
-                            Slider(value: $reading.preferences.scale, in: 5...300, step: 5).accessibilityLabel("Font size")
-                            Text("Line spacing \(Int(reading.preferences.spacing))%")
-                            Slider(value: $reading.preferences.spacing, in: 100...300, step: 5).accessibilityLabel("Line spacing")
-                            Text("Text weight \(Int(reading.preferences.stroke))")
-                            Slider(value: $reading.preferences.stroke, in: 0...300, step: 5).accessibilityLabel("Text weight")
-                            Picker("Spread", selection: $reading.preferences.spread) { Text("Automatic").tag("auto"); Text("Single page").tag("none"); Text("Two pages").tag("always") }
-                        }.navigationTitle("Reading settings").toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Done") { settings = false } } }
+                            Picker(l10n("Theme"), selection: $reading.preferences.theme) { Text(l10n("Light")).tag("light"); Text(l10n("Dark")).tag("dark"); Text(l10n("Black")).tag("black") }
+                            Picker(l10n("Font"), selection: $reading.preferences.font) { Text(l10n("Serif")).tag("serif"); Text(l10n("Sans serif")).tag("sans-serif"); Text(l10n("Monospace")).tag("monospace") }
+                            Text(l10n("Font size {0}%", Int(reading.preferences.scale)))
+                            Slider(value: $reading.preferences.scale, in: 5...300, step: 5).accessibilityLabel(l10n("Font size"))
+                            Text(l10n("Line spacing {0}%", Int(reading.preferences.spacing)))
+                            Slider(value: $reading.preferences.spacing, in: 100...300, step: 5).accessibilityLabel(l10n("Line spacing"))
+                            Text(l10n("Text weight {0}", Int(reading.preferences.stroke)))
+                            Slider(value: $reading.preferences.stroke, in: 0...300, step: 5).accessibilityLabel(l10n("Text weight"))
+                            Picker(l10n("Spread"), selection: $reading.preferences.spread) { Text(l10n("Automatic")).tag("auto"); Text(l10n("Single page")).tag("none"); Text(l10n("Two pages")).tag("always") }
+                        }.navigationTitle(l10n("Reading settings")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { settings = false } } }
                     }.navigationViewStyle(StackNavigationViewStyle())
                 }
         }.navigationViewStyle(StackNavigationViewStyle()).accentColor(ShelfStyle.accent)
@@ -264,7 +265,9 @@ struct EbookReader: View {
     let api: APIClient
     let store: ReadingStore
     var body: some View {
-        if source.ebook.format == "pdf" { PDFReader(source: source, api: api, store: store) }
-        else { EPUBReader(source: source, api: api, store: store) }
+        Group {
+            if source.ebook.format == "pdf" { PDFReader(source: source, api: api, store: store) }
+            else { EPUBReader(source: source, api: api, store: store) }
+        }.nativeLocalization()
     }
 }

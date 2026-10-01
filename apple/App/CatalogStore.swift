@@ -68,7 +68,7 @@ import SwiftUI
             catalog.total = response.total
             if !newItems.isEmpty || !catalog.hasMore { page += 1 }
             if newItems.isEmpty && catalog.hasMore {
-                catalog.pageError = "The server returned no more books. Refresh the library to try again."
+                catalog.pageError = NativeStrings.current("The server returned no more books. Refresh the library to try again.")
             }
         } catch {
             guard generation == request else { return }

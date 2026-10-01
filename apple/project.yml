@@ -21,7 +21,12 @@ targets:
         buildPhase: resources
       - Playback
       - Export/Sources/YearExport
+      - Localization/Sources/NativeLocalization
+      - Diagnostics/Sources/NativeDiagnostics
+      - path: Adoption
+        excludes: ["*.md"]
       - ../tvos/Core/Sources/TVCore
+      - Migration/Sources/LegacyMigration
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.native.preview
@@ -38,6 +43,14 @@ targets:
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
         NSPhotoLibraryAddUsageDescription: Save your year in review image to Photos.
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: org.audiobookshelf.legacy-migration
+            UTTypeDescription: Audiobookshelf Migration Package
+            UTTypeConformsTo: [com.apple.package, public.composite-content]
+            UTTypeTagSpecification:
+              public.filename-extension: [absmigration]
         NSLocalNetworkUsageDescription: Connect directly to your Audiobookshelf server on your local network.
         UIBackgroundModes: [audio]
         CFBundleURLTypes:
@@ -54,6 +67,24 @@ targets:
       base:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.native.preview.uitests
+  # Runs without a host app so the stores under test use injected storage and never share the
+  # app's background download session.
+  NativeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - NativeTests
+      - path: Adoption
+        excludes: ["*.md"]
+      - App/NativeDownloads.swift
+      - App/ReadingStore.swift
+      - Playback
+      - ../tvos/Core/Sources/TVCore
+      - Migration/Sources/LegacyMigration
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.native.preview.nativetests
 schemes:
   AudiobookshelfNative:
     build:
@@ -62,3 +93,9 @@ schemes:
         NativeJourneyTests: [test]
     test:
       targets: [NativeJourneyTests]
+  NativeTests:
+    build:
+      targets:
+        NativeTests: [test]
+    test:
+      targets: [NativeTests]

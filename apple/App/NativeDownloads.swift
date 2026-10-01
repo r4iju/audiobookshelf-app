@@ -6,11 +6,12 @@ import UIKit
 // Temporary download files must move before the download callback returns.
 @MainActor private final class DownloadDelegate: NSObject, @preconcurrency URLSessionDownloadDelegate {
     weak var owner: NativeDownloads?
+    var stagingDirectory = NativeDownloads.directory
     private var staged: [Int: URL] = [:]
     private var failures: [Int: Error] = [:]
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         do {
-            let target = NativeDownloads.directory.appendingPathComponent("staging-" + UUID().uuidString)
+            let target = stagingDirectory.appendingPathComponent("staging-" + UUID().uuidString)
             try FileManager.default.moveItem(at: location, to: target)
             staged[downloadTask.taskIdentifier] = target
         } catch { failures[downloadTask.taskIdentifier] = error }
@@ -62,12 +63,15 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         var state: State
         var error: String?
     }
-    private struct Manifest: Codable { let version: Int; let entries: [Entry] }
+    private struct Manifest: Codable { let version: Int; let entries: [Entry]; var adopted: [String]? }
     nonisolated static var directory: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("NativeDownloads", isDirectory: true)
     }
-    private static let sessionID = "com.forkzed.audiobookshelf.native.preview.downloads"
+    nonisolated static let sessionID = "com.forkzed.audiobookshelf.native.preview.downloads"
     @Published private(set) var entries: [Entry] = []
+    /// Ids of entries carried over from the legacy migration, kept after the user removes them so
+    /// a later import never adds them again. Written in the same manifest write as the entries.
+    private(set) var adoptedIDs: Set<String> = []
     @Published private(set) var error: String?
     @Published private var fractions: [String: Double] = [:]
     @Published var presented = false
@@ -80,16 +84,20 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     private var recovered = false
     private var writable = true
     private var policyBlocked = false
-    private var manifest: URL { Self.directory.appendingPathComponent("manifest.json") }
-    init(api: APIClient) {
+    /// Where this store keeps its manifest and files; `directory` unless injected.
+    let root: URL
+    private var manifest: URL { root.appendingPathComponent("manifest.json") }
+    init(api: APIClient, directory: URL = NativeDownloads.directory, configuration: URLSessionConfiguration = .background(withIdentifier: NativeDownloads.sessionID)) {
         self.api = api
+        root = directory
+        delegate.stagingDirectory = directory
         networkObserver = NotificationCenter.default.addObserver(forName: AppleNetworkPolicy.changed, object: nil, queue: .main) { [weak self] note in
             guard note.object as? String == AppleNetworkPolicy.downloadsKey else { return }
             Task { @MainActor in self?.applyCellularPolicy() }
         }
         do {
-            try FileManager.default.createDirectory(at: Self.directory, withIntermediateDirectories: true)
-            var directory = Self.directory
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+            var directory = root
             var resource = URLResourceValues(); resource.isExcludedFromBackup = true
             try directory.setResourceValues(resource)
             try FileManager.default.setAttributes([.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication], ofItemAtPath: directory.path)
@@ -103,6 +111,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                           (entry.state != .ready || entry.finished.count == entry.parts.count)
                       }) else { throw ListeningJournal.Failure.invalidData }
                 entries = saved.entries
+                adoptedIDs = Set(saved.adopted ?? [])
                 var recovered = entries
                 for index in recovered.indices {
                     let valid = recovered[index].finished.filter { part in
@@ -122,11 +131,11 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                 }
                 if recovered.map(\.finished) != entries.map(\.finished) || recovered.map(\.generation) != entries.map(\.generation) { try save(recovered) }
             }
-            for file in try FileManager.default.contentsOfDirectory(at: Self.directory, includingPropertiesForKeys: nil) where file.lastPathComponent.hasPrefix("staging-") {
+            for file in try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) where file.lastPathComponent.hasPrefix("staging-") {
                 try? FileManager.default.removeItem(at: file)
             }
         } catch { self.error = "Downloads could not be restored: " + error.localizedDescription; writable = false }
-        let config = URLSessionConfiguration.background(withIdentifier: Self.sessionID)
+        let config = configuration
         config.sessionSendsLaunchEvents = true; config.isDiscretionary = false
         config.allowsCellularAccess = true; config.httpMaximumConnectionsPerHost = 2
         delegate.owner = self
@@ -186,10 +195,12 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         return min(max((Double(entry.finished.count) + partial) / Double(entry.parts.count), 0), 1)
     }
     func refresh() { Task { await pump() } }
-    private func save(_ values: [Entry]) throws {
+    private func save(_ values: [Entry], adopted: Set<String>? = nil) throws {
         guard writable else { throw ListeningJournal.Failure.invalidData }
-        try JSONEncoder().encode(Manifest(version: 1, entries: values)).write(to: manifest, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        let ids = adopted ?? adoptedIDs
+        try JSONEncoder().encode(Manifest(version: 1, entries: values, adopted: ids.isEmpty ? nil : ids.sorted())).write(to: manifest, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
         entries = values
+        adoptedIDs = ids
     }
     func enqueue(item: LibraryItem, episode: Episode?, supplementaryID: String? = nil) async {
         do {
@@ -243,7 +254,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             let duration = tracks.map { $0.startOffset + $0.duration }.max() ?? 0
             let media = ListeningMedia(itemID: item.id, episodeID: episode?.id, title: attachment?.metadata?.filename ?? selected?.title ?? item.title, author: item.author, mediaType: item.mediaType, duration: duration, startTime: progress?.currentTime ?? 0)
             let entry = Entry(id: UUID().uuidString, account: identity, media: media, tracks: tracks, chapters: supplementaryID == nil ? (selected?.chapters ?? detail.media.chapters ?? []) : [], ebook: ebook, readingProgress: progress, supplementaryID: supplementaryID, cellularConsent: policy == .ask ? consent : nil, networkPolicy: policy.rawValue, serverPosition: progress?.currentTime ?? 0, serverUpdatedAt: progress?.lastUpdate ?? 0, generation: UUID().uuidString, finished: [], state: .queued, error: nil)
-            try FileManager.default.createDirectory(at: Self.directory.appendingPathComponent(entry.id), withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: root.appendingPathComponent(entry.id), withIntermediateDirectories: true)
             try save(entries + [entry])
             refresh()
         } catch { self.error = error.localizedDescription }
@@ -262,14 +273,14 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         if index == entry.tracks.count, let ebook = entry.ebook {
             let ext = ebook.format.trimmingCharacters(in: CharacterSet(charactersIn: "."))
             let safe = !ext.isEmpty && ext.count <= 10 && ext.unicodeScalars.allSatisfy(CharacterSet.alphanumerics.contains) ? ext : "ebook"
-            return Self.directory.appendingPathComponent(entry.id).appendingPathComponent("ebook." + safe)
+            return root.appendingPathComponent(entry.id).appendingPathComponent("ebook." + safe)
         }
         let track = entry.tracks[index]
         let known: [String: String] = ["audio/wav": "wav", "audio/x-wav": "wav", "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/aac": "aac", "audio/flac": "flac", "audio/ogg": "ogg"]
         let raw = track.metadata?.ext ?? track.metadata?.filename.map { URL(fileURLWithPath: $0).pathExtension } ?? known[track.mimeType ?? ""] ?? "m4b"
         let ext = raw.trimmingCharacters(in: CharacterSet(charactersIn: ".")).lowercased()
         let safe = !ext.isEmpty && ext.count <= 10 && ext.unicodeScalars.allSatisfy(CharacterSet.alphanumerics.contains) ? ext : "m4b"
-        return Self.directory.appendingPathComponent(entry.id).appendingPathComponent("audio-\(index)." + safe)
+        return root.appendingPathComponent(entry.id).appendingPathComponent("audio-\(index)." + safe)
     }
     private func key(_ entry: Entry, _ index: Int) -> String { entry.id + ":" + entry.generation + ":" + String(index) }
     private func part(for key: String) -> (Int, Int)? {
@@ -369,9 +380,41 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             cancel(entry)
             guard entries.first(where: { $0.id == entry.id })?.state != .queued else { return }
             try save(entries.filter { $0.id != entry.id })
-            try FileManager.default.removeItem(at: Self.directory.appendingPathComponent(entry.id))
+            try FileManager.default.removeItem(at: root.appendingPathComponent(entry.id))
         } catch { self.error = error.localizedDescription }
     }
+    /// Where part `part` of `entry` lives once finished; adoption places migrated files here.
+    func adoptionFile(_ entry: Entry, part: Int) -> URL { localFile(entry, part) }
+
+    /// Adds or updates entries carried over from the legacy migration in one manifest write. An
+    /// update applies only if its `previous` entry is still unchanged; a new entry only if no
+    /// entry has its id or stands for the same account, item, episode and supplementary file.
+    /// Every finished part must already be in place. The entries' ids join `adoptedIDs` in the
+    /// same write.
+    func publishAdopted(_ changes: [(entry: Entry, previous: Entry?)]) throws {
+        guard writable else { throw ListeningJournal.Failure.invalidData }
+        var next = entries
+        for (entry, previous) in changes {
+            guard UUID(uuidString: entry.id) != nil, UUID(uuidString: entry.generation) != nil, !entry.parts.isEmpty,
+                  entry.media.duration.isFinite, entry.media.duration >= 0,
+                  Set(entry.finished).count == entry.finished.count, entry.finished.allSatisfy(entry.parts.contains),
+                  entry.state != .queued, entry.state != .ready || entry.finished.count == entry.parts.count,
+                  entry.finished.allSatisfy({ ((try? localFile(entry, $0).resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0) > 0 })
+            else { throw ListeningJournal.Failure.invalidData }
+            if let previous {
+                guard entry.id == previous.id, let index = next.firstIndex(where: { $0.id == previous.id }),
+                      next[index].generation == previous.generation, next[index].state == previous.state, next[index].finished == previous.finished
+                else { throw CancellationError() }
+                next[index] = entry
+            } else {
+                guard !next.contains(where: { $0.id == entry.id || ($0.account == entry.account && $0.media.libraryItemID == entry.media.libraryItemID && $0.media.episodeID == entry.media.episodeID && $0.supplementaryID == entry.supplementaryID) })
+                else { throw CancellationError() }
+                next.append(entry)
+            }
+        }
+        try save(next, adopted: adoptedIDs.union(changes.map(\.entry.id)))
+    }
+
     func ebookURL(_ entry: Entry) throws -> URL {
         guard entry.account == account, entry.state == .ready, entry.ebook != nil else { throw APIError.signInRequired }
         let file = localFile(entry, entry.tracks.count)

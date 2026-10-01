@@ -46,7 +46,7 @@ import CryptoKit
                       manifest.records.allSatisfy({ !$0.itemID.isEmpty && $0.enclosureID.count == 64 && $0.enclosureID.allSatisfy { $0.isHexDigit } }) else { throw ListeningJournal.Failure.invalidData }
                 records = manifest.records
             }
-        } catch { writable = false; storageError = "Server download requests could not be restored. The original data is retained. " + error.localizedDescription }
+        } catch { writable = false; storageError = NativeStrings.current("Server download requests could not be restored. The original data is retained. {0}", error.localizedDescription) }
     }
     func connect() {
         guard account != connectedAccount || connectionTask == nil else { return }
@@ -63,7 +63,7 @@ import CryptoKit
                     do {
                         if job.failed { try receiveFailure(itemID: itemID, job: job) }
                         revision += 1
-                    } catch { storageError = "The server download result could not be saved: " + error.localizedDescription }
+                    } catch { storageError = NativeStrings.current("The server download result could not be saved: {0}", error.localizedDescription) }
                 }
             }, onFailure: { failure in
                 guard generation == request, account == owner else { return }
@@ -110,7 +110,7 @@ import CryptoKit
             if unsavedReceipts.isEmpty, writable { storageError = nil }
         } catch {
             unsavedReceipts[receiptKey] = Receipt(owner: owner, itemID: itemID, job: job)
-            storageError = "The server download result could not be saved: " + error.localizedDescription
+            storageError = NativeStrings.current("The server download result could not be saved: {0}", error.localizedDescription)
             throw error
         }
     }
