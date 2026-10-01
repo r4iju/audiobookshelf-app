@@ -13,8 +13,10 @@ import SwiftUI
     private var generation = UUID()
     private var owner: AccountIdentity?
     init(catalog: CatalogStore, kind: AudioGroupKind) { self.catalog = catalog; self.kind = kind }
-    var canEdit: Bool { !loading && owner != nil && user != nil && (kind == .playlist || user?.permissions.update == true || user?.canManagePodcasts == true) }
-    var canDelete: Bool { !loading && owner != nil && user != nil && (kind == .playlist || user?.permissions.delete == true || user?.canManagePodcasts == true) }
+    // Server 2.30 lets a playlist's owner manage it, and authorizes collection changes by the update and delete
+    // permissions alone, whatever the account type.
+    var canEdit: Bool { !loading && owner != nil && user != nil && (kind == .playlist || user?.permissions.update == true) }
+    var canDelete: Bool { !loading && owner != nil && user != nil && (kind == .playlist || user?.permissions.delete == true) }
     func save(id: String?, name: String, description: String, members: [AudioGroupMember]) async -> Bool {
         guard !saving, canEdit, let owner else { return false }
         let request = UUID(); generation = request; loading = false; saving = true; error = nil
