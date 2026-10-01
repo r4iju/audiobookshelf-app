@@ -9,6 +9,7 @@ import SwiftUI
         #if DEBUG && targetEnvironment(simulator)
         if CommandLine.arguments.contains("--reset-preview-account") {
             try? vault.clear()
+            try? FileManager.default.removeItem(at: ListeningSync.file)
             UserDefaults.standard.removeObject(forKey: "previewLibrary")
             UserDefaults.standard.removeObject(forKey: "previewServer")
             UserDefaults.standard.removeObject(forKey: "previewUsername")

@@ -23,7 +23,7 @@ import Foundation
         let data = try await send(request)
         let response = try JSONDecoder().decode(AuthResponse.self, from: data)
         guard let token = response.user.bearerToken, !token.isEmpty else { throw APIError.signInRequired }
-        let value = Credentials(server: address.base.absoluteString, accessToken: token, refreshToken: response.user.refreshToken)
+        let value = Credentials(server: address.base.absoluteString, accessToken: token, refreshToken: response.user.refreshToken, userID: response.user.id, username: response.user.username)
         try store.save(value)
         refreshTask?.cancel()
         refreshTask = nil
@@ -40,6 +40,29 @@ import Foundation
     }
 
     public func me() async throws -> CurrentUser { try await get("api/me") }
+
+    public func currentAccount() async throws -> AccountIdentity {
+        guard let original = credentials else { throw APIError.signInRequired }
+        if let id = original.userID { return try AccountIdentity(server: original.server, userID: id) }
+        let generation = authGeneration
+        let user = try await me()
+        guard generation == authGeneration, let current = credentials else { throw CancellationError() }
+        let identified = Credentials(server: current.server, accessToken: current.accessToken, refreshToken: current.refreshToken, userID: user.id, username: user.username)
+        try store.save(identified)
+        credentials = identified
+        return try AccountIdentity(server: identified.server, userID: user.id)
+    }
+
+    public func syncListening(_ record: ListeningRecord) async throws {
+        guard try await currentAccount() == record.account else { throw APIError.signInRequired }
+        let response = try await request("api/session/local-all", method: "POST", body: [
+            "sessions": [record.payload], "deviceInfo": Self.deviceInfo(id: record.deviceID)
+        ])
+        struct Result: Decodable { let id: String; let success: Bool }
+        struct Response: Decodable { let results: [Result] }
+        let acknowledged = try JSONDecoder().decode(Response.self, from: response)
+        guard acknowledged.results.contains(where: { $0.id == record.id && $0.success }) else { throw APIError.http(500) }
+    }
 
     public func personalized(libraryID: String) async throws -> [PersonalizedShelf] {
         try await get("api/libraries/\(libraryID)/personalized", query: [URLQueryItem(name: "minified", value: "1")])
@@ -58,16 +81,11 @@ import Foundation
     public func item(id: String) async throws -> LibraryItem { try await get("api/items/\(id)", query: [URLQueryItem(name: "expanded", value: "1")]) }
 
     public func play(itemID: String, episodeID: String? = nil, deviceID: String) async throws -> PlaybackSession {
-        #if os(iOS)
-        let device = ["deviceId": deviceID, "clientName": "Audiobookshelf Native", "manufacturer": "Apple", "model": "iPhone / iPad"]
-        #else
-        let device = ["deviceId": deviceID, "clientName": "Audiobookshelf TV", "manufacturer": "Apple", "model": "Apple TV"]
-        #endif
         var path = "api/items/\(itemID)/play"
         if let episodeID { path += "/\(episodeID)" }
         let data = try await request(path, method: "POST", body: [
             "forceDirectPlay": true, "mediaPlayer": "AVPlayer",
-            "deviceInfo": device
+            "deviceInfo": Self.deviceInfo(id: deviceID)
         ])
         let result = try JSONDecoder().decode(PlaybackSession.self, from: data)
         guard !result.audioTracks.isEmpty else { throw APIError.noAudio }
@@ -76,6 +94,19 @@ import Foundation
     public func report(sessionID: String, report: ProgressReport, close: Bool = false) async throws {
         let body = try JSONEncoder().encode(report)
         _ = try await request("api/session/\(sessionID)/\(close ? "close" : "sync")", method: "POST", bodyData: body)
+    }
+
+    public func closeStream(sessionID: String) async throws {
+        do { _ = try await request("api/session/\(sessionID)/close", method: "POST", body: [:]) }
+        catch APIError.http(404) { return }
+    }
+
+    private static func deviceInfo(id: String) -> [String: String] {
+        #if os(iOS)
+        return ["deviceId": id, "clientName": "Audiobookshelf Native", "manufacturer": "Apple", "model": "iPhone / iPad"]
+        #else
+        return ["deviceId": id, "clientName": "Audiobookshelf TV", "manufacturer": "Apple", "model": "Apple TV"]
+        #endif
     }
 
     public func mediaURL(_ path: String) throws -> URL {
@@ -147,7 +178,8 @@ import Foundation
             try Task.checkCancellation()
             guard let bearer = response.user.bearerToken, !bearer.isEmpty,
                   authGeneration == generation else { throw APIError.signInRequired }
-            let updated = Credentials(server: original.server, accessToken: bearer, refreshToken: response.user.refreshToken ?? token)
+            guard original.userID == nil || response.user.id == nil || original.userID == response.user.id else { throw APIError.signInRequired }
+            let updated = Credentials(server: original.server, accessToken: bearer, refreshToken: response.user.refreshToken ?? token, userID: original.userID ?? response.user.id, username: response.user.username ?? original.username)
             try store.save(updated)
             credentials = updated
         }

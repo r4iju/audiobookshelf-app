@@ -8,6 +8,7 @@ struct BookDetails: View {
     @State private var expanded: LibraryItem?
     @State private var error: String?
     @State private var request: Task<Void, Never>?
+    @State private var playAttempted = false
     private var book: LibraryItem { expanded ?? item }
 
     var body: some View {
@@ -24,14 +25,14 @@ struct BookDetails: View {
                         }
                     }
                 }
-                Button { Task { await player.start(item: book) } } label: {
+                Button { playAttempted = true; Task { await player.start(item: book) } } label: {
                     HStack {
                         Image(systemName: "play.fill")
                         Text((progress?.currentTime ?? 0) > 0 ? "Resume listening" : "Start listening").fontWeight(.semibold)
                         Spacer()
                     }.padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
                 }.disabled(player.preparing).accessibilityIdentifier("play-book")
-                if let error = player.error, player.itemID == book.id { Text(error).font(.callout).foregroundColor(.red) }
+                if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
                 if let progress, (progress.currentTime ?? 0) > 0 {
                     VStack(alignment: .leading, spacing: 10) {
                         ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)

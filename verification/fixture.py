@@ -37,6 +37,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     progress = {('book-0', None): {'libraryItemId': 'book-0', 'episodeId': None, 'currentTime': 6, 'duration': 20, 'progress': 0.3, 'isFinished': False}, ('book-60', None): {'libraryItemId': 'book-60', 'episodeId': None, 'currentTime': 6, 'duration': 20, 'progress': 0.3, 'isFinished': False}}
     user['mediaProgress'] = list(progress.values())
     reports = []
+    local_sessions = {}
     login_outcomes = []
     requests = []
     configuration = {'mode': 'baseline', 'failed': False}
@@ -82,7 +83,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if path == '/status':
                 return self.respond(200, {'isInit': True, 'version': '2.30.0-fixture', 'authMethods': ['local'], 'language': 'en-us', 'serverSettings': {}})
             if path == '/__fixture__/observations':
-                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes})
+                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values())})
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
             if path == '/api/libraries':
@@ -115,6 +116,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 image = Path(__file__).resolve().parents[1] / 'static/book_placeholder.jpg'
                 return self.respond(200, image.read_bytes(), 'image/jpeg')
             if path in ('/audio/0', '/audio/1'):
+                if configuration['mode'] == 'broken-audio':
+                    return self.respond(503, {})
                 if configuration['mode'] == 'slow-audio':
                     time.sleep(2)
                 data = tracks[int(path[-1])]
@@ -157,14 +160,18 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(400, {})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'no-audio'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False)
                 items[0]['media']['metadata']['title'] = 'A Very Long Story Title About Finding Your Way Home Through A City Of Unexpected Doors And Forgotten Libraries' if mode == 'edge-metadata' else 'Stories for Tomorrow 01'
                 items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else 20
-                if mode in ('baseline', 'slow-audio', 'slow-session', 'no-audio'):
+                if mode in ('baseline', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress'):
                     reports.clear()
-                    progress[('book-0', None)].update(currentTime=6, duration=20, progress=0.3, isFinished=False)
+                    local_sessions.clear()
+                    progress[('book-0', None)].update(currentTime=6, duration=20, progress=0.3, isFinished=False, lastUpdate=0)
+                    user['mediaProgress'] = list(progress.values())
+                if mode == 'newer-remote':
+                    progress[('book-0', None)].update(currentTime=19, duration=20, progress=0.95, isFinished=False, lastUpdate=time.time() * 1000)
                     user['mediaProgress'] = list(progress.values())
                 return self.respond(200, {})
             if path == '/login':
@@ -179,6 +186,27 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'user': {**user, 'token': 'fresh', 'accessToken': 'fresh', 'refreshToken': 'refresh'}})
             if not self.authorized():
                 return self.respond(401, {})
+            if path == '/api/session/local-all':
+                if configuration['mode'] == 'offline-progress':
+                    return self.respond(503, {})
+                results = []
+                for record in data.get('sessions', []):
+                    key = (record['libraryItemId'], record.get('episodeId'))
+                    local_sessions[record['id']] = record.copy()
+                    current = progress.get(key, {})
+                    newer_remote = current.get('lastUpdate', 0) > record['updatedAt']
+                    if not newer_remote:
+                        duration = record['duration']
+                        position = record['currentTime']
+                        progress[key] = {'libraryItemId': key[0], 'episodeId': key[1], 'duration': duration, 'currentTime': position,
+                                         'progress': min(max(position / duration, 0), 1), 'isFinished': position >= duration, 'lastUpdate': record['updatedAt']}
+                    reports.append({'path': path, 'currentTime': record['currentTime'], 'timeListened': record['timeListening'], 'sessionId': record['id']})
+                    results.append({'id': record['id'], 'success': True, 'progressSynced': not newer_remote})
+                user['mediaProgress'] = list(progress.values())
+                if configuration['mode'] == 'lost-ack' and not configuration['failed']:
+                    configuration['failed'] = True
+                    return self.respond(503, {})
+                return self.respond(200, {'results': results})
             play = re.fullmatch(r'/api/items/(book-[0-9]+|podcast)/play(?:/(episode))?', path or '')
             if play:
                 if configuration['mode'] == 'slow-session':
@@ -204,7 +232,13 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, result)
             report = re.fullmatch(r'/api/session/([^/]+)/(sync|close)', path or '')
             if report and report.group(1) in sessions:
+                if configuration['mode'] == 'offline-progress':
+                    return self.respond(503, {})
+                if configuration['mode'] == 'slow-close' and report.group(2) == 'close':
+                    time.sleep(4)
                 session = sessions[report.group(1)]
+                if not data:
+                    return self.respond(200, {})
                 key = (session['libraryItemId'], session['episodeId'])
                 progress[key] = {'libraryItemId': key[0], 'episodeId': key[1], **data}
                 position = float(data.get('currentTime', 0))

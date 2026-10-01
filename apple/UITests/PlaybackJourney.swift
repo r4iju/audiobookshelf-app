@@ -1,6 +1,65 @@
 import XCTest
 
 @MainActor final class PlaybackJourney: NativeJourney {
+    func testPauseWhileReplacingSessionPreventsNewBookAutoplay() async throws {
+        try await FixtureControl.configure("slow-close")
+        addTeardownBlock { try await FixtureControl.configure("baseline") }
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs")
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        app.buttons["play-book"].tap()
+        XCTAssertTrue(app.buttons["mini-player"].waitForExistence(timeout: 10))
+        app.navigationBars.buttons["Audiobooks"].tap()
+        app.scrollViews["catalog"].swipeUp()
+        app.buttons["book-book-1"].tap()
+        XCTAssertTrue(app.buttons["play-book"].waitForExistence(timeout: 5))
+        app.buttons["play-book"].tap()
+        let pause = app.buttons["mini-pause-playback"]
+        XCTAssertTrue(pause.waitForExistence(timeout: 2))
+        guard pause.exists else { return }
+        pause.tap()
+        app.buttons["mini-player"].tap()
+        let settled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Paused"), object: app.staticTexts["playback-status"])
+        await fulfillment(of: [settled], timeout: 10)
+        try await Task.sleep(nanoseconds: 2_000_000_000)
+        XCTAssertEqual(app.staticTexts["playback-elapsed"].label, "6 sec")
+        XCTAssertTrue(app.buttons["resume-playback"].exists)
+    }
+
+    func testMediaHTTPFailureShowsErrorAndCanBeReopened() async throws {
+        try await FixtureControl.configure("broken-audio")
+        addTeardownBlock { try await FixtureControl.configure("baseline") }
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs")
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        app.buttons["play-book"].tap()
+        app.buttons["mini-player"].tap()
+        XCTAssertTrue(app.staticTexts["playback-error"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["resume-playback"].exists)
+        app.buttons["Done"].tap()
+        try await FixtureControl.configure("baseline")
+        app.buttons["play-book"].tap()
+        app.buttons["mini-player"].tap()
+        XCTAssertTrue(app.staticTexts["File 2 of 2"].waitForExistence(timeout: 12))
+        XCTAssertFalse(app.staticTexts["playback-error"].exists)
+    }
+
+    func testNaturalBookEndRetainsFinalPositionAndRestartsAtBeginning() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs")
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        app.buttons["play-book"].tap()
+        app.buttons["mini-player"].tap()
+        let finished = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "20 sec"), object: app.staticTexts["playback-elapsed"])
+        await fulfillment(of: [finished], timeout: 25)
+        XCTAssertTrue(app.buttons["resume-playback"].exists)
+        app.buttons["resume-playback"].tap()
+        XCTAssertTrue(app.staticTexts["File 1 of 2"].waitForExistence(timeout: 5))
+        let position = try await fixtureObservations().reports
+        XCTAssertTrue(position.contains { $0.currentTime == 20 && $0.timeListened > 0 })
+    }
+
     func testPauseDuringSessionPreparationPreventsAutoplay() async throws {
         try await FixtureControl.configure("slow-session")
         addTeardownBlock { try await FixtureControl.configure("baseline") }
@@ -71,6 +130,7 @@ import XCTest
         XCTAssertTrue(app.staticTexts["File 2 of 2"].waitForExistence(timeout: 12))
         app.buttons["pause-playback"].tap()
         XCTAssertTrue(app.buttons["resume-playback"].waitForExistence(timeout: 5))
+        capture("native-player")
         let requests = try await fixtureRequests()
         let media = requests.dropFirst(cursor)
         XCTAssertTrue(media.contains { $0.path == "/audio/0" })

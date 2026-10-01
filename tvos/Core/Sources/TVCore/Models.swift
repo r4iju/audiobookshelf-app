@@ -52,8 +52,11 @@ public struct Credentials: Codable, Sendable {
     public let server: String
     public let accessToken: String
     public let refreshToken: String?
-    public init(server: String, accessToken: String, refreshToken: String?) {
+    public let userID: String?
+    public let username: String?
+    public init(server: String, accessToken: String, refreshToken: String?, userID: String? = nil, username: String? = nil) {
         self.server = server; self.accessToken = accessToken; self.refreshToken = refreshToken
+        self.userID = userID; self.username = username
     }
 }
 
@@ -67,6 +70,8 @@ public struct AuthResponse: Decodable {
     public let user: AuthUser
 }
 public struct AuthUser: Decodable {
+    public let id: String?
+    public let username: String?
     public let token: String?
     public let accessToken: String?
     public let refreshToken: String?

@@ -26,6 +26,7 @@ import Combine
 
     func restore() async {
         guard api.credentials != nil else { return }
+        await playback.restoreListening()
         await openLibraries()
     }
 

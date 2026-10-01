@@ -7,7 +7,7 @@ struct PlaybackContainer<Content: View>: View {
     var body: some View {
         content.padding(.bottom, player.session == nil && !player.preparing ? 0 : 86)
             .overlay(miniPlayer, alignment: .bottom)
-            .sheet(isPresented: $expanded) { NowListening().environmentObject(player) }
+            .fullScreenCover(isPresented: $expanded) { NowListening().environmentObject(player) }
     }
     private var miniPlayer: some View {
         Group {

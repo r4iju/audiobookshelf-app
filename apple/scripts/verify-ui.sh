@@ -57,4 +57,4 @@ xcodegen generate --spec "$apple_root/project.yml"
 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative \
     -destination "platform=iOS Simulator,name=${ABS_QA_SIMULATOR:-Audiobookshelf Native QA}" \
     -derivedDataPath "$apple_root/build" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
-    IPHONEOS_DEPLOYMENT_TARGET=15.0 "$@" test
+    IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never "$@" test

@@ -32,10 +32,12 @@ import XCTest
         let firstBook = app.buttons["book-book-0"]
         XCTAssertTrue(firstBook.waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Continue listening"].exists)
+        capture("native-catalog")
         firstBook.tap()
         XCTAssertTrue(app.staticTexts["Narrated by QA Narrator"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Opening"].exists)
         XCTAssertTrue(app.staticTexts["Next chapter"].exists)
+        capture("native-book-details")
         app.navigationBars.buttons["Audiobooks"].tap()
         let lastBook = app.buttons["book-book-60"]
         for _ in 0..<20 {

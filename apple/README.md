@@ -29,10 +29,18 @@ Run the same journeys on a dedicated iPad simulator with `ABS_QA_SIMULATOR='Audi
 
 ## Playback
 
-The app and TV target share `Playback/ApplePlayback.swift`. One app-owned AVPlayer session survives catalog navigation and sheet dismissal. The mini-player and full player provide play/pause, whole-book scrubbing, 30-second skips, elapsed time and preparation/error status. Authenticated media URLs are validated against the connected server. File-relative positions are translated to complete-book positions, and natural track endings load the next file.
+The app and TV target share `Playback/ApplePlayback.swift`. One app-owned AVPlayer session survives catalog navigation and player dismissal. The mini-player and full-screen player provide play/pause, whole-book scrubbing, 30-second skips, elapsed time and preparation/error status. Authenticated media URLs are validated against the connected server. File-relative positions are translated to complete-book positions, and natural track endings load the next file.
 
 Pending seeks are serialized with the newest requested position retained. Play intent is separate from AVPlayer's observed playback state, so pausing during session or file preparation prevents autoplay. Failed media preparation stays visible; failed session close retains its progress rather than silently signing out.
 
 Production UI journeys use real synthetic WAV media and server request/progress observations. They cover file transitions while navigating, missing media, a replacement seek during slow file preparation, and pausing during a delayed session request. The missing-play action, dropped-seek race, preparation-pause gap and missing-media error were observed failing before their implementations or fixes.
 
-This preview is a delivery slice, not a replacement readiness claim. Durable progress across termination, offline storage, readers, preference/data migration and final physical-device acceptance remain tracked separately. Synthetic fixture coverage does not establish live-server or physical-device readiness.
+## Durable listening
+
+Listening positions and cumulative listening time are atomically persisted in the app's Application Support directory before publication. Each record has a stable session UUID and a canonical server/user identity; credentials stay in Keychain. Reopening the app recovers unsent records before requesting a new playback session. Acknowledgments retire only the revision actually sent, retaining listening recorded during a request. Unreadable data is preserved for recovery, and a disk-write failure pauses playback with an error.
+
+The server's `/api/session/local-all` endpoint accepts absolute listening totals for the same UUID, allowing an ambiguous acknowledgment to be retried without adding the same listening twice. This behavior was checked against the installed server's `PlaybackSessionManager` implementation. Ordinary stream `/sync` requests add deltas and are unsuitable for this retry path. Stream sessions close with an empty body; they do not repeat journal progress. A server response accepting history while preserving newer remote progress is a successful acknowledgment.
+
+Core tests reopen real files, isolate accounts, preserve newer revisions, recover terminated sessions and exercise failed writes. Native simulator journeys play actual WAV files, terminate the process while progress publication is unavailable, then restore it and observe server progress. iPhone and iPad restart-recovery journeys pass. These local fixtures do not establish physical-device acceptance or real-server multi-device acceptance.
+
+This preview is a delivery slice, not a replacement readiness claim. Offline media, readers, preference/data migration and final physical-device acceptance remain tracked separately. Synthetic fixture coverage does not establish live-server or physical-device readiness.

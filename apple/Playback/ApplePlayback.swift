@@ -9,13 +9,17 @@ import SwiftUI
     @Published private(set) var wantsPlayback = false
     @Published private(set) var preparing = false
     @Published private(set) var seeking = false
-    @Published var error: String?
+    @Published var error: String? { didSet { failureOrigin = .playback } }
+    private enum FailureOrigin { case playback, progress }
+    private var failureOrigin = FailureOrigin.playback
     @Published private(set) var needsSignIn = false
     @Published var speed: Float = 1
     @Published private(set) var title = ""
     @Published private(set) var author = ""
     @Published private(set) var itemID: String?
     private let api: APIClient
+    private let listening: ListeningSync
+    private var listeningID: String?
     private let player = AVPlayer()
     @Published private(set) var trackIndex = 0
     private struct SeekRequest {
@@ -30,10 +34,12 @@ import SwiftUI
     private var itemStatus: NSKeyValueObservation?
     private var controlStatus: NSKeyValueObservation?
     private var syncTask: Task<Void, Never>?
-    private var pendingListening: Double = 0
     private var lastTick = Date()
+    private var measuredPlayback = false
+    private var measuredSpeed: Float = 1
     private var lastSync = Date()
     private var generation = UUID()
+    private var closing = false
     private var commandTargets: [(MPRemoteCommand, Any)] = []
 
     private static var deviceKey: String {
@@ -46,12 +52,15 @@ import SwiftUI
 
     init(api: APIClient) {
         self.api = api
+        listening = ListeningSync(api: api)
         timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 600), queue: .main) { [weak self] time in
             Task { @MainActor in self?.tick(time) }
         }
         controlStatus = player.observe(\.timeControlStatus, options: [.new]) { [weak self] player, _ in
-            let active = player.timeControlStatus == .playing
-            Task { @MainActor in self?.playing = active }
+            Task { @MainActor in
+                guard let self else { return }
+                self.playing = self.player.timeControlStatus == .playing
+            }
         }
         let commands = MPRemoteCommandCenter.shared()
         commandTargets.append((commands.playCommand, commands.playCommand.addTarget { [weak self] _ in
@@ -73,35 +82,37 @@ import SwiftUI
     func start(item: LibraryItem, episode: Episode? = nil) async {
         guard !preparing, !seeking else { return }
         preparing = true
+        wantsPlayback = true
         error = nil
         defer { preparing = false }
         do {
-            try await stop()
-            wantsPlayback = true
+            try await closeCurrentSession()
+            let requestGeneration = generation
+            try await listening.flush()
+            guard requestGeneration == generation else { return }
             itemID = item.id
             title = episode?.title ?? item.title
             author = item.author
-            let audio = AVAudioSession.sharedInstance()
-            try audio.setCategory(.playback, mode: .spokenAudio)
-            try audio.setActive(true)
+            try await Self.activateAudioSession()
+            guard requestGeneration == generation else { return }
             let deviceID: String
             if let stored = UserDefaults.standard.string(forKey: Self.deviceKey) { deviceID = stored }
             else {
                 deviceID = UUID().uuidString
                 UserDefaults.standard.set(deviceID, forKey: Self.deviceKey)
             }
-            let requestGeneration = generation
             let result = try await api.play(itemID: item.id, episodeID: episode?.id, deviceID: deviceID)
             guard requestGeneration == generation else {
                 try await api.report(sessionID: result.id, report: ProgressReport(currentTime: result.currentTime, timeListened: 0, duration: result.duration), close: true)
                 return
             }
             session = result
+            currentTime = result.currentTime
             generation = UUID()
             itemID = item.id
             title = episode?.title ?? item.title
             author = item.author
-            pendingListening = 0
+            listeningID = try await listening.begin(media: ListeningMedia(item: item, episode: episode, session: result), deviceID: deviceID)
             lastTick = Date(); lastSync = Date()
             try await seek(to: result.currentTime, autoplay: wantsPlayback)
         } catch { wantsPlayback = false; failed(error) }
@@ -110,9 +121,10 @@ import SwiftUI
     func toggle() { if wantsPlayback { pause() } else { resume() } }
     func resume() {
         wantsPlayback = true
-        guard session != nil, !seeking else { return }
-        if let session, currentTime >= session.duration - 0.1 {
-            Task { do { try await seek(to: 0, autoplay: true) } catch { failed(error) } }
+        guard let session, !seeking, !closing, player.currentItem != nil else { return }
+        if currentTime >= session.duration - 0.1 || session.position(at: currentTime)?.trackIndex != trackIndex {
+            let target = currentTime >= session.duration - 0.1 ? 0 : currentTime
+            Task { do { try await seek(to: target, autoplay: wantsPlayback) } catch { failed(error) } }
         } else {
             lastTick = Date()
             player.playImmediately(atRate: speed)
@@ -128,6 +140,8 @@ import SwiftUI
         sync()
     }
     func changeSpeed() {
+        tick(player.currentTime())
+        measuredSpeed = speed
         if playing { player.rate = speed }
         updateNowPlaying()
     }
@@ -160,8 +174,11 @@ import SwiftUI
                 guard request.generation == generation else { throw CancellationError() }
                 if pendingSeek != nil { continue }
                 guard finished else { throw PlaybackFailure.seekFailed }
+                if let listeningID { try listening.record(id: listeningID, position: request.time, listened: 0) }
                 currentTime = request.time
                 lastTick = Date()
+                measuredPlayback = false
+                measuredSpeed = speed
             }
             if wantsPlayback { player.playImmediately(atRate: speed) }
             updateNowPlaying()
@@ -191,7 +208,7 @@ import SwiftUI
         if let failureObserver { NotificationCenter.default.removeObserver(failureObserver) }
         endObserver = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { [weak self] _ in
             Task { @MainActor in
-                guard self?.player.currentItem === item else { return }
+                guard self?.player.currentItem === item, self?.generation == requestGeneration else { return }
                 await self?.trackEnded()
             }
         }
@@ -217,10 +234,11 @@ import SwiftUI
         error = "Audio could not be played. Check the server connection, then reopen this item to retry."
     }
     private func trackEnded() async {
-        guard let session else { return }
+        guard let session, !closing, !seeking else { return }
         tick(player.currentTime())
         if trackIndex + 1 < session.audioTracks.count {
-            do { try await seek(to: session.audioTracks[trackIndex + 1].startOffset, autoplay: true) }
+            guard wantsPlayback else { return }
+            do { try await seek(to: session.audioTracks[trackIndex + 1].startOffset, autoplay: wantsPlayback) }
             catch { failed(error) }
         } else {
             currentTime = session.duration
@@ -235,26 +253,39 @@ import SwiftUI
         let now = Date()
         let elapsed = now.timeIntervalSince(lastTick)
         lastTick = now
-        guard let session, !seeking else { return }
+        guard let session, !seeking, !closing, player.currentItem != nil else { return }
         let time = player.currentTime()
-        if player.timeControlStatus == .playing { pendingListening += min(max(elapsed, 0), 2) }
-        if time.seconds.isFinite { currentTime = min(session.duration, session.audioTracks[trackIndex].startOffset + max(time.seconds, 0)) }
+        if time.seconds.isFinite {
+            let position = min(session.duration, session.audioTracks[trackIndex].startOffset + max(time.seconds, 0))
+            let active = player.timeControlStatus == .playing
+            let delta = active || measuredPlayback ? min(max(elapsed, 0), max((position - currentTime) / Double(measuredSpeed), 0)) : 0
+            measuredPlayback = active
+            do {
+                if let listeningID, abs(position - currentTime) > 0.001 || delta > 0 {
+                    try listening.record(id: listeningID, position: position, listened: delta)
+                }
+                currentTime = position
+            } catch {
+                player.pause()
+                playing = false
+                wantsPlayback = false
+                failed(error, prefix: "Listening could not be saved on this device: ")
+            }
+        }
         if now.timeIntervalSince(lastSync) >= 15 { sync() }
         updateNowPlaying()
     }
 
     func sync() {
-        guard syncTask == nil, let session else { return }
-        let sentListening = pendingListening
-        let report = ProgressReport(currentTime: currentTime, timeListened: sentListening, duration: session.duration)
+        guard syncTask == nil, !closing, session != nil else { return }
         lastSync = Date()
         syncTask = Task { @MainActor in
             defer { syncTask = nil }
             do {
-                try await api.report(sessionID: session.id, report: report)
-                pendingListening = max(0, pendingListening - sentListening)
+                try await listening.flush()
                 lastSync = Date()
-            } catch { failed(error, prefix: "Playback progress could not be saved: ") }
+                clearProgressFailure()
+            } catch { failed(error, prefix: "Playback progress could not be saved: ", origin: .progress) }
         }
     }
 
@@ -264,17 +295,33 @@ import SwiftUI
         sync()
     }
 
-    private func failed(_ failure: Error, prefix: String = "") {
+    func restoreListening() async {
+        do { try await listening.flush(); clearProgressFailure() }
+        catch { failed(error, prefix: "Saved listening is waiting to sync: ", origin: .progress) }
+    }
+
+    private func clearProgressFailure() {
+        if failureOrigin == .progress { error = nil }
+    }
+
+    private func failed(_ failure: Error, prefix: String = "", origin: FailureOrigin = .playback) {
         if failure is CancellationError { return }
         if failure as? APIError == .signInRequired { needsSignIn = true }
         error = prefix + failure.localizedDescription
+        failureOrigin = origin
     }
 
     func stop() async throws {
+        wantsPlayback = false
+        try await closeCurrentSession()
+    }
+
+    private func closeCurrentSession() async throws {
         tick(player.currentTime())
+        closing = true
+        defer { closing = false }
         generation = UUID()
         pendingSeek = nil
-        wantsPlayback = false
         seekLoop?.cancel()
         player.currentItem?.cancelPendingSeeks()
         if let seekLoop { _ = try? await seekLoop.value }
@@ -282,14 +329,27 @@ import SwiftUI
         playing = false
         if let syncTask { await syncTask.value }
         if let session {
-            let report = ProgressReport(currentTime: currentTime, timeListened: pendingListening, duration: session.duration)
-            // Do not discard the session or its unsent progress if closing it fails.
-            try await api.report(sessionID: session.id, report: report, close: true)
+            try await listening.flush()
+            try await api.closeStream(sessionID: session.id)
+            if let listeningID { try listening.finish(id: listeningID) }
         }
         generation = UUID()
         player.replaceCurrentItem(with: nil)
-        session = nil; itemID = nil; currentTime = 0; pendingListening = 0
+        session = nil; itemID = nil; currentTime = 0; listeningID = nil
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    }
+
+    nonisolated private static func activateAudioSession() async throws {
+        try await withCheckedThrowingContinuation { (completion: CheckedContinuation<Void, Error>) in
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    let audio = AVAudioSession.sharedInstance()
+                    try audio.setCategory(.playback, mode: .spokenAudio)
+                    try audio.setActive(true)
+                    completion.resume()
+                } catch { completion.resume(throwing: error) }
+            }
+        }
     }
 
     private func updateNowPlaying() {

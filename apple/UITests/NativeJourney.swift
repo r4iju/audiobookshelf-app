@@ -6,6 +6,13 @@ import XCTest
         super.tearDown()
     }
 
+    func capture(_ name: String) {
+        let evidence = XCTAttachment(screenshot: XCUIApplication().screenshot())
+        evidence.name = name
+        evidence.lifetime = .keepAlways
+        add(evidence)
+    }
+
     func connectSelectAndRestore(serverURL: String) {
         let app = XCUIApplication()
         app.launchArguments = ["--reset-preview-account"]
@@ -43,6 +50,12 @@ import XCTest
     struct Observations: Decodable {
         let requests: [ObservedRequest]
         let reports: [ProgressObservation]
+        let localSessions: [LocalSessionObservation]
+    }
+    struct LocalSessionObservation: Decodable {
+        let id: String
+        let currentTime: Double
+        let timeListening: Double
     }
     func fixtureRequests() async throws -> [ObservedRequest] {
         try await fixtureObservations().requests
