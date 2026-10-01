@@ -31,21 +31,29 @@ public enum LegacyArchive {
         try FileManager.default.createDirectory(at: files, withIntermediateDirectories: true)
 
         var exported = snapshot
-        exported.preferences = LegacyStorageAllowlist.preferences(snapshot.preferences)
-        exported.webStorage = LegacyStorageAllowlist.webStorage(snapshot.webStorage)
+        exported.preferences = LegacyStorageAllowlist.archivePreferences(snapshot.preferences)
+        exported.webStorage = LegacyStorageAllowlist.archiveWebStorage(snapshot.webStorage)
 
         // Reuse the migration's path validation so the archive never contains anything a migration
         // from Documents would refuse to read.
         let plan = MigrationPlan(source: LegacySource(kind: .inPlace, snapshot: exported, filesRoot: documents))
+        var unique: [String: PlannedFile] = [:]
+        for planned in plan.files.values { unique[planned.legacyPath] = planned }
+        let ordered = unique.values.sorted { $0.legacyPath < $1.legacyPath }
+        var report = LegacyArchiveProgress(completedFiles: 0, totalFiles: ordered.count, completedBytes: 0, totalBytes: ordered.reduce(0) { $0 + $1.size })
+        progress?(report)
         var digests: [String: String] = [:]
         var storedPaths: [String: String] = [:]
-        for planned in plan.files.values where digests[planned.legacyPath] == nil {
+        for planned in ordered {
             let stored = MigrationPlan.archivedPath(planned.legacyPath)
             storedPaths[planned.legacyPath] = stored
             let target = files.appendingPathComponent(stored)
             try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: planned.source, to: target)
             digests[planned.legacyPath] = try ContainedFile.digest(of: target, reading: LocalMigrationFileSystem()).sha256
+            report.completedFiles += 1
+            report.completedBytes += planned.size
+            progress?(report)
         }
 
         let manifest = try MigrationJSON.encoder.encode(Manifest(formatVersion: formatVersion, snapshot: exported, digests: digests, storedPaths: storedPaths))

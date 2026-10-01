@@ -57,10 +57,40 @@ public enum LegacyExportProgress: Equatable {
     case copyingFiles(LegacyArchiveProgress)
 }
 
+/// Runs inside the legacy app: writes a credential-free archive the user carries to a separately
+/// identified app (such as the native preview) through the Files app.
 public enum LegacyArchiveExporter {
+    /// - Parameters:
+    ///   - workDirectory: belongs to the exporter. It holds the database copy, which contains
+    ///     access tokens, and is removed before returning or throwing; copies left by an export the
+    ///     system interrupted are removed first.
+    ///   - copyRealm: writes a consistent copy of the open legacy Realm to the given URL, normally
+    ///     `Realm.writeCopy(toFile:)`. The copy is read, never the live database.
+    ///   - webStorage: WebView `localStorage` entries; only reader settings and location caches cross.
     @discardableResult
     public static func export(documents: URL, defaults: UserDefaults, webStorage: [String: String], workDirectory: URL, to destination: URL,
                               copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)? = nil) throws -> URL {
-        throw CocoaError(.featureUnsupported)
+        try? FileManager.default.removeItem(at: workDirectory)
+        defer { try? FileManager.default.removeItem(at: workDirectory) }
+        let databaseDirectory = workDirectory.appendingPathComponent("Database")
+        #if os(iOS)
+        let attributes: [FileAttributeKey: Any] = [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication]
+        #else
+        let attributes: [FileAttributeKey: Any] = [:]
+        #endif
+        try FileManager.default.createDirectory(at: databaseDirectory, withIntermediateDirectories: true, attributes: attributes)
+        let copy = databaseDirectory.appendingPathComponent("legacy.realm")
+
+        progress?(.copyingDatabase)
+        try copyRealm(copy)
+        progress?(.readingDatabase)
+        let contents = try LegacyRealmReader.read(realmAt: copy, workDirectory: workDirectory.appendingPathComponent("Reader"))
+        try? FileManager.default.removeItem(at: databaseDirectory)
+
+        var snapshot = contents.snapshot
+        snapshot.preferences = LegacyInstallation.capacitorPreferences(defaults)
+        snapshot.webStorage = webStorage
+        try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
+        return try LegacyArchive.write(snapshot, documents: documents, to: destination) { progress?(.copyingFiles($0)) }
     }
 }
