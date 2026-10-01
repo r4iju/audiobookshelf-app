@@ -72,7 +72,7 @@ struct NativeLanguageSettings: View {
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
         ShelfList {
-            Section(footer: Text(l10n("Native screens show these translations where the earlier app had an equivalent. Text without one, and system controls, stay in English or follow the device language.")).accessibilityIdentifier("language-coverage-note")) {
+            Section(footer: Text(l10n("Native screens show these translations where the earlier app had an equivalent. Text without one, and system controls, stay in English or follow the device language.")).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("language-coverage-note")) {
                 row(l10n("System default"), detail: NativeLanguage.resolve(saved: nil, preferred: Locale.preferredLanguages).name, selected: setting.saved == nil, id: "language-system") { setting.choose(nil) }
             }
             Section {
@@ -91,7 +91,7 @@ struct NativeLanguageSettings: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).foregroundColor(.primary)
-                    if let detail { Text(detail).font(.caption).foregroundColor(.secondary) }
+                    if let detail { Text(detail).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
                 }
                 Spacer()
                 if selected { Image(systemName: "checkmark").foregroundColor(ShelfStyle.accent).accessibilityIdentifier("language-selected-mark") }

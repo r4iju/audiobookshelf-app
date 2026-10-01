@@ -214,7 +214,7 @@ struct EPUBReader: View {
                 if let error = store.error ?? reading.savingError {
                     Text(error).font(.caption).foregroundColor(.red).padding(.horizontal).accessibilityIdentifier("reading-save-error")
                 } else if store.waitingForListening {
-                    Text(l10n("Passage saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(.secondary).padding(.horizontal)
+                    Text(l10n("Passage saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding(.horizontal)
                 }
             }.navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } } }

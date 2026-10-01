@@ -24,7 +24,7 @@ struct RelatedAuthorView: View {
                         if let image {
                             Image(uiImage: image).resizable().scaledToFill().accessibilityIdentifier("author-image")
                         } else {
-                            Image(systemName: "person.fill").font(.system(size: 40)).foregroundColor(.secondary)
+                            Image(systemName: "person.fill").font(.system(size: 40)).foregroundColor(ShelfStyle.secondaryText)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity).background(appearance.card)
                         }
                     }
@@ -32,13 +32,13 @@ struct RelatedAuthorView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(page.author?.name ?? name).font(.title2.weight(.semibold)).accessibilityIdentifier("author-name")
                         if page.books.total > 0 {
-                            Text(page.books.total == 1 ? l10n("1 title") : l10n("{0} titles", page.books.total)).font(.subheadline).foregroundColor(.secondary)
+                            Text(page.books.total == 1 ? l10n("1 title") : l10n("{0} titles", page.books.total)).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
                                 .accessibilityIdentifier("author-count")
                         }
                     }
                 }
                 if let bio = page.author?.description?.trimmingCharacters(in: .whitespacesAndNewlines), !bio.isEmpty {
-                    Text(bio).font(.callout).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
+                    Text(bio).font(.callout).foregroundColor(ShelfStyle.secondaryText).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("author-bio")
                 }
                 if let failure = page.failure {
@@ -51,8 +51,8 @@ struct RelatedAuthorView: View {
                             HStack {
                                 Text(series.name).foregroundColor(.primary)
                                 Spacer()
-                                if let books = series.books { Text("\(books.count)").foregroundColor(.secondary) }
-                                Image(systemName: "chevron.right").foregroundColor(.secondary)
+                                if let books = series.books { Text("\(books.count)").foregroundColor(ShelfStyle.secondaryText) }
+                                Image(systemName: "chevron.right").foregroundColor(ShelfStyle.secondaryText)
                             }.padding(18).background(appearance.card).cornerRadius(16)
                         }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("author-series." + series.id)
                     }
@@ -108,10 +108,10 @@ struct RelatedSeriesView: View {
             LazyVStack(alignment: .leading, spacing: 16) {
                 Text(page.series?.name ?? name).font(.title2.weight(.semibold)).accessibilityIdentifier("series-name")
                 if let summary = progressSummary {
-                    Text(summary).font(.subheadline).foregroundColor(.secondary).accessibilityIdentifier("series-progress")
+                    Text(summary).font(.subheadline).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("series-progress")
                 }
                 if let description = page.series?.description?.trimmingCharacters(in: .whitespacesAndNewlines), !description.isEmpty {
-                    Text(description).font(.callout).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
+                    Text(description).font(.callout).foregroundColor(ShelfStyle.secondaryText).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("series-description")
                 }
                 if let failure = page.failure {
@@ -120,7 +120,7 @@ struct RelatedSeriesView: View {
                 ForEach(page.books.items) { item in
                     VStack(alignment: .leading, spacing: 6) {
                         if let sequence = page.sequence(of: item) {
-                            Text(l10n("Book {0}", sequence)).font(.caption.weight(.semibold)).foregroundColor(.secondary)
+                            Text(l10n("Book {0}", sequence)).font(.caption.weight(.semibold)).foregroundColor(ShelfStyle.secondaryText)
                                 .accessibilityIdentifier("series-sequence." + item.id)
                         }
                         NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: nil)) {

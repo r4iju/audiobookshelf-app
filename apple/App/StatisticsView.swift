@@ -61,24 +61,24 @@ struct StatisticsView: View {
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load() } } }
             if let stats = store.stats {
                 NavigationLink(destination: YearReviewView(api: store.api)) { Text(l10n("Year in review")) }
-                Section(header: Text(l10n("Your listening"))) {
+                Section(header: Text(l10n("Your listening")).foregroundColor(ShelfStyle.secondaryText)) {
                     Text(l10n("{0} minutes listened", minutes(stats.totalTime))).font(.title2.bold())
                     Text(l10n("{0} days listened", stats.days.count))
                     Text(l10n(store.finished == 1 ? "{0} title finished" : "{0} titles finished", store.finished))
                 }
-                Section(header: Text(l10n("Minutes listened in the last 7 days"))) {
+                Section(header: Text(l10n("Minutes listened in the last 7 days")).foregroundColor(ShelfStyle.secondaryText)) {
                     ForEach(recentDays, id: \.date) { day in
                         dayRow(day).accessibilityElement(children: .ignore).accessibilityLabel(l10n("{0}, {1} minutes listened", day.date, minutes(day.time)))
                     }
                 }
-                Section(header: Text(l10n("Recent sessions"))) {
-                    if stats.recentSessions.isEmpty { Text(l10n("No listening sessions yet.")).foregroundColor(.secondary) }
+                Section(header: Text(l10n("Recent sessions")).foregroundColor(ShelfStyle.secondaryText)) {
+                    if stats.recentSessions.isEmpty { Text(l10n("No listening sessions yet.")).foregroundColor(ShelfStyle.secondaryText) }
                     ForEach(stats.recentSessions) { session in
                         VStack(alignment: .leading, spacing: 6) {
                             Text(session.mediaMetadata?.title ?? l10n("Unavailable title")).font(.headline)
-                            if let author = session.mediaMetadata?.authorName, !author.isEmpty { Text(author).foregroundColor(.secondary) }
+                            if let author = session.mediaMetadata?.authorName, !author.isEmpty { Text(author).foregroundColor(ShelfStyle.secondaryText) }
                             Text(l10n("{0} minutes listened", minutes(session.timeListening))).font(.caption)
-                            Text(Date(timeIntervalSince1970: session.updatedAt / 1000), style: .date).font(.caption).foregroundColor(.secondary)
+                            Text(Date(timeIntervalSince1970: session.updatedAt / 1000), style: .date).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         }.padding(.vertical, 6)
                     }
                 }

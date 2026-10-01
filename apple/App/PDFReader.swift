@@ -180,7 +180,7 @@ struct PDFReader: View {
                     }.padding(.horizontal).padding(.bottom, 8)
                     HStack {
                         Button(l10n("Rotate page")) { reading.rotate() }
-                        Text(l10n("Rotation {0}°", reading.displayedRotation)).font(.caption).foregroundColor(.secondary)
+                        Text(l10n("Rotation {0}°", reading.displayedRotation)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         Spacer()
                         Text(l10n("Continuous")).font(.caption)
                         Toggle(l10n("Continuous"), isOn: $reading.continuous).labelsHidden().accessibilityLabel(l10n("Continuous")).fixedSize()
@@ -196,7 +196,7 @@ struct PDFReader: View {
                         }.padding(.horizontal).padding(.bottom, 8)
                     }
                     if let error = reading.error ?? store.error ?? player.error { Text(error).font(.caption).foregroundColor(.red).padding(.horizontal) }
-                    else if store.waitingForListening { Text(l10n("Page saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(.secondary).padding(.horizontal) }
+                    else if store.waitingForListening { Text(l10n("Page saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding(.horizontal) }
                 } else if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding() }
                 else { ProgressView(l10n("Opening PDF…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
             }.background(appearance.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)

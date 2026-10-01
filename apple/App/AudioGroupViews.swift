@@ -129,11 +129,11 @@ struct AudioGroupList: View {
                 NavigationLink(destination: AudioGroupDetails(catalog: store.catalog, kind: store.kind, group: group)) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(group.name).font(.headline)
-                        Text(l10n("{0} titles", group.members.count)).font(.caption).foregroundColor(.secondary)
+                        Text(l10n("{0} titles", group.members.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                     }.padding(.vertical, 6)
                 }.accessibilityIdentifier("group-\(group.id)")
             }
-            if !store.loading, store.error == nil, store.groups.isEmpty { Text(l10n(store.kind.text("No collections yet.", "No playlists yet."))).foregroundColor(.secondary) }
+            if !store.loading, store.error == nil, store.groups.isEmpty { Text(l10n(store.kind.text("No collections yet.", "No playlists yet."))).foregroundColor(ShelfStyle.secondaryText) }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n(store.kind.title))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -173,15 +173,15 @@ struct AudioGroupDetails: View {
         let active = player.wantsPlayback && group.members.contains { $0.libraryItemId == player.itemID && $0.episodeId == player.episodeID }
         ShelfList {
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load(id: initial.id) } } }
-            if let description = group.description, !description.isEmpty { Text(description).foregroundColor(.secondary) }
+            if let description = group.description, !description.isEmpty { Text(description).foregroundColor(ShelfStyle.secondaryText) }
             Button(l10n(active ? store.kind.text("Pause collection", "Pause playlist") : store.kind.text("Play collection", "Play playlist"))) { NativeHaptic.impact("play"); Task { await store.play(group, player: player, downloads: downloads) } }
                 .disabled(store.loading || store.saving || store.starting || store.error != nil || player.preparing || !group.members.contains(where: \.playable))
             ForEach(group.members) { member in
                 if let item = member.libraryItem {
                     NavigationLink(destination: BookDetails(item: item, catalog: store.catalog, progress: store.user?.mediaProgress.first { $0.libraryItemId == item.id && $0.episodeId == member.episodeId }, episode: member.episode)) {
-                        VStack(alignment: .leading, spacing: 6) { Text(member.title).font(.headline); Text(item.author).font(.caption).foregroundColor(.secondary) }.padding(.vertical, 6)
+                        VStack(alignment: .leading, spacing: 6) { Text(member.title).font(.headline); Text(item.author).font(.caption).foregroundColor(ShelfStyle.secondaryText) }.padding(.vertical, 6)
                     }.accessibilityIdentifier("group-member-\(member.id)")
-                } else { Text(member.title).foregroundColor(.secondary) }
+                } else { Text(member.title).foregroundColor(ShelfStyle.secondaryText) }
             }
             if let error = player.error { Text(error).foregroundColor(.red) }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(group.name)
@@ -233,11 +233,11 @@ struct AudioGroupEditor: View {
     var body: some View {
         NavigationView {
             ShelfForm {
-                Section(header: Text(l10n("Details"))) {
+                Section(header: Text(l10n("Details")).foregroundColor(ShelfStyle.secondaryText)) {
                     TextField(l10n("Name"), text: $name).accessibilityIdentifier("group-name")
                     TextField(l10n("Description"), text: $description).accessibilityIdentifier("group-description")
                 }
-                Section(header: Text(l10n("Listening order"))) {
+                Section(header: Text(l10n("Listening order")).foregroundColor(ShelfStyle.secondaryText)) {
                     ForEach(members) { member in
                         HStack {
                             Text(member.title)
@@ -253,7 +253,7 @@ struct AudioGroupEditor: View {
                         }
                     }
                     Button(l10n("Choose titles")) { choosing = true }
-                    if store.kind == .playlist, group != nil, members.count == 1 { Text(l10n("To remove the last title, delete this playlist from its actions menu.")).font(.caption).foregroundColor(.secondary) }
+                    if store.kind == .playlist, group != nil, members.count == 1 { Text(l10n("To remove the last title, delete this playlist from its actions menu.")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
                 }
                 if let error = store.error { Text(error).foregroundColor(.red).accessibilityIdentifier("group-save-error") }
                 if store.saving { ProgressView(l10n("Saving changes…")) }

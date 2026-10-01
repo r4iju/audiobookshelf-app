@@ -85,17 +85,17 @@ struct NativeSettings: View {
         ShelfList {
             Section {
                 NavigationLink(destination: NativeLanguageSettings()) {
-                    HStack { Text(l10n("Language")); Spacer(); Text(l10n.language.name).foregroundColor(.secondary) }
+                    HStack { Text(l10n("Language")); Spacer(); Text(l10n.language.name).foregroundColor(ShelfStyle.secondaryText) }
                 }.accessibilityIdentifier("language-settings")
             }
-            Section(header: Text(l10n("Appearance"))) {
+            Section(header: Text(l10n("Appearance")).foregroundColor(ShelfStyle.secondaryText)) {
                 ForEach(NativeAppearance.allCases, id: \.self) { choice in
                     option(l10n(choice.name), selected: theme == choice.rawValue, id: "theme-" + choice.rawValue) {
                         theme = choice.rawValue; NativeHaptic.impact("settings")
                     }
                 }
             }
-            Section(header: Text(l10n("Haptic feedback")), footer: Text(l10n("Choose the feedback for playback controls and library actions."))) {
+            Section(header: Text(l10n("Haptic feedback")).foregroundColor(ShelfStyle.secondaryText), footer: Text(l10n("Choose the feedback for playback controls and library actions.")).foregroundColor(ShelfStyle.secondaryText)) {
                 ForEach(NativeHaptic.allCases, id: \.self) { choice in
                     option(l10n(choice.name), selected: haptic == choice.rawValue, id: "haptic-" + choice.rawValue) {
                         haptic = choice.rawValue; NativeHaptic.impact("settings")
@@ -127,7 +127,7 @@ struct NativeNetworkSettings: View {
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Network preferences"))
     }
     private func choices(_ title: String, key: String, selected: Binding<AppleNetworkPolicy>, id: String) -> some View {
-        Section(header: Text(title), footer: Text(l10n("Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions."))) {
+        Section(header: Text(title).foregroundColor(ShelfStyle.secondaryText), footer: Text(l10n("Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions.")).foregroundColor(ShelfStyle.secondaryText)) {
             ForEach(AppleNetworkPolicy.allCases, id: \.self) { choice in
                 Button {
                     NativeHaptic.impact("settings")

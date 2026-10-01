@@ -27,10 +27,10 @@ struct AddPodcast: View {
         NavigationView {
             ShelfForm {
                 if feed == nil {
-                    Section(header: Text(l10n("Discover a podcast"))) {
+                    Section(header: Text(l10n("Discover a podcast")).foregroundColor(ShelfStyle.secondaryText)) {
                         TextField(l10n("Podcast name"), text: $query).accessibilityIdentifier("podcast-discovery-query").disabled(busy)
                         Button(l10n("Search podcasts"), action: search).disabled(busy || !permitted || query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        if searchCompleted, results.isEmpty { Text(l10n("No podcasts found")).foregroundColor(.secondary) }
+                        if searchCompleted, results.isEmpty { Text(l10n("No podcasts found")).foregroundColor(ShelfStyle.secondaryText) }
                         ForEach(results) { result in
                             Button {
                                 guard let url = result.feedUrl else { return }
@@ -40,19 +40,19 @@ struct AddPodcast: View {
                             } label: {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(result.title)
-                                    if let author = result.artistName { Text(author).font(.caption).foregroundColor(.secondary) }
+                                    if let author = result.artistName { Text(author).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
                                 }
                             }.disabled(busy || result.feedUrl == nil).accessibilityIdentifier("podcast-discovery-\(result.id)")
                         }
                     }
                 }
-                Section(header: Text(l10n("Podcast feed"))) {
+                Section(header: Text(l10n("Podcast feed")).foregroundColor(ShelfStyle.secondaryText)) {
                     TextField(l10n("RSS feed URL"), text: $feedURL).keyboardType(.URL).autocapitalization(.none).disableAutocorrection(true)
                         .accessibilityIdentifier("podcast-feed-url").disabled(busy)
                     Button(l10n("Preview feed"), action: preview).disabled(busy || !permitted || feedURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
                 if feed != nil {
-                    Section(header: Text(l10n("Add to your library"))) {
+                    Section(header: Text(l10n("Add to your library")).foregroundColor(ShelfStyle.secondaryText)) {
                         TextField(l10n("Title"), text: $title).accessibilityIdentifier("podcast-title")
                         TextField(l10n("Author"), text: $author)
                         TextEditor(text: $description).frame(minHeight: 100).accessibilityLabel(l10n("Description"))
@@ -62,7 +62,7 @@ struct AddPodcast: View {
                         Toggle(l10n("Automatically download new episodes"), isOn: $autoDownload)
                         Button(l10n("Create podcast"), action: create).disabled(!permitted || busy || folders.isEmpty || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }.disabled(busy)
-                    if folders.isEmpty { Text(l10n("This library has no server folder. Add one in server settings before creating a podcast.")).foregroundColor(.secondary) }
+                    if folders.isEmpty { Text(l10n("This library has no server folder. Add one in server settings before creating a podcast.")).foregroundColor(ShelfStyle.secondaryText) }
                 }
                 if busy { ProgressView(l10n("Contacting your server…")) }
                 if let error { Text(error).foregroundColor(.red).accessibilityIdentifier("podcast-action-error") }
