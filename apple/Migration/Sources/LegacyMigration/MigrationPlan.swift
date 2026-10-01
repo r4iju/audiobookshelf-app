@@ -220,7 +220,7 @@ struct MigrationPlan {
             let cover = item.coverPath.flatMap { adopted[Self.fileKey(owner, $0)] }
             downloads.append(MigratedDownload(account: owner, legacyLocalItemID: item.id, libraryItemID: item.libraryItemId, mediaType: item.mediaType,
                                               title: item.title, author: item.author, cover: cover, tracks: tracks, chapters: item.chapters,
-                                              ebook: ebook, episodes: episodes, complete: complete))
+                                              ebook: ebook, episodes: episodes, files: [], legacyItem: item, complete: complete))
         }
 
         let itemsByID = Dictionary(snapshot.localItems.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -260,7 +260,7 @@ struct MigrationPlan {
                                         preferences: LegacyStorageAllowlist.preferences(snapshot.preferences),
                                         webStorage: LegacyStorageAllowlist.webStorage(snapshot.webStorage))
         return MigrationOutcome(formatVersion: MigrationOutcome.formatVersion, sourceKind: kind, sourceFingerprint: fingerprint,
-                                legacySchemaVersion: snapshot.schemaVersion, accounts: accounts, settings: settings, downloads: downloads,
+                                legacySchemaVersion: snapshot.schemaVersion, accounts: accounts, settings: settings, downloads: downloads, interruptedDownloads: [],
                                 progress: progress, pendingSessions: sessions, issues: issues)
     }
 

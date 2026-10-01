@@ -55,6 +55,7 @@ final class LegacyRealmExportTests: XCTestCase {
         let pdfSize = try write("li-book/companion.pdf", "%PDF-legacy")
         _ = try write("li-book/cover.jpg", "legacy-cover")
         let episodeSize = try write("li-pod/ep.mp3", "legacy-episode")
+        let partSize = try write("li-next/01.mp3", "finished-part")
 
         let configuration = Realm.Configuration(fileURL: realmURL, schemaVersion: schemaVersion, objectTypes: LegacyRealmSchema.objectTypes)
         try autoreleasepool {
@@ -113,7 +114,19 @@ final class LegacyRealmExportTests: XCTestCase {
                 let metadata = LegacyRealmMetadata()
                 metadata.title = "Legacy Book"
                 metadata.authorName = "Legacy Author"
+                metadata.subtitle = "A Subtitle"
+                metadata.narrators.append("Legacy Narrator")
+                metadata.seriesName = "Legacy Series #2"
+                metadata.desc = "Legacy description"
+                metadata.genres.append("Fiction")
+                let author = LegacyRealmAuthor()
+                author.id = "author-1"
+                author.name = "Legacy Author"
+                metadata.authors.append(author)
                 media.metadata = metadata
+                media.tags.append("favourite")
+                media.duration = 321
+                book.isInvalid = true
                 let track = LegacyRealmAudioTrack()
                 track.index = 1
                 track.startOffset = 0
@@ -156,6 +169,11 @@ final class LegacyRealmExportTests: XCTestCase {
                 episode.id = "ep-7"
                 episode.title = "Episode Seven"
                 episode.duration = 90
+                episode.index = 7
+                episode.episode = "7"
+                episode.episodeType = "full"
+                episode.desc = "Episode description"
+                episode.size = 1234
                 let episodeTrack = LegacyRealmAudioTrack()
                 episodeTrack.duration = 90
                 episodeTrack.mimeType = "audio/mpeg"
@@ -212,6 +230,16 @@ final class LegacyRealmExportTests: XCTestCase {
                 session.serverAddress = "https://books.example.test/abs"
                 session.isActiveSession = false
                 session.serverUpdatedAt = 1_759_300_000_000
+                session.coverPath = "li-book/cover.jpg"
+                let sessionChapter = LegacyRealmChapter()
+                sessionChapter.id = 0
+                sessionChapter.end = 321
+                sessionChapter.title = "Only Chapter"
+                session.chapters.append(sessionChapter)
+                let sessionMetadata = LegacyRealmMetadata()
+                sessionMetadata.title = "Legacy Book"
+                sessionMetadata.narratorName = "Legacy Narrator"
+                session.mediaMetadata = sessionMetadata
                 realm.add(session)
 
                 let download = LegacyRealmDownloadItem()
@@ -227,6 +255,14 @@ final class LegacyRealmExportTests: XCTestCase {
                     part.downloadItemId = "download-1"
                     part.completed = index == 0
                     part.moved = index == 0
+                    part.filename = "0\(index + 1).mp3"
+                    part.destinationUri = "li-next/0\(index + 1).mp3"
+                    part.fileSize = Double(index == 0 ? partSize : 1000)
+                    part.uri = "https://books.example.test/abs/api/items/li-next/file/\(index)?token=\(Self.accessToken)"
+                    let partTrack = LegacyRealmAudioTrack()
+                    partTrack.index = index + 1
+                    partTrack.mimeType = "audio/mpeg"
+                    part.audioTrack = partTrack
                     download.downloadItemParts.append(part)
                 }
                 realm.add(download)
@@ -298,6 +334,43 @@ final class LegacyRealmExportTests: XCTestCase {
         _ = try LegacyRealmReader.read(realmAt: realmURL, workDirectory: work)
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: stale.path))
+    }
+
+    func testEveryPreservedLegacyFieldIsReadButNeverTheTokenizedDownloadURL() throws {
+        try seedLegacyRealm()
+
+        let snapshot = try LegacyRealmReader.read(realmAt: realmURL, workDirectory: directory.appendingPathComponent("Work")).snapshot
+
+        let book = try XCTUnwrap(snapshot.localItems.first { $0.id == "local_book" })
+        XCTAssertTrue(book.isInvalid)
+        XCTAssertEqual(book.basePath, "")
+        XCTAssertEqual(book.metadata?.subtitle, "A Subtitle")
+        XCTAssertEqual(book.metadata?.narrators, ["Legacy Narrator"])
+        XCTAssertEqual(book.metadata?.seriesName, "Legacy Series #2")
+        XCTAssertEqual(book.metadata?.description, "Legacy description")
+        XCTAssertEqual(book.metadata?.genres, ["Fiction"])
+        XCTAssertEqual(book.metadata?.authors, [LegacyAuthor(id: "author-1", name: "Legacy Author")])
+        XCTAssertEqual(book.tags, ["favourite"])
+        XCTAssertEqual(book.mediaDuration, 321)
+        let episode = try XCTUnwrap(snapshot.localItems.first { $0.id == "local_pod" }?.episodes.first)
+        XCTAssertEqual(episode.index, 7)
+        XCTAssertEqual(episode.episode, "7")
+        XCTAssertEqual(episode.episodeType, "full")
+        XCTAssertEqual(episode.description, "Episode description")
+        XCTAssertEqual(episode.size, 1234)
+        let session = try XCTUnwrap(snapshot.sessions.first)
+        XCTAssertEqual(session.chapters.map(\.title), ["Only Chapter"])
+        XCTAssertEqual(session.mediaMetadata?.narratorName, "Legacy Narrator")
+        XCTAssertEqual(session.coverPath, "li-book/cover.jpg")
+        let download = try XCTUnwrap(snapshot.pendingDownloads.first)
+        XCTAssertEqual(download.parts.map(\.path), ["li-next/01.mp3", "li-next/02.mp3", "li-next/03.mp3"])
+        XCTAssertEqual(download.parts.map(\.moved), [true, false, false])
+        XCTAssertEqual(download.parts.first?.role, .track)
+        XCTAssertEqual(download.parts.first?.trackIndex, 1)
+        XCTAssertEqual(download.parts.first?.size, 13)
+
+        let encoded = String(decoding: try JSONEncoder().encode(snapshot), as: UTF8.self)
+        XCTAssertFalse(encoded.contains(Self.accessToken), "the part download URL carries the access token and must not be read")
     }
 
     func testANewerLegacySchemaIsRefusedAndKept() throws {

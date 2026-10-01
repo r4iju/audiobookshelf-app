@@ -8,6 +8,9 @@ public enum LegacyMigrationError: Error, Equatable {
     case archiveIncomplete
     case archiveUnreadable(String)
     case legacyDatabaseUnreadable(String)
+    /// The committed migration no longer matches its record (adopted files missing or changed, or
+    /// journal and outcome disagree). Run `migrate` with the legacy source again to repair it.
+    case committedMigrationDamaged
 }
 
 public struct MigrationPreflight: Equatable {

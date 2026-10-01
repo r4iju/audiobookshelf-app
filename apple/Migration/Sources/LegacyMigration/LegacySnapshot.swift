@@ -46,8 +46,14 @@ public struct LegacyPendingDownload: Codable, Equatable {
     public var serverUserId: String?
     public var completedParts: Int
     public var totalParts: Int
+    public var mediaType: String?
+    /// Parts already finished and moved into Documents are real downloaded files that no
+    /// `LocalLibraryItem` references yet.
+    public var parts: [LegacyDownloadPart]
 
-    public init(id: String, libraryItemId: String?, episodeId: String?, title: String?, serverConnectionConfigId: String?, serverAddress: String?, serverUserId: String?, completedParts: Int, totalParts: Int) {
+    public init(id: String, libraryItemId: String?, episodeId: String?, title: String?, serverConnectionConfigId: String?, serverAddress: String?, serverUserId: String?, completedParts: Int, totalParts: Int, mediaType: String? = nil, parts: [LegacyDownloadPart] = []) {
+        self.mediaType = mediaType
+        self.parts = parts
         self.id = id
         self.libraryItemId = libraryItemId
         self.episodeId = episodeId
@@ -57,6 +63,78 @@ public struct LegacyPendingDownload: Codable, Equatable {
         self.serverUserId = serverUserId
         self.completedParts = completedParts
         self.totalParts = totalParts
+    }
+}
+
+/// `DownloadItemPart` without its `uri`, which embeds the access token as a query parameter.
+public struct LegacyDownloadPart: Codable, Equatable {
+    public enum Role: String, Codable {
+        case track, episode, ebook, cover, other
+    }
+
+    public var id: String
+    public var filename: String?
+    /// Legacy `destinationUri`, relative to Documents.
+    public var path: String?
+    public var size: Int
+    public var completed: Bool
+    public var moved: Bool
+    public var failed: Bool
+    public var role: Role
+    public var trackIndex: Int?
+    public var episodeId: String?
+    public var ebookFormat: String?
+
+    public init(id: String, filename: String?, path: String?, size: Int, completed: Bool, moved: Bool, failed: Bool = false, role: Role, trackIndex: Int? = nil, episodeId: String? = nil, ebookFormat: String? = nil) {
+        self.id = id
+        self.filename = filename
+        self.path = path
+        self.size = size
+        self.completed = completed
+        self.moved = moved
+        self.failed = failed
+        self.role = role
+        self.trackIndex = trackIndex
+        self.episodeId = episodeId
+        self.ebookFormat = ebookFormat
+    }
+}
+
+public struct LegacyAuthor: Codable, Equatable {
+    public var id: String
+    public var name: String
+
+    public init(id: String, name: String) {
+        self.id = id
+        self.name = name
+    }
+}
+
+/// The legacy `Metadata` embedded object, kept whole so offline display and later reconciliation
+/// do not depend on the server.
+public struct LegacyMediaMetadata: Codable, Equatable {
+    public var title: String
+    public var subtitle: String?
+    public var authors: [LegacyAuthor] = []
+    public var author: String?
+    public var narrators: [String] = []
+    public var genres: [String] = []
+    public var publishedYear: String?
+    public var publishedDate: String?
+    public var publisher: String?
+    public var description: String?
+    public var isbn: String?
+    public var asin: String?
+    public var language: String?
+    public var explicit = false
+    public var authorName: String?
+    public var authorNameLF: String?
+    public var narratorName: String?
+    public var seriesName: String?
+    public var feedUrl: String?
+
+    public init(title: String) {
+        self.title = title
     }
 }
 
@@ -133,8 +211,10 @@ public struct LegacyTrack: Codable, Equatable {
     public var duration: Double
     public var mimeType: String
     public var contentUrl: String?
+    public var serverIndex: Int?
 
-    public init(index: Int?, localFileId: String?, title: String? = nil, startOffset: Double, duration: Double, mimeType: String, contentUrl: String? = nil) {
+    public init(index: Int?, localFileId: String?, title: String? = nil, startOffset: Double, duration: Double, mimeType: String, contentUrl: String? = nil, serverIndex: Int? = nil) {
+        self.serverIndex = serverIndex
         self.index = index
         self.localFileId = localFileId
         self.title = title
@@ -180,8 +260,20 @@ public struct LegacyEpisode: Codable, Equatable {
     public var duration: Double?
     public var track: LegacyTrack?
     public var chapters: [LegacyChapter]
+    public var index: Int?
+    public var episode: String?
+    public var episodeType: String?
+    public var subtitle: String?
+    public var description: String?
+    public var size: Int?
 
-    public init(id: String, title: String, duration: Double?, track: LegacyTrack?, chapters: [LegacyChapter] = []) {
+    public init(id: String, title: String, duration: Double?, track: LegacyTrack?, chapters: [LegacyChapter] = [], index: Int? = nil, episode: String? = nil, episodeType: String? = nil, subtitle: String? = nil, description: String? = nil, size: Int? = nil) {
+        self.index = index
+        self.episode = episode
+        self.episodeType = episodeType
+        self.subtitle = subtitle
+        self.description = description
+        self.size = size
         self.id = id
         self.title = title
         self.duration = duration
@@ -206,8 +298,23 @@ public struct LegacyLocalItem: Codable, Equatable {
     public var chapters: [LegacyChapter]
     public var ebook: LegacyEbook?
     public var episodes: [LegacyEpisode]
+    /// The legacy app marked the item unusable; kept as it was.
+    public var isInvalid: Bool
+    public var basePath: String?
+    public var metadata: LegacyMediaMetadata?
+    public var tags: [String]
+    public var mediaDuration: Double?
+    public var mediaSize: Int?
+    public var autoDownloadEpisodes: Bool?
 
-    public init(id: String, libraryItemId: String?, mediaType: String, serverConnectionConfigId: String?, serverAddress: String?, serverUserId: String?, title: String, author: String? = nil, coverPath: String? = nil, files: [LegacyLocalFile], tracks: [LegacyTrack] = [], chapters: [LegacyChapter] = [], ebook: LegacyEbook? = nil, episodes: [LegacyEpisode] = []) {
+    public init(id: String, libraryItemId: String?, mediaType: String, serverConnectionConfigId: String?, serverAddress: String?, serverUserId: String?, title: String, author: String? = nil, coverPath: String? = nil, files: [LegacyLocalFile], tracks: [LegacyTrack] = [], chapters: [LegacyChapter] = [], ebook: LegacyEbook? = nil, episodes: [LegacyEpisode] = [], isInvalid: Bool = false, basePath: String? = nil, metadata: LegacyMediaMetadata? = nil, tags: [String] = [], mediaDuration: Double? = nil, mediaSize: Int? = nil, autoDownloadEpisodes: Bool? = nil) {
+        self.isInvalid = isInvalid
+        self.basePath = basePath
+        self.metadata = metadata
+        self.tags = tags
+        self.mediaDuration = mediaDuration
+        self.mediaSize = mediaSize
+        self.autoDownloadEpisodes = autoDownloadEpisodes
         self.id = id
         self.libraryItemId = libraryItemId
         self.mediaType = mediaType
@@ -287,8 +394,14 @@ public struct LegacySession: Codable, Equatable {
     public var serverAddress: String?
     public var isActiveSession: Bool
     public var serverUpdatedAt: Double
+    public var chapters: [LegacyChapter]
+    public var mediaMetadata: LegacyMediaMetadata?
+    public var coverPath: String?
 
-    public init(id: String, userId: String?, libraryItemId: String?, episodeId: String? = nil, localLibraryItemId: String?, mediaType: String, displayTitle: String? = nil, displayAuthor: String? = nil, duration: Double, playMethod: Int, startedAt: Double?, updatedAt: Double?, timeListening: Double, currentTime: Double, serverConnectionConfigId: String?, serverAddress: String?, isActiveSession: Bool, serverUpdatedAt: Double = 0) {
+    public init(id: String, userId: String?, libraryItemId: String?, episodeId: String? = nil, localLibraryItemId: String?, mediaType: String, displayTitle: String? = nil, displayAuthor: String? = nil, duration: Double, playMethod: Int, startedAt: Double?, updatedAt: Double?, timeListening: Double, currentTime: Double, serverConnectionConfigId: String?, serverAddress: String?, isActiveSession: Bool, serverUpdatedAt: Double = 0, chapters: [LegacyChapter] = [], mediaMetadata: LegacyMediaMetadata? = nil, coverPath: String? = nil) {
+        self.chapters = chapters
+        self.mediaMetadata = mediaMetadata
+        self.coverPath = coverPath
         self.id = id
         self.userId = userId
         self.libraryItemId = libraryItemId

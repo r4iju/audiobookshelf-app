@@ -96,6 +96,28 @@ public struct MigratedEpisode: Codable, Equatable {
     public var chapters: [LegacyChapter]
 }
 
+/// One legacy file of a downloaded item with what it was for. Every `LocalFile` of the item is
+/// listed, adopted or not, so nothing the legacy item held disappears from the outcome.
+public struct MigratedItemFile: Codable, Equatable {
+    public enum Role: String, Codable {
+        case track, episodeTrack, ebook, cover
+        /// Retained by the legacy item without a track, episode, ebook or cover pointing at it
+        /// (supplementary PDFs and other kept files).
+        case supplementary
+    }
+
+    public var role: Role
+    public var trackIndex: Int?
+    public var episodeID: String?
+    public var legacyFileID: String
+    public var legacyPath: String
+    public var filename: String?
+    public var mimeType: String?
+    public var recordedSize: Int
+    /// Nil when the file could not be adopted; the matching issue explains why.
+    public var file: MigratedFile?
+}
+
 public struct MigratedDownload: Codable, Equatable {
     /// Nil when the legacy item recorded no resolvable account; such data is kept and reported.
     public var account: MigrationAccount?
@@ -109,8 +131,28 @@ public struct MigratedDownload: Codable, Equatable {
     public var chapters: [LegacyChapter]
     public var ebook: MigratedEbook?
     public var episodes: [MigratedEpisode]
-    /// Every referenced legacy file was verified and adopted.
+    public var files: [MigratedItemFile]
+    /// The credential-free legacy record, unchanged, including metadata not interpreted here.
+    public var legacyItem: LegacyLocalItem
+    /// Every legacy file of the item was verified and adopted.
     public var complete: Bool
+}
+
+/// A download the upgrade interrupted. Parts that had finished are adopted so they need not be
+/// downloaded again.
+public struct MigratedInterruptedDownload: Codable, Equatable {
+    public struct Part: Codable, Equatable {
+        public var part: LegacyDownloadPart
+        public var file: MigratedFile?
+    }
+
+    public var account: MigrationAccount?
+    public var legacyDownloadID: String
+    public var libraryItemID: String?
+    public var episodeID: String?
+    public var title: String?
+    public var mediaType: String?
+    public var parts: [Part]
 }
 
 /// A saved reader location, interpreted by format but always carrying the untouched legacy value.
@@ -198,6 +240,7 @@ public struct MigrationOutcome: Codable, Equatable {
     public var accounts: [MigratedAccount]
     public var settings: MigratedSettings
     public var downloads: [MigratedDownload]
+    public var interruptedDownloads: [MigratedInterruptedDownload]
     public var progress: [MigratedProgress]
     public var pendingSessions: [MigratedSession]
     public var issues: [MigrationIssue]
