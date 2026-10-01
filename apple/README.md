@@ -15,7 +15,7 @@ Create the dedicated simulator with `xcrun simctl create 'Audiobookshelf Native 
 
 No replacement in-memory credential store is used by the app or UI journey.
 
-Packaging reuses Xcode's local dependency cache. Use `ABS_CLEAN_BUILD=1 ./apple/scripts/deploy.sh --build-only` when a fresh rebuild is needed. Focused feature journeys reuse the sign-in helper without an extra process restart; authentication journeys and explicit persistence scenarios retain their restart checks.
+Packaging reuses Xcode's local dependency cache and automatically retries a clean local build if strict signature verification rejects cached resources. Both the built app and copied IPA payload must pass signature verification. Use `ABS_CLEAN_BUILD=1 ./apple/scripts/deploy.sh --build-only` when a fresh rebuild is needed. Focused feature journeys reuse the sign-in helper without an extra process restart; authentication journeys and explicit persistence scenarios retain their restart checks.
 
 The provisioning helper uses the existing developer certificate and App Store Connect signing key to register the internal preview and devices. Signing, compilation, packaging and installation execute on the Studio; there is no hosted build or public release. The resulting internal IPA is `apple/build-release/AudiobookshelfNative.ipa`.
 

@@ -15,15 +15,25 @@ apple_profile="$(python3 "$repo_root/tvos/scripts/provision.py" "${profile_args[
 xcodegen generate --spec "$apple_root/project.yml"
 apple_actions=(build)
 if [[ "${ABS_CLEAN_BUILD:-0}" == '1' ]]; then apple_actions=(clean build); fi
+apple_build() {
 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" \
     -scheme AudiobookshelfNative -configuration Release -destination 'generic/platform=iOS' \
     -derivedDataPath "$apple_root/build-release" IPHONEOS_DEPLOYMENT_TARGET=15.0 \
     CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Development' \
-    PROVISIONING_PROFILE_SPECIFIER="$apple_profile" "${apple_actions[@]}"
+    PROVISIONING_PROFILE_SPECIFIER="$apple_profile" "$@"
+}
+apple_build "${apple_actions[@]}"
 apple_app="$apple_root/build-release/Build/Products/Release-iphoneos/AudiobookshelfNative.app"
-codesign --verify --deep --strict "$apple_app"
+if ! codesign --verify --deep --strict "$apple_app"; then
+    if [[ "${ABS_CLEAN_BUILD:-0}" == '1' ]]; then exit 1; fi
+    echo 'Cached signature resources failed verification; rebuilding locally.'
+    apple_build clean build
+    codesign --verify --deep --strict "$apple_app"
+fi
 mkdir -p "$apple_root/build-release/package/Payload"
+rm -rf "$apple_root/build-release/package/Payload/AudiobookshelfNative.app"
 ditto "$apple_app" "$apple_root/build-release/package/Payload/AudiobookshelfNative.app"
+codesign --verify --deep --strict "$apple_root/build-release/package/Payload/AudiobookshelfNative.app"
 (cd "$apple_root/build-release/package" && ditto -c -k --keepParent Payload ../AudiobookshelfNative.ipa)
 if [[ "$apple_target" == '--build-only' ]]; then
     echo "Signed internal preview: $apple_app"
