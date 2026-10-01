@@ -228,6 +228,10 @@ private fun ChapterRow(index: Int, chapter: Chapter, current: Boolean, onClick: 
 fun MiniPlayer(onOpen: () -> Unit) {
     val engine = LocalContext.current.graph.playback
     val state by engine.state.collectAsState()
+    if (state.unsavedListening && (state.now == null || state.error == null)) Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
+        Text("Some listening is not saved on this device yet. It is kept and saved as soon as storage allows.",
+            style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).testTag("listening-unsaved"))
+    }
     val now = state.now ?: return
     Surface(tonalElevation = 3.dp, modifier = Modifier.fillMaxWidth()) {
         Column {

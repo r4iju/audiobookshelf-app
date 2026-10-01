@@ -24,7 +24,7 @@ data class CatalogQuery(val sort: String = "media.metadata.title", val descendin
  * Catalog for the active account. Each library switch or query change starts a new generation;
  * responses from an older generation are dropped so results never leak between libraries.
  */
-class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, private val accounts: AccountStore, savedLibraryId: String?, initialQuery: CatalogQuery) {
+class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, private val accounts: AccountStore, savedLibraryId: String?, initialQuery: CatalogQuery, private val report: Report = { _, _, _ -> }) {
     var libraries by mutableStateOf<List<Library>>(emptyList()); private set
     var library by mutableStateOf<Library?>(null); private set
     var shelves by mutableStateOf<List<PersonalizedShelf>>(emptyList()); private set
@@ -152,6 +152,7 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
 
     private fun fail(failure: Throwable) {
         Log.w("AbsCatalog", "Catalog load failed", failure)
+        report(Diagnostics.Area.CONNECTION, "The library could not be loaded from ${client.account.server}", failure)
         loading = false
         error = failure.message ?: "Something went wrong."
         accounts.handle(failure)

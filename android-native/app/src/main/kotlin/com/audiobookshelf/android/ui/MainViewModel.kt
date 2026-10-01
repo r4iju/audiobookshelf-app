@@ -82,7 +82,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (existing != null && existing.client === active.client) return existing
         stack.clear(); retained.clear(); tab.value = Tab.Library
         val settings = graph.settings.current
-        return CatalogModel(viewModelScope, active.client, graph.accounts, active.connection.libraryId, CatalogQuery(settings.catalogSort, settings.catalogDescending))
+        return CatalogModel(viewModelScope, active.client, graph.accounts, active.connection.libraryId, CatalogQuery(settings.catalogSort, settings.catalogDescending), graph.diagnostics::record)
             .also { catalog = it; it.reload() }
     }
 }

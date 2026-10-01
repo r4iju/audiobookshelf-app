@@ -4,6 +4,7 @@ import com.audiobookshelf.core.AbsJson
 import com.audiobookshelf.core.AccountIdentity
 import com.audiobookshelf.core.AudioTrack
 import com.audiobookshelf.core.Chapter
+import com.audiobookshelf.core.writeAtomically
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
@@ -62,11 +63,9 @@ class DownloadStore(private val file: File) {
 
     @Synchronized fun remove(id: String) = save(state.value.filterNot { it.id == id })
 
+    /** Records are published only once they are on disk; a refused replacement leaves the previous manifest in place. */
     private fun save(next: List<Record>) {
-        val temporary = File(file.path + ".tmp")
-        file.parentFile?.mkdirs()
-        temporary.writeText(AbsJson.encodeToString(Document.serializer(), Document(records = next)))
-        if (!temporary.renameTo(file)) { file.delete(); temporary.renameTo(file) }
+        writeAtomically(file, AbsJson.encodeToString(Document.serializer(), Document(records = next)).toByteArray())
         state.value = next
     }
 

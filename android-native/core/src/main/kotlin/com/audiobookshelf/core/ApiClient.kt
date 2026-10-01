@@ -160,6 +160,13 @@ class ApiClient(
 
     suspend fun removeProgress(progressId: String) { raw("api/me/progress/$progressId", "DELETE", null) }
 
+    /** The account's progress for one item, or null when the server has none. */
+    suspend fun progress(itemId: String, episodeId: String?): MediaProgress? = try {
+        get("api/me/progress/$itemId" + (episodeId?.let { "/$it" } ?: ""), MediaProgress.serializer())
+    } catch (error: ApiError.Http) {
+        if (error.status == 404) null else throw error
+    }
+
     suspend fun saveEbookProgress(itemId: String, location: String, progress: Double) {
         raw("api/me/progress/$itemId", "PATCH", buildJsonObject { put("ebookLocation", location); put("ebookProgress", progress) })
     }

@@ -74,6 +74,7 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
             Downloads.Request.NoAudio -> "This item has no audio to download."
             Downloads.Request.NeedsCellularConsent -> { askCellular = true; null }
             is Downloads.Request.NoSpace -> "Not enough free space on this device for ${formatBytes(result.needed)} while keeping storage free for the system."
+            Downloads.Request.NotSaved -> NOT_SAVED
         }
     }
 
@@ -88,7 +89,7 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
                     Text(record.error ?: if (fraction != null) "Downloading ${(fraction * 100).toInt()}%" else "Downloading…", style = MaterialTheme.typography.bodyMedium)
                     if (fraction != null) LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth()) else LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
-                IconButton(onClick = { graph.downloads.delete(record.id) }, modifier = Modifier.testTag("download-cancel")) { Icon(Icons.Outlined.Close, "Cancel download") }
+                IconButton(onClick = { if (!graph.downloads.delete(record.id)) message = NOT_SAVED }, modifier = Modifier.testTag("download-cancel")) { Icon(Icons.Outlined.Close, "Cancel download") }
             }
             DownloadStore.State.COMPLETE -> Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.CheckCircle, null, tint = MaterialTheme.colorScheme.primary)
@@ -98,8 +99,8 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
             DownloadStore.State.FAILED -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(record.error ?: "The download failed.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("download-error"))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { graph.downloads.retry(record.id) }, modifier = Modifier.testTag("download-retry")) { Icon(Icons.Outlined.Refresh, null); Text("Retry", Modifier.padding(start = 6.dp)) }
-                    TextButton(onClick = { graph.downloads.delete(record.id) }) { Text("Discard") }
+                    OutlinedButton(onClick = { if (!graph.downloads.retry(record.id)) message = NOT_SAVED }, modifier = Modifier.testTag("download-retry")) { Icon(Icons.Outlined.Refresh, null); Text("Retry", Modifier.padding(start = 6.dp)) }
+                    TextButton(onClick = { if (!graph.downloads.delete(record.id)) message = NOT_SAVED }) { Text("Discard") }
                 }
             }
         }
@@ -113,13 +114,15 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
         confirmButton = { TextButton(onClick = { askCellular = false; start(true) }, modifier = Modifier.testTag("download-cellular-allow")) { Text("Download") } },
         dismissButton = { TextButton(onClick = { askCellular = false }) { Text("Not now") } },
     )
-    if (confirmRemove && record != null) RemoveDialog(record.title, onDismiss = { confirmRemove = false }) { confirmRemove = false; remove(graph, record) }
+    if (confirmRemove && record != null) RemoveDialog(record.title, onDismiss = { confirmRemove = false }) { confirmRemove = false; if (!remove(graph, record)) message = NOT_SAVED }
 }
 
-private fun remove(graph: com.audiobookshelf.android.AppGraph, record: DownloadStore.Record) {
+private const val NOT_SAVED = "The download list could not be saved on this device, so nothing changed. Free some storage and try again."
+
+private fun remove(graph: com.audiobookshelf.android.AppGraph, record: DownloadStore.Record): Boolean {
     val now = graph.playback.state.value.now
     if (now != null && now.local && now.itemId == record.itemId && now.episodeId == record.episodeId) graph.playback.close()
-    graph.downloads.delete(record.id)
+    return graph.downloads.delete(record.id)
 }
 
 @Composable
@@ -138,11 +141,13 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
     val all by graph.downloads.records.collectAsState()
     val records = all.filter { it.account == active.client.account }.sortedByDescending { it.createdAt }
     var removing by remember { mutableStateOf<DownloadStore.Record?>(null) }
+    var message by remember { mutableStateOf<String?>(null) }
     if (records.isEmpty()) {
         MessageState("No downloads", "Download books or episodes from their page to listen without a connection.", Modifier.padding(padding), tag = "downloads-empty")
         return
     }
     LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("downloads"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        message?.let { text -> item(key = "message") { Text(text, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("downloads-message")) } }
         items(records, key = { it.id }) { record ->
             val key = record.key
             val tag = when (record.state) {
@@ -175,8 +180,8 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
                         onClick = { graph.playback.play(graph.downloads.localSource(record, catalog.progressFor(record.itemId, record.episodeId))) },
                         modifier = Modifier.testTag("play-offline-$key"),
                     ) { Icon(Icons.Filled.PlayArrow, "Play ${record.title}") }
-                    DownloadStore.State.FAILED -> IconButton(onClick = { graph.downloads.retry(record.id) }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, "Retry ${record.title}") }
-                    else -> IconButton(onClick = { graph.downloads.delete(record.id) }, modifier = Modifier.testTag("cancel-download-$key")) { Icon(Icons.Outlined.Close, "Cancel ${record.title}") }
+                    DownloadStore.State.FAILED -> IconButton(onClick = { message = if (graph.downloads.retry(record.id)) null else NOT_SAVED }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, "Retry ${record.title}") }
+                    else -> IconButton(onClick = { message = if (graph.downloads.delete(record.id)) null else NOT_SAVED }, modifier = Modifier.testTag("cancel-download-$key")) { Icon(Icons.Outlined.Close, "Cancel ${record.title}") }
                 }
                 if (record.state != DownloadStore.State.QUEUED && record.state != DownloadStore.State.RUNNING) {
                     IconButton(onClick = { removing = record }, modifier = Modifier.testTag("delete-download-$key")) { Icon(Icons.Outlined.Delete, "Remove ${record.title}") }
@@ -184,5 +189,5 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
             }
         }
     }
-    removing?.let { record -> RemoveDialog(record.title, onDismiss = { removing = null }) { removing = null; remove(graph, record) } }
+    removing?.let { record -> RemoveDialog(record.title, onDismiss = { removing = null }) { removing = null; message = if (remove(graph, record)) null else NOT_SAVED } }
 }

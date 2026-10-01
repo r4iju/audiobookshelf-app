@@ -77,6 +77,8 @@ data class PlayerState(
     val openError: Pair<String, String>? = null,
     /** Collection or playlist whose members continue after the current one ends. */
     val queueId: String? = null,
+    /** Listening, possibly from an earlier title, that this device has not managed to save yet. */
+    val unsavedListening: Boolean = false,
 )
 
 /** A media source the engine can open: server stream or files already on this device. */
@@ -112,6 +114,7 @@ class PlaybackEngine(
     private val sync: ProgressSync,
     private val device: () -> DeviceInfo,
     private val io: CoroutineDispatcher,
+    private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
 ) {
     private class Loaded(
         val source: PlaySource,
@@ -131,6 +134,7 @@ class PlaybackEngine(
     val state: StateFlow<PlayerState> = mutable
 
     private var loaded: Loaded? = null
+    private val writer = ListeningWriter(scope, io, write = { id, position, listened -> journal.record(id, position, listened) }, finish = journal::finish)
     private var generation = 0
     private var ticker: Job? = null
     /** Wall-clock time of the last user pause; 0 after a seek, matching the existing app's auto-rewind. */
@@ -185,6 +189,7 @@ class PlaybackEngine(
             } catch (failure: Exception) {
                 if (request != generation) return@launch
                 Log.w(TAG, "Could not open ${source.itemId}", failure)
+                report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Item ${source.itemId} could not start playing", failure)
                 accounts.handle(failure)
                 mutable.value = mutable.value.copy(loading = false, openError = itemKey(source.itemId, source.episodeId) to describe(failure))
             }
@@ -270,6 +275,12 @@ class PlaybackEngine(
 
     fun retry() {
         val current = loaded ?: return
+        if (mutable.value.error == SAVE_ERROR) {
+            // Saving, not the media, failed: try the write again and continue only once nothing is unsaved.
+            writer.retryNow()
+            if (current.recordId !in writer.failing.value) { mutable.value = mutable.value.copy(error = null); resume() }
+            return
+        }
         val position = globalPosition()
         val request = ++generation
         mutable.value = mutable.value.copy(error = null, loading = true)
@@ -304,6 +315,25 @@ class PlaybackEngine(
     } == true
 
     init {
+        // Unsaved listening is shown even after its title stopped; the playing title pauses until it can be saved.
+        scope.launch {
+            var reported = emptySet<String>()
+            writer.failing.collect { failing ->
+                if ((failing - reported).isNotEmpty()) report(com.audiobookshelf.android.data.Diagnostics.Area.STORAGE, "Listening could not be saved on this device; it is kept in memory and retried", null)
+                reported = failing
+                val current = loaded
+                if (current != null && current.recordId in failing && mutable.value.error == null) {
+                    player.pause()
+                    mutable.value = mutable.value.copy(playing = false, error = SAVE_ERROR)
+                } else if (failing.isEmpty() && mutable.value.error == SAVE_ERROR) {
+                    mutable.value = mutable.value.copy(error = null)
+                }
+                mutable.value = mutable.value.copy(unsavedListening = failing.isNotEmpty())
+            }
+        }
+    }
+
+    init {
         // Media of one account must not keep playing, or finish opening, under another account or after sign-out.
         scope.launch {
             accounts.session.map { (it as? SessionState.Active)?.client?.account }.distinctUntilChanged().collect { active ->
@@ -331,9 +361,10 @@ class PlaybackEngine(
         }
         if (request != generation) {
             // Superseded while the journal was written: retire this session instead of installing it.
-            withContext(io) { journal.finish(recordId) }
-            sync.publish(source.account)
-            media.streamSessionId?.let { if (source is PlaySource.Stream) closeStream(source.client, it) }
+            writer.finish(recordId) {
+                sync.publish(source.account)
+                media.streamSessionId?.let { if (source is PlaySource.Stream) closeStream(source.client, it) }
+            }
             return
         }
         val current = Loaded(source, media.now.copy(duration = timeline.duration), timeline, recordId, media.streamSessionId, transcode)
@@ -414,8 +445,8 @@ class PlaybackEngine(
         persist(current, force = true)
         player.stop()
         player.clearMediaItems()
-        scope.launch {
-            withContext(io) { journal.finish(current.recordId) }
+        // The server session stays open until this session's listening is saved and published.
+        writer.finish(current.recordId) {
             sync.publish(current.source.account)
             val source = current.source
             if (closeStream && source is PlaySource.Stream) current.streamSessionId?.let { closeStream(source.client, it) }
@@ -454,34 +485,18 @@ class PlaybackEngine(
         }
     }
 
-    private fun persist(force: Boolean) { loaded?.let { persist(it, force) } }
+    private fun persist(force: Boolean, then: (suspend () -> Unit)? = null) { loaded?.let { persist(it, force, then) } }
 
-    private fun persist(current: Loaded, force: Boolean) {
+    /** Hands the listening since the last write to [writer], which owns it until it is in the journal. */
+    private fun persist(current: Loaded, force: Boolean, then: (suspend () -> Unit)? = null) {
         val position = globalPosition(current)
         val listened = current.unrecordedListening
         if (!force && listened <= 0 && position == current.lastRecordedPosition) return
         current.unrecordedListening = 0.0
         current.lastRecord = SystemClock.elapsedRealtime()
         current.lastRecordedPosition = position
-        record(current, position, listened)
+        writer.record(current.recordId, position, listened, then)
     }
-
-    /** A failed write gives the listening back to [current] so the next write retries it, and stops playback visibly. */
-    private fun record(current: Loaded, position: Double, listened: Double): Job =
-        scope.launch(io) {
-            runCatching { journal.record(current.recordId, position, listened) }.onFailure { failure ->
-                Log.e(TAG, "Listening not recorded", failure)
-                withContext(kotlinx.coroutines.Dispatchers.Main) {
-                    current.unrecordedListening += listened
-                    current.lastRecordedPosition = -1.0
-                    if (loaded === current) {
-                        player.pause()
-                        mutable.value = mutable.value.copy(playing = false,
-                            error = "Listening could not be saved on this device, so playback paused. Free some storage and try again.")
-                    }
-                }
-            }
-        }
     // endregion
 
     private fun globalPosition(current: Loaded? = loaded): Double {
@@ -505,7 +520,7 @@ class PlaybackEngine(
         current.lastRecordedPosition = end
         val listened = current.unrecordedListening
         current.unrecordedListening = 0.0
-        record(current, end, listened).invokeOnCompletion { scope.launch { sync.publish(current.source.account) } }
+        writer.record(current.recordId, end, listened) { sync.publish(current.source.account) }
         val next = queue.firstOrNull()
         if (next == null) mutable.value = mutable.value.copy(queueId = null)
         else {
@@ -517,6 +532,7 @@ class PlaybackEngine(
     private fun onError(error: PlaybackException) {
         val current = loaded ?: return
         Log.w(TAG, "Playback failed", error)
+        report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Playback of \"${current.now.title}\" failed", error)
         val source = current.source
         if (source is PlaySource.Stream && !current.transcoded) {
             // The existing app retries a failed direct play once as a server transcode.
@@ -541,9 +557,8 @@ class PlaybackEngine(
     }
 
     private fun fail(current: Loaded, message: String?) {
-        persist(current, force = true)
+        persist(current, force = true) { sync.publish(current.source.account) }
         mutable.value = mutable.value.copy(error = "Playback stopped: ${message ?: "the audio could not be loaded"}. Your position is kept.", playing = false, loading = false)
-        scope.launch { sync.publish(current.source.account) }
     }
 
     private fun describe(failure: Throwable): String = when (failure) {
@@ -591,8 +606,7 @@ class PlaybackEngine(
                         mutable.value = mutable.value.copy(playing = playWhenReady && mutable.value.error == null)
                         if (!playWhenReady && reason != Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM) {
                             pausedAt = System.currentTimeMillis()
-                            persist(force = true)
-                            loaded?.let { current -> scope.launch { sync.publish(current.source.account) } }
+                            loaded?.let { current -> persist(current, force = true) { sync.publish(current.source.account) } }
                         }
                         if (playWhenReady) player.volume = 1f
                     }
@@ -614,6 +628,7 @@ class PlaybackEngine(
     companion object {
         private const val TAG = "AbsPlayback"
         private const val RECORD_INTERVAL_MS = 5_000L
+        private const val SAVE_ERROR = "Listening could not be saved on this device, so playback paused. Free some storage and try again."
         private const val PUBLISH_INTERVAL_MS = 15_000L
 
         /** Same thresholds as the existing Android app, keyed by how long playback was paused. */

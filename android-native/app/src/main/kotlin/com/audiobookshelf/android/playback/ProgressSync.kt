@@ -27,6 +27,7 @@ class ProgressSync(
     private val journal: ListeningJournal,
     private val accounts: AccountStore,
     private val io: CoroutineDispatcher,
+    private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
 ) {
     private val lock = Mutex()
     private var retry: Job? = null
@@ -69,6 +70,7 @@ class ProgressSync(
             !failing.value
         } catch (failure: Exception) {
             Log.i("AbsProgress", "Listening kept for retry: ${failure.javaClass.simpleName}")
+            report(com.audiobookshelf.android.data.Diagnostics.Area.SYNC, "Listening could not be sent to ${account.server}; it is kept and retried", failure)
             failing.value = true
             if (failure is ApiError.SignInRequired) accounts.handle(failure) else scheduleRetry()
             false

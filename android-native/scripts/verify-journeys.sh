@@ -25,23 +25,15 @@ cleanup() {
 }
 trap 'status=$?; cleanup; exit $status' EXIT
 
-# Never take over a port another worker holds: anything accepting a connection, or any listener on
-# loopback or the wildcard address, means the port is occupied and this run stops without touching it.
-python3 - <<'PY'
-import socket
-for port in [28765, 28766, 28767, 28769]:
-    try:
-        with socket.create_connection(('127.0.0.1', port), timeout=0.3):
-            raise SystemExit(f'Android fixture port {port} is already in use; choose a free emulator run or stop only your own fixture.')
-    except OSError:
-        pass
-    for host in ('0.0.0.0', '127.0.0.1'):
-        with socket.socket() as listener:
-            try:
-                listener.bind((host, port))
-            except OSError:
-                raise SystemExit(f'Android fixture port {port} is already in use; choose a free emulator run or stop only your own fixture.')
-PY
+# Never take over a port another worker holds: a listener on any address, or anything accepting a
+# connection, means the port is occupied and this run stops without touching it. Sockets merely
+# lingering in TIME_WAIT after an earlier run are not listeners and do not block the fixtures.
+for port in 28765 28766 28767 28769; do
+    if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1 || nc -z -G 1 127.0.0.1 "$port" >/dev/null 2>&1; then
+        echo "Android fixture port $port is already in use; choose a free emulator run or stop only your own fixture." >&2
+        exit 1
+    fi
+done
 
 if [[ ! -d "$repo_root/verification/realtime/node_modules/socket.io" ]]; then
     npm ci --prefix "$repo_root/verification/realtime" --ignore-scripts --no-audit --no-fund >/dev/null
@@ -49,10 +41,10 @@ fi
 openssl req -x509 -newkey rsa:2048 -nodes -days 2 -keyout "$fixture_dir/key.pem" -out "$fixture_dir/cert.pem" \
     -subj /CN=127.0.0.1 -addext subjectAltName=IP:127.0.0.1 >/dev/null 2>&1
 
-(cd "$repo_root" && exec python3 -m verification.fixture --port 28769) > "${ABS_FIXTURE_LOG:-$fixture_dir/http.log}" 2>&1 & pids+=("$!")
+(cd "$repo_root" && exec python3 android-native/scripts/android_fixture.py --port 28769) > "${ABS_FIXTURE_LOG:-$fixture_dir/http.log}" 2>&1 & pids+=("$!")
 (cd "$repo_root" && exec node verification/realtime/native-fixture.mjs 28765 28769) > "$fixture_dir/realtime.log" 2>&1 & pids+=("$!")
-(cd "$repo_root" && exec python3 -m verification.fixture --port 28766) > "$fixture_dir/second.log" 2>&1 & pids+=("$!")
-(cd "$repo_root" && exec python3 -m verification.fixture --port 28767 --tls-cert "$fixture_dir/cert.pem" --tls-key "$fixture_dir/key.pem") > "$fixture_dir/https.log" 2>&1 & pids+=("$!")
+(cd "$repo_root" && exec python3 android-native/scripts/android_fixture.py --port 28766) > "$fixture_dir/second.log" 2>&1 & pids+=("$!")
+(cd "$repo_root" && exec python3 android-native/scripts/android_fixture.py --port 28767 --tls-cert "$fixture_dir/cert.pem" --tls-key "$fixture_dir/key.pem") > "$fixture_dir/https.log" 2>&1 & pids+=("$!")
 python3 - <<'PY'
 import socket, time
 for port in [28765, 28766, 28767, 28769]:

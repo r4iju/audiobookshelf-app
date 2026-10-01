@@ -35,6 +35,7 @@ class AppGraph private constructor(val context: Context) {
         DeviceInfo(id, "Audiobookshelf Android", BuildConfig.VERSION_NAME, Build.MANUFACTURER, Build.MODEL, Build.VERSION.SDK_INT)
     }
     val settings by lazy { SettingsStore(File(context.filesDir, "settings.json")) }
+    val diagnostics by lazy { com.audiobookshelf.android.data.Diagnostics(File(context.filesDir, "diagnostics.json")) }
     /** Requests from the media notification to show the full player. */
     val openPlayerRequests = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -42,7 +43,7 @@ class AppGraph private constructor(val context: Context) {
     val io = kotlinx.coroutines.Dispatchers.IO.limitedParallelism(1)
     val journal: ListeningJournal by lazy { openJournal(File(context.filesDir, "listening-journal.json")) }
     val progressSync by lazy {
-        ProgressSync(scope, journal, accounts, io).also { sync ->
+        ProgressSync(scope, journal, accounts, io, diagnostics::record).also { sync ->
             context.getSystemService(ConnectivityManager::class.java)?.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) = sync.publishAll()
             })
@@ -51,16 +52,23 @@ class AppGraph private constructor(val context: Context) {
     /** Creating the engine closes listening left open by a previous process and publishes it. */
     val playback by lazy {
         journal.finishRecoveredSessions()
-        PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io).also { progressSync.publishAll() }
+        PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io, diagnostics::record).also { progressSync.publishAll() }
     }
 
     val downloads by lazy {
-        com.audiobookshelf.android.download.Downloads(context, com.audiobookshelf.android.download.DownloadStore(File(context.filesDir, "downloads.json")), accounts, settings, journal, http)
+        com.audiobookshelf.android.download.Downloads(context, com.audiobookshelf.android.download.DownloadStore(File(context.filesDir, "downloads.json")), accounts, settings, journal, http, diagnostics::record)
     }
 
     val reading by lazy { com.audiobookshelf.android.reader.ReadingStore(File(context.filesDir, "reading-positions.json")) }
     val readingSync by lazy {
-        com.audiobookshelf.android.reader.ReadingSync(scope, reading, accounts).also { sync ->
+        com.audiobookshelf.android.reader.ReadingSync(scope, reading, remoteFor = { account ->
+            accounts.clientFor(account)?.let { client ->
+                object : com.audiobookshelf.android.reader.ReadingRemote {
+                    override suspend fun progress(itemId: String) = client.progress(itemId, null)
+                    override suspend fun save(itemId: String, location: String, progress: Double) = client.saveEbookProgress(itemId, location, progress)
+                }
+            }
+        }, onSignInRequired = accounts::handle, report = diagnostics::record).also { sync ->
             context.getSystemService(ConnectivityManager::class.java)?.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) = sync.publishAll()
             })

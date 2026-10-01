@@ -56,6 +56,7 @@ class Downloads(
     private val settings: SettingsStore,
     private val journal: ListeningJournal,
     http: OkHttpClient,
+    private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
 ) {
     sealed interface Request {
         data object Started : Request
@@ -63,6 +64,8 @@ class Downloads(
         data object NoAudio : Request
         data object NeedsCellularConsent : Request
         data class NoSpace(val needed: Long) : Request
+        /** The download list could not be written, so nothing was started. */
+        data object NotSaved : Request
     }
 
     /** Transfers stall-fail after a minute without data, like the existing app. */
@@ -95,7 +98,7 @@ class Downloads(
             DownloadStore.Part("/api/items/${item.id}/file/${it.ino}/download", "ebook.${it.format ?: "bin"}", it.metadata?.size, null, ebookFileId = it.ino, ebookFormat = it.format)
         })
         val previous = store.get(id)
-        store.put(DownloadStore.Record(
+        try { store.put(DownloadStore.Record(
             id = id, account = client.account, itemId = item.id, episodeId = episode?.id,
             title = episode?.title?.takeIf { it.isNotBlank() } ?: item.title,
             author = if (episode != null) item.title else item.author.orEmpty(),
@@ -106,22 +109,37 @@ class Downloads(
             parts = parts.map { part -> previous?.parts?.firstOrNull { it.path == part.path && it.done }?.let { part.copy(done = true) } ?: part },
             directory = directory.path,
             allowMetered = allowMetered || settings.current.downloadUsingCellular == CellularPolicy.ALWAYS,
-        ))
+        )) } catch (failure: IOException) {
+            Log.w(TAG, "Download list not saved", failure)
+            return Request.NotSaved
+        }
         enqueue(id)
         return Request.Started
     }
 
-    fun retry(id: String) {
-        store.update(id) { it.copy(state = DownloadStore.State.QUEUED, error = null) } ?: return
+    /** False when the download list could not be written. */
+    fun retry(id: String): Boolean {
+        try {
+            store.update(id) { it.copy(state = DownloadStore.State.QUEUED, error = null) } ?: return true
+        } catch (failure: IOException) {
+            Log.w(TAG, "Download list not saved", failure); return false
+        }
         enqueue(id)
+        return true
     }
 
-    /** Removes the files and the record; listening history in the journal is kept. */
-    fun delete(id: String) {
+    /**
+     * Removes the record and then its files, so a record never points at deleted files; listening history
+     * in the journal is kept. False when the download list could not be written and nothing was removed.
+     */
+    fun delete(id: String): Boolean {
         WorkManager.getInstance(context).cancelUniqueWork(workName(id))
-        val record = store.get(id) ?: return
+        val record = store.get(id) ?: return true
+        try { store.remove(id) } catch (failure: IOException) {
+            Log.w(TAG, "Download list not saved", failure); return false
+        }
         File(record.directory).deleteRecursively()
-        store.remove(id)
+        return true
     }
 
     /** Re-enqueues downloads interrupted by process death; queued work already known to WorkManager is kept. */
@@ -172,8 +190,8 @@ class Downloads(
         val record = store.get(id) ?: return Outcome.Done
         if (record.state == DownloadStore.State.COMPLETE) return Outcome.Done
         runCatching { foreground(notification(record)) }.onFailure { Log.i(TAG, "Download continues without a foreground notice: ${it.javaClass.simpleName}") }
-        store.update(id) { it.copy(state = DownloadStore.State.RUNNING, error = null) }
         try {
+            store.update(id) { it.copy(state = DownloadStore.State.RUNNING, error = null) }
             val client = accounts.clientFor(record.account) ?: throw Rejected("Sign in to this account again to download.")
             val directory = File(record.directory).apply { mkdirs() }
             for (part in record.parts) {
@@ -186,18 +204,23 @@ class Downloads(
             store.update(id) { it.copy(state = DownloadStore.State.COMPLETE, error = null, completedAt = System.currentTimeMillis()) }
             Outcome.Done
         } catch (failure: Rejected) {
-            store.update(id) { it.copy(state = DownloadStore.State.FAILED, error = failure.message) }
+            report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Download of \"${record.title}\" stopped: ${failure.message}", null)
+            try { store.update(id) { it.copy(state = DownloadStore.State.FAILED, error = failure.message) } } catch (unsaved: IOException) { return Outcome.Retry }
             Outcome.Done
         } catch (failure: Exception) {
             if (failure is kotlinx.coroutines.CancellationException) throw failure
             accounts.handle(failure)
+            report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Download of \"${record.title}\" failed", failure)
             val message = when (failure) {
                 is ApiError.SignInRequired -> "Sign in to this account again to download."
                 is ApiError -> failure.message
                 else -> "The connection was interrupted."
             }
             val again = attempt < MAX_ATTEMPTS && failure !is ApiError.SignInRequired
-            store.update(id) { it.copy(state = if (again) DownloadStore.State.QUEUED else DownloadStore.State.FAILED, error = if (again) "$message Retrying…" else message) }
+            // A state that cannot be written is retried later rather than reported as settled.
+            try {
+                store.update(id) { it.copy(state = if (again) DownloadStore.State.QUEUED else DownloadStore.State.FAILED, error = if (again) "$message Retrying…" else message) }
+            } catch (unsaved: IOException) { return Outcome.Retry }
             if (again) Outcome.Retry else Outcome.Done
         }
     }
@@ -261,10 +284,13 @@ class Downloads(
         }
     }
 
+    /** Byte counts are only shown progress; the finished parts recorded separately are what resuming relies on. */
     private fun progress(id: String, part: DownloadStore.Part, written: Long) {
-        store.update(id) { current ->
-            val finished = current.parts.takeWhile { it.path != part.path }.sumOf { it.size ?: 0L }
-            current.copy(bytes = finished + written)
+        runCatching {
+            store.update(id) { current ->
+                val finished = current.parts.takeWhile { it.path != part.path }.sumOf { it.size ?: 0L }
+                current.copy(bytes = finished + written)
+            }
         }
     }
 

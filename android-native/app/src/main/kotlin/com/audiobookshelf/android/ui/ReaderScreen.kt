@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.RotateRight
 import androidx.compose.material.icons.outlined.ViewDay
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -125,6 +127,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
         } catch (failure: Exception) {
             if (failure is kotlinx.coroutines.CancellationException) throw failure
             graph.accounts.handle(failure)
+            graph.diagnostics.record(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "PDF \"${route.title}\" could not be opened", failure)
             error = when (failure) {
                 is ApiError -> failure.message
                 else -> failure.message ?: "The document could not be opened."
@@ -140,7 +143,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
     LaunchedEffect(document) {
         val current = document ?: return@LaunchedEffect
         snapshotFlow { page }.distinctUntilChanged().collect { shown ->
-            if (shown == opened?.startPage && graph.reading.entry(account, route.itemId, fileKey)?.page == shown) return@collect
+            if (graph.reading.entry(account, route.itemId, fileKey)?.page == shown) return@collect
             try {
                 graph.reading.record(account, route.itemId, fileKey, primary = !route.supplementary, page = shown, pages = current.pageCount)
                 if (!route.supplementary) scope.launch { graph.readingSync.publish(account) }
@@ -148,6 +151,27 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
                 saveError = failure.message ?: "This page could not be saved on this device."
             }
         }
+    }
+
+    val changes by graph.reading.changes.collectAsState()
+    val conflict = remember(changes) { if (route.supplementary) null else graph.reading.entry(account, route.itemId, fileKey)?.conflictPage }
+    if (document != null && conflict != null) {
+        fun resolve(keepLocal: Boolean) {
+            try {
+                graph.reading.resolveConflict(account, route.itemId, fileKey, keepLocal)
+                if (keepLocal) scope.launch { graph.readingSync.publish(account) } else page = conflict.coerceIn(1, document.pageCount)
+            } catch (failure: Exception) {
+                saveError = failure.message ?: "Your choice could not be saved on this device."
+            }
+        }
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text("Continue where?") },
+            text = { Text("Another device reached page $conflict while page $page here was not yet saved to the server.") },
+            confirmButton = { TextButton(onClick = { resolve(keepLocal = false) }, modifier = Modifier.testTag("reading-conflict-remote")) { Text("Go to page $conflict") } },
+            dismissButton = { TextButton(onClick = { resolve(keepLocal = true) }, modifier = Modifier.testTag("reading-conflict-local")) { Text("Stay on page $page") } },
+            modifier = Modifier.testTag("reading-conflict"),
+        )
     }
 
     Scaffold(
