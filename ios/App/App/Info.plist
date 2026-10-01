@@ -71,5 +71,26 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.apple.package</string>
+				<string>public.composite-content</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Audiobookshelf Migration Package</string>
+			<key>UTTypeIdentifier</key>
+			<string>org.audiobookshelf.legacy-migration</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>absmigration</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 </dict>
 </plist>

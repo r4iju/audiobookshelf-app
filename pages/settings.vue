@@ -175,6 +175,8 @@
       </div>
     </template>
 
+    <settings-legacy-migration-export v-if="isiOS" />
+
     <div v-show="loading" class="w-full h-full absolute top-0 left-0 flex items-center justify-center z-10">
       <ui-loading-indicator />
     </div>
