@@ -176,6 +176,8 @@ struct BookDetails: View {
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
             .onReceive(realtime.events) { event in receive(event) }
+            // A save made in the background, such as the player's on pause, can leave a write unknown while these are open.
+            .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in Task { await refreshWaitingWrites() } }
     }
 
     @ViewBuilder private var header: some View {
@@ -282,8 +284,9 @@ struct BookDetails: View {
         }
     }
 
+    /// For the signed-in account and this title only.
     private func refreshWaitingWrites() async {
-        guard let account = try? await catalog.api.currentAccount() else { return }
+        guard let account = try? await catalog.api.currentAccount() else { writesWaiting = false; return }
         writesWaiting = player.publications.unresolved(account: account, itemID: book.id, episodeID: episode?.id)
     }
 
