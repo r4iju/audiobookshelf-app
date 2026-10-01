@@ -44,6 +44,7 @@ struct StatisticsView: View {
             if store.loading { ProgressView("Opening your statistics…") }
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load() } } }
             if let stats = store.stats {
+                NavigationLink(destination: YearReviewView(api: store.api)) { Text("Year in review") }
                 Section(header: Text("Your listening")) {
                     Text("\(minutes(stats.totalTime)) minutes listened").font(.title2.bold())
                     Text("\(stats.days.count) days listened")

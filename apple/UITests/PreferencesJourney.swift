@@ -1,6 +1,41 @@
 import XCTest
 
 @MainActor final class PreferencesJourney: NativeJourney {
+    func testYearReviewUsesServerCalendarWithBuddhistDeviceLocale() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false, arguments: ["-AppleLocale", "en_US@calendar=buddhist"])
+        let app = XCUIApplication()
+        app.buttons["account"].tap(); app.buttons["Statistics"].tap(); app.buttons["Year in review"].tap()
+        XCTAssertTrue(app.staticTexts["120 minutes listened"].waitForExistence(timeout: 8))
+        let year = Calendar(identifier: .gregorian).component(.year, from: Date())
+        let requests = try await fixtureRequests()
+        XCTAssertTrue(requests.contains { $0.path == "/api/me/stats/year/\(year)" }, "Protocol years must remain Gregorian with another device calendar")
+    }
+    func testYearReviewShowsServerTotalsAndChangesYear() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["account"].tap(); app.buttons["Statistics"].tap()
+        let review = app.buttons["Year in review"]
+        XCTAssertTrue(review.waitForExistence(timeout: 5))
+        guard review.exists else { return }
+        review.tap()
+        XCTAssertTrue(app.staticTexts["120 minutes listened"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["5 books finished"].exists)
+        XCTAssertTrue(app.staticTexts["9 books listened to"].exists)
+        XCTAssertTrue(app.staticTexts["12 listening sessions"].exists)
+        app.swipeUp()
+        XCTAssertTrue(app.staticTexts["Mira Vale"].exists)
+        XCTAssertTrue(app.staticTexts["QA Narrator"].exists)
+        capture("Native year in review")
+        app.swipeDown(); app.buttons["Previous year"].tap()
+        XCTAssertTrue(app.staticTexts["60 minutes listened"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["2 books finished"].exists)
+        let year = Calendar.current.component(.year, from: Date())
+        let requests = try await fixtureRequests()
+        XCTAssertTrue(requests.contains { $0.path == "/api/me/stats/year/\(year)" })
+        XCTAssertTrue(requests.contains { $0.path == "/api/me/stats/year/\(year - 1)" })
+    }
     func testLiveBookProgressRequiresCompletionConfirmationWithoutLeavingDetails() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
@@ -98,6 +133,7 @@ import XCTest
         XCTAssertTrue(app.staticTexts["61 minutes listened"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["3 days listened"].exists)
         XCTAssertTrue(app.staticTexts["0 titles finished"].exists)
+        app.swipeUp()
         XCTAssertTrue(app.staticTexts["Stories for Tomorrow 03"].exists)
         let requests = try await fixtureRequests()
         XCTAssertTrue(requests.contains { $0.path == "/api/me/listening-stats" })

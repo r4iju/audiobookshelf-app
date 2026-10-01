@@ -272,6 +272,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, entry)
             if path == '/api/me/listening-stats':
                 return self.respond(200, {'totalTime': 3660, 'days': {'2026-09-28': 1200, '2026-09-29': 1260, '2026-09-30': 1200}, 'dayOfWeek': {'Monday': 1200, 'Tuesday': 1260, 'Wednesday': 1200}, 'recentSessions': [{'id': 'stats-session', 'libraryItemId': 'book-2', 'mediaMetadata': {'title': 'Stories for Tomorrow 03', 'authorName': 'Mira Vale'}, 'timeListening': '1200', 'updatedAt': 1790784000000}]})
+            annual = re.fullmatch(r'/api/me/stats/year/(\d{4})', path)
+            if annual:
+                current = int(annual[1]) == time.localtime().tm_year
+                return self.respond(200, {'totalListeningSessions': 12 if current else 6, 'totalListeningTime': 7200 if current else 3600, 'totalBookListeningTime': 6000 if current else 3000, 'totalPodcastListeningTime': 1200 if current else 600, 'numBooksFinished': 5 if current else 2, 'numBooksListened': 9 if current else 4, 'topAuthors': [{'name': 'Mira Vale', 'time': 4000}], 'topGenres': [{'genre': 'Stories', 'time': 6000}], 'mostListenedNarrator': {'name': 'QA Narrator', 'time': 5000}, 'mostListenedMonth': {'month': 8, 'time': 4000}, 'longestAudiobookFinished': {'title': 'Stories for Tomorrow 03', 'duration': 36000}, 'booksWithCovers': ['book-2'], 'finishedBooksWithCovers': ['book-0']})
             if path == '/api/libraries/podcasts/items':
                 if created_podcasts:
                     time.sleep(2)

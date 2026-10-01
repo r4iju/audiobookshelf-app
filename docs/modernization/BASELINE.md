@@ -23,7 +23,7 @@ TV installation and HTTPS connectivity were confirmed on the physical second-gen
 - Platform features: Android casting and Android Auto, including browse grouping/series order; Apple media routes/system controls. Do not make a capability mandatory on a platform where it did not exist.
 - Preferences: the exact platform fields and web preference/storage keys are in the inventory. Android additionally has shake sensitivity/reset feedback/chime and scheduled sleep behavior. iOS stores playback rate and chapter-track preferences in Realm.
 - Realtime: Socket.IO initialization/authentication, user/item-progress updates, playlist updates and reconnect state. The initial HTTP fixture does not yet emulate these and must not be reported as realtime acceptance.
-- Account/statistics/logs: preserve permitted progress-management actions, diagnostics, languages, orientation/haptics, large text, contrast, assistive navigation and reduced motion.
+- Account/statistics/logs: preserve permitted progress-management actions, diagnostics, languages, orientation/haptics, large text, contrast, assistive navigation and reduced motion. The item/player local-event history action is explicitly disabled on iOS in `components/modals/ItemMoreMenuModal.vue` and `components/app/AudioPlayer.vue`; the iOS database plugin exposes no history method. This Android/browser workflow does not gate Apple parity. Server listening-session history remains applicable to Apple statistics.
 
 ## Migration inventory
 

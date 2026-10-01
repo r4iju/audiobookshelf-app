@@ -14,6 +14,7 @@
 		1C540F8B7740B872808013E4 /* DurableProgressJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648832F721FE449B09116AC8 /* DurableProgressJourney.swift */; };
 		1D04F1C76DAF3872336653B7 /* NativeDownloads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555E32B34297E5993C20AE0B /* NativeDownloads.swift */; };
 		1FE9EA77C952A31EF63EA86A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C645D6AE0D674A57C0773628 /* Assets.xcassets */; };
+		2827F89F67488E2FA0269A5C /* YearReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CE0125ADF13E64A5D923DE /* YearReviewView.swift */; };
 		285CD6737141BF31B5382E4F /* OfflineJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476656CB1D03ABE26877362E /* OfflineJourney.swift */; };
 		2B132A6700DE521417D1F55F /* ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB2BE9B3C4981C09FDF4568 /* ConnectionStore.swift */; };
 		31260902F1F2030E7F0E2C82 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB589548138556B32D60EDD /* Models.swift */; };
@@ -92,6 +93,7 @@
 		4E98547EED961F9F0A11BA05 /* AudioGroupViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioGroupViews.swift; sourceTree = "<group>"; };
 		4F700893C65CF63267BFB1A3 /* ReaderJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderJourney.swift; sourceTree = "<group>"; };
 		4FE9972E1A212CD4A7EB8F13 /* ReadingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingStore.swift; sourceTree = "<group>"; };
+		50CE0125ADF13E64A5D923DE /* YearReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearReviewView.swift; sourceTree = "<group>"; };
 		555E32B34297E5993C20AE0B /* NativeDownloads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeDownloads.swift; sourceTree = "<group>"; };
 		612D1953AEA2C0DB8083C470 /* ReaderVolume.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderVolume.swift; sourceTree = "<group>"; };
 		648832F721FE449B09116AC8 /* DurableProgressJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurableProgressJourney.swift; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				612D1953AEA2C0DB8083C470 /* ReaderVolume.swift */,
 				4FE9972E1A212CD4A7EB8F13 /* ReadingStore.swift */,
 				A9D52E6E9BDD652E1011F601 /* StatisticsView.swift */,
+				50CE0125ADF13E64A5D923DE /* YearReviewView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 				5E3420D9B864D407CD1D6C6A /* ReadingStore.swift in Sources */,
 				E00EF93C2285FE0ED68DB1DD /* ServerEvents.swift in Sources */,
 				3F33E769B7B6FE27B0786A21 /* StatisticsView.swift in Sources */,
+				2827F89F67488E2FA0269A5C /* YearReviewView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
