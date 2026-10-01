@@ -34,6 +34,8 @@ public struct ServerAddress: Sendable {
         let suffix = path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         parts.path = "/" + [prefix, suffix].filter { !$0.isEmpty }.joined(separator: "/")
         parts.queryItems = query.isEmpty ? nil : query
+        // Express treats a literal plus as a space when it parses the query.
+        parts.percentEncodedQuery = parts.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
         guard let url = parts.url else { throw APIError.invalidServer }
         return url
     }

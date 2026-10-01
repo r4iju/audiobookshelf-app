@@ -21,6 +21,34 @@
                ReferencedContainer = "container:AudiobookshelfTV.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "811604307BC8F00AFF7C064D"
+               BuildableName = "TVAppTests.xctest"
+               BlueprintName = "TVAppTests"
+               ReferencedContainer = "container:AudiobookshelfTV.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "73793CC66F7D5CE52C81483E"
+               BuildableName = "TVJourneyTests.xctest"
+               BlueprintName = "TVJourneyTests"
+               ReferencedContainer = "container:AudiobookshelfTV.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -39,7 +67,31 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "811604307BC8F00AFF7C064D"
+               BuildableName = "TVAppTests.xctest"
+               BlueprintName = "TVAppTests"
+               ReferencedContainer = "container:AudiobookshelfTV.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "73793CC66F7D5CE52C81483E"
+               BuildableName = "TVJourneyTests.xctest"
+               BlueprintName = "TVJourneyTests"
+               ReferencedContainer = "container:AudiobookshelfTV.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
