@@ -119,4 +119,21 @@ class MigrationJourney {
             assertFalse(compose.isShown("start-import"))
         }
     }
+
+    @Test
+    fun f_importedFilesDamagedBeforeSignInAreDownloadedAgainInsteadOfDroppingTheTitle() {
+        Fixture.resetAppData()
+        Fixture.configure("pdf-reader")
+        val start = Fixture.requests().size
+        open("legacy-export.absmigration").use {
+            compose.tap("start-import")
+            compose.waitForTag("migration-done", 30_000)
+            compose.tap("migration-close")
+            File(context.filesDir, "migration/staging").listFiles()!!.forEach { it.appendBytes(byteArrayOf(1)) }
+            compose.signIn()
+            compose.tap("tab-downloads")
+            compose.waitForTag("offline-book-0", 45_000)
+            eventually(45_000) { downloaded("book-0", start).isNotEmpty() }
+        }
+    }
 }

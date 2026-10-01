@@ -221,14 +221,14 @@ class Migration(
                 issues += Issue(Issue.Kind.ITEM_CHANGED, title.title, match.problem!!)
                 return@map title.copy(attached = true)
             }
-            val chosen = match.audio.filterNotNull() + listOfNotNull(match.ebook)
-            if (chosen.any { import.verified(it) == null }) {
-                issues += Issue(Issue.Kind.FILE_CORRUPT, title.title, "A file changed on this device after it was imported, so this title is not adopted. Download it again.")
-                return@map title.copy(attached = true)
+            val audio = match.audio.map { it?.let(import::verified) }
+            val ebook = match.ebook?.let(import::verified)
+            if (audio.count { it != null } != match.audio.count { it != null } || match.ebook != null && ebook == null) {
+                issues += Issue(Issue.Kind.FILE_CORRUPT, title.title, "A file changed on this device after it was imported, so it is downloaded again from the server.")
             }
             val episode = title.episodeId?.let { id -> item.media.episodes.firstOrNull { it.id == id } }
             val cover = runCatching { client.bytes("api/items/${item.id}/cover") }.getOrNull()
-            downloads.adopt(account, item, episode, match.tracks, match.audio.map { it?.let(import::verified) }, match.ebook?.let(import::verified), cover)
+            downloads.adopt(account, item, episode, match.tracks, audio, ebook, match.ebook != null, cover)
             title.copy(attached = true)
         }
         val sessions = outcome.sessions.map { imported ->

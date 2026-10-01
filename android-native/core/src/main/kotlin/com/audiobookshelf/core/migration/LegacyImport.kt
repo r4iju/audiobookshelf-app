@@ -7,6 +7,8 @@ import com.audiobookshelf.core.writeAtomically
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 import java.security.MessageDigest
 
 @Serializable data class Issue(val kind: Kind, val title: String? = null, val detail: String) {
@@ -109,20 +111,10 @@ class LegacyImport(private val root: File) {
         for (file in needed) {
             val stored = archive.manifest.storedPaths[file.legacyPath] ?: throw MigrationError.Unreadable()
             val temporary = File(staging, "${file.digest}.tmp")
-            val digest = MessageDigest.getInstance("SHA-256")
-            archive.read(stored) { input ->
-                temporary.outputStream().use { output ->
-                    val buffer = ByteArray(1 shl 16)
-                    while (true) {
-                        val read = input.read(buffer)
-                        if (read < 0) break
-                        digest.update(buffer, 0, read)
-                        output.write(buffer, 0, read)
-                    }
-                    output.fd.sync()
-                }
+            val digest = archive.read(stored) { input ->
+                temporary.outputStream().use { output -> sha256(input, output).also { output.fd.sync() } }
             }
-            if (hex(digest.digest()) != file.digest) {
+            if (digest != file.digest) {
                 temporary.delete()
                 state = state.copy(corrupt = state.corrupt + file.legacyPath)
                 saveState(state)
@@ -187,18 +179,17 @@ class LegacyImport(private val root: File) {
 
     fun staged(file: StagedFile): File = File(staging, file.digest)
 
-    /** The staged copy of [file] when its bytes still match the export; a damaged copy is never reused or adopted. */
-    fun verified(file: StagedFile): File? = staged(file).takeIf { it.isFile && sha256(it) == file.digest }
+    /** The staged copy of [file] when its bytes still match the export. */
+    fun verified(file: StagedFile): File? = staged(file).takeIf { it.isFile && it.inputStream().use(::sha256) == file.digest }
 
-    private fun sha256(file: File): String {
+    private fun sha256(input: InputStream, output: OutputStream? = null): String {
         val digest = MessageDigest.getInstance("SHA-256")
-        file.inputStream().use { input ->
-            val buffer = ByteArray(1 shl 16)
-            while (true) {
-                val read = input.read(buffer)
-                if (read < 0) break
-                digest.update(buffer, 0, read)
-            }
+        val buffer = ByteArray(1 shl 16)
+        while (true) {
+            val read = input.read(buffer)
+            if (read < 0) break
+            digest.update(buffer, 0, read)
+            output?.write(buffer, 0, read)
         }
         return hex(digest.digest())
     }
