@@ -20,6 +20,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.native.preview
         CODE_SIGN_ENTITLEMENTS: App/Preview.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Audiobookshelf Native
@@ -30,7 +31,6 @@ targets:
       properties:
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
-          NSAllowsLocalNetworking: true
         NSLocalNetworkUsageDescription: Connect directly to your Audiobookshelf server on your local network.
         UIBackgroundModes: [audio]
   NativeJourneyTests:

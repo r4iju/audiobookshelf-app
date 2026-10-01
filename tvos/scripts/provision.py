@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a tvOS profile using an existing App Store Connect key and certificate."""
+"""Create an internal Apple development profile using an existing App Store Connect key and certificate."""
 import argparse
 import base64
 import json

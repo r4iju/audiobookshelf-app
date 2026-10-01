@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		02FCDB4812C2E4A5ABE04ADA /* ConnectionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4040D3FA55A53CC8CDA2201E /* ConnectionViews.swift */; };
 		14F09228AC5E0D0019578027 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531C37EF60AF8C9DC7A2FA61 /* Models.swift */; };
+		1FE9EA77C952A31EF63EA86A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C645D6AE0D674A57C0773628 /* Assets.xcassets */; };
 		2B132A6700DE521417D1F55F /* ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB2BE9B3C4981C09FDF4568 /* ConnectionStore.swift */; };
 		6B718442BFC9CFF8B068B101 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3F3A11D4C48FCECC2411E /* APIClient.swift */; };
 		7AA8A946DEFE5E40C63888EB /* KeychainCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB2B0D3551E87A9FB4A17E2 /* KeychainCredentials.swift */; };
@@ -33,6 +34,7 @@
 		4AD3D05466170BDFD9F08A6E /* AudiobookshelfNative.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AudiobookshelfNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		531C37EF60AF8C9DC7A2FA61 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		72C3F3A11D4C48FCECC2411E /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		C645D6AE0D674A57C0773628 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1C2CFEF2D5FBC6F4EC51932 /* Preview.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Preview.entitlements; sourceTree = "<group>"; };
 		E7CAC9658FF3F40EF409324C /* ConnectionJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionJourney.swift; sourceTree = "<group>"; };
 		EFAFE56250047C7E8BAD3D12 /* NativeJourneyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NativeJourneyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,6 +46,7 @@
 		1D53BE3F9BEFB051AD534B99 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				C645D6AE0D674A57C0773628 /* Assets.xcassets */,
 				F5E8EDE31211BADCFCC8AF4B /* AudiobookshelfNativeApp.swift */,
 				3CB2BE9B3C4981C09FDF4568 /* ConnectionStore.swift */,
 				4040D3FA55A53CC8CDA2201E /* ConnectionViews.swift */,
@@ -131,6 +134,7 @@
 			buildConfigurationList = C4730F7D20AC77FC216069BF /* Build configuration list for PBXNativeTarget "AudiobookshelfNative" */;
 			buildPhases = (
 				AA2545B5C746029F9267940F /* Sources */,
+				A2654E362BDEA17EA780749E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -198,6 +202,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A2654E362BDEA17EA780749E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FE9EA77C952A31EF63EA86A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		339545BE6AA1A88966A337CE /* Sources */ = {

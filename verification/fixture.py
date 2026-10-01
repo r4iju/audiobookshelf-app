@@ -1,10 +1,11 @@
-"""Loopback-only, synthetic Audiobookshelf reference server; never uses live credentials."""
+"""Synthetic local Audiobookshelf reference server; loopback by default, never uses live credentials."""
 import argparse
 import io
 import json
 import math
 import re
 import struct
+import ssl
 import wave
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -21,7 +22,7 @@ def audio(seconds):
     return data.getvalue()
 
 
-def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='modern'):
+def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='modern', bind='127.0.0.1'):
     tracks = [audio(8), audio(12)]
     chapters = [{'id': 0, 'title': 'Opening', 'start': 0, 'end': 8}, {'id': 1, 'title': 'Next chapter', 'start': 8, 'end': 20}]
     items = [{'id': f'book-{i}', 'mediaType': 'book', 'media': {
@@ -177,7 +178,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {})
             self.respond(404, {})
 
-    return ThreadingHTTPServer(('127.0.0.1', port), Handler), prefix
+    return ThreadingHTTPServer((bind, port), Handler), prefix
 
 
 def main():
@@ -186,9 +187,23 @@ def main():
     parser.add_argument('--prefix', default='/abs')
     parser.add_argument('--scenario', choices=['baseline', 'library-schema-change'], default='baseline')
     parser.add_argument('--auth-mode', choices=['legacy', 'modern'], default='modern')
+    parser.add_argument('--bind', default='127.0.0.1', help='Explicit private IPv4 address for a LAN-device fixture; loopback by default')
+    parser.add_argument('--tls-cert')
+    parser.add_argument('--tls-key')
     args = parser.parse_args()
-    server, prefix = make_server(args.port, args.prefix, args.scenario, args.auth_mode)
-    print(f'http://127.0.0.1:{server.server_port}{prefix}', flush=True)
+    if bool(args.tls_cert) != bool(args.tls_key):
+        parser.error('TLS requires both the synthetic certificate and its key.')
+    import ipaddress
+    address = ipaddress.IPv4Address(args.bind)
+    if not address.is_private or address.is_unspecified or address.is_multicast:
+        parser.error('The synthetic fixture must bind to an explicit loopback or private LAN IPv4 address.')
+    server, prefix = make_server(args.port, args.prefix, args.scenario, args.auth_mode, args.bind)
+    if args.tls_cert:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(args.tls_cert, args.tls_key)
+        server.socket = context.wrap_socket(server.socket, server_side=True)
+    scheme = 'https' if args.tls_cert else 'http'
+    print(f'{scheme}://{args.bind}:{server.server_port}{prefix}', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -82,6 +82,10 @@ import Combine
             switch failure.code {
             case .serverCertificateUntrusted, .serverCertificateHasBadDate, .serverCertificateHasUnknownRoot, .serverCertificateNotYetValid:
                 return "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry."
+            case .secureConnectionFailed:
+                return "A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry."
+            case .appTransportSecurityRequiresSecureConnection:
+                return "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server."
             case .notConnectedToInternet, .cannotConnectToHost, .cannotFindHost, .timedOut, .networkConnectionLost:
                 return "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained."
             default: return "The connection failed. Check the server address and network, then retry."

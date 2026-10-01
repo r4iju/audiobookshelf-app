@@ -34,7 +34,6 @@ targets:
       properties:
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
-          NSAllowsLocalNetworking: true
         NSLocalNetworkUsageDescription: Connect to your Audiobookshelf server on your local network.
 schemes:
   AudiobookshelfTV:
