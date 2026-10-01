@@ -23,7 +23,7 @@ cleanup() {
     for port in 28765 28766 28767; do "$adb" -s "$serial" reverse --remove tcp:$port >/dev/null 2>&1 || true; done
     rm -rf "$fixture_dir"
 }
-trap cleanup EXIT
+trap 'status=$?; cleanup; exit $status' EXIT
 
 python3 - <<'PY'
 import socket
@@ -56,6 +56,10 @@ for port in [28765, 28766, 28767, 28769]:
     else: raise SystemExit(f'Fixture on {port} did not start.')
 PY
 for port in 28765 28766 28767; do "$adb" -s "$serial" reverse tcp:$port tcp:$port >/dev/null; done
+# Unrelated system notification sounds take audio focus, which pauses spoken-word playback mid-journey.
+"$adb" -s "$serial" shell cmd notification set_dnd priority >/dev/null 2>&1 || true
+# Chrome's own notification prompt can cover the sign-in page during browser journeys.
+"$adb" -s "$serial" shell pm grant com.android.chrome android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
 
 args=()
 if (( $# > 0 )); then
@@ -64,4 +68,4 @@ if (( $# > 0 )); then
     args+=("-Pandroid.testInstrumentationRunnerArguments.class=$classes")
 fi
 cd "$android_root"
-./gradlew :app:connectedDebugAndroidTest --console=plain "${args[@]}"
+./gradlew :app:connectedDebugAndroidTest --console=plain ${args[@]+"${args[@]}"}

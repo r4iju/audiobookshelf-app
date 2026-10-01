@@ -11,9 +11,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
+
+/** Content shown under every pushed screen, used for the mini player. */
+val LocalBottomAccessory = compositionLocalOf<@Composable () -> Unit> { {} }
 
 /** Standard pushed screen: title bar with Back, so every route has the same navigation affordance. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,6 +31,7 @@ fun RouteScaffold(title: String, onBack: () -> Unit, actions: @Composable RowSco
                 actions = actions,
             )
         },
+        bottomBar = LocalBottomAccessory.current,
         content = content,
     )
 }

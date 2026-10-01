@@ -75,12 +75,14 @@ dependencies {
     implementation("com.google.android.material:material:1.13.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2")
     implementation("androidx.browser:browser:1.9.0")
     implementation("androidx.work:work-runtime-ktx:2.11.0")
 
     implementation("androidx.media3:media3-exoplayer:1.9.0")
     implementation("androidx.media3:media3-session:1.9.0")
     implementation("androidx.media3:media3-datasource-okhttp:1.9.0")
+    implementation("androidx.media3:media3-exoplayer-hls:1.9.0")
     implementation("androidx.media3:media3-cast:1.9.0")
 
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")

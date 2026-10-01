@@ -18,6 +18,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +32,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.graph
+import com.audiobookshelf.android.playback.PlaySource
 import com.audiobookshelf.core.ApiClient
 import com.audiobookshelf.core.LibraryItem
 
@@ -69,14 +72,24 @@ private fun SignedIn(active: SessionState.Active) {
         onGenre = { name -> openFiltered(ApiClient.filter("genres", name), name) },
     )
 
-    Column(Modifier.fillMaxSize()) {
-        Box(Modifier.weight(1f)) {
+    LaunchedEffect(Unit) {
+        graph.openPlayerRequests.collect { if (graph.playback.state.value.now != null && model.stack.lastOrNull() != Route.Player) model.push(Route.Player) }
+    }
+    val mini: @Composable () -> Unit = { MiniPlayer(onOpen = { model.push(Route.Player) }) }
+
+    CompositionLocalProvider(LocalBottomAccessory provides mini) {
+        Box(Modifier.fillMaxSize()) {
             when (route) {
                 null -> Home(model, active, open, openFiltered)
+                Route.Player -> PlayerScreen(onCollapse = pop, onClosed = pop)
                 Route.Accounts -> RouteScaffold("Accounts", pop) { AccountsScreen(active, it) }
                 is Route.Item -> RouteScaffold("", pop) { padding ->
                     LoadItem(active.client, route.id, padding, graph.accounts::handle) { item, _ ->
-                        ItemDetail(item, active.client.coverUrl(item.id).toString(), catalog.progressFor(item.id), padding, itemActions, primary = {})
+                        val cover = active.client.coverUrl(item.id).toString()
+                        val progress = catalog.progressFor(item.id)
+                        ItemDetail(item, cover, progress, padding, itemActions, primary = {
+                            PlayButton({ PlaySource.Stream(active.client, item.id, null, cover, progress?.lastUpdate) }, item.id, null, onOpened = { model.push(Route.Player) })
+                        })
                     }
                 }
                 is Route.Filtered -> RouteScaffold(route.label, pop) { padding ->
@@ -105,9 +118,12 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
             }
         },
         bottomBar = {
+            Column {
+            LocalBottomAccessory.current()
             NavigationBar {
                 NavigationBarItem(selected = tab == Tab.Library, onClick = { model.tab.value = Tab.Library }, icon = { Icon(Icons.Outlined.LibraryBooks, null) }, label = { Text("Library") }, modifier = Modifier.testTag("tab-library"))
                 NavigationBarItem(selected = tab == Tab.Search, onClick = { model.tab.value = Tab.Search }, icon = { Icon(Icons.Outlined.Search, null) }, label = { Text("Search") }, modifier = Modifier.testTag("tab-search"))
+            }
             }
         },
     ) { padding ->

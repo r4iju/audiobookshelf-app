@@ -30,7 +30,16 @@ class AccountStore(private val vault: CredentialVault, private val http: OkHttpC
     private val auth = AuthApi(http)
     private val clients = mutableMapOf<String, ApiClient>()
 
+    fun activeLibraryId(): String? = (state.value as? SessionState.Active)?.connection?.libraryId
+
     val activeClient: ApiClient? get() = (state.value as? SessionState.Active)?.client
+
+    /** Client for any saved account, active or not, so its unsent listening can still be published. */
+    fun clientFor(account: AccountIdentity): ApiClient? {
+        val saved = runCatching { vault.load() }.getOrNull() ?: return null
+        val connection = saved.connections.firstOrNull { it.credentials.account == account && !it.needsSignIn } ?: return null
+        return clientFor(connection)
+    }
 
     fun restore() {
         val document = try {

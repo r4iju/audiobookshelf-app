@@ -157,3 +157,38 @@ fun ComposeTestRule.scrollTo(container: String, tag: String, timeoutMs: Long = 3
     }
     onNodeWithTag(container).performScrollToNode(hasTestTag(tag))
 }
+
+/** Whole-book position shown by the player, parsed from its visible clock text (m:ss or h:mm:ss). */
+fun ComposeTestRule.shownSeconds(tag: String = "player-position"): Int {
+    val node = onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().firstOrNull() ?: return -1
+    val text = node.config.getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Text) { null }?.joinToString("") { it.text } ?: return -1
+    return text.trim().split(':').fold(0) { total, part -> total * 60 + (part.toIntOrNull() ?: return -1) }
+}
+
+fun ComposeTestRule.waitForSeconds(atLeast: Int, timeoutMs: Long = 30_000, tag: String = "player-position") =
+    waitUntil(timeoutMs) { shownSeconds(tag) >= atLeast }
+
+object Device {
+    val device get() = androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+
+    /** Taps a media control in the system notification shade by its accessibility label. */
+    fun tapNotificationControl(description: String, timeoutMs: Long = 15_000) {
+        device.openNotification()
+        val deadline = android.os.SystemClock.uptimeMillis() + timeoutMs
+        // The media notification redraws as the position advances, which can stale a found control.
+        while (true) {
+            val control = device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.desc(description)), 1_000)
+            val clicked = control != null && runCatching { control.click() }.isSuccess
+            if (clicked) break
+            if (android.os.SystemClock.uptimeMillis() > deadline) {
+                device.executeShellCommand("screencap -p /data/local/tmp/abs-notification.png")
+                val out = java.io.ByteArrayOutputStream().also { device.dumpWindowHierarchy(it) }
+                Regex("content-desc=\"[^\"]+\"").findAll(out.toString()).forEach { android.util.Log.e("AbsJourney", it.value) }
+                throw AssertionError("Media notification control \"$description\" not found")
+            }
+        }
+        device.pressBack()
+    }
+
+    fun mediaKey(code: Int) { device.pressKeyCode(code) }
+}

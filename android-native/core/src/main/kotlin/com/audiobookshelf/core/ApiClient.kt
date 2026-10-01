@@ -124,10 +124,11 @@ class ApiClient(
     // endregion
 
     // region Playback and progress
-    suspend fun play(itemId: String, episodeId: String?): PlaybackSession {
+    /** Opens a server stream session; [transcode] requests HLS when direct play of the files failed. */
+    suspend fun play(itemId: String, episodeId: String?, transcode: Boolean = false): PlaybackSession {
         val path = "api/items/$itemId/play" + (episodeId?.let { "/$it" } ?: "")
         val session = send(path, "POST", buildJsonObject {
-            put("forceDirectPlay", true); put("forceTranscode", false); put("mediaPlayer", "exo-player")
+            put("forceDirectPlay", !transcode); put("forceTranscode", transcode); put("mediaPlayer", "exo-player")
             put("deviceInfo", AbsJson.encodeToJsonElement(DeviceInfo.serializer(), device))
         }, PlaybackSession.serializer())
         if (session.audioTracks.isEmpty()) throw ApiError.NoAudio()

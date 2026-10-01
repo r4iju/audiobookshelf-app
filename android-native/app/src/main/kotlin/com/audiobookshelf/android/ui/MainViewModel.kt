@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import com.audiobookshelf.android.data.CatalogModel
 import com.audiobookshelf.android.data.CatalogQuery
 import com.audiobookshelf.android.data.PagedItems
@@ -42,6 +43,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var catalog: CatalogModel? = null
     private var searchModel: SearchModel? = null
     private val retained = mutableMapOf<Route, Any>()
+
+    init {
+        viewModelScope.launch {
+            graph.progressSync.published.collect { account -> catalog?.takeIf { it.client.account == account }?.refreshUser() }
+        }
+    }
 
     fun push(route: Route) { stack.add(route) }
     fun pop(): Boolean {

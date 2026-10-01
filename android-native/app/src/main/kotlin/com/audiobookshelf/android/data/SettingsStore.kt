@@ -50,6 +50,8 @@ enum class SeriesOrder { ASC, DESC }
     val catalogDescending: Boolean = false,
     val episodeSort: String = "publishedAt",
     val episodeDescending: Boolean = true,
+    /** Browse media ID of the last opened title, for resuming from Bluetooth or the system media controls. */
+    val lastPlayed: String? = null,
 )
 
 class SettingsStore(private val file: File) {

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Audiobookshelf Preview</string>
+    <string name="jump_back">Jump back</string>
+    <string name="jump_forward">Jump forward</string>
+    <string name="playback_speed">Playback speed</string>
 </resources>
