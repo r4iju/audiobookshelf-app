@@ -132,8 +132,17 @@ import XCTest
         XCTAssertTrue(observed.deleted.isEmpty)
         XCTAssertTrue(observed.progress.contains { $0.key == ResetFixture.Key("book-0", nil) })
 
-        try discardAction(in: app).tap()
-        confirmation(in: app).buttons["Discard progress"].tap()
+        let detailLoads = observed.requests.filter { $0.method == "GET" && $0.path == "/api/items/book-0" }.count
+        XCUIDevice.shared.press(.home)
+        app.activate()
+        for _ in 0..<50 {
+            observed = try await ResetFixture.observations()
+            if observed.requests.filter({ $0.method == "GET" && $0.path == "/api/items/book-0" }).count > detailLoads { break }
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        XCTAssertGreaterThan(observed.requests.filter { $0.method == "GET" && $0.path == "/api/items/book-0" }.count, detailLoads, "Returning to the foreground reloads these details")
+        XCTAssertTrue(failure.exists, "An unrelated foreground load must retain recovery for the pending reset")
+        app.buttons["Try again"].tap()
         await waitUntilGone(listened(in: app))
         XCTAssertFalse(failure.exists)
         observed = try await ResetFixture.observations()

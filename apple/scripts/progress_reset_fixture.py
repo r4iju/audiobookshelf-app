@@ -10,6 +10,7 @@ import argparse
 import json
 import re
 import sys
+import time
 import uuid
 from pathlib import Path
 from urllib.parse import urlparse
@@ -17,12 +18,7 @@ from urllib.parse import urlparse
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from verification.fixture import make_server  # noqa: E402
 
-ROW_NAMESPACE = uuid.UUID('6f0f6c1e-6c55-4c0e-9d2f-7a1d0e0c5e10')
 SEEDED = [('book-0', None), ('book-1', None), ('podcast', 'episode'), ('podcast', 'episode-morning')]
-
-
-def row_id(item_id, episode_id):
-    return str(uuid.uuid5(ROW_NAMESPACE, f'{item_id}/{episode_id or ""}'))
 
 
 def make_progress_reset_server(port, prefix='/abs', bind='127.0.0.1'):
@@ -33,12 +29,13 @@ def make_progress_reset_server(port, prefix='/abs', bind='127.0.0.1'):
     class ProgressResetHandler(base):
         def seed(self, fail):
             self.progress.clear()
+            now = int(time.time() * 1000)
             for item_id, episode_id in SEEDED:
                 self.progress[(item_id, episode_id)] = {
-                    'id': row_id(item_id, episode_id), 'userId': self.account['id'], 'libraryItemId': item_id, 'episodeId': episode_id,
+                    'id': str(uuid.uuid4()), 'userId': self.account['id'], 'libraryItemId': item_id, 'episodeId': episode_id,
                     'mediaItemType': 'podcastEpisode' if episode_id else 'book', 'duration': 20, 'currentTime': 6, 'progress': 0.3,
                     'isFinished': False, 'hideFromContinueListening': False, 'ebookLocation': None, 'ebookProgress': 0,
-                    'lastUpdate': 1700000000000, 'startedAt': 1700000000000, 'finishedAt': None}
+                    'lastUpdate': now, 'startedAt': now, 'finishedAt': None}
             self.account['mediaProgress'] = list(self.progress.values())
             state.update(fail=fail, requests=[], deleted=[], sessions=[])
 
@@ -63,6 +60,8 @@ def make_progress_reset_server(port, prefix='/abs', bind='127.0.0.1'):
 
         def do_GET(self):
             path = self.local_path()
+            if path and re.fullmatch(r'/api/items/[^/]+', path):
+                state['requests'].append({'method': 'GET', 'path': path})
             if path == '/__reset__/observations':
                 progress = [{key: entry.get(key) for key in ('id', 'libraryItemId', 'episodeId', 'currentTime', 'progress')}
                             for entry in self.progress.values()]

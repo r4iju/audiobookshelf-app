@@ -3,12 +3,13 @@ import json
 import sys
 import threading
 import unittest
+import uuid
 import urllib.error
 import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from progress_reset_fixture import make_progress_reset_server, row_id  # noqa: E402
+from progress_reset_fixture import make_progress_reset_server  # noqa: E402
 
 
 class ProgressResetFixtureTests(unittest.TestCase):
@@ -43,7 +44,7 @@ class ProgressResetFixtureTests(unittest.TestCase):
         self.configure()
         status, row = self.call('GET', '/api/me/progress/podcast/episode')
         self.assertEqual(status, 200)
-        self.assertEqual(row['id'], row_id('podcast', 'episode'))
+        self.assertEqual(uuid.UUID(row['id']).version, 4)
         self.assertEqual((row['libraryItemId'], row['episodeId'], row['currentTime']), ('podcast', 'episode', 6))
         self.assertEqual(self.call('DELETE', '/api/me/progress/podcast/episode')[0], 404, 'The delete route takes the row id, not the item')
         self.assertEqual(self.call('DELETE', '/api/me/progress/' + row['id'])[0], 200)
@@ -54,6 +55,18 @@ class ProgressResetFixtureTests(unittest.TestCase):
         self.assertNotIn(('podcast', 'episode'), {(entry['libraryItemId'], entry['episodeId']) for entry in me['mediaProgress']})
         self.assertEqual(self.observations()['deleted'], [{'id': row['id'], 'libraryItemId': 'podcast', 'episodeId': 'episode'}])
 
+    def test_late_delete_of_previous_row_preserves_new_progress(self):
+        self.configure()
+        old_row = self.call('GET', '/api/me/progress/book-0')[1]
+        self.configure()
+        new_row = self.call('GET', '/api/me/progress/book-0')[1]
+        self.assertNotEqual(old_row['id'], new_row['id'])
+        self.assertEqual(self.call('DELETE', '/api/me/progress/' + old_row['id'])[0], 200)
+        status, remaining = self.call('GET', '/api/me/progress/book-0')
+        self.assertEqual(status, 200)
+        self.assertEqual(remaining, new_row)
+        self.assertEqual(self.observations()['deleted'], [])
+
     def test_an_unknown_row_id_is_still_answered_with_200(self):
         self.configure()
         self.assertEqual(self.call('DELETE', '/api/me/progress/unknown-row')[0], 200)
@@ -62,7 +75,7 @@ class ProgressResetFixtureTests(unittest.TestCase):
 
     def test_a_configured_failure_fails_one_delete_and_keeps_the_row(self):
         self.configure(fail='delete')
-        identity = row_id('book-0', None)
+        identity = self.call('GET', '/api/me/progress/book-0')[1]['id']
         self.assertEqual(self.call('DELETE', '/api/me/progress/' + identity)[0], 500)
         self.assertEqual(self.call('GET', '/api/me/progress/book-0')[0], 200)
         self.assertEqual(self.call('DELETE', '/api/me/progress/' + identity)[0], 200)
@@ -71,14 +84,14 @@ class ProgressResetFixtureTests(unittest.TestCase):
     def test_playback_starts_at_zero_only_without_a_row(self):
         self.configure()
         self.assertEqual(self.call('POST', '/api/items/book-1/play', {})[1]['currentTime'], 6)
-        self.call('DELETE', '/api/me/progress/' + row_id('book-0', None))
+        self.call('DELETE', '/api/me/progress/' + self.call('GET', '/api/me/progress/book-0')[1]['id'])
         self.assertEqual(self.call('POST', '/api/items/book-0/play', {})[1]['currentTime'], 0)
         self.assertEqual([(session['libraryItemId'], session['currentTime']) for session in self.observations()['sessions']], [('book-1', 6), ('book-0', 0)])
 
     def test_requests_need_the_signed_in_user(self):
         self.configure()
         self.assertEqual(self.call('GET', '/api/me/progress/book-0', auth=False)[0], 401)
-        self.assertEqual(self.call('DELETE', '/api/me/progress/' + row_id('book-0', None), auth=False)[0], 401)
+        self.assertEqual(self.call('DELETE', '/api/me/progress/' + self.call('GET', '/api/me/progress/book-0')[1]['id'], auth=False)[0], 401)
         self.assertEqual(len(self.observations()['progress']), 4)
 
 

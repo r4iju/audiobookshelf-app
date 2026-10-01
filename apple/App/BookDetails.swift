@@ -17,7 +17,13 @@ struct BookDetails: View {
     let progress: MediaProgress?
     let episode: Episode?
     @State private var expanded: LibraryItem?
-    @State private var error: String?
+    private enum DetailFailure {
+        case load(String), discard(String)
+        var message: String {
+            switch self { case .load(let message), .discard(let message): return message }
+        }
+    }
+    @State private var error: DetailFailure?
     @State private var request: Task<Void, Never>?
     @State private var playAttempted = false
     @State private var mediaProgress: [MediaProgress] = []
@@ -71,7 +77,7 @@ struct BookDetails: View {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         Task {
                             do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil) }
-                            catch { self.error = error.localizedDescription }
+                            catch { recordLoadFailure(error.localizedDescription) }
                         }
                     }
                 }
@@ -82,7 +88,7 @@ struct BookDetails: View {
                                 Button(l10n("Read {0}", file.metadata?.filename ?? l10n("supplementary PDF"))) {
                                     Task {
                                         do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: file.metadata?.filename ?? book.title, ebook: ebook, file: nil, fileID: file.ino) }
-                                        catch { self.error = error.localizedDescription }
+                                        catch { recordLoadFailure(error.localizedDescription) }
                                     }
                                 }
                                 Button(l10n("Download {0}", file.metadata?.filename ?? l10n("supplementary PDF"))) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: nil, supplementaryID: file.ino) } }
@@ -123,7 +129,14 @@ struct BookDetails: View {
                         }
                     }
                 }
-                if let error { RecoveryCard(message: error) { load(monitorDownloads: true) } }
+                if let error {
+                    RecoveryCard(message: error.message) {
+                        switch error {
+                        case .load: load(monitorDownloads: true)
+                        case .discard: discardProgress()
+                        }
+                    }
+                }
             }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
         }.background(appearance.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
             .onAppear { load(monitorDownloads: true) }
@@ -192,7 +205,7 @@ struct BookDetails: View {
         request?.cancel()
         detailRevision = UUID()
         progressBusy = true
-        error = nil
+        clearLoadFailure()
         progressRequest = Task {
             defer { progressBusy = false }
             do {
@@ -200,7 +213,7 @@ struct BookDetails: View {
                 guard !Task.isCancelled else { return }
                 mediaProgress = user.mediaProgress
                 catalog.applyProgress(user)
-            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+            } catch { if !Task.isCancelled { recordLoadFailure(ConnectionStore.recovery(for: error)) } }
         }
     }
 
@@ -219,7 +232,7 @@ struct BookDetails: View {
                 progressDiscarded = true
                 mediaProgress = user.mediaProgress
                 catalog.discardProgress(user, itemID: book.id, episodeID: episode?.id)
-            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+            } catch { if !Task.isCancelled { self.error = .discard(ConnectionStore.recovery(for: error)) } }
         }
     }
 
@@ -318,6 +331,15 @@ struct BookDetails: View {
         }
     }
 
+    private func clearLoadFailure() {
+        if case .load? = error { error = nil }
+    }
+
+    private func recordLoadFailure(_ message: String) {
+        if case .discard? = error { return }
+        error = .load(message)
+    }
+
     private func watchDownloads() {
         downloadRequest?.cancel()
         downloadRequest = Task {
@@ -335,7 +357,7 @@ struct BookDetails: View {
                     if requestedDownloads.isEmpty, jobs.allSatisfy({ $0.isFinished || $0.failed }) { return }
                     try await Task.sleep(nanoseconds: 2_000_000_000)
                 }
-            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+            } catch { if !Task.isCancelled { recordLoadFailure(ConnectionStore.recovery(for: error)) } }
         }
     }
 
@@ -369,11 +391,11 @@ struct BookDetails: View {
                     try serverQueue.adoptLegacy(itemID: item.id)
                     try serverQueue.reconcile(itemID: item.id, episodes: book.media.episodes ?? [])
                 }
-                error = nil
+                clearLoadFailure()
                 if monitorDownloads, book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() }
             } catch {
                 guard !Task.isCancelled, detailRevision == revision, event.map(catalog.owns) != false else { return }
-                self.error = ConnectionStore.recovery(for: error)
+                recordLoadFailure(ConnectionStore.recovery(for: error))
             }
         }
     }
