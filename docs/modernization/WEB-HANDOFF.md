@@ -71,6 +71,13 @@ Last full run, on `296259de` (Studio, Chromium; the commit after it changes only
   image built from that commit, the OpenID journeys and the e-reader journey. The checks that a restart request
   must be the account's own are unit tests; no journey covers them.
 
+Checked by hand on `296259de` in the T3 preview (the dev server, signed in to the QA server as `qa`): with a held
+delete and a restart request naming another account seeded in IndexedDB, the shell showed the unreadable-request
+notice with **Restart the server**; choosing it kept the foreign request as a `restarted:...:unreadable-...` record
+and showed the request notice with **I restarted the server**, covering only this account's delete. The preview's
+screenshots failed, so the notice text and stored records were read from the page. The seeded records were removed
+afterwards, and nothing was confirmed.
+
 Superseded runs: on `843a928c` (`final-check-14.log`) everything passed (101 unit tests, 62 journeys, no fixture
 stalls); the run on `d272afbf` (`final-check-15.log`) was stopped part-way when review found the problems fixed in
 `296259de`, and is not evidence for either commit. On `df362fbd` (`final-check-10.log`) 98 unit tests and 61 journeys
