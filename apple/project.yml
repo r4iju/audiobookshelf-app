@@ -20,6 +20,7 @@ targets:
         type: folder
         buildPhase: resources
       - Playback
+      - Export/Sources/YearExport
       - ../tvos/Core/Sources/TVCore
     settings:
       base:
@@ -36,6 +37,7 @@ targets:
       properties:
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
+        NSPhotoLibraryAddUsageDescription: Save your year in review image to Photos.
         NSLocalNetworkUsageDescription: Connect directly to your Audiobookshelf server on your local network.
         UIBackgroundModes: [audio]
         CFBundleURLTypes:
