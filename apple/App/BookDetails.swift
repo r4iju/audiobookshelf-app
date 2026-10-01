@@ -1,4 +1,6 @@
 import SwiftUI
+import CryptoKit
+import UIKit
 
 struct BookDetails: View {
     @EnvironmentObject private var player: ApplePlayback
@@ -10,6 +12,19 @@ struct BookDetails: View {
     @State private var error: String?
     @State private var request: Task<Void, Never>?
     @State private var playAttempted = false
+    @State private var episodeProgress: [MediaProgress] = []
+    @AppStorage("previewEpisodeSort") private var episodeSort = "publishedAt"
+    @AppStorage("previewEpisodeDescending") private var episodeDescending = true
+    @State private var episodeFilter = "all"
+    @State private var progressBusy = false
+    @State private var progressRequest: Task<Void, Never>?
+    @State private var canManagePodcasts = false
+    @State private var showingFeed = false
+    @State private var downloads: [PodcastDownload] = []
+    @State private var downloadRequest: Task<Void, Never>?
+    @State private var requestedDownloads: Set<String> = []
+    @State private var downloadStorageKey: String?
+    @State private var detailRevision = UUID()
     private var book: LibraryItem { expanded ?? item }
 
     init(item: LibraryItem, catalog: CatalogStore, progress: MediaProgress?, episode: Episode? = nil) {
@@ -25,31 +40,40 @@ struct BookDetails: View {
                         Text(episode?.title ?? book.title).font(.system(.title2, design: .serif).bold())
                         if episode != nil { Text(book.title).font(.subheadline).foregroundColor(.secondary) }
                         Text(book.author).font(.headline).foregroundColor(.secondary)
-                        if let duration = book.media.duration { Label(ShelfTime.describe(duration), systemImage: "headphones").font(.subheadline) }
+                        if let duration = listeningDuration { Label(ShelfTime.describe(duration), systemImage: "headphones").font(.subheadline) }
                         if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
                             Text("Narrated by \(narrators.joined(separator: ", "))").font(.subheadline).foregroundColor(.secondary)
                         }
                     }
                 }
+                if book.mediaType != "podcast" || episode != nil {
                 Button { playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
                     HStack {
                         Image(systemName: "play.fill")
-                        Text(episode != nil ? "Start episode" : (progress?.currentTime ?? 0) > 0 ? "Resume listening" : "Start listening").fontWeight(.semibold)
+                        Text((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening").fontWeight(.semibold)
                         Spacer()
                     }.padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
-                }.disabled(player.preparing).accessibilityIdentifier("play-book")
+                }.disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
+                }
+                if episode != nil {
+                    Button(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished", action: toggleFinished).disabled(progressBusy)
+                    if progressBusy { ProgressView("Saving your progress…") }
+                }
                 if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
-                if let progress, (progress.currentTime ?? 0) > 0 {
+                if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
                     VStack(alignment: .leading, spacing: 10) {
                         ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
                         Text("\(ShelfTime.describe(progress.currentTime ?? 0)) listened · \(Int(progress.fraction * 100))% complete").font(.caption).foregroundColor(.secondary)
                     }
                 }
-                if let description = book.media.metadata.description, !description.isEmpty {
+                if let description = episode?.description ?? book.media.metadata.description, !description.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("About this book").font(.title3.bold())
+                        Text(episode != nil ? "About this episode" : book.mediaType == "podcast" ? "About this podcast" : "About this book").font(.title3.bold())
                         Text(Self.plainDescription(description)).font(.body).lineSpacing(5).foregroundColor(.secondary)
                     }
+                }
+                if book.mediaType == "podcast", episode == nil {
+                    podcastEpisodes
                 }
                 if let chapters = book.media.chapters, !chapters.isEmpty {
                     VStack(alignment: .leading, spacing: 14) {
@@ -64,26 +88,186 @@ struct BookDetails: View {
                         }
                     }
                 }
-                if let error { RecoveryCard(message: error) { load() } }
+                if let error { RecoveryCard(message: error) { load(monitorDownloads: true) } }
             }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
         }.background(ShelfStyle.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
-            .onAppear { if expanded == nil { load() } }
-            .onDisappear { request?.cancel() }
+            .onAppear { load(monitorDownloads: true) }
+            .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel() }
+            .sheet(isPresented: $showingFeed) {
+                FeedEpisodes(api: catalog.api, item: book, presented: $showingFeed) { urls in
+                    requestedDownloads.formUnion(urls.map(downloadIdentity))
+                    saveDownloadRequests()
+                    watchDownloads()
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
     }
 
-    private func load() {
+    private func toggleFinished() {
+        guard !progressBusy, let episode else { return }
+        let finished = selectedProgress?.isFinished != true
         request?.cancel()
+        detailRevision = UUID()
+        progressBusy = true
+        error = nil
+        progressRequest = Task {
+            defer { progressBusy = false }
+            do {
+                try await player.prepareProgressEdit(itemID: book.id, episodeID: episode.id)
+                try Task.checkCancellation()
+                try await catalog.api.setFinished(itemID: book.id, episodeID: episode.id, finished: finished)
+                let user = try await catalog.api.me()
+                guard !Task.isCancelled else { return }
+                episodeProgress = user.mediaProgress
+            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+        }
+    }
+
+    private var selectedProgress: MediaProgress? {
+        episodeProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? progress
+    }
+    private var listeningDuration: Double? {
+        if let episode { return episode.duration ?? episode.audioFile?.duration }
+        return book.media.duration
+    }
+    private func progress(for episode: Episode) -> MediaProgress? {
+        episodeProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode.id }
+    }
+    private var visibleEpisodes: [Episode] {
+        (book.media.episodes ?? []).filter { episode in
+            let progress = progress(for: episode)
+            switch episodeFilter {
+            case "complete": return progress?.isFinished == true
+            case "incomplete": return progress?.isFinished != true
+            case "inProgress": return progress != nil && progress?.isFinished != true
+            default: return true
+            }
+        }.sorted { left, right in
+            func value(_ episode: Episode) -> String {
+                switch episodeSort {
+                case "title": return episode.title
+                case "season": return episode.season ?? ""
+                case "episode": return episode.episode ?? ""
+                case "filename": return episode.audioFile?.metadata?.filename ?? ""
+                default: return String(episode.publishedAt ?? 0)
+                }
+            }
+            let comparison = value(left).localizedStandardCompare(value(right))
+            if comparison == .orderedSame { return left.id < right.id }
+            return comparison == (episodeDescending ? .orderedDescending : .orderedAscending)
+        }
+    }
+    private var podcastEpisodes: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack {
+                Text("Episodes").font(.title2.bold())
+                Spacer()
+                Menu {
+                    ForEach([("Published date", "publishedAt"), ("Title", "title"), ("Season", "season"), ("Episode number", "episode"), ("Filename", "filename")], id: \.1) { choice in
+                        Button(choice.0) { episodeSort = choice.1 }
+                    }
+                    Button(episodeDescending ? "Ascending order" : "Descending order") { episodeDescending.toggle() }
+                } label: { Image(systemName: "arrow.up.arrow.down") }.accessibilityLabel("Sort episodes")
+                Menu {
+                    Button("All episodes") { episodeFilter = "all" }
+                    Button("Incomplete") { episodeFilter = "incomplete" }
+                    Button("In progress") { episodeFilter = "inProgress" }
+                    Button("Complete") { episodeFilter = "complete" }
+                } label: { Image(systemName: "line.3.horizontal.decrease.circle") }.accessibilityLabel("Filter episodes")
+            }
+            if canManagePodcasts, book.media.metadata.feedUrl?.isEmpty == false {
+                Button { showingFeed = true } label: { Label("Feed episodes", systemImage: "dot.radiowaves.left.and.right") }
+            }
+            ForEach(downloads) { download in
+                HStack {
+                    Image(systemName: download.failed ? "exclamationmark.triangle" : download.isFinished ? "checkmark.circle" : "arrow.down.circle")
+                    Text(download.episodeDisplayTitle ?? "Podcast episode")
+                    Spacer()
+                    Text(download.failed ? "Failed" : download.isFinished ? "Ready" : "Downloading on server").font(.caption).foregroundColor(.secondary)
+                }
+            }
+            if !requestedDownloads.isEmpty {
+                Text("Waiting for \(requestedDownloads.count) episode(s) from your server").font(.caption).foregroundColor(.secondary).accessibilityIdentifier("server-download-pending")
+                Button("Refresh downloads", action: watchDownloads)
+            }
+            if visibleEpisodes.isEmpty { Text("No episodes found").foregroundColor(.secondary) }
+            ForEach(visibleEpisodes) { episode in
+                NavigationLink(destination: BookDetails(item: book, catalog: catalog, progress: progress(for: episode), episode: episode)) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(episode.title).font(.headline).foregroundColor(.primary)
+                        HStack {
+                            if let published = episode.publishedAt { Text(Date(timeIntervalSince1970: published / 1000), style: .date) }
+                            if let duration = episode.duration { Text(ShelfTime.describe(duration)) }
+                        }.font(.caption).foregroundColor(.secondary)
+                        if let progress = progress(for: episode) {
+                            ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
+                            Text(progress.isFinished == true ? "Finished" : ShelfTime.describe(progress.currentTime ?? 0) + " listened").font(.caption).foregroundColor(.secondary)
+                        }
+                    }.frame(maxWidth: .infinity, alignment: .leading).padding(18).background(ShelfStyle.card).cornerRadius(16)
+                }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("episode-\(episode.id)")
+            }
+        }
+    }
+
+    private func watchDownloads() {
+        downloadRequest?.cancel()
+        downloadRequest = Task {
+            do {
+                while !Task.isCancelled {
+                    async let queue = catalog.api.podcastDownloads(itemID: book.id)
+                    async let detail = catalog.api.item(id: book.id)
+                    let (jobs, value) = try await (queue, detail)
+                    guard !Task.isCancelled else { return }
+                    downloads = jobs
+                    expanded = value
+                    requestedDownloads.formUnion(jobs.filter { !$0.failed }.compactMap { $0.url }.map(downloadIdentity))
+                    let available = Set((value.media.episodes ?? []).compactMap { $0.enclosure?.url }.map(downloadIdentity))
+                    requestedDownloads.subtract(available)
+                    requestedDownloads.subtract(jobs.filter(\.failed).compactMap { $0.url }.map(downloadIdentity))
+                    saveDownloadRequests()
+                    if requestedDownloads.isEmpty, jobs.allSatisfy({ $0.isFinished || $0.failed }) { return }
+                    try await Task.sleep(nanoseconds: 2_000_000_000)
+                }
+            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+        }
+    }
+
+    private func load(monitorDownloads: Bool = false) {
+        guard !progressBusy else { return }
+        request?.cancel()
+        let revision = UUID()
+        detailRevision = revision
         request = Task {
             do {
-                let value = try await catalog.api.item(id: item.id)
-                guard !Task.isCancelled else { return }
+                async let detail = catalog.api.item(id: item.id)
+                async let account = catalog.api.me()
+                let (value, user) = try await (detail, account)
+                guard !Task.isCancelled, detailRevision == revision else { return }
                 expanded = value
+                episodeProgress = user.mediaProgress
+                canManagePodcasts = user.canManagePodcasts
+                if let server = catalog.api.credentials?.server {
+                    let account = try AccountIdentity(server: server, userID: user.id)
+                    let key = "previewServerPodcastRequests." + downloadIdentity(account.server + "\n" + account.userID + "\n" + book.id)
+                    downloadStorageKey = key
+                    requestedDownloads.formUnion(UserDefaults.standard.stringArray(forKey: key) ?? [])
+                    requestedDownloads.subtract((book.media.episodes ?? []).compactMap { $0.enclosure?.url }.map(downloadIdentity))
+                    saveDownloadRequests()
+                }
                 error = nil
+                if monitorDownloads, book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() }
             } catch {
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, detailRevision == revision else { return }
                 self.error = ConnectionStore.recovery(for: error)
             }
         }
+    }
+
+    private func downloadIdentity(_ value: String) -> String {
+        SHA256.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+    private func saveDownloadRequests() {
+        if let downloadStorageKey { UserDefaults.standard.set(Array(requestedDownloads), forKey: downloadStorageKey) }
     }
 
     private static func plainDescription(_ html: String) -> String {

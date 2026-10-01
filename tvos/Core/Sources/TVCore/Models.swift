@@ -1,7 +1,7 @@
 import Foundation
 
 public enum APIError: Error, LocalizedError, Equatable {
-    case invalidServer, unsafeMediaURL, signInRequired, http(Int), noAudio
+    case invalidServer, unsafeMediaURL, signInRequired, http(Int), noAudio, invalidPodcastTitle, podcastRequestTooLarge
     public var errorDescription: String? {
         switch self {
         case .invalidServer: return "Enter an http:// or https:// server address, without credentials, a query, or a fragment."
@@ -10,6 +10,8 @@ public enum APIError: Error, LocalizedError, Equatable {
         case .http(401): return "The username or password was not accepted."
         case .http(let code): return "The server returned HTTP \(code). Please try again."
         case .noAudio: return "This item has no playable audio."
+        case .invalidPodcastTitle: return "Enter a podcast title that can name a folder on your server."
+        case .podcastRequestTooLarge: return "Select fewer feed episodes and try again. The server accepts requests smaller than 5 MB."
         }
     }
 }
@@ -87,6 +89,11 @@ public struct Library: Decodable, Identifiable, Hashable {
     public let id: String
     public let name: String
     public let mediaType: String
+    public let folders: [LibraryFolder]?
+}
+public struct LibraryFolder: Decodable, Identifiable, Hashable {
+    public let id: String
+    public let fullPath: String
 }
 public struct LibrariesResponse: Decodable { public let libraries: [Library] }
 public struct ItemsResponse: Decodable {
@@ -117,12 +124,25 @@ public struct Metadata: Decodable {
     public let description: String?
     public let narrators: [String]?
     public let genres: [String]?
+    public let feedUrl: String?
 }
 public struct Author: Decodable { public let name: String }
 public struct Episode: Decodable, Identifiable {
     public let id: String
     public let title: String
     public let duration: Double?
+    public let description: String?
+    public let publishedAt: Double?
+    public let season: String?
+    public let episode: String?
+    public let audioFile: File?
+    public let enclosure: Enclosure?
+    public struct Enclosure: Decodable { public let url: String? }
+    public struct File: Decodable {
+        public let duration: Double?
+        public let metadata: FileMetadata?
+        public struct FileMetadata: Decodable { public let filename: String? }
+    }
 }
 public struct Chapter: Decodable, Identifiable {
     public let id: Int
@@ -168,9 +188,50 @@ public struct ProgressReport: Codable {
 public struct CurrentUser: Decodable {
     public let id: String
     public let username: String
+    public let type: String?
+    public var canManagePodcasts: Bool { type == "root" || type == "admin" }
     public let mediaProgress: [MediaProgress]
     public let permissions: UserPermissions
     public let bookmarks: [Bookmark]?
+}
+
+public struct PodcastFeedResponse: Decodable {
+    public let podcast: PodcastFeed
+}
+public struct PodcastDiscovery: Decodable, Identifiable {
+    public let id: Int
+    public let title: String
+    public let artistName: String?
+    public let descriptionPlain: String?
+    public let feedUrl: String?
+    public let cover: String?
+    public let genres: [String]?
+    public let releaseDate: String?
+    public let pageUrl: String?
+    public let artistId: Int?
+}
+public struct PodcastFeed: Decodable {
+    public let metadata: FeedMetadata
+    public let episodes: [PodcastFeedEpisode]?
+    public struct FeedMetadata: Decodable {
+        public let title: String?
+        public let author: String?
+        public let descriptionPlain: String?
+        public let feedUrl: String?
+        public let image: String?
+        public let categories: [String]?
+    }
+}
+
+public struct PodcastDownloads: Decodable {
+    public let downloads: [PodcastDownload]
+}
+public struct PodcastDownload: Decodable, Identifiable {
+    public let id: String
+    public let episodeDisplayTitle: String?
+    public let isFinished: Bool
+    public let failed: Bool
+    public let url: String?
 }
 
 public struct Bookmark: Decodable, Identifiable {

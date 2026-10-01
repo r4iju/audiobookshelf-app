@@ -54,6 +54,44 @@ import Foundation
 
     public func me() async throws -> CurrentUser { try await get("api/me") }
 
+    public func setFinished(itemID: String, episodeID: String?, finished: Bool) async throws {
+        let path = "api/me/progress/\(itemID)" + (episodeID.map { "/" + $0 } ?? "")
+        _ = try await request(path, method: "PATCH", body: ["isFinished": finished])
+    }
+
+    public func podcastFeed(url: String) async throws -> PodcastFeed {
+        let data = try await request("api/podcasts/feed", method: "POST", body: ["rssFeed": url])
+        return try JSONDecoder().decode(PodcastFeedResponse.self, from: data).podcast
+    }
+    public func discoverPodcasts(term: String) async throws -> [PodcastDiscovery] {
+        try await get("api/search/podcast", query: [URLQueryItem(name: "term", value: term)])
+    }
+
+    public func downloadFeedEpisodes(itemID: String, episodes: [PodcastFeedEpisode]) async throws {
+        let data = try JSONEncoder().encode(episodes)
+        guard data.count < 5 * 1024 * 1024 else { throw APIError.podcastRequestTooLarge }
+        _ = try await request("api/podcasts/\(itemID)/download-episodes", method: "POST", bodyData: data)
+    }
+    public func podcastDownloads(itemID: String) async throws -> [PodcastDownload] {
+        let response: PodcastDownloads = try await get("api/podcasts/\(itemID)/downloads")
+        return response.downloads
+    }
+
+    public func createPodcast(libraryID: String, folder: LibraryFolder, title: String, author: String, description: String, feed: PodcastFeed, feedURL: String, autoDownload: Bool, discovery: PodcastDiscovery? = nil) async throws -> LibraryItem {
+        let filename = title.components(separatedBy: CharacterSet(charactersIn: "/\\:?*\"<>|").union(.controlCharacters)).joined(separator: "_").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !filename.isEmpty, filename != ".", filename != ".." else { throw APIError.invalidPodcastTitle }
+        let path = (folder.fullPath as NSString).appendingPathComponent(filename)
+        let data = try await request("api/podcasts", method: "POST", body: [
+            "libraryId": libraryID, "folderId": folder.id, "path": path,
+            "media": ["metadata": ["title": title, "author": author, "description": description,
+                "feedUrl": discovery?.feedUrl ?? feed.metadata.feedUrl ?? feedURL, "imageUrl": discovery?.cover ?? feed.metadata.image ?? "",
+                "genres": discovery?.genres ?? feed.metadata.categories ?? [], "releaseDate": discovery?.releaseDate ?? "",
+                "itunesId": discovery.map { String($0.id) } ?? "", "itunesArtistId": discovery?.artistId.map(String.init) ?? "",
+                "itunesPageUrl": discovery?.pageUrl ?? ""] as [String: Any], "autoDownloadEpisodes": autoDownload]
+        ])
+        return try JSONDecoder().decode(LibraryItem.self, from: data)
+    }
+
     public func saveBookmark(itemID: String, time: Double, title: String, editing: Bool) async throws {
         _ = try await request("api/me/item/\(itemID)/bookmark", method: editing ? "PATCH" : "POST", body: ["time": time, "title": title])
     }

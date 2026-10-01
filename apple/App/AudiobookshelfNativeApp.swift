@@ -19,6 +19,11 @@ import SwiftUI
             UserDefaults.standard.removeObject(forKey: "previewSkipBackward")
             UserDefaults.standard.removeObject(forKey: "previewResumeRewind")
             UserDefaults.standard.removeObject(forKey: "previewMediaSeeking")
+            UserDefaults.standard.removeObject(forKey: "previewEpisodeSort")
+            UserDefaults.standard.removeObject(forKey: "previewEpisodeDescending")
+            for key in UserDefaults.standard.dictionaryRepresentation().keys where key.hasPrefix("previewServerPodcastRequests.") {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
         }
         if CommandLine.arguments.contains("--seed-legacy-preview-account") {
             try? vault.seedLegacyPreviewAccount()

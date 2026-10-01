@@ -24,6 +24,7 @@ import UIKit
     @Published private(set) var title = ""
     @Published private(set) var author = ""
     @Published private(set) var itemID: String?
+    @Published private(set) var episodeID: String?
     @Published private(set) var bookmarkSupported = false
     @Published private(set) var bookmarks: [Bookmark] = []
     @Published private(set) var bookmarkBusy = false
@@ -152,6 +153,7 @@ import UIKit
             try await listening.flush()
             guard requestGeneration == generation else { return }
             itemID = item.id
+            episodeID = episode?.id
             bookmarkSupported = item.mediaType == "book"
             title = episode?.title ?? item.title
             author = item.author
@@ -175,6 +177,7 @@ import UIKit
             currentTime = result.currentTime
             generation = UUID()
             itemID = item.id
+            episodeID = episode?.id
             title = episode?.title ?? item.title
             author = item.author
             listeningID = try await listening.begin(media: ListeningMedia(item: item, episode: episode, session: result), deviceID: deviceID)
@@ -412,6 +415,11 @@ import UIKit
         try await closeCurrentSession()
     }
 
+    func prepareProgressEdit(itemID: String, episodeID: String?) async throws {
+        if self.itemID == itemID, self.episodeID == episodeID { try await stop() }
+        try await listening.flush()
+    }
+
     func suspendForConnectionChange() async throws {
         guard !closing else { throw CancellationError() }
         wantsPlayback = false
@@ -437,7 +445,7 @@ import UIKit
         if let listeningID { try listening.finish(id: listeningID) }
         if let session { try api.releaseStream(sessionID: session.id) }
         player.replaceCurrentItem(with: nil)
-        session = nil; itemID = nil; currentTime = 0; listeningID = nil
+        session = nil; itemID = nil; episodeID = nil; currentTime = 0; listeningID = nil
         bookmarks = []; bookmarkError = nil
         error = nil
         needsSignIn = false
@@ -467,7 +475,7 @@ import UIKit
         }
         generation = UUID()
         player.replaceCurrentItem(with: nil)
-        session = nil; itemID = nil; currentTime = 0; listeningID = nil
+        session = nil; itemID = nil; episodeID = nil; currentTime = 0; listeningID = nil
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 

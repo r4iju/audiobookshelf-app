@@ -37,8 +37,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     user = {'id': '00000000-0000-4000-8000-000000000001', 'username': 'qa', 'type': 'user',
             'permissions': {'download': True, 'update': True, 'delete': False, 'upload': False},
             'mediaProgress': [], 'bookmarks': [], 'settings': {}}
-    podcast = {'id': 'podcast', 'mediaType': 'podcast', 'media': {'metadata': {'title': 'Evening Stories', 'author': 'QA Studio'}, 'episodes': [{'id': 'episode', 'title': 'A Quiet Evening', 'duration': 20}]}}
+    podcast = {'id': 'podcast', 'mediaType': 'podcast', 'media': {'metadata': {'title': 'Evening Stories', 'author': 'QA Studio'}, 'episodes': [{'id': 'episode', 'title': 'A Quiet Evening', 'duration': 20, 'publishedAt': 1000}, {'id': 'episode-morning', 'title': 'The Morning After', 'duration': 20, 'publishedAt': 2000}]}}
     sessions = {}
+    created_podcasts = []
+    pending_feed_downloads = []
     progress = {('book-0', None): {'libraryItemId': 'book-0', 'episodeId': None, 'currentTime': 6, 'duration': 20, 'progress': 0.3, 'isFinished': False}, ('book-60', None): {'libraryItemId': 'book-60', 'episodeId': None, 'currentTime': 6, 'duration': 20, 'progress': 0.3, 'isFinished': False}}
     user['mediaProgress'] = list(progress.values())
     other_user = {**copy.deepcopy(user), 'id': '00000000-0000-4000-8000-000000000002', 'username': 'qa-other'}
@@ -142,9 +144,11 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
             if path == '/api/libraries':
-                return self.respond(200, {'libraries': [{'id': 'books', 'name': 'Audiobooks', 'mediaType': 'book'}, {'id': 'podcasts', 'name': 'Podcasts', 'mediaType': 'podcast'}]})
+                return self.respond(200, {'libraries': [{'id': 'books', 'name': 'Audiobooks', 'mediaType': 'book'}, {'id': 'podcasts', 'name': 'Podcasts', 'mediaType': 'podcast', 'folders': [{'id': 'podcast-folder', 'fullPath': '/fixtures/podcasts'}]}]})
             if path == '/api/libraries/podcasts/items':
-                return self.respond(200, {'results': [podcast], 'total': 1})
+                if created_podcasts:
+                    time.sleep(2)
+                return self.respond(200, {'results': [podcast] + created_podcasts, 'total': 1 + len(created_podcasts)})
             if path == '/api/libraries/podcasts/personalized':
                 return self.respond(200, [])
             if path == '/api/libraries/podcasts/search':
@@ -182,7 +186,17 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if path == '/api/me':
                 return self.respond(200, {**self.account, 'permissions': {'download': False, 'update': False, 'delete': False, 'upload': False}} if configuration['mode'] == 'edge-metadata' else self.account)
             if path == '/api/items/podcast':
+                if configuration['mode'] == 'podcast-slow-detail':
+                    time.sleep(5)
+                for download in list(pending_feed_downloads):
+                    if time.monotonic() >= download['readyAt']:
+                        podcast['media']['episodes'].append(download['episode'])
+                        pending_feed_downloads.remove(download)
                 return self.respond(200, podcast)
+            if path == '/api/podcasts/podcast/downloads':
+                return self.respond(200, {'downloads': []})
+            if path == '/api/search/podcast':
+                return self.respond(200, [{'id': 42, 'title': 'New Voices Discovery', 'artistName': 'Fixture Studio', 'feedUrl': 'http://127.0.0.1:19765/feed.xml', 'genres': ['Stories']}])
             if path and path.startswith('/api/items/book-') and not path.endswith('/cover'):
                 try:
                     return self.respond(200, items[int(path.rsplit('-', 1)[1])])
@@ -238,15 +252,23 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(400, {})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False)
+                user['type'] = 'admin' if mode == 'podcast-admin' else 'user'
+                created_podcasts.clear()
+                pending_feed_downloads.clear()
+                podcast['media']['metadata']['feedUrl'] = 'http://127.0.0.1/feed.xml'
+                podcast['media']['episodes'] = [episode for episode in podcast['media']['episodes'] if episode['id'] != 'episode-new']
                 items[0]['media']['metadata']['title'] = 'A Very Long Story Title About Finding Your Way Home Through A City Of Unexpected Doors And Forgotten Libraries' if mode == 'edge-metadata' else 'Stories for Tomorrow 01'
                 items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else 20
                 if mode in ('baseline', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress'):
                     reports.clear()
                     local_sessions.clear()
                     for account in users.values():
+                        for key in list(progress_by_user[account['id']]):
+                            if key[0] == 'podcast':
+                                del progress_by_user[account['id']][key]
                         account['bookmarks'] = []
                         position = 6 if account['username'] == 'qa' else 2
                         progress_by_user[account['id']][('book-0', None)].update(currentTime=position, duration=20, progress=position / 20, isFinished=False, lastUpdate=0)
@@ -272,6 +294,36 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'user': {**account, 'token': 'fresh' + suffix, 'accessToken': 'fresh' + suffix, 'refreshToken': 'refresh' + suffix}})
             if not self.authorized():
                 return self.respond(401, {})
+            if path == '/api/podcasts/feed':
+                if self.account['type'] not in ('root', 'admin'):
+                    return self.respond(403, {})
+                return self.respond(200, {'podcast': {'metadata': {'title': 'New Voices', 'author': 'Fixture Studio', 'descriptionPlain': 'A local feed', 'feedUrl': data.get('rssFeed'), 'categories': ['Stories']}, 'episodes': [{'title': 'The Next Story', 'guid': 'rss-next', 'publishedAt': 3000, 'enclosure': {'url': 'http://127.0.0.1/audio-next.mp3', 'type': 'audio/mpeg', 'length': '1234'}, 'customMetadata': {'retain': True}}]}})
+            if path == '/api/podcasts/podcast/download-episodes':
+                if self.account['type'] not in ('root', 'admin'):
+                    return self.respond(403, {})
+                if not isinstance(data, list) or len(data) != 1 or data[0].get('guid') != 'rss-next' or data[0].get('customMetadata') != {'retain': True} or data[0].get('enclosure', {}).get('url') != 'http://127.0.0.1/audio-next.mp3':
+                    return self.respond(400, {})
+                pending_feed_downloads.append({'readyAt': time.monotonic() + 5, 'episode': {'id': 'episode-new', 'title': data[0]['title'], 'duration': 20, 'publishedAt': data[0]['publishedAt'], 'enclosure': data[0]['enclosure']}})
+                return self.respond(200, {})
+            if path == '/api/podcasts':
+                if self.account['type'] not in ('root', 'admin'):
+                    return self.respond(403, {})
+                if data.get('libraryId') != 'podcasts' or data.get('folderId') != 'podcast-folder' or data.get('path') not in ('/fixtures/podcasts/New Voices', '/fixtures/podcasts/New Voices Discovery'):
+                    return self.respond(400, {'error': 'Invalid folder/path'})
+                value = {'id': 'podcast-new', 'mediaType': 'podcast', 'media': {**data['media'], 'episodes': []}}
+                created_podcasts.append(value)
+                return self.respond(200, value)
+            completion = re.fullmatch(r'/api/me/progress/podcast/(episode|episode-morning)', path or '')
+            if completion and self.command == 'PATCH':
+                if not isinstance(data.get('isFinished'), bool):
+                    return self.respond(400, {})
+                key = ('podcast', completion.group(1))
+                current = self.progress.get(key, {})
+                finished = data['isFinished']
+                self.progress[key] = {**current, 'libraryItemId': 'podcast', 'episodeId': key[1], 'duration': 20,
+                    'currentTime': 20 if finished else 0, 'progress': 1 if finished else 0, 'isFinished': finished, 'lastUpdate': int(time.time() * 1000)}
+                self.account['mediaProgress'] = list(self.progress.values())
+                return self.respond(200, self.progress[key])
             if path == '/api/session/local-all':
                 if configuration['mode'] == 'offline-progress':
                     return self.respond(503, {})
@@ -306,14 +358,15 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 bookmark = {'libraryItemId': 'book-0', 'time': position, 'title': title, 'createdAt': int(time.time() * 1000)}
                 self.account['bookmarks'].append(bookmark)
                 return self.respond(200, bookmark)
-            play = re.fullmatch(r'/api/items/(book-[0-9]+|podcast)/play(?:/(episode))?', path or '')
+            play = re.fullmatch(r'/api/items/(book-[0-9]+|podcast)/play(?:/(episode|episode-morning))?', path or '')
             if play:
                 delay_response = configuration['mode'] == 'slow-session'
                 item_id, episode_id = play.groups()
                 if item_id == 'podcast':
-                    if episode_id != 'episode':
+                    selected_episode = next((episode for episode in podcast['media']['episodes'] if episode['id'] == episode_id), None)
+                    if selected_episode is None:
                         return self.respond(404, {})
-                    title = 'A Quiet Evening'
+                    title = selected_episode['title']
                 else:
                     index = int(item_id.removeprefix('book-'))
                     if index >= len(items) or episode_id is not None:

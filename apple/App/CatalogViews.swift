@@ -38,6 +38,7 @@ struct CatalogShelf: View {
     @StateObject private var catalog: CatalogStore
     @State private var listLayout = false
     @State private var filterOptions = false
+    @State private var addingPodcast = false
     init(api: APIClient, library: Library, filter: String? = nil) {
         _catalog = StateObject(wrappedValue: CatalogStore(api: api, library: library, filter: filter))
     }
@@ -117,6 +118,9 @@ struct CatalogShelf: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
+                        if catalog.library.mediaType == "podcast", case .content(let content) = catalog.state, content.user.canManagePodcasts {
+                            Button("Add podcast") { addingPodcast = true }
+                        }
                         Button("Refresh") { Task { await catalog.reload() } }
                         Button("Change library") { Task { await connection.openLibrariesForSelection() } }
                         Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
@@ -125,6 +129,7 @@ struct CatalogShelf: View {
                 }
             }.onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
             .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
+            .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
     }
 
     private func progress(_ item: LibraryItem, _ content: CatalogStore.Catalog) -> MediaProgress? {
