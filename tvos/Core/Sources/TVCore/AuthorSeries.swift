@@ -86,6 +86,9 @@ public struct SeriesPage: Decodable {
         guard api.authorizationRevision == revision, let account, let credentials = api.credentials, let user = credentials.userID else { return false }
         return (try? AccountIdentity(server: credentials.server, userID: user)) == account
     }
+
+    /// Whether a server response about `userID` belongs to this sign-in's account.
+    func owns(userID: String) -> Bool { isCurrent && account?.userID == userID }
 }
 
 /// Books of one author or series in the server's order, a page at a time.

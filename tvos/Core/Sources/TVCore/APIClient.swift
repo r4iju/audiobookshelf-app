@@ -224,6 +224,28 @@ import Foundation
     public func authorImageData(authorID: String, authorization: UUID) async throws -> Data {
         try await request("api/authors/\(authorID)/image", query: [URLQueryItem(name: "width", value: "400")], pinned: authorization)
     }
+    /// The signed-in user and the e-reader devices the server lets them use, from the same payload as sign-in.
+    public func sessionAuthorization(authorization: UUID) async throws -> SessionAuthorization {
+        try JSONDecoder().decode(SessionAuthorization.self, from: await request("api/authorize", method: "POST", pinned: authorization))
+    }
+    /// The expanded item with its open RSS feed, if any.
+    public func itemActions(id: String, authorization: UUID) async throws -> ItemActionsDetail {
+        try await get("api/items/\(id)", pinned: authorization, query: [URLQueryItem(name: "expanded", value: "1"), URLQueryItem(name: "include", value: "rssfeed")])
+    }
+    public func openFeed(itemID: String, serverAddress: String, slug: String, preventIndexing: Bool, ownerName: String, ownerEmail: String, authorization: UUID) async throws -> RSSFeed {
+        struct Opened: Decodable { let feed: RSSFeed }
+        let data = try await request("api/feeds/item/\(itemID)/open", method: "POST", body: [
+            "serverAddress": serverAddress, "slug": slug,
+            "metadataDetails": ["preventIndexing": preventIndexing, "ownerName": ownerName, "ownerEmail": ownerEmail]
+        ], pinned: authorization)
+        return try JSONDecoder().decode(Opened.self, from: data).feed
+    }
+    public func closeFeed(id: String, authorization: UUID) async throws {
+        _ = try await request("api/feeds/\(id)/close", method: "POST", pinned: authorization)
+    }
+    public func sendEbookToDevice(itemID: String, deviceName: String, authorization: UUID) async throws {
+        _ = try await request("api/emails/send-ebook-to-device", method: "POST", body: ["libraryItemId": itemID, "deviceName": deviceName], pinned: authorization)
+    }
     public func filters(libraryID: String) async throws -> LibraryFilters { try await get("api/libraries/\(libraryID)/filterdata") }
     public func item(id: String) async throws -> LibraryItem { try await get("api/items/\(id)", query: [URLQueryItem(name: "expanded", value: "1")]) }
 
