@@ -52,6 +52,15 @@ import Foundation
         return serverFinished || audio.serverPosition >= audio.media.duration
     }
 
+    /// Whether this device still holds unacknowledged listening for the media or, given a remote
+    /// update time, saved a later position for it.
+    func hasLocalListening(account: AccountIdentity, itemID: String, episodeID: String?, newerThan remoteUpdatedAt: Double?) throws -> Bool {
+        let journal = try loaded()
+        if journal.pending(account: account).contains(where: { $0.media.libraryItemID == itemID && $0.media.episodeID == episodeID }) { return true }
+        guard let remoteUpdatedAt else { return false }
+        return journal.cachedPosition(account: account, itemID: itemID, episodeID: episodeID, newerThan: remoteUpdatedAt.nextUp) != nil
+    }
+
     func record(id: String, position: Double, listened: Double) throws {
         try loaded().record(id: id, position: position, listened: listened)
     }

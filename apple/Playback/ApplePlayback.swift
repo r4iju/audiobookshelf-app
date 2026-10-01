@@ -512,6 +512,51 @@ import UIKit
         sync()
     }
 
+    /// Moves a paused player to progress another session saved for the open media, as the baseline
+    /// player does for `user_media_progress_updated`. Returns whether the player moved.
+    @discardableResult
+    func followRemoteProgress(account: AccountIdentity, itemID: String, episodeID: String?, sessionID: String?) async -> Bool {
+        guard itemID == self.itemID, episodeID == self.episodeID,
+              sessionID == nil || (sessionID != session?.id && sessionID != listeningID) else { return false }
+        return await followPausedProgress(account: account)
+    }
+
+    /// Progress events can be missed while disconnected; call after reconnecting to refresh paused media.
+    @discardableResult
+    func refreshPausedProgress(account: AccountIdentity) async -> Bool {
+        await followPausedProgress(account: account)
+    }
+
+    // Never publishes first: a 2.30 local session sync replaces server progress that is not strictly
+    // newer, which could erase the other device's movement. Unsent or newer own listening is left to
+    // the regular sync, and any local change while the server answers keeps the local position.
+    private func followPausedProgress(account: AccountIdentity) async -> Bool {
+        guard let session, let itemID else { return false }
+        let episodeID = self.episodeID
+        let authorization = api.authorizationRevision
+        let intent = playbackIntent
+        let position = currentTime
+        func unchanged() -> Bool {
+            !wantsPlayback && !playing && !preparing && !seeking && !closing && seekLoop == nil
+                && api.authorizationRevision == authorization && playbackIntent == intent
+                && self.session?.id == session.id && self.itemID == itemID && self.episodeID == episodeID
+                && currentTime == position
+        }
+        do {
+            guard unchanged(), try await api.currentAccount() == account, unchanged(),
+                  try !listening.hasLocalListening(account: account, itemID: itemID, episodeID: episodeID, newerThan: nil) else { return false }
+            let user = try await api.me()
+            guard unchanged(), try await api.currentAccount() == account, unchanged(),
+                  let progress = user.mediaProgress.first(where: { $0.libraryItemId == itemID && $0.episodeId == episodeID }),
+                  let remote = progress.currentTime, remote.isFinite, let updated = progress.lastUpdate, updated.isFinite,
+                  try !listening.hasLocalListening(account: account, itemID: itemID, episodeID: episodeID, newerThan: updated) else { return false }
+            let target = min(max(remote, 0), session.duration)
+            guard target != position else { return false }
+            try await seek(to: target, autoplay: false)
+            return self.session?.id == session.id && currentTime == target
+        } catch { return false }
+    }
+
     func restoreListening() async {
         do { try await listening.flush(); clearProgressFailure() }
         catch { failed(error, prefix: "Saved listening is waiting to sync: ", origin: .progress) }
