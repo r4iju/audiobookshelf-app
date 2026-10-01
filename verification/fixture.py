@@ -94,6 +94,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     login_outcomes = []
     requests = []
     realtime_authentications = []
+    remote_events = []
+    remote_originals = {'progress': {}, 'playlists': {}}
     configuration = {'mode': 'baseline', 'failed': False}
     collections = [{'id': 'collection-evening', 'libraryId': 'books', 'name': 'Evening shelf', 'description': 'An established listening order.', 'books': [items[2], items[1]]}]
     playlists = [{'id': 'playlist-evening', 'libraryId': 'books', 'userId': user['id'], 'name': 'Evening queue', 'description': 'Personal listening.', 'items': [{'libraryItemId': item['id'], 'libraryItem': item} for item in [items[1], items[2]]]}]
@@ -201,6 +203,50 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             self.respond(200, entry)
             return True
 
+        def remote_change(self, data):
+            """Applies a change as another client of the same server would, queueing the server 2.30 realtime events."""
+            change = data.get('change')
+            account = users.get(data.get('username', 'qa'))
+            if account is None:
+                return self.respond(400, {})
+            if change in ('progress', 'silent-progress'):
+                key = (data.get('itemId'), None)
+                if not re.fullmatch(r'book-[0-9]+', key[0] or '') or not isinstance(data.get('currentTime'), (int, float)):
+                    return self.respond(400, {})
+                position = data['currentTime']
+                entry = {**progress_by_user[account['id']].get(key, {}), 'id': 'progress-' + key[0], 'userId': account['id'], 'libraryItemId': key[0], 'episodeId': None,
+                         'duration': 20, 'currentTime': position, 'progress': position / 20, 'isFinished': position >= 20, 'lastUpdate': int(time.time() * 1000)}
+                remote_originals['progress'].setdefault((account['id'], key), copy.deepcopy(progress_by_user[account['id']].get(key)))
+                progress_by_user[account['id']][key] = entry
+                account['mediaProgress'] = list(progress_by_user[account['id']].values())
+                if change == 'progress':
+                    remote_events.append({'name': 'user_item_progress_updated', 'userId': account['id'], 'data': {'id': entry['id'], 'sessionId': 'remote-session', 'deviceDescription': 'Remote fixture client', 'data': entry}})
+            elif change == 'item-title':
+                if data.get('itemId') != 'book-1' or not isinstance(data.get('title'), str):
+                    return self.respond(400, {})
+                items[1]['media']['metadata']['title'] = data['title']
+                remote_events.append({'name': 'item_updated', 'data': {**items[1], 'libraryId': 'books'}})
+            elif change == 'playlist-add':
+                entry = {'id': 'playlist-remote', 'libraryId': 'books', 'userId': account['id'], 'name': data.get('name', 'Shared from elsewhere'), 'items': [{'libraryItemId': items[3]['id'], 'libraryItem': items[3]}]}
+                playlists.append(entry)
+                remote_events.append({'name': 'playlist_added', 'userId': account['id'], 'data': entry})
+            elif change in ('playlist-rename', 'playlist-remove'):
+                entry = next((entry for entry in playlists if entry['id'] == data.get('playlistId') and entry['userId'] == account['id']), None)
+                if entry is None:
+                    return self.respond(404, {})
+                if entry['id'] != 'playlist-remote':
+                    remote_originals['playlists'].setdefault(entry['id'], (playlists.index(entry), copy.deepcopy(entry)))
+                if change == 'playlist-rename':
+                    entry['name'] = data.get('name', 'Renamed elsewhere')
+                else:
+                    playlists.remove(entry)
+                remote_events.append({'name': 'playlist_updated' if change == 'playlist-rename' else 'playlist_removed', 'userId': account['id'], 'data': entry})
+            elif change == 'disconnect':
+                remote_events.append({'name': '__disconnect__'})
+            else:
+                return self.respond(400, {})
+            return self.respond(200, {})
+
         def do_GET(self):
             path, query = self.route()
             if path == '/__fixture__/realtime-events':
@@ -210,6 +256,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                         if download.get('emitted'): download['duplicateEmitted'] = True
                         download['emitted'] = True
                         events.append({'name': 'episode_download_finished', 'data': {'id': download['id'], 'libraryItemId': 'podcast', 'libraryId': 'podcasts', 'url': download['episode']['enclosure']['url'], 'episodeDisplayTitle': download['episode']['title'], 'isFinished': True, 'failed': True}})
+                events += remote_events
+                remote_events.clear()
                 return self.respond(200, events)
             if path == '/status':
                 return self.respond(200, {'isInit': True, 'version': '2.30.0-fixture', 'authMethods': ['local', 'openid'] if configuration['mode'].startswith('openid') else ['local'], 'language': 'en-us', 'serverSettings': {}})
@@ -424,11 +472,24 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 identity = other_user['id'] if token == 'fresh-other' else user['id']
                 realtime_authentications.append(identity)
                 return self.respond(200, {'userId': identity})
+            if path == '/__fixture__/remote-change':
+                return self.remote_change(data)
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
                 if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
+                remote_events.clear()
+                for (account_id, key), original in remote_originals['progress'].items():
+                    if original is None: progress_by_user[account_id].pop(key, None)
+                    else: progress_by_user[account_id][key] = original
+                for account in users.values():
+                    account['mediaProgress'] = list(progress_by_user[account['id']].values())
+                playlists[:] = [entry for entry in playlists if entry['id'] != 'playlist-remote']
+                for index, original in sorted(remote_originals['playlists'].values(), key=lambda value: value[0]):
+                    playlists[:] = [entry for entry in playlists if entry['id'] != original['id']]
+                    playlists.insert(index, original)
+                remote_originals['progress'].clear(); remote_originals['playlists'].clear()
                 if mode in ('pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
                     document = b'not a PDF' if mode == 'pdf-invalid' else pdf(pages=120 if mode == 'pdf-long' else 4, rotation=90 if mode == 'pdf-rotated' else 0)
                     items[0]['media']['ebookFile'] = {'ino': 'pdf', 'ebookFormat': 'pdf', 'metadata': {'filename': 'stories.pdf', 'ext': '.pdf', 'size': len(document)}}
