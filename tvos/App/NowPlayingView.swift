@@ -6,6 +6,8 @@ struct NowPlayingView: View {
     @EnvironmentObject private var player: TVPlayer
     @State private var showChapters = false
     @State private var stopError: String?
+    @State private var restartError: String?
+    @State private var restarting = false
     static let speeds: [Float] = [0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
 
     var body: some View {
@@ -44,21 +46,26 @@ struct NowPlayingView: View {
             }
             transport.focusSection()
             options.focusSection()
-            if let error = stopError ?? player.error {
+            if let error = stopError ?? restartError ?? player.error {
                 HStack(spacing: 30) {
                     Text(error).foregroundStyle(.orange).accessibilityIdentifier("playback-error")
                     if player.needsSignIn {
                         Button("Sign in again") { catalog.needsSignIn = true }
-                    } else {
+                    } else if stopError != nil || player.isProgressFailure {
                         Button("Save progress again") { stopError = nil; player.sync() }.accessibilityIdentifier("retry-sync")
+                    } else {
+                        Button(restarting ? "Restarting…" : "Restart playback") { Task { await restartMedia() } }
+                            .accessibilityIdentifier("restart-playback")
+                            .disabled(restarting || player.preparing || player.seeking)
                     }
                 }
+                .focusSection()
             }
         }
         .padding(.horizontal, 90)
         .padding(.vertical, 50)
         .sheet(isPresented: $showChapters) { chapters }
-        .onChange(of: player.session?.id) { stopError = nil }
+        .onChange(of: player.session?.id) { stopError = nil; restartError = nil }
     }
 
     private var status: String {
@@ -130,6 +137,27 @@ struct NowPlayingView: View {
             } label: { Label("Stop", systemImage: "stop.fill") }
                 .accessibilityIdentifier("stop-playback")
                 .disabled(player.preparing)
+        }
+    }
+
+    /// Reopens the media that failed from its saved position, unless another title started meanwhile.
+    private func restartMedia() async {
+        guard let itemID = player.itemID else { return }
+        let episodeID = player.episodeID
+        restarting = true; restartError = nil
+        defer { restarting = false }
+        do {
+            let item = try await catalog.api.item(id: itemID)
+            guard player.itemID == itemID, player.episodeID == episodeID else { return }
+            let episode = episodeID.flatMap { id in item.media.episodes?.first { $0.id == id } }
+            if episodeID != nil, episode == nil {
+                restartError = "This episode is no longer on the server."
+                return
+            }
+            await player.start(item: item, episode: episode)
+        } catch {
+            catalog.noteAuthentication(error)
+            restartError = "Playback could not be restarted: " + CatalogStore.recovery(for: error)
         }
     }
 

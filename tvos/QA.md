@@ -1,14 +1,14 @@
 # Apple TV verification
 
-Last verified October 1, 2026 (after the review fixes) on the Studio with Xcode 27.0 (27A266a), the tvOS 27 simulator `Audiobookshelf TV QA` (`00DD108F-2435-4FEC-9C37-3E62861A0EF6`, Apple TV 4K 2nd generation, 1080p) and the synthetic fixture `verification/fixture.py`, which reports server version `2.30.0-fixture`. Fixture titles, accounts and audio are synthetic; no live library or credentials were used.
+Last verified October 2, 2026, integrated with shared commit `44011bc2`, on the Studio with Xcode 27.0 (27A266a), the tvOS 27 simulator `Audiobookshelf TV QA` (`00DD108F-2435-4FEC-9C37-3E62861A0EF6`, Apple TV 4K 2nd generation, 1080p) and the synthetic fixture `verification/fixture.py`, which reports server version `2.30.0-fixture`. Fixture titles, accounts and audio are synthetic; no live library or credentials were used.
 
 ## Automated evidence
 
 | Check | Command | Result |
 | --- | --- | --- |
-| TV core contracts | `swift test --package-path tvos/Core` | 15 passed |
+| TV core contracts | `swift test --package-path tvos/Core` | 21 passed |
 | TV app unit tests (`TVAppTests`) | run by `./tvos/scripts/verify-ui.sh` | 6 passed |
-| Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 15 journeys passed, 0 failed (389 s) |
+| Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 16 journeys passed, 0 failed (413 s) |
 | Signed device build and install | `./tvos/scripts/deploy.sh --no-launch a5ef39a5001ef59dec9c2fa15838447215252137` | Release build signed by team `C7X9BCC7LP`, `codesign --verify --deep --strict` passes, installed on Living Room TV (tvOS 18.6) |
 
 The journeys run the Debug app with no test-only code paths beyond the launch-time reset. They operate it only through `XCUIRemote` presses (directions, Select, Menu, Play/Pause) and keyboard entry. They then assert what the screen shows and what the fixture server observed. Every journey was written first. The red run on October 1, 2026 against the previous TV app failed all 13 journeys before any implementation.
@@ -25,13 +25,14 @@ The journeys run the Debug app with no test-only code paths beyond the launch-ti
 | #27 | `PlaybackJourney.testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying` | Chapter list seek into the second audio file; leaving Now Playing for Home keeps listening |
 | #27 | `PlaybackJourney.testSpeedSelectionAndExplicitStopClosesTheSession` | Speed menu; Stop closes the server session |
 | #27 | `PlaybackJourney.testNaturalEndShowsFinished` | Multi-file book plays to its natural end and reports Finished at 0:20 |
+| #28 | `RecoveryJourney.testMediaFailureOffersRestartRatherThanSavingProgress` | Unplayable audio shows Restart playback, not Save progress again; after the server recovers, Restart reaches Playing on the same title without leaving Now Playing |
 | #28 | `RecoveryJourney.testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch` | With the server rejecting progress, listen, pause and terminate. Relaunch sends the saved listening once; details show the new server position; a second relaunch sends nothing more |
 | #29 | `PodcastJourney.testEpisodesSortAndPlaySeparatelyFromBooks` | Newest/oldest episode order, episode details, playback, server listening recorded for the episode only |
 | #29 | `PodcastJourney.testMarkEpisodeFinishedUpdatesOnlyThatEpisode` | Mark as finished sends `PATCH /api/me/progress/podcast/episode-morning`; only that episode shows Finished |
 | #29 | `PodcastJourney.testPodcastResultTileShowsItsEpisodeProgress` | A finished episode's search tile reports Finished, from that episode's progress rather than the podcast's |
 | #26, #28 | `CatalogJourney.testProgressFilterDropsATitleMarkedFinishedOnReturn` | With the Not started filter, marking a title finished and pressing Back refetches the filter so the title is gone and the filter is kept |
 
-`TVAppTests` covers what the fixture cannot produce: formatting of absurd server times (for example `1e300` seconds) saturates instead of trapping, search keeps a podcast and each of its matching episodes as separate navigable results, and only an HTTP 404 marks a cover as absent (5xx, 429, timeouts and cancellations retry). Each of those tests and the two journeys above failed first on October 1–2, 2026: the formatting test crashed with `Double value cannot be converted to Int`, search returned one result instead of three, the cover policy cached 500/503/429, the filter kept the finished title, and the tile reported no progress.
+`TVAppTests` covers what the fixture cannot produce: formatting of absurd server times (for example `1e300` seconds) saturates instead of trapping, search keeps a podcast and each of its matching episodes as separate navigable results, and only an HTTP 404 marks a cover as absent (5xx, 429, timeouts and cancellations retry). Each of those tests and the new journeys failed first on October 1–2, 2026. The media-failure journey failed because Now Playing offered Save progress again; it then exposed two more TV defects that are now fixed: the error row was unreachable with the remote, and restarting dropped back to Home while the new session prepared. Other first failures: the formatting test crashed with `Double value cannot be converted to Int`, search returned one result instead of three, the cover policy cached 500/503/429, the filter kept the finished title, and the tile reported no progress.
 
 Screenshots captured by those journeys:
 

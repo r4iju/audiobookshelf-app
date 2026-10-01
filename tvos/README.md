@@ -43,6 +43,7 @@ Connections go directly to the server. HTTPS uses system trust only, so a server
 
 - Switching tabs, opening details or returning to Home keeps the current session.
 - Pressing the TV/Home button sends the app to the background, which pauses and saves. Control Center or the screen saver (the inactive phase) keeps listening.
+- Failures say what helps: a progress failure offers "Save progress again"; a media failure offers "Restart playback", which reopens the same book or episode from its saved position and stays on Now Playing while it prepares.
 - Stop closes the server session after sending outstanding listening. Signing out stops playback first and is cancelled if listening cannot be saved.
 
 ### Not included
@@ -53,7 +54,6 @@ Downloads, offline playback, ebook/PDF reading, collections/playlists management
 
 - The interface is English only; there is no string catalog yet.
 - Home and Search skip a library that fails to load and show the others; they report an error only when every library fails.
-- Open defect: when playback reports an error, Now Playing offers "Save progress again" even if the failure came from the media rather than from saving progress. Fixing it needs the shared player to expose the failure origin (see [HANDOFF.md](HANDOFF.md), item 2). Until then, start playback again from the details screen after a media failure.
 
 ## Build and verify
 

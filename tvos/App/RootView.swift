@@ -42,7 +42,7 @@ struct RootView: View {
             }
             SearchView()
                 .tabItem { Text("Search") }.tag(TVTab.search)
-            if player.session != nil {
+            if player.session != nil || player.preparing {
                 NowPlayingView()
                     .tabItem { Text("Now Playing") }.tag(TVTab.nowPlaying)
             }
@@ -50,7 +50,7 @@ struct RootView: View {
                 .tabItem { Text("Settings") }.tag(TVTab.settings)
         }
         .onPlayPauseCommand { if player.session != nil { player.toggle() } }
-        .onChange(of: player.session == nil) { _, ended in
+        .onChange(of: player.session == nil && !player.preparing) { _, ended in
             if ended && navigator.tab == .nowPlaying { navigator.tab = .home }
         }
         .task { if catalog.libraries.isEmpty { await catalog.loadCatalog() } }

@@ -13,6 +13,8 @@ final class RecoveryJourney: TVJourney {
         remote.press(.playPause)
         wait(app.staticTexts["playback-status"], label: "Paused")
         XCTAssertTrue(app.staticTexts["playback-error"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["retry-sync"].exists, "A progress failure offers to save again")
+        XCTAssertFalse(app.buttons["restart-playback"].exists)
         let listenedTo = seconds("now-playing-elapsed")
         XCTAssertGreaterThan(listenedTo, 6)
         app.terminate()
@@ -42,5 +44,22 @@ final class RecoveryJourney: TVJourney {
         let after = try await observations()
         XCTAssertEqual(after.reports.count, reported, "A delivered report must not be sent again")
         XCTAssertEqual(after.localSessions.filter { $0.libraryItemId == "book-0" }.map(\.timeListening).reduce(0, +), recovered.timeListening, accuracy: 0.01)
+    }
+
+    func testMediaFailureOffersRestartRatherThanSavingProgress() async throws {
+        try await Fixture.configure("broken-audio")
+        signIn()
+        waitForHome()
+        select(app.buttons["continue-listening.book-0"])
+        select(app.buttons["play-item"])
+        let restart = app.buttons["restart-playback"]
+        XCTAssertTrue(restart.waitForExistence(timeout: 30), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["playback-error"].exists)
+        XCTAssertFalse(app.buttons["retry-sync"].exists, "Saving progress again cannot fix unplayable audio")
+        try await Fixture.configure("baseline")
+        select(restart)
+        wait(app.staticTexts["playback-status"], label: "Playing", timeout: 30)
+        XCTAssertEqual(label("now-playing-title"), "Stories for Tomorrow 01")
+        XCTAssertFalse(app.staticTexts["playback-error"].exists)
     }
 }
