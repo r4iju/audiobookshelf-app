@@ -8,6 +8,7 @@ import { AddToCollectionDialog, AddToPlaylistDialog } from "@/components/lists/a
 import { Cover } from "@/components/media/cover";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { QueryState } from "@/components/ui/query-state";
+import { Alert } from "@/components/ui/status";
 import { useI18n } from "@/i18n/i18n";
 import { coverShapeOf, coverUrl, formatClock, formatDuration } from "@/lib/abs/media";
 import { can } from "@/lib/abs/permissions";
@@ -20,6 +21,8 @@ import { DownloadButton } from "./download";
 import { EpisodeList } from "./episodes";
 import { playerMediaFor } from "./play-media";
 import { ProgressControls, ProgressSummary, remainingTime } from "./progress-controls";
+import { canSeeFeed, RssFeedButton } from "./rss-feed";
+import { SendEbookButton, type SendResult } from "./send-ebook";
 
 export function ItemDetail({ itemId }: { itemId: string }) {
   const item = useItem(itemId);
@@ -36,6 +39,7 @@ function ItemView({ item }: { item: LibraryItem }) {
   const canUpdate = can(me, "update");
   const [showAll, setShowAll] = useState(false);
   const [adding, setAdding] = useState<"playlist" | "collection" | null>(null);
+  const [notice, setNotice] = useState<SendResult | null>(null);
   const isBook = item.mediaType === "book";
   const metadata = item.media.metadata;
   const isPlayingThis =
@@ -162,7 +166,18 @@ function ItemView({ item }: { item: LibraryItem }) {
               </Button>
             ) : null}
             {can(me, "download") ? <DownloadButton itemId={item.id} /> : null}
+            {isBook && item.media.ebookFile ? (
+              <SendEbookButton itemId={item.id} onResult={setNotice} />
+            ) : null}
+            {canSeeFeed(item, me) ? (
+              <RssFeedButton
+                item={item}
+                me={me}
+                onClosed={() => setNotice({ tone: "info", text: t("ToastRSSFeedCloseSuccess") })}
+              />
+            ) : null}
           </div>
+          {notice ? <Alert tone={notice.tone}>{notice.text}</Alert> : null}
 
           {description ? (
             <div className="max-w-prose">

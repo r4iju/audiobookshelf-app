@@ -10,6 +10,7 @@ import {
   libraryItemSchema,
   libraryWithFilterDataSchema,
   listeningStatsSchema,
+  loginResponseSchema,
   mediaProgressSchema,
   pagedCollectionsSchema,
   pagedItemsSchema,
@@ -42,6 +43,7 @@ export const keys = {
   items: (connectionId: string, libraryId: string, query: string) =>
     [connectionId, "library", libraryId, "items", query] as const,
   item: (connectionId: string, itemId: string) => [connectionId, "item", itemId] as const,
+  ereaderDevices: (connectionId: string) => [connectionId, "ereader-devices"] as const,
   itemProgress: (connectionId: string, itemId: string) => [connectionId, "item-progress", itemId] as const,
   ebook: (connectionId: string, path: string) => [connectionId, "ebook", path] as const,
   filterData: (connectionId: string, libraryId: string) =>
@@ -223,6 +225,16 @@ export function useItem(itemId: string) {
     queryKey: keys.item(connection.id, itemId),
     queryFn: ({ signal }) =>
       client.get(`/api/items/${itemId}?expanded=1&include=rssfeed,downloads`, libraryItemSchema, signal),
+  });
+}
+
+/** The e-readers this account may send ebooks to; the server filters them by each device's availability. */
+export function useEreaderDevices() {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.ereaderDevices(connection.id),
+    queryFn: async ({ signal }) =>
+      (await client.send("POST", "/api/authorize", undefined, loginResponseSchema, signal)).ereaderDevices,
   });
 }
 

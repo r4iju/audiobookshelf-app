@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { feedSchema } from "./feeds";
 
 // Contract boundary with the Audiobookshelf server (verified against 2.30.0). Objects are loose so newer servers
 // can add fields; only fields this client reads are declared, and they are validated.
@@ -233,6 +234,7 @@ export const libraryItemSchema = z.looseObject({
   progressLastUpdate: z.number().nullish(),
   episodeDownloadsQueued: z.array(episodeDownloadSchema).nullish(),
   episodesDownloading: z.array(episodeDownloadSchema).nullish(),
+  rssFeed: feedSchema.nullish(),
 });
 export type LibraryItem = z.infer<typeof libraryItemSchema>;
 

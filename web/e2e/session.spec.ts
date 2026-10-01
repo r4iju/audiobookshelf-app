@@ -69,7 +69,9 @@ test("finishing and discarding progress reach the server", async ({ page }) => {
   await expect(page.getByRole("progressbar", { name: "Your Progress" })).toHaveCount(0);
 });
 
-test("discarding the progress of the book in the player starts it over on this device too", async ({ page }) => {
+test("discarding the progress of the book in the player starts it over on this device too", async ({
+  page,
+}) => {
   const api = await serverApi(accounts.user);
   const id = await itemIdByTitle("Salt and Signal");
   await clearProgress(api, id);

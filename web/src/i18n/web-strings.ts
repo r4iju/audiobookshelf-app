@@ -133,6 +133,9 @@ export const webStrings = {
   WebServerVersion: "Server version {0}",
   WebClientVersion: "Browser client {0}",
   WebCopyDiagnostics: "Copy diagnostics",
+  WebCopyAddress: "Copy address",
+  WebEbookSent: "Ebook sent to {0}",
+  WebEbookSendFailed: "Failed to send ebook to device: {0}",
   WebAutoRewindHelp:
     "Otherwise playback resumes a little earlier after a pause: 3 seconds after 10 seconds, up to 30 seconds after half an hour.",
   WebCopied: "Copied",

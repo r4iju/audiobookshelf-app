@@ -25,6 +25,8 @@ export default defineConfig({
   webServer: [
     // The QA server downloads podcast feeds and episodes from here (qa/feed.mjs).
     { command: "node qa/feed.mjs", url: "http://127.0.0.1:19885/feed.xml", reuseExistingServer: true },
+    // The mail server the QA server sends ebooks to devices through (qa/mail.mjs).
+    { command: "node qa/mail.mjs", port: 19886, reuseExistingServer: true },
     // The identity provider for OpenID sign-in (qa/oidc.mjs), used by the deployment journeys.
     {
       command: "node qa/oidc.mjs",

@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import { usePlayerStore } from "@/lib/player/store";
 import { useAbs } from "@/lib/session/store";
 import type { AbsClient } from "./client";
+import { feedSchema } from "./feeds";
 import { keys } from "./queries";
 import {
   bookmarkSchema,
@@ -258,5 +260,50 @@ export function useSaveEbookPlace(itemId: string) {
     scope: { id: `ebook-place-${itemId}` },
     mutationFn: (place: EbookPlace) => client.command("PATCH", `/api/me/progress/${itemId}`, place),
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.itemProgress(connection.id, itemId) }),
+  });
+}
+
+function useItemMutation<Variables, Result>(
+  itemId: string,
+  run: (client: AbsClient, variables: Variables) => Promise<Result>,
+) {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: Variables) => run(client, variables),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: keys.item(connection.id, itemId) }),
+  });
+}
+
+export function useOpenFeed(itemId: string) {
+  return useItemMutation(
+    itemId,
+    async (
+      client,
+      metadata: { slug: string; preventIndexing: boolean; ownerName: string; ownerEmail: string },
+    ) => {
+      const { slug, ...metadataDetails } = metadata;
+      const { feed } = await client.send(
+        "POST",
+        `/api/feeds/item/${itemId}/open`,
+        { serverAddress: client.connection.serverUrl, slug, metadataDetails },
+        z.object({ feed: feedSchema }),
+      );
+      return feed;
+    },
+  );
+}
+
+export function useCloseFeed(itemId: string) {
+  return useItemMutation(itemId, (client, feedId: string) =>
+    client.command("POST", `/api/feeds/${feedId}/close`),
+  );
+}
+
+export function useSendEbook() {
+  const { client } = useAbs();
+  return useMutation({
+    mutationFn: ({ itemId, deviceName }: { itemId: string; deviceName: string }) =>
+      client.command("POST", "/api/emails/send-ebook-to-device", { libraryItemId: itemId, deviceName }),
   });
 }

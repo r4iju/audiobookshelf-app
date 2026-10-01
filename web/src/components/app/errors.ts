@@ -13,7 +13,7 @@ export function errorMessage(t: Translate, error: unknown) {
     case "not-found":
       return t("WebNotFound");
     case "http":
-      return t("WebErrorServer", error.status ?? "?");
+      return error.detail ?? t("WebErrorServer", error.status ?? "?");
     case "invalid-response":
       return error.message;
   }

@@ -14,6 +14,8 @@ export class AbsError extends Error {
     readonly kind: AbsErrorKind,
     message: string,
     readonly status?: number,
+    /** The server's own plain-text explanation, when it gives one. */
+    readonly detail?: string,
   ) {
     super(message);
     this.name = "AbsError";
@@ -131,7 +133,15 @@ export function createAbsClient({
     if (response.status === 403)
       throw new AbsError("forbidden", "This account is not allowed to do that.", 403);
     if (response.status === 404) throw new AbsError("not-found", "Not found on the server.", 404);
-    throw new AbsError("http", `The server responded with ${response.status}.`, response.status);
+    const detail = response.headers.get("Content-Type")?.startsWith("text/plain")
+      ? (await response.text()).slice(0, 300)
+      : undefined;
+    throw new AbsError(
+      "http",
+      `The server responded with ${response.status}.`,
+      response.status,
+      detail || undefined,
+    );
   }
 
   async function parse<T extends z.ZodType>(response: Response, schema: T): Promise<z.infer<T>> {

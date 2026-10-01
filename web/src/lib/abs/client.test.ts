@@ -28,6 +28,16 @@ const json = (status: number, body: unknown) =>
 const ok = z.object({ ok: z.boolean() });
 
 describe("AbsClient", () => {
+  it("keeps the server's own explanation of a refused request", async () => {
+    const { fetcher } = server(
+      () => new Response("Slug already in use", { status: 400, headers: { "Content-Type": "text/plain" } }),
+    );
+    const client = createAbsClient({ connection, fetcher, saveAuth: () => {} });
+    const error = await client.command("POST", "/api/feeds/item/i1/open", {}).catch((caught) => caught);
+    expect(error).toBeInstanceOf(AbsError);
+    expect(error).toMatchObject({ kind: "http", status: 400, detail: "Slug already in use" });
+  });
+
   it("resolves paths under the server subpath with the bearer token", async () => {
     const { seen, fetcher } = server(() => json(200, { ok: true }));
     const client = createAbsClient({ connection, fetcher, saveAuth: () => {} });
