@@ -19,9 +19,9 @@ test("an administrator opens an item's RSS feed, listeners see its address, and 
   const admin = await serverApi(accounts.admin);
   const id = await itemIdByTitle("The Long Tide");
   const openFeeds = async () =>
-    ((await admin.call("/api/feeds")).body.feeds as { id: string; entityId: string; feedUrl: string }[]).filter(
-      (feed) => feed.entityId === id,
-    );
+    (
+      (await admin.call("/api/feeds")).body.feeds as { id: string; entityId: string; feedUrl: string }[]
+    ).filter((feed) => feed.entityId === id);
   for (const feed of await openFeeds()) await admin.call(`/api/feeds/${feed.id}/close`, { method: "POST" });
   const slug = `qa-long-tide-${Date.now()}`;
 
