@@ -46,6 +46,7 @@ import XCTest
         let path: String
         let currentTime: Double
         let timeListened: Double
+        let userId: String?
     }
     struct Observations: Decodable {
         let requests: [ObservedRequest]

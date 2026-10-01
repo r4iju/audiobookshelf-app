@@ -8,7 +8,7 @@ import SwiftUI
         let vault = KeychainCredentials()
         #if DEBUG && targetEnvironment(simulator)
         if CommandLine.arguments.contains("--reset-preview-account") {
-            try? vault.clear()
+            try? vault.resetPreviewAccounts()
             try? FileManager.default.removeItem(at: ListeningSync.file)
             UserDefaults.standard.removeObject(forKey: "previewLibrary")
             UserDefaults.standard.removeObject(forKey: "previewServer")
@@ -18,7 +18,7 @@ import SwiftUI
         let api = APIClient(store: vault)
         let playback = ApplePlayback(api: api)
         _player = StateObject(wrappedValue: playback)
-        _connection = StateObject(wrappedValue: ConnectionStore(api: api, playback: playback))
+        _connection = StateObject(wrappedValue: ConnectionStore(api: api, playback: playback, vault: vault))
     }
 
     var body: some Scene {

@@ -15,7 +15,7 @@ cleanup() {
 trap cleanup EXIT
 python3 - <<'PY'
 import socket
-for port in [19765, 19767]:
+for port in [19765, 19766, 19767]:
     with socket.socket() as listener:
         listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
@@ -32,12 +32,15 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 2 \
 (cd "$repo_root" && exec python3 -m verification.fixture --port 19765) > "$fixture_dir/http.log" 2>&1 &
 fixture_pids+=("$!")
 fixture_count=$((fixture_count + 1))
+(cd "$repo_root" && exec python3 -m verification.fixture --port 19766) > "$fixture_dir/second-server.log" 2>&1 &
+fixture_pids+=("$!")
+fixture_count=$((fixture_count + 1))
 (cd "$repo_root" && exec python3 -m verification.fixture --port 19767 --tls-cert "$fixture_dir/cert.pem" --tls-key "$fixture_dir/key.pem") > "$fixture_dir/https.log" 2>&1 &
 fixture_pids+=("$!")
 fixture_count=$((fixture_count + 1))
 python3 - <<'PY'
 import socket, time
-for port in [19765, 19767]:
+for port in [19765, 19766, 19767]:
     for attempt in range(50):
         try:
             with socket.create_connection(('127.0.0.1', port), timeout=0.2):

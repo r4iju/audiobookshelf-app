@@ -34,6 +34,9 @@ targets:
           NSAllowsArbitraryLoads: true
         NSLocalNetworkUsageDescription: Connect directly to your Audiobookshelf server on your local network.
         UIBackgroundModes: [audio]
+        CFBundleURLTypes:
+          - CFBundleURLName: com.forkzed.audiobookshelf.native.preview.openid
+            CFBundleURLSchemes: [audiobookshelf-native-preview]
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
   NativeJourneyTests:
     type: bundle.ui-testing

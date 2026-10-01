@@ -11,21 +11,35 @@ import Combine
     @Published private(set) var screen: Screen = .connection(nil)
     @Published var server: String
     @Published var username: String
+    @Published var savedConnectionsPresented = false
+    @Published private(set) var savedConnections: [KeychainCredentials.Summary] = []
+    @Published var managementError: String?
     let api: APIClient
+    private let vault: KeychainCredentials
     private let playback: ApplePlayback
+    private let browserSignIn = OpenIDSignIn()
     private let defaults: UserDefaults
     private var generation = UUID()
 
-    init(api: APIClient, playback: ApplePlayback, defaults: UserDefaults = .standard) {
+    init(api: APIClient, playback: ApplePlayback, vault: KeychainCredentials, defaults: UserDefaults = .standard) {
         self.server = defaults.string(forKey: "previewServer") ?? ""
         self.username = defaults.string(forKey: "previewUsername") ?? ""
         self.api = api
+        self.vault = vault
         self.playback = playback
         self.defaults = defaults
+        refreshSavedConnections()
     }
 
     func restore() async {
         guard api.credentials != nil else { return }
+        server = api.credentials?.server ?? server
+        username = api.credentials?.username ?? username
+        if let active = try? vault.activeConnection(), active.id == "migrated-preview-connection", active.libraryID == nil,
+           let selected = defaults.string(forKey: "previewLibrary") {
+            do { try vault.selectLibrary(selected) }
+            catch { managementError = Self.recovery(for: error) }
+        }
         await playback.restoreListening()
         await openLibraries()
     }
@@ -35,10 +49,15 @@ import Combine
         generation = request
         screen = .loading
         do {
+            try await playback.suspendForConnectionChange()
             try await api.login(server: server, username: username, password: password)
             guard request == generation else { return }
             defaults.set(server, forKey: "previewServer")
             defaults.set(username, forKey: "previewUsername")
+            self.server = api.credentials?.server ?? server
+            self.username = api.credentials?.username ?? username
+            refreshSavedConnections()
+            await playback.restoreListening()
             await openLibraries()
         } catch {
             guard request == generation else { return }
@@ -47,8 +66,30 @@ import Combine
     }
 
     func openLibrariesForSelection() async {
-        defaults.removeObject(forKey: "previewLibrary")
+        do { try vault.selectLibrary(nil) }
+        catch { managementError = Self.recovery(for: error); return }
         await openLibraries()
+    }
+
+    func connectWithOpenID() async {
+        let request = UUID()
+        let address = server
+        generation = request
+        screen = .loading
+        do {
+            try await playback.suspendForConnectionChange()
+            let response = try await browserSignIn.signIn(server: address)
+            guard request == generation else { return }
+            try api.completeBrowserLogin(server: address, response: response)
+            server = api.credentials?.server ?? address
+            username = api.credentials?.username ?? ""
+            refreshSavedConnections()
+            await playback.restoreListening()
+            await openLibraries()
+        } catch {
+            guard request == generation else { return }
+            screen = .connection(Self.recovery(for: error))
+        }
     }
 
     func openLibraries() async {
@@ -57,7 +98,7 @@ import Combine
         do {
             let libraries = try await api.libraries()
             guard request == generation else { return }
-            if let id = defaults.string(forKey: "previewLibrary"), let library = libraries.first(where: { $0.id == id }) {
+            if let id = try vault.activeConnection()?.libraryID, let library = libraries.first(where: { $0.id == id }) {
                 screen = .shelf(library)
             } else { screen = .libraries(libraries) }
         } catch {
@@ -67,19 +108,57 @@ import Combine
     }
 
     func select(_ library: Library) {
-        defaults.set(library.id, forKey: "previewLibrary")
-        screen = .shelf(library)
+        do { try vault.selectLibrary(library.id); screen = .shelf(library) }
+        catch { managementError = Self.recovery(for: error) }
+    }
+
+    func refreshSavedConnections() {
+        do { savedConnections = try vault.summaries() }
+        catch { managementError = Self.recovery(for: error) }
+    }
+
+    func addServer() {
+        savedConnectionsPresented = false
+        server = ""
+        username = ""
+        screen = .connection(nil)
+    }
+
+    func cancelConnection() async { await restore() }
+
+    func switchConnection(_ id: String) async {
+        let request = UUID()
+        let previousScreen = screen
+        generation = request
+        managementError = nil
+        do {
+            try await playback.suspendForConnectionChange()
+            guard request == generation else { return }
+            screen = .loading
+            try vault.select(id: id)
+            try api.restoreSavedCredentials()
+            savedConnectionsPresented = false
+            server = api.credentials?.server ?? ""
+            username = api.credentials?.username ?? ""
+            await playback.restoreListening()
+            await openLibraries()
+        } catch {
+            guard request == generation else { return }
+            screen = previousScreen
+            managementError = Self.recovery(for: error)
+        }
     }
 
     func signOut() {
         Task {
             do {
-                try await playback.stop()
+                try await playback.suspendForConnectionChange()
                 try api.signOut()
                 generation = UUID()
                 defaults.removeObject(forKey: "previewLibrary")
+                refreshSavedConnections()
                 screen = .connection(nil)
-            } catch { playback.error = Self.recovery(for: error) }
+            } catch { managementError = Self.recovery(for: error) }
         }
     }
 

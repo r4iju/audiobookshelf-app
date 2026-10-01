@@ -102,6 +102,7 @@ struct CatalogShelf: View {
                     Menu {
                         Button("Refresh") { Task { await catalog.reload() } }
                         Button("Change library") { Task { await connection.openLibrariesForSelection() } }
+                        Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
                         Button("Sign out") { connection.signOut() }.accessibilityIdentifier("account-signout")
                     } label: { Image(systemName: "person.crop.circle").font(.title2) }.accessibilityIdentifier("account")
                 }

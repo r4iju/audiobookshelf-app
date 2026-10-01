@@ -39,6 +39,7 @@ import SwiftUI
     private var measuredSpeed: Float = 1
     private var lastSync = Date()
     private var generation = UUID()
+    private var preparationID = UUID()
     private var closing = false
     private var commandTargets: [(MPRemoteCommand, Any)] = []
 
@@ -81,10 +82,12 @@ import SwiftUI
 
     func start(item: LibraryItem, episode: Episode? = nil) async {
         guard !preparing, !seeking, !closing else { return }
+        let preparation = UUID()
+        preparationID = preparation
         preparing = true
         wantsPlayback = true
         error = nil
-        defer { preparing = false }
+        defer { if preparationID == preparation { preparing = false } }
         do {
             try await closeCurrentSession()
             let requestGeneration = generation
@@ -115,7 +118,11 @@ import SwiftUI
             listeningID = try await listening.begin(media: ListeningMedia(item: item, episode: episode, session: result), deviceID: deviceID)
             lastTick = Date(); lastSync = Date()
             try await seek(to: result.currentTime, autoplay: wantsPlayback)
-        } catch { wantsPlayback = false; failed(error) }
+        } catch {
+            guard preparationID == preparation else { return }
+            wantsPlayback = false
+            failed(error)
+        }
     }
 
     func toggle() { if wantsPlayback { pause() } else { resume() } }
@@ -314,6 +321,33 @@ import SwiftUI
     func stop() async throws {
         wantsPlayback = false
         try await closeCurrentSession()
+    }
+
+    func suspendForConnectionChange() async throws {
+        guard !closing else { throw CancellationError() }
+        wantsPlayback = false
+        tick(player.currentTime())
+        closing = true
+        defer { closing = false }
+        preparationID = UUID()
+        preparing = false
+        generation = UUID()
+        pendingSeek = nil
+        seekLoop?.cancel()
+        player.currentItem?.cancelPendingSeeks()
+        if let seekLoop { _ = try? await seekLoop.value }
+        player.pause()
+        playing = false
+        syncTask?.cancel()
+        await listening.cancelTransfers()
+        if let syncTask { await syncTask.value }
+        if let listeningID { try listening.finish(id: listeningID) }
+        if let session { try api.releaseStream(sessionID: session.id) }
+        player.replaceCurrentItem(with: nil)
+        session = nil; itemID = nil; currentTime = 0; listeningID = nil
+        error = nil
+        needsSignIn = false
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
     private func closeCurrentSession() async throws {

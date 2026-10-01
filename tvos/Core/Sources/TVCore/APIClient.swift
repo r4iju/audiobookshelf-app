@@ -21,6 +21,11 @@ import Foundation
         request.setValue("true", forHTTPHeaderField: "x-return-tokens")
         request.httpBody = try JSONSerialization.data(withJSONObject: ["username": username, "password": password])
         let data = try await send(request)
+        try completeBrowserLogin(server: address.base.absoluteString, response: data)
+    }
+
+    public func completeBrowserLogin(server: String, response data: Data) throws {
+        let address = try ServerAddress(server)
         let response = try JSONDecoder().decode(AuthResponse.self, from: data)
         guard let token = response.user.bearerToken, !token.isEmpty else { throw APIError.signInRequired }
         let value = Credentials(server: address.base.absoluteString, accessToken: token, refreshToken: response.user.refreshToken, userID: response.user.id, username: response.user.username)
@@ -37,6 +42,14 @@ import Foundation
         try store.clear()
         authGeneration = UUID()
         credentials = nil
+    }
+
+    public func restoreSavedCredentials() throws {
+        let restored = try store.load()
+        refreshTask?.cancel()
+        refreshTask = nil
+        authGeneration = UUID()
+        credentials = restored
     }
 
     public func me() async throws -> CurrentUser { try await get("api/me") }
@@ -99,6 +112,19 @@ import Foundation
     public func closeStream(sessionID: String) async throws {
         do { _ = try await request("api/session/\(sessionID)/close", method: "POST", body: [:]) }
         catch APIError.http(404) { return }
+    }
+
+    public func releaseStream(sessionID: String) throws {
+        guard let credentials else { throw APIError.signInRequired }
+        var request = URLRequest(url: try ServerAddress(credentials.server).url(path: "api/session/\(sessionID)/close"))
+        request.httpMethod = "POST"
+        request.timeoutInterval = 10
+        request.setValue("Bearer " + credentials.accessToken, forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Data("{}".utf8)
+        // Account switching must work offline. This cleanup uses the original server/token;
+        // durable listening remains in the account's journal until separately acknowledged.
+        Task { [session] in _ = try? await session.data(for: request) }
     }
 
     private static func deviceInfo(id: String) -> [String: String] {

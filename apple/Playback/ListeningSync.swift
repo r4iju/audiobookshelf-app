@@ -8,7 +8,11 @@ import Foundation
     private let api: APIClient
     private let journal: ListeningJournal?
     private let loadingFailure: Error?
-    private var request: Task<Void, Error>?
+    private struct Transfer {
+        let id: UUID
+        let task: Task<Void, Error>
+    }
+    private var request: Transfer?
 
     init(api: APIClient) {
         self.api = api
@@ -35,7 +39,8 @@ import Foundation
     func finish(id: String) throws { try loaded().finish(id: id) }
 
     func flush() async throws {
-        if let request { return try await request.value }
+        if let request { return try await request.task.value }
+        try Task.checkCancellation()
         let journal = try loaded()
         let account = try await api.currentAccount()
         let transfer = Task { @MainActor in
@@ -45,9 +50,17 @@ import Foundation
                 try journal.acknowledge(next)
             }
         }
-        request = transfer
-        defer { request = nil }
+        let id = UUID()
+        request = Transfer(id: id, task: transfer)
+        defer { if request?.id == id { request = nil } }
         try await transfer.value
+    }
+
+    func cancelTransfers() async {
+        guard let current = request else { return }
+        request = nil
+        current.task.cancel()
+        _ = try? await current.task.value
     }
 
     private func loaded() throws -> ListeningJournal {

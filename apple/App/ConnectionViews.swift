@@ -19,6 +19,15 @@ struct ConnectionRoot: View {
             case .shelf(let library): ConnectedLibrary(library: library)
             }
         }.background(ShelfStyle.background.edgesIgnoringSafeArea(.all))
+            .sheet(isPresented: $connection.savedConnectionsPresented) { SavedConnectionsView().environmentObject(connection) }
+            .overlay(Group {
+                if let error = connection.managementError {
+                    HStack {
+                        Text(error).font(.callout)
+                        Button("Dismiss") { connection.managementError = nil }
+                    }.padding().background(ShelfStyle.card).cornerRadius(16).padding()
+                }
+            }, alignment: .top)
     }
 }
 
@@ -63,9 +72,19 @@ struct ConnectionForm: View {
                         HStack { Text("Connect to your library").fontWeight(.semibold); Spacer(); Image(systemName: "arrow.right") }
                             .padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
                     }.disabled(connection.server.isEmpty || connection.username.isEmpty).accessibilityIdentifier("connect")
+                    Button("Sign in with OpenID") {
+                        password = ""
+                        Task { await connection.connectWithOpenID() }
+                    }.disabled(connection.server.isEmpty).accessibilityIdentifier("openid-sign-in")
                 }.padding(24).background(ShelfStyle.card).cornerRadius(26)
                 Text("Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported.")
                     .font(.footnote).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
+                if connection.api.credentials != nil {
+                    Button("Cancel") { Task { await connection.cancelConnection() } }
+                }
+                if !connection.savedConnections.isEmpty {
+                    Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+                }
             }.frame(maxWidth: 480).padding(24).frame(maxWidth: .infinity)
         }.accessibilityIdentifier("connection-screen")
     }
@@ -103,7 +122,35 @@ struct LibraryChooser: View {
                     if libraries.isEmpty { Text("No libraries are available to this account. Ask your server administrator for access.").foregroundColor(.secondary) }
                 }.padding(24).frame(maxWidth: 640).frame(maxWidth: .infinity)
             }.navigationTitle("Your libraries")
-                .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Sign out") { connection.signOut() } } }
+                .toolbar { ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+                        Button("Sign out") { connection.signOut() }
+                    } label: { Image(systemName: "person.crop.circle") }.accessibilityIdentifier("account")
+                } }
+        }.navigationViewStyle(StackNavigationViewStyle())
+    }
+}
+
+struct SavedConnectionsView: View {
+    @EnvironmentObject private var connection: ConnectionStore
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(connection.savedConnections) { saved in
+                    Button { Task { await connection.switchConnection(saved.id) } } label: {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(saved.username).font(.headline).foregroundColor(.primary)
+                            Text(saved.server).font(.caption).foregroundColor(.secondary)
+                        }.padding(.vertical, 8)
+                    }.accessibilityIdentifier("connection-" + saved.server)
+                        .accessibilityLabel(saved.username + " on " + saved.server)
+                }
+                Button("Add server") { connection.addServer() }
+            }.navigationTitle("Saved connections")
+                .toolbar { ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Done") { connection.savedConnectionsPresented = false }
+                } }
         }.navigationViewStyle(StackNavigationViewStyle())
     }
 }
