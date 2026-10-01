@@ -34,13 +34,6 @@ final class LegacyAppCompatibilityTests: XCTestCase {
         try? FileManager.default.removeItem(at: directory)
     }
 
-    private func write(_ path: String, _ contents: String) throws -> Int {
-        let url = documents.appendingPathComponent(path)
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try Data(contents.utf8).write(to: url)
-        return contents.utf8.count
-    }
-
     /// Downloaded files only; the live database belongs to the running app.
     private func downloadsDigest() throws -> [String: String] {
         var result: [String: String] = [:]
@@ -51,113 +44,8 @@ final class LegacyAppCompatibilityTests: XCTestCase {
         return result
     }
 
-    private func seedWithTheAppsOwnModels() throws {
-        let audioSize = try write("li-1/01.mp3", "app-audio")
-        let epubSize = try write("li-1/book.epub", "PK-app-epub")
-        let partSize = try write("li-2/01.mp3", "app-finished-part")
-
-        let realm = try Realm()
-        try realm.write {
-            let connection = ServerConnectionConfig()
-            connection.id = "conn-1"
-            connection.index = 1
-            connection.name = "Synthetic"
-            connection.address = "https://books.example.test"
-            connection.version = "2.26.0"
-            connection.userId = "user-1"
-            connection.username = "reader"
-            connection.token = Self.accessToken
-            realm.add(connection)
-            let active = ServerConnectionConfigActiveIndex()
-            active.index = 1
-            realm.add(active)
-            let settings = DeviceSettings()
-            settings.jumpForwardTime = 30
-            realm.add(settings)
-
-            let audio = LocalFile()
-            audio.id = "lf-audio"
-            audio.filename = "01.mp3"
-            audio._contentUrl = "li-1/01.mp3"
-            audio.mimeType = "audio/mpeg"
-            audio.size = audioSize
-            let epub = LocalFile()
-            epub.id = "lf-epub"
-            epub.filename = "book.epub"
-            epub._contentUrl = "li-1/book.epub"
-            epub.mimeType = "application/epub+zip"
-            epub.size = epubSize
-            let metadata = Metadata()
-            metadata.title = "Synthetic Book"
-            metadata.authorName = "Synthetic Author"
-            let track = AudioTrack()
-            track.index = 1
-            track.startOffset = 0
-            track.duration = 10
-            track.mimeType = "audio/mpeg"
-            track.localFileId = audio.id
-            let ebook = EBookFile()
-            ebook.ino = "ino-epub"
-            ebook.ebookFormat = "epub"
-            ebook.localFileId = epub.id
-            let media = MediaType()
-            media.libraryItemId = "li-1"
-            media.metadata = metadata
-            media.tracks.append(track)
-            media.ebookFile = ebook
-            let item = LocalLibraryItem()
-            item.id = "local_li-1"
-            item.libraryItemId = "li-1"
-            item.mediaType = "book"
-            item.basePath = "li-1"
-            item.serverConnectionConfigId = "conn-1"
-            item.serverAddress = "https://books.example.test"
-            item.serverUserId = "user-1"
-            item.media = media
-            item.localFiles.append(objectsIn: [audio, epub])
-            realm.add(item)
-
-            let progress = LocalMediaProgress()
-            progress.id = "local_li-1"
-            progress.localLibraryItemId = "local_li-1"
-            progress.libraryItemId = "li-1"
-            progress.serverConnectionConfigId = "conn-1"
-            progress.serverAddress = "https://books.example.test"
-            progress.serverUserId = "user-1"
-            progress.currentTime = 42
-            progress.duration = 10
-            progress.ebookLocation = "epubcfi(/6/4!/4/2/1:0)"
-            progress.ebookProgress = 0.3
-            realm.add(progress)
-
-            let part = DownloadItemPart()
-            part.id = "part-1"
-            part.downloadItemId = "dl-1"
-            part.filename = "01.mp3"
-            part.fileSize = Double(partSize)
-            part.completed = true
-            part.moved = true
-            part.uri = "https://books.example.test/api/items/li-2/file/1?token=\(Self.accessToken)"
-            part.destinationUri = "li-2/01.mp3"
-            let download = DownloadItem()
-            download.id = "dl-1"
-            download.libraryItemId = "li-2"
-            download.serverConnectionConfigId = "conn-1"
-            download.serverAddress = "https://books.example.test"
-            download.serverUserId = "user-1"
-            download.mediaType = "book"
-            download.itemTitle = "Interrupted"
-            download.downloadItemParts.append(part)
-            realm.add(download)
-
-            let log = LogEntry()
-            log.message = "request failed for \(Self.accessToken)"
-            realm.add(log)
-        }
-    }
-
     func testTheExporterReadsTheAppsOwnDatabaseInTheSameProcessAndLeavesTheAppUsable() throws {
-        try seedWithTheAppsOwnModels()
+        try LegacyAppSeed(documents: documents, address: "https://books.example.test", token: Self.accessToken).write()
         let downloads = try downloadsDigest()
         let work = directory.appendingPathComponent("Work")
 
