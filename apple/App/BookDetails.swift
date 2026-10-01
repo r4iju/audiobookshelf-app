@@ -363,7 +363,7 @@ struct BookDetails: View {
 
     private func receive(_ event: NativeRealtime.Event) {
         switch event.change {
-        case .authenticated(resumed: true): load(monitorDownloads: true, for: event)
+        case .authenticated: load(monitorDownloads: true, for: event)
         case .user: load(for: event)
         case .progress(let itemID, _, _) where itemID == book.id: load(for: event)
         case .itemsUpdated(let items) where items.contains(where: { $0.id == book.id }): load(for: event)

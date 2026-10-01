@@ -12,17 +12,19 @@ Scope: the `upstream-realtime` parity row for iPhone/iPad. Baseline: `plugins/se
 
 | Server event | Change | Native consumer |
 | --- | --- | --- |
-| `init` (first) | `authenticated(resumed: false)` | Podcast queue clears a stream rejection and retries saving results |
-| `init` after a dropped or restarted stream | `authenticated(resumed: true)` | Catalog reloads in place (or reopens if it had failed), details and groups reload |
+| `init`, first or after a dropped or restarted stream | `authenticated` | Catalog reloads in place (or reopens if it had failed), details, item feed and groups reload, the paused player refreshes, and the podcast queue clears a stream rejection and retries saving results |
 | `user_item_progress_updated` from another session | `progress(item, episode, session)` | Catalog refreshes user progress and Continue Listening; matching book details and open group details reload |
 | `user_updated` (REST progress, bookmarks, permissions) | `user` | Same as progress, for any item |
 | `item_updated`, `items_updated` | `itemsUpdated` | Catalog replaces items in place; matching details reload |
 | `item_added`, `items_added` | `itemsAdded(libraryIDs)` | Catalog of that library reloads its first page |
 | `item_removed` | `itemRemoved` | Catalog removes the item |
 | `playlist_*`, `collection_*` | `group(kind, id, removed)` | Group lists reload; open details reload, or close when removed |
+| `rss_feed_open`, `rss_feed_closed` for a `libraryItem` | `itemFeed(item, feed or nil)` | The open item's feed action shows the feed or hides it, like `pages/item/_id/index.vue` |
 | `episode_download_finished` | `episodeDownloadFinished` | Podcast queue (unchanged behaviour) |
 
-Refreshes are in place. The catalog owns one realtime refresh at a time; a change arriving during it queues the next, and a queued first-page reload is never downgraded to a progress refresh. A visible screen keeps its content when a refresh fails and retries on the next change, reconnection or manual refresh. A progress refresh leaves loaded and loading pages alone, except under a progress filter, whose first page reloads because membership follows progress. A refresh after additions or reconnection returns the catalog to its first page, matching the existing progress-filter refresh. Item updates and removals are applied in place and also to every catalog response that was in flight when they arrived, so an older page cannot restore a removed book or stale metadata. Removing a listed book while later pages are unloaded reloads the first page, because server pages are offsets. An item updated elsewhere is replaced where it is listed, even if it no longer matches the active filter or sort until the next reload. Queued listening progress is not touched; `ListeningSync` remains the only owner of unsent progress.
+Every `init` resyncs, not only one after a reconnection. Screens load over HTTP before the socket authenticates, and server 2.30 emits only to sockets already in the `authenticated` room and keeps no replay (`SocketAuthority.js`), so a change made between a screen's load and the first `init` would otherwise stay hidden. The cost is one extra read of each visible screen per sign-in or launch. Feed events are broadcast without a user id (`RssFeedManager.js`), so they are accepted for any item the open screen shows. Item actions publish only the latest load's result or error, so the load started on appear cannot overwrite the `init` refresh that overtook it. A feed change received while a load or this device's own open or close is in flight wins over that older response; this device's own successful open or close counts as such a change, so a load that read the item before it keeps its other capabilities but not its feed. Every request still completes its activity and error state.
+
+Refreshes are in place. The catalog owns one realtime refresh at a time; a change arriving during it queues the next, and a queued first-page reload is never downgraded to a progress refresh. A visible screen keeps its content when a refresh fails and retries on the next change, reconnection or manual refresh. Any realtime refresh that runs while the catalog is still on its first load becomes a full reload that supersedes it, because that load may have read the server before the change and there is no content to refresh in place. This covers a library opened after the socket already authenticated. If that reload fails, the catalog shows the failure instead of loading forever. A progress refresh leaves loaded and loading pages alone, except under a progress filter, whose first page reloads because membership follows progress. A refresh after additions or reconnection returns the catalog to its first page, matching the existing progress-filter refresh. Item updates and removals are applied in place and also to every catalog response that was in flight when they arrived, so an older page cannot restore a removed book or stale metadata. Removing a listed book while later pages are unloaded reloads the first page, because server pages are offsets. An item updated elsewhere is replaced where it is listed, even if it no longer matches the active filter or sort until the next reload. Queued listening progress is not touched; `ListeningSync` remains the only owner of unsent progress.
 
 ## Verification
 
@@ -37,7 +39,7 @@ bash apple/scripts/verify-realtime.sh              # RealtimeJourney against rea
 ABS_QA_SIMULATOR="Audiobookshelf Realtime iPad QA" bash apple/scripts/verify-realtime.sh
 ```
 
-The fixture adds `/__fixture__/remote-change`. It mutates server state as another client would and queues the 2.30 event to the affected user's room. It also supports a socket drop that permits the client's own reconnect, plus `/__fixture__/realtime-connections`, which reports open authenticated sockets per user. `configure` restores everything a remote change altered.
+`verify-realtime.sh` serves `apple/scripts/item_actions_fixture.py` on 26769, which adds `/__actions__/remote-feed` (opens or closes a feed elsewhere and queues `rss_feed_open` or `rss_feed_closed`). The Socket.IO proxy adds `/__fixture__/realtime-hold`, which holds authentication so changes land between a screen's load and `init`. The fixture adds `/__fixture__/remote-change`. It mutates server state as another client would and queues the 2.30 event to the affected user's room. It also supports a socket drop that permits the client's own reconnect, plus `/__fixture__/realtime-connections`, which reports open authenticated sockets per user. `configure` restores everything a remote change altered.
 
 Red first:
 
@@ -55,13 +57,16 @@ Red first:
   - a progress-filtered shelf kept a book whose progress changed
 - Opening book details and renaming the book elsewhere showed the rename in details. On return, the shelf still showed the old title: `LibraryItem` equality compares ids only, so the cards skipped redrawing. The extended item journey failed on that before the cards held their visible metadata.
 
+- Feeds and the gap before `init` (base `315183c1`): `testAFeedOpenedOrClosedElsewhereUpdatesTheOpenItem` failed because the open item ignored a feed opened elsewhere. `testChangesBeforeTheFirstInitAppearOnceAuthenticated` failed on the playlist list and Continue Listening, and `testChangesBeforeTheFirstInitAppearOnTheOpenItem` failed on details progress and the feed, because only a resumed `init` refreshed. The Core feed tests and `testAnInitDuringTheFirstLoadThatFailsShowsTheFailure` failed on behaviour before the fix. `testUnsentListeningSurvivesAReconnectionRefresh` is a guard and passed before and after: listening the server refused stays queued through a remote progress event and a reconnection, and is published once the server accepts it.
+
 Results are recorded in [the handoff](../handoff/APPLE-REALTIME.md).
 
 ## Remaining gates
 
 - Physical iPhone/iPad against the live server: a second client (web or TV) changes progress, playlists and item metadata while the app is visible, and the app recovers after Wi-Fi loss and background suspension.
-- Events missed while the app is suspended or terminated are covered only by the reconnection refresh of visible screens. Screens opened later load fresh data. No replay exists in server 2.30.
-- A stream connects once `api.credentials.userID` is known. Legacy credentials without a stored user id connect after `ConnectionStore.openLibraries` resolves the account (`activeAccount` change). Changes made in the first instant after launch, before the first `init`, are not replayed.
+- Server 2.30 has no replay. Events missed before the first `init`, while the stream is down or while the app is suspended are covered by the `init` refresh of visible screens. Screens opened later load fresh data. This is proven on simulators with a held synthetic socket, not on a device.
+- A stream connects once `api.credentials.userID` is known. Legacy credentials without a stored user id connect after `ConnectionStore.openLibraries` resolves the account (`activeAccount` change).
 - Baseline `layouts/default.vue` also moves a paused player to another session's position, and its player re-syncs after a long disconnection. `ApplePlayback` is owned by the paused-player worker; see the handoff.
-- Changes are not proven against queued unsent progress during reconnection; refreshes only read, and `ListeningSync` is untouched.
+- Queued unsent listening through a reconnection is proven only against the synthetic fixture on simulators.
+- Opening and closing an RSS feed from another client against the live server needs owner approval.
 - TV adoption of `RealtimeChange` is not part of this slice.

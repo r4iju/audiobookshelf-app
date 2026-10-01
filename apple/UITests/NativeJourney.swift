@@ -72,8 +72,8 @@ import XCTest
     func fixtureRequests() async throws -> [ObservedRequest] {
         try await fixtureObservations().requests
     }
-    func fixtureObservations() async throws -> Observations {
-        let (data, response) = try await URLSession.shared.data(from: URL(string: "http://127.0.0.1:19765/abs/__fixture__/observations")!)
+    func fixtureObservations(server: String = "http://127.0.0.1:19765/abs") async throws -> Observations {
+        let (data, response) = try await URLSession.shared.data(from: URL(string: server + "/__fixture__/observations")!)
         XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
         return try JSONDecoder().decode(Observations.self, from: data)
     }

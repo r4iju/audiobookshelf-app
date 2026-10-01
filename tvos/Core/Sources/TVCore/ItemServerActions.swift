@@ -66,6 +66,11 @@ public enum ItemServerActionError: Error, Equatable {
     private var hasAudio = false
     private var hasEbook = false
     private var isBook = false
+    /// Counts feed changes, from realtime events or this device's own open and close, so a load, open or close that
+    /// started before one does not undo it.
+    private var feedChanges = 0
+    /// Counts loads; only the latest one publishes its result or error.
+    private var loads = 0
 
     public init(api: APIClient, itemID: String) {
         self.api = api
@@ -106,42 +111,55 @@ public enum ItemServerActionError: Error, Equatable {
     }
 
     public func load() async {
+        loads += 1
+        let load = loads
         let authorization = signIn.revision
+        let changes = feedChanges
         do {
             try await signIn.confirm()
             async let session = api.sessionAuthorization(authorization: authorization)
             async let detail = api.itemActions(id: itemID, authorization: authorization)
             let (account, item) = try await (session, detail)
-            guard signIn.owns(userID: account.user.id) else { return }
+            guard load == loads, signIn.owns(userID: account.user.id) else { return }
             isAdmin = account.user.isAdminOrUp
             devices = account.ereaderDevices ?? []
             isBook = item.mediaType == "book"
             hasEbook = item.media.ebookFile != nil
             hasAudio = !(item.media.tracks ?? []).isEmpty || !(item.media.episodes ?? []).isEmpty
             hasEpisodesWithoutPubDate = (item.media.episodes ?? []).contains { ($0.pubDate ?? "").isEmpty }
-            feed = item.rssFeed
+            if feedChanges == changes { feed = item.rssFeed }
             error = nil
             loaded = true
         } catch {
+            guard load == loads else { return }
             report(error)
         }
+    }
+
+    /// Another client opened (`feed`) or closed (`nil`) this item's feed, as received by this sign-in.
+    public func feedChanged(_ feed: RSSFeed?) {
+        guard signIn.isCurrent else { return }
+        feedChanges += 1
+        self.feed = feed
     }
 
     public func openFeed(slug: String, preventIndexing: Bool, ownerName: String, ownerEmail: String) async {
         guard activity == nil, showsFeed, canManageFeed, feed == nil, signIn.isCurrent else { return }
         guard !slug.isEmpty, slug == Self.sanitizedSlug(slug) else { error = ItemServerActionError.invalidSlug; return }
         await perform(.opening) { authorization in
+            let changes = self.feedChanges
             let opened = try await self.api.openFeed(itemID: self.itemID, serverAddress: self.serverAddress, slug: slug, preventIndexing: preventIndexing,
                                                      ownerName: ownerName, ownerEmail: ownerEmail, authorization: authorization)
-            return { self.feed = opened }
+            return { self.applyOwnFeed(opened, ifUnchangedSince: changes) }
         }
     }
 
     public func closeFeed() async {
         guard activity == nil, canManageFeed, let feed, signIn.isCurrent else { return }
         await perform(.closing) { authorization in
+            let changes = self.feedChanges
             try await self.api.closeFeed(id: feed.id, authorization: authorization)
-            return { self.feed = nil }
+            return { self.applyOwnFeed(nil, ifUnchangedSince: changes) }
         }
     }
 
@@ -152,6 +170,14 @@ public enum ItemServerActionError: Error, Equatable {
             try await self.api.sendEbookToDevice(itemID: self.itemID, deviceName: device.name, authorization: authorization)
             return { self.sent = device.name }
         }
+    }
+
+    /// Publishes this device's own open or close unless another client changed the feed meanwhile. It counts as a feed
+    /// change, so a load that read the item before it cannot restore the previous feed.
+    private func applyOwnFeed(_ feed: RSSFeed?, ifUnchangedSince changes: Int) {
+        guard feedChanges == changes else { return }
+        feedChanges += 1
+        self.feed = feed
     }
 
     /// Runs one request for this sign-in and applies its result only if the sign-in is still current afterwards.

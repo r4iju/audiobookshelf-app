@@ -177,7 +177,7 @@ enum CatalogSort: String, CaseIterable {
     func receive(_ event: NativeRealtime.Event) {
         guard owns(event) else { return }
         switch event.change {
-        case .authenticated(resumed: true): refresh(items: true, for: event)
+        case .authenticated: refresh(items: true, for: event)
         case .progress, .user: refresh(items: filter?.hasPrefix("progress.") == true, for: event)
         case .itemsAdded(let libraries) where libraries.contains(library.id): refresh(items: true, for: event)
         case .itemsUpdated(let updated): change(updated.map { ($0.id, $0) }, for: event)
@@ -213,9 +213,12 @@ enum CatalogSort: String, CaseIterable {
     }
 
     /// Reloading items supersedes page loading; a progress-only refresh leaves loaded and loading pages alone. A progress
-    /// filter's membership follows progress, so `receive` reloads its items instead.
-    private func refreshNow(items reloadItems: Bool, for event: NativeRealtime.Event) async {
+    /// filter's membership follows progress, so `receive` reloads its items instead. During the first load there is no
+    /// content to refresh, and that load may have read the server before the change, so it is superseded by a reload.
+    private func refreshNow(items: Bool, for event: NativeRealtime.Event) async {
         guard owns(event) else { return }
+        let reloadItems: Bool
+        if case .loading = state { reloadItems = true } else { reloadItems = items }
         if reloadItems { generation = UUID() }
         let pages = generation
         defer {
@@ -243,7 +246,10 @@ enum CatalogSort: String, CaseIterable {
             }
             state = .content(content)
         } catch {
-            // The visible catalog stays usable; the next change, reconnection or manual refresh retries.
+            // A visible catalog stays usable; the next change, reconnection or manual refresh retries. One that this
+            // refresh superseded while loading has nothing to show.
+            guard reloadItems, generation == pages, owns(event), case .loading = state else { return }
+            state = .failed(ConnectionStore.recovery(for: error))
         }
     }
 

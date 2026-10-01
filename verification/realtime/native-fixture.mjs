@@ -3,7 +3,21 @@ import { Server } from 'socket.io'
 
 const port = Number(process.argv[2] ?? 19765)
 const backend = Number(process.argv[3] ?? 19769)
+// While held, sockets connect but are not authenticated, the window between an API load and `init`.
+let held = null
 const http = createServer((incoming, outgoing) => {
+  if (incoming.url === '/abs/__fixture__/realtime-hold' && incoming.method === 'POST') {
+    let body = ''
+    incoming.on('data', chunk => { body += chunk })
+    incoming.on('end', () => {
+      const hold = JSON.parse(body || '{}').hold === true
+      if (hold && !held) { let release; const promise = new Promise(resolve => { release = resolve }); held = { promise, release } }
+      if (!hold && held) { held.release(); held = null }
+      outgoing.writeHead(200, { 'Content-Type': 'application/json' })
+      outgoing.end('{}')
+    })
+    return
+  }
   if (incoming.url === '/abs/__fixture__/realtime-connections') {
     // Authenticated sockets currently open per user, so journeys can observe account isolation.
     const open = {}
@@ -22,6 +36,8 @@ const io = new Server(http, { path: '/abs/socket.io', transports: ['websocket'] 
 io.on('connection', socket => {
   socket.on('auth', async token => {
     try {
+      while (held) await held.promise
+      if (socket.disconnected) return
       const response = await fetch(`http://127.0.0.1:${backend}/abs/__fixture__/realtime-auth`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) })
       if (!response.ok) return socket.emit('auth_failed', { message: 'Synthetic credentials rejected' })
       const { userId } = await response.json()

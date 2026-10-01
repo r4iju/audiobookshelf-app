@@ -26,7 +26,6 @@ import Combine
     private var task: Task<Void, Never>?
     private var pinned: SignIn?
     private var generation = UUID()
-    private var authenticated = false
 
     /// `localSession` names this device's playback session. The server echoes each of its syncs (every 15 seconds while
     /// playing) as a progress event, which carries nothing the device does not already know.
@@ -36,18 +35,15 @@ import Combine
     func connect() {
         let target = api.signIn
         guard target != pinned || task == nil else { return }
-        // Restarting an ended stream of the same sign-in may have missed changes, like any reconnection.
-        let resuming = target == pinned && authenticated
         stop()
         guard let target else { return }
         let request = UUID()
         let stream = ServerEvents(api: api)
-        generation = request; pinned = target; self.stream = stream; authenticated = resuming
+        generation = request; pinned = target; self.stream = stream
         task = Task { [weak self] in
             await stream.listen(account: target.account, onEvent: { event in
                 guard let self, self.generation == request, self.api.signIn == target,
-                      let change = RealtimeChange(event, owner: target.account, resumed: self.authenticated) else { return }
-                if case .authenticated = change { self.authenticated = true }
+                      let change = RealtimeChange(event, owner: target.account) else { return }
                 if case .progress(_, _, let session?) = change, session == self.localSession() { return }
                 self.events.send(Event(signIn: target, change: change))
             }, onFailure: { failure in
@@ -62,7 +58,7 @@ import Combine
     func stop() {
         generation = UUID()
         task?.cancel(); stream?.stop()
-        task = nil; stream = nil; pinned = nil; authenticated = false
+        task = nil; stream = nil; pinned = nil
     }
 }
 

@@ -152,8 +152,8 @@ enum ItemActionsFixture {
     struct Feed { let id: String }
     struct Observed { let requests: [Request]; let feeds: [Feed]; let sent: [[String: String]] }
 
-    static func configure(_ options: [String: Any]) async throws {
-        var request = URLRequest(url: URL(string: ItemServerActionsJourney.fixture + "/__actions__/configure")!)
+    static func configure(_ options: [String: Any], at fixture: String = ItemServerActionsJourney.fixture) async throws {
+        var request = URLRequest(url: URL(string: fixture + "/__actions__/configure")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: options)
@@ -161,8 +161,8 @@ enum ItemActionsFixture {
         XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
     }
 
-    static func observations() async throws -> Observed {
-        let (data, _) = try await URLSession.shared.data(from: URL(string: ItemServerActionsJourney.fixture + "/__actions__/observations")!)
+    static func observations(at fixture: String = ItemServerActionsJourney.fixture) async throws -> Observed {
+        let (data, _) = try await URLSession.shared.data(from: URL(string: fixture + "/__actions__/observations")!)
         let value = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         let requests = (value["requests"] as? [[String: Any]] ?? []).map { Request(method: $0["method"] as? String ?? "", path: $0["path"] as? String ?? "", body: $0["body"] as? [String: Any]) }
         let feeds = (value["feeds"] as? [[String: Any]] ?? []).compactMap { ($0["id"] as? String).map(Feed.init) }
@@ -170,9 +170,9 @@ enum ItemActionsFixture {
     }
 
     /// Waits until the app has read the account and the item's feed, so a missing action is not just still loading.
-    static func waitForLoad(of itemID: String) async throws {
+    static func waitForLoad(of itemID: String, at fixture: String = ItemServerActionsJourney.fixture) async throws {
         for _ in 0..<50 {
-            let requests = try await observations().requests
+            let requests = try await observations(at: fixture).requests
             if requests.contains(where: { $0.path == "/api/items/" + itemID }) && requests.contains(where: { $0.path == "/api/authorize" }) { return }
             try await Task.sleep(nanoseconds: 200_000_000)
         }
