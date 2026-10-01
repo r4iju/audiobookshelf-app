@@ -155,3 +155,7 @@ These have not been performed:
 2. On the Living Room TV: Siri Remote focus through the search related row, the author series row and the title grid, and Back to the opening screen. Also bio legibility from across the room.
 3. On iPhone and iPad: VoiceOver reading of the series place ("The Tomorrow Saga, book 2"). Also the iPad regular-width details layout with the new links.
 4. A library where the same author id is returned by more than one library. Audiobookshelf scopes authors to a library, so the TV keeps the first.
+
+## Integrated mobile verification
+
+Root applied the actual search/details wiring and localized the new view labels. The combined checkout at `0aa6b83e` passed all four `RelatedAuthorSeriesJourney` cases on the owned Root Related QA iPhone simulator, using isolated fixture port 41765. The existing tests were temporarily remapped to that port, with assertions and timeouts unchanged, then restored. Evidence: `/tmp/abs-related-root-final-ui.log`, `apple/build-related/Related-20261002-032336.xcresult`. Shared Core passed 41/41 at the same checkout (`/tmp/abs-related-root-final-core.log`). This is simulator evidence; the physical and live-server gates above remain open.

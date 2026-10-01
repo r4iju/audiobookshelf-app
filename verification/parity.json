@@ -714,10 +714,14 @@
         "then": "Metadata, related items and series order lead to the intended book"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Integrated native author metadata/image, all title pages, series order/metadata, detail links and retry: RelatedAuthorSeriesJourney 4/4 pass at 0aa6b83e on Root Related QA; docs/modernization/APPLE-RELATED-AUTHOR-SERIES.md. Physical/live-server acceptance remains open."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "TV related author/series search, metadata, order, detail links and retry: RelatedJourney 4/4 pass at ccc7bac3; shared loaders 41/41 on integrated 0aa6b83e. tvos/QA.md. Physical/live-server acceptance remains open."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
