@@ -52,6 +52,7 @@ import com.audiobookshelf.android.data.DeviceSettings
 import com.audiobookshelf.android.data.Diagnostics
 import com.audiobookshelf.android.data.Haptics
 import com.audiobookshelf.android.data.Orientation
+import com.audiobookshelf.android.data.SeriesOrder
 import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.data.ShakeSensitivity
 import com.audiobookshelf.android.graph
@@ -147,12 +148,22 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         item { SettingsHeading("Storage") }
         item { DownloadLocation(settings, change) }
 
+        item { SettingsHeading("Android Auto") }
+        item {
+            Choices("Group authors and series in letters above", (CAR_GROUPING + settings.androidAutoBrowseLimitForGrouping).distinct().sorted(), settings.androidAutoBrowseLimitForGrouping, "car-grouping", label = { it.toString() }) { value -> change { it.copy(androidAutoBrowseLimitForGrouping = value) } }
+        }
+        item {
+            Choices("Series books order", SeriesOrder.entries, settings.androidAutoBrowseSeriesSequenceOrder, "car-series-order", label = { if (it == SeriesOrder.ASC) "First to last" else "Last to first" }) { value -> change { it.copy(androidAutoBrowseSeriesSequenceOrder = value) } }
+        }
+
         item { SettingsHeading("Support") }
         item {
             OutlinedButton(onClick = onDiagnostics, modifier = Modifier.fillMaxWidth().testTag("open-diagnostics")) { Text("Diagnostics") }
         }
     }
 }
+
+private val CAR_GROUPING = listOf(25, 50, 100, 200, 500)
 
 private val AUTO_SLEEP_HOURS = listOf("20:00", "21:00", "22:00", "23:00", "00:00", "05:00", "06:00", "07:00", "08:00")
 

@@ -93,6 +93,9 @@ class ApiClient(
     suspend fun search(libraryId: String, query: String, limit: Int = 12): SearchResponse =
         get("api/libraries/$libraryId/search", SearchResponse.serializer(), listOf("q" to query, "limit" to "$limit"))
     suspend fun item(id: String): LibraryItem = get("api/items/$id", LibraryItem.serializer(), listOf("expanded" to "1", "include" to "progress,rssfeed"))
+    suspend fun authors(libraryId: String): List<AuthorResult> = get("api/libraries/$libraryId/authors", AuthorsResponse.serializer()).authors
+    suspend fun series(libraryId: String): List<NamedRef> =
+        get("api/libraries/$libraryId/series", GroupPage.serializer(NamedRef.serializer()), listOf("minified" to "1", "sort" to "name", "limit" to "10000")).results
     suspend fun author(id: String): AuthorDetail = get("api/authors/$id", AuthorDetail.serializer(), listOf("include" to "items,series"))
     // endregion
 

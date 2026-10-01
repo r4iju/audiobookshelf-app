@@ -1,6 +1,10 @@
 package com.audiobookshelf.core
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonTransformingSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -110,6 +114,11 @@ object LenientDoubleSerializer : KSerializer<Double> {
 
 @Serializable data class SeriesRef(val id: String = "", val name: String = "", val sequence: String? = null)
 
+/** Lists filtered by a series carry that one series, with the book's sequence, as an object rather than a list. */
+object SeriesListSerializer : JsonTransformingSerializer<List<SeriesRef>>(ListSerializer(SeriesRef.serializer())) {
+    override fun transformDeserialize(element: JsonElement): JsonElement = if (element is JsonObject) JsonArray(listOf(element)) else element
+}
+
 @Serializable data class Metadata(
     val title: String? = null,
     val subtitle: String? = null,
@@ -118,7 +127,7 @@ object LenientDoubleSerializer : KSerializer<Double> {
     val authors: List<NamedRef> = emptyList(),
     val narrators: List<String> = emptyList(),
     val narratorName: String? = null,
-    val series: List<SeriesRef> = emptyList(),
+    @Serializable(with = SeriesListSerializer::class) val series: List<SeriesRef> = emptyList(),
     val seriesName: String? = null,
     val genres: List<String> = emptyList(),
     val description: String? = null,
@@ -215,6 +224,7 @@ object LenientDoubleSerializer : KSerializer<Double> {
     val isMissing: Boolean = false,
     val isInvalid: Boolean = false,
     val rssFeed: RssFeed? = null,
+    val collapsedSeries: CollapsedSeries? = null,
 ) {
     val isPodcast get() = mediaType == "podcast"
     val title get() = media.metadata.title?.takeIf { it.isNotBlank() } ?: "Untitled"
@@ -228,6 +238,9 @@ object LenientDoubleSerializer : KSerializer<Double> {
     val primaryEbook get() = media.ebookFile
     val supplementaryEbooks get() = libraryFiles.filter { it.fileType == "ebook" && it.isSupplementary == true }
 }
+
+/** A series standing in for its books when a list is requested with `collapseseries=1`. */
+@Serializable data class CollapsedSeries(val id: String, val name: String = "", val numBooks: Int = 0)
 
 @Serializable data class ItemsPage(val results: List<LibraryItem>, val total: Int = 0, val limit: Int = 0, val page: Int = 0)
 
@@ -247,6 +260,7 @@ object LenientDoubleSerializer : KSerializer<Double> {
 @Serializable data class SeriesResult(val series: NamedRef, val books: List<LibraryItem> = emptyList())
 @Serializable data class NarratorResult(val name: String, val numBooks: Int = 0)
 @Serializable data class TagResult(val name: String, val numItems: Int = 0)
+@Serializable data class AuthorsResponse(val authors: List<AuthorResult> = emptyList())
 @Serializable data class AuthorResult(val id: String, val name: String = "", val numBooks: Int? = null)
 
 @Serializable data class SearchResponse(

@@ -8,5 +8,6 @@
                 <data android:scheme="content" android:mimeType="application/epub+zip" />
             </intent-filter>
         </activity>
+        <activity android:name="com.audiobookshelf.android.journeys.ForeignBrowserActivity" android:exported="true" android:label="Foreign browser" />
     </application>
 </manifest>

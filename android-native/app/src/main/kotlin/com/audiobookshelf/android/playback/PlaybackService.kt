@@ -13,6 +13,7 @@ import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
 import com.audiobookshelf.android.MainActivity
 import com.audiobookshelf.android.R
@@ -80,20 +81,25 @@ class PlaybackService : MediaLibraryService() {
             return super.onCustomCommand(session, controller, customCommand, args)
         }
 
+        /** The library is browsed only by this app, cars, assistants, watches and the system, as in the existing app. */
+        private fun mayBrowse(browser: MediaSession.ControllerInfo) = browser.packageName == service.packageName || browser.packageName in BROWSERS || browser.isTrusted
+
+        private fun <T : Any> refused(): ListenableFuture<LibraryResult<T>> = Futures.immediateFuture(LibraryResult.ofError<T>(SessionError.ERROR_PERMISSION_DENIED))
+
         override fun onGetLibraryRoot(session: MediaLibrarySession, browser: MediaSession.ControllerInfo, params: LibraryParams?): ListenableFuture<LibraryResult<MediaItem>> =
-            service.browse.root(params)
+            if (mayBrowse(browser)) service.browse.root(params) else refused()
 
         override fun onGetChildren(session: MediaLibrarySession, browser: MediaSession.ControllerInfo, parentId: String, page: Int, pageSize: Int, params: LibraryParams?): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> =
-            service.browse.children(parentId, page, pageSize, params)
+            if (mayBrowse(browser)) service.browse.children(parentId, page, pageSize, params) else refused()
 
         override fun onGetItem(session: MediaLibrarySession, browser: MediaSession.ControllerInfo, mediaId: String): ListenableFuture<LibraryResult<MediaItem>> =
-            service.browse.item(mediaId)
+            if (mayBrowse(browser)) service.browse.item(mediaId) else refused()
 
         override fun onSearch(session: MediaLibrarySession, browser: MediaSession.ControllerInfo, query: String, params: LibraryParams?): ListenableFuture<LibraryResult<Void>> =
-            service.browse.search(session, browser, query, params)
+            if (mayBrowse(browser)) service.browse.search(session, browser, query, params) else refused()
 
         override fun onGetSearchResult(session: MediaLibrarySession, browser: MediaSession.ControllerInfo, query: String, page: Int, pageSize: Int, params: LibraryParams?): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> =
-            service.browse.searchResult(query, page, pageSize, params)
+            if (mayBrowse(browser)) service.browse.searchResult(query, page, pageSize, params) else refused()
 
         override fun onAddMediaItems(mediaSession: MediaSession, controller: MediaSession.ControllerInfo, mediaItems: MutableList<MediaItem>): ListenableFuture<MutableList<MediaItem>> =
             Futures.immediateFuture(mediaItems)
@@ -106,6 +112,10 @@ class PlaybackService : MediaLibraryService() {
 
     companion object {
         const val COMMAND_SPEED = "com.audiobookshelf.android.SPEED"
+        private val BROWSERS = setOf(
+            "com.audiobookshelf.app", "com.audiobookshelf.app.debug", "com.google.android.projection.gearhead", "com.google.android.autosimulator",
+            "com.google.android.wearable.app", "com.google.android.googlequicksearchbox", "com.google.android.carassistant",
+        )
         private val speeds = listOf(0.5f, 1f, 1.2f, 1.5f, 2f, 3f)
 
         /** The existing app's speed cycle for system controls; anything above 3x returns to 1x. */
@@ -117,7 +127,10 @@ class PlaybackService : MediaLibraryService() {
 private class SystemPlayer(private val engine: PlaybackEngine, private val browse: BrowseTree) : ForwardingSimpleBasePlayer(engine.player) {
     /** Browse and search selections arrive as media IDs; the engine opens the real media for them. */
     override fun handleSetMediaItems(mediaItems: MutableList<MediaItem>, startIndex: Int, startPositionMs: Long): ListenableFuture<*> {
-        mediaItems.getOrNull(startIndex.coerceAtLeast(0))?.let { browse.open(it.mediaId) }
+        mediaItems.getOrNull(startIndex.coerceAtLeast(0))?.let { item ->
+            val spoken = item.requestMetadata.searchQuery
+            if (item.mediaId.isEmpty() && spoken != null) browse.playFromSearch(spoken) else browse.open(item.mediaId)
+        }
         return Futures.immediateVoidFuture()
     }
 

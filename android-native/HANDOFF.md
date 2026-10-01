@@ -85,6 +85,35 @@ Evidence for 13ca2ed5121f9c3b50d5fbb4b901882bc2ef66b2:
 - Entries that exist are left for the mode, so layered modes such as `pdf-remote` then `pdf-supplementary` still work.
 - `/__android__/slow-discard` holds DELETE.
 
+## Opening downloads and a chosen download folder (#44) in af39cff48222cba49455dfa249825fa18b6d8f2f
+
+- A downloaded ebook opens in another app through the `${applicationId}.files` FileProvider. The provider is not exported and shares only `files/downloads/`. Opening grants read access to that single file (`FLAG_GRANT_READ_URI_PERMISSION`, no write).
+- Downloads can go to a folder picked with the system picker (Settings, Storage). The app keeps a persisted read and write grant. Finished files are copied to `<folder>/<Author>/<Title>/` and removed from app storage.
+- When the folder's grant is gone, Downloads says so, nothing plays from it, and the folder can be chosen again. A file removed by another app is reported as missing and can be downloaded again.
+- Without an app for the format, the format is named (for example MOBI) instead of failing silently.
+- No folder scanning: legacy upstream removed local folder scanning, so it is not carried over.
+- **RED:** `LocalFilesJourney` failed 4 of 4 (no `open-elsewhere`, no `choose-download-folder`).
+- **GREEN:** 4 of 4. The test APK's `OtherAppActivity` (its own uid) read the exact bytes (size and SHA-256), was refused writing, and could not read neighbouring files.
+- **Regression:** Download, Pdf, Settings and Podcast journeys pass 24 of 24; unit tests pass.
+
+## Android Auto browsing (#50)
+
+- `PlaybackService` (Media3 `MediaLibraryService`) serves the existing app's car layout:
+  - Root: Continue (only with titles in progress), Recent (per library shelves), Libraries, Downloads.
+  - Book libraries: Authors, Series, Collections, and Discovery when the server has a discover shelf. Podcast libraries list podcasts, then episodes newest first.
+  - Authors and series lists over the grouping limit split into letter groups, extended one letter at a time when a group is still too large (`CarBrowsing` in `:core`). The legacy crash on names shorter than the prefix and the empty group dead end do not occur.
+  - Series books sort by sequence (`1`, `2`, `10`; `1.5` before `1.10`), prefixed with their number. An author's series appear as one entry (`collapseseries=1`).
+  - Titles carry completion status and percentage. Downloaded titles are marked downloaded and play from the phone's copy, also when picked from server lists.
+  - Without the server, the root still offers Downloads.
+  - Voice requests (`playFromSearch`) play the title whose name matches, else the best match.
+- Settings: "Group authors and series in letters above" (25/50/100/200/500, plus any migrated value) and "Series books order".
+- Browsing is refused (`ERROR_PERMISSION_DENIED`) to apps other than this one, the existing app, Android Auto, the Auto simulator, Wear OS, Google app, car assistant and trusted system controllers. Playback controls are unchanged.
+- Manifest: `com.google.android.gms.car.application` (`automotive_app_desc`, media) and the car notification small icon.
+- **RED:** `CarJourney` failed 5 of 5 (root was Continue and Libraries only; no settings; foreign app allowed; voice request did nothing). `CarBrowsingTest` failed 5 of 6 on the stub, including decoding the single series object that filtered lists return.
+- **GREEN:** `CarJourney` 5 of 5, using the platform `MediaBrowser`/`MediaController` protocol a head unit uses, and a browser in the test APK's own uid for refusal. Two fixes came out of the GREEN runs: `recent/<library>` was routed to the top Recent node (bug), and the test compared Int 2 with the Long download status (test error).
+- **Regression:** Playback, Settings, Browse and Podcast journeys pass 17 of 17; unit tests pass.
+- **Not verified:** a physical car or the Desktop Head Unit. The MediaBrowser contract is checked on the emulator only.
+
 ## Evidence for 2b3227dc (emulator and fixture only)
 
 - Unit tests: `./gradlew :core:test :app:testDebugUnitTest`, 24 tests, 0 failures.
@@ -99,7 +128,7 @@ Evidence for 13ca2ed5121f9c3b50d5fbb4b901882bc2ef66b2:
 - `PlayerToolsJourney.a` (`delete-bookmark-0`) has flaked once in a full run. The fixture reset in 5068c1d3 removes the cross-class bookmark state behind the `bookmarks-empty` failure.
 - While a discard is pending (offline, or listening not yet sent), the title does not play and shows "Discarding progress" until the server confirms.
 - Physical-only gates are not yet exercised:
-  - Bluetooth, lock screen and Android Auto controls.
+  - Bluetooth, lock screen and Android Auto controls, and a physical car or Desktop Head Unit.
   - Real metered networks.
   - Migration from the legacy app on the owner's device.
 
