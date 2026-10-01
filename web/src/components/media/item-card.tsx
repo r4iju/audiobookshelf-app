@@ -55,14 +55,18 @@ export function MediaCard({
           </span>
         ) : null}
       </div>
-      {progress && !progress.finished && progress.value > 0 ? (
-        <ProgressBar value={progress.value} label={progressLabel} />
-      ) : (
-        <div aria-hidden className="h-1" />
-      )}
+      {/* A progressbar inside a link would leave the link without a name, so the bar is drawn and the value is told. */}
+      <div aria-hidden className="h-1">
+        {progress && !progress.finished && progress.value > 0 ? (
+          <ProgressBar value={progress.value} label={progressLabel} />
+        ) : null}
+      </div>
       <div className="h-14 overflow-hidden">
         <p className="line-clamp-2 text-sm font-semibold leading-snug break-words">{title}</p>
         {subtitle ? <p className="truncate text-xs text-muted">{subtitle}</p> : null}
+        {progress && !progress.finished && progress.value > 0 ? (
+          <span className="sr-only">{`${progressLabel} ${Math.round(progress.value * 100)}%`}</span>
+        ) : null}
       </div>
     </Link>
   );

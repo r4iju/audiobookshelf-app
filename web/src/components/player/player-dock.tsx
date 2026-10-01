@@ -45,7 +45,8 @@ function sleepValue(sleep: Sleep) {
   return sleep.kind === "off" ? "off" : sleep.kind === "chapter-end" ? "chapter" : "running";
 }
 
-export function PlayerDock() {
+/** `fullWindow` when no navigation surrounds it, as while reading, where it sits under the page instead of over it. */
+export function PlayerDock({ fullWindow = false }: { fullWindow?: boolean }) {
   const player = usePlayer();
   const pending = useProgressSync();
   const { t } = useI18n();
@@ -53,16 +54,16 @@ export function PlayerDock() {
     return pending > 0 ? (
       <p
         role="status"
-        className="fixed right-4 bottom-20 z-30 rounded-full bg-surface-2 px-3 py-1 text-xs lg:bottom-4"
+        className={`fixed right-4 z-30 rounded-full bg-surface-2 px-3 py-1 text-xs ${fullWindow ? "bottom-4" : "bottom-20 lg:bottom-4"}`}
       >
         {t("WebPendingProgress", pending)}
       </p>
     ) : null;
   }
-  return <Dock player={player} pending={pending} />;
+  return <Dock player={player} pending={pending} fullWindow={fullWindow} />;
 }
 
-function Dock({ player, pending }: { player: Active; pending: number }) {
+function Dock({ player, pending, fullWindow }: { player: Active; pending: number; fullWindow: boolean }) {
   const { t } = useI18n();
   const settings = useSettings();
   const updateSettings = useSettingsStore((state) => state.update);
@@ -93,7 +94,7 @@ function Dock({ player, pending }: { player: Active; pending: number }) {
   return (
     <section
       aria-label={t("WebPlayer")}
-      className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-40 border-t border-line bg-surface/95 shadow-[0_-8px_24px_rgb(0_0_0/0.25)] backdrop-blur lg:bottom-0 lg:left-60"
+      className={`z-40 border-t border-line bg-surface/95 shadow-[0_-8px_24px_rgb(0_0_0/0.25)] backdrop-blur ${fullWindow ? "pb-[env(safe-area-inset-bottom)]" : "fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] lg:bottom-0 lg:left-60"}`}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 lg:px-6">
         {error ? <Alert>{error}</Alert> : null}

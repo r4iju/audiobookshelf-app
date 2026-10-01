@@ -231,3 +231,19 @@ export function useRemoveEpisode() {
       ]),
   });
 }
+
+export interface EbookPlace {
+  ebookLocation: string;
+  ebookProgress: number;
+}
+
+export function useSaveEbookPlace(itemId: string) {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    // One at a time, so a quick run of page turns cannot land on the server out of order.
+    scope: { id: `ebook-place-${itemId}` },
+    mutationFn: (place: EbookPlace) => client.command("PATCH", `/api/me/progress/${itemId}`, place),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: keys.itemProgress(connection.id, itemId) }),
+  });
+}

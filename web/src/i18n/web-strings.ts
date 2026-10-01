@@ -54,6 +54,12 @@ export const webStrings = {
   WebPage: "Page {0}",
   WebPrevious: "Previous",
   WebNext: "Next",
+  WebNextPage: "Next page",
+  WebPreviousPage: "Previous page",
+  WebGoToPageNumber: "Go to page {0}",
+  WebDocumentUnreadable:
+    "This document could not be opened. It may be damaged, or in a form this browser cannot read.",
+  WebReaderNavigation: "Reading position",
   WebItemsCount: "{0} items",
   WebItemsCount_one: "{0} item",
   WebLibraryItems: "Library items",

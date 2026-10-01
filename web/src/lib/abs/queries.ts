@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useAbs } from "@/lib/session/store";
 import { type BrowseState, itemsQuery } from "./browse";
+import { AbsError } from "./client";
 import {
   authorDetailSchema,
   authorsResponseSchema,
@@ -8,6 +9,7 @@ import {
   librariesResponseSchema,
   libraryItemSchema,
   libraryWithFilterDataSchema,
+  mediaProgressSchema,
   pagedCollectionsSchema,
   pagedItemsSchema,
   pagedPlaylistsSchema,
@@ -33,6 +35,8 @@ export const keys = {
   items: (connectionId: string, libraryId: string, query: string) =>
     [connectionId, "library", libraryId, "items", query] as const,
   item: (connectionId: string, itemId: string) => [connectionId, "item", itemId] as const,
+  itemProgress: (connectionId: string, itemId: string) => [connectionId, "item-progress", itemId] as const,
+  ebook: (connectionId: string, path: string) => [connectionId, "ebook", path] as const,
   filterData: (connectionId: string, libraryId: string) =>
     [connectionId, "library", libraryId, "filterdata"] as const,
   search: (connectionId: string, libraryId: string, q: string) =>
@@ -115,6 +119,31 @@ export function useEpisodeProgress(itemId: string) {
           entry.libraryItemId === itemId && entry.episodeId ? [[entry.episodeId, entry] as const] : [],
         ),
       ),
+  });
+}
+
+/** Read fresh on open so a place saved by another client is where reading resumes. */
+export function useServerItemProgress(itemId: string) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.itemProgress(connection.id, itemId),
+    queryFn: ({ signal }) =>
+      client.get(`/api/me/progress/${itemId}`, mediaProgressSchema, signal).catch((error: unknown) => {
+        if (error instanceof AbsError && error.kind === "not-found") return null;
+        throw error;
+      }),
+    staleTime: 0,
+  });
+}
+
+export function useEbookFile(path: string) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.ebook(connection.id, path),
+    queryFn: ({ signal }) => client.blob(path, signal),
+    staleTime: Number.POSITIVE_INFINITY,
+    gcTime: 60_000,
+    retry: false,
   });
 }
 
