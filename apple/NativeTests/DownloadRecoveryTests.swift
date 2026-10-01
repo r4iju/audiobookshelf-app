@@ -85,4 +85,41 @@ import XCTest
         XCTAssertNotEqual(failed.error, "There is not enough storage on this device for this download. Free up space, then retry.")
         XCTAssertEqual(stub.requests("GET", "/abs/api/items/book-1/file/ino-1/download").count, 1)
     }
+
+    /// Server 2.30 lists each audio and ebook file's size in its `metadata`. A body that ends early without a
+    /// Content-Length must not be saved as the finished file when the server said how large it is, while a transfer
+    /// with neither a Content-Length nor a listed size stays acceptable.
+    func testUnsizedTransferShorterThanTheListedFileSizeIsNotSavedAsFinished() async throws {
+        let audio = AdoptionHarness.wav(seconds: 1, tone: 220)
+        let pdf = Data("%PDF-1.4 synthetic".utf8) + Data(repeating: 32, count: 2048)
+        stub.route("GET", "/abs/api/items/book-1/file/ino-1/download") { _ in .unsizedFile(200, "audio/wav", audio.prefix(audio.count / 2)) }
+        stub.route("GET", "/abs/api/items/book-1/file/ino-pdf/download") { _ in .unsizedFile(200, "application/pdf", pdf.prefix(100)) }
+        stub.route("GET", "/abs/api/items/book-1") { _ in
+            .json(200, ["id": "book-1", "mediaType": "book",
+                        "media": ["metadata": ["title": "Synthetic book"], "duration": 1,
+                                  "tracks": [["contentUrl": "/api/items/book-1/file/ino-1", "mimeType": "audio/wav", "metadata": ["filename": "01.wav", "ext": ".wav", "size": audio.count], "startOffset": 0, "duration": 1]],
+                                  "ebookFile": ["ino": "ino-pdf", "ebookFormat": "pdf", "metadata": ["filename": "book.pdf", "ext": ".pdf", "size": pdf.count]]]])
+        }
+        stub.route("GET", "/abs/api/items/book-2") { _ in
+            .json(200, ["id": "book-2", "mediaType": "book",
+                        "media": ["metadata": ["title": "Unsized book"], "duration": 1,
+                                  "tracks": [["contentUrl": "/api/items/book-2/file/ino-2", "mimeType": "audio/wav", "metadata": ["filename": "02.wav", "ext": ".wav"], "startOffset": 0, "duration": 1]]]])
+        }
+        stub.route("GET", "/abs/api/items/book-2/file/ino-2/download") { _ in .unsizedFile(200, "audio/wav", audio) }
+        let api = APIClient(store: credentials, session: stub.session())
+        try api.restoreSavedCredentials()
+        let downloads = store(api)
+        for id in ["book-1", "book-2"] {
+            let item = try JSONDecoder().decode(LibraryItem.self, from: JSONSerialization.data(withJSONObject: ["id": id, "mediaType": "book", "media": ["metadata": ["title": id]]]))
+            await downloads.enqueue(item: item, episode: nil)
+        }
+        for _ in 0..<50 where downloads.visible.contains(where: { $0.state == .queued }) { try await Task.sleep(nanoseconds: 100_000_000) }
+        let truncated = try XCTUnwrap(downloads.visible.first { $0.media.libraryItemID == "book-1" })
+        XCTAssertEqual(truncated.state, .failed)
+        XCTAssertFalse(truncated.audioAvailable, "Half of the audio file must not count as downloaded")
+        XCTAssertFalse(truncated.ebookAvailable, "Part of the PDF must not count as downloaded")
+        let unsized = try XCTUnwrap(downloads.visible.first { $0.media.libraryItemID == "book-2" })
+        XCTAssertEqual(unsized.state, .ready, "Without a Content-Length or a listed size the transfer is accepted")
+        XCTAssertEqual(try downloads.audio(unsized).files.map { try Data(contentsOf: $0) }, [audio])
+    }
 }

@@ -16,6 +16,8 @@ final class StubServer {
         case status(Int)
         /// A file body with its content type.
         case file(Int, String, Data)
+        /// A file body without Content-Length, as a proxy that streams the response sends it.
+        case unsizedFile(Int, String, Data)
         /// The server handled the request but the client never saw the answer.
         case lost
         /// The loading system failed the request with this error.
@@ -90,6 +92,8 @@ final class StubProtocol: URLProtocol {
             respond(code, try! JSONSerialization.data(withJSONObject: value))
         case .file(let code, let type, let data):
             respond(code, data, headers: ["Content-Type": type, "Content-Length": String(data.count)])
+        case .unsizedFile(let code, let type, let data):
+            respond(code, data, headers: ["Content-Type": type])
         }
     }
 
