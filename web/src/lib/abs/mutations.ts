@@ -37,3 +37,32 @@ export function useDeleteBookmark() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
   });
 }
+
+export function useSetFinished() {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      itemId,
+      episodeId,
+      finished,
+    }: {
+      itemId: string;
+      episodeId?: string | null;
+      finished: boolean;
+    }) =>
+      client.command("PATCH", `/api/me/progress/${itemId}${episodeId ? `/${episodeId}` : ""}`, {
+        isFinished: finished,
+      }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
+  });
+}
+
+export function useDiscardProgress() {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (progressId: string) => client.command("DELETE", `/api/me/progress/${progressId}`),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
+  });
+}

@@ -14,6 +14,7 @@ import { usePlayer, usePlayerStore } from "@/lib/player/store";
 import { useAbs } from "@/lib/session/store";
 import { htmlToText } from "@/lib/text";
 import { playerMediaFor } from "./play-media";
+import { ProgressControls } from "./progress-controls";
 
 export function ItemDetail({ itemId }: { itemId: string }) {
   const item = useItem(itemId);
@@ -133,6 +134,8 @@ function ItemView({ item }: { item: LibraryItem }) {
               </p>
             </div>
           ) : null}
+
+          <ProgressControls itemId={item.id} progress={progress} />
 
           <div className="flex flex-wrap gap-3">
             {hasAudio ? (

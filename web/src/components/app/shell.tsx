@@ -30,6 +30,7 @@ import * as registry from "@/lib/session/registry";
 import { useSession, useSessionStore } from "@/lib/session/store";
 import { errorMessage } from "./errors";
 import { useOnline } from "./online";
+import { useRealtime } from "./realtime";
 
 export function SignedInShell({ children }: { children: ReactNode }) {
   const session = useSession();
@@ -107,6 +108,7 @@ function Shell({ children }: { children: ReactNode }) {
   const params = useParams<{ libraryId?: string }>();
   const libraries = useLibraries();
   const online = useOnline();
+  useRealtime();
   const playerActive = usePlayer().phase === "active";
 
   if (session.phase !== "signed-in") return null;
@@ -117,7 +119,7 @@ function Shell({ children }: { children: ReactNode }) {
     list.find((library) => library.id === params.libraryId) ??
     list.find((library) => library.id === remembered) ??
     list[0];
-  const reauthHref = `/connect?${new URLSearchParams({ server: connection.serverUrl, username: connection.username })}`;
+  const reauthHref = `/connect?${new URLSearchParams({ server: connection.serverUrl, username: connection.username, next: pathname })}`;
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[15rem_1fr]">

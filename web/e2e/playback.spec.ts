@@ -1,15 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
-import { qa, serverApi, signIn } from "./qa";
+import { clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
 
 // "The Long Tide": three 30 s MP3 files, one chapter per file. Chromium plays MP3 natively.
-
-async function itemIdByTitle(title: string) {
-  const api = await serverApi({ username: "qa-admin", password: "qa-admin-pass" });
-  const { body } = await api.call(
-    `/api/libraries/${qa.libraries.books}/search?q=${encodeURIComponent(title)}`,
-  );
-  return body.book[0].libraryItem.id as string;
-}
 
 const player = (page: Page) => page.getByRole("region", { name: "Player" });
 const position = (page: Page) => player(page).getByRole("slider", { name: "Seek" }).inputValue().then(Number);
@@ -17,8 +9,7 @@ const position = (page: Page) => player(page).getByRole("slider", { name: "Seek"
 async function fresh(account = { username: "qa-other", password: "qa-other-pass" } as const) {
   const api = await serverApi(account);
   const id = await itemIdByTitle("The Long Tide");
-  const progress = await api.call(`/api/me/progress/${id}`);
-  if (progress.body?.id) await api.call(`/api/me/progress/${progress.body.id}`, { method: "DELETE" });
+  await clearProgress(api, id);
   const me = await api.call("/api/me");
   for (const bookmark of me.body.bookmarks ?? []) {
     await api.call(`/api/me/item/${bookmark.libraryItemId}/bookmark/${bookmark.time}`, { method: "DELETE" });

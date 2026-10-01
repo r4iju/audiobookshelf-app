@@ -7,7 +7,7 @@ export function errorMessage(t: Translate, error: unknown) {
     case "network":
       return t("WebOffline");
     case "unauthorized":
-      return t("WebReauthRequired");
+      return t("WebSignInToContinue");
     case "forbidden":
       return t("WebForbidden");
     case "not-found":

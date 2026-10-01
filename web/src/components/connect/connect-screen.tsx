@@ -1,8 +1,9 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { Server, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
 import { Alert } from "@/components/ui/status";
@@ -15,6 +16,7 @@ import {
   probeServer,
   startOpenId,
 } from "@/lib/abs/auth";
+import { keys } from "@/lib/abs/queries";
 import type { ServerStatus } from "@/lib/abs/schemas";
 import * as registry from "@/lib/session/registry";
 import { useSession, useSessionStore } from "@/lib/session/store";
@@ -62,12 +64,16 @@ function loginMessage(t: Translate, failure: LoginFailure, status?: number) {
 export function ConnectScreen({
   initialServer,
   initialUsername,
+  next,
 }: {
   initialServer: string;
   initialUsername: string;
+  /** Where to go after signing in; only same-app paths are accepted. */
+  next: string;
 }) {
   const { t } = useI18n();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const signIn = useSessionStore((state) => state.signIn);
   const switchTo = useSessionStore((state) => state.switchTo);
   // Stays disabled until hydration has restored saved servers, so an early click cannot submit a dead form.
@@ -82,7 +88,7 @@ export function ConnectScreen({
   const [state, submit, pending] = useActionState(
     async (previous: Step, form: FormData): Promise<Step> => {
       if (form.get("intent") === "change-server") return { step: "address", error: null, attempted: "" };
-      if (previous.step === "address") {
+      if (previous.step === "address" || form.get("intent") === "probe") {
         const address = String(form.get("server") ?? "");
         const result = await probeServer(address);
         if (!result.ok)
@@ -111,12 +117,23 @@ export function ConnectScreen({
       );
       // React resets the form after an action; the username survives through its default value.
       if (!result.ok) return { ...previous, error: result.reason, errorStatus: result.status, username };
+      // Anything cached while the old sign-in was failing is dropped so screens load again with the new one.
+      queryClient.removeQueries({ queryKey: keys.all(result.connection.id) });
       signIn(result.connection);
-      router.replace("/");
+      router.replace(next);
       return previous;
     },
     { step: "address", error: null, attempted: "" },
   );
+
+  // External system: the server; a link that names a server (for example "sign in again") checks it right away.
+  useEffect(() => {
+    if (!initialServer || restoring) return;
+    const form = new FormData();
+    form.set("server", initialServer);
+    form.set("intent", "probe");
+    startTransition(() => submit(form));
+  }, [initialServer, restoring, submit]);
 
   const reusable = saved.filter((entry) => entry.auth);
   const signedOut = saved.filter((entry) => !entry.auth);

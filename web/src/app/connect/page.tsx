@@ -6,8 +6,14 @@ export const metadata: Metadata = { title: "Connect" };
 export default async function ConnectPage({
   searchParams,
 }: {
-  searchParams: Promise<{ server?: string; username?: string }>;
+  searchParams: Promise<{ server?: string; username?: string; next?: string }>;
 }) {
-  const { server, username } = await searchParams;
-  return <ConnectScreen initialServer={server ?? ""} initialUsername={username ?? ""} />;
+  const { server, username, next } = await searchParams;
+  return (
+    <ConnectScreen initialServer={server ?? ""} initialUsername={username ?? ""} next={safeNext(next)} />
+  );
+}
+
+function safeNext(next: string | undefined) {
+  return next?.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : "/";
 }

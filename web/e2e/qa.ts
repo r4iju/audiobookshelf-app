@@ -58,3 +58,16 @@ export async function signIn(page: Page, account: Account = accounts.user, serve
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("navigation", { name: "Library" })).toBeVisible();
 }
+
+export async function itemIdByTitle(title: string) {
+  const api = await serverApi(accounts.admin);
+  const { body } = await api.call(
+    `/api/libraries/${qa.libraries.books}/search?q=${encodeURIComponent(title)}`,
+  );
+  return body.book[0].libraryItem.id as string;
+}
+
+export async function clearProgress(api: Awaited<ReturnType<typeof serverApi>>, itemId: string) {
+  const progress = await api.call(`/api/me/progress/${itemId}`);
+  if (progress.body?.id) await api.call(`/api/me/progress/${progress.body.id}`, { method: "DELETE" });
+}

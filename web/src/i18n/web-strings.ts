@@ -31,6 +31,9 @@ export const webStrings = {
   WebReauthRequired:
     "Your session on this server has ended. Sign in again to continue; unsent progress is kept.",
   WebRetry: "Retry",
+  WebSignInToContinue: "Sign in again to load this.",
+  WebConfirm: "Are you sure?",
+  WebCancel: "Cancel",
   WebNavLibrary: "Library",
   WebNoLibraries: "This account cannot open any libraries on this server.",
   WebNavPrimary: "Main",
