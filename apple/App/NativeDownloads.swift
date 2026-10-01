@@ -361,8 +361,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     private static func outOfSpace(_ error: Error) -> Bool {
         let error = error as NSError
         switch (error.domain, error.code) {
-        case (NSCocoaErrorDomain, NSFileWriteOutOfSpaceError), (NSPOSIXErrorDomain, Int(ENOSPC)), (NSPOSIXErrorDomain, Int(EDQUOT)),
-             (NSURLErrorDomain, NSURLErrorCannotCreateFile), (NSURLErrorDomain, NSURLErrorCannotWriteToFile): return true
+        case (NSCocoaErrorDomain, NSFileWriteOutOfSpaceError), (NSPOSIXErrorDomain, Int(ENOSPC)), (NSPOSIXErrorDomain, Int(EDQUOT)): return true
         default: return (error.userInfo[NSUnderlyingErrorKey] as? Error).map(outOfSpace) ?? false
         }
     }
