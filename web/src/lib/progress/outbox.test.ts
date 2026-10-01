@@ -113,6 +113,59 @@ describe("progress outbox", () => {
     expect(outbox.pending()).toHaveLength(1);
   });
 
+  it("sends nothing and reports a failure when the browser will not record what is being sent", async () => {
+    const outbox = createOutbox("conn-a", memoryStorage(), undefined, {
+      begin: async () => {
+        throw new Error("IndexedDB refused");
+      },
+      finish: async () => {},
+    });
+    outbox.record(report(10, 1_000));
+    let sent = false;
+    const result = await outbox.flush(async () => {
+      sent = true;
+      return [];
+    });
+    expect({ kind: result.kind, sent }).toEqual({ kind: "failed", sent: false });
+    expect(outbox.pending()).toHaveLength(1);
+  });
+
+  it("sends exactly what it recorded as being sent, though another tab advanced the report meanwhile", async () => {
+    const storage = memoryStorage();
+    let recorded: ListeningReport[] = [];
+    const outbox = createOutbox("conn-a", storage, undefined, {
+      begin: async (_connectionId, candidates) => {
+        recorded = structuredClone(candidates);
+        createOutbox("conn-a", storage).record(report(30, 3_000));
+        return { sendingKey: "k", sending: candidates };
+      },
+      finish: async () => {},
+    });
+    outbox.record(report(10, 1_000));
+    let sent: ListeningReport[] = [];
+    await outbox.flush(async (sessions) => {
+      sent = sessions;
+      return sessions.map((session) => ({ id: session.id, success: true }));
+    });
+    expect(sent).toEqual(recorded);
+    expect(outbox.pending().map((entry) => entry.currentTime)).toEqual([30]);
+  });
+
+  it("keeps what the server answered though the browser then fails to note that it was answered", async () => {
+    const outbox = createOutbox("conn-a", memoryStorage(), undefined, {
+      begin: async (_connectionId, candidates) => ({ sendingKey: "k", sending: candidates }),
+      finish: async () => {
+        throw new Error("IndexedDB refused");
+      },
+    });
+    outbox.record(report(10, 1_000));
+    const result = await outbox.flush(async (sessions) =>
+      sessions.map((session) => ({ id: session.id, success: true })),
+    );
+    expect(result).toEqual({ kind: "sent", delivered: 1 });
+    expect(outbox.pending()).toEqual([]);
+  });
+
   it("drops a report the server rejects for good so it cannot block the queue", async () => {
     const outbox = createOutbox("conn-a", memoryStorage());
     outbox.record(report(10, 1_000));

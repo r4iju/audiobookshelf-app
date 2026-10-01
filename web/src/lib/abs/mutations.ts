@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { type DiscardTarget, discardProgress } from "@/lib/progress/discard";
+import { discardAnyway, keepProgress } from "@/lib/progress/sync";
 import { useAbs } from "@/lib/session/store";
 import type { AbsClient } from "./client";
 import { feedSchema } from "./feeds";
@@ -76,6 +77,23 @@ export function useDiscardProgress() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
   });
 }
+
+/** Settles a discard left unconfirmed (see discardProgress) the way the user chose. */
+function useDiscardChoice(choose: typeof keepProgress) {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, episodeId }: { itemId: string; episodeId: string | null }) =>
+      choose(client, itemId, episodeId),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
+  });
+}
+
+/** Gives up the discard: nothing is deleted. */
+export const useKeepProgress = () => useDiscardChoice(keepProgress);
+
+/** Deletes anyway, accepting that the unconfirmed listening may bring the old place back. */
+export const useDiscardAnyway = () => useDiscardChoice(discardAnyway);
 
 export interface PlaylistEntry {
   libraryItemId: string;

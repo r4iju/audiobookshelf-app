@@ -87,8 +87,12 @@ server allows the development server's origins. OpenID cannot work cross-origin;
 - `PATCH /api/me/progress/:itemId[/:episodeId]`
   - `isFinished`, and reader places (`ebookLocation`, `ebookProgress`).
 - `DELETE /api/me/progress/:progressId`
-  - Discard progress. Sent only after the session is closed and any `local-all` already sent is answered. The
-    server creates progress afresh from a report that lands after the delete, bringing the old position back.
+  - Discard progress. Sent only after the session is closed and every `local-all` for that book that any tab
+    recorded as sent has been answered. The server creates progress afresh from a report that lands after the
+    delete, bringing the old position back. 2.30.0 offers no way to tell that a given request is done: `local-all`
+    requests run independently (a session found by id is updated, but one that finds no progress row creates
+    one), so neither a copy sent again nor the server holding that listening proves the original will not land
+    later. A request that failed without an answer therefore leaves the discard to the user (see WEB-HANDOFF.md).
     Listening for the same book recorded during the discard is held and sent after the delete, so it is not deleted
     with the old position. Opening a playback session (`/play`) does not change progress, so playing again during a
     discard is safe.

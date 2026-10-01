@@ -8,18 +8,18 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/dialog";
 import { useI18n } from "@/i18n/i18n";
 import { formatClock } from "@/lib/abs/media";
-import { useDiscardProgress, useSetFinished } from "@/lib/abs/mutations";
+import { useDiscardAnyway, useDiscardProgress, useKeepProgress, useSetFinished } from "@/lib/abs/mutations";
 import type { MediaProgress } from "@/lib/abs/schemas";
 import { outboxFor } from "@/lib/progress/sync";
 import { useAbs } from "@/lib/session/store";
 
-/** Whether this account's discard of the book or episode is still waiting for the server. */
-function useDiscardPending(itemId: string, episodeId: string | null) {
+/** Where this account's discard of the book or episode stands, while one is under way. */
+function useDiscardState(itemId: string, episodeId: string | null) {
   const outbox = outboxFor(useAbs().connection.id);
   return useSyncExternalStore(
     outbox.subscribe,
-    () => outbox.isHeld(itemId, episodeId),
-    () => false,
+    () => outbox.discardState(itemId, episodeId),
+    () => null,
   );
 }
 
@@ -35,10 +35,13 @@ export function ProgressControls({
   const { t } = useI18n();
   const setFinished = useSetFinished();
   const discard = useDiscardProgress();
+  const keep = useKeepProgress();
+  const discardAnyway = useDiscardAnyway();
   const [confirming, setConfirming] = useState(false);
-  const discardPending = useDiscardPending(itemId, episodeId ?? null);
+  const target = { itemId, episodeId: episodeId ?? null };
+  const discardState = useDiscardState(target.itemId, target.episodeId);
   const finished = progress?.isFinished ?? false;
-  const error = setFinished.error ?? discard.error;
+  const error = setFinished.error ?? discard.error ?? keep.error ?? discardAnyway.error;
 
   return (
     <div className="flex flex-col gap-2">
@@ -62,10 +65,30 @@ export function ProgressControls({
           </Button>
         ) : null}
       </div>
-      {discardPending ? (
+      {discardState === "pending" ? (
         <p role="status" className="text-sm text-muted">
           {t("WebDiscardPending")}
         </p>
+      ) : null}
+      {discardState === "unconfirmed" ? (
+        <div className="flex flex-col gap-2">
+          <p role="status" className="text-sm text-muted">
+            {t("WebDiscardUnconfirmed")}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" disabled={keep.isPending} onClick={() => keep.mutate(target)}>
+              {t("WebKeepProgress")}
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              disabled={discardAnyway.isPending}
+              onClick={() => discardAnyway.mutate(target)}
+            >
+              {t("WebDiscardAnyway")}
+            </Button>
+          </div>
+        </div>
       ) : null}
       <InlineError error={error} />
       <ConfirmDialog

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { randomId } from "@/lib/random-id";
+import { beginSending, finishSending, thisPage } from "./coordination";
 
 // Listening progress is reported as "local sessions": one record per listening session with cumulative totals and a
 // client-chosen id. Re-sending the same record is harmless, so anything not confirmed is simply sent again later,
@@ -88,6 +89,20 @@ export interface HoldOwners {
 
 const noOwners: HoldOwners = { claim: () => () => {}, live: async () => null };
 
+/** Records what is being sent, across tabs, so a discard can account for it (see coordination.ts). */
+export interface Deliveries {
+  begin: (
+    connectionId: string,
+    candidates: ListeningReport[],
+  ) => Promise<{ sendingKey: string; sending: ListeningReport[] }>;
+  finish: (sendingKey: string, outcome: "answered" | "failed") => Promise<void>;
+}
+
+const pageDeliveries: Deliveries = {
+  begin: (connectionId, candidates) => beginSending(connectionId, candidates, thisPage),
+  finish: finishSending,
+};
+
 /** A discard in progress: its listening stays queued until the delete of `progressId` is confirmed. */
 export interface Hold {
   id: string;
@@ -112,14 +127,21 @@ const holdSchema = z.object({
   libraryItemId: z.string(),
   episodeId: z.string().nullable(),
   progressId: z.string(),
+  /** Listening for it that another tab sent, or that failed without an answer, is not confirmed (see sync.ts). */
+  unconfirmed: z.boolean().default(false),
   heartbeat: z.number(),
   abandoned: z.boolean(),
 });
-/** Where owners cannot be told apart, one silent this long is taken for gone, and its delete is sent again. */
+/** Where owners cannot be told apart, one silent this long is taken for gone, and another tab tries to finish it. */
 const SILENT_MS = 5 * 60_000;
 const HEARTBEAT_MS = 60_000;
 
-export function createOutbox(connectionId: string, storage: OutboxStorage, owners: HoldOwners = noOwners) {
+export function createOutbox(
+  connectionId: string,
+  storage: OutboxStorage,
+  owners: HoldOwners = noOwners,
+  deliveries: Deliveries = pageDeliveries,
+) {
   const key = `abs-web:v1:outbox:${connectionId}`;
   // One key per hold, so tabs taking and releasing holds at once never overwrite each other's.
   const holdPrefix = `abs-web:v1:outbox-hold:${connectionId}:`;
@@ -145,8 +167,23 @@ export function createOutbox(connectionId: string, storage: OutboxStorage, owner
       } catch {}
       return [];
     });
+  const holdsFor = (libraryItemId: string, episodeId: string | null) =>
+    readHolds().filter((hold) => hold.libraryItemId === libraryItemId && hold.episodeId === episodeId);
   const isHeld = (libraryItemId: string, episodeId: string | null) =>
-    readHolds().some((hold) => hold.libraryItemId === libraryItemId && hold.episodeId === episodeId);
+    holdsFor(libraryItemId, episodeId).length > 0;
+  /** Rewrites an existing hold's fields; one another tab has finished stays gone. */
+  const update = (holdId: string, fields: Partial<z.infer<typeof holdSchema>>) => {
+    const current = readHolds().find((hold) => hold.id === holdId);
+    if (!current) return;
+    const { id: _, ...stored } = current;
+    storage.write(`${holdPrefix}${holdId}`, JSON.stringify({ ...stored, ...fields }));
+  };
+  const asHold = ({ id, libraryItemId, episodeId, progressId }: Hold): Hold => ({
+    id,
+    libraryItemId,
+    episodeId,
+    progressId,
+  });
   const notify = () => {
     for (const listener of listeners) listener();
   };
@@ -161,28 +198,27 @@ export function createOutbox(connectionId: string, storage: OutboxStorage, owner
     },
     /**
      * Keeps a book's or episode's listening queued, in every tab, while its progress is deleted, so listening recorded
-     * meanwhile is not deleted with it. The hold ends only when the delete is confirmed: by its owner (`settle`) or,
-     * once the owner has given up (`abandon`) or is gone, by whichever tab sends the delete again (see `orphaned`).
+     * meanwhile is not deleted with it. The hold ends when the delete is confirmed or the user keeps the progress: by
+     * its owner (`settle`) or, once the owner has given up (`abandon`) or is gone, by whichever tab finishes it.
      * Sending it again is safe because it names the old progress row, which no later listening can be saved in.
      */
     hold(libraryItemId: string, episodeId: string | null, progressId: string) {
       const id = randomId();
       const holdKey = `${holdPrefix}${id}`;
-      const write = (abandoned: boolean) =>
-        storage.write(
-          holdKey,
-          JSON.stringify({ libraryItemId, episodeId, progressId, heartbeat: Date.now(), abandoned }),
-        );
-      write(false);
+      storage.write(
+        holdKey,
+        JSON.stringify({ libraryItemId, episodeId, progressId, heartbeat: Date.now(), abandoned: false }),
+      );
       notify();
       const disown = owners.claim(id);
       // Only while it still exists: another tab may already have finished it.
-      const renewal = setInterval(() => storage.read(holdKey) !== null && write(false), HEARTBEAT_MS);
+      const renewal = setInterval(() => update(id, { heartbeat: Date.now() }), HEARTBEAT_MS);
       const stop = () => {
         clearInterval(renewal);
         disown();
       };
       return {
+        id,
         settle() {
           stop();
           storage.remove(holdKey);
@@ -190,25 +226,32 @@ export function createOutbox(connectionId: string, storage: OutboxStorage, owner
         },
         abandon() {
           stop();
-          if (storage.read(holdKey) !== null) write(true);
+          update(id, { abandoned: true });
           notify();
         },
       };
     },
     isHeld,
-    /** Holds no live tab is finishing, whose delete must be sent again. */
+    holdsFor: (libraryItemId: string, episodeId: string | null) =>
+      holdsFor(libraryItemId, episodeId).map(asHold),
+    /** Where this account's discard of the book or episode stands, if one is under way. */
+    discardState(libraryItemId: string, episodeId: string | null): "pending" | "unconfirmed" | null {
+      const holds = holdsFor(libraryItemId, episodeId);
+      if (holds.length === 0) return null;
+      return holds.some((hold) => hold.unconfirmed) ? "unconfirmed" : "pending";
+    },
+    markUnconfirmed(holdId: string, unconfirmed: boolean) {
+      update(holdId, { unconfirmed });
+      notify();
+    },
+    /** Holds no live tab is finishing, which another tab finishes (see finishDiscard). */
     async orphaned(): Promise<Hold[]> {
       const live = await owners.live();
       return readHolds()
         .filter(
           (hold) => hold.abandoned || (live ? !live.has(hold.id) : Date.now() - hold.heartbeat > SILENT_MS),
         )
-        .map(({ id, libraryItemId, episodeId, progressId }) => ({
-          id,
-          libraryItemId,
-          episodeId,
-          progressId,
-        }));
+        .map(asHold);
     },
     /** Ends a hold whose delete another tab has had confirmed. */
     settled(holdId: string) {
@@ -217,14 +260,38 @@ export function createOutbox(connectionId: string, storage: OutboxStorage, owner
     },
     hasHolds: () => readHolds().length > 0,
     async flush(send: (sessions: ListeningReport[]) => Promise<DeliveryResult[]>): Promise<FlushResult> {
-      const sending = load().filter((entry) => !isHeld(entry.libraryItemId, entry.episodeId));
-      if (sending.length === 0) return { kind: "idle" };
+      const unheld = load().filter((entry) => !isHeld(entry.libraryItemId, entry.episodeId));
+      if (unheld.length === 0) return { kind: "idle" };
+      let begun: Awaited<ReturnType<Deliveries["begin"]>>;
+      try {
+        begun = await deliveries.begin(connectionId, unheld);
+      } catch (error) {
+        // Unrecorded, a delivery could not be waited for by a discard in another tab.
+        return { kind: "failed", error };
+      }
+      const { sendingKey, sending: recorded } = begun;
+      // Exactly what was recorded is sent, so the record says what may still reach the server. A discard may have let
+      // go of a report while this tab was recording, and finished since, so a report no longer queued or now held is
+      // left out.
+      const queued = new Set(load().map((entry) => entry.id));
+      const sending = recorded.filter(
+        (report) => queued.has(report.id) && !isHeld(report.libraryItemId, report.episodeId),
+      );
+      // A record the browser fails to update stays as it was: still being sent, which only keeps discards waiting.
+      const finish = (outcome: "answered" | "failed") =>
+        deliveries.finish(sendingKey, outcome).catch(() => {});
+      if (sending.length === 0) {
+        await finish("answered");
+        return { kind: "idle" };
+      }
       let results: DeliveryResult[];
       try {
         results = await send(sending);
       } catch (error) {
+        await finish("failed");
         return { kind: "failed", error };
       }
+      await finish("answered");
       // A rejected report (for example an item deleted on the server) will never succeed; keeping it would only
       // block reports behind it.
       const settled = new Map(sending.map((report) => [report.id, report.updatedAt]));

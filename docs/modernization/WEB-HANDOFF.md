@@ -29,7 +29,8 @@ shared modernization documents. Issues #55 to #65.
 | `eb6980e3` | Discard ordering: the reset belongs to the account it came from, survives switches and new playback during the close, and waits for listening already on its way |
 | `df948480` | Discard barrier: a late session open cannot undo the reset, and listening begun after the reset is held until the delete is done |
 | `f4e8d15f` | Discard holds last as long as their tab, however slow the delete, and tabs taking or releasing holds at once keep each other's |
-| (this commit) | A discard is kept until the server confirms its delete: refused or abandoned deletes are sent again by any tab, playing it meanwhile starts from the beginning, and the item page shows it pending |
+| `c68e6c1e` | A discard is kept until the server confirms its delete: refused or abandoned deletes are sent again by any tab, playing it meanwhile starts from the beginning, and the item page shows it pending |
+| (this commit) | A discard accounts for listening any tab already sent, on plain-HTTP origins too: tabs record exactly what they send in IndexedDB; a discard deletes once those requests are answered, and otherwise is left unconfirmed for the user to keep or discard anyway |
 
 ## Checks
 
@@ -66,7 +67,7 @@ and in the browser's durable state, not component internals.
 | Evidence | Kind |
 | --- | --- |
 | Browser journeys in `web/e2e` | Fixture: Chromium (Playwright 1.62.1) against an unmodified Audiobookshelf 2.30.0 container with a synthetic library and synthetic accounts, all on loopback |
-| `e2e/deployment.spec.ts` | Fixture: the production image built from `web/Dockerfile` and run by `deploy/compose.yaml` with nginx. One plain-HTTP origin (`abs-web.test`, mapped to the proxy) serves the server and the client. OpenID sign-in through a loopback provider (`qa/oidc.mjs`) |
+| `e2e/deployment.spec.ts` | Fixture: the production image built from `web/Dockerfile` and run by `deploy/compose.yaml` with nginx. One plain-HTTP origin (`abs-web.test`, mapped to the proxy) serves the server and the client. OpenID sign-in through a loopback provider (`qa/oidc.mjs`). Two tabs on that origin, where Chromium offers no Web Locks: a discard stays unconfirmed, without deleting, while the other tab's listening is held in transit, and finishes once it is answered; after a delivery that failed without an answer, Keep progress deletes nothing and Discard anyway deletes |
 | `docs/modernization/evidence/web-legacy-ui-through-proxy.png` | Fixture: the server's own web interface signed in through the same proxy, with its socket connected (`ws://abs-web.test/audiobookshelf/socket.io`) |
 | Send to e-reader | Fixture: the QA server's real mail path to a loopback SMTP sink (`qa/mail.mjs`). No mail left the machine |
 | RSS feeds | Fixture: the QA server serves the opened feed's XML, and returns 404 once it is closed |
@@ -120,19 +121,48 @@ server, or a physical device. The production container `audiobookshelf` (port 13
      back to the start, paused. A session still being opened for it is let go when it arrives. Playing it again
      while the hold exists starts from the beginning, not from the server's old place;
   3. the old playback session is closed without a final report;
-  4. deliveries already on their way for that account are answered: this tab's always, other tabs' where the browser
-     offers Web Locks (secure origins). On a plain-HTTP origin another tab's delivery already sent is not waited for;
+  4. the book is blocked in IndexedDB, and listening for it that any tab of the account recorded as sent must be
+     answered (see below);
   5. the server's progress row is deleted;
-  6. once the delete is confirmed, the hold ends and listening recorded since step 2 is delivered as new progress.
+  6. once the delete is confirmed, the block and the hold end, and listening recorded since step 2 is delivered as
+     new progress. The block is marked finished, so a tab waking late neither blocks the book nor deletes again.
+
+  Every tab records the exact reports it is about to send in IndexedDB, checking the blocked books in the same
+  transaction, then sends those reports, leaving out any no longer queued or now held. IndexedDB orders these
+  transactions across tabs with or without Web Locks, so plain-HTTP origins are covered: a delivery recorded before
+  the block counts against the discard, and one recorded after it leaves the book out. A record ends only with the
+  server's answer to that request. A request that failed without an answer stays recorded (one entry per report),
+  since it may still reach the server, or still be running there.
+
+  2.30.0 shows nothing that says a given request is done. `local-all` requests for one session run independently,
+  and one that finds no progress row creates one, so neither a copy of the report sent again nor the server holding
+  that listening (any tab may send the same queued report) proves the original cannot land after the delete. So:
+
+  - if the only deliveries on their way are this tab's own, the discard waits for their answers and finishes;
+  - otherwise it is left **unconfirmed**. The item page says "Discarding progress. Listening for this that another
+    tab sent is not confirmed by the server, and could bring the old position back after the discard. It finishes
+    by itself once confirmed." and offers **Keep progress** (nothing is deleted, and the held listening is
+    delivered) and **Discard anyway** (the delete is sent; the old place can come back only if that listening still
+    lands, and discarding again then removes it). Any tab of the account finishes the discard by itself once the
+    other tab's answers are in. Nothing is decided from time passing.
 
   If the delete fails, the discard says so where it was asked, the item page shows "Discarding progress. It
   finishes when the server can be reached.", and the hold stays. The next delivery from any tab of that account
   sends the delete again, and the listening is delivered only after it is confirmed. A tab that goes away or stops
   answering mid-delete is finished the same way: where Web Locks exist, as soon as its lock is gone; on plain-HTTP
   origins, after five minutes without its once-a-minute heartbeat. Silence never releases the listening; it only
-  lets another tab finish the delete. Sending the delete again, or a frozen tab's delete arriving late, is safe:
-  it names the old row, and 2.30.0 saves later listening in a new row with a new id (`UUIDV4`), and answers 200 for
-  a row that is already gone.
+  lets another tab try to finish the discard, under the same rules. Sending the delete again, or a frozen tab's
+  delete arriving late, is safe: it names the old row, and 2.30.0 saves later listening in a new row with a new id
+  (`UUIDV4`), and answers 200 for a row that is already gone.
+
+  Limits:
+
+  - A tab that crashed, was closed or froze with a delivery on its way leaves later discards of that book
+    unconfirmed until it answers or the user chooses. A request that failed without an answer does so for good,
+    until the user chooses.
+  - Keep progress pressed in the moment a waiting discard sends its delete cannot stop that delete.
+  - A browser that refuses IndexedDB delivers no listening at all; each delivery fails as an outage would, and
+    nothing is sent unrecorded.
 
   Other books and other accounts stay playable and keep delivering throughout. A storage refusal in steps 1 or 2
   fails the discard before anything is sent, so the server's progress is unchanged. A refusal part-way through
