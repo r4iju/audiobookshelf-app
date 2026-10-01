@@ -58,11 +58,16 @@ import Foundation
     public func item(id: String) async throws -> LibraryItem { try await get("api/items/\(id)", query: [URLQueryItem(name: "expanded", value: "1")]) }
 
     public func play(itemID: String, episodeID: String? = nil, deviceID: String) async throws -> PlaybackSession {
+        #if os(iOS)
+        let device = ["deviceId": deviceID, "clientName": "Audiobookshelf Native", "manufacturer": "Apple", "model": "iPhone / iPad"]
+        #else
+        let device = ["deviceId": deviceID, "clientName": "Audiobookshelf TV", "manufacturer": "Apple", "model": "Apple TV"]
+        #endif
         var path = "api/items/\(itemID)/play"
         if let episodeID { path += "/\(episodeID)" }
         let data = try await request(path, method: "POST", body: [
             "forceDirectPlay": true, "mediaPlayer": "AVPlayer",
-            "deviceInfo": ["deviceId": deviceID, "clientName": "Audiobookshelf TV", "manufacturer": "Apple", "model": "Apple TV"]
+            "deviceInfo": device
         ])
         let result = try JSONDecoder().decode(PlaybackSession.self, from: data)
         guard !result.audioTracks.isEmpty else { throw APIError.noAudio }

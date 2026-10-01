@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct BookDetails: View {
+    @EnvironmentObject private var player: ApplePlayback
     let item: LibraryItem
     let catalog: CatalogStore
     let progress: MediaProgress?
@@ -23,6 +24,14 @@ struct BookDetails: View {
                         }
                     }
                 }
+                Button { Task { await player.start(item: book) } } label: {
+                    HStack {
+                        Image(systemName: "play.fill")
+                        Text((progress?.currentTime ?? 0) > 0 ? "Resume listening" : "Start listening").fontWeight(.semibold)
+                        Spacer()
+                    }.padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
+                }.disabled(player.preparing).accessibilityIdentifier("play-book")
+                if let error = player.error, player.itemID == book.id { Text(error).font(.callout).foregroundColor(.red) }
                 if let progress, (progress.currentTime ?? 0) > 0 {
                     VStack(alignment: .leading, spacing: 10) {
                         ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)

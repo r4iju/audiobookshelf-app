@@ -102,7 +102,7 @@ struct CatalogShelf: View {
                     Menu {
                         Button("Refresh") { Task { await catalog.reload() } }
                         Button("Change library") { Task { await connection.openLibrariesForSelection() } }
-                        Button("Sign out") { connection.signOut() }
+                        Button("Sign out") { connection.signOut() }.accessibilityIdentifier("account-signout")
                     } label: { Image(systemName: "person.crop.circle").font(.title2) }.accessibilityIdentifier("account")
                 }
             }.onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
@@ -187,7 +187,7 @@ struct RecoveryCard: View {
 
 enum ShelfTime {
     static func describe(_ seconds: Double) -> String {
-        let safe = max(0, seconds.isFinite ? Int(seconds) : 0)
+        let safe = seconds.isFinite ? Int(min(max(seconds, 0), Double(Int.max / 2))) : 0
         if safe < 60 { return "\(safe) sec" }
         if safe < 3600 { return "\(safe / 60) min" }
         return "\(safe / 3600) hr \((safe % 3600) / 60) min"

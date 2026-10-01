@@ -12,13 +12,15 @@ import Combine
     @Published var server: String
     @Published var username: String
     let api: APIClient
+    private let playback: ApplePlayback
     private let defaults: UserDefaults
     private var generation = UUID()
 
-    init(api: APIClient, defaults: UserDefaults = .standard) {
+    init(api: APIClient, playback: ApplePlayback, defaults: UserDefaults = .standard) {
         self.server = defaults.string(forKey: "previewServer") ?? ""
         self.username = defaults.string(forKey: "previewUsername") ?? ""
         self.api = api
+        self.playback = playback
         self.defaults = defaults
     }
 
@@ -69,12 +71,15 @@ import Combine
     }
 
     func signOut() {
-        do {
-            try api.signOut()
-            generation = UUID()
-            defaults.removeObject(forKey: "previewLibrary")
-            screen = .connection(nil)
-        } catch { screen = .connection(Self.recovery(for: error)) }
+        Task {
+            do {
+                try await playback.stop()
+                try api.signOut()
+                generation = UUID()
+                defaults.removeObject(forKey: "previewLibrary")
+                screen = .connection(nil)
+            } catch { playback.error = Self.recovery(for: error) }
+        }
     }
 
     static func recovery(for error: Error) -> String {

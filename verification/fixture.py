@@ -6,6 +6,7 @@ import math
 import re
 import struct
 import ssl
+import time
 import wave
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -38,6 +39,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     reports = []
     login_outcomes = []
     requests = []
+    configuration = {'mode': 'baseline', 'failed': False}
     prefix = '/' + prefix.strip('/') if prefix.strip('/') else ''
 
     class Handler(BaseHTTPRequestHandler):
@@ -87,11 +89,19 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'libraries': [{'id': 'books', 'name': 'Audiobooks', 'mediaType': 'book'}, {'id': 'podcasts', 'name': 'Podcasts', 'mediaType': 'podcast'}]})
             if path == '/api/libraries/books/items':
                 page = max(0, int(query.get('page', ['0'])[0])); limit = min(100, max(1, int(query.get('limit', ['60'])[0])))
+                mode = configuration['mode']
+                if mode == 'empty':
+                    return self.respond(200, {'results': [], 'total': 0})
+                if not configuration['failed'] and (mode == 'catalog-error' or mode == 'page-error' and page == 1):
+                    configuration['failed'] = True
+                    return self.respond(503, {'error': 'Synthetic temporary failure'})
                 return self.respond(200, {'items' if scenario == 'library-schema-change' else 'results': items[page * limit:(page + 1) * limit], 'total': len(items), 'limit': limit, 'page': page})
             if path == '/api/libraries/books/personalized':
+                if configuration['mode'] == 'empty':
+                    return self.respond(200, [])
                 return self.respond(200, [{'id': 'continue-listening', 'label': 'Continue Listening', 'type': 'book', 'entities': [items[int(key[0].removeprefix('book-'))] for key, value in progress.items() if key[0].startswith('book-') and value.get('currentTime', 0) > 0 and not value.get('isFinished')], 'total': len(progress)}, {'id': 'recently-added', 'label': 'Recently Added', 'type': 'book', 'entities': items[:10], 'total': 61}])
             if path == '/api/me':
-                return self.respond(200, user)
+                return self.respond(200, {**user, 'permissions': {'download': False, 'update': False, 'delete': False, 'upload': False}} if configuration['mode'] == 'edge-metadata' else user)
             if path == '/api/items/podcast':
                 return self.respond(200, {'id': 'podcast', 'mediaType': 'podcast', 'media': {'metadata': {'title': 'Evening Stories', 'author': 'QA Studio'}, 'episodes': [{'id': 'episode', 'title': 'A Quiet Evening', 'duration': 20}]}})
             if path and path.startswith('/api/items/book-') and not path.endswith('/cover'):
@@ -100,9 +110,13 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 except (ValueError, IndexError):
                     return self.respond(404, {})
             if path and path.endswith('/cover'):
+                if configuration['mode'] == 'edge-metadata':
+                    return self.respond(404, {})
                 image = Path(__file__).resolve().parents[1] / 'static/book_placeholder.jpg'
                 return self.respond(200, image.read_bytes(), 'image/jpeg')
             if path in ('/audio/0', '/audio/1'):
+                if configuration['mode'] == 'slow-audio':
+                    time.sleep(2)
                 data = tracks[int(path[-1])]
                 start, end = 0, len(data) - 1
                 if self.headers.get('Range'):
@@ -141,6 +155,18 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
             except (ValueError, TypeError):
                 return self.respond(400, {})
+            if path == '/__fixture__/configure':
+                mode = data.get('mode')
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'no-audio'):
+                    return self.respond(400, {})
+                configuration.update(mode=mode, failed=False)
+                items[0]['media']['metadata']['title'] = 'A Very Long Story Title About Finding Your Way Home Through A City Of Unexpected Doors And Forgotten Libraries' if mode == 'edge-metadata' else 'Stories for Tomorrow 01'
+                items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else 20
+                if mode in ('baseline', 'slow-audio', 'slow-session', 'no-audio'):
+                    reports.clear()
+                    progress[('book-0', None)].update(currentTime=6, duration=20, progress=0.3, isFinished=False)
+                    user['mediaProgress'] = list(progress.values())
+                return self.respond(200, {})
             if path == '/login':
                 login_outcomes.append({'accepted': data == {'username': 'qa', 'password': 'qa'}, 'usernameMatches': data.get('username') == 'qa', 'passwordMatches': data.get('password') == 'qa'})
                 if data != {'username': 'qa', 'password': 'qa'}:
@@ -155,6 +181,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(401, {})
             play = re.fullmatch(r'/api/items/(book-[0-9]+|podcast)/play(?:/(episode))?', path or '')
             if play:
+                if configuration['mode'] == 'slow-session':
+                    time.sleep(4)
                 item_id, episode_id = play.groups()
                 if item_id == 'podcast':
                     if episode_id != 'episode':
@@ -171,6 +199,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                         {'contentUrl': '/audio/0', 'startOffset': 0, 'duration': 8, 'mimeType': 'audio/wav'},
                         {'contentUrl': '/audio/1', 'startOffset': 8, 'duration': 12, 'mimeType': 'audio/wav'}], 'chapters': chapters}
                 sessions[session_id] = result
+                if configuration['mode'] == 'no-audio':
+                    result['audioTracks'] = []
                 return self.respond(200, result)
             report = re.fullmatch(r'/api/session/([^/]+)/(sync|close)', path or '')
             if report and report.group(1) in sessions:

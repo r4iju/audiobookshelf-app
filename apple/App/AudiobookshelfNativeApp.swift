@@ -2,6 +2,7 @@ import SwiftUI
 
 @main struct AudiobookshelfNativeApp: App {
     @StateObject private var connection: ConnectionStore
+    @StateObject private var player: ApplePlayback
 
     init() {
         let vault = KeychainCredentials()
@@ -13,12 +14,15 @@ import SwiftUI
             UserDefaults.standard.removeObject(forKey: "previewUsername")
         }
         #endif
-        _connection = StateObject(wrappedValue: ConnectionStore(api: APIClient(store: vault)))
+        let api = APIClient(store: vault)
+        let playback = ApplePlayback(api: api)
+        _player = StateObject(wrappedValue: playback)
+        _connection = StateObject(wrappedValue: ConnectionStore(api: api, playback: playback))
     }
 
     var body: some Scene {
         WindowGroup {
-            ConnectionRoot().environmentObject(connection)
+            PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player)
                 .accentColor(ShelfStyle.accent)
                 .onAppear { Task { await connection.restore() } }
         }

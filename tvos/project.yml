@@ -16,6 +16,7 @@ targets:
     platform: tvOS
     sources:
       - App
+      - ../apple/Playback
       - Core/Sources/TVCore
     settings:
       base:

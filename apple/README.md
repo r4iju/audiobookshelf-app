@@ -27,4 +27,12 @@ The UI journeys exercise the actual signed app against the synthetic server: boo
 
 Run the same journeys on a dedicated iPad simulator with `ABS_QA_SIMULATOR='Audiobookshelf Native iPad QA' ./apple/scripts/verify-ui.sh`. Create that simulator using an available iPad device type and the same iOS runtime.
 
-This preview is a delivery slice, not a replacement readiness claim. Playback, offline storage, readers, preference/data migration and final physical-device acceptance remain tracked separately. Synthetic fixture coverage does not establish live-server or physical-device readiness.
+## Playback
+
+The app and TV target share `Playback/ApplePlayback.swift`. One app-owned AVPlayer session survives catalog navigation and sheet dismissal. The mini-player and full player provide play/pause, whole-book scrubbing, 30-second skips, elapsed time and preparation/error status. Authenticated media URLs are validated against the connected server. File-relative positions are translated to complete-book positions, and natural track endings load the next file.
+
+Pending seeks are serialized with the newest requested position retained. Play intent is separate from AVPlayer's observed playback state, so pausing during session or file preparation prevents autoplay. Failed media preparation stays visible; failed session close retains its progress rather than silently signing out.
+
+Production UI journeys use real synthetic WAV media and server request/progress observations. They cover file transitions while navigating, missing media, a replacement seek during slow file preparation, and pausing during a delayed session request. The missing-play action, dropped-seek race, preparation-pause gap and missing-media error were observed failing before their implementations or fixes.
+
+This preview is a delivery slice, not a replacement readiness claim. Durable progress across termination, offline storage, readers, preference/data migration and final physical-device acceptance remain tracked separately. Synthetic fixture coverage does not establish live-server or physical-device readiness.
