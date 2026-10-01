@@ -74,7 +74,18 @@ export function createListeningReport(
 export interface OutboxStorage {
   read: (key: string) => string | null;
   write: (key: string, value: string) => void;
+  remove: (key: string) => void;
+  keys: (prefix: string) => string[];
 }
+
+/** Tells, across tabs, which holds still have a live owner, however long their work takes. */
+export interface HoldOwners {
+  /** Marks the hold as owned until the returned release is called or the tab goes away. */
+  claim: (holdId: string) => () => void;
+  live: () => Promise<Set<string>>;
+}
+
+const noOwners: HoldOwners = { claim: () => () => {}, live: async () => new Set() };
 
 export interface DeliveryResult {
   id: string;
@@ -88,20 +99,19 @@ export type FlushResult =
   | { kind: "failed"; error: unknown };
 
 const queueSchema = z.array(listeningReportSchema);
-const holdsSchema = z.array(
-  z.object({
-    id: z.string(),
-    libraryItemId: z.string(),
-    episodeId: z.string().nullable(),
-    until: z.number(),
-  }),
-);
-/** Long enough for any discard to finish; a tab closed mid-discard must not hold listening back for good. */
+const holdSchema = z.object({
+  libraryItemId: z.string(),
+  episodeId: z.string().nullable(),
+  until: z.number(),
+});
+/** Where owners cannot be told apart, a hold lasts this long after its owner last renewed it. */
 const HOLD_MS = 5 * 60_000;
+const RENEW_MS = 60_000;
 
-export function createOutbox(connectionId: string, storage: OutboxStorage) {
+export function createOutbox(connectionId: string, storage: OutboxStorage, owners: HoldOwners = noOwners) {
   const key = `abs-web:v1:outbox:${connectionId}`;
-  const holdsKey = `abs-web:v1:outbox-holds:${connectionId}`;
+  // One key per hold, so tabs taking and releasing holds at once never overwrite each other's.
+  const holdPrefix = `abs-web:v1:outbox-hold:${connectionId}:`;
   const listeners = new Set<() => void>();
 
   const load = (): ListeningReport[] => {
@@ -116,13 +126,19 @@ export function createOutbox(connectionId: string, storage: OutboxStorage) {
     storage.write(key, JSON.stringify(queue));
     for (const listener of listeners) listener();
   };
-  const loadHolds = () => {
-    try {
-      const parsed = holdsSchema.safeParse(JSON.parse(storage.read(holdsKey) ?? "[]"));
-      return parsed.success ? parsed.data.filter((hold) => hold.until > Date.now()) : [];
-    } catch {
+  /** Holds still in force; one whose owner is gone and whose time has run out is cleared away. */
+  const liveHolds = async () => {
+    const owned = await owners.live();
+    return storage.keys(holdPrefix).flatMap((holdKey) => {
+      let hold: z.infer<typeof holdSchema> | null = null;
+      try {
+        const parsed = holdSchema.safeParse(JSON.parse(storage.read(holdKey) ?? "null"));
+        if (parsed.success) hold = parsed.data;
+      } catch {}
+      if (hold && (owned.has(holdKey.slice(holdPrefix.length)) || hold.until > Date.now())) return [hold];
+      storage.remove(holdKey);
       return [];
-    }
+    });
   };
 
   return {
@@ -139,17 +155,21 @@ export function createOutbox(connectionId: string, storage: OutboxStorage) {
      */
     hold(libraryItemId: string, episodeId: string | null) {
       const id = randomId();
-      storage.write(
-        holdsKey,
-        JSON.stringify([...loadHolds(), { id, libraryItemId, episodeId, until: Date.now() + HOLD_MS }]),
-      );
+      const holdKey = `${holdPrefix}${id}`;
+      const renew = () =>
+        storage.write(holdKey, JSON.stringify({ libraryItemId, episodeId, until: Date.now() + HOLD_MS }));
+      renew();
+      const disown = owners.claim(id);
+      const renewal = setInterval(renew, RENEW_MS);
       return () => {
-        storage.write(holdsKey, JSON.stringify(loadHolds().filter((hold) => hold.id !== id)));
+        clearInterval(renewal);
+        disown();
+        storage.remove(holdKey);
         for (const listener of listeners) listener();
       };
     },
     async flush(send: (sessions: ListeningReport[]) => Promise<DeliveryResult[]>): Promise<FlushResult> {
-      const holds = loadHolds();
+      const holds = await liveHolds();
       const sending = load().filter(
         (entry) =>
           !holds.some(

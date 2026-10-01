@@ -27,7 +27,8 @@ shared modernization documents. Issues #55 to #65.
 | `e109644f` | RSS feeds (open, view, close) and send ebook to an e-reader |
 | `57ae6ae4` | README, deployment and server-contract docs, this handoff, formatting fix for `e109644f`'s spec |
 | `eb6980e3` | Discard ordering: the reset belongs to the account it came from, survives switches and new playback during the close, and waits for listening already on its way |
-| (this commit) | Discard barrier: a late session open cannot undo the reset, and listening begun after the reset is held until the delete is done |
+| `df948480` | Discard barrier: a late session open cannot undo the reset, and listening begun after the reset is held until the delete is done |
+| (this commit) | Discard holds last as long as their tab, however slow the delete, and tabs taking or releasing holds at once keep each other's |
 
 ## Checks
 
@@ -102,8 +103,12 @@ server, or a physical device. The production container `audiobookshelf` (port 13
   Opening needs an item with audio. The legacy slug cleaning is applied before opening, and the address shown is
   exactly the one used.
 - **Discarding progress** happens in this order, for the account the discard came from only:
-  1. that account's listening for the book or episode is held back from delivery, in every tab (for at most five
-     minutes, so a tab closed mid-discard cannot hold it for good);
+  1. that account's listening for the book or episode is held back from delivery, in every tab, until the discard
+     ends. Each hold has its own stored entry, so tabs discarding at once never overwrite each other's. The
+     discarding tab keeps a Web Lock for its hold, so the hold lasts however long the delete takes, and ends when
+     the tab goes away. Plain-HTTP origins have no Web Locks; there the tab renews the hold every minute and it
+     lapses five minutes after the last renewal. On such an origin, a tab the browser freezes for longer than that
+     in the middle of a delete can lose its hold;
   2. this device drops its unsent listening for it, and the player (if it holds that book for that account) goes
      back to the start, paused. A session still being opened for it is let go when it arrives;
   3. the old playback session is closed without a final report;

@@ -117,6 +117,7 @@ describe("discardProgress", () => {
     usePlayerStore.getState().attach(server.client);
     outboxFor("conn-a").record(report("old-x", "book-x"));
     const delivering = flushReports(server.client, () => {});
+    await vi.waitFor(() => expect(server.client.send).toHaveBeenCalled());
 
     const discarding = discardProgress(server.client, {
       progressId: "p-x",
@@ -175,6 +176,29 @@ describe("discardProgress", () => {
     vi.advanceTimersByTime(4_000);
     player.onTime(4);
     player.checkpoint();
+    await flushReports(server.client, () => {});
+
+    server.finishDelete();
+    await discarding;
+    await flushReports(server.client, () => {});
+    vi.useRealTimers();
+
+    expect(server.log).toEqual(["DELETE /api/me/progress/p-x", "listening book-x@4"]);
+  });
+
+  it("keeps holding new listening however long the delete takes", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const server = slowDeleteServer("conn-a");
+    usePlayerStore.getState().attach(server.client);
+
+    const discarding = discardProgress(server.client, {
+      progressId: "p-x",
+      itemId: "book-x",
+      episodeId: null,
+    });
+    await vi.waitFor(() => expect(server.deleteRequested()).toBe(true));
+    outboxFor("conn-a").record({ ...report("new-x", "book-x"), currentTime: 4 });
+    vi.advanceTimersByTime(60 * 60_000);
     await flushReports(server.client, () => {});
 
     server.finishDelete();

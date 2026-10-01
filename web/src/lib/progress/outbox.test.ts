@@ -3,7 +3,35 @@ import { createListeningReport, createOutbox, type ListeningReport, type OutboxS
 
 function memoryStorage(): OutboxStorage & { data: Map<string, string> } {
   const data = new Map<string, string>();
-  return { data, read: (key) => data.get(key) ?? null, write: (key, value) => data.set(key, value) };
+  return {
+    data,
+    read: (key) => data.get(key) ?? null,
+    write: (key, value) => data.set(key, value),
+    remove: (key) => data.delete(key),
+    keys: (prefix) => [...data.keys()].filter((key) => key.startsWith(prefix)),
+  };
+}
+
+/** Storage for a second tab; once armed, its next change is preceded by whatever the other tab does at that moment. */
+function interleaving(shared: OutboxStorage) {
+  let meanwhile: (() => void) | null = null;
+  const first = () => {
+    const step = meanwhile;
+    meanwhile = null;
+    step?.();
+  };
+  const storage: OutboxStorage = {
+    ...shared,
+    write: (key, value) => {
+      first();
+      shared.write(key, value);
+    },
+    remove: (key) => {
+      first();
+      shared.remove(key);
+    },
+  };
+  return { storage, arm: (step: () => void) => (meanwhile = step) };
 }
 
 const base = {
@@ -116,5 +144,42 @@ describe("progress outbox", () => {
         .pending()
         .map((entry) => entry.id),
     ).toEqual(["s2", "s3"]);
+  });
+
+  describe("holds taken by two tabs at the same moment", () => {
+    const queued = (id: string, libraryItemId: string) => ({ ...report(10, 1_000), id, libraryItemId });
+    const deliveredItems = async (outbox: ReturnType<typeof createOutbox>) => {
+      const sent: string[] = [];
+      await outbox.flush(async (sessions) => {
+        sent.push(...sessions.map((session) => session.libraryItemId));
+        return sessions.map((session) => ({ id: session.id, success: true }));
+      });
+      return sent;
+    };
+
+    it("keeps both when they are taken together", async () => {
+      const shared = memoryStorage();
+      const other = createOutbox("conn-a", shared);
+      const tab = interleaving(shared);
+      tab.arm(() => other.hold("book-z", null));
+      createOutbox("conn-a", tab.storage).hold("book-x", null);
+      other.record(queued("x", "book-x"));
+      other.record(queued("z", "book-z"));
+
+      expect(await deliveredItems(other)).toEqual([]);
+    });
+
+    it("keeps the other tab's when one is released", async () => {
+      const shared = memoryStorage();
+      const other = createOutbox("conn-a", shared);
+      const tab = interleaving(shared);
+      const release = createOutbox("conn-a", tab.storage).hold("book-x", null);
+      tab.arm(() => other.hold("book-z", null));
+      release();
+      other.record(queued("x", "book-x"));
+      other.record(queued("z", "book-z"));
+
+      expect(await deliveredItems(other)).toEqual(["book-x"]);
+    });
   });
 });
