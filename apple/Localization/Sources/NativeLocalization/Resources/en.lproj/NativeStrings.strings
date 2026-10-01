@@ -25,6 +25,7 @@
 "Always" = "Always";
 "An earlier import is already saved. Choose its original export to retry or repair it." = "An earlier import is already saved. Choose its original export to retry or repair it.";
 "Appearance" = "Appearance";
+"Are you sure you want to reset your progress?" = "Are you sure you want to reset your progress?";
 "Ascending order" = "Ascending order";
 "Ask" = "Ask";
 "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions." = "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions.";
@@ -73,6 +74,7 @@
 "Collections" = "Collections";
 "Compact" = "Compact";
 "Complete" = "Complete";
+"Confirm" = "Confirm";
 "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported.";
 "Connect to your library" = "Connect to your library";
 "Connecting" = "Connecting";
@@ -106,6 +108,7 @@
 "Details" = "Details";
 "Diagnostics" = "Diagnostics";
 "Diagnostics storage" = "Diagnostics storage";
+"Discard progress" = "Discard progress";
 "Discover a podcast" = "Discover a podcast";
 "Dismiss" = "Dismiss";
 "Done" = "Done";

@@ -138,6 +138,15 @@ enum CatalogSort: String, CaseIterable {
         state = .content(content)
     }
 
+    /// Applies the user after a progress reset; Continue Listening keeps items without progress
+    /// otherwise, so the reset book or episode is removed explicitly.
+    func discardProgress(_ user: CurrentUser, itemID: String, episodeID: String?) {
+        applyProgress(user)
+        guard case .content(var content) = state, content.user.id == user.id else { return }
+        content.continuing.removeAll { $0.id == itemID && $0.recentEpisode?.id == episodeID }
+        state = .content(content)
+    }
+
     func refreshProgressIfNeeded() async {
         guard needsProgressRefresh, case .content(var current) = state, !current.loadingMore else { return }
         let request = generation

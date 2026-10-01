@@ -19,6 +19,12 @@ import UniformTypeIdentifiers
         self.adopter = adopter
         self.player = player
     }
+    /// Discards the user's progress for the media so that carried-over legacy listening and
+    /// positions cannot bring it back. A reset that throws after it was saved stays on hold and is
+    /// finished by the next attempt, start or listening restore.
+    func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?) async throws -> CurrentUser {
+        try await player.resetProgress(account: account, itemID: itemID, episodeID: episodeID, adoption: adopter)
+    }
     private var selectedURL: URL?
     private var selectedFingerprint: String?
     private var syncPending = false

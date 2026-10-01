@@ -9,6 +9,7 @@ struct BookDetails: View {
     @State private var reader: ReadingSource?
     @EnvironmentObject private var localDownloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
+    @EnvironmentObject private var migration: NativeMigrationStore
     @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var realtime: NativeRealtime
     let item: LibraryItem
@@ -23,7 +24,12 @@ struct BookDetails: View {
     @AppStorage("previewEpisodeSort") private var episodeSort = "publishedAt"
     @AppStorage("previewEpisodeDescending") private var episodeDescending = true
     @State private var episodeFilter = "all"
-    @State private var confirmCompletion = false
+    private enum ProgressConfirmation: String, Identifiable {
+        case finish, discard
+        var id: String { rawValue }
+    }
+    @State private var progressConfirmation: ProgressConfirmation?
+    @State private var progressDiscarded = false
     @State private var progressBusy = false
     @State private var progressRequest: Task<Void, Never>?
     @State private var canManagePodcasts = false
@@ -53,6 +59,11 @@ struct BookDetails: View {
                 }
                 if episode != nil || book.mediaType == "book" {
                     Button(l10n(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished"), action: toggleFinished).disabled(progressBusy)
+                    if let progress = selectedProgress, (progress.progress ?? 0) > 0 || (progress.ebookProgress ?? 0) > 0 {
+                        Button(l10n("Discard progress")) { NativeHaptic.impact("discard-progress"); progressConfirmation = .discard }
+                            .disabled(progressBusy).accessibilityIdentifier("discard-progress")
+
+                    }
                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
                 }
                 if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
@@ -127,8 +138,13 @@ struct BookDetails: View {
                 }
             }
             .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: catalog.api, store: readingStore) }
-            .alert(isPresented: $confirmCompletion) {
-                Alert(title: Text(l10n("Mark book finished?")), message: Text(l10n("Your saved progress will change when this book is marked finished.")), primaryButton: .default(Text(l10n("Mark finished"))) { applyFinished(true) }, secondaryButton: .cancel(Text(l10n("Cancel"))))
+            .alert(item: $progressConfirmation) { confirmation in
+                switch confirmation {
+                case .finish:
+                    return Alert(title: Text(l10n("Mark book finished?")), message: Text(l10n("Your saved progress will change when this book is marked finished.")), primaryButton: .default(Text(l10n("Mark finished"))) { applyFinished(true) }, secondaryButton: .cancel(Text(l10n("Cancel"))))
+                case .discard:
+                    return Alert(title: Text(l10n("Confirm")), message: Text(l10n("Are you sure you want to reset your progress?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
+                }
             }
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
@@ -168,7 +184,7 @@ struct BookDetails: View {
         let finished = selectedProgress?.isFinished != true
         let livePosition = player.itemID == book.id && player.episodeID == nil ? player.currentTime : 0
         if episode == nil, finished, (selectedProgress?.currentTime ?? 0) > 0 || (selectedProgress?.ebookProgress ?? 0) > 0 || livePosition > 0 {
-            confirmCompletion = true
+            progressConfirmation = .finish
         } else { applyFinished(finished) }
     }
     private func applyFinished(_ finished: Bool) {
@@ -188,8 +204,28 @@ struct BookDetails: View {
         }
     }
 
+    private func discardProgress() {
+        guard !progressBusy else { return }
+        request?.cancel()
+        detailRevision = UUID()
+        progressBusy = true
+        error = nil
+        progressRequest = Task {
+            defer { progressBusy = false }
+            do {
+                let account = try await catalog.api.currentAccount()
+                let user = try await migration.resetProgress(account: account, itemID: book.id, episodeID: episode?.id)
+                guard !Task.isCancelled else { return }
+                progressDiscarded = true
+                mediaProgress = user.mediaProgress
+                catalog.discardProgress(user, itemID: book.id, episodeID: episode?.id)
+            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+        }
+    }
+
+    // After a discard the progress this view was opened with is stale.
     private var selectedProgress: MediaProgress? {
-        mediaProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? progress
+        mediaProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? (progressDiscarded ? nil : progress)
     }
     private var listeningDuration: Double? {
         if let episode { return episode.duration ?? episode.audioFile?.duration }

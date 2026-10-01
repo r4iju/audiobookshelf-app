@@ -1,6 +1,7 @@
 {
   "Allow seeking from system media controls": "LabelAllowSeekingOnMediaControls",
   "Always": "LabelAlways",
+  "Are you sure you want to reset your progress?": "MessageConfirmDiscardProgress",
   "Ask": "LabelAskConfirmation",
   "Author": "LabelAuthor",
   "Author, first name": "LabelAuthorFirstLast",
@@ -17,6 +18,7 @@
   "Close playback": "LabelClosePlayer",
   "Collections": "ButtonCollections",
   "Complete": "LabelComplete",
+  "Confirm": "HeaderConfirm",
   "Contents": "HeaderTableOfContents",
   "Continue listening": "LabelContinueListening",
   "Dark": "LabelThemeDark",
@@ -26,6 +28,7 @@
   "Delete": "ButtonDelete",
   "Description": "LabelDescription",
   "Details": "HeaderDetails",
+  "Discard progress": "MessageDiscardProgress",
   "Download for offline": "LabelDownload",
   "Downloaded": "LabelDownloaded",
   "Downloads": "HeaderDownloads",

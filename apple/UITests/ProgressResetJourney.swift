@@ -86,7 +86,7 @@ import XCTest
         app.buttons["pause-playback"].tap()
         app.buttons["Done"].tap()
 
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.navigationBars.buttons["BackButton"].firstMatch.tap()
         XCTAssertTrue(app.buttons["continue-book-1"].waitForExistence(timeout: 10), "Other progress stays in Continue listening")
         XCTAssertFalse(app.buttons["continue-book-0"].exists, "The reset book leaves Continue listening")
     }
@@ -111,7 +111,7 @@ import XCTest
         XCTAssertEqual(Set(observed.progress.map(\.key)), [ResetFixture.Key("book-0", nil), ResetFixture.Key("book-1", nil), ResetFixture.Key("podcast", "episode-morning")])
         XCTAssertTrue(app.buttons["play-book"].label.contains("Start episode"), app.buttons["play-book"].label)
 
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.navigationBars.buttons["BackButton"].firstMatch.tap()
         let morning = app.buttons["episode-episode-morning"]
         XCTAssertTrue(morning.waitForExistence(timeout: 10))
         morning.tap()
@@ -123,7 +123,7 @@ import XCTest
         let app = try await openBook("book-0", fail: "delete")
         try discardAction(in: app).tap()
         confirmation(in: app).buttons["Discard progress"].tap()
-        let failure = app.staticTexts["Couldn't open this part of your library"]
+        let failure = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Discarding progress has not finished")).firstMatch
         XCTAssertTrue(failure.waitForExistence(timeout: 10), "The failed reset is reported. " + app.debugDescription)
         XCTAssertTrue(listened(in: app).exists, "Progress is kept when the server did not delete it")
         XCTAssertTrue(app.buttons["play-book"].label.contains("Resume listening"))
