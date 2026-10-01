@@ -362,6 +362,15 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
   };
 });
 
+export function isPlaying(player: Player, media: Pick<PlayerMedia, "itemId" | "episodeId">) {
+  return (
+    player.phase === "active" &&
+    player.status === "playing" &&
+    player.media.itemId === media.itemId &&
+    player.media.episodeId === media.episodeId
+  );
+}
+
 export function usePlayer() {
   return usePlayerStore((state) => state.player);
 }

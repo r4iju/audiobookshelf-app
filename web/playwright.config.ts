@@ -22,12 +22,18 @@ export default defineConfig({
     launchOptions: { args: ["--autoplay-policy=user-gesture-required"] },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: process.env.ABS_WEB_URL
-    ? undefined
-    : {
-        command: process.env.ABS_WEB_PROD ? "npm run build && npm run start" : "npm run dev",
-        url: clientUrl,
-        reuseExistingServer: true,
-        timeout: 240_000,
-      },
+  webServer: [
+    // The QA server downloads podcast feeds and episodes from here (qa/feed.mjs).
+    { command: "node qa/feed.mjs", url: "http://127.0.0.1:19885/feed.xml", reuseExistingServer: true },
+    ...(process.env.ABS_WEB_URL
+      ? []
+      : [
+          {
+            command: process.env.ABS_WEB_PROD ? "npm run build && npm run start" : "npm run dev",
+            url: clientUrl,
+            reuseExistingServer: true,
+            timeout: 240_000,
+          },
+        ]),
+  ],
 });

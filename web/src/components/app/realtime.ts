@@ -66,6 +66,10 @@ export function useRealtime() {
       "items_added",
       "items_updated",
       "episode_added",
+      "episode_download_queued",
+      "episode_download_started",
+      "episode_download_finished",
+      "episode_download_queue_cleared",
     ]) {
       socket.on(event, refreshLibrary);
     }

@@ -23,11 +23,31 @@ interface I18n {
 
 const I18nContext = createContext<I18n | null>(null);
 
-function supplant(text: string, subs: Array<string | number>) {
+function supplant(text: string, subs: Array<string | number>, numbers: Intl.NumberFormat) {
   return text.replace(/{(\d+)}/g, (match, index: string) => {
     const value = subs[Number(index)];
-    return value === undefined ? match : String(value);
+    if (value === undefined) return match;
+    return typeof value === "number" ? numbers.format(value) : value;
   });
+}
+
+/**
+ * A count passed first picks the key's `_one` variant where the language uses its singular. English strings stand in
+ * for missing translations, so they are pluralised by English rules.
+ */
+export function translate(strings: Record<string, string> | null, locale: string): Translate {
+  const numbers = new Intl.NumberFormat(locale);
+  const plurals = { own: new Intl.PluralRules(locale), english: new Intl.PluralRules("en") };
+  return (key, ...subs) => {
+    const translated = strings?.[key] ? strings : null;
+    const source = translated ?? english;
+    const count = subs[0];
+    const singular =
+      typeof count === "number" && plurals[translated ? "own" : "english"].select(count) === "one"
+        ? source[`${key}_one`]
+        : undefined;
+    return supplant(singular || source[key] || key, subs, numbers);
+  };
 }
 
 export function I18nProvider({ code, children }: { code: LanguageCode; children: ReactNode }) {
@@ -53,11 +73,7 @@ export function I18nProvider({ code, children }: { code: LanguageCode; children:
 
   const value = useMemo<I18n>(() => {
     const strings = loaded?.code === code ? loaded.strings : null;
-    return {
-      code,
-      locale: localeTag(code),
-      t: (key, ...subs) => supplant(strings?.[key] || english[key] || key, subs),
-    };
+    return { code, locale: localeTag(code), t: translate(strings, localeTag(code)) };
   }, [code, loaded]);
 
   return <I18nContext value={value}>{children}</I18nContext>;

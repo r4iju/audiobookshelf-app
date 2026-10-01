@@ -60,7 +60,7 @@ function filterGroups(
 }
 
 export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: BrowseState }) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
   const settings = useSettings();
@@ -85,9 +85,7 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
           <h1 className="text-2xl font-bold tracking-tight lg:text-3xl">
             {library?.name ?? t("ButtonLibrary")}
           </h1>
-          {items.data ? (
-            <p className="text-sm text-muted">{t("WebItemsCount", total.toLocaleString(locale))}</p>
-          ) : null}
+          {items.data ? <p className="text-sm text-muted">{t("WebItemsCount", total)}</p> : null}
         </div>
         <div className="flex flex-wrap items-end gap-3">
           <SelectField

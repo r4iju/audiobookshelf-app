@@ -4,12 +4,19 @@ import { type BrowseState, itemsQuery } from "./browse";
 import {
   authorDetailSchema,
   authorsResponseSchema,
+  collectionSchema,
   librariesResponseSchema,
   libraryItemSchema,
   libraryWithFilterDataSchema,
+  pagedCollectionsSchema,
   pagedItemsSchema,
+  pagedPlaylistsSchema,
   pagedSeriesSchema,
   personalizedSchema,
+  playlistSchema,
+  podcastFeedSchema,
+  podcastSearchResultsSchema,
+  recentEpisodesSchema,
   searchResultsSchema,
   seriesSchema,
   userSchema,
@@ -38,6 +45,20 @@ export const keys = {
     [connectionId, "library", libraryId, "authors"] as const,
   author: (connectionId: string, libraryId: string, authorId: string) =>
     [connectionId, "library", libraryId, "author", authorId] as const,
+  recentEpisodes: (connectionId: string, libraryId: string, page: number) =>
+    [connectionId, "library", libraryId, "recent-episodes", page] as const,
+  // Collections and playlists share a prefix so one socket event or mutation refreshes every list view.
+  lists: (connectionId: string) => [connectionId, "lists"] as const,
+  collections: (connectionId: string, libraryId: string) =>
+    [connectionId, "lists", "collections", libraryId] as const,
+  collection: (connectionId: string, collectionId: string) =>
+    [connectionId, "lists", "collection", collectionId] as const,
+  playlists: (connectionId: string, libraryId: string) =>
+    [connectionId, "lists", "playlists", libraryId] as const,
+  playlist: (connectionId: string, playlistId: string) =>
+    [connectionId, "lists", "playlist", playlistId] as const,
+  podcastFeed: (connectionId: string, feedUrl: string) => [connectionId, "podcast-feed", feedUrl] as const,
+  podcastSearch: (connectionId: string, term: string) => [connectionId, "podcast-search", term] as const,
 };
 
 export function useLibraries() {
@@ -79,6 +100,20 @@ export function useItemProgress() {
     select: (user) =>
       new Map(
         user.mediaProgress.filter((entry) => !entry.episodeId).map((entry) => [entry.libraryItemId, entry]),
+      ),
+  });
+}
+
+export function useEpisodeProgress(itemId: string) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.me(connection.id),
+    queryFn: ({ signal }) => client.get("/api/me", userSchema, signal),
+    select: (user) =>
+      new Map(
+        user.mediaProgress.flatMap((entry) =>
+          entry.libraryItemId === itemId && entry.episodeId ? [[entry.episodeId, entry] as const] : [],
+        ),
       ),
   });
 }
@@ -126,7 +161,7 @@ export function useItem(itemId: string) {
   return useQuery({
     queryKey: keys.item(connection.id, itemId),
     queryFn: ({ signal }) =>
-      client.get(`/api/items/${itemId}?expanded=1&include=rssfeed`, libraryItemSchema, signal),
+      client.get(`/api/items/${itemId}?expanded=1&include=rssfeed,downloads`, libraryItemSchema, signal),
   });
 }
 
@@ -174,5 +209,82 @@ export function useAuthor(libraryId: string, authorId: string) {
         authorDetailSchema,
         signal,
       ),
+  });
+}
+
+export function useRecentEpisodes(libraryId: string, page: number) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.recentEpisodes(connection.id, libraryId, page),
+    queryFn: ({ signal }) =>
+      client.get(
+        `/api/libraries/${libraryId}/recent-episodes?limit=${PAGE_SIZE}&page=${page - 1}`,
+        recentEpisodesSchema,
+        signal,
+      ),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useCollections(libraryId: string) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.collections(connection.id, libraryId),
+    queryFn: ({ signal }) =>
+      client.get(`/api/libraries/${libraryId}/collections`, pagedCollectionsSchema, signal),
+    select: (data) => data.results,
+  });
+}
+
+export function useCollection(collectionId: string) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.collection(connection.id, collectionId),
+    queryFn: ({ signal }) => client.get(`/api/collections/${collectionId}`, collectionSchema, signal),
+  });
+}
+
+export function usePlaylists(libraryId: string) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.playlists(connection.id, libraryId),
+    queryFn: ({ signal }) =>
+      client.get(`/api/libraries/${libraryId}/playlists`, pagedPlaylistsSchema, signal),
+    select: (data) => data.results,
+  });
+}
+
+export function usePlaylist(playlistId: string) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.playlist(connection.id, playlistId),
+    queryFn: ({ signal }) => client.get(`/api/playlists/${playlistId}`, playlistSchema, signal),
+  });
+}
+
+/** Reads a feed through the server (administrators only); the browser never contacts the feed itself. */
+export function usePodcastFeed(feedUrl: string | null) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.podcastFeed(connection.id, feedUrl ?? ""),
+    queryFn: ({ signal }) =>
+      client.send("POST", "/api/podcasts/feed", { rssFeed: feedUrl }, podcastFeedSchema, signal),
+    enabled: !!feedUrl,
+    retry: false,
+  });
+}
+
+export function usePodcastSearch(term: string | null) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.podcastSearch(connection.id, term ?? ""),
+    queryFn: ({ signal }) =>
+      client.get(
+        `/api/search/podcast?${new URLSearchParams({ term: term ?? "" })}`,
+        podcastSearchResultsSchema,
+        signal,
+      ),
+    enabled: !!term,
+    retry: false,
   });
 }

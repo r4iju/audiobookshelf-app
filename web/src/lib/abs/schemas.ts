@@ -197,8 +197,12 @@ export const podcastEpisodeSchema = z.looseObject({
   size: z.number().nullish(),
   audioFile: z.looseObject({ duration: z.number().nullish(), metadata: fileMetadataSchema }).nullish(),
   chapters: z.array(chapterSchema).default([]),
+  /** Where a downloaded episode came from; matches the feed's enclosure. */
+  enclosure: z.looseObject({ url: z.string() }).nullish(),
 });
 export type PodcastEpisode = z.infer<typeof podcastEpisodeSchema>;
+
+const episodeDownloadSchema = z.looseObject({ id: z.string(), episodeDisplayTitle: nullableString });
 
 export const libraryItemSchema = z.looseObject({
   id: z.string(),
@@ -227,6 +231,8 @@ export const libraryItemSchema = z.looseObject({
   recentEpisode: podcastEpisodeSchema.nullish(),
   collapsedSeries: z.looseObject({ id: z.string(), name: z.string(), numBooks: z.number() }).nullish(),
   progressLastUpdate: z.number().nullish(),
+  episodeDownloadsQueued: z.array(episodeDownloadSchema).nullish(),
+  episodesDownloading: z.array(episodeDownloadSchema).nullish(),
 });
 export type LibraryItem = z.infer<typeof libraryItemSchema>;
 
@@ -268,6 +274,7 @@ const episodeWithPodcastSchema = podcastEpisodeSchema.extend({
       id: z.string().nullish(),
       libraryItemId: z.string().nullish(),
       metadata: bookMetadataSchema,
+      coverPath: nullableString,
     })
     .nullish(),
 });
@@ -365,8 +372,9 @@ export type Playlist = z.infer<typeof playlistSchema>;
 export const pagedPlaylistsSchema = z.looseObject({ results: z.array(playlistSchema), total: z.number() });
 
 export const recentEpisodesSchema = z.looseObject({
-  episodes: z.array(episodeWithPodcastSchema),
-  total: z.number().nullish(),
+  episodes: z.array(episodeWithPodcastSchema.extend({ libraryId: z.string() })),
+  limit: z.number().nullish(),
+  page: z.number().nullish(),
 });
 
 export const playbackSessionSchema = z.looseObject({
@@ -441,6 +449,9 @@ export const podcastSearchResultSchema = z.looseObject({
   language: nullableString,
   explicit: z.boolean().nullish(),
 });
+
+export type PodcastSearchResult = z.infer<typeof podcastSearchResultSchema>;
+export const podcastSearchResultsSchema = z.array(podcastSearchResultSchema);
 
 export const podcastFeedSchema = z.looseObject({
   podcast: z.looseObject({

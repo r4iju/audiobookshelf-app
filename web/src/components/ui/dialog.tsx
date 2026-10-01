@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useId, useRef } from "react";
 
 /** A modal built on the native dialog element: focus trapping, Escape and the top layer come from the browser. */
 export function Dialog({
@@ -15,6 +15,7 @@ export function Dialog({
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   // External system: the dialog element's modal state.
   useEffect(() => {
@@ -28,12 +29,12 @@ export function Dialog({
     <dialog
       ref={ref}
       onClose={onClose}
-      aria-labelledby="dialog-title"
+      aria-labelledby={titleId}
       className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-[var(--radius-card)] bg-surface p-0 text-fg shadow-2xl backdrop:bg-black/60"
     >
       {open ? (
         <div className="flex flex-col gap-4 p-5">
-          <h2 id="dialog-title" className="text-lg font-semibold">
+          <h2 id={titleId} className="text-lg font-semibold">
             {title}
           </h2>
           {children}

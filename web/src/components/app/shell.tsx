@@ -9,6 +9,7 @@ import {
   ListMusic,
   LogOut,
   Mic,
+  PlusCircle,
   Rss,
   Search,
   Settings,
@@ -23,9 +24,11 @@ import { PlayerDock } from "@/components/player/player-dock";
 import { ButtonLink } from "@/components/ui/button";
 import { Alert, Spinner } from "@/components/ui/status";
 import { type StringKey, useI18n } from "@/i18n/i18n";
-import { useLibraries } from "@/lib/abs/queries";
+import { isAdmin } from "@/lib/abs/permissions";
+import { useLibraries, useMe } from "@/lib/abs/queries";
 import type { Library } from "@/lib/abs/schemas";
 import { usePlayer } from "@/lib/player/store";
+import { useCurrentLibrary } from "@/lib/session/current-library";
 import * as registry from "@/lib/session/registry";
 import { useSession, useSessionStore } from "@/lib/session/store";
 import { errorMessage } from "./errors";
@@ -52,20 +55,32 @@ type Section = {
   label: StringKey;
   icon: typeof Home;
   for: Library["mediaType"] | "any";
+  adminOnly?: true;
+  /** Where the section sits on phones: the bottom bar or the scrolling row under the libraries. */
+  phone: "bar" | "more";
 };
 
 const sections: Section[] = [
-  { key: "home", href: (id) => `/library/${id}`, label: "WebHome", icon: Home, for: "any" },
+  { key: "home", phone: "bar", href: (id) => `/library/${id}`, label: "WebHome", icon: Home, for: "any" },
   {
     key: "items",
+    phone: "bar",
     href: (id) => `/library/${id}/items`,
     label: "ButtonLibrary",
     icon: LibraryIcon,
     for: "any",
   },
-  { key: "latest", href: (id) => `/library/${id}/latest`, label: "ButtonLatest", icon: Rss, for: "podcast" },
+  {
+    key: "latest",
+    phone: "bar",
+    href: (id) => `/library/${id}/latest`,
+    label: "ButtonLatest",
+    icon: Rss,
+    for: "podcast",
+  },
   {
     key: "series",
+    phone: "bar",
     href: (id) => `/library/${id}/series`,
     label: "ButtonSeries",
     icon: BookOpen,
@@ -73,6 +88,7 @@ const sections: Section[] = [
   },
   {
     key: "authors",
+    phone: "more",
     href: (id) => `/library/${id}/authors`,
     label: "ButtonAuthors",
     icon: Users,
@@ -80,6 +96,7 @@ const sections: Section[] = [
   },
   {
     key: "collections",
+    phone: "more",
     href: (id) => `/library/${id}/collections`,
     label: "ButtonCollections",
     icon: ListMusic,
@@ -87,12 +104,29 @@ const sections: Section[] = [
   },
   {
     key: "playlists",
+    phone: "more",
     href: (id) => `/library/${id}/playlists`,
     label: "ButtonPlaylists",
     icon: ListMusic,
     for: "any",
   },
-  { key: "search", href: (id) => `/library/${id}/search`, label: "ButtonSearch", icon: Search, for: "any" },
+  {
+    key: "search",
+    phone: "bar",
+    href: (id) => `/library/${id}/search`,
+    label: "ButtonSearch",
+    icon: Search,
+    for: "any",
+  },
+  {
+    key: "add-podcast",
+    phone: "more",
+    href: (id) => `/library/${id}/add-podcast`,
+    label: "WebAddPodcast",
+    icon: PlusCircle,
+    for: "podcast",
+    adminOnly: true,
+  },
 ];
 
 function navClass(active: boolean) {
@@ -107,6 +141,8 @@ function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const params = useParams<{ libraryId?: string }>();
   const libraries = useLibraries();
+  const admin = isAdmin(useMe().data);
+  const shownLibrary = useCurrentLibrary((state) => state.libraryId);
   const online = useOnline();
   useRealtime();
   const playerActive = usePlayer().phase === "active";
@@ -117,8 +153,18 @@ function Shell({ children }: { children: ReactNode }) {
   const remembered = registry.lastLibraryId(connection.id);
   const current =
     list.find((library) => library.id === params.libraryId) ??
+    list.find((library) => library.id === shownLibrary) ??
     list.find((library) => library.id === remembered) ??
     list[0];
+  const visible = current
+    ? sections.filter(
+        (section) =>
+          (section.for === "any" || section.for === current.mediaType) && (!section.adminOnly || admin),
+      )
+    : [];
+  const phoneMore = visible.filter((section) => section.phone === "more");
+  const isActive = (section: Section, href: string) =>
+    section.key === "home" ? pathname === href : pathname.startsWith(href);
   const reauthHref = `/connect?${new URLSearchParams({ server: connection.serverUrl, username: connection.username, next: pathname })}`;
 
   return (
@@ -180,27 +226,45 @@ function Shell({ children }: { children: ReactNode }) {
             className="max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 max-lg:border-t max-lg:border-line max-lg:bg-surface/95 max-lg:pb-[env(safe-area-inset-bottom)] max-lg:backdrop-blur"
           >
             <ul className="flex justify-around lg:flex-col lg:gap-0.5">
-              {sections
-                .filter((section) => section.for === "any" || section.for === current.mediaType)
-                .map((section) => {
-                  const href = section.href(current.id);
-                  const active = section.key === "home" ? pathname === href : pathname.startsWith(href);
-                  const Icon = section.icon;
-                  const mobileHidden =
-                    section.key === "authors" || section.key === "collections" || section.key === "playlists";
-                  return (
-                    <li key={section.key} className={mobileHidden ? "max-lg:hidden" : undefined}>
-                      <Link
-                        href={href}
-                        aria-current={active ? "page" : undefined}
-                        className={`${navClass(active)} max-lg:min-h-14 max-lg:flex-col max-lg:justify-center max-lg:gap-0.5 max-lg:bg-transparent max-lg:px-2 max-lg:text-[0.7rem] ${active ? "max-lg:text-accent" : ""}`}
-                      >
-                        <Icon aria-hidden className="size-5 shrink-0 lg:size-4" />
-                        {t(section.label)}
-                      </Link>
-                    </li>
-                  );
-                })}
+              {visible.map((section) => {
+                const href = section.href(current.id);
+                const Icon = section.icon;
+                return (
+                  <li key={section.key} className={section.phone === "more" ? "max-lg:hidden" : undefined}>
+                    <Link
+                      href={href}
+                      aria-current={isActive(section, href) ? "page" : undefined}
+                      className={`${navClass(isActive(section, href))} max-lg:min-h-14 max-lg:flex-col max-lg:justify-center max-lg:gap-0.5 max-lg:bg-transparent max-lg:px-2 max-lg:text-[0.7rem] ${isActive(section, href) ? "max-lg:text-accent" : ""}`}
+                    >
+                      <Icon aria-hidden className="size-5 shrink-0 lg:size-4" />
+                      {t(section.label)}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        ) : null}
+        {current && phoneMore.length ? (
+          // The phone's bottom bar has room for four sections; the rest sit in a scrolling row under the libraries.
+          <nav aria-label={t("WebMore")} className="px-4 pt-2 lg:hidden">
+            <ul className="flex gap-2 overflow-x-auto pb-1">
+              {phoneMore.map((section) => {
+                const href = section.href(current.id);
+                const Icon = section.icon;
+                return (
+                  <li key={section.key} className="shrink-0">
+                    <Link
+                      href={href}
+                      aria-current={isActive(section, href) ? "page" : undefined}
+                      className={`${navClass(isActive(section, href))} rounded-full border ${isActive(section, href) ? "border-accent" : "border-line"}`}
+                    >
+                      <Icon aria-hidden className="size-4 shrink-0" />
+                      {t(section.label)}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         ) : null}

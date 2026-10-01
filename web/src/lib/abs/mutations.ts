@@ -1,7 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAbs } from "@/lib/session/store";
+import type { AbsClient } from "./client";
 import { keys } from "./queries";
-import { bookmarkSchema } from "./schemas";
+import {
+  bookmarkSchema,
+  collectionSchema,
+  libraryItemSchema,
+  type PodcastFeed,
+  playlistSchema,
+} from "./schemas";
 
 export function useCreateBookmark() {
   const { client, connection } = useAbs();
@@ -64,5 +71,163 @@ export function useDiscardProgress() {
   return useMutation({
     mutationFn: (progressId: string) => client.command("DELETE", `/api/me/progress/${progressId}`),
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
+  });
+}
+
+export interface PlaylistEntry {
+  libraryItemId: string;
+  episodeId: string | null;
+}
+
+const toServerEntry = ({ libraryItemId, episodeId }: PlaylistEntry) =>
+  episodeId ? { libraryItemId, episodeId } : { libraryItemId };
+
+function useListMutation<Variables, Result>(
+  run: (client: AbsClient, variables: Variables) => Promise<Result>,
+) {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: Variables) => run(client, variables),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: keys.lists(connection.id) }),
+  });
+}
+
+export function useCreatePlaylist() {
+  return useListMutation(
+    (client, { libraryId, name, entry }: { libraryId: string; name: string; entry: PlaylistEntry }) =>
+      client.send(
+        "POST",
+        "/api/playlists",
+        { libraryId, name, items: [toServerEntry(entry)] },
+        playlistSchema,
+      ),
+  );
+}
+
+export function useAddToPlaylist() {
+  return useListMutation((client, { playlistId, entry }: { playlistId: string; entry: PlaylistEntry }) =>
+    client.send(
+      "POST",
+      `/api/playlists/${playlistId}/batch/add`,
+      { items: [toServerEntry(entry)] },
+      playlistSchema,
+    ),
+  );
+}
+
+/** The server deletes a playlist when its last entry is removed; the returned playlist then has no items. */
+export function useRemoveFromPlaylist() {
+  return useListMutation((client, { playlistId, entry }: { playlistId: string; entry: PlaylistEntry }) =>
+    client.send(
+      "DELETE",
+      `/api/playlists/${playlistId}/item/${entry.libraryItemId}${entry.episodeId ? `/${entry.episodeId}` : ""}`,
+      undefined,
+      playlistSchema,
+    ),
+  );
+}
+
+export function useDeletePlaylist() {
+  return useListMutation((client, playlistId: string) =>
+    client.command("DELETE", `/api/playlists/${playlistId}`),
+  );
+}
+
+export function useCreateCollection() {
+  return useListMutation(
+    (client, { libraryId, name, itemId }: { libraryId: string; name: string; itemId: string }) =>
+      client.send("POST", "/api/collections", { libraryId, name, books: [itemId] }, collectionSchema),
+  );
+}
+
+export function useAddToCollection() {
+  return useListMutation((client, { collectionId, itemId }: { collectionId: string; itemId: string }) =>
+    client.send("POST", `/api/collections/${collectionId}/book`, { id: itemId }, collectionSchema),
+  );
+}
+
+export function useRemoveFromCollection() {
+  return useListMutation((client, { collectionId, itemId }: { collectionId: string; itemId: string }) =>
+    client.send("DELETE", `/api/collections/${collectionId}/book/${itemId}`, undefined, collectionSchema),
+  );
+}
+
+export function useDeleteCollection() {
+  return useListMutation((client, collectionId: string) =>
+    client.command("DELETE", `/api/collections/${collectionId}`),
+  );
+}
+
+export interface NewPodcast {
+  libraryId: string;
+  folderId: string;
+  path: string;
+  autoDownloadEpisodes: boolean;
+  metadata: {
+    title: string;
+    author: string;
+    description: string;
+    feedUrl: string;
+    imageUrl: string;
+    genres: string[];
+    language: string;
+    itunesPageUrl?: string;
+    itunesId?: string;
+    itunesArtistId?: string;
+    releaseDate?: string;
+  };
+}
+
+export function useCreatePodcast() {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ metadata, autoDownloadEpisodes, ...placement }: NewPodcast) =>
+      client.send(
+        "POST",
+        "/api/podcasts",
+        { ...placement, media: { metadata, autoDownloadEpisodes } },
+        libraryItemSchema,
+      ),
+    onSettled: (_data, _error, podcast) =>
+      queryClient.invalidateQueries({ queryKey: keys.library(connection.id, podcast.libraryId) }),
+  });
+}
+
+export function useDownloadEpisodes() {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, episodes }: { itemId: string; episodes: PodcastFeed["podcast"]["episodes"] }) =>
+      client.command("POST", `/api/podcasts/${itemId}/download-episodes`, episodes),
+    onSettled: (_data, _error, { itemId }) =>
+      queryClient.invalidateQueries({ queryKey: keys.item(connection.id, itemId) }),
+  });
+}
+
+export function useClearDownloadQueue() {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (itemId: string) => client.command("GET", `/api/podcasts/${itemId}/clear-queue`),
+    onSettled: (_data, _error, itemId) =>
+      queryClient.invalidateQueries({ queryKey: keys.item(connection.id, itemId) }),
+  });
+}
+
+/** Deletes the episode's audio file too; the server also drops it from playlists and removes its progress. */
+export function useRemoveEpisode() {
+  const { client, connection } = useAbs();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, episodeId }: { itemId: string; episodeId: string }) =>
+      client.command("DELETE", `/api/podcasts/${itemId}/episode/${episodeId}?hard=1`),
+    onSettled: (_data, _error, { itemId }) =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: keys.item(connection.id, itemId) }),
+        queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
+        queryClient.invalidateQueries({ queryKey: keys.lists(connection.id) }),
+      ]),
   });
 }

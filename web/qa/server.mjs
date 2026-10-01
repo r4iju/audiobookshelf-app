@@ -87,7 +87,8 @@ async function seed() {
       name: "Podcasts",
       mediaType: "podcast",
       provider: "itunes",
-      folders: [{ fullPath: "/library/podcasts" }],
+      // The scanned fixtures are read-only; podcasts created through the client are written to a separate volume.
+      folders: [{ fullPath: "/library/podcasts" }, { fullPath: "/podcasts" }],
     },
   });
   for (const library of [books, podcasts])
@@ -150,8 +151,15 @@ async function up({ fresh }) {
       // Test journeys sign in far more often than people do; only this QA server disables the login rate limit.
       "-e",
       "RATE_LIMIT_AUTH_MAX=0",
+      // The local RSS feed (qa/feed.mjs) runs on the host; only that host is exempt from the server's SSRF filter.
+      "--add-host",
+      "host.docker.internal:host-gateway",
+      "-e",
+      "SSRF_REQUEST_FILTER_WHITELIST=host.docker.internal",
       "-v",
       `${join(runtime, "library")}:/library:ro`,
+      "-v",
+      `${container}-podcasts:/podcasts`,
       // Named volumes: SQLite on a bind mount through the VM's file sharing fails to open after the directory is recreated.
       "-v",
       `${container}-config:/config`,
@@ -174,7 +182,7 @@ async function up({ fresh }) {
 function down() {
   for (const args of [
     ["rm", "-f", container],
-    ["volume", "rm", "-f", `${container}-config`, `${container}-metadata`],
+    ["volume", "rm", "-f", `${container}-config`, `${container}-metadata`, `${container}-podcasts`],
   ]) {
     try {
       docker(...args);

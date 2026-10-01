@@ -2,10 +2,12 @@
 
 import { CheckCircle2, RotateCcw, Undo2 } from "lucide-react";
 import { useState } from "react";
-import { errorMessage } from "@/components/app/errors";
+import { InlineError } from "@/components/app/inline-error";
+import { ProgressBar } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/dialog";
 import { useI18n } from "@/i18n/i18n";
+import { formatClock } from "@/lib/abs/media";
 import { useDiscardProgress, useSetFinished } from "@/lib/abs/mutations";
 import type { MediaProgress } from "@/lib/abs/schemas";
 
@@ -47,11 +49,7 @@ export function ProgressControls({
           </Button>
         ) : null}
       </div>
-      {error ? (
-        <p role="alert" className="text-sm text-danger">
-          {errorMessage(t, error)}
-        </p>
-      ) : null}
+      <InlineError error={error} />
       <ConfirmDialog
         open={confirming}
         title={t("WebDiscardProgress")}
@@ -64,6 +62,34 @@ export function ProgressControls({
           if (progress) discard.mutate(progress.id, { onSettled: () => setConfirming(false) });
         }}
       />
+    </div>
+  );
+}
+
+/** Time left in the media, or null when nothing has been played or it is finished. */
+export function remainingTime(progress: MediaProgress | undefined, duration: number) {
+  return progress && !progress.isFinished && progress.currentTime > 0
+    ? duration - progress.currentTime
+    : null;
+}
+
+export function ProgressSummary({
+  progress,
+  duration,
+}: {
+  progress: MediaProgress | undefined;
+  duration: number;
+}) {
+  const { t, locale } = useI18n();
+  if (!progress || (progress.progress <= 0 && !progress.isFinished)) return null;
+  return (
+    <div className="flex max-w-md flex-col gap-1">
+      <ProgressBar value={progress.isFinished ? 1 : progress.progress} label={t("LabelYourProgress")} />
+      <p className="text-xs text-muted">
+        {progress.isFinished
+          ? t("LabelFinished")
+          : `${Math.round(progress.progress * 100).toLocaleString(locale)}% · ${formatClock(remainingTime(progress, duration) ?? 0)}`}
+      </p>
     </div>
   );
 }

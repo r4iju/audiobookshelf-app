@@ -1,20 +1,24 @@
 "use client";
 
-import { BookOpen, Pause, Play } from "lucide-react";
+import { BookOpen, FolderPlus, ListPlus, Pause, Play } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Cover, ProgressBar } from "@/components/media/cover";
+import { useLibrary } from "@/components/library/use-library";
+import { AddToCollectionDialog, AddToPlaylistDialog } from "@/components/lists/add-to-list";
+import { Cover } from "@/components/media/cover";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { QueryState } from "@/components/ui/query-state";
 import { useI18n } from "@/i18n/i18n";
 import { coverShapeOf, coverUrl, formatClock, formatDuration } from "@/lib/abs/media";
-import { useItem, useItemProgress, useLibraries } from "@/lib/abs/queries";
+import { can } from "@/lib/abs/permissions";
+import { useItem, useItemProgress, useMe } from "@/lib/abs/queries";
 import type { LibraryItem } from "@/lib/abs/schemas";
 import { usePlayer, usePlayerStore } from "@/lib/player/store";
 import { useAbs } from "@/lib/session/store";
 import { htmlToText } from "@/lib/text";
+import { EpisodeList } from "./episodes";
 import { playerMediaFor } from "./play-media";
-import { ProgressControls } from "./progress-controls";
+import { ProgressControls, ProgressSummary, remainingTime } from "./progress-controls";
 
 export function ItemDetail({ itemId }: { itemId: string }) {
   const item = useItem(itemId);
@@ -22,13 +26,15 @@ export function ItemDetail({ itemId }: { itemId: string }) {
 }
 
 function ItemView({ item }: { item: LibraryItem }) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const { client } = useAbs();
-  const libraries = useLibraries();
+  const { library } = useLibrary(item.libraryId);
   const progress = useItemProgress().data?.get(item.id);
   const player = usePlayer();
+  const canUpdate = can(useMe().data, "update");
   const [showAll, setShowAll] = useState(false);
-  const library = libraries.data?.find((entry) => entry.id === item.libraryId);
+  const [adding, setAdding] = useState<"playlist" | "collection" | null>(null);
+  const isBook = item.mediaType === "book";
   const metadata = item.media.metadata;
   const isPlayingThis =
     player.phase === "active" && player.media.itemId === item.id && player.media.episodeId === null;
@@ -39,10 +45,7 @@ function ItemView({ item }: { item: LibraryItem }) {
   const supplementary = (item.libraryFiles ?? []).filter(
     (file) => file.fileType === "ebook" && file.isSupplementary && file.ino !== item.media.ebookFile?.ino,
   );
-  const remaining =
-    progress && !progress.isFinished && progress.currentTime > 0
-      ? (item.media.duration ?? 0) - progress.currentTime
-      : null;
+  const remaining = remainingTime(progress, item.media.duration ?? 0);
   const play = (startTime?: number) =>
     usePlayerStore.getState().play({ media: playerMediaFor(client, item), startTime });
 
@@ -121,21 +124,9 @@ function ItemView({ item }: { item: LibraryItem }) {
             ) : null}
           </dl>
 
-          {progress && (progress.progress > 0 || progress.isFinished) ? (
-            <div className="flex max-w-md flex-col gap-1">
-              <ProgressBar
-                value={progress.isFinished ? 1 : progress.progress}
-                label={t("LabelYourProgress")}
-              />
-              <p className="text-xs text-muted">
-                {progress.isFinished
-                  ? t("LabelFinished")
-                  : `${Math.round(progress.progress * 100).toLocaleString(locale)}% · ${formatClock(remaining ?? 0)}`}
-              </p>
-            </div>
-          ) : null}
+          <ProgressSummary progress={progress} duration={item.media.duration ?? 0} />
 
-          <ProgressControls itemId={item.id} progress={progress} />
+          {isBook ? <ProgressControls itemId={item.id} progress={progress} /> : null}
 
           <div className="flex flex-wrap gap-3">
             {hasAudio ? (
@@ -155,6 +146,18 @@ function ItemView({ item }: { item: LibraryItem }) {
                 <BookOpen aria-hidden className="size-4" />
                 {t("ButtonRead")}
               </ButtonLink>
+            ) : null}
+            {isBook ? (
+              <Button onClick={() => setAdding("playlist")}>
+                <ListPlus aria-hidden className="size-4" />
+                {t("LabelAddToPlaylist")}
+              </Button>
+            ) : null}
+            {isBook && canUpdate ? (
+              <Button onClick={() => setAdding("collection")}>
+                <FolderPlus aria-hidden className="size-4" />
+                {t("WebAddToCollection")}
+              </Button>
             ) : null}
           </div>
 
@@ -196,6 +199,19 @@ function ItemView({ item }: { item: LibraryItem }) {
             ))}
           </ul>
         </section>
+      ) : null}
+
+      {item.mediaType === "podcast" ? <EpisodeList item={item} /> : null}
+
+      {adding === "playlist" ? (
+        <AddToPlaylistDialog
+          libraryId={item.libraryId}
+          entry={{ libraryItemId: item.id, episodeId: null }}
+          onClose={() => setAdding(null)}
+        />
+      ) : null}
+      {adding === "collection" ? (
+        <AddToCollectionDialog libraryId={item.libraryId} itemId={item.id} onClose={() => setAdding(null)} />
       ) : null}
 
       {chapters.length ? (

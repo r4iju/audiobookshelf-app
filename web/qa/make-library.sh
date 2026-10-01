@@ -4,7 +4,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")" && pwd)/.runtime/library"
-stamp="$root/.complete-v2"
+stamp="$root/.complete-v3"
 if [[ -f "$stamp" ]]; then
   echo "$root"
   exit 0
@@ -124,6 +124,16 @@ for episode in 1 2 3 4; do
     -metadata title="Episode $episode: Evening $episode" -metadata artist="QA Studio" -metadata album="Evening Stories" \
     -metadata date="2026-09-0$episode" -metadata track="$episode" -metadata genre="Podcast" \
     -c:a libmp3lame -b:a 48k "$dir/Episode $episode.mp3"
+done
+
+# 7. Media for the local RSS feed (qa/feed.mjs) that administrators add as a new podcast.
+feed="$root/../feed"
+rm -rf "$feed"
+mkdir -p "$feed"
+cover "$feed/cover.jpg" 600 600 "#1f7a4d"
+for episode in 1 2; do
+  ffmpeg -loglevel error -y -f lavfi -i "sine=frequency=$((500 + episode * 60)):sample_rate=22050:duration=12" -ac 1 \
+    -c:a libmp3lame -b:a 48k "$feed/feed-episode-$episode.mp3"
 done
 
 touch "$stamp"

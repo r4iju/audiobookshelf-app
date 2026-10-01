@@ -164,9 +164,10 @@ export function createAbsClient({
       path: string,
       body: unknown,
       schema: T,
-    ) => parse(await send(path, { method, body }), schema),
+      signal?: AbortSignal,
+    ) => parse(await send(path, { method, body, signal }), schema),
     /** For endpoints that answer "OK" or nothing. */
-    command: async (method: "POST" | "PATCH" | "DELETE", path: string, body?: unknown) => {
+    command: async (method: "GET" | "POST" | "PATCH" | "DELETE", path: string, body?: unknown) => {
       await send(path, { method, body });
     },
     blob: async (path: string, signal?: AbortSignal) => (await send(path, { signal })).blob(),
