@@ -158,9 +158,16 @@ class LegacyArchive private constructor(val file: File, val manifest: LegacyMani
     }
 
     companion object {
+        private val DIGEST = Regex("[0-9a-f]{64}")
+        private val STORED = Regex("files/[0-9a-f]{24}/[^/]+")
+
         fun open(file: File): LegacyArchive {
+            val entries: Set<String>
             val bytes = try {
-                ZipFile(file).use { zip -> zip.getEntry("archive.json")?.let { entry -> zip.getInputStream(entry).use { it.readBytes() } } }
+                ZipFile(file).use { zip ->
+                    entries = zip.entries().asSequence().map { it.name }.toSet()
+                    zip.getEntry("archive.json")?.let { entry -> zip.getInputStream(entry).use { it.readBytes() } }
+                }
             } catch (failure: IOException) {
                 throw MigrationError.Unreadable()
             } ?: throw MigrationError.Incomplete()
@@ -170,6 +177,9 @@ class LegacyArchive private constructor(val file: File, val manifest: LegacyMani
             val version = document["formatVersion"]?.jsonPrimitive?.intOrNull ?: throw MigrationError.Unreadable()
             if (version != 1) throw MigrationError.Unsupported(version)
             val manifest = try { AbsJson.decodeFromJsonElement(LegacyManifest.serializer(), document) } catch (failure: Exception) { throw MigrationError.Unreadable() }
+            // Digests name staged files, so anything but a SHA-256 could address a path outside staging.
+            if (manifest.digests.values.any { !DIGEST.matches(it) }) throw MigrationError.Unreadable()
+            if (manifest.storedPaths.any { (path, stored) -> path !in manifest.digests || !STORED.matches(stored) || ".." in stored.split('/') || stored !in entries }) throw MigrationError.Unreadable()
             val fingerprint = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
             return LegacyArchive(file, manifest, fingerprint)
         }

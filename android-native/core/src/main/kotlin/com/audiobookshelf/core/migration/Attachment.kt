@@ -11,6 +11,8 @@ object Attachment {
             else item.media.tracks.sortedBy { it.index ?: 0 }
         val legacy = title.audio
         val audio: List<StagedFile?> = when {
+            // Only the ebook was downloaded; the title's audio was never asked for.
+            legacy.isEmpty() -> emptyList()
             // A running download recorded the server's own 1-based track index, which listings may omit.
             title.partial -> tracks.mapIndexed { position, track -> legacy.firstOrNull { it.trackIndex != null && it.trackIndex == (track.index ?: (position + 1)) } }
             legacy.size == tracks.size -> legacy

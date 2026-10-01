@@ -170,4 +170,59 @@ class LegacyImportTest {
         assertNull(match.problem)
         assertEquals(listOf("track-1.wav", null), match.audio.map { it?.name })
     }
+
+    @Test
+    fun anArchiveWhoseDigestsOrPathsCouldLeaveStagingIsRefusedBeforeAnythingIsWritten() {
+        val sentinel = folder.root.resolve("planted.tmp").apply { writeText("kept") }
+        val escaping = altered("escaping.absmigration") { name, bytes ->
+            if (name != "archive.json") bytes
+            else Regex("\"digests\":\\{\"([^\"]+)\":\"[0-9a-f]{64}\"").replace(String(bytes)) { "\"digests\":{\"${it.groupValues[1]}\":\"../../planted\"" }.toByteArray()
+        }
+        val outside = altered("outside.absmigration") { name, bytes ->
+            if (name != "archive.json") bytes else Regex("\"storedPaths\":\\{\"([^\"]+)\":\"[^\"]+\"").replace(String(bytes)) { "\"storedPaths\":{\"${it.groupValues[1]}\":\"../archive.json\"" }.toByteArray()
+        }
+        for (file in listOf(escaping, outside)) {
+            try {
+                importer().run(LegacyArchive.open(file))
+                fail("${file.name} was imported")
+            } catch (expected: MigrationError.Unreadable) {}
+        }
+        assertEquals("kept", sentinel.readText())
+        assertFalse(root.resolve("staging").exists())
+    }
+
+    @Test
+    fun aFileThatCannotBeMovedIntoPlaceInterruptsTheImportInsteadOfCountingAsCorrupt() {
+        try {
+            importer().run(LegacyArchive.open(exported())) { throw InterruptedException("process ended") }
+            fail("The import was interrupted")
+        } catch (expected: InterruptedException) {}
+        val staging = root.resolve("staging")
+        val waiting = LegacyArchive.open(exported()).manifest.digests.values.filterNot { staging.resolve(it).exists() }
+        // A directory in a file's place makes moving it there fail, as a full or failing disk would.
+        waiting.forEach { staging.resolve(it).resolve("blocker").mkdirs() }
+        try {
+            importer().run(LegacyArchive.open(exported()))
+            fail("The import went ahead without its files")
+        } catch (expected: java.io.IOException) {}
+        assertNull("Nothing is committed while files cannot be placed", importer().outcome())
+
+        waiting.forEach { staging.resolve(it).deleteRecursively() }
+        val outcome = importer().run(LegacyArchive.open(exported()))
+        assertEquals(3, outcome.titles.size)
+        assertTrue(outcome.issues.none { it.kind == Issue.Kind.FILE_CORRUPT })
+    }
+
+    @Test
+    fun aPdfDownloadedWithoutItsTitlesAudioIsMatchedOnItsOwn() {
+        val pdf = importer().run(LegacyArchive.open(exported())).titles.single { it.itemId == "book-0" }.ebook!!
+        val companion = ImportedTitle(qa, "book-0", null, "Stories for Tomorrow 01", "", "book", listOf(pdf))
+        val item = AbsJson.decodeFromString(LibraryItem.serializer(), """{"id":"book-0","mediaType":"book","media":{"duration":20,
+            "tracks":[{"index":1,"duration":8,"contentUrl":"/api/items/book-0/file/0","mimeType":"audio/wav"},{"index":2,"startOffset":8,"duration":12,"contentUrl":"/api/items/book-0/file/1","mimeType":"audio/wav"}],
+            "ebookFile":{"ino":"pdf","ebookFormat":"pdf"}}}""")
+        val match = Attachment.match(companion, item, episodeId = null)
+        assertNull(match.problem)
+        assertTrue(match.audio.isEmpty())
+        assertEquals("stories.pdf", match.ebook?.name)
+    }
 }

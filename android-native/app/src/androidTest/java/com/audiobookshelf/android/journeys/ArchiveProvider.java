@@ -22,7 +22,8 @@ import java.util.zip.ZipOutputStream;
 /**
  * Serves exports the way a file manager does when the user opens one with the app: a content URI of
  * unknown type. "legacy-export" is the archive the legacy app's own exporter wrote; "corrupt" is that
- * archive with one byte of its PDF changed; "not-an-export" is any other file. Java, because this runs
+ * archive with one byte of its PDF changed; "not-an-export" is any other file. "slow-legacy-export"
+ * arrives over two seconds, like a file from a slow network drive. Java, because this runs
  * in the test package's own process without the app's Kotlin runtime.
  */
 public class ArchiveProvider extends ContentProvider {
@@ -66,8 +67,25 @@ public class ArchiveProvider extends ContentProvider {
 
     @Override
     public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
+        if ("slow-legacy-export.absmigration".equals(uri.getLastPathSegment())) return slow();
         try {
             return ParcelFileDescriptor.open(file(uri), ParcelFileDescriptor.MODE_READ_ONLY);
+        } catch (IOException failure) {
+            throw new FileNotFoundException(failure.getMessage());
+        }
+    }
+
+    private ParcelFileDescriptor slow() throws FileNotFoundException {
+        try {
+            File source = file(Uri.parse("content://" + AUTHORITY + "/legacy-export.absmigration"));
+            ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
+            new Thread(() -> {
+                try (InputStream in = new java.io.FileInputStream(source); OutputStream out = new ParcelFileDescriptor.AutoCloseOutputStream(pipe[1])) {
+                    Thread.sleep(2000);
+                    copy(in, out);
+                } catch (Exception ignored) {}
+            }).start();
+            return pipe[0];
         } catch (IOException failure) {
             throw new FileNotFoundException(failure.getMessage());
         }

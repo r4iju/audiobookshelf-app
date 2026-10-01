@@ -163,6 +163,17 @@ Evidence: unit tests pass. In one run on `emulator-5584`: ListeningRecovery 1, L
   - AccountsJourney 3 of 3 pass after the emulator's Chrome was force-stopped.
 - **Emulator caveat:** the first AccountsJourney attempt failed because Chrome on the emulator was stuck on an old fixture tab and never requested `/auth/openid`. Force-stop Chrome before the OIDC journey if this recurs.
 
+## Review blockers at 274aa769
+
+| Blocker | Fix | RED observed before the fix |
+| --- | --- | --- |
+| Manifest digests named staging and temporary files before any check, so a digest such as `../../planted` wrote outside staging | `LegacyArchive.open` refuses the archive unless every digest is 64 lowercase hex characters, and every stored path is `files/<24 hex>/<name>` with no `..`, belongs to a digest and is an entry in the zip. Nothing is written for a refused archive | `LegacyImportTest.anArchiveWhoseDigestsOrPathsCouldLeaveStagingIsRefusedBeforeAnythingIsWritten`: both crafted archives were imported |
+| A file whose digest matched but whose move into staging failed was marked corrupt, and its title was left out of the committed import for good | Only a digest mismatch marks a file corrupt. A failed move removes the temporary copy and stops the import as an interruption. Nothing is committed, and choosing the same export again resumes it | `aFileThatCannotBeMovedIntoPlaceInterruptsTheImportInsteadOfCountingAsCorrupt`: the import committed without the files |
+| A PDF downloaded without its title's audio was refused (`ITEM_CHANGED`) because zero legacy tracks did not equal the server's track count | A title with no legacy audio matches on its ebook alone (format and ino still checked) and is adopted as an ebook-only download. Audio identity checks are unchanged when audio is present | `aPdfDownloadedWithoutItsTitlesAudioIsMatchedOnItsOwn`: "Its audio files changed on the server" |
+| Closing the import while an export was still being read did not stop the read, which then reopened the screen. A second choice shared and overwrote the first's temporary file | Each choice gets its own temporary file. A newer choice or closing cancels the read in progress. The read's copy loop stops, removes its own file once nothing writes it any more, and its result is dropped. Choices are ignored while an import runs, and closing does not stop an import | `MigrationSelectionJourney` (instrumented, using a test provider whose export arrives after 2 s): the screen reopened as `Refused` after close; the slower first choice replaced the second as `Ready(slow-legacy-export…)` |
+
+Evidence: core and app unit tests pass. On `emulator-5584`, MigrationSelectionJourney 2 of 2 and MigrationJourney 5 of 5 in one run.
+
 ## Migration from the legacy Android app (#52, #53)
 
 The preview keeps its own identity (`com.audiobookshelf.app.nativepreview`, debug key), as the Apple preview does. It cannot read the legacy app's private storage, so migration is a faithful export and import, not an in-place upgrade.

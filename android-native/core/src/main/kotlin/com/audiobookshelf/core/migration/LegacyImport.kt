@@ -122,15 +122,20 @@ class LegacyImport(private val root: File) {
                     output.fd.sync()
                 }
             }
-            if (hex(digest.digest()) == file.digest && temporary.renameTo(staged(file))) {
-                state = state.copy(verified = state.verified + (file.legacyPath to file.digest))
-                saveState(state)
-                copied(file.legacyPath)
-            } else {
+            if (hex(digest.digest()) != file.digest) {
                 temporary.delete()
                 state = state.copy(corrupt = state.corrupt + file.legacyPath)
                 saveState(state)
+                continue
             }
+            if (!temporary.renameTo(staged(file))) {
+                temporary.delete()
+                // The file itself is intact, so this stops the import like an interruption and is retried.
+                throw java.io.IOException("An imported file could not be put in place")
+            }
+            state = state.copy(verified = state.verified + (file.legacyPath to file.digest))
+            saveState(state)
+            copied(file.legacyPath)
         }
 
         val corrupt = candidates.filter { candidate -> candidate.title.files.any { it.legacyPath in state.corrupt } }
