@@ -47,7 +47,7 @@ class OpenIdSignIn private constructor(private val context: Context) {
     private val graph get() = context.graph
     private val transport by lazy { graph.http.newBuilder().followRedirects(false).followSslRedirects(false).build() }
 
-    fun start(address: ServerAddress) {
+    fun start(address: ServerAddress, launcher: Context) {
         error = null; busy = true
         graph.scope.launch {
             try {
@@ -70,8 +70,8 @@ class OpenIdSignIn private constructor(private val context: Context) {
                 writeAtomically(file, AbsJson.encodeToString(Pending.serializer(), Pending(address.canonical, verifier, providerState, authorize.cookies)).toByteArray())
                 browserOpen = true
                 CustomTabsIntent.Builder().setShowTitle(true).setEphemeralBrowsingEnabled(true).build().apply {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }.launchUrl(context, Uri.parse(provider.toString()))
+                    if (launcher !is android.app.Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }.launchUrl(launcher, Uri.parse(provider.toString()))
             } catch (failure: Exception) {
                 error = failure.message
                 busy = false
@@ -104,6 +104,8 @@ class OpenIdSignIn private constructor(private val context: Context) {
         }
         return true
     }
+
+    fun clear() { error = null }
 
     /** Called when the app returns to the foreground; no callback means the user left the browser. */
     fun resumed() {

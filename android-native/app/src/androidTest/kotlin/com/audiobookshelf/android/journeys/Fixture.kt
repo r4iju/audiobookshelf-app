@@ -100,3 +100,44 @@ fun eventually(timeoutMs: Long = 15_000, check: () -> Boolean) {
 }
 
 @Suppress("unused") private fun SemanticsNodeInteractionsProvider.unused() = Unit
+
+/** Drives the system browser for the local synthetic OpenID provider, clearing Chrome's first-run screens. */
+object Browser {
+    private val device get() = androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    private val firstRun = listOf("Use without an account", "Accept & continue", "No thanks", "No, thanks", "Got it", "Continue")
+
+    fun approve(timeoutMs: Long = 45_000) = until(timeoutMs, "Approve sign-in")
+
+    fun waitForProvider(timeoutMs: Long = 45_000) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            if (device.findObject(androidx.test.uiautomator.By.text("Local OpenID")) != null) return
+            dismissFirstRun()
+            Thread.sleep(300)
+        }
+        fail("Local OpenID provider page did not appear")
+    }
+
+    fun back() { device.pressBack() }
+
+    private fun until(timeoutMs: Long, link: String) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            val target = device.findObject(androidx.test.uiautomator.By.text(link))
+            if (target != null) { target.click(); return }
+            dismissFirstRun()
+            Thread.sleep(300)
+        }
+        fail("Browser never showed \"$link\"")
+    }
+
+    private fun fail(message: String): Nothing {
+        val shot = File(InstrumentationRegistry.getInstrumentation().targetContext.externalCacheDir, "browser-failure.png")
+        device.takeScreenshot(shot)
+        throw AssertionError("$message (screenshot: ${shot.absolutePath})")
+    }
+
+    private fun dismissFirstRun() {
+        for (label in firstRun) device.findObject(androidx.test.uiautomator.By.text(label))?.let { it.click(); return }
+    }
+}

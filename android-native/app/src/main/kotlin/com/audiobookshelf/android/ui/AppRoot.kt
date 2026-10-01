@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -45,10 +46,12 @@ private fun SignedIn(active: SessionState.Active) {
         null -> Scaffold(
             topBar = {
                 LibraryTopBar(catalog) {
+                    IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, "Accounts") }
                     IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, "Settings") }
                 }
             },
         ) { padding -> LibraryScreen(catalog, padding, open = { model.push(Route.Item(it.id)) }) }
+        Route.Accounts -> RouteScaffold("Accounts", onBack = { model.pop() }) { AccountsScreen(active, it) }
         else -> LaunchedEffect(route) { model.pop() }
     }
 }

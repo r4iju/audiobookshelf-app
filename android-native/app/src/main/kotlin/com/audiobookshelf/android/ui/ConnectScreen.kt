@@ -88,10 +88,14 @@ fun ConnectScreen(state: SessionState.SignedOut) {
             Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(48.dp))
+            if (state.adding) {
+                Row(Modifier.fillMaxWidth()) {
+                    TextButton(onClick = { openId.clear(); graph.accounts.cancelAddAccount() }, modifier = Modifier.testTag("cancel-add-account")) { Text("Cancel") }
+                }
+            } else Spacer(Modifier.height(48.dp))
             Column(Modifier.widthIn(max = 480.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Icon(Icons.Outlined.LibraryBooks, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
-                Text("Audiobookshelf", style = MaterialTheme.typography.headlineMedium)
+                Text(if (state.adding) "Add an account" else "Audiobookshelf", style = MaterialTheme.typography.headlineMedium)
                 Text("Connect directly to your own server. Nothing is routed through another service.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 state.notice?.let {
                     Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium) {
@@ -144,7 +148,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                     }
                     if ("openid" in connected.second.authMethods) {
                         OutlinedButton(
-                            onClick = { openId.start(connected.first) },
+                            onClick = { openId.start(connected.first, context) },
                             modifier = Modifier.fillMaxWidth().height(52.dp).testTag("openid-sign-in"),
                         ) { Text("Sign in with OpenID") }
                     }

@@ -16,7 +16,7 @@ import java.util.UUID
 sealed interface SessionState {
     data object Loading : SessionState
     /** No active account: connection screen. [reauth] pre-fills a rejected account; saved data is kept. */
-    data class SignedOut(val connections: List<SavedConnection>, val reauth: SavedConnection? = null, val notice: String? = null) : SessionState
+    data class SignedOut(val connections: List<SavedConnection>, val reauth: SavedConnection? = null, val notice: String? = null, val adding: Boolean = false) : SessionState
     data class Active(val connection: SavedConnection, val client: ApiClient, val connections: List<SavedConnection>) : SessionState
 }
 
@@ -66,7 +66,7 @@ class AccountStore(private val vault: CredentialVault, private val http: OkHttpC
 
     fun addAccount() {
         val saved = runCatching { vault.load() }.getOrNull()
-        state.value = SessionState.SignedOut(saved?.connections.orEmpty())
+        state.value = SessionState.SignedOut(saved?.connections.orEmpty(), adding = true)
     }
 
     fun cancelAddAccount() = restore()
