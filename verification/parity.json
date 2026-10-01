@@ -93,12 +93,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Books with square/tall/missing covers and long titles",
+        "when": "Browse home, detail and player on each supported device",
+        "then": "Consistent type, spacing and action hierarchy; text and artwork remain readable"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -114,10 +122,18 @@
         "apple-mobile",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "iPhone in compact portrait and landscape",
+        "when": "Navigate library \u2192 item \u2192 player and back with native gestures",
+        "then": "Touch targets and back behavior follow platform conventions; audio survives navigation"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -132,9 +148,17 @@
       "platforms": [
         "apple-mobile"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "iPad in split-screen and full landscape",
+        "when": "Browse and open an item while resizing",
+        "then": "Adaptive columns and readable detail/reader controls use the available space"
+      },
       "replacementEvidence": {
         "apple-mobile": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -149,9 +173,17 @@
       "platforms": [
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Android with gesture and button navigation",
+        "when": "Browse \u2192 play \u2192 background \u2192 return",
+        "then": "Native navigation and system controls remain coherent"
+      },
       "replacementEvidence": {
         "android": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -166,9 +198,17 @@
       "platforms": [
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Paired physical TV and synthetic library",
+        "when": "Operate connection, selection and playback entirely with remote",
+        "then": "Every supported action is reachable with visible focus and reliable Back"
+      },
       "replacementEvidence": {
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -186,12 +226,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Existing compatible server, no intermediary",
+        "when": "Enter server address and authenticate",
+        "then": "Client contacts that server directly; no replacement backend is required"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -208,11 +256,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Two servers/accounts with different libraries and pending reports",
+        "when": "Save both, switch, return and restart",
+        "then": "Credentials, content and queued progress remain isolated by connection"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -230,12 +286,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Loopback/local HTTP server and trusted HTTPS server",
+        "when": "Connect to each; retry untrusted HTTPS",
+        "then": "Supported HTTP works; valid HTTPS verifies; untrusted HTTPS gives recovery without bypass"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -253,12 +317,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Server rooted at /abs reverse-proxy subpath",
+        "when": "Sign in, browse and play media",
+        "then": "All API/media/auth requests retain the subpath"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -276,12 +348,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Valid and invalid synthetic password credentials",
+        "when": "Sign in, close/reopen, then submit wrong password",
+        "then": "Valid session restores securely; rejection is explained; password is not persisted"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -298,11 +378,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "OpenID-enabled server with valid/cancelled callback",
+        "when": "Complete browser sign-in; cancel another attempt",
+        "then": "Correct account returns to app; cancellation leaves recoverable state intact"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Server advertises OpenID and has configured callback/client support."
       }
     },
     {
@@ -320,12 +408,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Modern expiring token and legacy bearer-only server",
+        "when": "Start listening and expire the token",
+        "then": "Modern refresh is coordinated and playback continues; legacy reauth is explicit when needed"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Modern refresh-token contract from 2.26.0; retain applicable earlier bearer-only behavior."
       }
     },
     {
@@ -343,12 +439,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Authenticated client with queued progress",
+        "when": "Disconnect network during browsing/playback, then reconnect",
+        "then": "Account and queued history survive; retry succeeds without forced sign-out"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -366,12 +470,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Server rejects refresh/authorization",
+        "when": "Resume an expired session and reauthenticate",
+        "then": "User reaches sign-in without discarding recoverable progress"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -392,12 +504,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Audiobook and podcast libraries",
+        "when": "Switch libraries and select an item in each",
+        "then": "Correct media type and items appear; stale results do not leak between libraries"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -418,12 +538,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "A book resumed at six seconds and a partially played episode",
+        "when": "Open home and choose Continue Listening",
+        "then": "Correct item/episode and position are prominent and resume accurately"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -444,12 +572,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Mixed covers, missing cover and long metadata",
+        "when": "Switch supported grid/list modes and open a title",
+        "then": "Artwork fallback, labels and primary action remain readable"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -470,12 +606,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "61-item library with page size 60",
+        "when": "Load first page, scroll to next, revisit library",
+        "then": "61 unique items become reachable without full-library initial load or duplicates"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -496,12 +640,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Known book, author, series and podcast query terms",
+        "when": "Search each term and select a result",
+        "then": "Matching supported entity types navigate to their correct content"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -521,11 +673,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Books/episodes with different dates, titles and completion states",
+        "when": "Change baseline sort/filter options and restart",
+        "then": "Ordering/filter semantics and saved preference match the selected values"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -546,12 +706,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Author with related books and ordered series",
+        "when": "Open author and series then select a related book",
+        "then": "Metadata, related items and series order lead to the intended book"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -571,11 +739,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Owned/editable and read-only collections/playlists",
+        "when": "Browse, play, reorder and exercise permitted management",
+        "then": "Permitted changes persist; forbidden actions are absent or fail clearly without fake success"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Account/item ownership and permissions required by the actual management endpoint; explicitly exercise rejection.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -596,12 +772,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Book with description, author, narrator, two chapters and saved progress",
+        "when": "Open details and expand chapter/metadata controls",
+        "then": "Required metadata and accurate progress are visible with a clear play/resume action"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -620,12 +804,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Prepared two-file audiobook",
+        "when": "Play, pause and resume using player and mini-player",
+        "then": "Actual audio and visible state agree; only one session is active"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -644,12 +836,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Configured backward/forward intervals and twenty-second book",
+        "when": "Seek and skip within/across files",
+        "then": "Media position changes by the selected interval and clamps to valid bounds"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -668,12 +868,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Eight-second and twelve-second audio files",
+        "when": "Play through boundary; seek backward/forward across it",
+        "then": "Continuous playback and total-book position remain correct across both files"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -692,12 +900,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Opening chapter 0\u20138 seconds and next chapter 8\u201320",
+        "when": "Select next chapter and inspect both progress displays",
+        "then": "Playback starts at eight seconds; chapter and whole-book progress differ correctly"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -716,12 +932,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Known audible media and baseline speed options",
+        "when": "Change speed during playback and restart session",
+        "then": "Actual rate changes and the selected supported preference is retained"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -739,11 +963,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Owned book with two bookmarked passages",
+        "when": "Create, edit, jump to and delete bookmarks",
+        "then": "Permitted operations persist and jumping reaches the saved media position"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Account/item ownership and permissions required by the actual management endpoint; explicitly exercise rejection.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -761,11 +993,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Playing book with two chapters",
+        "when": "Set duration timer and then end-of-chapter timer",
+        "then": "Audio stops at the selected deadline/boundary without requiring the timer screen"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -783,11 +1023,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Platform-specific advanced timer/rewind/reset settings",
+        "when": "Exercise each supported option while foregrounded and backgrounded",
+        "then": "Fade, feedback, rewind and reset behavior matches the selected setting"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -806,12 +1054,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Active mobile audiobook",
+        "when": "Navigate away, lock, background and return",
+        "then": "Actual audio continues and the same position/session remains authoritative"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -830,12 +1086,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Physical headset/Bluetooth and lock-screen/notification controls",
+        "when": "Pause/resume/skip without opening app",
+        "then": "System metadata/state and actual playback agree without duplicated sessions"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -854,12 +1118,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Playing media on physical device",
+        "when": "Interrupt with call/system event; disconnect route and reconnect",
+        "then": "Resume follows platform policy, never surprises the user, and position is retained"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -875,9 +1147,17 @@
       "platforms": [
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Supported Android Auto environment with books and episodes",
+        "when": "Browse, select, play and use car transport controls",
+        "then": "Supported grouping/series order and playback work without phone interaction"
+      },
       "replacementEvidence": {
         "android": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -893,9 +1173,17 @@
       "platforms": [
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Supported cast receiver and playing book/episode",
+        "when": "Connect, transfer, control, disconnect and recover receiver loss",
+        "then": "Remote/local state and progress stay correct through transitions"
+      },
       "replacementEvidence": {
         "android": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -914,12 +1202,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Two clients on the same account",
+        "when": "Listen and finish on one, refresh/resume on the other",
+        "then": "Correct item/episode position and completion state synchronize"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -938,12 +1234,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Queued unsent position/listening delta",
+        "when": "Terminate app before acknowledgment; restart and reconnect",
+        "then": "Reports survive and retry without lost history, duplicate time or stale overwrite"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -961,12 +1265,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Podcast with episodes of different dates/completion states",
+        "when": "Sort/filter, inspect, stream and download an episode",
+        "then": "Episode identity, progress and permitted download behavior remain first-class"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -983,11 +1295,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Admin/root and ordinary server accounts",
+        "when": "Attempt existing add-podcast and related actions",
+        "then": "Authorized actions work; ordinary account cannot gain administration capability"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Baseline admin/root account gate for add-podcast; do not expose it as permitted for ordinary users.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1005,10 +1325,18 @@
         "apple-mobile",
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Downloaded two-file book and episode",
+        "when": "Disable all network, open Downloads and play",
+        "then": "Actual local media plays without a server connection"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": []
+      },
+      "gates": {
+        "permissions": "Server download permission plus platform network/storage policy.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1026,10 +1354,18 @@
         "apple-mobile",
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Queued downloads including an interrupted part",
+        "when": "Observe progress, cancel, retry, restart and resume",
+        "then": "Queue state and durable files are correct; no completed content is corrupted"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": []
+      },
+      "gates": {
+        "permissions": "Server download permission plus platform network/storage policy.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1047,10 +1383,18 @@
         "apple-mobile",
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Completed download with offline listening history",
+        "when": "Restart device/app while offline and resume",
+        "then": "Files and latest local position remain available"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1068,10 +1412,18 @@
         "apple-mobile",
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Cellular route and baseline ask/allow/deny policies",
+        "when": "Attempt streaming and downloads under each policy",
+        "then": "Only allowed transfers occur; prompts/denials match saved setting"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": []
+      },
+      "gates": {
+        "permissions": "Server download permission plus platform network/storage policy.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1089,10 +1441,18 @@
         "apple-mobile",
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Android local folder URI and revoked storage grant; iOS supported local files",
+        "when": "Select/scan/open supported local content and recover permission loss",
+        "then": "Files remain usable through supported workflows; unsupported iOS folder selection is not invented"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1111,11 +1471,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "EPUB, PDF, MOBI, AZW3, CBZ, CBR and supplementary ebooks",
+        "when": "Open each supported format online/offline or with baseline external mode",
+        "then": "Actual content opens through the appropriate supported mode, including format-specific failures"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1134,11 +1502,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Representative reader documents and saved appearance settings",
+        "when": "Change typography, colors, layout, navigation and supported options",
+        "then": "Rendered content visibly changes and preferences persist"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1157,11 +1533,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Known passage/page plus legacy saved reader location",
+        "when": "Upgrade or restart; resume and synchronize reading",
+        "then": "The same passage/page resumes, not merely an equivalent-looking stored field"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1180,11 +1564,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Book with both audio and supplementary ebook",
+        "when": "Play audio while opening/navigating reader and switching screens",
+        "then": "Reader and player coexist without lost location, duplicated audio or conflicting controls"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1203,11 +1595,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Established account/display/language/haptic/orientation/platform settings",
+        "when": "Restart and exercise each applicable setting",
+        "then": "Settings persist and cause their documented platform behavior"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1226,11 +1626,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Synthetic listening activity and permitted progress management",
+        "when": "View statistics/history and change permitted completion/progress",
+        "then": "Displayed totals/history and persisted server state reflect actual activity/actions"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "Account/item ownership and permissions required by the actual management endpoint; explicitly exercise rejection.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1250,12 +1658,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Trust, authentication, download and media failures",
+        "when": "Open diagnostics and recovery controls",
+        "then": "Actionable failures are visible; passwords/tokens/private keys are absent"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1275,12 +1691,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Large text, screen reader, reduced motion and high-contrast needs",
+        "when": "Navigate and operate each delivered workflow",
+        "then": "Labels/order/focus/contrast remain usable and motion respects preferences"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1300,12 +1724,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Supported non-English language and long translated labels",
+        "when": "Change language and navigate all relevant screens",
+        "then": "Translations/layout are retained; controls do not silently become English-only or truncate essentials"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1320,9 +1752,17 @@
       "platforms": [
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Physical TV with multiple focusable sections",
+        "when": "Use directional remote navigation and Back through screens",
+        "then": "Focus is visible and predictable; Back returns reliably without trapping the user"
+      },
       "replacementEvidence": {
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1337,9 +1777,17 @@
       "platforms": [
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Physical TV viewed from normal sofa distance",
+        "when": "Browse missing/tall covers and long descriptions/titles",
+        "then": "Artwork and text are readable and focus/primary action remain clear"
+      },
       "replacementEvidence": {
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1354,9 +1802,17 @@
       "platforms": [
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "TV audiobook and podcast library with saved positions",
+        "when": "Browse, resume, choose episode/chapter, change speed and sync",
+        "then": "Supported TV listening journey produces real audio and correct cross-device progress"
+      },
       "replacementEvidence": {
         "tv": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1373,10 +1829,18 @@
         "apple-mobile",
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Synthetic old fork installation with downloaded files/settings/queued progress",
+        "when": "Perform supported in-place upgrade and validate migration",
+        "then": "Existing data remains usable without mandatory redownload or silent resets"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1393,10 +1857,18 @@
         "apple-mobile",
         "android"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Separately identified fork and inaccessible upstream sandbox",
+        "when": "Attempt migration through documented supported path",
+        "then": "Import/reauthentication works where allowed; inaccessible data is explained honestly"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1414,11 +1886,19 @@
         "android",
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Working legacy installation and incomplete replacement QA build",
+        "when": "Install/test QA identity then exercise documented transition/recovery",
+        "then": "Legacy remains usable; cutover happens only after acceptance and preservation"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1433,9 +1913,17 @@
       "platforms": [
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Locally self-hosted Next.js client and existing server",
+        "when": "Open browser and authenticate directly to configured deployment",
+        "then": "Modern real server-connected client operates without a required cloud intermediary"
+      },
       "replacementEvidence": {
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1450,9 +1938,17 @@
       "platforms": [
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Browser books, podcasts and supported documents",
+        "when": "Sign in, browse/search, play/read and synchronize progress",
+        "then": "Actual applicable workflows work; unsupported native capabilities are explained"
+      },
       "replacementEvidence": {
         "browser": []
+      },
+      "gates": {
+        "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1467,9 +1963,17 @@
       "platforms": [
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "LAN/subpath deployments with authentication callbacks/origin rules",
+        "when": "Build locally, self-host, sign in and reach media",
+        "then": "Documented connection model works without undisclosed credentials/media relay"
+      },
       "replacementEvidence": {
         "browser": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1484,9 +1988,17 @@
       "platforms": [
         "browser"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Browser operation requiring unavailable native capability",
+        "when": "Attempt operation and inspect fallback",
+        "then": "Clear limitation and supported alternative appear; operation is not falsely reported successful"
+      },
       "replacementEvidence": {
         "browser": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1504,12 +2016,20 @@
         "browser",
         "tv"
       ],
-      "verification": "Exercise the user workflow through production presentation and platform controls against the controlled server; verify visible outcome and applicable media, persisted state, and server observations.",
+      "verification": {
+        "given": "Applicable platform rows and versioned local evidence",
+        "when": "Run acceptance and inspect parity report before cutover",
+        "then": "Every applicable baseline row has passing observable evidence or replacement is blocked"
+      },
       "replacementEvidence": {
         "apple-mobile": [],
         "android": [],
         "browser": [],
         "tv": []
+      },
+      "gates": {
+        "permissions": "No additional server permission for presentation/build/migration checks.",
+        "serverCapability": "Baseline existing Audiobookshelf contract; no mandatory replacement backend."
       }
     },
     {
@@ -1524,7 +2044,16 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {}
+      "replacementEvidence": {},
+      "verification": {
+        "given": "EPUB rendering, CFI location, typography, navigation and combined audio with an independently identified passage/page",
+        "when": "Open representative real documents, change supported settings, restart and resume",
+        "then": "Actual supported content renders and the same passage/page resumes with the saved settings"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "reader-mobi-azw3",
@@ -1539,7 +2068,16 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {}
+      "replacementEvidence": {},
+      "verification": {
+        "given": "MOBI and AZW3 rendering and supported locations/opening modes with an independently identified passage/page",
+        "when": "Open representative real documents, change supported settings, restart and resume",
+        "then": "Actual supported content renders and the same passage/page resumes with the saved settings"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "reader-pdf",
@@ -1553,7 +2091,16 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {}
+      "replacementEvidence": {},
+      "verification": {
+        "given": "PDF pages, rotation, links and supported location behavior with an independently identified passage/page",
+        "when": "Open representative real documents, change supported settings, restart and resume",
+        "then": "Actual supported content renders and the same passage/page resumes with the saved settings"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "reader-cbz-cbr",
@@ -1567,7 +2114,16 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {}
+      "replacementEvidence": {},
+      "verification": {
+        "given": "CBZ and CBR comic extraction, images and page navigation with an independently identified passage/page",
+        "when": "Open representative real documents, change supported settings, restart and resume",
+        "then": "Actual supported content renders and the same passage/page resumes with the saved settings"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "settings-android-auto",
@@ -1576,8 +2132,19 @@
       "baselineSources": [
         "android/app/src/main/java/com/audiobookshelf/app/data/DeviceClasses.kt"
       ],
-      "platforms": [],
-      "replacementEvidence": {}
+      "platforms": [
+        "android"
+      ],
+      "replacementEvidence": {},
+      "verification": {
+        "given": "Car library exceeding configured group limit and an ordered series",
+        "when": "Change grouping limit/series sequence preference, reopen car browse",
+        "then": "Car grouping and ordering reflect both saved preferences"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "settings-sleep",
@@ -1587,8 +2154,20 @@
         "android/app/src/main/java/com/audiobookshelf/app/data/DeviceClasses.kt",
         "ios/App/Shared/models/DeviceSettings.swift"
       ],
-      "platforms": [],
-      "replacementEvidence": {}
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "replacementEvidence": {},
+      "verification": {
+        "given": "Playing audio with each baseline platform-specific sleep option",
+        "when": "Exercise auto-window, reset, rewind/fade and supported feedback/chime",
+        "then": "Actual timing/audio/feedback follow the selected option; unavailable platform options are not claimed"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "upstream-realtime",
@@ -1597,8 +2176,21 @@
       "baselineSources": [
         "plugins/server.js"
       ],
-      "platforms": [],
-      "replacementEvidence": {}
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "browser"
+      ],
+      "replacementEvidence": {},
+      "verification": {
+        "given": "Server emits authenticated user/progress/playlist events",
+        "when": "Connect, mutate relevant state on another client, disconnect/reconnect",
+        "then": "Visible state updates without stale account data or lost queued progress"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "local-builds",
@@ -1608,8 +2200,22 @@
         "package.json",
         "tvos/scripts/deploy.sh"
       ],
-      "platforms": [],
-      "replacementEvidence": {}
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "tv",
+        "browser"
+      ],
+      "replacementEvidence": {},
+      "verification": {
+        "given": "Studio toolchains and source checkout",
+        "when": "Run documented build/test/sign/package commands locally",
+        "then": "Usable artifacts and reproducible evidence are produced without hosted compute"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "internal-distribution",
@@ -1618,8 +2224,22 @@
       "baselineSources": [
         "tvos/scripts/deploy.sh"
       ],
-      "platforms": [],
-      "replacementEvidence": {}
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "tv",
+        "browser"
+      ],
+      "replacementEvidence": {},
+      "verification": {
+        "given": "Locally accepted and signed artifacts",
+        "when": "Install directly or deploy the browser internally",
+        "then": "Internal devices/users can use them without a public store release"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "sequential-delivery",
@@ -1628,8 +2248,22 @@
       "baselineSources": [
         "tvos/README.md"
       ],
-      "platforms": [],
-      "replacementEvidence": {}
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "tv",
+        "browser"
+      ],
+      "replacementEvidence": {},
+      "verification": {
+        "given": "Ticket graph and platform acceptance results",
+        "when": "Choose the next implementation frontier",
+        "then": "Apple precedes Android, which precedes Next.js; no incomplete platform gate is bypassed"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     },
     {
       "id": "server-upgrade-gate",
@@ -1639,8 +2273,43 @@
         "plugins/nativeHttp.js",
         "tvos/Core/Sources/TVCore/APIClient.swift"
       ],
-      "platforms": [],
-      "replacementEvidence": {}
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "tv",
+        "browser"
+      ],
+      "replacementEvidence": {},
+      "verification": {
+        "given": "Supported baseline and a candidate changing an observed contract",
+        "when": "Run every completed client locally and align affected behavior",
+        "then": "Incompatibility is detected; adoption remains blocked until regressions pass"
+      },
+      "gates": {
+        "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
+        "serverCapability": "Format- or operation-specific baseline support; unavailable native browser operations require an explicit fallback."
+      }
     }
-  ]
+  ],
+  "identities": {
+    "apple-mobile": {
+      "bundleId": "com.forkzed.audiobookshelf",
+      "developmentTeam": "C7X9BCC7LP",
+      "upstreamIdentity": "Separate upstream signing/sandbox is not assumed accessible",
+      "declaredSharedKeychainGroup": "No explicit shared group declared in this source checkout; verify actual provisioning entitlements for in-place migration"
+    },
+    "tv": {
+      "bundleId": "com.forkzed.audiobookshelf.tv",
+      "developmentTeam": "C7X9BCC7LP",
+      "credentialService": "com.forkzed.audiobookshelf.tv",
+      "credentialAccount": "server",
+      "accessibility": "AfterFirstUnlockThisDeviceOnly"
+    },
+    "android": {
+      "releaseApplicationId": "com.audiobookshelf.app",
+      "debugApplicationId": "com.audiobookshelf.app.debug",
+      "releaseSigning": "No release signing configuration in the baseline Gradle source; never assume debug can upgrade a differently signed release",
+      "keystoreAlias": "AudiobookshelfRefreshTokens"
+    }
+  }
 }

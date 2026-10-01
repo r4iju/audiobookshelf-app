@@ -3,6 +3,7 @@ import argparse
 import io
 import json
 import math
+import re
 import struct
 import wave
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -30,6 +31,7 @@ def make_server(port=18765, prefix='/abs'):
     user = {'id': '00000000-0000-4000-8000-000000000001', 'username': 'qa', 'type': 'user',
             'permissions': {'download': True, 'update': True, 'delete': False, 'upload': False},
             'mediaProgress': [], 'bookmarks': [], 'settings': {}}
+    sessions = {}
     reports = []
     requests = []
     prefix = '/' + prefix.strip('/') if prefix.strip('/') else ''
@@ -97,11 +99,24 @@ def make_server(port=18765, prefix='/abs'):
                 data = tracks[int(path[-1])]
                 start, end = 0, len(data) - 1
                 if self.headers.get('Range'):
-                    value = self.headers['Range'].split('=')[1].split('-')
-                    if not value[0]:
-                        start = max(0, len(data) - int(value[1]))
-                    else:
-                        start = int(value[0]); end = min(int(value[1]) if value[1] else end, end)
+                    value = re.fullmatch(r'bytes=([0-9]*)-([0-9]*)', self.headers['Range'])
+                    valid = value is not None and any(value.groups())
+                    if valid:
+                        first, last = value.groups()
+                        if not first:
+                            length = int(last)
+                            start = max(0, len(data) - length)
+                            valid = length > 0
+                        else:
+                            start = int(first)
+                            end = min(int(last) if last else end, end)
+                        valid = valid and 0 <= start <= end < len(data)
+                    if not valid:
+                        self.send_response(416)
+                        self.send_header('Content-Range', f'bytes */{len(data)}')
+                        self.headers_for('audio/wav', 0)
+                        self.end_headers()
+                        return
                     self.send_response(206)
                     self.send_header('Content-Range', f'bytes {start}-{end}/{len(data)}')
                 else:
@@ -130,12 +145,27 @@ def make_server(port=18765, prefix='/abs'):
                 return self.respond(200, {'user': {**user, 'token': 'fresh', 'accessToken': 'fresh', 'refreshToken': 'refresh'}})
             if not self.authorized():
                 return self.respond(401, {})
-            if path and '/play' in path:
-                return self.respond(200, {'id': 'session', 'libraryItemId': 'book-0', 'currentTime': 6, 'duration': 20, 'playMethod': 0,
-                    'displayTitle': 'Playback fixture', 'displayAuthor': 'QA Studio', 'audioTracks': [
+            play = re.fullmatch(r'/api/items/(book-[0-9]+|podcast)/play(?:/(episode))?', path or '')
+            if play:
+                item_id, episode_id = play.groups()
+                if item_id == 'podcast':
+                    if episode_id != 'episode':
+                        return self.respond(404, {})
+                    title = 'A Quiet Evening'
+                else:
+                    index = int(item_id.removeprefix('book-'))
+                    if index >= len(items) or episode_id is not None:
+                        return self.respond(404, {})
+                    title = items[index]['media']['metadata']['title']
+                session_id = f'session-{len(sessions) + 1}'
+                result = {'id': session_id, 'libraryItemId': item_id, 'episodeId': episode_id, 'currentTime': 6, 'duration': 20, 'playMethod': 0,
+                    'displayTitle': title, 'displayAuthor': 'QA Studio', 'audioTracks': [
                         {'contentUrl': '/audio/0', 'startOffset': 0, 'duration': 8, 'mimeType': 'audio/wav'},
-                        {'contentUrl': '/audio/1', 'startOffset': 8, 'duration': 12, 'mimeType': 'audio/wav'}], 'chapters': chapters})
-            if path in ('/api/session/session/sync', '/api/session/session/close'):
+                        {'contentUrl': '/audio/1', 'startOffset': 8, 'duration': 12, 'mimeType': 'audio/wav'}], 'chapters': chapters}
+                sessions[session_id] = result
+                return self.respond(200, result)
+            report = re.fullmatch(r'/api/session/([^/]+)/(sync|close)', path or '')
+            if report and report.group(1) in sessions:
                 reports.append({'path': path, **data})
                 return self.respond(200, {})
             self.respond(404, {})
