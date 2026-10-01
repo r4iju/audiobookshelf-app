@@ -82,8 +82,10 @@ class PdfDocument private constructor(private val descriptor: ParcelFileDescript
         fun contentApis() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13
 
         /** Throws when [file] is not a PDF the platform can open. */
-        fun open(file: File): PdfDocument {
-            val descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+        fun open(file: File): PdfDocument = open(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY))
+
+        /** Takes ownership of [descriptor], closing it if it is not a PDF. */
+        fun open(descriptor: ParcelFileDescriptor): PdfDocument {
             return try {
                 PdfDocument(descriptor, PdfRenderer(descriptor))
             } catch (error: Exception) {

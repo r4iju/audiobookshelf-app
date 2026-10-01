@@ -4,6 +4,7 @@ The shared fixture belongs to the cross-platform verification suite, so Android-
 here instead of edited into it.
 """
 import argparse
+import base64
 import copy
 import io
 import json
@@ -39,6 +40,20 @@ def android_server(port, prefix, bind='127.0.0.1'):
     # Server 2.30 item actions the shared fixture does not model. Nothing is sent anywhere: feeds and
     # e-reader deliveries are only recorded for journeys to observe.
     actions = {'feeds': {}, 'devices': [], 'sent': [], 'ebook': False}
+    # The shared EPUB title can be described as another ebook format, such as one this app leaves to
+    # other apps, while the file itself stays the same.
+    ebook_format = {'format': None}
+
+    def described(value):
+        if isinstance(value, dict):
+            ebook = value.get('ebookFile')
+            if isinstance(ebook, dict) and ebook.get('ino') == 'epub' and ebook_format['format']:
+                value = {**value, 'ebookFile': {**ebook, 'ebookFormat': ebook_format['format'],
+                                                'metadata': {**ebook.get('metadata', {}), 'filename': 'stories.' + ebook_format['format'], 'ext': '.' + ebook_format['format']}}}
+            return {key: described(entry) for key, entry in value.items()}
+        if isinstance(value, list):
+            return [described(entry) for entry in value]
+        return value
 
     def reset_actions(mode):
         actions.update(feeds={}, devices=[], sent=[], ebook=mode.startswith('pdf-') or mode.startswith('epub-'))
@@ -47,6 +62,37 @@ def android_server(port, prefix, bind='127.0.0.1'):
         return {'id': 'feed-' + slug, 'slug': slug, 'entityType': 'libraryItem', 'entityId': item_id, 'feedUrl': '/feed/' + slug,
                 'meta': {'title': item_id, 'preventIndexing': bool(meta.get('preventIndexing', True)),
                          'ownerName': meta.get('ownerName') or None, 'ownerEmail': meta.get('ownerEmail') or None}}
+
+    # Authors and series for car browsing, built on the shared synthetic titles without changing them.
+    # One series has sequences out of title order, and there are more authors than a small grouping limit.
+    def shared(name):
+        for function in (base.do_GET, base.do_POST):
+            if name in function.__code__.co_freevars:
+                return function.__closure__[function.__code__.co_freevars.index(name)].cell_contents
+        raise LookupError(name)
+    books = shared('items')
+    series = {'series-tomorrow': {'name': 'Tomorrow Trilogy', 'books': [(books[4], '10'), (books[5], '1'), (books[6], '2')]}}
+    extra_authors = ['Ada Ellison', 'Alan Rook', 'Amara Hale', 'Arlo Penn', 'Avery Stone', 'Bea Lin', 'Bruno Vale', 'Cara Holt', 'Cyrus Bell',
+                     'Dana Frost', 'Eli Moss', 'Faye Quinn', 'Gus Ward', 'Hana Ito', 'Ivo Lund', 'Jade Park', 'Kai Rhee', 'Lena Cruz', 'Milo Fenn',
+                     'Nora Vance', 'Omar Reed', 'Pia Sol', 'Quin Ash', 'Rhea Doyle', 'Sami Kerr', 'Tess Lowe', 'Uma Roy', 'Vic Hart', 'Wren Hale', 'Zoe Marsh']
+    authors = [{'id': 'author', 'name': 'Audiobookshelf QA', 'numBooks': len(books)}] + [
+        {'id': f'author-{index}', 'name': name, 'numBooks': 1} for index, name in enumerate(extra_authors)]
+
+    def in_series(series_id):
+        entry = series[series_id]
+        return [{**book, 'media': {**book['media'], 'metadata': {**book['media']['metadata'], 'series': {'id': series_id, 'name': entry['name'], 'sequence': sequence}}}}
+                for book, sequence in entry['books']]
+
+    def by_author(author_id, collapse):
+        if author_id != 'author':
+            index = int(author_id.removeprefix('author-'))
+            return [books[10 + index]]
+        if not collapse:
+            return list(books)
+        grouped = {book['id'] for entry in series.values() for book, _ in entry['books']}
+        collapsed = [{**entry['books'][0][0], 'collapsedSeries': {'id': series_id, 'name': entry['name'], 'numBooks': len(entry['books'])}}
+                     for series_id, entry in series.items()]
+        return collapsed + [book for book in books if book['id'] not in grouped]
 
     class AndroidHandler(base):
         def own_path(self):
@@ -62,6 +108,8 @@ def android_server(port, prefix, bind='127.0.0.1'):
             item_id = getattr(self, 'feed_item', None)
             if item_id and status == 200 and isinstance(value, dict):
                 value = {**value, 'rssFeed': actions['feeds'].get(item_id)}
+            if ebook_format['format'] and status == 200 and isinstance(value, (dict, list)):
+                value = described(value)
             return super().respond(status, value, *args, **kwargs)
 
         def is_admin(self):
@@ -79,6 +127,26 @@ def android_server(port, prefix, bind='127.0.0.1'):
             item = re.fullmatch(r'/api/items/([^/]+)', self.own_path() or '')
             if item and 'rssfeed' in parse_qs(urlparse(self.path).query).get('include', [''])[0].split(','):
                 self.feed_item = item[1]
+            if self.own_path() == '/api/libraries/books/authors':
+                self.route()
+                return self.respond(200, {'authors': authors}) if self.authorized() else self.respond(401, {})
+            if self.own_path() == '/api/libraries/books/series':
+                self.route()
+                if not self.authorized():
+                    return self.respond(401, {})
+                results = [{'id': series_id, 'name': entry['name'], 'books': in_series(series_id)} for series_id, entry in series.items()]
+                return self.respond(200, {'results': results, 'total': len(results), 'limit': 0, 'page': 0})
+            if self.own_path() == '/api/libraries/books/items':
+                query = parse_qs(urlparse(self.path).query)
+                selected = query.get('filter', [''])[0]
+                kind, _, encoded = selected.partition('.')
+                if kind in ('series', 'authors'):
+                    self.route()
+                    if not self.authorized():
+                        return self.respond(401, {})
+                    wanted = base64.b64decode(encoded).decode()
+                    results = in_series(wanted) if kind == 'series' and wanted in series else [] if kind == 'series' else by_author(wanted, query.get('collapseseries') == ['1'])
+                    return self.respond(200, {'results': results, 'total': len(results), 'limit': len(results), 'page': 0})
             if self.own_path() == '/__android__/progress':
                 self.route()
                 return self.respond(200, {'progress': list(self.progress.values())})
@@ -181,6 +249,10 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 discard_delay['seconds'] = float(self.body().get('seconds', 0))
                 self.route()
                 return self.respond(200, discard_delay)
+            if path == '/__android__/ebook-format':
+                ebook_format['format'] = self.body().get('format')
+                self.route()
+                return self.respond(200, ebook_format)
             if path == '/__android__/refuse-reading':
                 refusal['reading'] = bool(self.body().get('refuse'))
                 self.route()
@@ -197,6 +269,7 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 refusal['listening'] = False
                 refusal['reading'] = False
                 discard_delay['seconds'] = 0
+                ebook_format['format'] = None
                 for probe, entries, original in zip(probes, accounts, originals):
                     for key in [key for key in entries if key not in original]:
                         del entries[key]

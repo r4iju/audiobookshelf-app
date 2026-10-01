@@ -14,8 +14,11 @@ import java.io.File
 class DownloadStore(private val file: File) {
     enum class State { QUEUED, RUNNING, FAILED, COMPLETE }
 
-    /** [ebookFileId] marks the item's ebook, kept beside the audio so it opens without the server. */
-    @Serializable data class Part(val path: String, val name: String, val size: Long? = null, val mimeType: String? = null, val done: Boolean = false, val ebookFileId: String? = null, val ebookFormat: String? = null)
+    /**
+     * [ebookFileId] marks the item's ebook, kept beside the audio so it opens without the server.
+     * [uri] is the file's document in the record's chosen folder, once it has been placed there.
+     */
+    @Serializable data class Part(val path: String, val name: String, val size: Long? = null, val mimeType: String? = null, val done: Boolean = false, val ebookFileId: String? = null, val ebookFormat: String? = null, val fileName: String? = null, val uri: String? = null)
 
     @Serializable data class Record(
         val id: String,
@@ -37,6 +40,9 @@ class DownloadStore(private val file: File) {
         val completedAt: Long? = null,
         /** The user allowed this download on a metered network. */
         val allowMetered: Boolean = false,
+        /** Folder tree the files are saved in; [directory] then only holds the cover and unfinished parts. */
+        val folder: String? = null,
+        val folderName: String? = null,
     ) {
         /** Matches the UI's item key: the item id, or `item-episode` for an episode. */
         val key get() = if (episodeId == null) itemId else "$itemId-$episodeId"

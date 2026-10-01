@@ -54,6 +54,9 @@ enum class SeriesOrder { ASC, DESC }
     val lastPlayed: String? = null,
     /** PDF pages scroll as one continuous column instead of one page at a time. */
     val pdfContinuous: Boolean = false,
+    /** Folder tree new downloads are saved in, chosen through the system picker; app storage when null. */
+    val downloadFolder: String? = null,
+    val downloadFolderName: String? = null,
 )
 
 class SettingsStore(private val file: File) {

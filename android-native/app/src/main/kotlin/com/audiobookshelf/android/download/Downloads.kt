@@ -55,6 +55,7 @@ class Downloads(
     private val accounts: AccountStore,
     private val settings: SettingsStore,
     private val journal: ListeningJournal,
+    val folder: DownloadFolder,
     http: OkHttpClient,
     private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
 ) {
@@ -66,6 +67,15 @@ class Downloads(
         data class NoSpace(val needed: Long) : Request
         /** The download list could not be written, so nothing was started. */
         data object NotSaved : Request
+        /** The chosen download folder can no longer be reached; nothing was started. */
+        data class FolderLost(val name: String) : Request
+    }
+
+    sealed interface Opened {
+        /** [open] gives a read-only descriptor of the file, wherever it is kept. */
+        class Readable(val uri: android.net.Uri, val open: () -> android.os.ParcelFileDescriptor) : Opened
+        data object Missing : Opened
+        data class FolderLost(val name: String) : Opened
     }
 
     /** Transfers stall-fail after a minute without data, like the existing app. */
@@ -87,15 +97,18 @@ class Downloads(
         val free = StatFs(context.filesDir.path)
         val reserve = maxOf(MIN_FREE_BYTES, free.totalBytes / 20)
         if (free.availableBytes - needed < reserve) return Request.NoSpace(needed)
+        val tree = settings.current.downloadFolder
+        val treeName = settings.current.downloadFolderName ?: "the chosen folder"
+        if (tree != null && !folder.granted(tree)) return Request.FolderLost(treeName)
         if (!allowMetered && settings.current.downloadUsingCellular == CellularPolicy.ASK && metered()) return Request.NeedsCellularConsent
 
         val id = recordId(client.account, item.id, episode?.id)
         val directory = File(context.filesDir, "downloads/$id")
         val parts = tracks.mapIndexed { index, track ->
             val ext = track.metadata?.ext?.takeIf { it.isNotBlank() }?.let { if (it.startsWith(".")) it else ".$it" } ?: extension(track.mimeType)
-            DownloadStore.Part(track.contentUrl!! + "/download", "track-${index + 1}$ext", track.metadata?.size, track.mimeType)
+            DownloadStore.Part(track.contentUrl!! + "/download", "track-${index + 1}$ext", track.metadata?.size, track.mimeType, fileName = track.metadata?.filename)
         } + listOfNotNull(ebook?.let {
-            DownloadStore.Part("/api/items/${item.id}/file/${it.ino}/download", "ebook.${it.format ?: "bin"}", it.metadata?.size, null, ebookFileId = it.ino, ebookFormat = it.format)
+            DownloadStore.Part("/api/items/${item.id}/file/${it.ino}/download", "ebook.${it.format ?: "bin"}", it.metadata?.size, null, ebookFileId = it.ino, ebookFormat = it.format, fileName = it.metadata?.filename)
         })
         val previous = store.get(id)
         try { store.put(DownloadStore.Record(
@@ -106,8 +119,10 @@ class Downloads(
             duration = episode?.playableDuration ?: item.media.duration ?: tracks.sumOf { it.duration },
             chapters = episode?.chapters ?: item.media.chapters,
             tracks = tracks.mapIndexed { index, track -> track.copy(index = index, startOffset = tracks.take(index).sumOf { it.duration }) },
-            parts = parts.map { part -> previous?.parts?.firstOrNull { it.path == part.path && it.done }?.let { part.copy(done = true) } ?: part },
+            parts = parts.map { part -> previous?.parts?.firstOrNull { it.path == part.path && it.done && previous.folder == tree }?.let { part.copy(done = true, uri = it.uri) } ?: part },
             directory = directory.path,
+            folder = tree,
+            folderName = tree?.let { treeName },
             allowMetered = allowMetered || settings.current.downloadUsingCellular == CellularPolicy.ALWAYS,
         )) } catch (failure: IOException) {
             Log.w(TAG, "Download list not saved", failure)
@@ -139,6 +154,40 @@ class Downloads(
             Log.w(TAG, "Download list not saved", failure); return false
         }
         File(record.directory).deleteRecursively()
+        record.parts.mapNotNull { it.uri }.forEach(folder::delete)
+        return true
+    }
+
+    /** True when the record's folder can no longer be reached through its grant. */
+    fun folderLost(record: DownloadStore.Record) = record.folder != null && !folder.granted(record.folder)
+
+    /** A finished download whose files were moved or deleted outside the app. */
+    fun missing(record: DownloadStore.Record) = record.state == DownloadStore.State.COMPLETE && !folderLost(record) && record.parts.any { !present(record, it) }
+
+    private fun present(record: DownloadStore.Record, part: DownloadStore.Part) =
+        part.uri?.let(folder::exists) ?: File(record.directory, part.name).exists()
+
+    fun openPart(record: DownloadStore.Record, part: DownloadStore.Part): Opened {
+        if (folderLost(record)) return Opened.FolderLost(record.folderName ?: "the chosen folder")
+        if (!present(record, part)) return Opened.Missing
+        part.uri?.let { document ->
+            val uri = Uri.parse(document)
+            return Opened.Readable(uri) { context.contentResolver.openFileDescriptor(uri, "r") ?: throw IOException("The file could not be opened") }
+        }
+        val file = File(record.directory, part.name)
+        return Opened.Readable(androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.files", file)) {
+            android.os.ParcelFileDescriptor.open(file, android.os.ParcelFileDescriptor.MODE_READ_ONLY)
+        }
+    }
+
+    /**
+     * Restores access to a folder the user chose again. False, keeping nothing, when it is not the
+     * folder any download is in.
+     */
+    fun regainFolder(tree: Uri): Boolean {
+        val wanted = store.records.value.mapNotNull { it.folder }.toSet()
+        if (tree.toString() !in wanted) return false
+        folder.adopt(tree)
         return true
     }
 
@@ -166,7 +215,7 @@ class Downloads(
         val cover = File(directory, COVER).takeIf { it.exists() }?.let { Uri.fromFile(it).toString() }
         return PlaySource.Local(
             record.account, record.itemId, record.episodeId, record.title, record.author, cover, record.mediaType,
-            record.tracks, record.audio.map { Uri.fromFile(File(directory, it.name)) }, record.chapters,
+            record.tracks, record.audio.map { part -> part.uri?.let(Uri::parse) ?: Uri.fromFile(File(directory, part.name)) }, record.chapters,
             startTime = journal.cachedPosition(record.account, record.itemId, record.episodeId, newerThan = Double.NEGATIVE_INFINITY) ?: 0.0,
         )
     }
@@ -193,10 +242,17 @@ class Downloads(
             store.update(id) { it.copy(state = DownloadStore.State.RUNNING, error = null) }
             val client = accounts.clientFor(record.account) ?: throw Rejected("Sign in to this account again to download.")
             val directory = File(record.directory).apply { mkdirs() }
+            if (folderLost(record)) throw Rejected("Access to ${record.folderName} was removed. Choose the folder again in Downloads.")
             for (part in record.parts) {
-                if (part.done && File(directory, part.name).exists()) continue
+                if (part.done && present(record, part)) continue
                 fetch(client, id, directory, part)
-                store.update(id) { current -> current.copy(parts = current.parts.map { if (it.path == part.path) it.copy(done = true) else it }) }
+                val placed = record.folder?.let { tree ->
+                    val file = File(directory, part.name)
+                    val name = part.fileName?.takeIf { it.isNotBlank() } ?: part.name
+                    folder.place(tree, listOfNotNull(record.author.ifBlank { null }, record.title), name, part.mimeType ?: "application/octet-stream", file)
+                        .also { file.delete() }.toString()
+                }
+                store.update(id) { current -> current.copy(parts = current.parts.map { if (it.path == part.path) it.copy(done = true, uri = placed) else it }) }
             }
             runCatching { File(directory, COVER).writeBytes(client.bytes("api/items/${record.itemId}/cover")) }
                 .onFailure { Log.i(TAG, "Cover not saved: ${it.javaClass.simpleName}") }

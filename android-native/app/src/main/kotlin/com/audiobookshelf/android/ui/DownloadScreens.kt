@@ -1,5 +1,15 @@
 package com.audiobookshelf.android.ui
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.audiobookshelf.android.data.DeviceSettings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -75,6 +85,7 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
             Downloads.Request.NeedsCellularConsent -> { askCellular = true; null }
             is Downloads.Request.NoSpace -> "Not enough free space on this device for ${formatBytes(result.needed)} while keeping storage free for the system."
             Downloads.Request.NotSaved -> NOT_SAVED
+            is Downloads.Request.FolderLost -> "Access to ${result.name} was removed, so nothing was downloaded. Choose the download folder again in Settings."
         }
     }
 
@@ -117,6 +128,78 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
     if (confirmRemove && record != null) RemoveDialog(record.title, onDismiss = { confirmRemove = false }) { confirmRemove = false; if (!remove(graph, record)) message = NOT_SAVED }
 }
 
+/** Where new downloads go: app storage, or a folder the user chose and can reach from other apps. */
+@Composable
+fun DownloadLocation(settings: DeviceSettings, change: ((DeviceSettings) -> DeviceSettings) -> Unit) {
+    val graph = LocalContext.current.graph
+    var problem by remember { mutableStateOf<String?>(null) }
+    fun releaseUnused(tree: String?) {
+        if (tree != null && graph.downloads.records.value.none { it.folder == tree }) graph.downloads.folder.release(tree)
+    }
+    val choose = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { tree ->
+        if (tree == null) return@rememberLauncherForActivityResult
+        problem = try {
+            val name = graph.downloads.folder.adopt(tree)
+            val previous = settings.downloadFolder
+            change { it.copy(downloadFolder = tree.toString(), downloadFolderName = name) }
+            if (previous != tree.toString()) releaseUnused(previous)
+            null
+        } catch (failure: SecurityException) {
+            "That folder cannot be kept for downloads. Choose another one."
+        }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(settings.downloadFolder?.let { "Downloads are saved in ${settings.downloadFolderName}" } ?: "Downloads are saved in app storage",
+            style = MaterialTheme.typography.bodyLarge, modifier = Modifier.testTag("download-folder"))
+        Text(if (settings.downloadFolder != null) "Other apps on this device can see these files. Downloads made before a change stay where they are."
+            else "Only this app can see these files. Choose a folder to keep downloads where other apps can reach them.",
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = { choose.launch(null) }, modifier = Modifier.testTag("choose-download-folder")) {
+                Icon(Icons.Outlined.Folder, null); Text("Choose folder", Modifier.padding(start = 6.dp))
+            }
+            if (settings.downloadFolder != null) TextButton(onClick = {
+                val previous = settings.downloadFolder
+                change { it.copy(downloadFolder = null, downloadFolderName = null) }
+                releaseUnused(previous)
+            }, modifier = Modifier.testTag("use-app-storage")) { Text("Use app storage") }
+        }
+        problem?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium) }
+    }
+}
+
+private fun ebookType(format: String?) = when (format?.lowercase()) {
+    "pdf" -> "application/pdf"
+    "epub" -> "application/epub+zip"
+    "mobi" -> "application/x-mobipocket-ebook"
+    "azw3", "azw" -> "application/vnd.amazon.ebook"
+    "cbz" -> "application/vnd.comicbook+zip"
+    "cbr" -> "application/vnd.comicbook-rar"
+    else -> android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(format?.lowercase()) ?: "application/octet-stream"
+}
+
+/**
+ * Hands the downloaded ebook to another app with read access to that one file only, for formats this
+ * app does not open itself and for readers people prefer. Returns why it did not open, if it did not.
+ */
+private fun openElsewhere(context: Context, graph: com.audiobookshelf.android.AppGraph, record: DownloadStore.Record): String? {
+    val part = record.ebook ?: return null
+    val format = part.ebookFormat?.uppercase() ?: "this kind of"
+    return when (val opened = graph.downloads.openPart(record, part)) {
+        Downloads.Opened.Missing -> "The ebook is missing from this device. Download it again to open it."
+        is Downloads.Opened.FolderLost -> folderLostMessage(opened.name, "open")
+        is Downloads.Opened.Readable -> try {
+            context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(opened.uri, ebookType(part.ebookFormat)).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+            null
+        } catch (missing: ActivityNotFoundException) {
+            "No app on this device opens $format files. Install one that does and try again."
+        }
+    }
+}
+
+private fun folderLostMessage(name: String, verb: String) =
+    "This download is in $name, and access to $name was removed. Choose $name again to $verb it."
+
 private const val NOT_SAVED = "The download list could not be saved on this device, so nothing changed. Free some storage and try again."
 
 private fun remove(graph: com.audiobookshelf.android.AppGraph, record: DownloadStore.Record): Boolean {
@@ -137,54 +220,92 @@ private fun RemoveDialog(title: String, onDismiss: () -> Unit, onConfirm: () -> 
 /** Everything downloaded for the active account; works without the server. */
 @Composable
 fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues, onRead: (Route) -> Unit) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val all by graph.downloads.records.collectAsState()
     val records = all.filter { it.account == active.client.account }.sortedByDescending { it.createdAt }
     var removing by remember { mutableStateOf<DownloadStore.Record?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
+    // Grants and files can change outside the app, so they are looked at again whenever it returns.
+    var looked by remember { mutableIntStateOf(0) }
+    LifecycleResumeEffect(Unit) { looked++; onPauseOrDispose {} }
+    val lost = remember(records, looked) { records.filter(graph.downloads::folderLost) }
+    val missing = remember(records, looked) { records.filter(graph.downloads::missing).map { it.id }.toSet() }
+    val regain = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { tree ->
+        if (tree == null) return@rememberLauncherForActivityResult
+        val names = lost.mapNotNull { it.folderName }.distinct().joinToString(" or ")
+        message = try {
+            if (graph.downloads.regainFolder(tree)) null else "That is not $names. Choose the folder these downloads are in."
+        } catch (failure: SecurityException) { "Access to that folder could not be kept. Try again." }
+        looked++
+    }
     if (records.isEmpty()) {
         MessageState("No downloads", "Download books or episodes from their page to listen without a connection.", Modifier.padding(padding), tag = "downloads-empty")
         return
     }
-    LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("downloads"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        message?.let { text -> item(key = "message") { Text(text, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("downloads-message")) } }
-        items(records, key = { it.id }) { record ->
-            val key = record.key
-            val tag = when (record.state) {
-                DownloadStore.State.COMPLETE -> "offline-$key"
-                DownloadStore.State.FAILED -> "download-failed-$key"
-                else -> "downloading-$key"
+    // Notices stay above the list: an item inserted above the first visible row would be scrolled out of view.
+    Column(Modifier.fillMaxSize().padding(padding)) {
+        if (lost.isNotEmpty()) {
+            val names = lost.mapNotNull { it.folderName }.distinct().joinToString(" and ")
+            Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp).testTag("folder-access-lost"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Access to $names was removed", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+                Text("${lost.size} ${if (lost.size == 1) "download is" else "downloads are"} kept there. Choose $names again to play and open ${if (lost.size == 1) "it" else "them"}.", style = MaterialTheme.typography.bodyMedium)
+                OutlinedButton(onClick = { regain.launch(null) }, modifier = Modifier.testTag("choose-folder-again")) { Text("Choose $names again") }
             }
-            Row(Modifier.fillMaxWidth().testTag(tag), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Cover(File(record.directory, "cover.jpg").takeIf { it.exists() }, record.title, Modifier.size(56.dp), podcast = record.mediaType == "podcast")
-                Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
-                    Text(record.title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    if (record.author.isNotBlank()) Text(record.author, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    when (record.state) {
-                        DownloadStore.State.COMPLETE -> Text(formatBytes(record.bytes.takeIf { it > 0 } ?: record.total ?: 0), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        DownloadStore.State.FAILED -> Text(record.error ?: "The download failed.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                        else -> {
-                            val fraction = record.fraction()
-                            if (fraction != null) LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) else LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
-                            record.error?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+        }
+        message?.let { text -> Text(text, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp).testTag("downloads-message")) }
+        LazyColumn(Modifier.weight(1f).testTag("downloads"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(records, key = { it.id }) { record ->
+                val key = record.key
+                val tag = when (record.state) {
+                    DownloadStore.State.COMPLETE -> "offline-$key"
+                    DownloadStore.State.FAILED -> "download-failed-$key"
+                    else -> "downloading-$key"
+                }
+                Row(Modifier.fillMaxWidth().testTag(tag), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Cover(File(record.directory, "cover.jpg").takeIf { it.exists() }, record.title, Modifier.size(56.dp), podcast = record.mediaType == "podcast")
+                    Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
+                        Text(record.title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        if (record.author.isNotBlank()) Text(record.author, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        when (record.state) {
+                            DownloadStore.State.COMPLETE -> if (record.id in missing) Text("Some files are missing from this device", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                else Text(listOfNotNull(formatBytes(record.bytes.takeIf { it > 0 } ?: record.total ?: 0), record.folderName?.let { "in $it" }).joinToString(" "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            DownloadStore.State.FAILED -> Text(record.error ?: "The download failed.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                            else -> {
+                                val fraction = record.fraction()
+                                if (fraction != null) LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) else LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
+                                record.error?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                            }
                         }
                     }
-                }
-                val readable = record.ebook?.takeIf { record.state == DownloadStore.State.COMPLETE && it.ebookFormat == "pdf" }
-                if (readable != null) IconButton(
-                    onClick = { onRead(Route.Reader(record.itemId, readable.ebookFileId!!, supplementary = false, title = record.title, downloadId = record.id)) },
-                    modifier = Modifier.testTag("read-offline-$key"),
-                ) { Icon(Icons.AutoMirrored.Outlined.MenuBook, "Read ${record.title}") }
-                when (record.state) {
-                    DownloadStore.State.COMPLETE -> if (record.audio.isNotEmpty()) IconButton(
-                        onClick = { graph.playback.play(graph.downloads.localSource(record, catalog.progressFor(record.itemId, record.episodeId))) },
-                        modifier = Modifier.testTag("play-offline-$key"),
-                    ) { Icon(Icons.Filled.PlayArrow, "Play ${record.title}") }
-                    DownloadStore.State.FAILED -> IconButton(onClick = { message = if (graph.downloads.retry(record.id)) null else NOT_SAVED }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, "Retry ${record.title}") }
-                    else -> IconButton(onClick = { message = if (graph.downloads.delete(record.id)) null else NOT_SAVED }, modifier = Modifier.testTag("cancel-download-$key")) { Icon(Icons.Outlined.Close, "Cancel ${record.title}") }
-                }
-                if (record.state != DownloadStore.State.QUEUED && record.state != DownloadStore.State.RUNNING) {
-                    IconButton(onClick = { removing = record }, modifier = Modifier.testTag("delete-download-$key")) { Icon(Icons.Outlined.Delete, "Remove ${record.title}") }
+                    val readable = record.ebook?.takeIf { record.state == DownloadStore.State.COMPLETE && it.ebookFormat == "pdf" }
+                    if (readable != null) IconButton(
+                        onClick = { onRead(Route.Reader(record.itemId, readable.ebookFileId!!, supplementary = false, title = record.title, downloadId = record.id)) },
+                        modifier = Modifier.testTag("read-offline-$key"),
+                    ) { Icon(Icons.AutoMirrored.Outlined.MenuBook, "Read ${record.title}") }
+                    if (record.state == DownloadStore.State.COMPLETE && record.ebook != null && record.id !in missing) IconButton(
+                        onClick = { message = openElsewhere(context, graph, record); looked++ },
+                        modifier = Modifier.testTag("open-elsewhere-$key"),
+                    ) { Icon(Icons.AutoMirrored.Outlined.OpenInNew, "Open ${record.title} in another app") }
+                    when {
+                        record.id in missing -> IconButton(onClick = { message = if (graph.downloads.retry(record.id)) null else NOT_SAVED }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, "Download ${record.title} again") }
+                        record.state == DownloadStore.State.COMPLETE -> if (record.audio.isNotEmpty()) IconButton(
+                            onClick = {
+                                message = when {
+                                    graph.downloads.folderLost(record) -> folderLostMessage(record.folderName ?: "the chosen folder", "play")
+                                    graph.downloads.missing(record) -> "Some files of this download are missing from this device. Download it again to play it."
+                                    else -> { graph.playback.play(graph.downloads.localSource(record, catalog.progressFor(record.itemId, record.episodeId))); null }
+                                }
+                                looked++
+                            },
+                            modifier = Modifier.testTag("play-offline-$key"),
+                        ) { Icon(Icons.Filled.PlayArrow, "Play ${record.title}") }
+                        record.state == DownloadStore.State.FAILED -> IconButton(onClick = { message = if (graph.downloads.retry(record.id)) null else NOT_SAVED }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, "Retry ${record.title}") }
+                        else -> IconButton(onClick = { message = if (graph.downloads.delete(record.id)) null else NOT_SAVED }, modifier = Modifier.testTag("cancel-download-$key")) { Icon(Icons.Outlined.Close, "Cancel ${record.title}") }
+                    }
+                    if (record.state != DownloadStore.State.QUEUED && record.state != DownloadStore.State.RUNNING) {
+                        IconButton(onClick = { removing = record }, modifier = Modifier.testTag("delete-download-$key")) { Icon(Icons.Outlined.Delete, "Remove ${record.title}") }
+                    }
                 }
             }
         }

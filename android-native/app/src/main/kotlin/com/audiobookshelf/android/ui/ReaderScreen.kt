@@ -1,5 +1,6 @@
 package com.audiobookshelf.android.ui
 
+import android.os.ParcelFileDescriptor
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -70,6 +71,7 @@ import com.audiobookshelf.android.AppGraph
 import com.audiobookshelf.android.data.CatalogModel
 import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.download.DownloadStore
+import com.audiobookshelf.android.download.Downloads
 import com.audiobookshelf.android.graph
 import com.audiobookshelf.android.reader.PdfDocument
 import com.audiobookshelf.android.reader.RenderedPage
@@ -112,7 +114,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
         try {
             val file = resolve(graph, active.client, route)
             val document = withContext(Dispatchers.IO) {
-                runCatching { PdfDocument.open(file) }.getOrElse { throw IOException("This file is not a PDF this device can open.") }
+                runCatching { PdfDocument.open(file()) }.getOrElse { throw IOException("This file is not a PDF this device can open.") }
             }
             if (!route.supplementary) {
                 // A fresh server position is worth a short wait; offline, the last known one is used.
@@ -330,12 +332,16 @@ private fun ContinuousPages(document: PdfDocument, page: Int, rotation: Int, onP
 }
 
 /** The downloaded copy when there is one, otherwise the server's file streamed to the cache. */
-private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Reader): File {
+private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Reader): () -> ParcelFileDescriptor {
     val records = graph.downloads.records.value
     val local = records.firstOrNull { it.id == route.downloadId }
         ?: records.firstOrNull { it.account == client.account && it.itemId == route.itemId && it.episodeId == null && it.state == DownloadStore.State.COMPLETE && it.ebook?.ebookFileId == route.ino }
-    local?.ebook?.let { part -> File(local.directory, part.name).takeIf { it.exists() }?.let { return it } }
-    if (route.downloadId != null) throw IOException("The downloaded document is missing. Download it again.")
+    if (local != null && local.ebook != null) when (val opened = graph.downloads.openPart(local, local.ebook!!)) {
+        is Downloads.Opened.Readable -> return opened.open
+        is Downloads.Opened.FolderLost -> if (route.downloadId != null) throw IOException("This download is in ${opened.name}, and access to ${opened.name} was removed. Choose the folder again in Downloads.")
+        Downloads.Opened.Missing -> Unit
+    }
+    if (route.downloadId != null) throw IOException("The downloaded document is missing from this device. Download it again.")
     return withContext(Dispatchers.IO) {
         val name = MessageDigest.getInstance("SHA-256").digest("${client.account.server}\n${route.itemId}\n${route.ino}".toByteArray()).take(12).joinToString("") { "%02x".format(it) }
         val directory = File(graph.context.cacheDir, "reader").apply { mkdirs() }
@@ -353,7 +359,7 @@ private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Rea
                 staging.outputStream().use { output -> body.byteStream().use { it.copyTo(output) } }
                 target.delete()
                 if (!staging.renameTo(target)) throw IOException("The document could not be stored for reading.")
-                return@withContext target
+                return@withContext { ParcelFileDescriptor.open(target, ParcelFileDescriptor.MODE_READ_ONLY) }
             }
         }
         throw ApiError.SignInRequired(client.account, token)

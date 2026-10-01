@@ -144,6 +144,9 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         item { Choices("Downloads on mobile data", CellularPolicy.entries, settings.downloadUsingCellular, "download-cellular", label = ::policyLabel) { value -> change { it.copy(downloadUsingCellular = value) } } }
         item { Choices("Streaming on mobile data", CellularPolicy.entries, settings.streamingUsingCellular, "stream-cellular", label = ::policyLabel) { value -> change { it.copy(streamingUsingCellular = value) } } }
 
+        item { SettingsHeading("Storage") }
+        item { DownloadLocation(settings, change) }
+
         item { SettingsHeading("Support") }
         item {
             OutlinedButton(onClick = onDiagnostics, modifier = Modifier.fillMaxWidth().testTag("open-diagnostics")) { Text("Diagnostics") }

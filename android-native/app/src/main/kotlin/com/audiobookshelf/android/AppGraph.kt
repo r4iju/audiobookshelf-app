@@ -66,7 +66,8 @@ class AppGraph private constructor(val context: Context) {
     }
 
     val downloads by lazy {
-        com.audiobookshelf.android.download.Downloads(context, com.audiobookshelf.android.download.DownloadStore(File(context.filesDir, "downloads.json")), accounts, settings, journal, http, diagnostics::record)
+        com.audiobookshelf.android.download.Downloads(context, com.audiobookshelf.android.download.DownloadStore(File(context.filesDir, "downloads.json")), accounts, settings, journal,
+            com.audiobookshelf.android.download.DownloadFolder(context), http, diagnostics::record)
     }
 
     val reading by lazy { com.audiobookshelf.android.reader.ReadingStore(File(context.filesDir, "reading-positions.json")) }
