@@ -104,6 +104,8 @@ public struct Metadata: Decodable {
     public let author: String?
     public let authors: [Author]?
     public let description: String?
+    public let narrators: [String]?
+    public let genres: [String]?
 }
 public struct Author: Decodable { public let name: String }
 public struct Episode: Decodable, Identifiable {
@@ -149,5 +151,43 @@ public struct ProgressReport: Codable {
     public let duration: Double
     public init(currentTime: Double, timeListened: Double, duration: Double) {
         self.currentTime = currentTime; self.timeListened = timeListened; self.duration = duration
+    }
+}
+
+public struct CurrentUser: Decodable {
+    public let id: String
+    public let username: String
+    public let mediaProgress: [MediaProgress]
+    public let permissions: UserPermissions
+}
+
+public struct UserPermissions: Decodable {
+    public let download: Bool?
+    public let update: Bool?
+    public let delete: Bool?
+    public let upload: Bool?
+}
+
+public struct MediaProgress: Decodable, Identifiable {
+    public let libraryItemId: String
+    public let episodeId: String?
+    public let currentTime: Double?
+    public let duration: Double?
+    public let progress: Double?
+    public let isFinished: Bool?
+    public var id: String { libraryItemId + ":" + (episodeId ?? "book") }
+    public var fraction: Double { min(max(progress ?? 0, 0), 1) }
+}
+
+public struct PersonalizedShelf: Decodable {
+    public let id: String
+    public let type: String
+    public let entities: [LibraryItem]
+    private enum CodingKeys: String, CodingKey { case id, type, entities }
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(String.self, forKey: .id)
+        type = try values.decode(String.self, forKey: .type)
+        entities = type == "book" || type == "podcast" ? try values.decode([LibraryItem].self, forKey: .entities) : []
     }
 }

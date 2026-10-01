@@ -1,10 +1,10 @@
 import SwiftUI
 
- enum ShelfStyle {
+enum ShelfStyle {
     static let accent = Color(red: 0.80, green: 0.31, blue: 0.17)
     static let background = Color(UIColor.systemGroupedBackground)
     static let card = Color(UIColor.secondarySystemGroupedBackground)
- }
+}
 
 struct ConnectionRoot: View {
     @EnvironmentObject private var connection: ConnectionStore
@@ -103,23 +103,6 @@ struct LibraryChooser: View {
                     if libraries.isEmpty { Text("No libraries are available to this account. Ask your server administrator for access.").foregroundColor(.secondary) }
                 }.padding(24).frame(maxWidth: 640).frame(maxWidth: .infinity)
             }.navigationTitle("Your libraries")
-                .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Sign out") { connection.signOut() } } }
-        }.navigationViewStyle(StackNavigationViewStyle())
-    }
-}
-
-struct ConnectedLibrary: View {
-    @EnvironmentObject private var connection: ConnectionStore
-    let library: Library
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                Image(systemName: "books.vertical.fill").font(.system(size: 54)).foregroundColor(ShelfStyle.accent)
-                Text(library.name).font(.largeTitle.bold())
-                Text("Your library is connected.").foregroundColor(.secondary)
-                Button("Change library") { Task { await connection.openLibrariesForSelection() } }
-            }.frame(maxWidth: .infinity, maxHeight: .infinity).background(ShelfStyle.background)
-                .navigationTitle("Library")
                 .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Sign out") { connection.signOut() } } }
         }.navigationViewStyle(StackNavigationViewStyle())
     }

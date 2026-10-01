@@ -39,6 +39,12 @@ import Foundation
         credentials = nil
     }
 
+    public func me() async throws -> CurrentUser { try await get("api/me") }
+
+    public func personalized(libraryID: String) async throws -> [PersonalizedShelf] {
+        try await get("api/libraries/\(libraryID)/personalized", query: [URLQueryItem(name: "minified", value: "1")])
+    }
+
     public func libraries() async throws -> [Library] {
         let response: LibrariesResponse = try await get("api/libraries")
         return response.libraries

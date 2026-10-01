@@ -19,4 +19,12 @@ The provisioning helper uses the existing developer certificate and App Store Co
 
 Source deployment minimum remains iOS 14. Xcode 27 needs a build-only iOS 15 override; iOS 14 runtime compatibility remains unverified until an appropriate SDK/runtime is available. The override does not authorize changing the final supported audience. TLS uses platform certificate validation; allowing HTTP servers does not accept untrusted HTTPS certificates. Certificate failures explain installation and full-trust recovery.
 
-This connection preview is a delivery slice, not a replacement readiness claim. Browsing, playback, offline storage, readers, preference/data migration and final physical-device acceptance remain tracked separately.
+## Browsing
+
+The native catalog uses the server's paginated item API, expanded book details, current-user progress and personalized Continue Listening shelf. Resume cards can include titles outside the first catalog page; scrolling to the last catalog card requests the next page. Cover and list views share the same navigation and support missing artwork. iPad uses a library sidebar and a flexible catalog grid.
+
+The UI journeys exercise the actual signed app against the synthetic server: book details and chapters, scrolling through 61 titles, and a resume card outside page one without an eager page-two request. The fixture's request observations verify pagination behavior. The original placeholder failed the browsing journey; the eager-fetch regression failed before personalized shelves and scrolling-driven pagination were implemented.
+
+Run the same journeys on a dedicated iPad simulator with `ABS_QA_SIMULATOR='Audiobookshelf Native iPad QA' ./apple/scripts/verify-ui.sh`. Create that simulator using an available iPad device type and the same iOS runtime.
+
+This preview is a delivery slice, not a replacement readiness claim. Playback, offline storage, readers, preference/data migration and final physical-device acceptance remain tracked separately. Synthetic fixture coverage does not establish live-server or physical-device readiness.

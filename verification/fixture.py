@@ -27,13 +27,14 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     chapters = [{'id': 0, 'title': 'Opening', 'start': 0, 'end': 8}, {'id': 1, 'title': 'Next chapter', 'start': 8, 'end': 20}]
     items = [{'id': f'book-{i}', 'mediaType': 'book', 'media': {
         'metadata': {'title': f'Stories for Tomorrow {i + 1:02}', 'authorName': 'Audiobookshelf QA', 'authors': [{'id': 'author', 'name': 'Audiobookshelf QA'}],
-                     'description': '<p>Synthetic two-file audio. No live library data.</p>'},
+                     'narrators': ['QA Narrator'], 'genres': ['Fiction'], 'description': '<p>Synthetic two-file audio. No live library data.</p>'},
         'duration': 20, 'numTracks': 2, 'chapters': chapters}} for i in range(61)]
     user = {'id': '00000000-0000-4000-8000-000000000001', 'username': 'qa', 'type': 'user',
             'permissions': {'download': True, 'update': True, 'delete': False, 'upload': False},
             'mediaProgress': [], 'bookmarks': [], 'settings': {}}
     sessions = {}
-    progress = {}
+    progress = {('book-0', None): {'libraryItemId': 'book-0', 'episodeId': None, 'currentTime': 6, 'duration': 20, 'progress': 0.3, 'isFinished': False}, ('book-60', None): {'libraryItemId': 'book-60', 'episodeId': None, 'currentTime': 6, 'duration': 20, 'progress': 0.3, 'isFinished': False}}
+    user['mediaProgress'] = list(progress.values())
     reports = []
     login_outcomes = []
     requests = []
@@ -65,7 +66,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if prefix and not parsed.path.startswith(prefix + '/'):
                 return None, {}
             path = parsed.path[len(prefix):]
-            requests.append({'method': self.command, 'path': path})
+            observed = {'method': self.command, 'path': path}
+            if path and re.fullmatch(r'/api/libraries/[^/]+/items', path):
+                observed['page'] = parse_qs(parsed.query).get('page', ['0'])[0]
+            requests.append(observed)
             return path, parse_qs(parsed.query)
 
         def authorized(self):
@@ -85,7 +89,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 page = max(0, int(query.get('page', ['0'])[0])); limit = min(100, max(1, int(query.get('limit', ['60'])[0])))
                 return self.respond(200, {'items' if scenario == 'library-schema-change' else 'results': items[page * limit:(page + 1) * limit], 'total': len(items), 'limit': limit, 'page': page})
             if path == '/api/libraries/books/personalized':
-                return self.respond(200, [{'id': 'recently-added', 'label': 'Recently Added', 'type': 'book', 'entities': items[:10], 'total': 61}])
+                return self.respond(200, [{'id': 'continue-listening', 'label': 'Continue Listening', 'type': 'book', 'entities': [items[int(key[0].removeprefix('book-'))] for key, value in progress.items() if key[0].startswith('book-') and value.get('currentTime', 0) > 0 and not value.get('isFinished')], 'total': len(progress)}, {'id': 'recently-added', 'label': 'Recently Added', 'type': 'book', 'entities': items[:10], 'total': 61}])
             if path == '/api/me':
                 return self.respond(200, user)
             if path == '/api/items/podcast':
@@ -173,6 +177,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 session = sessions[report.group(1)]
                 key = (session['libraryItemId'], session['episodeId'])
                 progress[key] = {'libraryItemId': key[0], 'episodeId': key[1], **data}
+                position = float(data.get('currentTime', 0))
+                duration = float(data.get('duration', session['duration']))
+                progress[key]['progress'] = min(max(position / duration, 0), 1) if duration > 0 else 0
+                progress[key]['isFinished'] = duration > 0 and position >= duration
                 user['mediaProgress'] = list(progress.values())
                 reports.append({'path': path, **data})
                 return self.respond(200, {})

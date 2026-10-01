@@ -47,7 +47,9 @@ class LocalReferenceJourney(FixtureJourneyBase):
         resumed = self.request('/api/items/book-0/play', {}, 'fresh')
         self.assertEqual(resumed['currentTime'], 9)
         self.assertEqual(self.request('/api/items/book-1/play', {}, 'fresh')['currentTime'], 6)
-        self.assertEqual(self.request('/api/me', token='fresh')['mediaProgress'][0]['currentTime'], 9)
+        saved = self.request('/api/me', token='fresh')['mediaProgress'][0]
+        self.assertEqual(saved['currentTime'], 9)
+        self.assertEqual(saved['progress'], 0.45)
 
     def test_media_supports_suffix_ranges_for_player_probes(self):
         request = Request(self.address + '/audio/0', headers={'Authorization': 'Bearer fresh', 'Range': 'bytes=-8'})
