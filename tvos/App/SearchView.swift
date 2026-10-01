@@ -6,7 +6,6 @@ struct SearchView: View {
     @State private var results: [LibraryItem] = []
     @State private var searching = false
     @State private var error: String?
-    private let columns = [GridItem(.adaptive(minimum: 260, maximum: 260), spacing: 48, alignment: .top)]
 
     var body: some View {
         NavigationStack {
@@ -19,7 +18,7 @@ struct SearchView: View {
                     } else if !query.isEmpty && results.isEmpty {
                         Text("No titles or episodes match “\(query)”.").font(.title3).foregroundStyle(.secondary)
                     }
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 56) {
+                    LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
                         ForEach(results) { item in
                             NavigationLink(value: Route.to(item)) { ItemTile(item: item) }
                                 .buttonStyle(.card)

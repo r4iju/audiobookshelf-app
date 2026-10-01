@@ -3,7 +3,6 @@ import SwiftUI
 struct LibraryView: View {
     @EnvironmentObject private var catalog: CatalogStore
     @StateObject private var browser: LibraryBrowser
-    private let columns = [GridItem(.adaptive(minimum: 260, maximum: 260), spacing: 48, alignment: .top)]
 
     init(library: Library, api: APIClient) {
         _browser = StateObject(wrappedValue: LibraryBrowser(library: library, api: api))
@@ -20,7 +19,7 @@ struct LibraryView: View {
                         Text(browser.filter == nil ? "This library is empty." : "No titles match this filter.")
                             .font(.title3).foregroundStyle(.secondary).padding(60)
                     }
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 56) {
+                    LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
                         ForEach(browser.items) { item in
                             NavigationLink(value: Route.item(item)) { ItemTile(item: item) }
                                 .buttonStyle(.card)
@@ -46,7 +45,7 @@ struct LibraryView: View {
         HStack(spacing: 30) {
             Text(browser.library.name).font(.title2.bold())
             if browser.total > 0 {
-                Text("\(browser.total) \(browser.library.mediaType == "podcast" ? "podcasts" : "titles")").foregroundStyle(.secondary)
+                Text("\(browser.total) \(browser.library.isPodcast ? "podcasts" : "titles")").foregroundStyle(.secondary)
             }
             Spacer()
             Menu {
@@ -56,7 +55,7 @@ struct LibraryView: View {
             } label: { Label("Sort: \(browser.sort.title)", systemImage: "arrow.up.arrow.down") }
                 .accessibilityIdentifier("library-sort")
                 .accessibilityLabel("Sort: \(browser.sort.title)")
-            if browser.library.mediaType == "book" {
+            if !browser.library.isPodcast {
                 Menu {
                     Button("All titles") { Task { await browser.apply(filter: nil) } }
                     Section("Progress") { options(LibraryFilter.progress) }

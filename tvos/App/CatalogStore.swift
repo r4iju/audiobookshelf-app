@@ -23,6 +23,8 @@ struct HomeShelf: Identifiable {
     private var covers: [String: UIImage] = [:]
     private var missingCovers: Set<String> = []
 
+    static let lastServerKey = "lastServer", lastUsernameKey = "lastUsername"
+
     init(api: APIClient) {
         self.api = api
         signedIn = api.credentials != nil
@@ -37,14 +39,15 @@ struct HomeShelf: Identifiable {
         defer { signingIn = false }
         do {
             try await api.login(server: server, username: username, password: password)
-            UserDefaults.standard.set(server, forKey: "lastServer")
-            UserDefaults.standard.set(username, forKey: "lastUsername")
+            UserDefaults.standard.set(server, forKey: Self.lastServerKey)
+            UserDefaults.standard.set(username, forKey: Self.lastUsernameKey)
             needsSignIn = false
             signedIn = true
         } catch { signInError = Self.recovery(for: error) }
     }
 
     func loadCatalog() async {
+        generation = UUID()
         let request = generation
         loadingCatalog = true
         catalogError = nil
@@ -54,10 +57,8 @@ struct HomeShelf: Identifiable {
             guard request == generation else { return }
             libraries = found
             async let user = api.me()
-            var loaded: [HomeShelf] = []
-            for library in found {
-                let personalized = try await api.personalized(libraryID: library.id)
-                loaded += personalized.filter { !$0.entities.isEmpty }.map {
+            let loaded = try await Self.eachLibrary(found) { library in
+                try await self.api.personalized(libraryID: library.id).filter { !$0.entities.isEmpty }.map {
                     HomeShelf(id: library.id + "." + $0.id, shelfID: $0.id, title: Self.shelfTitle($0.id, library: library, among: found), items: $0.entities)
                 }
             }
@@ -85,22 +86,37 @@ struct HomeShelf: Identifiable {
     }
 
     func search(_ text: String) async throws -> [LibraryItem] {
-        var results: [LibraryItem] = []
-        for library in libraries {
-            let response = try await api.search(libraryID: library.id, query: text, limit: 25)
-            results += response.items + (response.episodes ?? []).map(\.libraryItem)
+        let results = try await Self.eachLibrary(libraries) { library in
+            let response = try await self.api.search(libraryID: library.id, query: text, limit: 25)
+            return response.items + (response.episodes ?? []).map(\.libraryItem)
         }
         var seen = Set<String>()
         return results.filter { seen.insert($0.id).inserted }
     }
 
+    /// One unavailable library must not hide the others; fail only when every library fails.
+    private static func eachLibrary<T>(_ libraries: [Library], _ load: (Library) async throws -> [T]) async throws -> [T] {
+        var results: [T] = []
+        var failure: Error?
+        for library in libraries {
+            do { results += try await load(library) }
+            catch { failure = failure ?? error }
+        }
+        if let failure, results.isEmpty { throw failure }
+        return results
+    }
+
     func cover(itemID: String) async -> UIImage? {
         if let cached = covers[itemID] { return cached }
         if missingCovers.contains(itemID) { return nil }
-        guard let data = try? await api.coverData(itemID: itemID), let image = UIImage(data: data) else {
-            missingCovers.insert(itemID)
+        let data: Data
+        do { data = try await api.coverData(itemID: itemID) }
+        catch {
+            // Only a server answer means the cover is absent; timeouts and cancelled tiles retry later.
+            if case APIError.http = error { missingCovers.insert(itemID) }
             return nil
         }
+        guard let image = UIImage(data: data) else { missingCovers.insert(itemID); return nil }
         if covers.count >= 240 { covers.removeAll() }
         covers[itemID] = image
         return image
@@ -111,6 +127,7 @@ struct HomeShelf: Identifiable {
         generation = UUID()
         libraries = []; shelves = []; progress = [:]; covers = [:]; missingCovers = []
         catalogError = nil
+        loadingCatalog = false
         signedIn = false
         needsSignIn = false
     }

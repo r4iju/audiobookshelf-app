@@ -10,7 +10,7 @@ import SwiftUI
         // Debug-only isolation for remote UI journeys; signed device builds use Release.
         if ProcessInfo.processInfo.arguments.contains("--reset-tv-state") {
             try? KeychainCredentials().clear()
-            for key in ["lastServer", "lastUsername"] { UserDefaults.standard.removeObject(forKey: key) }
+            for key in [CatalogStore.lastServerKey, CatalogStore.lastUsernameKey] { UserDefaults.standard.removeObject(forKey: key) }
             try? FileManager.default.removeItem(at: ListeningSync.file)
         }
         #endif

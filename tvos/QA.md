@@ -1,16 +1,16 @@
 # Apple TV verification
 
-Last verified October 1, 2026 on the Studio with Xcode 27.0 (27A266a), the tvOS 27 simulator `Audiobookshelf TV QA` (`00DD108F-2435-4FEC-9C37-3E62861A0EF6`, Apple TV 4K 2nd generation, 1080p) and the synthetic fixture `verification/fixture.py`, which reports server version `2.30.0-fixture`. Fixture titles, accounts and audio are synthetic; no live library or credentials were used.
+Last verified October 1, 2026 (after the review fixes) on the Studio with Xcode 27.0 (27A266a), the tvOS 27 simulator `Audiobookshelf TV QA` (`00DD108F-2435-4FEC-9C37-3E62861A0EF6`, Apple TV 4K 2nd generation, 1080p) and the synthetic fixture `verification/fixture.py`, which reports server version `2.30.0-fixture`. Fixture titles, accounts and audio are synthetic; no live library or credentials were used.
 
 ## Automated evidence
 
 | Check | Command | Result |
 | --- | --- | --- |
 | TV core contracts | `swift test --package-path tvos/Core` | 15 passed |
-| Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 13 passed, 0 failed (332 s) |
+| Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 13 passed, 0 failed (338 s) |
 | Signed device build and install | `./tvos/scripts/deploy.sh --no-launch a5ef39a5001ef59dec9c2fa15838447215252137` | Release build signed by team `C7X9BCC7LP`, `codesign --verify --deep --strict` passes, installed on Living Room TV (tvOS 18.6) |
 
-The journeys run the Debug app with no test-only code paths beyond the launch-time reset. They operate it only through `XCUIRemote` presses (directions, Select, Menu, Play/Pause) and keyboard entry. They then assert what the screen shows and what the fixture server observed. Every journey was written first and failed against the previous TV app before the implementation.
+The journeys run the Debug app with no test-only code paths beyond the launch-time reset. They operate it only through `XCUIRemote` presses (directions, Select, Menu, Play/Pause) and keyboard entry. They then assert what the screen shows and what the fixture server observed. Every journey was written first. The red run on October 1, 2026 against the previous TV app failed all 13 journeys before any implementation.
 
 | Story | Journey | Proves |
 | --- | --- | --- |
@@ -52,5 +52,7 @@ Installing the build is not acceptance. These checks need a person using the Sir
 7. Durability on hardware: listen, force-quit from the app switcher, relaunch, then confirm server progress and resume on the iPhone without double-counted listening time. Repeat with the network disconnected while listening, then reconnected.
 8. Leaving with the TV/Home button pauses and saves; the screen saver and Control Center keep listening.
 9. Login expiry: after server-side token revocation, the TV asks for the password and then sends the saved listening.
+
+These behaviours have no simulator journey yet and rely on the physical checks above: rapid skips across file boundaries (check 4), login expiry (check 9), progress bars on podcast tiles, and Home/Search when one of several libraries fails. The synthetic fixture has no mode that fails a single library or revokes a token.
 
 See [HANDOFF.md](HANDOFF.md) for the hardware storage caveat that affects check 7.

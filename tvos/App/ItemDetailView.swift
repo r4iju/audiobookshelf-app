@@ -21,9 +21,16 @@ import SwiftUI
     }
 
     func play(_ item: LibraryItem, episode: Episode? = nil, restart: Bool, player: TVPlayer, navigator: TVNavigator) async {
+        error = nil
         await player.start(item: item, episode: episode)
         guard player.session != nil else { return }
-        if restart { try? await player.seek(to: 0, autoplay: true) }
+        if restart {
+            do { try await player.seek(to: 0, autoplay: true) }
+            catch {
+                self.error = "Could not start from the beginning: " + CatalogStore.recovery(for: error)
+                return
+            }
+        }
         navigator.tab = .nowPlaying
     }
 
@@ -93,7 +100,7 @@ struct ItemDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 50) {
                 HStack(alignment: .top, spacing: 70) {
-                    CoverView(itemID: item.id, podcast: item.mediaType == "podcast")
+                    CoverView(itemID: item.id, podcast: item.isPodcast)
                         .frame(width: 440, height: 440).clipShape(RoundedRectangle(cornerRadius: 22))
                     VStack(alignment: .leading, spacing: 22) {
                         Text(loaded.title).font(.system(size: 52, weight: .bold)).fixedSize(horizontal: false, vertical: true)
@@ -104,7 +111,7 @@ struct ItemDetailView: View {
                                 .accessibilityIdentifier("detail-narrators")
                         }
                         Text(facts(loaded)).foregroundStyle(.secondary)
-                        if loaded.mediaType == "book" {
+                        if !loaded.isPodcast {
                             if let state = Format.progress(catalog.progress(itemID: item.id), duration: loaded.media.duration) {
                                 Text(state).font(.headline).accessibilityIdentifier("detail-progress")
                             }
@@ -121,7 +128,7 @@ struct ItemDetailView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                if loaded.mediaType == "podcast", detail.item != nil { episodes(loaded) }
+                if loaded.isPodcast, detail.item != nil { episodes(loaded) }
             }
             .padding(80)
         }
@@ -165,15 +172,13 @@ struct EpisodeRow: View {
     let episode: Episode
 
     var body: some View {
-        let duration = episode.duration ?? episode.audioFile?.duration
         HStack(spacing: 30) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(episode.title).font(.headline).lineLimit(2)
-                Text([Format.published(episode.publishedAt), duration.map(Format.duration)].compactMap { $0 }.joined(separator: " · "))
-                    .font(.callout).foregroundStyle(.secondary)
+                Text(Format.facts(episode)).font(.callout).foregroundStyle(.secondary)
             }
             Spacer()
-            if let state = Format.progress(catalog.progress(itemID: item.id, episodeID: episode.id), duration: duration) {
+            if let state = Format.progress(catalog.progress(itemID: item.id, episodeID: episode.id), duration: episode.playableDuration) {
                 Text(state).font(.callout).foregroundStyle(.secondary)
                     .accessibilityIdentifier("episode-state-\(episode.id)")
             }
@@ -199,10 +204,8 @@ struct EpisodeDetailView: View {
                     if let episode {
                         Text(episode.title).font(.system(size: 48, weight: .bold)).fixedSize(horizontal: false, vertical: true)
                             .accessibilityIdentifier("episode-title")
-                        let duration = episode.duration ?? episode.audioFile?.duration
-                        Text([Format.published(episode.publishedAt), duration.map(Format.duration)].compactMap { $0 }.joined(separator: " · "))
-                            .foregroundStyle(.secondary)
-                        if let state = Format.progress(catalog.progress(itemID: item.id, episodeID: episodeID), duration: duration) {
+                        Text(Format.facts(episode)).foregroundStyle(.secondary)
+                        if let state = Format.progress(catalog.progress(itemID: item.id, episodeID: episodeID), duration: episode.playableDuration) {
                             Text(state).font(.headline).accessibilityIdentifier("episode-progress")
                         }
                         if detail.item != nil { PlaybackActions(detail: detail, item: podcast, episode: episode, playIdentifier: "play-episode").focusSection() }

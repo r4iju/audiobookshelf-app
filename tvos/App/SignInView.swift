@@ -5,8 +5,8 @@ struct SignInView: View {
     @Environment(\.dismiss) private var dismiss
     var reauthenticating = false
     var onAuthenticated: () -> Void = {}
-    @State private var server = UserDefaults.standard.string(forKey: "lastServer") ?? ""
-    @State private var username = UserDefaults.standard.string(forKey: "lastUsername") ?? ""
+    @State private var server = UserDefaults.standard.string(forKey: CatalogStore.lastServerKey) ?? ""
+    @State private var username = UserDefaults.standard.string(forKey: CatalogStore.lastUsernameKey) ?? ""
     @State private var password = ""
 
     var body: some View {

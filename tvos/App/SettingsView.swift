@@ -51,7 +51,7 @@ struct SettingsView: View {
 
     private var syncStatus: String {
         if let error = player.error, player.session == nil { return error }
-        return "Listening on this TV is saved locally first and sent to the server every 15 seconds, on pause, on stop and when the app opens."
+        return "Listening on this TV is saved locally first and sent to the server regularly while playing, on pause, on stop and when the app opens."
     }
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {

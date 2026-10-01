@@ -58,6 +58,7 @@ struct NowPlayingView: View {
         .padding(.horizontal, 90)
         .padding(.vertical, 50)
         .sheet(isPresented: $showChapters) { chapters }
+        .onChange(of: player.session?.id) { stopError = nil }
     }
 
     private var status: String {

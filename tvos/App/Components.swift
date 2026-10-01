@@ -29,6 +29,10 @@ enum Format {
     }
 
     /// Listening state for an item or episode, or nil when it has not been started.
+    static func facts(_ episode: Episode) -> String {
+        [published(episode.publishedAt), episode.playableDuration.map(duration)].compactMap { $0 }.joined(separator: " · ")
+    }
+
     static func progress(_ progress: MediaProgress?, duration: Double?) -> String? {
         guard let progress else { return nil }
         if progress.isFinished == true { return "Finished" }
@@ -71,10 +75,10 @@ struct ItemTile: View {
     var width: CGFloat = 260
 
     var body: some View {
-        let state = catalog.progress(itemID: item.id)
+        let state = catalog.progress(itemID: item.id, episodeID: item.isPodcast ? item.recentEpisode?.id : nil)
         VStack(alignment: .leading, spacing: 10) {
             ZStack(alignment: .bottom) {
-                CoverView(itemID: item.id, podcast: item.mediaType == "podcast")
+                CoverView(itemID: item.id, podcast: item.isPodcast)
                 if state?.isFinished == true {
                     HStack { Spacer(); Image(systemName: "checkmark.circle.fill").font(.title2).padding(10) }
                         .frame(maxHeight: .infinity, alignment: .top)
@@ -113,13 +117,21 @@ struct StatusMessage: View {
     }
 }
 
+extension LibraryItem { var isPodcast: Bool { mediaType == "podcast" } }
+extension Library { var isPodcast: Bool { mediaType == "podcast" } }
+extension Episode { var playableDuration: Double? { duration ?? audioFile?.duration } }
+
+enum TileGrid {
+    static let columns = [GridItem(.adaptive(minimum: 260, maximum: 260), spacing: 48, alignment: .top)]
+}
+
 enum Route: Hashable {
     case item(LibraryItem)
     case episode(LibraryItem, episodeID: String)
 
     /// Search and shelf results for podcasts carry the matched episode; open it directly.
     static func to(_ item: LibraryItem) -> Route {
-        if let episode = item.recentEpisode, item.mediaType == "podcast" { return .episode(item, episodeID: episode.id) }
+        if let episode = item.recentEpisode, item.isPodcast { return .episode(item, episodeID: episode.id) }
         return .item(item)
     }
 }

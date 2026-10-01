@@ -21,7 +21,7 @@ Apple's [pairing instructions](https://help.apple.com/xcode/mac/current/en.lproj
 
 ## Included
 
-- **Remote-first navigation.** A top tab bar holds Home, one tab per server library, Search, Now Playing (while a session exists) and Settings. Every screen is operated with the Siri Remote: focus is always visible, rows and controls are focus sections so directional movement is predictable, and Back returns to the tile that opened a screen.
+- **Remote-first navigation.** A top tab bar holds Home, one tab per server library, Search, Now Playing (while a session exists) and Settings. Every screen is operated with the Siri Remote. Rows and controls are focus sections so directional movement is predictable, and Back returns to the tile that opened a screen. The simulator journeys verify this focus behaviour; legibility from across a room still needs the physical check in [QA.md](QA.md).
 - **Home.** The server's personalized shelves, such as Continue Listening and Recently Added, with listening progress on each cover.
 - **Libraries.** Server-side sorting (title, author, recently added) and filtering (progress, genre, narrator, author) with automatic pagination as focus approaches the end of the loaded titles. Loading, empty and failure states each offer a recovery action.
 - **Search.** Server search across every library for titles, authors, narrators and podcast episodes, including titles that have not been loaded yet.
@@ -48,6 +48,12 @@ Connections go directly to the server. HTTPS uses system trust only, so a server
 ### Not included
 
 Downloads, offline playback, ebook/PDF reading, collections/playlists management, podcast administration and bookmarks are mobile capabilities that are deliberately not on the TV.
+
+### Known limitations
+
+- The interface is English only; there is no string catalog yet.
+- Home and Search skip a library that fails to load and show the others; they report an error only when every library fails.
+- When playback reports an error, Now Playing offers "Save progress again" even if the failure came from the media rather than from saving progress. The shared player does not expose which it was (see [HANDOFF.md](HANDOFF.md), item 2). For a media failure, start playback again from the details screen.
 
 ## Build and verify
 
@@ -86,6 +92,6 @@ Provisioning uses `python3` with `cryptography`, both already available here. Th
 
 The signed hardware app is at `tvos/build/Build/Products/Release-appletvos/AudiobookshelfTV.app`, and the packaged IPA is at `tvos/build/AudiobookshelfTV.ipa`.
 
-On October 1, 2026, the second-generation **Living Room TV** running tvOS 18.6 was paired, registered, and provisioned. `deploy.sh` successfully built, installed, and launched the app on that physical TV. Run the script again for subsequent updates; it builds with the selected device's profile. The original packaged IPA predates this pairing, so use the script rather than assuming that IPA is provisioned for the current TV.
+On October 1, 2026, the second-generation **Living Room TV** running tvOS 18.6 was paired, registered, and provisioned. `deploy.sh` successfully built, installed, and launched the app on that physical TV. The build for stories #26–#30 was installed with `deploy.sh --no-launch` on the same day and has not been operated on the TV yet. Run the script again for subsequent updates; it builds with the selected device's profile. The original packaged IPA predates this pairing, so use the script rather than assuming that IPA is provisioned for the current TV.
 
 See [QA.md](QA.md) for automated evidence and the physical-TV acceptance checklist, and [HANDOFF.md](HANDOFF.md) for integration notes for shared code owners.

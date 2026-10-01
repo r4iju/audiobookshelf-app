@@ -7,7 +7,7 @@ struct LibrarySort: Hashable, Identifiable {
     var id: String { field + (descending ? ".descending" : ".ascending") }
 
     static func options(for library: Library) -> [LibrarySort] {
-        let podcast = library.mediaType == "podcast"
+        let podcast = library.isPodcast
         return [
             LibrarySort(field: "media.metadata.title", descending: false, title: "Title A–Z"),
             LibrarySort(field: "media.metadata.title", descending: true, title: "Title Z–A"),
@@ -61,7 +61,7 @@ struct LibraryFilter: Hashable, Identifiable {
         generation = UUID()
         items = []; total = 0; nextPage = 0; loading = false; error = nil
         await loadPage()
-        if filterData == nil, library.mediaType == "book" { filterData = try? await api.filters(libraryID: library.id) }
+        if filterData == nil, !library.isPodcast { filterData = try? await api.filters(libraryID: library.id) }
     }
 
     func loadMore(after item: LibraryItem) async {
