@@ -2,6 +2,8 @@
 
 The approved specification is GitHub issue #1. Implementation order is Apple mobile and TV, then Android, then Next.js. Android starts only after issues #25 and #30 pass; Next.js starts only after #54 passes. All builds, fixtures, signing, verification and packaging run locally. Distribution is internal: direct native installation and a self-hosted browser client. No store release, TestFlight, hosted build runner or paid cloud service is required.
 
+The owner approved a reader scope change on October 1, 2026: PDF remains required for iPhone/iPad and Android; remaining EPUB work, MOBI/AZW3 and comics are deferred until after Phase 2 readiness (#65). Their mobile acceptance does not gate current replacement readiness or downstream stages. Preserve all existing reader data during migration, then validate deferred-format opening/resume in the later tickets. Already delivered Apple EPUB stays in the preview. Browser Phase 2 scope is unchanged. This amendment overrides blanket reader-parity requirements below; source inventory remains a record of baseline capabilities, not a completion claim. The current specification is mirrored in `SPEC.md`.
+
 ## Parity inventory
 
 `verification/parity.json` records all 65 approved stories and additional source-derived capabilities. Source references identify the baseline implementation; they are not evidence that a replacement passed. Replacement evidence starts empty and must identify the tested client/server versions, commands or UI journey, actual outcome and device. Applicable rows must all pass before cutover.

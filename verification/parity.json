@@ -2311,5 +2311,27 @@
       "releaseSigning": "No release signing configuration in the baseline Gradle source; never assume debug can upgrade a differently signed release",
       "keystoreAlias": "AudiobookshelfRefreshTokens"
     }
-  }
+  },
+  "scopeAmendments": [
+    {
+      "date": "2026-10-01",
+      "approvedBy": "owner",
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "requiredReader": "pdf",
+      "deferredUntil": "After Phase 2 readiness (issue #65)",
+      "deferredReaders": [
+        "epub remaining work",
+        "mobi",
+        "azw3",
+        "cbz",
+        "cbr"
+      ],
+      "preservation": "Preserve deferred-format files, associations, settings and locations during migration; validate opening/resume in the deferred reader tickets.",
+      "browserScope": "unchanged",
+      "readiness": "Deferred mobile reader capabilities do not block Apple/Android readiness or downstream implementation."
+    }
+  ]
 }

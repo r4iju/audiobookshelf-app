@@ -75,7 +75,7 @@ Download a book or episode from its details and open Downloads from the account 
 
 Offline playback uses owned file URLs in the shared player. It retains multi-file seeking, chapters, speed and skip preferences, and writes listening to the local journal before attempting publication. Resume positions remain cached after history is acknowledged. Reconnection records timestamped remote progress so a later offline start can adopt a newer position from another client without downloading the audio again. Saved media remains scoped to canonical server plus user ID.
 
-MOBI/AZW3 and comic readers, expanded transfer interruption/storage/device acceptance, preference/data migration and final physical-device acceptance remain tracked separately. This preview is a delivery slice, not a replacement readiness claim. Synthetic fixture coverage does not establish live-server or physical-device readiness.
+The owner deferred remaining EPUB acceptance and MOBI/AZW3/comic readers on both mobile platforms until after Phase 2; PDF remains required. Expanded transfer interruption/storage/device acceptance, preference/data migration and final physical-device acceptance remain current requirements. Preserve deferred reader files and saved locations during migration. This preview is a delivery slice, not a replacement readiness claim. Synthetic fixture coverage does not establish live-server or physical-device readiness.
 
 
 ## PDF reading
