@@ -6,6 +6,7 @@ import Foundation
     var itemID: String? { get }
     var episodeID: String? { get }
     var wantsPlayback: Bool { get }
+    var playbackIntentID: UUID { get }
     var error: String? { get }
     var isProgressFailure: Bool { get }
     func start(item: LibraryItem, episode: Episode?) async
@@ -22,6 +23,7 @@ extension ApplePlayback: RestartablePlayback {}
         let itemID: String
         let episodeID: String?
         let wantsPlayback: Bool
+        let intent: UUID
         let error: String
 
         @MainActor init?(_ player: RestartablePlayback, account: UUID) {
@@ -31,6 +33,7 @@ extension ApplePlayback: RestartablePlayback {}
             self.itemID = itemID
             episodeID = player.episodeID
             wantsPlayback = player.wantsPlayback
+            intent = player.playbackIntentID
             self.error = error
         }
     }

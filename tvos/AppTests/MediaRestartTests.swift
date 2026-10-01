@@ -7,6 +7,7 @@ import XCTest
         var itemID: String? = "book-0"
         var episodeID: String?
         var wantsPlayback = true
+        var playbackIntentID = UUID()
         var error: String? = "Audio could not be played."
         var isProgressFailure = false
         var started: [String] = []
@@ -68,6 +69,15 @@ import XCTest
         let recovered = Player(), again = Gate()
         _ = await restart(recovered, gate: again) { recovered.error = nil }
         XCTAssertEqual(recovered.started, [], "A seek that recovered the media must not be overridden")
+    }
+
+    func testAPlayOrSeekThatFailsAgainWhileWaitingIsRespected() async {
+        let player = Player(), gate = Gate()
+        _ = await restart(player, gate: gate) {
+            // Pause then resume, or a seek that fails with the same message: only the intent revision differs.
+            player.playbackIntentID = UUID()
+        }
+        XCTAssertEqual(player.started, [], "A newer play, pause or seek request wins over the older restart")
     }
 
     func testAnAccountSwitchCancelsTheRestart() async {
