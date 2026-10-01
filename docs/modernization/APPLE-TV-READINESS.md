@@ -148,3 +148,9 @@ Not performed. On the Living Room TV with the Siri Remote and the real server:
 2. Readability from the sofa in German and Arabic, including long translations and the Diagnostics list.
 3. Reduce Motion and Increase Contrast on the TV: focus remains visible.
 4. A real failed sign-in and a real server outage appear in Diagnostics without credentials.
+
+## Root composition verification
+
+The integrated root source `1652c305` passes all 13 app unit tests and 25 remote-driven journeys, including the five new readiness journeys (`/tmp/abs-root-tv-readiness-final-ui.log`, `tvos/build/TVJourneys-20261002-051935.xcresult`). Existing browsing, related pages, podcast and multi-file playback cases remain intact. NativeLocalization passes 13/13 (`/tmp/abs-root-tv-localization-tests.log`); localization generation check and iOS 14 mobile source typecheck pass. Independent review cleared the exact source `8444b02d`, and generated conflicts were resolved by regenerating the project and language tables from their merged source.
+
+This closes local TV UI readiness verification, not whole-platform replacement. A separately identified publication-uncertainty issue in shared listening/reading reset ordering is under correction. Physical and live-server gates remain open.
