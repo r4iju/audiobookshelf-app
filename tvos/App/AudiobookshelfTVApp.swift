@@ -10,8 +10,9 @@ import SwiftUI
         // Debug-only isolation for remote UI journeys; signed device builds use Release.
         if ProcessInfo.processInfo.arguments.contains("--reset-tv-state") {
             try? KeychainCredentials().clear()
-            for key in [CatalogStore.lastServerKey, CatalogStore.lastUsernameKey, "NativeListeningJournal"] { UserDefaults.standard.removeObject(forKey: key) }
+            for key in [CatalogStore.lastServerKey, CatalogStore.lastUsernameKey, "NativeListeningJournal", NativeStrings.savedKey] { UserDefaults.standard.removeObject(forKey: key) }
             try? FileManager.default.removeItem(at: ListeningSync.file)
+            try? FileManager.default.removeItem(at: TVDiagnostics.file)
         }
         #endif
         let api = APIClient(store: KeychainCredentials())
@@ -22,6 +23,7 @@ import SwiftUI
     var body: some Scene {
         WindowGroup {
             RootView()
+                .tvLocalization()
                 .environmentObject(catalog)
                 .environmentObject(player)
                 .preferredColorScheme(.dark)

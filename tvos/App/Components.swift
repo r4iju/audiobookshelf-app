@@ -20,10 +20,26 @@ enum Format {
             : String(format: "%d:%02d", value / 60, value % 60)
     }
 
-    static func duration(_ seconds: Double) -> String {
+    static func duration(_ seconds: Double, locale: Locale = NativeLanguage.current.locale) -> String {
         let minutes = Self.seconds(seconds) / 60
         if minutes == 0 { return clock(seconds) }
-        return minutes >= 60 ? "\(minutes / 60) h \(minutes % 60) min" : "\(minutes) min"
+        return components(TimeInterval(minutes * 60), units: [.hour, .minute], style: .short, locale: locale) ?? clock(seconds)
+    }
+
+    /// A time read out in words, such as "14 seconds", for VoiceOver rather than a clock.
+    static func spoken(_ seconds: Double, locale: Locale = NativeLanguage.current.locale) -> String {
+        components(TimeInterval(Self.seconds(seconds)), units: [.hour, .minute, .second], style: .full, locale: locale) ?? clock(seconds)
+    }
+
+    private static func components(_ interval: TimeInterval, units: NSCalendar.Unit, style: DateComponentsFormatter.UnitsStyle, locale: Locale) -> String? {
+        let formatter = DateComponentsFormatter()
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        formatter.calendar = calendar
+        formatter.allowedUnits = units
+        formatter.unitsStyle = style
+        formatter.zeroFormattingBehavior = interval == 0 ? .default : .dropAll
+        return formatter.string(from: interval)
     }
 
     static func speed(_ value: Float) -> String { String(format: "%g", value) + "×" }
@@ -36,22 +52,22 @@ enum Format {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    static func published(_ milliseconds: Double?) -> String? {
+    static func published(_ milliseconds: Double?, locale: Locale = NativeLanguage.current.locale) -> String? {
         guard let milliseconds, milliseconds > 0 else { return nil }
-        return Date(timeIntervalSince1970: milliseconds / 1000).formatted(date: .abbreviated, time: .omitted)
+        return Date(timeIntervalSince1970: milliseconds / 1000).formatted(.dateTime.day().month(.abbreviated).year().locale(locale))
     }
 
-    static func facts(_ episode: Episode) -> String {
-        [published(episode.publishedAt), episode.playableDuration.map(duration)].compactMap { $0 }.joined(separator: " · ")
+    static func facts(_ episode: Episode, locale: Locale = NativeLanguage.current.locale) -> String {
+        [published(episode.publishedAt, locale: locale), episode.playableDuration.map { duration($0, locale: locale) }].compactMap { $0 }.joined(separator: " · ")
     }
 
     /// Listening state for an item or episode, or nil when it has not been started.
-    static func progress(_ progress: MediaProgress?, duration: Double?) -> String? {
+    static func progress(_ progress: MediaProgress?, duration: Double?, strings: NativeStrings = .current) -> String? {
         guard let progress else { return nil }
-        if progress.isFinished == true { return "Finished" }
+        if progress.isFinished == true { return strings("Finished") }
         guard let position = progress.currentTime, position > 0 else { return nil }
         let total = progress.duration ?? duration ?? 0
-        return total > 0 ? "\(clock(position)) of \(clock(total)) listened" : "\(clock(position)) listened"
+        return total > 0 ? strings("{0} of {1} listened", clock(position), clock(total)) : strings("{0} listened", clock(position))
     }
 }
 
@@ -84,6 +100,7 @@ struct CoverView: View {
 /// A focusable cover with title, author and listening state that stays legible across the room.
 struct ItemTile: View {
     @EnvironmentObject private var catalog: CatalogStore
+    @Environment(\.nativeStrings) private var l10n
     let item: LibraryItem
     let episodeID: String?
     private let width: CGFloat = 260
@@ -118,11 +135,12 @@ struct ItemTile: View {
                 .frame(width: width, alignment: .leading)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityValue(Format.progress(state, duration: episode?.playableDuration ?? item.media.duration) ?? "")
+        .accessibilityValue(Format.progress(state, duration: episode?.playableDuration ?? item.media.duration, strings: l10n) ?? "")
     }
 }
 
 struct StatusMessage: View {
+    @Environment(\.nativeStrings) private var l10n
     let text: String
     var identifier = "catalog-error"
     var retryIdentifier = "retry-catalog"
@@ -133,7 +151,7 @@ struct StatusMessage: View {
             Image(systemName: "wifi.exclamationmark").font(.system(size: 60)).foregroundStyle(.secondary)
             Text(text).font(.title3).multilineTextAlignment(.center).frame(maxWidth: 1100)
                 .accessibilityIdentifier(identifier)
-            Button("Try again", action: retry).accessibilityIdentifier(retryIdentifier)
+            Button(l10n("Try again"), action: retry).accessibilityIdentifier(retryIdentifier)
         }
         .frame(maxWidth: .infinity)
         .padding(60)

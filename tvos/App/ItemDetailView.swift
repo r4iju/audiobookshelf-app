@@ -16,6 +16,7 @@ import SwiftUI
             item = try await detail
         } catch {
             catalog.noteAuthentication(error)
+            TVDiagnostics.shared.record(error, detail: "Details")
             self.error = CatalogStore.recovery(for: error)
         }
     }
@@ -27,7 +28,8 @@ import SwiftUI
         if restart {
             do { try await player.seek(to: 0, autoplay: true) }
             catch {
-                self.error = "Could not start from the beginning: " + CatalogStore.recovery(for: error)
+                TVDiagnostics.shared.record(error, detail: "Play again")
+                self.error = NativeStrings.current("Could not start from the beginning: {0}", CatalogStore.recovery(for: error))
                 return
             }
         }
@@ -41,12 +43,14 @@ import SwiftUI
         catch is CancellationError {}
         catch {
             catalog.noteAuthentication(error)
+            TVDiagnostics.shared.record(error, detail: finished ? "Mark as finished" : "Mark as not finished")
             self.error = CatalogStore.recovery(for: error)
         }
     }
 }
 
 struct PlaybackActions: View {
+    @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     @EnvironmentObject private var player: TVPlayer
     @EnvironmentObject private var navigator: TVNavigator
@@ -59,15 +63,15 @@ struct PlaybackActions: View {
         let state = catalog.progress(itemID: item.id, episodeID: episode?.id)
         let current = player.session != nil && player.itemID == item.id && player.episodeID == episode?.id
         let finished = state?.isFinished == true
-        let action = current ? "Now Playing" : finished ? "Play again" : (state?.currentTime ?? 0) > 0 ? "Resume" : "Play"
-        let completion = finished ? "Mark as not finished" : "Mark as finished"
+        let action = current ? l10n("Now Playing") : finished ? l10n("Play again") : (state?.currentTime ?? 0) > 0 ? l10n("Resume") : l10n("Play")
+        let completion = finished ? l10n("Mark as not finished") : l10n("Mark as finished")
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 30) {
                 Button {
                     if current { navigator.tab = .nowPlaying; return }
                     Task { await detail.play(item, episode: episode, restart: finished, player: player, navigator: navigator) }
                 } label: {
-                    Label(player.preparing && !current ? "Preparing…" : action, systemImage: current ? "waveform" : "play.fill")
+                    Label(player.preparing && !current ? l10n("Preparing…") : action, systemImage: current ? "waveform" : "play.fill")
                 }
                 .accessibilityIdentifier(playIdentifier)
                 .accessibilityLabel(action)
@@ -89,6 +93,7 @@ struct PlaybackActions: View {
 }
 
 struct ItemDetailView: View {
+    @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     let item: LibraryItem
     @StateObject private var detail = ItemDetail()
@@ -102,26 +107,27 @@ struct ItemDetailView: View {
                 HStack(alignment: .top, spacing: 70) {
                     CoverView(itemID: item.id, podcast: item.isPodcast)
                         .frame(width: 440, height: 440).clipShape(RoundedRectangle(cornerRadius: 22))
+                        .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 22) {
                         Text(loaded.title).font(.system(size: 52, weight: .bold)).fixedSize(horizontal: false, vertical: true)
                             .accessibilityIdentifier("detail-title")
                         if !loaded.author.isEmpty { Text(loaded.author).font(.title3).foregroundStyle(.secondary) }
                         if let narrators = metadata.narrators, !narrators.isEmpty {
-                            Text("Narrated by " + narrators.joined(separator: ", ")).foregroundStyle(.secondary)
+                            Text(l10n("Narrated by {0}", narrators.joined(separator: ", "))).foregroundStyle(.secondary)
                                 .accessibilityIdentifier("detail-narrators")
                         }
                         Text(facts(loaded)).foregroundStyle(.secondary)
                         if !loaded.isPodcast {
-                            if let state = Format.progress(catalog.progress(itemID: item.id), duration: loaded.media.duration) {
+                            if let state = Format.progress(catalog.progress(itemID: item.id), duration: loaded.media.duration, strings: l10n) {
                                 Text(state).font(.headline).accessibilityIdentifier("detail-progress")
                             }
                             if detail.item != nil { PlaybackActions(detail: detail, item: loaded).focusSection() }
                         }
                         if detail.item != nil { RelatedLinks(item: loaded) }
-                        if detail.loading && detail.item == nil { ProgressView("Loading details…") }
+                        if detail.loading && detail.item == nil { ProgressView(l10n("Loading details…")) }
                         if let error = detail.error, detail.item == nil {
                             Text(error).foregroundStyle(.orange).accessibilityIdentifier("detail-error")
-                            Button("Try again") { Task { await detail.load(item.id, catalog: catalog) } }
+                            Button(l10n("Try again")) { Task { await detail.load(item.id, catalog: catalog) } }
                         }
                         if let description = metadata.description.map(Format.plainText), !description.isEmpty {
                             Text(description).font(.body).foregroundStyle(.secondary).lineLimit(8)
@@ -138,9 +144,9 @@ struct ItemDetailView: View {
 
     private func facts(_ item: LibraryItem) -> String {
         var facts: [String] = []
-        if let duration = item.media.duration, duration.isFinite, duration > 0, duration < 1e7 { facts.append(Format.duration(duration)) }
-        if let chapters = item.media.chapters, chapters.count > 1 { facts.append("\(chapters.count) chapters") }
-        if let episodes = item.media.episodes { facts.append(episodes.count == 1 ? "1 episode" : "\(episodes.count) episodes") }
+        if let duration = item.media.duration, duration.isFinite, duration > 0, duration < 1e7 { facts.append(Format.duration(duration, locale: l10n.language.locale)) }
+        if let chapters = item.media.chapters, chapters.count > 1 { facts.append(l10n("{0} chapters", chapters.count)) }
+        if let episodes = item.media.episodes { facts.append(episodes.count == 1 ? l10n("1 episode") : l10n("{0} episodes", episodes.count)) }
         if let genres = item.media.metadata.genres, !genres.isEmpty { facts.append(genres.prefix(3).joined(separator: ", ")) }
         return facts.joined(separator: " · ")
     }
@@ -152,13 +158,13 @@ struct ItemDetailView: View {
         }
         VStack(alignment: .leading, spacing: 24) {
             HStack {
-                Text("Episodes").font(.title2.bold())
+                Text(l10n("Episodes")).font(.title2.bold())
                 Spacer()
-                Button(newestFirst ? "Newest first" : "Oldest first") { newestFirst.toggle() }
+                Button(newestFirst ? l10n("Newest first") : l10n("Oldest first")) { newestFirst.toggle() }
                     .accessibilityIdentifier("episode-sort")
             }
             .focusSection()
-            if sorted.isEmpty { Text("No episodes have been downloaded to the server yet.").foregroundStyle(.secondary) }
+            if sorted.isEmpty { Text(l10n("No episodes have been downloaded to the server yet.")).foregroundStyle(.secondary) }
             ForEach(sorted) { episode in
                 NavigationLink(value: Route.episode(podcast, episodeID: episode.id)) { EpisodeRow(item: podcast, episode: episode) }
                     .accessibilityIdentifier("episode-\(episode.id)")
@@ -168,6 +174,7 @@ struct ItemDetailView: View {
 }
 
 struct EpisodeRow: View {
+    @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     let item: LibraryItem
     let episode: Episode
@@ -176,10 +183,10 @@ struct EpisodeRow: View {
         HStack(spacing: 30) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(episode.title).font(.headline).lineLimit(2)
-                Text(Format.facts(episode)).font(.callout).foregroundStyle(.secondary)
+                Text(Format.facts(episode, locale: l10n.language.locale)).font(.callout).foregroundStyle(.secondary)
             }
             Spacer()
-            if let state = Format.progress(catalog.progress(itemID: item.id, episodeID: episode.id), duration: episode.playableDuration) {
+            if let state = Format.progress(catalog.progress(itemID: item.id, episodeID: episode.id), duration: episode.playableDuration, strings: l10n) {
                 Text(state).font(.callout).foregroundStyle(.secondary)
                     .accessibilityIdentifier("episode-state-\(episode.id)")
             }
@@ -189,6 +196,7 @@ struct EpisodeRow: View {
 }
 
 struct EpisodeDetailView: View {
+    @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     let item: LibraryItem
     let episodeID: String
@@ -200,13 +208,14 @@ struct EpisodeDetailView: View {
         ScrollView {
             HStack(alignment: .top, spacing: 70) {
                 CoverView(itemID: item.id, podcast: true).frame(width: 400, height: 400).clipShape(RoundedRectangle(cornerRadius: 22))
+                    .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 22) {
                     Text(podcast.title).font(.title3).foregroundStyle(.secondary)
                     if let episode {
                         Text(episode.title).font(.system(size: 48, weight: .bold)).fixedSize(horizontal: false, vertical: true)
                             .accessibilityIdentifier("episode-title")
-                        Text(Format.facts(episode)).foregroundStyle(.secondary)
-                        if let state = Format.progress(catalog.progress(itemID: item.id, episodeID: episodeID), duration: episode.playableDuration) {
+                        Text(Format.facts(episode, locale: l10n.language.locale)).foregroundStyle(.secondary)
+                        if let state = Format.progress(catalog.progress(itemID: item.id, episodeID: episodeID), duration: episode.playableDuration, strings: l10n) {
                             Text(state).font(.headline).accessibilityIdentifier("episode-progress")
                         }
                         if detail.item != nil { PlaybackActions(detail: detail, item: podcast, episode: episode, playIdentifier: "play-episode").focusSection() }
@@ -214,12 +223,12 @@ struct EpisodeDetailView: View {
                             Text(description).foregroundStyle(.secondary).lineLimit(10)
                         }
                     }
-                    if detail.loading && detail.item == nil { ProgressView("Loading episode…") }
+                    if detail.loading && detail.item == nil { ProgressView(l10n("Loading episode…")) }
                     if let error = detail.error, detail.item == nil {
                         Text(error).foregroundStyle(.orange).accessibilityIdentifier("detail-error")
-                        Button("Try again") { Task { await detail.load(item.id, catalog: catalog) } }
+                        Button(l10n("Try again")) { Task { await detail.load(item.id, catalog: catalog) } }
                     } else if detail.item != nil && episode == nil {
-                        Text("This episode is no longer available on the server.").foregroundStyle(.secondary)
+                        Text(l10n("This episode is no longer available on the server.")).foregroundStyle(.secondary)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

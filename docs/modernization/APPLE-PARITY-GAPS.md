@@ -76,3 +76,7 @@ Progress reset was still running at the initial reconciliation; its final simula
 ## Final integration checks recorded afterward
 
 At `315183c1`, the full remote-driven TV suite passes 20/20 journeys and 12/12 app unit tests (`/tmp/abs-root-final-tv-ui.log`). The signed iPhone/iPad Release build passes and is installed on both devices without launching (`/tmp/abs-root-items-device-build.log`, `/tmp/abs-root-items-phone-install.log`, `/tmp/abs-root-items-pad-install.log`). Independent composition review found no blocking issue. These results do not close hardware interaction or live-server acceptance.
+
+## Newly identified publication-ordering blocker
+
+Independent review after PR79 identified that a replay acknowledgment cannot prove a timed-out original server write has finished under server2.30. An original listening sync or primary-reading PATCH can complete after a progress reset and recreate discarded progress. The current actor waits cover client transport completion, not server completion. A dedicated correction and meaningful delayed-handler regressions are underway before whole-platform replacement. Earlier passing reset tests cover their documented failure paths and do not close this newly identified case.

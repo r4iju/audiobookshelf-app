@@ -16,7 +16,8 @@ import sys
 LOCALIZATION = pathlib.Path(__file__).resolve().parent
 APPLE = LOCALIZATION.parent
 REPOSITORY = APPLE.parent
-SOURCES = [APPLE / 'App', APPLE / 'Playback', APPLE / 'Diagnostics' / 'Sources', LOCALIZATION / 'Sources', APPLE / 'Export' / 'Sources']
+SOURCES = [APPLE / 'App', APPLE / 'Playback', APPLE / 'Diagnostics' / 'Sources', LOCALIZATION / 'Sources', APPLE / 'Export' / 'Sources',
+           REPOSITORY / 'tvos' / 'App']
 RESOURCES = LOCALIZATION / 'Sources' / 'NativeLocalization' / 'Resources'
 TABLE = 'NativeStrings.strings'
 # `copy("…")` marks English templates in renderers that receive `NativeStrings.copy` instead of looking text up.

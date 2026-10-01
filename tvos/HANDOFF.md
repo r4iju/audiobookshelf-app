@@ -16,6 +16,7 @@ Scope: stories #26–#30 (TV browsing, playback controls, durable progress, podc
    - `local-builds`, `internal-distribution`: `./tvos/scripts/verify-ui.sh` and `./tvos/scripts/deploy.sh`.
 
 7. **Authors and series (story #21).** Additive shared Core API, models and loaders, the TV pages and the mobile views with their wiring patch are described in [APPLE-RELATED-AUTHOR-SERIES.md](../docs/modernization/APPLE-RELATED-AUTHOR-SERIES.md).
+8. **Diagnostics, accessibility and localization (stories 52–54).** The TV compiles the shared `NativeLocalization` and `NativeDiagnostics` packages, `generate.py` scans `tvos/App`, and `legacy-equivalents.json` gained 18 mappings. Strings left English for their owners and the integration steps are in [APPLE-TV-READINESS.md](../docs/modernization/APPLE-TV-READINESS.md).
 
 ## Integration notes
 

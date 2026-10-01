@@ -14,7 +14,7 @@ final class FormatTests: XCTestCase {
 
     func testDurationSaturatesHugeValues() {
         XCTAssertEqual(Format.duration(1e300), Format.duration(Format.longestTime))
-        XCTAssertEqual(Format.duration(5400), "1 h 30 min")
+        XCTAssertEqual(Format.duration(5400, locale: Locale(identifier: "en")), "1 hr, 30 min")
     }
 
     func testProgressWithHugeServerValuesStillFormats() throws {
@@ -24,5 +24,18 @@ final class FormatTests: XCTestCase {
         XCTAssertEqual(Format.fraction(progress.progress), 1)
         XCTAssertEqual(Format.fraction(-.infinity), 0)
         XCTAssertEqual(Format.fraction(.nan), 0)
+    }
+
+    /// The saved interface language, not the device language, decides how durations and dates read.
+    func testDurationsAndDatesFollowTheChosenLanguage() {
+        let key = "previewLanguage"
+        let saved = UserDefaults.standard.string(forKey: key)
+        defer { UserDefaults.standard.set(saved, forKey: key) }
+        UserDefaults.standard.set("de", forKey: key)
+        let duration = Format.duration(5400)
+        XCTAssertTrue(duration.contains("Std."), duration)
+        XCTAssertFalse(duration.contains(" h "), duration)
+        let date = Format.published(1_790_812_800_000) ?? ""
+        XCTAssertTrue(date.contains("Okt"), date)
     }
 }

@@ -98,7 +98,7 @@ final class CatalogJourney: TVJourney {
     }
 
     func testTrustedHTTPSServerAndLongMetadata() async throws {
-        let secure = "https://127.0.0.1:20767/abs"
+        let secure = TVJourney.secureFixture
         try await Fixture.configure("edge-metadata", base: secure)
         addTeardownBlock { try await Fixture.configure("baseline", base: secure) }
         signIn(server: secure)
@@ -111,7 +111,7 @@ final class CatalogJourney: TVJourney {
         XCTAssertTrue(label("detail-title").hasSuffix("Forgotten Libraries"))
         capture("long-title")
         tab("Settings")
-        XCTAssertEqual(label("server-address"), secure)
+        XCTAssertEqual(app.staticTexts["server-address"].value as? String, secure, "VoiceOver reads it as the server address's value")
         XCTAssertTrue(label("auth-modes").contains("username and password"))
     }
 }

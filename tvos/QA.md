@@ -42,6 +42,8 @@ The journeys run the Debug app with no test-only code paths beyond the launch-ti
 
 `RelatedJourney` failed all 4 journeys on October 2, 2026 before story #21 was implemented: search showed no author or series and details had no series link. Details of the core and app tests are in [APPLE-RELATED-AUTHOR-SERIES.md](../docs/modernization/APPLE-RELATED-AUTHOR-SERIES.md).
 
+Diagnostics, language and accessibility (stories 52–54): `ReadinessJourney` failed all 5 journeys at `a64f655b` and passes at `8444b02d`. The complete suite passed there: 13 app tests and 25 journeys, on simulator `0D7C1DBC-E266-4F62-AC6D-F68222A8706A` with fixture ports 30765/30767. Details, audit exceptions and screenshots are in [APPLE-TV-READINESS.md](../docs/modernization/APPLE-TV-READINESS.md). Physical acceptance for these stories is open too.
+
 Screenshots captured by those journeys:
 
 ![Details](evidence/detail.png)

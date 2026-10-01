@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SearchView: View {
+    @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     @State private var query = ""
     @State private var found = SearchFound()
@@ -14,9 +15,9 @@ struct SearchView: View {
                     if let error {
                         StatusMessage(text: error, identifier: "search-error", retryIdentifier: "retry-search") { Task { await search() } }
                     } else if searching && found.titles.isEmpty && found.related.isEmpty {
-                        ProgressView("Searching…").frame(maxWidth: .infinity)
+                        ProgressView(l10n("Searching…")).frame(maxWidth: .infinity)
                     } else if !query.isEmpty && found.titles.isEmpty && found.related.isEmpty {
-                        Text("No titles, episodes, authors or series match “\(query)”.").font(.title3).foregroundStyle(.secondary)
+                        Text(l10n("No titles, episodes, authors or series match “{0}”.", query)).font(.title3).foregroundStyle(.secondary)
                     }
                     if !found.related.isEmpty {
                         ScrollView(.horizontal) {
@@ -41,7 +42,7 @@ struct SearchView: View {
                 }
                 .padding(.horizontal, 80)
             }
-            .searchable(text: $query, prompt: "Titles, authors, narrators or episodes")
+            .searchable(text: $query, prompt: l10n("Titles, authors, narrators or episodes"))
             .catalogRoutes()
         }
         .task(id: query) {
@@ -64,7 +65,8 @@ struct SearchView: View {
         } catch is CancellationError {
         } catch {
             catalog.noteAuthentication(error)
-            self.error = CatalogStore.recovery(for: error)
+            TVDiagnostics.shared.record(error, detail: "Search")
+            self.error = CatalogStore.recovery(for: error, in: l10n)
         }
     }
 }

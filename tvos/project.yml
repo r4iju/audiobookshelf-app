@@ -18,6 +18,8 @@ targets:
       - App
       - ../apple/Playback
       - Core/Sources/TVCore
+      - ../apple/Localization/Sources/NativeLocalization
+      - ../apple/Diagnostics/Sources/NativeDiagnostics
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.tv

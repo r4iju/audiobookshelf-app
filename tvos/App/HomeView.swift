@@ -16,6 +16,7 @@ extension View {
 struct HomeView: View {
     @EnvironmentObject private var catalog: CatalogStore
     @EnvironmentObject private var player: TVPlayer
+    @Environment(\.nativeStrings) private var l10n
 
     var body: some View {
         NavigationStack {
@@ -28,12 +29,12 @@ struct HomeView: View {
                     if let error = catalog.catalogError {
                         StatusMessage(text: error) { Task { await catalog.loadCatalog() } }
                     } else if catalog.shelves.isEmpty {
-                        if catalog.loadingCatalog { ProgressView("Loading your library…").frame(maxWidth: .infinity).padding(120) }
-                        else { Text("Nothing to continue yet. Choose a library above to start listening.").font(.title3).foregroundStyle(.secondary).padding(80) }
+                        if catalog.loadingCatalog { ProgressView(l10n("Loading your library…")).frame(maxWidth: .infinity).padding(120) }
+                        else { Text(l10n("Nothing to continue yet. Choose a library above to start listening.")).font(.title3).foregroundStyle(.secondary).padding(80) }
                     }
                     ForEach(catalog.shelves) { shelf in
                         VStack(alignment: .leading, spacing: 20) {
-                            Text(shelf.title).font(.title3.bold())
+                            Text(title(shelf)).font(.title3.bold())
                             ScrollView(.horizontal) {
                                 LazyHStack(spacing: 48) {
                                     ForEach(shelf.items) { item in
@@ -57,4 +58,17 @@ struct HomeView: View {
         .onAppear { Task { await catalog.refreshProgress() } }
     }
 
+    private func title(_ shelf: HomeShelf) -> String {
+        let name: String
+        switch shelf.shelfID {
+        case "continue-listening": name = l10n("Continue Listening")
+        case "continue-series": name = l10n("Continue Series")
+        case "recently-added": name = l10n("Recently Added")
+        case "listen-again": name = l10n("Listen Again")
+        case "discover": name = l10n("Discover")
+        case "newest-episodes", "episodes-recently-added": name = l10n("Newest Episodes")
+        default: name = shelf.shelfID.split(separator: "-").map { $0.capitalized }.joined(separator: " ")
+        }
+        return shelf.libraryName.map { name + " · " + $0 } ?? name
+    }
 }

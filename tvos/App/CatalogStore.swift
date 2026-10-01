@@ -15,7 +15,8 @@ struct SearchFound {
 struct HomeShelf: Identifiable {
     let id: String
     let shelfID: String
-    let title: String
+    /// Set when there are several libraries, so shelves with the same name can be told apart.
+    let libraryName: String?
     let items: [LibraryItem]
 }
 
@@ -60,7 +61,10 @@ struct HomeShelf: Identifiable {
             UserDefaults.standard.set(username, forKey: Self.lastUsernameKey)
             needsSignIn = false
             signedIn = true
-        } catch { signInError = Self.recovery(for: error) }
+        } catch {
+            signInError = Self.recovery(for: error)
+            TVDiagnostics.shared.record(error, detail: "Server: " + server)
+        }
     }
 
     func loadCatalog() async {
@@ -76,7 +80,7 @@ struct HomeShelf: Identifiable {
             async let user = api.me()
             let loaded = try await Self.eachLibrary(found) { library in
                 try await self.api.personalized(libraryID: library.id).filter { !$0.entities.isEmpty }.map {
-                    HomeShelf(id: library.id + "." + $0.id, shelfID: $0.id, title: Self.shelfTitle($0.id, library: library, among: found), items: $0.entities)
+                    HomeShelf(id: library.id + "." + $0.id, shelfID: $0.id, libraryName: found.count > 1 ? library.name : nil, items: $0.entities)
                 }
             }
             let current = try await user
@@ -181,6 +185,7 @@ struct HomeShelf: Identifiable {
         if failure is CancellationError { return }
         noteAuthentication(failure)
         catalogError = Self.recovery(for: failure)
+        TVDiagnostics.shared.record(failure, detail: "Libraries")
     }
 
     func noteAuthentication(_ failure: Error) {
@@ -188,26 +193,28 @@ struct HomeShelf: Identifiable {
     }
 
     /// Explains connection failures in terms of what the person can change on the TV or server.
-    static func recovery(for failure: Error) -> String {
+    static func recovery(for failure: Error, in strings: NativeStrings = .current) -> String {
         if let failure = failure as? URLError {
             switch failure.code {
             case .serverCertificateUntrusted, .serverCertificateHasUnknownRoot, .serverCertificateHasBadDate, .serverCertificateNotYetValid, .secureConnectionFailed:
-                return "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address."
+                return strings("This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address.")
             case .cannotFindHost, .dnsLookupFailed:
-                return "The server address could not be found. Check the host name and that the TV is on the same network."
+                return strings("The server address could not be found. Check the host name and that the TV is on the same network.")
             case .cannotConnectToHost, .networkConnectionLost, .notConnectedToInternet, .timedOut:
-                return "The server could not be reached. Check that it is running and that the TV is on the network, then try again."
+                return strings("The server could not be reached. Check that it is running and that the TV is on the network, then try again.")
             default: break
             }
         }
-        if failure as? APIError == .http(404) { return "No Audiobookshelf server answered at this address. Include any reverse-proxy path, such as https://example.com/audiobookshelf." }
-        return failure.localizedDescription
-    }
-
-    private static func shelfTitle(_ id: String, library: Library, among libraries: [Library]) -> String {
-        let known = ["continue-listening": "Continue Listening", "continue-series": "Continue Series", "recently-added": "Recently Added",
-                     "listen-again": "Listen Again", "discover": "Discover", "newest-episodes": "Newest Episodes", "episodes-recently-added": "Newest Episodes"]
-        let title = known[id] ?? id.split(separator: "-").map { $0.capitalized }.joined(separator: " ")
-        return libraries.count > 1 ? "\(title) · \(library.name)" : title
+        // The same wording as the shared core's descriptions, so each can be translated.
+        switch failure as? APIError {
+        case .http(404): return strings("No Audiobookshelf server answered at this address. Include any reverse-proxy path, such as https://example.com/audiobookshelf.")
+        case .invalidServer: return strings("Enter an http:// or https:// server address, without credentials, a query, or a fragment.")
+        case .signInRequired: return strings("Your session expired. Please sign in again.")
+        case .http(401): return strings("The username or password was not accepted.")
+        case .http(let code): return strings("The server returned HTTP {0}. Please try again.", code)
+        case .noAudio: return strings("This item has no playable audio.")
+        case .unsafeMediaURL: return strings("The server returned a media URL outside this server.")
+        default: return failure.localizedDescription
+        }
     }
 }
