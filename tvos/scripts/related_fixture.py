@@ -1,13 +1,15 @@
 """Synthetic Audiobookshelf 2.30 author and series endpoints on top of verification/fixture.py.
 
-Shapes follow the 2.30 server source: AuthorController.findOne/getImage, SeriesController.findOne,
-LibraryController.getAllSeriesForLibrary (seriesFilters, `filter=authors.<base64>`), and library items
+Shapes follow the 2.30 server source: AuthorController.findOne/getImage, LibraryController.getSeriesForLibrary
+(`/api/libraries/:id/series/:seriesId`, which the server asks mobile clients to use over the deprecated global
+`/api/series/:id`), LibraryController.getAllSeriesForLibrary (seriesFilters, `filter=authors.<base64>`), and library items
 filtered by `authors.<base64>` or `series.<base64>` with `sort=sequence` (CAST(sequence AS FLOAT), nulls last).
 Book data, authorization and progress come from the base fixture through an authenticated loopback request.
 """
 import argparse
 import base64
 import json
+import re
 import ssl
 import struct
 import sys
@@ -109,7 +111,8 @@ def make_related_server(port, prefix='/abs', bind='127.0.0.1'):
                 finished = {series['id']: sum(1 for book, _ in series['books'] if self.progress.get((book, None), {}).get('isFinished')) for series in SERIES}
                 self.respond(200, {'requests': state['observations'], 'finished': finished})
                 return True
-            related = path.startswith('/api/authors/') or path.startswith('/api/series/') or path == '/api/libraries/books/series'
+            series_detail = re.fullmatch(r'/api/libraries/([^/]+)/series/([^/]+)', path)
+            related = path.startswith('/api/authors/') or series_detail or path == '/api/libraries/books/series'
             filtered = path == '/api/libraries/books/items' and query.get('filter', [''])[0].split('.')[0] in ('authors', 'series')
             item = path.startswith('/api/items/') and path.count('/') == 3
             search = path == '/api/libraries/books/search'
@@ -141,9 +144,10 @@ def make_related_server(port, prefix='/abs', bind='127.0.0.1'):
                         author['series'] = [{'id': series['id'], 'name': series['name'], 'items': [self.with_series(book, False) for book in self.ordered(series, books)]} for series in SERIES]
                 self.respond(200, author)
                 return True
-            if path.startswith('/api/series/'):
-                series = next((entry for entry in SERIES if path == '/api/series/' + entry['id']), None)
-                if series is None:
+            if series_detail:
+                library, series_id = series_detail.groups()
+                series = next((entry for entry in SERIES if entry['id'] == series_id), None)
+                if library != 'books' or series is None:
                     self.respond(404, {})
                     return True
                 result = series_json(series)

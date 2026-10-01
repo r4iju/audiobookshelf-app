@@ -56,7 +56,7 @@ final class RelatedAuthorSeriesTests: XCTestCase {
             seen.append(URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!)
             switch request.url!.path {
             case "/abs/api/authors/author": return (200, #"{"id":"author","name":"Writer"}"#)
-            case "/abs/api/series/saga": return (200, #"{"id":"saga","name":"Saga"}"#)
+            case "/abs/api/libraries/books/series/saga": return (200, #"{"id":"saga","name":"Saga"}"#)
             case "/abs/api/libraries/books/series": return (200, #"{"results":[],"total":0}"#)
             case "/abs/api/authors/author/image": return (200, "image")
             default: return (404, "")
@@ -64,12 +64,12 @@ final class RelatedAuthorSeriesTests: XCTestCase {
         }
         defer { MockURLProtocol.handler = nil; http.invalidateAndCancel() }
         _ = try await api.author(id: "author")
-        _ = try await api.series(id: "saga")
+        _ = try await api.series(libraryID: "books", id: "saga")
         _ = try await api.authorSeries(libraryID: "books", authorID: "author", page: 2)
         let image = try await api.authorImageData(authorID: "author", authorization: api.authorizationRevision)
         XCTAssertEqual(image, Data("image".utf8))
         func value(_ name: String, _ components: URLComponents) -> String? { components.queryItems?.first { $0.name == name }?.value }
-        XCTAssertEqual(seen.map(\.path), ["/abs/api/authors/author", "/abs/api/series/saga", "/abs/api/libraries/books/series", "/abs/api/authors/author/image"])
+        XCTAssertEqual(seen.map(\.path), ["/abs/api/authors/author", "/abs/api/libraries/books/series/saga", "/abs/api/libraries/books/series", "/abs/api/authors/author/image"])
         XCTAssertEqual(value("include", seen[1]), "progress")
         XCTAssertEqual(value("filter", seen[2]), "authors." + Data("author".utf8).base64EncodedString())
         XCTAssertEqual(value("sort", seen[2]), "name")

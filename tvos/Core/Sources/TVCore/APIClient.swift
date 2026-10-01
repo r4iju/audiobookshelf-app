@@ -194,8 +194,9 @@ import Foundation
         let response: LibrariesResponse = try await get("api/libraries")
         return response.libraries
     }
-    public func items(libraryID: String, page: Int, filter: String? = nil, sort: String = "media.metadata.title", descending: Bool = false) async throws -> ItemsResponse {
-        try await get("api/libraries/\(libraryID)/items", query: [
+    /// With `authorization`, only for that sign-in, like `coverData(itemID:authorization:)`.
+    public func items(libraryID: String, page: Int, filter: String? = nil, sort: String = "media.metadata.title", descending: Bool = false, authorization: UUID? = nil) async throws -> ItemsResponse {
+        try await get("api/libraries/\(libraryID)/items", pinned: authorization, query: [
             URLQueryItem(name: "limit", value: "60"), URLQueryItem(name: "page", value: String(page)),
             URLQueryItem(name: "sort", value: sort), URLQueryItem(name: "desc", value: descending ? "1" : "0"), URLQueryItem(name: "minified", value: "1")
         ] + (filter.map { [URLQueryItem(name: "filter", value: $0)] } ?? []))
@@ -205,13 +206,15 @@ import Foundation
     }
     /// A library filter such as `authors.<base64 id>` or `series.<base64 id>`, as the server's filter decoder expects.
     public static func relatedFilter(_ group: String, _ value: String) -> String { group + "." + Data(value.utf8).base64EncodedString() }
-    public func author(id: String) async throws -> AuthorDetail { try await get("api/authors/\(id)") }
-    public func series(id: String) async throws -> SeriesDetail {
-        try await get("api/series/\(id)", query: [URLQueryItem(name: "include", value: "progress")])
+    public func author(id: String, authorization: UUID? = nil) async throws -> AuthorDetail { try await get("api/authors/\(id)", pinned: authorization) }
+    /// A series with progress over its books in `libraryID`. The server's global `api/series/:id` is deprecated
+    /// because a series is not specific to one library.
+    public func series(libraryID: String, id: String, authorization: UUID? = nil) async throws -> SeriesDetail {
+        try await get("api/libraries/\(libraryID)/series/\(id)", pinned: authorization, query: [URLQueryItem(name: "include", value: "progress")])
     }
     /// The series in a library that contain at least one book by the author, sorted by name.
-    public func authorSeries(libraryID: String, authorID: String, page: Int, limit: Int = 20) async throws -> SeriesPage {
-        try await get("api/libraries/\(libraryID)/series", query: [
+    public func authorSeries(libraryID: String, authorID: String, page: Int, limit: Int = 20, authorization: UUID? = nil) async throws -> SeriesPage {
+        try await get("api/libraries/\(libraryID)/series", pinned: authorization, query: [
             URLQueryItem(name: "filter", value: Self.relatedFilter("authors", authorID)), URLQueryItem(name: "sort", value: "name"),
             URLQueryItem(name: "desc", value: "0"), URLQueryItem(name: "limit", value: String(limit)),
             URLQueryItem(name: "page", value: String(page)), URLQueryItem(name: "minified", value: "1")
@@ -311,8 +314,8 @@ import Foundation
         return expiry < Date().timeIntervalSince1970 + 60
     }
 
-    private func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
-        try JSONDecoder().decode(T.self, from: await request(path, query: query))
+    private func get<T: Decodable>(_ path: String, pinned: UUID? = nil, query: [URLQueryItem] = []) async throws -> T {
+        try JSONDecoder().decode(T.self, from: await request(path, query: query, pinned: pinned))
     }
 
     private func request(_ path: String, method: String = "GET", query: [URLQueryItem] = [], body: [String: Any]? = nil, bodyData: Data? = nil, retry: Bool = true, pinned: UUID? = nil) async throws -> Data {

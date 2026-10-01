@@ -64,21 +64,50 @@ public struct SeriesPage: Decodable {
     public let total: Int
 }
 
+/// The sign-in a page was opened under. Every request carries its revision, so none goes out once another sign-in
+/// replaced it, even the same account signing in again, and results are shown only while it is still the current one.
+@MainActor final class OpenedSignIn {
+    let revision: UUID
+    private let api: APIClient
+    private var account: AccountIdentity?
+
+    init(api: APIClient) { self.api = api; revision = api.authorizationRevision }
+
+    /// Identifies the account on first use. Throws `CancellationError` once the sign-in changed.
+    func confirm() async throws {
+        guard api.authorizationRevision == revision else { throw CancellationError() }
+        guard account == nil else { return }
+        let found = try await api.currentAccount()
+        guard api.authorizationRevision == revision else { throw CancellationError() }
+        account = found
+    }
+
+    var isCurrent: Bool {
+        guard api.authorizationRevision == revision, let account, let credentials = api.credentials, let user = credentials.userID else { return false }
+        return (try? AccountIdentity(server: credentials.server, userID: user)) == account
+    }
+}
+
 /// Books of one author or series in the server's order, a page at a time.
 @MainActor public final class RelatedBooks: ObservableObject {
     @Published public private(set) var items: [LibraryItem] = []
     @Published public private(set) var total = 0
     @Published public private(set) var loading = false
     @Published public private(set) var error: Error?
-    private let fetch: (Int) async throws -> ItemsResponse
+    private let signIn: OpenedSignIn
+    private let fetch: (_ page: Int, _ authorization: UUID) async throws -> ItemsResponse
     private var nextPage = 0
     private var generation = UUID()
 
-    init(fetch: @escaping (Int) async throws -> ItemsResponse) { self.fetch = fetch }
+    init(signIn: OpenedSignIn, fetch: @escaping (_ page: Int, _ authorization: UUID) async throws -> ItemsResponse) {
+        self.signIn = signIn
+        self.fetch = fetch
+    }
 
     public var hasMore: Bool { items.count < total }
 
     public func reload() async {
+        guard signIn.isCurrent else { return }
         generation = UUID()
         items = []; total = 0; nextPage = 0; loading = false; error = nil
         await loadPage()
@@ -86,7 +115,7 @@ public struct SeriesPage: Decodable {
 
     /// Loads the next page once a title near the end of those loaded appears.
     public func loadMore(after item: LibraryItem) async {
-        guard hasMore, !loading, error == nil,
+        guard hasMore, !loading, error == nil, signIn.isCurrent,
               let index = items.firstIndex(of: item), index >= items.count - 12 else { return }
         await loadPage()
     }
@@ -96,14 +125,14 @@ public struct SeriesPage: Decodable {
         loading = true
         defer { if request == generation { loading = false } }
         do {
-            let response = try await fetch(nextPage)
-            guard request == generation else { return }
+            let response = try await fetch(nextPage, signIn.revision)
+            guard request == generation, signIn.isCurrent else { return }
             let known = Set(items.map(\.id))
             items += response.results.filter { !known.contains($0.id) }
             total = response.results.isEmpty ? items.count : response.total
             nextPage += 1
         } catch {
-            guard request == generation, !(error is CancellationError) else { return }
+            guard request == generation, signIn.isCurrent, !(error is CancellationError) else { return }
             self.error = error
         }
     }
@@ -117,13 +146,18 @@ public struct SeriesPage: Decodable {
     @Published public private(set) var error: Error?
     public let books: RelatedBooks
     private let api: APIClient
+    private let signIn: OpenedSignIn
     private let id: String
     private let libraryID: String
     private var forwarding: AnyCancellable?
 
     public init(api: APIClient, id: String, libraryID: String) {
         self.api = api; self.id = id; self.libraryID = libraryID
-        books = RelatedBooks { page in try await api.items(libraryID: libraryID, page: page, filter: APIClient.relatedFilter("authors", id)) }
+        let signIn = OpenedSignIn(api: api)
+        self.signIn = signIn
+        books = RelatedBooks(signIn: signIn) { page, authorization in
+            try await api.items(libraryID: libraryID, page: page, filter: APIClient.relatedFilter("authors", id), authorization: authorization)
+        }
         forwarding = books.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
 
@@ -131,37 +165,61 @@ public struct SeriesPage: Decodable {
     public var failure: Error? { error ?? (books.items.isEmpty ? books.error : nil) }
 
     public func load() async {
+        let authorization = signIn.revision
+        do { try await signIn.confirm() } catch { return report(error) }
         error = nil
-        async let detail = api.author(id: id)
-        async let found = api.authorSeries(libraryID: libraryID, authorID: id, page: 0, limit: 50)
+        async let detail = api.author(id: id, authorization: authorization)
+        async let found = allSeries(authorization: authorization)
         await books.reload()
         do {
             let loaded = try await detail
+            let all = try await found
+            guard signIn.isCurrent else { return }
             author = loaded
-            series = try await found.results
-            if loaded.hasImage, imageData == nil {
-                imageData = try? await api.authorImageData(authorID: id, authorization: api.authorizationRevision)
+            series = all
+            if loaded.hasImage, imageData == nil,
+               let image = try? await api.authorImageData(authorID: id, authorization: authorization), signIn.isCurrent {
+                imageData = image
             }
         } catch {
-            guard !(error is CancellationError) else { return }
-            self.error = error
+            report(error)
         }
+    }
+
+    /// Every page of the author's series, until the server's total is reached or it returns no more.
+    private func allSeries(authorization: UUID) async throws -> [SeriesPage.Series] {
+        var all: [SeriesPage.Series] = []
+        for page in 0... {
+            let response = try await api.authorSeries(libraryID: libraryID, authorID: id, page: page, limit: 50, authorization: authorization)
+            all += response.results
+            if response.results.isEmpty || all.count >= response.total { break }
+        }
+        return all
+    }
+
+    private func report(_ error: Error) {
+        guard signIn.isCurrent, !(error is CancellationError) else { return }
+        self.error = error
     }
 }
 
-/// A series' details and progress, with its books in the server's sequence order.
+/// A series' details and progress within one library, with its books in the server's sequence order.
 @MainActor public final class RelatedSeries: ObservableObject {
     @Published public private(set) var series: SeriesDetail?
     @Published public private(set) var error: Error?
     public let books: RelatedBooks
     private let api: APIClient
+    private let signIn: OpenedSignIn
     private let id: String
+    private let libraryID: String
     private var forwarding: AnyCancellable?
 
     public init(api: APIClient, id: String, libraryID: String) {
-        self.api = api; self.id = id
-        books = RelatedBooks { page in
-            try await api.items(libraryID: libraryID, page: page, filter: APIClient.relatedFilter("series", id), sort: "sequence")
+        self.api = api; self.id = id; self.libraryID = libraryID
+        let signIn = OpenedSignIn(api: api)
+        self.signIn = signIn
+        books = RelatedBooks(signIn: signIn) { page, authorization in
+            try await api.items(libraryID: libraryID, page: page, filter: APIClient.relatedFilter("series", id), sort: "sequence", authorization: authorization)
         }
         forwarding = books.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
@@ -179,13 +237,21 @@ public struct SeriesPage: Decodable {
     }
 
     public func load() async {
+        let authorization = signIn.revision
+        do { try await signIn.confirm() } catch { return report(error) }
         error = nil
-        async let detail = api.series(id: id)
+        async let detail = api.series(libraryID: libraryID, id: id, authorization: authorization)
         await books.reload()
-        do { series = try await detail }
-        catch {
-            guard !(error is CancellationError) else { return }
-            self.error = error
+        do {
+            let loaded = try await detail
+            if signIn.isCurrent { series = loaded }
+        } catch {
+            report(error)
         }
+    }
+
+    private func report(_ error: Error) {
+        guard signIn.isCurrent, !(error is CancellationError) else { return }
+        self.error = error
     }
 }

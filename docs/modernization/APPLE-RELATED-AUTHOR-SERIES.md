@@ -15,7 +15,7 @@ Every route below exists in 2.30. No endpoint was invented.
 | Author image | `GET /api/authors/:id/image?width=` (404 when there is none) | `AuthorController.getImage`, `CacheManager.handleAuthorCache` |
 | An author's series, sorted by name, paginated | `GET /api/libraries/:id/series?filter=authors.<base64 id>&sort=name&limit&page&minified=1` | `LibraryController.getAllSeriesForLibrary`, `utils/queries/seriesFilters.js` |
 | An author's titles, paginated | `GET /api/libraries/:id/items?filter=authors.<base64 id>&limit=60&page` | `libraryItemsBookFilters` |
-| Series name, description, progress | `GET /api/series/:id?include=progress`, which returns `progress {libraryItemIds, libraryItemIdsFinished, isFinished}` | `SeriesController.findOne` (the baseline mobile series page uses the same include) |
+| Series name, description, progress | `GET /api/libraries/:id/series/:seriesId?include=progress`, which returns `series.toOldJSON()` plus `progress {libraryItemIds, libraryItemIdsFinished, isFinished}` over the books the user can access. 404 when the series or library is missing, 403 when the user cannot access the library | `LibraryController.getSeriesForLibrary` (`routers/ApiRouter.js`). The global `GET /api/series/:id` (`SeriesController.findOne`) is `@deprecated`, and its comment asks mobile clients to use the library route because series are not library specific |
 | Series books in reading order | `GET /api/libraries/:id/items?filter=series.<base64 id>&sort=sequence`, ordered by `CAST(sequence AS FLOAT)` with nulls last. Each item carries `media.metadata.series` as one `{id, name, sequence}` object | `libraryItemsBookFilters.getSortOrder` |
 | A book's series and authors | expanded `GET /api/items/:id?expanded=1`: `metadata.series` is an array of `{id, name, sequence}`, and `metadata.authors[].id` | `models/Book.js` `oldMetadataToJSONExpanded` |
 
@@ -23,16 +23,17 @@ Filter values are `group.base64(value)`. The server decodes them with `Buffer.fr
 
 ## Shared Core additions (`tvos/Core/Sources/TVCore`)
 
-All additions are new and additive. Existing request, authorization-revision, playback and year code is unchanged. The new endpoint methods reuse the file-private `get` and `request(…, pinned:)`.
+Existing request, authorization-revision, playback and year code is unchanged. The new endpoint methods reuse the file-private `request(…, pinned:)`. The file-private `get` gains a `pinned: UUID? = nil` passed through to it, and the existing `items(…)` gains a trailing `authorization: UUID? = nil`. Both defaults keep every existing caller as it was.
 
 `APIClient.swift`:
 
 - `static func relatedFilter(_ group:, _ value:) -> String` returns `group + "." + base64(value)`.
-- `func author(id:) async throws -> AuthorDetail` calls `api/authors/:id`.
-- `func series(id:) async throws -> SeriesDetail` calls `api/series/:id?include=progress`.
-- `func authorSeries(libraryID:authorID:page:limit: = 20) async throws -> SeriesPage` calls `api/libraries/:id/series` with `filter=authors.<b64>`, `sort=name`, `desc=0`, `limit`, `page` and `minified=1`.
+- `func author(id:authorization: = nil) async throws -> AuthorDetail` calls `api/authors/:id`.
+- `func series(libraryID:id:authorization: = nil) async throws -> SeriesDetail` calls `api/libraries/:id/series/:seriesId?include=progress`.
+- `func authorSeries(libraryID:authorID:page:limit: = 20, authorization: = nil) async throws -> SeriesPage` calls `api/libraries/:id/series` with `filter=authors.<b64>`, `sort=name`, `desc=0`, `limit`, `page` and `minified=1`.
 - `func authorImageData(authorID:authorization:) async throws -> Data` calls `api/authors/:id/image?width=400`. It is pinned to the sign-in, like `coverData(itemID:authorization:)`.
-- Series books reuse the existing `items(libraryID:page:filter:sort:)` with `sort: "sequence"`.
+- Series books reuse the existing `items(libraryID:page:filter:sort:authorization:)` with `sort: "sequence"`.
+- With `authorization`, a request is never sent once the sign-in changed, and its result is dropped if the sign-in changes while it is in flight.
 
 `Models.swift`:
 
@@ -48,9 +49,10 @@ All additions are new and additive. Existing request, authorization-revision, pl
   - A numeric sequence is kept as text.
 - `AuthorDetail` (`hasImage` is true when `imagePath` is non-empty), `SeriesDetail` (with `Progress`) and `SeriesPage`.
 - `@MainActor` `ObservableObject` loaders shared by both clients:
+  - Each page is pinned to the sign-in it was opened under (internal `OpenedSignIn`). It records `authorizationRevision` when the loader is created and the `AccountIdentity` on its first load. Every later request (book pages, series pages, details, image, retries) carries that revision. Nothing is published unless both the revision and the account are unchanged. A new sign-in to the same account (A→B→A) is a new revision, so the page opened for the first sign-in stays as it was and loads nothing more.
   - `RelatedBooks` pages server-ordered items, 60 at a time. It loads the next page when one of the last 12 appears and stops at `total`.
-  - `RelatedAuthor(api:id:libraryID:)` loads the details, series and books concurrently, plus the image when `hasImage` is true. It exposes `failure` and forwards `books` changes.
-  - `RelatedSeries(api:id:libraryID:)` loads the details with progress and the books by sequence. It exposes `sequence(of:)`, `summary` ("4 books · 1 finished", or just the count without progress) and `failure`.
+  - `RelatedAuthor(api:id:libraryID:)` loads the details, series and books concurrently, plus the image when `hasImage` is true. It loads every page of the author's series, 50 at a time, until the server's `total` is reached or a page is empty, and publishes them together. It exposes `failure` and forwards `books` changes.
+  - `RelatedSeries(api:id:libraryID:)` loads the details with progress from the library route, and the books by sequence from the same library, so the count and progress match the listed books. It exposes `sequence(of:)`, `summary` ("4 books · 1 finished", or just the count without progress) and `failure`.
 
 The TV app and mobile app both compile `TVCore` sources directly. The new core file is named `AuthorSeries.swift` because the TV target already has a `RelatedAuthorSeries.swift`.
 
@@ -91,15 +93,17 @@ All data is synthetic. `tvos/scripts/related_fixture.py` extends `verification/f
 - "The Tomorrow Saga" has sequences 1, 2, 2.5 and 10 on books 5, 2, 9 and 1. That is deliberately out of title order, and wrong if sorted as text.
 - "Evening Tales" is a second series.
 - Search adds author and series matches. Items carry `libraryId`.
+- The series details are served only on `/api/libraries/books/series/:id`, shaped like `getSeriesForLibrary`. The deprecated global `/api/series/:id` is not served, so a client that uses it fails.
 - `POST /__related__/configure {"fail": "author"|"series"}` makes the next request of that kind fail once with 503.
 - `GET /__related__/observations` returns the routes it received and the current finished count for each series.
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Core contracts | `swift test --package-path tvos/Core` | 37 passed: 27 already in base (including the year lane's annual and pinned-cover tests), 6 in `RelatedAuthorSeriesTests`, 4 in `RelatedLoadersTests` |
+| Core contracts | `swift test --package-path tvos/Core` | 41 passed: 27 already in base (including the year lane's annual and pinned-cover tests), 6 in `RelatedAuthorSeriesTests`, 8 in `RelatedLoadersTests` |
 | TV unit tests and every journey | `./tvos/scripts/verify-ui.sh` (ports 20765/20767, TV QA simulator) | 12 app tests and 20 journeys pass. After the details-links fix and a spacing change, `-only-testing:TVAppTests -only-testing:TVJourneyTests/RelatedJourney` passes 16 of 16. See [tvos/QA.md](../../tvos/QA.md) |
 | Mobile related journeys, app as it is | `./apple/scripts/verify-related.sh` (port 27765, simulator "Audiobookshelf RelatedQA") | 4 of 4 fail (expected red) |
 | Mobile related journeys with the wiring | `./apple/scripts/verify-related.sh --wired` | 4 of 4 pass (fresh build); `testBookDetailsLeadToItsSeriesAndAuthor` passes again after a forced rebuild |
+| After the review corrections | `swift test --package-path tvos/Core`, `./tvos/scripts/verify-ui.sh -only-testing:TVJourneyTests/RelatedJourney`, `./apple/scripts/verify-related.sh --wired` | 41 of 41, 4 of 4 and 4 of 4 pass. The series journeys now assert the library route and that no `/api/series/` request was made |
 
 **Tests were observed failing first.**
 
@@ -107,6 +111,15 @@ All data is synthetic. `tvos/scripts/related_fixture.py` extends `verification/f
 - **Core tests.** `RelatedAuthorSeriesTests` failed 5 of 5 against stubs (empty series, nil numeric sequence, `hasImage` false, 501 from the stub). The `libraryId` test and `RelatedLoadersTests` failed to compile before the members existed. The `summary` assertions also failed to compile first.
 - **TV unit test.** `CatalogStoreTests.testSearchKeepsAuthorsAndSeriesWithTheLibraryThatFoundThem` was checked against the base app in a throwaway worktree, where it failed to compile (no `CatalogStore.related` or `RelatedLink`). It was not observed failing on behaviour.
 - **Mobile journeys.** `RelatedAuthorSeriesJourney` failed 4 of 4 without the wiring: there was no author or series search row leading to the new pages, and no `detail-series` link.
+
+**Review corrections, each observed failing first.** A pinned review of 2f21037b found three defects. The new `RelatedLoadersTests` failed 5 tests with 18 assertions before the fixes:
+
+- **Sign-in pinning.**
+  - `testAnAuthorPageOpenedForOneSignInNeverRequestsOrShowsAnothers` failed after B signed in: page 1, page 0, the details and the series went to `other.example` with B's token. After A signed in again, they went out once more (12 requests instead of 4).
+  - `testAnAuthorImageIsOnlyRequestedForTheSignInThePageOpenedWith` failed because a retry under B requested and published B's details and `/api/authors/author/image`. The image revision was read only after the awaited details.
+  - `testASeriesPageOpenedForOneSignInNeverRequestsOrShowsAnothers` failed because a page opened before A→B→A loaded under the new sign-in.
+- **Author series pagination.** `testAnAuthorWithMoreSeriesThanOnePageShowsThemAll` (53 series) listed only `s00`–`s49`.
+- **Library-scoped series.** `testSeriesKeepsTheServerSequenceOrderAndProgress` and `testAFailedSeriesIsReportedAndLoadingAgainRecovers` failed with 404 because they mock only the library route; the loader called `api/series/saga`.
 
 **Fixed: stale details links.** After each fresh build, the wired mobile `testBookDetailsLeadToItsSeriesAndAuthor` failed reproducibly (3 runs, the same with a 40 s wait). Details showed the author link but not the series link.
 

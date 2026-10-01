@@ -53,7 +53,8 @@ final class RelatedJourney: TVJourney {
         XCTAssertTrue(app.staticTexts["detail-title"].waitForExistence(timeout: 10))
         XCTAssertEqual(label("detail-title"), "Stories for Tomorrow 10")
         let observed = try await RelatedFixture.requests()
-        XCTAssertTrue(observed.contains { $0.path == "/api/series/series-saga" && $0.query["include"] == "progress" })
+        XCTAssertTrue(observed.contains { $0.path == "/api/libraries/books/series/series-saga" && $0.query["include"] == "progress" })
+        XCTAssertFalse(observed.contains { $0.path.hasPrefix("/api/series/") }, "Series details come from the library the books are listed from")
         XCTAssertTrue(observed.contains { $0.path == "/api/libraries/books/items" && $0.query["filter"] == "series." + Data("series-saga".utf8).base64EncodedString() && $0.query["sort"] == "sequence" })
     }
 

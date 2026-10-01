@@ -8,7 +8,7 @@ Coordinator integration reran the complete suite from `feat/apple-tv-completion`
 
 | Check | Command | Result |
 | --- | --- | --- |
-| TV core contracts | `swift test --package-path tvos/Core` | 37 passed |
+| TV core contracts | `swift test --package-path tvos/Core` | 41 passed |
 | TV app unit tests (`TVAppTests`) | run by `./tvos/scripts/verify-ui.sh` | 12 passed |
 | Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 20 journeys passed, 0 failed (543 s); local result `tvos/build/TVFull-related-final.xcresult`. After the final details-links and spacing change to the related views only, `TVAppTests` and `RelatedJourney` passed again: 16 of 16 (`tvos/build/Related-final.xcresult`) |
 | Signed device build and install | `./tvos/scripts/deploy.sh --no-launch a5ef39a5001ef59dec9c2fa15838447215252137` | Release build signed by team `C7X9BCC7LP`, `codesign --verify --deep --strict` passes, installed on Living Room TV (tvOS 18.6) |

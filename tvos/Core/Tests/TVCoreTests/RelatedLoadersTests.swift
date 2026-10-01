@@ -9,7 +9,7 @@ import XCTest
 
     override func setUp() async throws {
         let store = MemoryCredentials()
-        store.value = Credentials(server: "https://books.example/abs", accessToken: "token", refreshToken: nil)
+        store.value = Credentials(server: "https://books.example/abs", accessToken: "token", refreshToken: nil, userID: "a", username: "a")
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
         http = URLSession(configuration: configuration)
@@ -27,6 +27,25 @@ import XCTest
             let components = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!
             seen.append(components)
             return respond(components.path, Dictionary((components.queryItems ?? []).map { ($0.name, $0.value ?? "") }, uniquingKeysWith: { $1 }))
+        }
+    }
+
+    private func signIn(_ server: String, user: String) throws {
+        try api.completeBrowserLogin(server: server, response: Data(#"{"user":{"id":"\#(user)","username":"\#(user)","accessToken":"token-\#(user)"}}"#.utf8))
+    }
+
+    /// Any server answers like the first one, so only the pin can keep another sign-in's requests from succeeding.
+    private func serveAuthorEverywhere(seriesTotal: Int = 1) {
+        serve { path, query in
+            switch path {
+            case "/abs/api/authors/author": return (200, #"{"id":"author","name":"Writer","imagePath":"/metadata/authors/author.jpg"}"#)
+            case "/abs/api/authors/author/image": return (200, "png")
+            case "/abs/api/libraries/books/series": return (200, #"{"results":[{"id":"saga","name":"Saga"}],"total":\#(seriesTotal)}"#)
+            case "/abs/api/libraries/books/items":
+                return query["page"] == "0" ? (200, #"{"results":[\#(Self.book("b0")),\#(Self.book("b1"))],"total":3}"#) : (200, #"{"results":[\#(Self.book("b2"))],"total":3}"#)
+            case "/abs/api/libraries/books/series/saga": return (200, #"{"id":"saga","name":"Saga"}"#)
+            default: return (404, "")
+            }
         }
     }
 
@@ -85,7 +104,7 @@ import XCTest
     func testSeriesKeepsTheServerSequenceOrderAndProgress() async throws {
         serve { path, _ in
             switch path {
-            case "/abs/api/series/saga": return (200, #"{"id":"saga","name":"Saga","description":"In order","progress":{"libraryItemIds":["b5","b2","b9","b1"],"libraryItemIdsFinished":["b5"],"isFinished":false}}"#)
+            case "/abs/api/libraries/books/series/saga": return (200, #"{"id":"saga","name":"Saga","description":"In order","progress":{"libraryItemIds":["b5","b2","b9","b1"],"libraryItemIdsFinished":["b5"],"isFinished":false}}"#)
             case "/abs/api/libraries/books/items":
                 return (200, #"{"results":[\#(Self.book("b5", series: "1")),\#(Self.book("b2", series: "2")),\#(Self.book("b9", series: "2.5")),\#(Self.book("b1", series: "10"))],"total":4}"#)
             default: return (404, "")
@@ -102,14 +121,15 @@ import XCTest
         let query = try XCTUnwrap(requests("/abs/api/libraries/books/items").first)
         XCTAssertEqual(query["sort"], "sequence")
         XCTAssertEqual(query["filter"], "series." + Data("saga".utf8).base64EncodedString())
-        XCTAssertEqual(requests("/abs/api/series/saga").first?["include"], "progress")
+        XCTAssertEqual(requests("/abs/api/libraries/books/series/saga").first?["include"], "progress", "Series span libraries, so details and progress come from the library the books are listed from")
+        XCTAssertTrue(requests("/abs/api/series/saga").isEmpty)
     }
 
     func testAFailedSeriesIsReportedAndLoadingAgainRecovers() async throws {
         var failures = 1
         serve { path, _ in
             switch path {
-            case "/abs/api/series/saga":
+            case "/abs/api/libraries/books/series/saga":
                 if failures > 0 { failures -= 1; return (503, "") }
                 return (200, #"{"id":"saga","name":"Saga"}"#)
             case "/abs/api/libraries/books/items": return (200, #"{"results":[\#(Self.book("b1", series: "1"))],"total":1}"#)
@@ -125,5 +145,73 @@ import XCTest
         XCTAssertEqual(series.series?.name, "Saga")
         XCTAssertEqual(series.summary, "1 book", "Without the server's progress only the count is known")
         XCTAssertEqual(series.books.items.map(\.id), ["b1"])
+    }
+
+    func testAnAuthorWithMoreSeriesThanOnePageShowsThemAll() async throws {
+        let names = (0..<53).map { String(format: "s%02d", $0) }
+        serve { path, query in
+            switch path {
+            case "/abs/api/authors/author": return (200, #"{"id":"author","name":"Writer"}"#)
+            case "/abs/api/libraries/books/series":
+                let limit = Int(query["limit"] ?? "") ?? 0, page = Int(query["page"] ?? "") ?? 0
+                let window = names.dropFirst(page * limit).prefix(limit).map { #"{"id":"\#($0)","name":"\#($0)"}"# }
+                return (200, #"{"results":[\#(window.joined(separator: ","))],"total":\#(names.count),"limit":\#(limit),"page":\#(page)}"#)
+            case "/abs/api/libraries/books/items": return (200, #"{"results":[],"total":0}"#)
+            default: return (404, "")
+            }
+        }
+        let author = RelatedAuthor(api: api, id: "author", libraryID: "books")
+        await author.load()
+        XCTAssertNil(author.error)
+        XCTAssertEqual(author.series.map(\.id), names, "Every series the server totals is listed, in its name order")
+    }
+
+    func testAnAuthorPageOpenedForOneSignInNeverRequestsOrShowsAnothers() async throws {
+        serveAuthorEverywhere()
+        let author = RelatedAuthor(api: api, id: "author", libraryID: "books")
+        await author.load()
+        XCTAssertEqual(author.books.items.map(\.id), ["b0", "b1"])
+        let opened = seen.count
+
+        try signIn("https://other.example/abs", user: "b")
+        await author.books.loadMore(after: author.books.items[1])
+        await author.load()
+        XCTAssertEqual(seen.count, opened, "No later page, detail or image goes out for B: \(seen.dropFirst(opened).map(\.string))")
+        XCTAssertEqual(author.books.items.map(\.id), ["b0", "b1"], "B's pages are never appended to A's")
+
+        try signIn("https://books.example/abs", user: "a")
+        await author.books.loadMore(after: author.books.items[1])
+        await author.load()
+        XCTAssertEqual(seen.count, opened, "Signing A in again is a new sign-in, not the one the page was opened for")
+        XCTAssertEqual(author.books.items.map(\.id), ["b0", "b1"])
+        XCTAssertNil(author.error)
+    }
+
+    func testAnAuthorImageIsOnlyRequestedForTheSignInThePageOpenedWith() async throws {
+        serveAuthorEverywhere()
+        MockURLProtocol.handler = { [unowned self, handler = MockURLProtocol.handler!] request in
+            if request.url!.path == "/abs/api/authors/author" { seen.append(URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!); return (503, "") }
+            return handler(request)
+        }
+        let author = RelatedAuthor(api: api, id: "author", libraryID: "books")
+        await author.load()
+        XCTAssertEqual(author.error as? APIError, .http(503))
+        serveAuthorEverywhere()
+        try signIn("https://other.example/abs", user: "b")
+        await author.load()
+        XCTAssertFalse(seen.contains { $0.host == "other.example" }, "Retrying under B requests nothing: \(seen.filter { $0.host == "other.example" }.map(\.string))")
+        XCTAssertNil(author.imageData)
+        XCTAssertNil(author.author)
+    }
+
+    func testASeriesPageOpenedForOneSignInNeverRequestsOrShowsAnothers() async throws {
+        serveAuthorEverywhere()
+        let series = RelatedSeries(api: api, id: "saga", libraryID: "books")
+        try signIn("https://other.example/abs", user: "b")
+        try signIn("https://books.example/abs", user: "a")
+        await series.load()
+        XCTAssertTrue(seen.isEmpty, "A page opened before A signed in again loads nothing: \(seen.map(\.string))")
+        XCTAssertNil(series.series)
+        XCTAssertTrue(series.books.items.isEmpty)
     }
 }
