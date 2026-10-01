@@ -64,4 +64,25 @@ import XCTest
         let relaunched = try XCTUnwrap(downloads.visible.first)
         XCTAssertEqual(try downloads.audio(relaunched).files.map { try Data(contentsOf: $0) }, [audio])
     }
+
+    /// A transfer the system could not write for a reason other than space, here a permission failure, must not be
+    /// reported as a full device.
+    func testFileWriteFailureWithoutAStorageCauseIsNotReportedAsInsufficientStorage() async throws {
+        let permission = NSError(domain: NSPOSIXErrorDomain, code: Int(EACCES))
+        stub.route("GET", "/abs/api/items/book-1/file/ino-1/download") { _ in
+            .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotWriteToFile, userInfo: [NSUnderlyingErrorKey: permission]))
+        }
+        let api = APIClient(store: credentials, session: stub.session())
+        try api.restoreSavedCredentials()
+        let downloads = store(api)
+        serveItem(ebook: false)
+        let item = try JSONDecoder().decode(LibraryItem.self, from: JSONSerialization.data(withJSONObject: ["id": "book-1", "mediaType": "book", "media": ["metadata": ["title": "Synthetic book"]]]))
+        await downloads.enqueue(item: item, episode: nil)
+        try await wait(downloads) { $0?.state == .failed }
+        let failed = try XCTUnwrap(downloads.visible.first)
+        XCTAssertEqual(failed.state, .failed)
+        XCTAssertNotNil(failed.error)
+        XCTAssertNotEqual(failed.error, "There is not enough storage on this device for this download. Free up space, then retry.")
+        XCTAssertEqual(stub.requests("GET", "/abs/api/items/book-1/file/ino-1/download").count, 1)
+    }
 }

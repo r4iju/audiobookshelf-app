@@ -18,6 +18,8 @@ final class StubServer {
         case file(Int, String, Data)
         /// The server handled the request but the client never saw the answer.
         case lost
+        /// The loading system failed the request with this error.
+        case failure(Error)
     }
 
     private let lock = NSLock()
@@ -80,6 +82,8 @@ final class StubProtocol: URLProtocol {
         switch server.handle(request) {
         case .lost:
             client?.urlProtocol(self, didFailWithError: URLError(.networkConnectionLost))
+        case .failure(let error):
+            client?.urlProtocol(self, didFailWithError: error)
         case .status(let code):
             respond(code, Data())
         case .json(let code, let value):
