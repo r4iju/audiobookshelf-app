@@ -13,6 +13,7 @@
     <div v-else-if="state === 'ready' || state === 'saved'" class="py-3">
       <p class="text-sm break-all">{{ result.name }}</p>
       <p class="text-xs text-fg-muted">{{ result.files }} files, {{ $bytesPretty(result.bytes) }}</p>
+      <p v-if="error" class="text-sm text-error py-1">{{ error }}</p>
       <p v-if="state === 'saved'" class="text-sm text-success py-1">Saved. Open the new app and import this file. You can remove it from here when the import has finished.</p>
       <p v-else class="text-sm text-fg-muted py-1">Choose "On My iPhone" in the save dialog to keep the file off cloud storage.</p>
       <div class="flex items-center pt-2">
@@ -66,21 +67,23 @@ export default {
     },
     async save() {
       this.saving = true
+      this.error = null
       try {
         const { saved } = await LegacyMigrationExport.saveArchive()
         if (saved) this.state = 'saved'
       } catch (error) {
         this.error = error?.message || 'The file could not be saved.'
-        this.state = 'idle'
       } finally {
         this.saving = false
       }
     },
     async discard() {
+      this.error = null
       try {
         await LegacyMigrationExport.discardArchive()
       } catch (error) {
         this.error = error?.message || 'The export could not be removed.'
+        return
       }
       this.result = null
       this.state = 'idle'
