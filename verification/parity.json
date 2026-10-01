@@ -204,7 +204,9 @@
         "then": "Every supported action is reachable with visible focus and reliable Back"
       },
       "replacementEvidence": {
-        "tv": []
+        "tv": [
+          "Simulator remote-only catalog, details and Back: TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus; tvos/QA.md. Physical remote acceptance remains open."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -1758,7 +1760,9 @@
         "then": "Focus is visible and predictable; Back returns reliably without trapping the user"
       },
       "replacementEvidence": {
-        "tv": []
+        "tv": [
+          "Simulator directional focus, pagination and Back: TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus and testLibraryLoadsNextPageAsFocusMovesDown; tvos/QA.md. Physical focus acceptance remains open."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -1783,7 +1787,9 @@
         "then": "Artwork and text are readable and focus/primary action remain clear"
       },
       "replacementEvidence": {
-        "tv": []
+        "tv": [
+          "Synthetic long title and missing cover over trusted HTTPS: TVJourneyTests/CatalogJourney/testTrustedHTTPSServerAndLongMetadata; tvos/evidence/long-title.png. Across-room hardware readability remains open."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -1808,7 +1814,9 @@
         "then": "Supported TV listening journey produces real audio and correct cross-device progress"
       },
       "replacementEvidence": {
-        "tv": []
+        "tv": [
+          "Synthetic simulator playback, chapters, speed, episode selection and durable progress: TVJourneyTests/PlaybackJourney, PodcastJourney and RecoveryJourney; tvos/QA.md. Real codecs, routes and cross-device hardware acceptance remain open."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -2206,7 +2214,11 @@
         "tv",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "tv": [
+          "Local TV core and app tests, remote-driven simulator journeys and signed Release build: tvos/scripts/verify-ui.sh, tvos/scripts/deploy.sh; tvos/QA.md."
+        ]
+      },
       "verification": {
         "given": "Studio toolchains and source checkout",
         "when": "Run documented build/test/sign/package commands locally",
@@ -2230,7 +2242,11 @@
         "tv",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "tv": [
+          "Signed Release directly installed on paired Living Room TV, tvOS 18.6: tvos/scripts/deploy.sh --no-launch; tvos/QA.md. Installation does not establish physical acceptance."
+        ]
+      },
       "verification": {
         "given": "Locally accepted and signed artifacts",
         "when": "Install directly or deploy the browser internally",

@@ -4,6 +4,9 @@ set -euo pipefail
 tv_root="$(cd "$(dirname "$0")/.." && pwd)"
 tv_devices="$(mktemp)"
 trap 'rm -f "$tv_devices"' EXIT
+# --no-launch installs without opening the app, so a TV in use is not interrupted.
+tv_launch=1
+if [[ "${1:-}" == "--no-launch" ]]; then tv_launch=0; shift; fi
 
 if [[ "${1:-}" == "--build-only" ]]; then
     tv_profile="$(python3 "$tv_root/scripts/provision.py")"
@@ -50,6 +53,10 @@ if [[ "${1:-}" == "--build-only" ]]; then
     echo "Signed Apple TV build: $tv_app"
 else
     xcrun devicectl device install app --device "$tv_udid" "$tv_app"
-    xcrun devicectl device process launch --device "$tv_udid" com.forkzed.audiobookshelf.tv
-    echo 'Audiobookshelf is installed and launched on your Apple TV.'
+    if (( tv_launch )); then
+        xcrun devicectl device process launch --device "$tv_udid" com.forkzed.audiobookshelf.tv
+        echo 'Audiobookshelf is installed and launched on your Apple TV.'
+    else
+        echo 'Audiobookshelf is installed on your Apple TV.'
+    fi
 fi

@@ -36,11 +36,35 @@ targets:
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
         NSLocalNetworkUsageDescription: Connect to your Audiobookshelf server on your local network.
+  TVJourneyTests:
+    type: bundle.ui-testing
+    platform: tvOS
+    sources: [UITests]
+    dependencies:
+      - target: AudiobookshelfTV
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.tv.uitests
+  TVAppTests:
+    type: bundle.unit-test
+    platform: tvOS
+    sources: [AppTests]
+    dependencies:
+      - target: AudiobookshelfTV
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.tv.apptests
 schemes:
   AudiobookshelfTV:
     build:
       targets:
         AudiobookshelfTV: all
+        TVJourneyTests: [test]
+        TVAppTests: [test]
+    test:
+      targets: [TVAppTests, TVJourneyTests]
     run:
       config: Debug
     archive:
