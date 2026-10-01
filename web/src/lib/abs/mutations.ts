@@ -9,7 +9,7 @@ import {
   keepProgress,
   sendChange,
 } from "@/lib/progress/sync";
-import { useAbs } from "@/lib/session/store";
+import { useAbs, useSessionStore } from "@/lib/session/store";
 import type { AbsClient } from "./client";
 import { feedSchema } from "./feeds";
 import { keys } from "./queries";
@@ -248,15 +248,19 @@ export function useClearDownloadQueue() {
 
 /**
  * Deletes the episode's audio file too; the server also drops it from playlists and removes its progress.
- * `onRemoved` runs even if the episode's page has already gone, as it does when the server's update arrives first.
+ * `onRemoved` runs even if the episode's page has already gone, as it does when the server's update arrives first,
+ * but not once another account is in use.
  */
-export function useRemoveEpisode(onRemoved: (itemId: string) => void) {
+export function useRemoveEpisode(onRemoved: (removed: { itemId: string; episodeId: string }) => void) {
   const { client, connection } = useAbs();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ itemId, episodeId }: { itemId: string; episodeId: string }) =>
       client.command("DELETE", `/api/podcasts/${itemId}/episode/${episodeId}?hard=1`),
-    onSuccess: (_data, { itemId }) => onRemoved(itemId),
+    onSuccess: (_data, removed) => {
+      const { session } = useSessionStore.getState();
+      if (session.phase === "signed-in" && session.connection.id === connection.id) onRemoved(removed);
+    },
     onSettled: (_data, _error, { itemId }) =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: keys.item(connection.id, itemId) }),

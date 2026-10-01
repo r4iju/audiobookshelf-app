@@ -170,8 +170,8 @@ server, or a physical device. The production container `audiobookshelf` (port 13
   records, and what it sent as `reports`, which is read as failed without an answer. A block without a readable
   phase leaves its discard unconfirmed: nothing is deleted by itself, and Keep progress is refused too, since its
   delete may still land, so Discard anyway is the way out. A record whose book cannot be read blocks, or counts
-  against, every book; such a block that no hold of this device is finishing is removed, since nothing would ever
-  end it. A playback session record that cannot be read is not sent, until a discard of its book drops its
+  against, every book; such a block that no hold of this device is finishing is removed only if its phase is
+  readably blocked, since its delete was never issued. A playback session record that cannot be read is not sent, until a discard of its book drops its
   listening. Before a reader place recorded when it was made is sent, it checks that it still counts, so one still
   waiting its turn when the user discards anyway is dropped.
 
@@ -213,6 +213,9 @@ server, or a physical device. The production container `audiobookshelf` (port 13
   - IndexedDB keeps one small record per playback session ever sent, and one per discard; nothing prunes them.
   - For a discard left by the version before `cc26ec24`, the item page still offers Keep progress, which leaves it
     unconfirmed.
+  - A block whose book cannot be read, whose delete may have been issued, and that no hold is finishing stops all
+    listening for that account in this browser. Nothing in the app clears it; clearing the site's data does, along
+    with any unsent listening.
   - A reader place made before a discard and still waiting its turn in a tab that then closes stays recorded, so
     discards of that book are unconfirmed until the user chooses.
   - A browser that refuses IndexedDB delivers no listening and saves no reader place; each attempt fails as an

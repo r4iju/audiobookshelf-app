@@ -817,6 +817,25 @@ describe("discardProgress", () => {
 
       expect(server.log).toEqual(["listening book-y@40"]);
     });
+
+    it.each([
+      ["deleting", { phase: "deleting" }],
+      ["unreadable", { phase: "removing" }],
+      ["from the earlier version", {}],
+    ])(
+      "delivers nothing past a block whose book cannot be read, its phase %s, while its delete may still land",
+      async (_, phase) => {
+        vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+        const server = scriptedDeleteServer("conn-a", ["ok"]);
+        await storedCoordination([{ key: "block:conn-a:gone", ...phase }]);
+        outboxFor("conn-a").record(report("new-y", "book-y"));
+
+        await flushReports(server.client, () => {});
+        await flushReports(server.client, () => {});
+
+        expect(server.log).toEqual([]);
+      },
+    );
   });
 
   it("sends no reading place still waiting its turn once the user discards anyway", async () => {

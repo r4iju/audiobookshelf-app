@@ -269,3 +269,68 @@ test("an administrator follows the server's download queue, clears it, and remov
     .poll(async () => (await admin.call(`/api/items/${created.id}`)).body.media.episodes)
     .toHaveLength(0);
 });
+
+test("removing an episode returns to its podcast only if its page is still showing", async ({ page }) => {
+  test.setTimeout(90_000);
+  const admin = await serverApi(accounts.admin);
+  const existing = (await admin.call(`/api/libraries/${qa.libraries.podcasts}/search?q=QA%20Remove`)).body
+    .podcast;
+  for (const result of existing)
+    await admin.call(`/api/items/${result.libraryItem.id}?hard=1`, { method: "DELETE" });
+  const library = (await admin.call(`/api/libraries/${qa.libraries.podcasts}`)).body;
+  const folder = library.folders.find((entry: { fullPath: string }) => entry.fullPath === "/podcasts");
+  const created = (
+    await admin.call("/api/podcasts", {
+      method: "POST",
+      body: {
+        libraryId: qa.libraries.podcasts,
+        folderId: folder.id,
+        path: "/podcasts/QA Remove Show",
+        media: {
+          metadata: { title: "QA Remove Show", feedUrl: "http://host.docker.internal:19885/feed.xml" },
+          autoDownloadEpisodes: false,
+        },
+      },
+    })
+  ).body;
+
+  await signIn(page, accounts.admin);
+  await page.goto(`/item/${created.id}`);
+  await page.getByRole("button", { name: "Find new episodes" }).click();
+  const dialog = page.getByRole("dialog", { name: "Episodes" });
+  await dialog.getByRole("checkbox", { name: "Feed Episode 1" }).check();
+  await dialog.getByRole("checkbox", { name: "Feed Episode 2" }).check();
+  await dialog.getByRole("button", { name: "Download 2 episodes" }).click();
+  const episodes = page.getByRole("region", { name: "Episodes" });
+  await expect(episodes.getByRole("list").getByRole("heading")).toHaveCount(2, { timeout: 30_000 });
+
+  let release = () => {};
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(/\/api\/podcasts\/[^/]+\/episode\//, async (route) => {
+    await released;
+    await route.continue();
+  });
+  await episodes.getByRole("link", { name: "Feed Episode 1" }).click();
+  await page.getByRole("button", { name: "Remove from Server" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Remove from Server" }).click();
+  await page.keyboard.press("Escape");
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await expect(page).toHaveURL(/\/settings$/);
+  const answered = page.waitForResponse(/\/api\/podcasts\/[^/]+\/episode\//);
+  release();
+  await answered;
+  await expect
+    .poll(async () => (await admin.call(`/api/items/${created.id}`)).body.media.episodes)
+    .toHaveLength(1);
+  await page.waitForTimeout(500);
+  await expect(page).toHaveURL(/\/settings$/);
+
+  await page.unroute(/\/api\/podcasts\/[^/]+\/episode\//);
+  await page.goto(`/item/${created.id}`);
+  await episodes.getByRole("link", { name: "Feed Episode 2" }).click();
+  await page.getByRole("button", { name: "Remove from Server" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Remove from Server" }).click();
+  await expect(page).toHaveURL(new RegExp(`/item/${created.id}$`));
+});

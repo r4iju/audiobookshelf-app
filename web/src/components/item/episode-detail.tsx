@@ -46,7 +46,11 @@ function EpisodeView({ item, episode }: { item: LibraryItem; episode: PodcastEpi
   const me = useMe().data;
   const progress = useEpisodeProgress(item.id).data?.get(episode.id);
   const player = usePlayer();
-  const remove = useRemoveEpisode((itemId) => router.replace(`/item/${itemId}`));
+  const remove = useRemoveEpisode(({ itemId, episodeId }) => {
+    // Only from the removed episode's page: the user may have gone elsewhere while the server answered.
+    if (window.location.pathname.endsWith(`/item/${itemId}/episode/${episodeId}`))
+      router.replace(`/item/${itemId}`);
+  });
   const [dialog, setDialog] = useState<"playlist" | "remove" | null>(null);
   const playing = isPlaying(player, { itemId: item.id, episodeId: episode.id });
   const duration = episodeDuration(episode);

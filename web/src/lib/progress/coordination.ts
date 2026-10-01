@@ -595,8 +595,9 @@ export function isSending(sendingKey: string) {
 }
 
 /**
- * Removes blocks whose book cannot be read and that none of `holdIds` is finishing: nothing would ever end them, and
- * they would hold back every book.
+ * Removes blocks whose book cannot be read, that none of `holdIds` is finishing and whose delete was never issued:
+ * nothing would ever end them, and they would hold back every book. One whose delete may have been issued stays,
+ * since that delete may still land after listening sent past it.
  */
 export function releaseUnreadableBlocks(connectionId: string, holdIds: string[]) {
   return transact<void>((store, finish) => {
@@ -604,7 +605,8 @@ export function releaseUnreadableBlocks(connectionId: string, holdIds: string[])
     records.onsuccess = () => {
       for (const raw of records.result) {
         const block = readBlock(storedKey(raw), raw);
-        if (!block.target && !holdIds.includes(holdOf(connectionId, block))) store.delete(block.key);
+        if (!block.target && block.phase === "blocked" && !holdIds.includes(holdOf(connectionId, block)))
+          store.delete(block.key);
       }
     };
     finish(undefined);
