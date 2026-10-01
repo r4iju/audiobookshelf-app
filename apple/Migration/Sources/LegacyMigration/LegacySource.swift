@@ -37,9 +37,12 @@ public struct LegacySource {
     public let filesRoot: URL
     /// SHA-256 recorded when an archive was written, keyed by legacy relative path.
     public let recordedDigests: [String: String]
+    /// Where each legacy path is stored under `filesRoot` when that differs from the path itself.
+    public let storedPaths: [String: String]
     public let secrets: LegacySecretSource?
 
-    public init(kind: LegacySourceKind, snapshot: LegacySnapshot, filesRoot: URL, recordedDigests: [String: String] = [:], secrets: LegacySecretSource? = nil) {
+    public init(kind: LegacySourceKind, snapshot: LegacySnapshot, filesRoot: URL, recordedDigests: [String: String] = [:], storedPaths: [String: String] = [:], secrets: LegacySecretSource? = nil) {
+        self.storedPaths = storedPaths
         self.kind = kind
         self.snapshot = snapshot
         self.filesRoot = filesRoot

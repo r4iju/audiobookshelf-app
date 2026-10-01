@@ -372,7 +372,8 @@ final class LegacyMigratorTests: XCTestCase {
 
     func testCorruptArchiveFileIsReportedWhileOtherDataImports() throws {
         let archive = try LegacyArchive.write(fixture.snapshot, documents: fixture.documents, to: fixture.directory.appendingPathComponent("Audiobookshelf.abslegacy"))
-        try Data("bit-rot".utf8).write(to: archive.appendingPathComponent("files/li-epub/book.epub"))
+        let stored = try XCTUnwrap(try LegacyArchive.open(archive).storedPaths["li-epub/book.epub"])
+        try Data("bit-rot".utf8).write(to: archive.appendingPathComponent("files").appendingPathComponent(stored))
 
         let migrator = LegacyMigrator(root: fixture.migrationRoot())
         let outcome = try migrator.migrate(try LegacyArchive.open(archive), secrets: nil)

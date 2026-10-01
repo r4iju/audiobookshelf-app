@@ -187,8 +187,10 @@ struct MigrationPlan {
         return digestName("\(account.server)\n\(account.userID)")
     }
 
-    /// Legacy identifiers are arbitrary strings; only their digest becomes a path component.
-    private static func digestName(_ identity: String) -> String {
+    /// Legacy identifiers and paths are arbitrary strings; only their digest becomes a path
+    /// component, which also keeps names differing only by case or normalisation apart on
+    /// case-insensitive volumes.
+    static func digestName(_ identity: String) -> String {
         String(SHA256.hash(data: Data(identity.utf8)).hex.prefix(24))
     }
 
@@ -197,11 +199,18 @@ struct MigrationPlan {
         return !relativePath.isEmpty && !relativePath.hasPrefix("/") && !components.contains { $0.isEmpty || $0 == "." || $0 == ".." }
     }
 
+    /// Where a legacy path is stored under an archive's `files`: its own digest directory, so
+    /// paths differing only by case cannot collide on the volume the archive is written to.
+    static func archivedPath(_ legacyPath: String) -> String {
+        "\(digestName(legacyPath))/\((legacyPath as NSString).lastPathComponent)"
+    }
+
     /// Resolves a legacy relative path inside the source root, or nil when it would escape it.
     private func resolve(_ path: String) -> URL? {
-        guard Self.isContained(path) else { return nil }
+        let stored = source.storedPaths[path] ?? path
+        guard Self.isContained(path), Self.isContained(stored) else { return nil }
         let base = source.filesRoot.standardizedFileURL.resolvingSymlinksInPath()
-        let url = base.appendingPathComponent(path).standardizedFileURL.resolvingSymlinksInPath()
+        let url = base.appendingPathComponent(stored).standardizedFileURL.resolvingSymlinksInPath()
         guard url.path.hasPrefix(base.path + "/") else { return nil }
         return url
     }
@@ -241,8 +250,8 @@ struct MigrationPlan {
     }
 
     /// Decides whether one legacy file can be adopted and where. The destination is
-    /// `<account digest>/<owner digest>/<validated legacy path>`, so neither an identifier nor a
-    /// path can leave the account's directory or land on another file's destination.
+    /// `<account digest>/<owner digest>/<legacy path digest>/<file name>`, so neither an identifier
+    /// nor a path can leave the account's directory or land on another file's destination.
     private mutating func plan(_ reference: FileReference, owner: MigrationAccount?, libraryItemID: String?, title: String, scope: String) {
         let key = Self.fileKey(owner, reference.path)
         guard files[key] == nil else { return }
@@ -267,18 +276,25 @@ struct MigrationPlan {
                    "A downloaded file of \"\(title)\" is incomplete (\(actualSize) of \(reference.size) bytes). The original is kept; download it again to play this part offline.")
             return
         }
-        let destination = "\(Self.directory(for: owner))/\(Self.digestName(scope))/\(reference.path)"
-        guard Self.isContained(destination), !destinations.contains(destination) else {
+        let destination = "\(Self.directory(for: owner))/\(Self.digestName(scope))/\(Self.digestName(reference.path))/\((reference.path as NSString).lastPathComponent)"
+        guard Self.isContained(destination), !destinations.contains(destination.lowercased()) else {
             report(.unsafePath, account: owner, item: libraryItemID, path: reference.path,
                    "A file of \"\(title)\" could not be given a place of its own and was not read. The original is unchanged.")
             return
         }
-        destinations.insert(destination)
+        destinations.insert(destination.lowercased())
         files[key] = PlannedFile(legacyPath: reference.path, source: url, destination: destination, legacyFileID: reference.id,
                                  filename: reference.filename, mimeType: reference.mimeType, size: actualSize, account: owner, libraryItemID: libraryItemID)
     }
 
     static let damagedInExportMessage = "This downloaded file was damaged in the export. The original in the old app is unchanged; export again or download it again."
+
+    /// Withdraws the "missing" or "incomplete" report for a file kept from an earlier commit.
+    mutating func retractUnavailable(key: String, legacyPath: String) {
+        issues.removeAll { issue in
+            (issue.code == .fileMissing || issue.code == .fileIncomplete) && issue.legacyPath == legacyPath && Self.fileKey(issue.account, legacyPath) == key
+        }
+    }
 
     mutating func report(_ code: MigrationIssue.Code, account: MigrationAccount?, item: String?, path: String?, _ message: String) {
         let issue = MigrationIssue(code: code, account: account, libraryItemID: item, legacyPath: path, message: message)

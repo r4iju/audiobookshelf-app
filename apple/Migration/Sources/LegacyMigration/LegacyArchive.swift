@@ -1,7 +1,7 @@
 import Foundation
 
 /// Credential-free export of a legacy installation that can cross the sandbox boundary through the
-/// Files app: a directory holding `files/<legacy path>` and `archive.json`. The archive is built
+/// Files app: a directory holding `files/<legacy path digest>/<file name>` and `archive.json`. The archive is built
 /// under `<name>.partial` and renamed only after `archive.json` (written last) is complete, so a
 /// directory without `archive.json` is always an interrupted export.
 public enum LegacyArchive {
@@ -12,6 +12,7 @@ public enum LegacyArchive {
         var formatVersion: Int
         var snapshot: LegacySnapshot
         var digests: [String: String]
+        var storedPaths: [String: String]
     }
 
     @discardableResult
@@ -30,14 +31,17 @@ public enum LegacyArchive {
         // from Documents would refuse to read.
         let plan = MigrationPlan(source: LegacySource(kind: .inPlace, snapshot: exported, filesRoot: documents))
         var digests: [String: String] = [:]
+        var storedPaths: [String: String] = [:]
         for planned in plan.files.values where digests[planned.legacyPath] == nil {
-            let target = files.appendingPathComponent(planned.legacyPath)
+            let stored = MigrationPlan.archivedPath(planned.legacyPath)
+            storedPaths[planned.legacyPath] = stored
+            let target = files.appendingPathComponent(stored)
             try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: planned.source, to: target)
             digests[planned.legacyPath] = try LegacyMigrator.sha256(of: target)
         }
 
-        let manifest = try MigrationJSON.encoder.encode(Manifest(formatVersion: formatVersion, snapshot: exported, digests: digests))
+        let manifest = try MigrationJSON.encoder.encode(Manifest(formatVersion: formatVersion, snapshot: exported, digests: digests, storedPaths: storedPaths))
         try manifest.write(to: partial.appendingPathComponent(manifestName), options: .atomic)
         try FileManager.default.moveItem(at: partial, to: destination)
         return destination
@@ -55,6 +59,6 @@ public enum LegacyArchive {
         guard manifest.formatVersion == formatVersion else {
             throw LegacyMigrationError.archiveUnreadable("This export was made by an unsupported version (\(manifest.formatVersion)).")
         }
-        return LegacySource(kind: .archive, snapshot: manifest.snapshot, filesRoot: url.appendingPathComponent("files"), recordedDigests: manifest.digests)
+        return LegacySource(kind: .archive, snapshot: manifest.snapshot, filesRoot: url.appendingPathComponent("files"), recordedDigests: manifest.digests, storedPaths: manifest.storedPaths)
     }
 }

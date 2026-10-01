@@ -89,8 +89,9 @@ public final class LegacyMigrator {
         if journal.committed, let previous = previous, verifies(previous) { return previous }
         var recordedDigests: [String: String] = [:]
         for file in previous.map(Self.adoptedFiles) ?? [] { recordedDigests[file.path] = file.sha256 }
-        journal.committed = false
-        try writeJournal(journal)
+        // A repair keeps the journal committed, so a failed repair stays damaged-and-committed
+        // to this source instead of looking like no migration happened.
+        if !journal.committed { try writeJournal(journal) }
 
         var plan = MigrationPlan(source: source)
         try? FileManager.default.removeItem(at: stagingURL)
@@ -172,6 +173,14 @@ public final class LegacyMigrator {
                         "Sign in to \(account.account.server) as \(account.username.isEmpty ? "this user" : account.username) again. Downloads, progress and unsent listening for this account are kept and become available after sign-in.")
         }
 
+        // A file adopted earlier stays adopted when its legacy original can no longer be read, as
+        // long as the adopted copy still has its committed content.
+        for (key, file) in previous.map(Self.adoptedFilesByKey) ?? [:] where adopted[key] == nil && plan.files[key] == nil {
+            guard (try? Self.sha256(of: fileURL(for: file))) == file.sha256 else { continue }
+            adopted[key] = file
+            plan.retractUnavailable(key: key, legacyPath: file.legacyPath)
+        }
+
         let outcome = plan.outcome(kind: source.kind, fingerprint: fingerprint, accounts: accounts, adopted: adopted)
         try fileSystem.writeAtomically(try MigrationJSON.encoder.encode(outcome), to: outcomeURL)
         journal.committed = true
@@ -182,6 +191,17 @@ public final class LegacyMigrator {
 
     private static func adoptedFiles(of outcome: MigrationOutcome) -> [MigratedFile] {
         outcome.downloads.flatMap { $0.files.compactMap(\.file) } + outcome.interruptedDownloads.flatMap { $0.parts.compactMap(\.file) }
+    }
+
+    private static func adoptedFilesByKey(_ outcome: MigrationOutcome) -> [String: MigratedFile] {
+        var files: [String: MigratedFile] = [:]
+        for download in outcome.downloads {
+            for file in download.files.compactMap(\.file) { files[MigrationPlan.fileKey(download.account, file.legacyPath)] = file }
+        }
+        for download in outcome.interruptedDownloads {
+            for file in download.parts.compactMap(\.file) { files[MigrationPlan.fileKey(download.account, file.legacyPath)] = file }
+        }
+        return files
     }
 
     /// Full check of a committed outcome against the files it names.

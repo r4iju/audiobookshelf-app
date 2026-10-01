@@ -16,7 +16,7 @@ From a legacy Capacitor/Realm installation (Realm 10.54.6, schema 21):
 | `ServerConnectionConfig.token`, Keychain `AudiobookshelfRefreshTokens` / `refresh_token_<id>` | `LegacyAccountSecret`, handed only to `MigrationSecretSink.adopt`; never written to disk by the module |
 | `DeviceSettings`, `PlayerSettings`, Capacitor Preferences (`CapacitorStorage.*`, allowlisted) | `MigratedSettings` |
 | WebView `ereaderSettings`, `ebookLocations-<id>`, `absDeviceId` (allowlisted) | `MigratedSettings.webStorage` |
-| `LocalLibraryItem` and every one of its `LocalFile`s (audio, PDF, EPUB, MOBI, AZW3, CBZ, CBR, covers, podcast episodes, supplementary files) | Hard link or verified copy under `<root>/Files/<account digest>/<item digest>/<legacy path>`; `MigratedDownload` with tracks, chapters, ebook, episodes, a `files` record of every legacy file with its role (`track`, `episodeTrack`, `ebook`, `cover`, `supplementary`) and the unchanged credential-free `legacyItem` (full metadata, tags, `isInvalid`, episode details) |
+| `LocalLibraryItem` and every one of its `LocalFile`s (audio, PDF, EPUB, MOBI, AZW3, CBZ, CBR, covers, podcast episodes, supplementary files) | Hard link or verified copy under `<root>/Files/<account digest>/<item digest>/<legacy path digest>/<file name>`; `MigratedDownload` with tracks, chapters, ebook, episodes, a `files` record of every legacy file with its role (`track`, `episodeTrack`, `ebook`, `cover`, `supplementary`) and the unchanged credential-free `legacyItem` (full metadata, tags, `isInvalid`, episode details) |
 | `LocalMediaProgress` (audio position, finished state, `ebookLocation`, `ebookProgress`) | `MigratedProgress`, with `MigratedReadingLocation` (`page` for PDF/CBZ/CBR, `cfi` for EPUB, `opaque` for MOBI/AZW3; the raw legacy value is always kept) |
 | `PlaybackSession` rows (unsynced listening), with chapters, media metadata and cover path | `MigratedSession` with `sessionTotal` (local playback) or `sinceLastSync` (streamed) semantics |
 | `DownloadItem` rows (interrupted downloads) and their `DownloadItemPart`s | `MigratedInterruptedDownload` plus a `downloadInterrupted` issue; parts that finished and were moved into Documents are adopted, so they are not downloaded again |
@@ -59,7 +59,7 @@ There is no automatic cross-sandbox import.
 apple/Migration/
   Package.swift                     LegacyMigration (Foundation + CryptoKit only), iOS 14, macOS 12
   Sources/LegacyMigration/          snapshot, plan, migrator, archive, outcome
-  Tests/LegacyMigrationTests/       29 tests, synthetic Documents tree and fault-injecting file system
+  Tests/LegacyMigrationTests/       32 tests, synthetic Documents tree and fault-injecting file system
   LegacyRealm/Package.swift         LegacyRealmExport (RealmSwift 10.54.6 exact)
   LegacyRealm/Sources/...           schema-21 mirror classes, Realm reader, installation source,
                                     archive exporter, read-only legacy Keychain reader
@@ -85,7 +85,10 @@ the default schema, so they cannot collide with any other Realm schema in either
   file by SHA-256. A deleted or replaced adopted file is repaired from the untouched source. A file
   whose source no longer matches the digest it was committed with (for example changed in place
   through a hard link) is reported `fileCorrupt` and dropped from the outcome instead of being
-  adopted again; this holds when the repair itself is interrupted and resumed.
+  adopted again; this holds when the repair itself is interrupted and resumed. An adopted file
+  whose legacy original is gone but whose adopted copy still has its committed content is kept.
+  A repair never uncommits: a failed repair leaves the migration committed to its source and
+  reported damaged.
 - A different legacy source after commit throws `differentSourceAlreadyCommitted`. This holds when
   `state.json` is lost or unreadable: a readable `outcome.json` is then the commit record, only the
   same source continues (credentials it recorded as adopted are not adopted again), and records
@@ -96,15 +99,26 @@ the default schema, so they cannot collide with any other Realm schema in either
   runs `migrate` with the source to repair. If the source is gone (an archive the user deleted),
   ask for a new export: the same legacy data repairs, changed legacy data is refused, and starting
   over means deleting `root` (an explicit user action; the legacy data is untouched).
-- Destinations are `<account digest>/<digest of the legacy item or download id>/<legacy path>`.
-  Legacy identifiers never become path components, legacy paths are rejected if absolute or if
-  they contain `.`, `..` or empty components, and no destination is assigned twice.
+- Destinations are `<account digest>/<digest of the legacy item or download id>/<digest of the
+  legacy path>/<file name>`. Legacy identifiers and directory names never become path components,
+  legacy paths are rejected if absolute or if they contain `.`, `..` or empty components, and no
+  destination is assigned twice, compared case-insensitively. Archives store each file the same
+  way (`files/<legacy path digest>/<file name>`, mapped by `storedPaths` in `archive.json`), so
+  paths differing only by case survive export to a case-insensitive volume.
 - Ownership: every item, progress row, session and interrupted download must corroborate the
   connection it was saved under. When the row's own recorded user or server differs from that
   connection's, the row is quarantined (`account` nil, `accountMismatch`) and kept, never
   attributed to the connection's current user. The legacy app updates a connection's address and
   user in place under the same id, so data from before a server move is quarantined rather than
-  guessed.
+  guessed. A matching user id alone does not prove the same server: early Audiobookshelf servers
+  gave the root user the literal id `root`. Decision for the coordinator: offer a user-confirmed
+  "attach to this account" action for quarantined rows (their legacy records are in the outcome:
+  `legacyItem`, `MigratedProgress.legacyID`, `MigratedSession.session`), rather than attaching
+  automatically.
+- The source fingerprint covers the whole credential-free snapshot. A repair therefore needs the
+  same legacy data; if legacy rows changed in between (or a caller passes different WebView
+  storage), the repair is refused as a different source. Recovery is then a new export plus
+  deleting `root`, an explicit user action.
 - A corrupt journal is moved aside (`state.corrupt-<timestamp>-<id>.json`) and the migration
   restarts from the untouched legacy source.
 - Copy fallback checks free space before copying (`insufficientSpace`).
@@ -309,6 +323,13 @@ directly with availability enforced (`xcrun --sdk iphoneos swiftc -typecheck -ta
 arm64-apple-ios14.0 ...` and the `-simulator` variant): no errors or warnings. The Realm adapter
 was not typechecked for iOS 14 (it needs the RealmSwift module for that target); it uses no API
 newer than iOS 13 by inspection, which is not evidence.
+
+Fourth round (an adversarial review of the third), committed red first at `d4593e5f`: 3 new core
+tests failing (a repair interrupted midway uncommitted the migration, after which a different
+source was accepted; a repair dropped an intact adopted file whose legacy original was gone; paths
+differing only by case shared a destination on a case-insensitive volume and broke archive
+export), then core 32 of 32 and Realm adapter 7 of 7 passing. The iOS 14 typecheck was repeated
+with no errors or warnings.
 
 ## Remaining physical gates (open)
 
