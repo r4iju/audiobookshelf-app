@@ -32,21 +32,27 @@ export function ContentsDialog({
   chapters,
   onPick,
   onClose,
+  title,
+  current,
 }: {
   chapters: Chapter[];
   onPick: (chapter: Chapter) => void;
   onClose: () => void;
+  title?: string;
+  /** The key of the entry being read. */
+  current?: string;
 }) {
   const { t } = useI18n();
   return (
-    <Dialog open onClose={onClose} title={t("HeaderTableOfContents")}>
+    <Dialog open onClose={onClose} title={title ?? t("HeaderTableOfContents")}>
       {chapters.length ? (
         <ul className="-mx-2 flex max-h-[60vh] flex-col gap-0.5 overflow-y-auto">
           {chapters.map((chapter) => (
             <li key={chapter.key}>
               <button
                 type="button"
-                className="w-full rounded-lg px-3 py-2 text-start text-sm hover:bg-surface-2 focus-ring"
+                aria-current={chapter.key === current ? "page" : undefined}
+                className="w-full truncate rounded-lg px-3 py-2 text-start text-sm hover:bg-surface-2 focus-ring aria-[current=page]:bg-accent/15 aria-[current=page]:font-medium"
                 style={{ paddingInlineStart: `${0.75 + chapter.depth}rem` }}
                 onClick={() => {
                   onClose();

@@ -279,3 +279,102 @@ test("a damaged MOBI is reported as unreadable", async ({ page }) => {
   await page.goto(`/read/${id}`);
   await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
 });
+
+/** Each fixture page is its own colour with a white bar 60px tall per page number (qa/make-library.sh). */
+async function shownComicPage(page: import("@playwright/test").Page, number: number) {
+  return page
+    .getByRole("main")
+    .getByRole("img", { name: `Page ${number}`, exact: true })
+    .evaluate(async (image) => {
+      if (!(image instanceof HTMLImageElement)) return null;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const context = canvas.getContext("2d");
+      if (!context) return null;
+      context.drawImage(image, 0, 0);
+      const pixels = context.getImageData(300, 0, 1, image.naturalHeight).data;
+      let bar = 0;
+      for (let y = 40; y < image.naturalHeight && (pixels[y * 4 + 1] ?? 0) > 200; y++) bar++;
+      return { width: image.naturalWidth, height: image.naturalHeight, number: Math.round(bar / 60) };
+    });
+}
+
+for (const { issue, format } of [
+  { issue: 1, format: "CBZ" },
+  { issue: 2, format: "CBR" },
+]) {
+  test(`a ${format} comic shows its pages in order, and resumes at the saved page here and from other clients`, async ({
+    page,
+  }) => {
+    const api = await serverApi(accounts.user);
+    const id = await bookId(api, `Skyline ${issue}`);
+    await resetProgress(api, id);
+
+    await signIn(page);
+    await page.goto(`/item/${id}`);
+    await page.getByRole("link", { name: "Read" }).click();
+    await expect(page.getByText("Page 1 of 12")).toBeVisible();
+    expect(await shownComicPage(page, 1)).toEqual({ width: 600, height: 900, number: 1 });
+
+    await page.getByRole("button", { name: "Next page" }).click();
+    await page.keyboard.press("ArrowRight");
+    await expect(page.getByText("Page 3 of 12")).toBeVisible();
+    expect((await shownComicPage(page, 3))?.number).toBe(3);
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toBe("3");
+    expect((await serverProgress(api, id)).ebookProgress).toBeCloseTo(2 / 12, 5);
+
+    // Page 10 sorts after page 9 by its number, not between page 1 and page 2 by its name.
+    await page.getByRole("button", { name: "Pages" }).click();
+    const pages = page.getByRole("dialog", { name: "Pages" });
+    await expect(pages.getByRole("button")).toHaveText([
+      ...Array.from({ length: 12 }, (_, index) => `page ${index + 1}.png`),
+      "Close",
+    ]);
+    await expect(pages.getByRole("button", { name: "page 3.png" })).toHaveAttribute("aria-current", "page");
+    await pages.getByRole("button", { name: "page 10.png" }).click();
+    await expect(page.getByText("Page 10 of 12")).toBeVisible();
+    expect((await shownComicPage(page, 10))?.number).toBe(10);
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toBe("10");
+
+    await page.getByRole("button", { name: "Comic details" }).click();
+    const details = page.getByRole("dialog", { name: "Comic details" });
+    await expect(details.getByRole("definition")).toHaveText([
+      `Skyline Issue ${issue}`,
+      "Skyline",
+      String(issue),
+      "Rin Okada",
+    ]);
+    await expect(details.getByRole("term")).toHaveText(["Title", "Series", "Number", "Writer"]);
+    await details.getByRole("button", { name: "Close" }).click();
+
+    await page.reload();
+    await expect(page.getByText("Page 10 of 12")).toBeVisible();
+    expect((await shownComicPage(page, 10))?.number).toBe(10);
+
+    await api.call(`/api/me/progress/${id}`, {
+      method: "PATCH",
+      body: { ebookLocation: "6", ebookProgress: 5 / 12 },
+    });
+    await page.getByRole("link", { name: "Back" }).click();
+    await page.getByRole("link", { name: "Read" }).click();
+    await expect(page.getByText("Page 6 of 12")).toBeVisible();
+    expect((await shownComicPage(page, 6))?.number).toBe(6);
+  });
+}
+
+test("a damaged comic is reported as unreadable", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Skyline 1");
+  await signIn(page);
+  await page.route(`**/api/items/${id}/ebook**`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/vnd.comicbook+zip",
+      body: "PK this is not a zip",
+    }),
+  );
+  await page.goto(`/read/${id}`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
+});

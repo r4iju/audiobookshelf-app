@@ -102,10 +102,12 @@ export function PageControls({
   page,
   pages,
   onGo,
+  children,
 }: {
   page: number;
   pages: number;
   onGo: (page: number) => void;
+  children?: ReactNode;
 }) {
   const { t } = useI18n();
   return (
@@ -115,31 +117,34 @@ export function PageControls({
       canGoBack={page > 1}
       canGoOn={page < pages}
     >
-      <form
-        className="flex items-center gap-2 text-sm"
-        action={(form) => {
-          const parsed = pageInput.safeParse(form.get("page"));
-          if (parsed.success) onGo(parsed.data);
-        }}
-      >
-        <label className="sr-only" htmlFor="reader-page">
-          {t("WebGoToPage")}
-        </label>
-        <input
-          key={page}
-          id="reader-page"
-          name="page"
-          type="number"
-          inputMode="numeric"
-          min={1}
-          max={pages}
-          defaultValue={page}
-          className="w-16 rounded-lg border border-line bg-surface px-2 py-1 text-center tabular-nums focus-ring"
-        />
-        <output aria-live="polite" className="text-muted tabular-nums">
-          {t("WebReaderPage", page, pages)}
-        </output>
-      </form>
+      <div className="flex items-center gap-1">
+        <form
+          className="flex items-center gap-2 text-sm"
+          action={(form) => {
+            const parsed = pageInput.safeParse(form.get("page"));
+            if (parsed.success) onGo(parsed.data);
+          }}
+        >
+          <label className="sr-only" htmlFor="reader-page">
+            {t("WebGoToPage")}
+          </label>
+          <input
+            key={page}
+            id="reader-page"
+            name="page"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={pages}
+            defaultValue={page}
+            className="w-16 rounded-lg border border-line bg-surface px-2 py-1 text-center tabular-nums focus-ring"
+          />
+          <output aria-live="polite" className="text-muted tabular-nums">
+            {t("WebReaderPage", page, pages)}
+          </output>
+        </form>
+        {children}
+      </div>
     </ReaderBar>
   );
 }

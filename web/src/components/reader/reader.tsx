@@ -27,7 +27,7 @@ const views: Record<EbookKind, React.ComponentType<ReaderViewProps> | null> = {
   pdf: dynamic(() => import("./pdf-view").then((module) => module.PdfView), { ssr: false }),
   epub: dynamic(() => import("./epub-view").then((module) => module.EpubView), { ssr: false }),
   mobi: dynamic(() => import("./mobi-view").then((module) => module.MobiView), { ssr: false }),
-  comic: null,
+  comic: dynamic(() => import("./comic-view").then((module) => module.ComicView), { ssr: false }),
 };
 
 export function Reader({ itemId, fileIno }: { itemId: string; fileIno: string | null }) {

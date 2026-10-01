@@ -154,6 +154,7 @@ export const webStrings = {
   WebReaderProgressSaveFailed: "Reading position could not be saved yet; it will be retried.",
   WebGoToPage: "Go to page",
   WebComicInfo: "Comic details",
+  WebComicPages: "Pages",
   WebYearInReview: "{0} in review",
   WebTotalListening: "Total listening",
   WebSessionsCount: "{0} sessions",
