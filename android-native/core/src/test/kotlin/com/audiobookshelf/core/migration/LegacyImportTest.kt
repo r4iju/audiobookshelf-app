@@ -236,4 +236,29 @@ class LegacyImportTest {
         assertTrue(outcome.issues.any { it.kind == Issue.Kind.INVALID_RECORD && it.title == "Stories for Tomorrow 01" })
         assertEquals(3, outcome.titles.size)
     }
+
+    @Test
+    fun aStagedFileDamagedWhileTheImportWasInterruptedIsCopiedAgainFromTheArchive() {
+        try {
+            importer().run(LegacyArchive.open(exported())) { throw InterruptedException("process ended") }
+            fail("The import was interrupted")
+        } catch (expected: InterruptedException) {}
+        val damaged = root.resolve("staging").listFiles()!!.single { it.name.length == 64 }
+        damaged.writeBytes(damaged.readBytes().copyOf(10))
+
+        val again = mutableListOf<String>()
+        val outcome = importer().run(LegacyArchive.open(exported())) { again += it }
+        assertEquals(damaged.name, sha(damaged))
+        assertEquals("The damaged file and the rest are copied", 5, again.size)
+        assertEquals(3, outcome.titles.size)
+    }
+
+    @Test
+    fun aStagedFileDamagedAfterTheImportIsNotOfferedForAdoption() {
+        val title = importer().run(LegacyArchive.open(exported())).titles.single { it.itemId == "book-0" }
+        val pdf = title.ebook!!
+        assertEquals(importer().staged(pdf), importer().verified(pdf))
+        importer().staged(pdf).appendBytes(byteArrayOf(1))
+        assertNull(importer().verified(pdf))
+    }
 }

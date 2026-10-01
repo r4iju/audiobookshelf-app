@@ -40,7 +40,7 @@ class MigrationJourney {
             .config.getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.Selected) { null } == true
     }
 
-    private fun downloaded(itemId: String) = Fixture.requests().map { it.getString("path") }.filter { it.startsWith("/api/items/$itemId/") && it.endsWith("/download") }
+    private fun downloaded(itemId: String, after: Int) = Fixture.requests().drop(after).map { it.getString("path") }.filter { it.startsWith("/api/items/$itemId/") && it.endsWith("/download") }
 
     @Test
     fun a_aFileThatIsNotAnExportIsRefusedAndNothingIsWritten() {
@@ -69,6 +69,7 @@ class MigrationJourney {
     fun c_legacyDownloadsListeningAndPagesArriveWhenTheAccountSignsIn() {
         Fixture.resetAppData()
         Fixture.configure("pdf-reader")
+        val start = Fixture.requests().size
         open("legacy-export.absmigration").use {
             compose.waitForTag("migration-preflight")
             compose.waitForText("Stories for Tomorrow 01")
@@ -88,11 +89,11 @@ class MigrationJourney {
             compose.pressBack()
             compose.tap("tab-downloads")
             compose.waitForTag("offline-book-0")
-            eventually(45_000) { downloaded("book-4") == listOf("/api/items/book-4/file/1/download") }
+            eventually(45_000) { downloaded("book-4", start) == listOf("/api/items/book-4/file/1/download") }
             compose.waitForTag("offline-book-4", 45_000)
             compose.capture("migration-downloads")
         }
-        assertEquals("Imported files are not downloaded again", emptyList<String>(), downloaded("book-0"))
+        assertEquals("Imported files are not downloaded again", emptyList<String>(), downloaded("book-0", start))
     }
 
     @Test

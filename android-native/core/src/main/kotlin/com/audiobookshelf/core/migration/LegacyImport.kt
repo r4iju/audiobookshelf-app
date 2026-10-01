@@ -102,7 +102,7 @@ class LegacyImport(private val root: File) {
             ?: State(archive.fingerprint).also { staging.deleteRecursively(); saveState(it) }
         val (candidates, issues) = candidates(archive)
         val files = candidates.flatMap { it.title.files }.distinctBy { it.legacyPath }
-        val needed = files.filterNot { state.verified[it.legacyPath] == it.digest && staged(it).exists() || it.legacyPath in state.corrupt }
+        val needed = files.filterNot { state.verified[it.legacyPath] == it.digest && verified(it) != null || it.legacyPath in state.corrupt }
         val available = root.usableSpace
         if (needed.sumOf { it.size } > available) throw MigrationError.InsufficientSpace(needed.sumOf { it.size }, available)
         staging.mkdirs()
@@ -186,6 +186,22 @@ class LegacyImport(private val root: File) {
     val interrupted get() = stateFile.exists() && !outcomeFile.exists()
 
     fun staged(file: StagedFile): File = File(staging, file.digest)
+
+    /** The staged copy of [file] when its bytes still match the export; a damaged copy is never reused or adopted. */
+    fun verified(file: StagedFile): File? = staged(file).takeIf { it.isFile && sha256(it) == file.digest }
+
+    private fun sha256(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        file.inputStream().use { input ->
+            val buffer = ByteArray(1 shl 16)
+            while (true) {
+                val read = input.read(buffer)
+                if (read < 0) break
+                digest.update(buffer, 0, read)
+            }
+        }
+        return hex(digest.digest())
+    }
 
     /** Removes staged files no title still waiting for its account needs. */
     fun releaseAttached() {

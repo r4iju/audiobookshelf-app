@@ -186,6 +186,14 @@ Findings fixed in the next commit:
 
 Not changed (judgement calls): long parameter lists on `ListeningJournal.adopt` and `LegacyImport.propose`, and a shared copy-loop helper.
 
+## Review blocker at 598ba9c4
+
+| Blocker | Fix | RED observed before the fix |
+| --- | --- | --- |
+| Resuming an interrupted import reused a staged file because it was recorded as verified and still existed, without reading it again. A copy truncated or damaged while the import was stopped was committed and adopted as complete | `LegacyImport.verified(file)` returns the staged copy only when its SHA-256 still matches the export's digest. Resume copies any file that fails this from the untouched archive again. Attachment adopts only files that pass `verified`, and a title with a damaged file is reported as `FILE_CORRUPT` instead of being adopted. The archive is only read, so retries can be repeated | `LegacyImportTest.aStagedFileDamagedWhileTheImportWasInterruptedIsCopiedAgainFromTheArchive` (4 copies instead of 5; the damaged file was kept) and `aStagedFileDamagedAfterTheImportIsNotOfferedForAdoption` (the appended-to file was returned) |
+
+The diagnostic full run on 598ba9c4 failed one case, MigrationJourney c. It counted every download request in the fixture's log, including those made by DownloadJourney earlier in the same run. The journey now counts only requests made after it starts, like the other journeys. DownloadJourney, MigrationJourney and MigrationSelectionJourney then passed 13 of 13 in that order.
+
 ## Migration from the legacy Android app (#52, #53)
 
 The preview keeps its own identity (`com.audiobookshelf.app.nativepreview`, debug key), as the Apple preview does. It cannot read the legacy app's private storage, so migration is a faithful export and import, not an in-place upgrade.
