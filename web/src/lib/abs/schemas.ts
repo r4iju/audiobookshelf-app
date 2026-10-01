@@ -490,3 +490,40 @@ export const podcastFeedSchema = z.looseObject({
 export type PodcastFeed = z.infer<typeof podcastFeedSchema>;
 
 export const anyJson = z.unknown();
+
+const ranked = <Shape extends z.ZodRawShape>(shape: Shape) =>
+  z.array(z.looseObject({ ...shape, time: z.number().default(0) })).default([]);
+const rankedGenres = ranked({ genre: z.string() }).transform((genres) =>
+  genres.map(({ genre, time }) => ({ name: genre, time })),
+);
+const itemIds = z.array(z.string()).default([]);
+
+export const yearStatsSchema = z.looseObject({
+  totalListeningSessions: z.number().default(0),
+  totalListeningTime: z.number().default(0),
+  numBooksFinished: z.number().default(0),
+  numBooksListened: z.number().default(0),
+  topAuthors: ranked({ name: z.string() }),
+  topGenres: rankedGenres,
+  mostListenedNarrator: z.looseObject({ name: z.string(), time: z.number() }).nullish(),
+  mostListenedMonth: z.looseObject({ month: z.number(), time: z.number() }).nullish(),
+  booksWithCovers: itemIds,
+  finishedBooksWithCovers: itemIds,
+});
+export type YearStats = z.infer<typeof yearStatsSchema>;
+
+export const serverYearStatsSchema = z.looseObject({
+  numListeningSessions: z.number().default(0),
+  totalListeningTime: z.number().default(0),
+  numBooksAdded: z.number().default(0),
+  numAuthorsAdded: z.number().default(0),
+  totalBooksAddedSize: z.number().default(0),
+  totalBooksSize: z.number().default(0),
+  totalBooksAddedDuration: z.number().default(0),
+  totalBooksDuration: z.number().default(0),
+  booksAddedWithCovers: itemIds,
+  topAuthors: ranked({ name: z.string() }),
+  topNarrators: ranked({ name: z.string() }),
+  topGenres: rankedGenres,
+});
+export type ServerYearStats = z.infer<typeof serverYearStatsSchema>;

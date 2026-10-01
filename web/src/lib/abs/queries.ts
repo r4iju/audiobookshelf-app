@@ -9,6 +9,7 @@ import {
   librariesResponseSchema,
   libraryItemSchema,
   libraryWithFilterDataSchema,
+  listeningStatsSchema,
   mediaProgressSchema,
   pagedCollectionsSchema,
   pagedItemsSchema,
@@ -21,7 +22,9 @@ import {
   recentEpisodesSchema,
   searchResultsSchema,
   seriesSchema,
+  serverYearStatsSchema,
   userSchema,
+  yearStatsSchema,
 } from "./schemas";
 
 // Every key starts with the connection id so two saved servers or accounts never share cached data.
@@ -29,6 +32,10 @@ export const keys = {
   all: (connectionId: string) => [connectionId] as const,
   libraries: (connectionId: string) => [connectionId, "libraries"] as const,
   me: (connectionId: string) => [connectionId, "me"] as const,
+  listeningStats: (connectionId: string) => [connectionId, "stats", "listening"] as const,
+  yearStats: (connectionId: string, year: number) => [connectionId, "stats", "year", year] as const,
+  serverYearStats: (connectionId: string, year: number) =>
+    [connectionId, "stats", "server-year", year] as const,
   library: (connectionId: string, libraryId: string) => [connectionId, "library", libraryId] as const,
   personalized: (connectionId: string, libraryId: string) =>
     [connectionId, "library", libraryId, "personalized"] as const,
@@ -79,6 +86,31 @@ export function useMe() {
   return useQuery({
     queryKey: keys.me(connection.id),
     queryFn: ({ signal }) => client.get("/api/me", userSchema, signal),
+  });
+}
+
+export function useListeningStats() {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.listeningStats(connection.id),
+    queryFn: ({ signal }) => client.get("/api/me/listening-stats", listeningStatsSchema, signal),
+  });
+}
+
+export function useYearStats(year: number) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.yearStats(connection.id, year),
+    queryFn: ({ signal }) => client.get(`/api/me/stats/year/${year}`, yearStatsSchema, signal),
+  });
+}
+
+/** Only administrators may read the server's year; the server refuses everyone else. */
+export function useServerYearStats(year: number) {
+  const { client, connection } = useAbs();
+  return useQuery({
+    queryKey: keys.serverYearStats(connection.id, year),
+    queryFn: ({ signal }) => client.get(`/api/stats/year/${year}`, serverYearStatsSchema, signal),
   });
 }
 

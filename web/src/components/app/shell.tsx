@@ -196,6 +196,9 @@ function Shell({ children }: { children: ReactNode }) {
                 {t("WebAppName")}
               </Link>
               <div className="flex items-center gap-1 lg:hidden">
+                <ButtonLink href="/stats" variant="ghost" size="icon" aria-label={t("WebStats")}>
+                  <BarChart3 aria-hidden className="size-5" />
+                </ButtonLink>
                 <ButtonLink href="/settings" variant="ghost" size="icon" aria-label={t("HeaderSettings")}>
                   <Settings aria-hidden className="size-5" />
                 </ButtonLink>

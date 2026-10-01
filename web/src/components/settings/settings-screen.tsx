@@ -2,10 +2,11 @@
 
 import { Check, Copy, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { SelectField, TextField, Toggle } from "@/components/ui/field";
+import { Section } from "@/components/ui/section";
 import { useI18n } from "@/i18n/i18n";
 import { isLanguageCode, languages } from "@/i18n/languages";
 import { clientVersion } from "@/lib/device";
@@ -13,18 +14,6 @@ import { useSession, useSessionStore } from "@/lib/session/store";
 import { jumpTimes, settingsSchema, useSettings, useSettingsStore } from "@/lib/settings/store";
 
 const jumpChoice = z.coerce.number().pipe(settingsSchema.shape.jumpForwardTime.unwrap());
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-surface p-5">
-      <h2 id={id} className="text-sm font-semibold tracking-wide text-muted uppercase">
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
 
 export function SettingsScreen() {
   const { t } = useI18n();
