@@ -15,6 +15,7 @@ import {
   isSending,
   keep,
   type ProgressChange,
+  reattempt,
   inFlight as recordedDeliveries,
   releaseUnreadableBlocks,
   requestRestart,
@@ -194,7 +195,9 @@ export async function sendChange(client: AbsClient, issued: IssuedChange) {
   if (begun === recorded && !(await isSending(sendingKey))) return;
   const episode = target.episodeId ? `/${target.episodeId}` : "";
   try {
-    await client.command("PATCH", `/api/me/progress/${target.libraryItemId}${episode}`, item.change);
+    await client.command("PATCH", `/api/me/progress/${target.libraryItemId}${episode}`, item.change, () =>
+      reattempt(sendingKey),
+    );
   } catch (error) {
     await finishSending(sendingKey, "failed").catch(() => {});
     throw error;
@@ -222,12 +225,14 @@ export async function flushReports(client: AbsClient, onUnauthorized: () => void
         // Still held; finished with a later delivery.
       }
     }
-    return outbox.flush(async (sessions) => {
+    return outbox.flush(async (sessions, beforeRetry) => {
       const response = await client.send(
         "POST",
         "/api/session/local-all",
         { sessions, deviceInfo: deviceInfo() },
         localSyncResultSchema,
+        undefined,
+        beforeRetry,
       );
       return response.results;
     });

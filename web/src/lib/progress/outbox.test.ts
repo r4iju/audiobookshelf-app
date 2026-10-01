@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { beginPublishing, finishSending } from "./coordination";
+import { beginPublishing, finishSending, reattempt } from "./coordination";
 import { createListeningReport, createOutbox, type ListeningReport, type OutboxStorage } from "./outbox";
 
 function memoryStorage(): OutboxStorage & { data: Map<string, string> } {
@@ -123,6 +123,7 @@ describe("progress outbox", () => {
         throw new Error("IndexedDB refused");
       },
       finish: async () => {},
+      reattempt: async () => {},
     });
     outbox.record(report(10, 1_000));
     let sent = false;
@@ -144,6 +145,7 @@ describe("progress outbox", () => {
         return { sendingKey: "k", issued: recorded.map(asPublished), again: [] };
       },
       finish: async () => {},
+      reattempt: async () => {},
     });
     outbox.record(report(10, 1_000));
     let sent: ListeningReport[] = [];
@@ -165,6 +167,7 @@ describe("progress outbox", () => {
       finish: async () => {
         throw new Error("IndexedDB refused");
       },
+      reattempt: async () => {},
     });
     outbox.record(report(10, 1_000));
     const result = await outbox.flush(async (sessions) =>
@@ -219,6 +222,7 @@ describe("progress outbox", () => {
       const outbox = createOutbox("conn-a", storage, undefined, {
         begin: (connectionId, candidates) => beginPublishing(connectionId, candidates, "page-other"),
         finish: finishSending,
+        reattempt,
       });
       let release = () => {};
       const released = new Promise<void>((resolve) => {

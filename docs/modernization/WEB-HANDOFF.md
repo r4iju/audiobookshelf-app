@@ -249,9 +249,15 @@ server, or a physical device. The production container `audiobookshelf` (port 13
      record and stays held. The request is kept as a `restarted:` record of the values it retired. The queue and
      session records are untouched, so the held listening is then sent as it was recorded. Listening another tab was
      sending under a retired record is sent again, unchanged, as after a failure, since that tab's answer no longer
-     finds its record.
+     finds its record. A retired delete ends as a confirmed one does: listening versions that failed without an
+     answer for its book (for every book, if its book cannot be read) are never sent, since they may carry the
+     deleted place, and are kept in the `restarted:` record instead; a reader place that waited for it is dropped.
+     A request sent again after a renewed sign-in is first recorded as a new attempt, so a restart asked for before
+     then does not retire it.
 
-  A restart request that cannot be read releases nothing. The notice says so, and **Restart the server** sets it
+  A restart request is used only if it is this account's own: stored under the account's key, naming the account, and
+  covering only the account's own delete and sending records, each stored under the key it names. Any other, like
+  one that cannot be read, releases nothing. The notice says so, and **Restart the server** sets it
   aside (kept, as a `restarted:` record) and records a new one, so only a restart after that new request counts.
 
   Nothing is released by time passing, and the moment of confirming is not taken as the restart. The confirmation

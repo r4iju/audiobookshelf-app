@@ -635,6 +635,25 @@ const restartSchema = z.object({
 });
 type Restart = z.infer<typeof restartSchema>;
 
+/**
+ * The account's restart request, or `unreadable` when one is stored but cannot be shown to be this account's own:
+ * malformed, naming another account, or covering a record that is not one of this account's blocks and sendings
+ * stored under its own key.
+ */
+function readRestart(connectionId: string, stored: unknown): Restart | "unreadable" | null {
+  if (stored === undefined) return null;
+  const parsed = restartSchema.safeParse(stored);
+  if (!parsed.success) return "unreadable";
+  const restart = parsed.data;
+  const own = (key: string) =>
+    key.startsWith(blockPrefix(connectionId)) || key.startsWith(sendingPrefix(connectionId));
+  const valid =
+    restart.key === restartKey(connectionId) &&
+    restart.connectionId === connectionId &&
+    restart.records.every(({ key, value }) => own(key) && keySchema.safeParse(value).data?.key === key);
+  return valid ? restart : "unreadable";
+}
+
 /** Blocks whose delete may have been issued, that none of `holdIds` is finishing: only a restart ends them. */
 const unfinishedBlocks = (connectionId: string, blockRecords: unknown[], holdIds: string[]) =>
   blockRecords.filter((raw) => {
@@ -656,14 +675,11 @@ export function heldByUnfinishedDeletes(connectionId: string, holdIds: string[])
     readAll<[unknown[], unknown]>(
       [store.getAll(prefixed(blockPrefix(connectionId))), store.get(restartKey(connectionId))],
       (blockRecords, stored) => {
-        const restart = restartSchema.safeParse(stored);
+        const restart = readRestart(connectionId, stored);
         finish({
           held: unfinishedBlocks(connectionId, blockRecords, holdIds).length,
-          restart: restart.success
-            ? { serverOrigin: restart.data.serverOrigin }
-            : stored === undefined
-              ? null
-              : "unreadable",
+          restart:
+            restart === null || restart === "unreadable" ? restart : { serverOrigin: restart.serverOrigin },
         });
       },
     );
@@ -684,9 +700,10 @@ export function requestRestart(connectionId: string, serverOrigin: string, holdI
         store.getAll(prefixed(sendingPrefix(connectionId))),
       ],
       (existing, blockRecords, sendings) => {
-        if (restartSchema.safeParse(existing).success) return;
+        const restart = readRestart(connectionId, existing);
+        if (restart !== null && restart !== "unreadable") return;
         const requestedAt = Date.now();
-        if (existing !== undefined)
+        if (restart === "unreadable")
           store.put({
             key: `${restartedPrefix(connectionId)}unreadable-${requestedAt}`,
             unreadable: existing,
@@ -713,41 +730,57 @@ export function requestRestart(connectionId: string, serverOrigin: string, holdI
 
 /**
  * Retires, once the user confirms restarting the server the request named, the recorded records still exactly as
- * they were. Listening another page was sending under a retired record is sent again, as after a failure, since that
- * page's answer no longer finds the record. The request is kept, as a record of what was retired.
+ * they were. A retired delete ends as a confirmed one does (see `finishDelete`): the listening it may have deleted is
+ * never sent, for every book when its book cannot be read, and is kept with the request instead. Listening another
+ * page was sending under a retired record is sent again, as after a failure, since that page's answer no longer finds
+ * the record. The request is kept, as a record of what was retired.
  */
 export async function confirmRestart(connectionId: string, serverOrigin: string) {
   await transact<void>((store, finish) => {
     const stored = store.get(restartKey(connectionId));
     stored.onsuccess = () => {
       // Thrown here, the error aborts the transaction, so nothing is retired.
-      const restart = restartSchema.safeParse(stored.result);
-      if (!restart.success) throw new Error("No readable restart of this server was asked for");
-      if (restart.data.serverOrigin !== serverOrigin)
+      const restart = readRestart(connectionId, stored.result);
+      if (restart === null || restart === "unreadable")
+        throw new Error("No readable restart of this server was asked for");
+      if (restart.serverOrigin !== serverOrigin)
         throw new Error("The restart asked for was of another server");
-      const { records } = restart.data;
+      const { records } = restart;
       readAll<[unknown[], ...unknown[]]>(
         [store.getAll(prefixed(streamPrefix(connectionId))), ...records.map(({ key }) => store.get(key))],
         (streamRecords, ...current) => {
           const retired = records.filter(
             ({ value }, index) => JSON.stringify(current[index]) === JSON.stringify(value),
           );
-          const items = retired.flatMap(({ key, value }) =>
+          const sent = retired.flatMap(({ key, value }) =>
             key.startsWith(sendingPrefix(connectionId)) ? readSending(key, connectionId, value).items : [],
           );
+          const deletes = retired.flatMap(({ key, value }) =>
+            key.startsWith(blockPrefix(connectionId)) ? [readBlock(key, value)] : [],
+          );
+          const deleted = (stream: Stream) =>
+            deletes.some((block) => !block.target || sameTarget(block.target, stream));
+          const dropped: Stream["frozen"] = [];
           for (const stream of readStreams(connectionId, streamRecords).streams.values()) {
+            const before = JSON.stringify(stream);
             const open = stream.open?.report;
-            if (open && items.some((item) => item !== null && sameVersion(open, item))) {
-              freeze(stream);
-              store.put(stream);
-            }
+            if (open && sent.some((item) => item !== null && sameVersion(open, item))) freeze(stream);
+            if (deleted(stream)) dropped.push(...stream.frozen.splice(0));
+            if (JSON.stringify(stream) !== before) store.put(stream);
           }
           for (const { key } of retired) store.delete(key);
+          for (const block of deletes)
+            store.put({
+              key: endedKey(connectionId, holdOf(connectionId, block)),
+              phase: "finished",
+              ...(block.target ?? {}),
+            } satisfies Ended);
           store.delete(restartKey(connectionId));
           store.put({
-            ...restart.data,
-            key: `${restartedPrefix(connectionId)}${restart.data.requestedAt}`,
+            ...restart,
+            key: `${restartedPrefix(connectionId)}${restart.requestedAt}`,
             retired: retired.map(({ key }) => key),
+            dropped,
           });
         },
       );
@@ -755,6 +788,22 @@ export async function confirmRestart(connectionId: string, serverOrigin: string)
     finish(undefined);
   });
   announce();
+}
+
+/**
+ * Marks a recorded sending as a new attempt before its request is sent again (after a renewed sign-in), so a restart
+ * asked for before then does not retire it. One no longer recorded is not sent again.
+ */
+export function reattempt(sendingKey: string) {
+  return transact<void>((store, finish) => {
+    const stored = store.get(sendingKey);
+    stored.onsuccess = () => {
+      if (keySchema.safeParse(stored.result).data?.key !== sendingKey)
+        throw new Error("No longer recorded as being sent");
+      store.put({ ...(stored.result as object), attempt: randomId() });
+    };
+    finish(undefined);
+  });
 }
 
 /** What is still recorded as being sent for the target. */

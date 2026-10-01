@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { randomId } from "@/lib/random-id";
-import { type Begun, beginPublishing, finishSending, thisPage } from "./coordination";
+import { type Begun, beginPublishing, finishSending, reattempt, thisPage } from "./coordination";
 
 // Listening progress is reported as "local sessions": one record per listening session with cumulative totals and a
 // client-chosen id. What is not confirmed is sent again later, after a reload, an outage or a new sign-in, in the
@@ -93,11 +93,14 @@ const noOwners: HoldOwners = { claim: () => () => {}, live: async () => null };
 export interface Deliveries {
   begin: (connectionId: string, candidates: () => ListeningReport[]) => Promise<Begun>;
   finish: (sendingKey: string, outcome: "answered" | "failed") => Promise<void>;
+  /** Before a delivery's request is sent again; throws if it must not be. */
+  reattempt: (sendingKey: string) => Promise<void>;
 }
 
 const pageDeliveries: Deliveries = {
   begin: (connectionId, candidates) => beginPublishing(connectionId, candidates, thisPage),
   finish: finishSending,
+  reattempt,
 };
 
 /** A discard in progress: its listening stays queued until the delete of `progressId` is confirmed. */
@@ -256,7 +259,9 @@ export function createOutbox(
       storage.remove(`${holdPrefix}${holdId}`);
       notify();
     },
-    async flush(send: (sessions: ListeningReport[]) => Promise<DeliveryResult[]>): Promise<FlushResult> {
+    async flush(
+      send: (sessions: ListeningReport[], beforeRetry: () => Promise<void>) => Promise<DeliveryResult[]>,
+    ): Promise<FlushResult> {
       let begun: Begun;
       try {
         begun = await deliveries.begin(connectionId, () =>
@@ -278,7 +283,10 @@ export function createOutbox(
       }
       let results: DeliveryResult[];
       try {
-        results = await send(sending.map((publication) => publication.report));
+        results = await send(
+          sending.map((publication) => publication.report),
+          () => deliveries.reattempt(sendingKey),
+        );
       } catch (error) {
         await finish("failed");
         return { kind: "failed", error };

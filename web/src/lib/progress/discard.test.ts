@@ -1,9 +1,10 @@
 import { MutationObserver, QueryClient } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type AbsClient, AbsError } from "@/lib/abs/client";
+import { type AbsClient, AbsError, createAbsClient } from "@/lib/abs/client";
 import { ebookPlaceSaves } from "@/lib/abs/mutations";
+import { localSyncResultSchema } from "@/lib/abs/schemas";
 import { usePlayerStore } from "@/lib/player/store";
-import { beginPublishing, finishSending } from "./coordination";
+import { beginPublishing, finishSending, reattempt } from "./coordination";
 import { discardProgress } from "./discard";
 import { createListeningReport, createOutbox, type ListeningReport } from "./outbox";
 import {
@@ -199,6 +200,7 @@ function otherTab(
       return beginPublishing(connectionId, candidates, page);
     },
     finish: finishSending,
+    reattempt,
   });
   let answer = () => {};
   const answered = new Promise<void>((resolve) => {
@@ -1000,6 +1002,138 @@ describe("a delete that may still be running on the server, with no discard left
       log: ["listening book-y@40"],
     });
     expect(kept).toContainEqual(expect.objectContaining({ unreadable: { ...unreadable } }));
+  });
+
+  it("keeps holding another tab's request sent again after its sign-in was renewed past the restart request", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    usePlayerStore.getState().attach(server.client);
+    outboxFor("conn-a").record(report("old-z", "book-z"));
+    let renew = () => {};
+    const renewed = new Promise<void>((resolve) => {
+      renew = resolve;
+    });
+    let refused = false;
+    const fetcher = vi.fn(async (url: string | URL | Request) => {
+      if (String(url).endsWith("/auth/refresh")) {
+        await renewed;
+        return Response.json({ user: { accessToken: "access-2", refreshToken: "refresh-2" } });
+      }
+      if (!refused) {
+        refused = true;
+        return new Response(null, { status: 401 });
+      }
+      // Still running on the restarted server.
+      return new Promise<Response>(() => {});
+    });
+    const tabClient = createAbsClient({
+      connection: {
+        ...server.client.connection,
+        auth: { kind: "token", accessToken: "access-1", refreshToken: "refresh-1" },
+      } as unknown as AbsClient["connection"],
+      fetcher,
+      saveAuth: () => {},
+    });
+    const tab = createOutbox("conn-a", sharedStorage, undefined, {
+      begin: (connectionId, candidates) => beginPublishing(connectionId, candidates, "page-other"),
+      finish: finishSending,
+      reattempt,
+    });
+    void tab.flush(async (sessions, beforeRetry) => {
+      const answer = await tabClient.send(
+        "POST",
+        "/api/session/local-all",
+        { sessions },
+        localSyncResultSchema,
+        undefined,
+        beforeRetry,
+      );
+      return answer.results;
+    });
+    await vi.waitFor(() => expect(fetcher).toHaveBeenCalledTimes(2));
+    await storedCoordination([readablePoisoned]);
+
+    await requestServerRestart(server.client);
+    renew();
+    await vi.waitFor(() => expect(fetcher).toHaveBeenCalledTimes(3));
+    await confirmServerRestarted(server.client);
+
+    expect(await discardOf(server.client, "book-z")).toBe("unconfirmed");
+  });
+
+  it.each([
+    ["whose book is known", readablePoisoned],
+    ["whose book cannot be read", poisoned],
+  ])(
+    "ends a retired delete %s as a confirmed one, never sending listening it may have deleted",
+    async (_, block) => {
+      vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+      const server = scriptedDeleteServer("conn-a", []);
+      usePlayerStore.getState().attach(server.client);
+      outboxFor("conn-a").record(report("old-q", "book-q"));
+      const tab = otherTab(server.log, { fails: true });
+      const failing = tab.delivering();
+      tab.answer();
+      await failing;
+      await storedCoordination([block]);
+
+      await requestServerRestart(server.client);
+      await confirmServerRestarted(server.client);
+      await flushReports(server.client, () => {});
+      const [restarted] = (await coordinationRecords("restarted:conn-a:")) as {
+        dropped?: { report: ListeningReport }[];
+      }[];
+
+      // Kept with the request, not sent.
+      expect({
+        log: server.log,
+        dropped: restarted?.dropped?.map((frozen) => frozen.report.libraryItemId),
+      }).toEqual({
+        log: [],
+        dropped: ["book-q"],
+      });
+    },
+  );
+
+  const foreign = { key: "block:conn-b:gone", libraryItemId: "book-q", episodeId: null, phase: "deleting" };
+  it.each([
+    ["names another account", { connectionId: "conn-b" }],
+    ["covers another account's record", { records: [{ key: foreign.key, value: foreign }] }],
+    [
+      "covers a record whose value names another key",
+      { records: [{ key: poisoned.key, value: { ...poisoned, key: "block:conn-a:other" } }] },
+    ],
+  ])("releases nothing for a restart request that %s, and lets the user ask again", async (_, wrong) => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", []);
+    await storedCoordination([
+      poisoned,
+      foreign,
+      {
+        key: "restart:conn-a",
+        connectionId: "conn-a",
+        serverOrigin: "https://abs.example",
+        requestedAt: 1,
+        records: [{ key: poisoned.key, value: poisoned }],
+        ...wrong,
+      },
+    ]);
+
+    const before = await heldDeliveries(server.client);
+    const confirmed = await confirmServerRestarted(server.client).then(
+      () => "confirmed",
+      () => "refused",
+    );
+    const stored = (await coordinationRecords("block:")).map(({ key }) => key);
+    await requestServerRestart(server.client);
+    const asked = await heldDeliveries(server.client);
+
+    expect({ before, confirmed, stored, asked }).toEqual({
+      before: { held: 1, restart: "unreadable" },
+      confirmed: "refused",
+      stored: ["block:conn-a:gone", "block:conn-b:gone"],
+      asked: { held: 1, restart: { serverOrigin: "https://abs.example" } },
+    });
   });
 
   it("keeps holding a record that changed after the restart was asked for", async () => {

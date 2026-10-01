@@ -45,6 +45,8 @@ interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
   signal?: AbortSignal;
+  /** Runs before the request is sent again with a renewed sign-in; throwing stops it. */
+  beforeRetry?: () => Promise<void>;
 }
 
 export type AbsClient = ReturnType<typeof createAbsClient>;
@@ -125,6 +127,7 @@ export function createAbsClient({
     let response = await transport(path, options, bearer);
     if (response.status === 401) {
       auth = await refresh(bearer);
+      await options.beforeRetry?.();
       response = await transport(path, options, bearerOf(auth));
     }
     if (response.ok) return response;
@@ -175,10 +178,16 @@ export function createAbsClient({
       body: unknown,
       schema: T,
       signal?: AbortSignal,
-    ) => parse(await send(path, { method, body, signal }), schema),
+      beforeRetry?: () => Promise<void>,
+    ) => parse(await send(path, { method, body, signal, beforeRetry }), schema),
     /** For endpoints that answer "OK" or nothing. */
-    command: async (method: "GET" | "POST" | "PATCH" | "DELETE", path: string, body?: unknown) => {
-      await send(path, { method, body });
+    command: async (
+      method: "GET" | "POST" | "PATCH" | "DELETE",
+      path: string,
+      body?: unknown,
+      beforeRetry?: () => Promise<void>,
+    ) => {
+      await send(path, { method, body, beforeRetry });
     },
     blob: async (path: string, signal?: AbortSignal) => (await send(path, { signal })).blob(),
   };
