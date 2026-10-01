@@ -104,6 +104,7 @@ public struct ItemsResponse: Decodable {
 }
 public struct LibraryItem: Decodable, Identifiable, Hashable {
     public let id: String
+    public let libraryId: String?
     public let isMissing: Bool?
     public let isInvalid: Bool?
     public let mediaType: String
@@ -150,8 +151,10 @@ public struct Metadata: Decodable {
     public let narrators: [String]?
     public let genres: [String]?
     public let feedUrl: String?
+    public let seriesName: String?
+    let series: SeriesReferences?
 }
-public struct Author: Decodable { public let name: String }
+public struct Author: Decodable { public let id: String?; public let name: String }
 public struct Episode: Decodable, Identifiable {
     public let id: String
     public let title: String

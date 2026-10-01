@@ -203,6 +203,24 @@ import Foundation
     public func search(libraryID: String, query: String, limit: Int) async throws -> SearchResponse {
         try await get("api/libraries/\(libraryID)/search", query: [URLQueryItem(name: "q", value: query), URLQueryItem(name: "limit", value: String(limit))])
     }
+    /// A library filter such as `authors.<base64 id>` or `series.<base64 id>`, as the server's filter decoder expects.
+    public static func relatedFilter(_ group: String, _ value: String) -> String { group + "." + Data(value.utf8).base64EncodedString() }
+    public func author(id: String) async throws -> AuthorDetail { try await get("api/authors/\(id)") }
+    public func series(id: String) async throws -> SeriesDetail {
+        try await get("api/series/\(id)", query: [URLQueryItem(name: "include", value: "progress")])
+    }
+    /// The series in a library that contain at least one book by the author, sorted by name.
+    public func authorSeries(libraryID: String, authorID: String, page: Int, limit: Int = 20) async throws -> SeriesPage {
+        try await get("api/libraries/\(libraryID)/series", query: [
+            URLQueryItem(name: "filter", value: Self.relatedFilter("authors", authorID)), URLQueryItem(name: "sort", value: "name"),
+            URLQueryItem(name: "desc", value: "0"), URLQueryItem(name: "limit", value: String(limit)),
+            URLQueryItem(name: "page", value: String(page)), URLQueryItem(name: "minified", value: "1")
+        ])
+    }
+    /// Only for the sign-in identified by `authorization`, like `coverData(itemID:authorization:)`.
+    public func authorImageData(authorID: String, authorization: UUID) async throws -> Data {
+        try await request("api/authors/\(authorID)/image", query: [URLQueryItem(name: "width", value: "400")], pinned: authorization)
+    }
     public func filters(libraryID: String) async throws -> LibraryFilters { try await get("api/libraries/\(libraryID)/filterdata") }
     public func item(id: String) async throws -> LibraryItem { try await get("api/items/\(id)", query: [URLQueryItem(name: "expanded", value: "1")]) }
 
