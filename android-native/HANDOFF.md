@@ -195,6 +195,10 @@ Not changed (judgement calls): long parameter lists on `ListeningJournal.adopt` 
 
 The diagnostic full run on 598ba9c4 failed one case, MigrationJourney c. It counted every download request in the fixture's log, including those made by DownloadJourney earlier in the same run. The journey now counts only requests made after it starts, like the other journeys. DownloadJourney, MigrationJourney and MigrationSelectionJourney then passed 14 of 14 in that order.
 
+## Final acceptance at ecba6a5a
+
+On `emulator-5584` (`abs_native_android_qa`, Android 16) with the loopback fixture only: one full journey run, 21 classes and 79 tests, 0 failures. Unit tests: core 56 and app 6, 0 failures. `scripts/package.sh` built and verified `app-release.apk` (`com.audiobookshelf.app.nativepreview` 0.15.0-native-preview, signed with the local debug key), SHA-256 `872a95b30e68fb9ccdc3e822810b16130b7185975d877681b79e066ceec126e6`. Details are in `verification/android-evidence.json`. Earlier full runs at 598ba9c4 and 11060261 were diagnostic only: 598ba9c4 failed the journey isolation case above. At 11060261, PlayerToolsJourney a timed out once and passed when rerun without changes.
+
 ## Migration from the legacy Android app (#52, #53)
 
 The preview keeps its own identity (`com.audiobookshelf.app.nativepreview`, debug key), as the Apple preview does. It cannot read the legacy app's private storage, so migration is a faithful export and import, not an in-place upgrade.

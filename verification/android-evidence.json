@@ -1,0 +1,176 @@
+{
+  "platform": "android-native",
+  "sourceSha": "ecba6a5a711e9350cf36f355fdb8380ca5fc045f",
+  "evidenceKind": "emulator and synthetic loopback fixture only; no live server, owner account or physical device",
+  "identity": {
+    "applicationId": "com.audiobookshelf.app.nativepreview",
+    "label": "Audiobookshelf Preview",
+    "versionName": "0.15.0-native-preview",
+    "versionCode": 200,
+    "legacyApplicationIdUntouched": "com.audiobookshelf.app"
+  },
+  "device": {
+    "serial": "emulator-5584",
+    "avd": "abs_native_android_qa",
+    "androidRelease": "16"
+  },
+  "commands": {
+    "unit": "./gradlew :core:test :app:testDebugUnitTest",
+    "journeys": "ABS_FIXTURE_LOG=/tmp/abs-android-http.log scripts/verify-journeys.sh",
+    "package": "scripts/package.sh"
+  },
+  "unitTests": {
+    "core": {
+      "tests": 56,
+      "failures": 0
+    },
+    "app": {
+      "tests": 6,
+      "failures": 0
+    }
+  },
+  "journeys": {
+    "classes": 21,
+    "tests": 79,
+    "failures": 0,
+    "singleRun": true,
+    "byClass": {
+      "AccessibilityJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "AccountsJourney": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0
+      },
+      "BrowseJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "CarJourney": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0
+      },
+      "ConnectionJourney": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0
+      },
+      "DownloadJourney": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0
+      },
+      "GroupsJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "ItemActionsJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "LatePublicationJourney": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0
+      },
+      "ListeningDurabilityJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "ListeningRecoveryJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "LocalFilesJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "MigrationJourney": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0
+      },
+      "MigrationSelectionJourney": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0
+      },
+      "PdfJourney": {
+        "tests": 10,
+        "failures": 0,
+        "errors": 0
+      },
+      "PlaybackJourney": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0
+      },
+      "PlayerToolsJourney": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0
+      },
+      "PodcastJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "ProgressResetJourney": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0
+      },
+      "ReadingListeningJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "SettingsJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      }
+    }
+  },
+  "artifact": {
+    "path": "android-native/app/build/outputs/apk/release/app-release.apk",
+    "sha256": "872a95b30e68fb9ccdc3e822810b16130b7185975d877681b79e066ceec126e6",
+    "bytes": 22068344,
+    "signer": "local Android debug key (CN=Android Debug), certificate SHA-256 118d754789a01ef088d67fabb4a9be5fd51447997cf20dcaa66ab59f2a13f688",
+    "distribution": "local internal install only; not uploaded or published"
+  },
+  "readiness": {
+    "migration": "Legacy export (legacy app instrumented test) and native import verified with synthetic archives: refusal, corruption, resume after interruption with rehashing of staged files, account binding, adoption with damaged files fetched again, repeated export recognised",
+    "accessibility": "AccessibilityJourney runs Accessibility Test Framework 4.1.1 checks (errors fail) on the main screens",
+    "localization": "NOT MET: the native app is English only; the legacy app ships 38 locales",
+    "backupRollback": "Separate identity; the legacy app and its data are never modified, so uninstalling the preview is the rollback. Listening already sent to the server is not undone"
+  },
+  "physicalGates": [
+    "Migration on the owner's device from the real legacy installation",
+    "Driving the legacy export UI on a device",
+    "TalkBack walkthrough",
+    "Android Auto / car head unit and Bluetooth controls",
+    "Metered and lost networks on real radios",
+    "Owner-signed release key"
+  ],
+  "diagnosticRuns": [
+    {
+      "sha": "598ba9c4",
+      "result": "77 of 78; MigrationJourney c counted downloads made by earlier journeys (test isolation, fixed)"
+    },
+    {
+      "sha": "11060261",
+      "result": "77 of 78; PlayerToolsJourney a timed out once and passed 2 of 2 when rerun with no player change"
+    }
+  ]
+}
