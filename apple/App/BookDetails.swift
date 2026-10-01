@@ -154,6 +154,7 @@ struct BookDetails: View {
             if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
                 Text(l10n("Narrated by {0}", narrators.joined(separator: ", "))).font(.footnote).foregroundColor(.secondary)
             }
+            if episode == nil, book.mediaType == "book" { RelatedBookLinks(item: book, catalog: catalog) }
         }.multilineTextAlignment(alignment == .center ? .center : .leading)
             .frame(maxWidth: .infinity, alignment: alignment == .center ? .center : .leading)
     }

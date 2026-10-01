@@ -2,6 +2,7 @@ import SwiftUI
 
 /// An author in the current library: bio, image, series and every title, as the server reports them.
 struct RelatedAuthorView: View {
+    @Environment(\.nativeStrings) private var l10n
     @Environment(\.shelfAppearance) private var appearance
     let catalog: CatalogStore
     let name: String
@@ -31,7 +32,7 @@ struct RelatedAuthorView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(page.author?.name ?? name).font(.title2.weight(.semibold)).accessibilityIdentifier("author-name")
                         if page.books.total > 0 {
-                            Text(page.books.total == 1 ? "1 title" : "\(page.books.total) titles").font(.subheadline).foregroundColor(.secondary)
+                            Text(page.books.total == 1 ? l10n("1 title") : l10n("{0} titles", page.books.total)).font(.subheadline).foregroundColor(.secondary)
                                 .accessibilityIdentifier("author-count")
                         }
                     }
@@ -44,7 +45,7 @@ struct RelatedAuthorView: View {
                     RecoveryCard(message: ConnectionStore.recovery(for: failure)) { Task { await page.load() } }
                 }
                 if !page.series.isEmpty {
-                    Text("Series").font(.headline)
+                    Text(l10n("Series")).font(.headline)
                     ForEach(page.series) { series in
                         NavigationLink(destination: RelatedSeriesView(catalog: catalog, seriesID: series.id, name: series.name)) {
                             HStack {
@@ -57,7 +58,7 @@ struct RelatedAuthorView: View {
                     }
                 }
                 if !page.books.items.isEmpty {
-                    Text("Titles").font(.headline)
+                    Text(l10n("Titles")).font(.headline)
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 140, maximum: 210), spacing: 16, alignment: .top)], spacing: 22) {
                         ForEach(page.books.items) { item in
                             NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: nil)) {
@@ -81,6 +82,7 @@ struct RelatedAuthorView: View {
 
 /// A series in the current library, with its books in the server's sequence order.
 struct RelatedSeriesView: View {
+    @Environment(\.nativeStrings) private var l10n
     @Environment(\.shelfAppearance) private var appearance
     let catalog: CatalogStore
     let name: String
@@ -110,7 +112,7 @@ struct RelatedSeriesView: View {
                 ForEach(page.books.items) { item in
                     VStack(alignment: .leading, spacing: 6) {
                         if let sequence = page.sequence(of: item) {
-                            Text("Book " + sequence).font(.caption.weight(.semibold)).foregroundColor(.secondary)
+                            Text(l10n("Book {0}", sequence)).font(.caption.weight(.semibold)).foregroundColor(.secondary)
                                 .accessibilityIdentifier("series-sequence." + item.id)
                         }
                         NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: nil)) {
@@ -133,6 +135,7 @@ struct RelatedSeriesView: View {
 /// Links from a book's details to each of its series, with its place in it, and to each author.
 /// It keeps only the derived links: `LibraryItem` equality is by id, so holding the item would hide the expanded item's series.
 struct RelatedBookLinks: View {
+    @Environment(\.nativeStrings) private var l10n
     struct AuthorLink: Hashable { let id: String; let name: String }
     let catalog: CatalogStore
     private let series: [SeriesReference]
@@ -148,11 +151,11 @@ struct RelatedBookLinks: View {
         VStack(alignment: .leading, spacing: 10) {
             ForEach(series, id: \.self) { series in
                 NavigationLink(destination: RelatedSeriesView(catalog: catalog, seriesID: series.id, name: series.name)) {
-                    Label(series.name + (series.sequence.map { " · Book " + $0 } ?? ""), systemImage: "books.vertical")
+                    Label(series.sequence.map { l10n("{0} · Book {1}", series.name, $0) } ?? series.name, systemImage: "books.vertical")
                         .font(.subheadline)
                 }
                 .accessibilityIdentifier("detail-series." + series.id)
-                .accessibilityLabel(series.name + (series.sequence.map { ", book " + $0 } ?? ""))
+                .accessibilityLabel(series.sequence.map { l10n("{0}, book {1}", series.name, $0) } ?? series.name)
             }
             ForEach(authors, id: \.self) { author in
                 NavigationLink(destination: RelatedAuthorView(catalog: catalog, authorID: author.id, name: author.name)) {
