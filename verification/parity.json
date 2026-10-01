@@ -817,7 +817,8 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "CollectionJourney 6/6 on iPhone and iPad simulators on October 1 (APPLE-GROUPS.md): order, playlist create/reorder/remove/delete through relaunch, selected podcast episode, downloaded member playback without the server. Realtime playlist edits and deletion (RealtimeJourney). Open: permission denial, partial membership failure, collection editing, podcast playlist membership editing; testCreateReorderRemoveAndDeletePlaylistThroughRelaunch failed 3 of 4 runs on pre-correction realtime wiring with no established cause (docs/handoff/APPLE-REALTIME.md on fork/apple-realtime)."
+          "CollectionJourney 6/6 on iPhone and iPad simulators on October 1 (APPLE-GROUPS.md): order, playlist create/reorder/remove/delete through relaunch, selected podcast episode, downloaded member playback without the server. Realtime playlist edits and deletion (RealtimeJourney). Open: permission denial, partial membership failure, collection editing, podcast playlist membership editing; testCreateReorderRemoveAndDeletePlaylistThroughRelaunch failed 3 of 4 runs on pre-correction realtime wiring with no established cause (docs/handoff/APPLE-REALTIME.md on fork/apple-realtime).",
+          "Remaining local QA (APPLE-REMAINING-QA.md, iPhone simulator; RemainingQAGroupJourney also on iPad): a 403 edit now says the account is not allowed instead of claiming a partial save (RED 9768ad9e, fix 3546707d). Probed correct without changes: read-only absence of editing, partial membership failure and retry, collection editing through relaunch, an unavailable collection member skipped on play, and podcast playlist episode add/reorder/remove (fixture patch kept with the evidence, not committed)."
         ],
         "android": [],
         "browser": []
@@ -1488,7 +1489,8 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "Partial: OfflineJourney.testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload (retry survives relaunch); Downloads screen with progress, cancel and retry (apple/README.md). Background transfer interruption, device restart and insufficient storage are not tested."
+          "Partial: OfflineJourney.testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload (retry survives relaunch); Downloads screen with progress, cancel and retry (apple/README.md). Background transfer interruption, device restart and insufficient storage are not tested.",
+          "Remaining local QA (APPLE-REMAINING-QA.md, NativeTests 67/67): a transfer meeting a full mounted volume fails once with a storage message instead of restarting endlessly (RED 33eb9455, fix 3efb624c; non-storage write failures stay generic, RED 63ed02cf, fix 553fd012). Finished audio stays playable offline when a later PDF fails (RED 02bbb418, fix b405a805). A lost connection with retry recovery was probed correct. Background reattachment, device restart, whole-device full and cellular transitions remain untested."
         ],
         "android": []
       },
@@ -1519,7 +1521,8 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "OfflineJourney relaunch after simulator process termination keeps downloaded audio and progress (APPLE-OFFLINE.md). A device restart is not tested."
+          "OfflineJourney relaunch after simulator process termination keeps downloaded audio and progress (APPLE-OFFLINE.md). A device restart is not tested.",
+          "Remaining local QA: downloaded audio stays playable after a relaunch when its later PDF part failed (DownloadRecoveryTests, b405a805)."
         ],
         "android": []
       },
@@ -1850,7 +1853,8 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "Partial: PresentationJourney.testAccessibilityTextSizeKeepsPlayerControlsOnScreen; reduced motion relies on system transitions with no journey; no VoiceOver walkthrough or contrast check recorded (APPLE-PRESENTATION.md)."
+          "Partial: PresentationJourney.testAccessibilityTextSizeKeepsPlayerControlsOnScreen; reduced motion relies on system transitions with no journey; no VoiceOver walkthrough or contrast check recorded (APPLE-PRESENTATION.md).",
+          "Remaining local QA (APPLE-REMAINING-QA.md): the XCUITest contrast audit of eight main screens in light, dark and black passes on iPhone and iPad simulators after raising the accent and secondary text to 4.5:1 (RED 5a8a9a5b, fix 30a66e60); each dismissal is measured from a screenshot. Reduced motion is a source observation: no custom animation, with no journey toggling it. No VoiceOver walkthrough."
         ],
         "android": [],
         "browser": [],

@@ -1,0 +1,189 @@
+# Apple remaining mobile QA
+
+Local, simulator-only checks for the remaining computable iPhone and iPad gaps in story 22 (collections and playlists),
+stories 42 and 43 (download recovery and storage) and story 53 (contrast and reduced motion). Branch
+`fork/apple-remaining-local-qa` from `000ea3c8` (`origin/fork/native-tv`). Synthetic fixture data only. No owner
+server, account or device was used, and nothing here is hardware or live-server acceptance.
+
+## How to run
+
+- Simulators: "ABS Remaining QA iPhone" (iPhone 17, iOS 27) and "ABS Remaining QA iPad" (iPad Air 13-inch M4, iOS 27),
+  created with `xcrun simctl create`.
+- `apple/scripts/verify-remaining-qa.sh [xcodebuild args]` runs the `RemainingQA*` UI journeys. It owns ports 57765
+  (realtime proxy) and 57769 (HTTP fixture) and refuses to start if either is in use. It builds a generated, ignored
+  copy of `project.yml` into `apple/build-remaining-qa`. Set `ABS_REMAINING_QA_SIMULATOR` to pick the iPad.
+- `apple/scripts/verify-download-storage.sh [xcodebuild args]` runs the hostless `NativeTests` (default:
+  `DownloadStorageTests`). It first mounts an 8 MB HFS+ image at `apple/build-remaining-qa/full-volume` and passes its
+  path as `ABS_FULL_VOLUME`, so a transfer meets a full volume. It detaches the image on exit.
+- `apple/scripts/measure-contrast.swift <png> <scale> <x> <y> <w> <h>` measures one element in a screenshot with the same
+  method the audit uses.
+
+## Contrast (story 53)
+
+`RemainingQAAccessibilityJourney` runs XCUITest's contrast audit in light, dark and black on these screens: catalog,
+book details, PDF reader, player, Downloads, Collections, a collection and Settings.
+
+An issue stays a failure unless one of these holds:
+
+- The screenshot taken just before the audit measures the element at 4.5:1 or more (WCAG 1.4.3).
+- The element is disabled (WCAG 1.4.3 exempts inactive controls).
+
+Every dismissal is printed with its measurement.
+
+RED (`5a8a9a5b`, iPhone): 38 findings in light and 2 each in dark and black. Measured examples:
+
+| Element | Colours | Ratio |
+| --- | --- | --- |
+| System secondary label | `#85858B` on `#F2F2F7` | 3.29:1 |
+| System secondary label | `#8A8A8E` on white | 3.44:1 |
+| Accent | `#CC4F2B` on `#F2F2F7` | 3.99:1 |
+| White on the accent ("Resume listening") | | 4.45:1 |
+| Dark accent on a card ("Play collection") | | 3.82:1 |
+| System blue in the PDF reader and the iPad player | | 3.15:1 |
+
+The blue appears because sheets and full screen covers do not inherit `.accentColor`.
+
+GREEN (`30a66e60`):
+
+- The accent is now the asset catalog's global accent: `#B5451F` in light, `#F07A54` in dark.
+- White text sits on `#B5451F` in every appearance.
+- Secondary text and section headers are `#6B6B70` in light and the system secondary label in dark.
+
+On the final run, both iPhone and iPad passed with 0 findings in all three appearances.
+
+Remaining dismissals, all evidenced:
+
+- Liquid Glass toolbar buttons, measured 11.35 to 19.7:1.
+- "Go to page", which stays disabled until a page number is typed.
+
+**Not covered:**
+
+- Screens outside the list above: for example the RSS sheet's orange footnotes, red error text and the migration import screen.
+- A VoiceOver walkthrough.
+
+## Reduced motion (story 53)
+
+Searched at this branch's head, outside the deferred EPUB reader assets:
+
+- No `withAnimation`, `.animation`, `.transition`, `matchedGeometryEffect`, `repeatForever`, phase or keyframe
+  animators, symbol effects, `UIView.animate`, Core Animation or reduce-motion checks.
+- The only `animated: true` is the system alert in `AppleNetworkPolicy`.
+- PDF page changes use PDFKit's `go(to:)`.
+
+Motion therefore comes only from system navigation, sheets and progress indicators, which follow Reduce Motion
+themselves. This is a source observation. No journey toggles Reduce Motion, and it has not been checked on a device.
+
+## Collections and playlists (story 22)
+
+Every case was probed on iPhone against the fixture before any change. The probe source, its fixture patch, logs and
+results are kept with the evidence. Only the failing case became a committed test.
+
+**Permission denial: confirmed bug.**
+
+- Symptom: when the server answers 403, the editor said "Changes could not be completed. Some membership changes may
+  already be saved. The server returned HTTP 403. Please try again."
+- Why it was wrong: nothing had been saved, and a retry cannot succeed.
+- RED: `9768ad9e`. GREEN: `3546707d`.
+- Fix: the save now reports a partial save only when a membership request had succeeded before the failure.
+- Message now: a 403 on save or delete reads "Your account is not allowed to do this on the server."
+- With these changes, the partial-failure and collection-editing probes still pass.
+
+**Probes that passed on unchanged code** (documented, not committed as tests):
+
+- **Read-only account:** with `update: false`, New collection, Edit collection and Delete collection are absent.
+- **Partial membership failure and retry** (`group-partial-failure`, which fails the first PATCH with 503 after
+  `batch/add` and `batch/remove` succeed):
+  - The editor stays open and says some membership changes may already be saved.
+  - The server holds the saved membership.
+  - Saving again re-reads the server, adds nothing twice (one `batch/add` in total), applies the order and closes the
+    editor.
+- **Collection editing:** create, rename, change the description, reorder, add two titles and remove one. The server
+  holds the result, and after a relaunch the collection shows it in the same order.
+- **Unavailable members:**
+  - A collection that starts with an `isMissing` title with no audio lists it. The probe fixture also put one first in a
+    playlist, but only the collection was exercised.
+  - Play skips it and starts the next playable member: `POST /api/items/book-2/play`.
+  - No session is requested for the missing title.
+- **Podcast playlist membership editing:**
+  - In the podcast library's playlist, the app adds a second episode through the episode picker, moves it first and
+    later removes the original.
+  - The server holds `podcast:episode, podcast:episode-morning`, then `podcast:episode`.
+  - The committed fixture cannot express this. It checks members against books only, drops `episodeId` and removes
+    by item. The probe used a fixture patch that matches episodes by `libraryItemId` and `episodeId`, as the server
+    does. The patch was not committed because no committed test needs it.
+
+**Still open:**
+
+- `CollectionJourney.testCreateReorderRemoveAndDeletePlaylistThroughRelaunch` was not rerun. It uses the coordinator's
+  fixture ports.
+- In `podcast-admin` mode the fixture's admin has `delete: false`, so the app offers Delete collection to an admin whom
+  the fixture refuses. Whether a real server admin can lack delete was not checked.
+
+## Downloads (stories 42 and 43)
+
+**Insufficient storage: confirmed bug.**
+
+- Setup: the full-volume test fills the mounted volume while a transfer is held open.
+- Symptom: the staging move and the manifest write both failed, the entry stayed queued in memory, and every
+  completion started the same part again: 245 transfers in about four seconds, with no message.
+- RED: `33eb9455`. GREEN: `3efb624c`.
+- Fix: a failed part leaves the queue in memory even when the manifest cannot record it. The entry fails once with
+  "There is not enough storage on this device for this download. Free up space, then retry." After the space is
+  freed, Retry completes with the original bytes.
+- After review, URL file-write and file-creation errors count as storage only with an underlying `ENOSPC`, `EDQUOT` or
+  Cocoa out-of-space cause. RED: `63ed02cf`, an `EACCES` cause. GREEN: `553fd012`. The real full-volume test still
+  passes.
+
+**PDF added after the audio: confirmed bug.**
+
+- Trigger: when the server item gains a PDF after its audio was downloaded, "Download for offline" queues the ready
+  entry again for the PDF alone.
+- Symptom: if that transfer failed, offline audio refused the finished, intact audio files with `signInRequired`,
+  before and after a relaunch.
+- RED: `02bbb418`. GREEN: `b405a805`.
+- Fix:
+  - Offline audio needs every audio part saved, and offline reading needs the ebook part.
+  - Downloads shows Play offline beside Retry download.
+  - A group plays such a member offline.
+- Primary and supplementary entries keep their meaning: a supplementary entry has no audio parts.
+
+**Lost connection mid-transfer** (probe, passed on unchanged code):
+
+- One part failing with `networkConnectionLost` fails the entry and cancels its other running part.
+- Retry fetches the unfinished parts and the entry becomes ready.
+- Through the in-process stub the stored message was the generic `NSURLErrorDomain error -1005` text. A real session's
+  wording was not observed.
+
+`NativeTests` result: 67 of 67 at `553fd012`.
+
+**Still open:**
+
+- **Background transfers:**
+  - The background `URLSession` reattaches after a relaunch in source (`init`, `getAllTasks`).
+  - No local test covers it: hostless tests use an ephemeral session, and `XCUIApplication.terminate()` does not
+    reproduce the system relaunching a suspended app or a user force-quit.
+  - A device restart and real cellular transitions are untested.
+- **Storage limits:**
+  - A whole-device full condition, where the system cannot even stage the transfer, was not reproduced. Only the
+    app's own volume was full.
+  - From the source (not run): truncated bodies without a `Content-Length` are accepted as complete.
+- **Missing files** (from the source, not run):
+  - A downloaded ebook removed while the app runs is only detected at the next launch.
+  - A missing entry folder makes Retry fail, because only enqueue creates it. Neither has a realistic trigger: the
+    folder lives in Application Support and is excluded from backup.
+
+## Evidence
+
+All under `/tmp/abs-remaining-qa-evidence`:
+
+- **`contrast-red/`:** RED logs. `light.xcresult` holds the light run.
+- **`contrast-green/`:** iPhone and iPad logs, results and exported screenshots.
+- **`groups/`:**
+  - The probe source `RemainingQAGroupJourney-probes.swift` and its `fixture-probe-modes.patch`.
+  - Probe logs and results: `probe-1`, `probe-podcast`, `forbidden-red`, `forbidden-green-with-probes`.
+- **`downloads/`:**
+  - `storage-red`, `storage-green`, `pdf-added-red`, `write-failure-red` and `interruption-probe`.
+  - `NativeTests` runs: 65, 66 and 67 tests.
+- **`final/`:**
+  - iPhone and iPad runs of the three contrast audits and the forbidden-edit journey, with exported screenshots.
+  - These ran at `b405a805`. `553fd012` changes only the storage classification, which the 67-test run covers.
