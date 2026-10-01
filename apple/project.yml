@@ -80,6 +80,7 @@ targets:
       - App/NativeDownloads.swift
       - App/ReadingStore.swift
       - App/CatalogStore.swift
+      - App/WaitingWrites.swift
       - App/NativeRealtime.swift
       - Localization/Sources/NativeLocalization
       - Playback

@@ -55,7 +55,7 @@ enum CatalogSort: String, CaseIterable {
     private var page = 0
     private var generation = UUID()
     /// The account this catalog was loaded for; changes for any other account never reach it.
-    private var owner: AccountIdentity?
+    private(set) var owner: AccountIdentity?
     /// One realtime refresh runs at a time. The next one waits, and a queued items reload is never downgraded.
     private var refreshing = false
     private var queuedRefresh: (event: NativeRealtime.Event, items: Bool)?

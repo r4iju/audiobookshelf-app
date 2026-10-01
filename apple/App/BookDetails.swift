@@ -37,7 +37,7 @@ struct BookDetails: View {
     }
     @State private var progressConfirmation: ProgressConfirmation?
     /// Whether the server may still apply an earlier save of this title, so newer ones wait.
-    @State private var writesWaiting = false
+    @StateObject private var writesWaiting = WaitingWrites()
     /// Whether confirming the restart goes on to discard the progress.
     @State private var restartThenDiscard = true
     @State private var progressDiscarded = false
@@ -76,7 +76,7 @@ struct BookDetails: View {
 
                     }
                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
-                    if writesWaiting {
+                    if writesWaiting.waiting {
                         VStack(alignment: .leading, spacing: 12) {
                             Text(l10n("An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.")).font(.callout).foregroundColor(ShelfStyle.secondaryText)
                             Button(l10n("Restart the server")) { askForRestart(thenDiscard: false) }.disabled(progressBusy).accessibilityIdentifier("restart-server")
@@ -151,8 +151,8 @@ struct BookDetails: View {
                 }
             }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
         }.background(appearance.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
-            .onAppear { load(monitorDownloads: true) }
-            .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel() }
+            .onAppear { writesWaiting.activate(); load(monitorDownloads: true) }
+            .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel(); writesWaiting.stop() }
             .sheet(isPresented: $showingFeed) {
                 FeedEpisodes(api: catalog.api, item: book, presented: $showingFeed) { change in
                     switch change {
@@ -176,6 +176,11 @@ struct BookDetails: View {
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
             .onReceive(realtime.events) { event in receive(event) }
+            // A save made in the background, such as the player's on pause, can leave a write unknown while these are open.
+            .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in
+                let appearance = writesWaiting.lifecycle
+                Task { await refreshWaitingWrites(during: appearance) }
+            }
     }
 
     @ViewBuilder private var header: some View {
@@ -216,6 +221,7 @@ struct BookDetails: View {
     }
     private func applyFinished(_ finished: Bool) {
         guard !progressBusy else { return }
+        let appearance = writesWaiting.lifecycle
         request?.cancel()
         detailRevision = UUID()
         progressBusy = true
@@ -229,7 +235,7 @@ struct BookDetails: View {
                 catalog.applyProgress(user)
             } catch {
                 if !Task.isCancelled { recordLoadFailure(ConnectionStore.recovery(for: error)) }
-                await refreshWaitingWrites()
+                await refreshWaitingWrites(during: appearance)
             }
         }
     }
@@ -269,6 +275,7 @@ struct BookDetails: View {
 
     private func confirmRestart() {
         guard !progressBusy else { return }
+        let appearance = writesWaiting.lifecycle
         Task {
             do {
                 try player.confirmServerRestarted(account: try await catalog.api.currentAccount())
@@ -276,15 +283,14 @@ struct BookDetails: View {
                 // Sends what waited.
                 await player.restoreListening()
                 readingStore.sync(api: catalog.api)
-                await refreshWaitingWrites()
+                await refreshWaitingWrites(during: appearance)
                 load()
             } catch { self.error = .discard(ConnectionStore.recovery(for: error)) }
         }
     }
 
-    private func refreshWaitingWrites() async {
-        guard let account = try? await catalog.api.currentAccount() else { return }
-        writesWaiting = player.publications.unresolved(account: account, itemID: book.id, episodeID: episode?.id)
+    private func refreshWaitingWrites(during appearance: UUID?) async {
+        await writesWaiting.refresh(api: catalog.api, ledger: player.publications, owner: catalog.owner, itemID: book.id, episodeID: episode?.id, during: appearance)
     }
 
     // After a discard the progress this view was opened with is stale.
@@ -426,6 +432,7 @@ struct BookDetails: View {
     private func load(monitorDownloads: Bool = false, for event: NativeRealtime.Event? = nil) {
         guard !progressBusy, event.map(catalog.owns) != false else { return }
         request?.cancel()
+        let appearance = writesWaiting.lifecycle
         let revision = UUID()
         detailRevision = revision
         request = Task {
@@ -437,7 +444,7 @@ struct BookDetails: View {
                 guard !Task.isCancelled, detailRevision == revision, try await catalog.api.currentAccount() == owner, event.map(catalog.owns) != false else { return }
                 expanded = value
                 mediaProgress = user.mediaProgress
-                await refreshWaitingWrites()
+                await refreshWaitingWrites(during: appearance)
                 canManagePodcasts = user.canManagePodcasts
                 if book.mediaType == "podcast", episode == nil {
                     try serverQueue.adoptLegacy(itemID: item.id)
