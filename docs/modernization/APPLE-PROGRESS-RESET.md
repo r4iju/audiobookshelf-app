@@ -111,7 +111,20 @@ Root also owns realtime: the server's `user_updated` after the delete reaches ot
 - An unreadable intent file counts as pending for every media: playback refuses, and reading and carried-over positions wait, rather than risking a recreated row.
 - Pages read after the confirmation while the reset is pending are kept and published once it finishes. No test distinguishes this rule; see the mutation results.
 - A write can stay unresolved for good until the owner confirms a server restart. Until then, all later progress for that media (listening, pages, finished, carried-over) waits on this device. A single timeout therefore holds a title's progress back until a restart, which is the cost of not inventing a server guarantee. Exact replays still go out.
-- tvOS has no restart action. A TV title with an unresolved write keeps its later progress on the device indefinitely, and the existing progress recovery does not explain why. Root owns any TV UI for this.
+- tvOS recovers in Settings rather than at a reset (TV has no reset).
+  - **Notice:** a "Saves waiting" section appears while the account has an unresolved write or an unreadable record. It counts the titles and names the server and signed-in account. Now Playing says when the current title's newer listening waits.
+  - **Step 1:** "Start server restart" calls `requestServerRestart` before the owner restarts.
+  - **Step 2:** "The server has restarted" confirms and sends what waited. "Start again" takes a new snapshot. The step survives a relaunch.
+  - **Refresh:** both views refresh on `PublicationLedger.changed`, which the ledger posts after every change, so the state never expires on its own.
+  - **Reset:** `--reset-tv-state` clears the ledger, so journeys cannot inherit an earlier run's unanswered writes.
+  - **Evidence:** the remote-driven `RecoveryJourney.testLaterListeningWaitsForARequestedAndConfirmedServerRestart` runs against the fixture's `held-sync` mode:
+    - the first book-0 `local-all` gets a 504 while the fixture keeps its handler;
+    - `/__fixture__/restart` ends kept handlers unapplied;
+    - `/__fixture__/release-held` applies them.
+
+    The journey checks that newer listening stays on the TV, that a manual resend does not send it, that the request survives a relaunch, and that after the fixture restart and the confirmation the session reaches the server once with both plays' listening.
+    - RED: `b1ddd70e`, run on a fresh simulator, where the notice is missing.
+    - Source: `d4d68b62`.
 - Requests sent by builds before the ledger left no record, so they cannot hold back a reset.
 - tvOS keeps the same rule with the ledger in Application Support, next to the intents, which the system may purge. TV has no reset, so the ledger only gates resets on the device that sent the writes, and a ledger write that fails stops TV listening from being sent until it succeeds, shown through the existing progress recovery.
 - Simulator and fixture evidence only. No live server, physical device or cross-device acceptance is claimed, and the reset was never run against the owner's server.

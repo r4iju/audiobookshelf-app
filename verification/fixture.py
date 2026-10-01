@@ -704,7 +704,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, self.progress[key])
             if path == '/api/session/local-all':
                 if configuration['mode'] == 'offline-progress':
-                    return self.respond(503, {})
+                    # The server's own handler fails before writing anything, so the client knows it
+                    # was not applied. A gateway's 503 would leave that unknown; held-sync covers it.
+                    return self.respond(500, {'error': 'Synthetic progress failure'})
                 if configuration['mode'] == 'held-sync' and not configuration['failed'] and any(record.get('libraryItemId') == 'book-0' for record in data.get('sessions', [])):
                     # A gateway gives up on the request while its handler is still running.
                     configuration['failed'] = True
@@ -761,7 +763,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             report = re.fullmatch(r'/api/session/([^/]+)/(sync|close)', path or '')
             if report and report.group(1) in sessions:
                 if configuration['mode'] == 'offline-progress':
-                    return self.respond(503, {})
+                    # The server's own handler fails before writing anything, so the client knows it
+                    # was not applied. A gateway's 503 would leave that unknown; held-sync covers it.
+                    return self.respond(500, {'error': 'Synthetic progress failure'})
                 if configuration['mode'] == 'slow-close' and report.group(2) == 'close':
                     time.sleep(8)
                 session = sessions[report.group(1)]
