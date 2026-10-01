@@ -1,0 +1,36 @@
+import type { LanguageCode } from "./languages";
+
+type Strings = Record<string, string>;
+
+export const loaders: Record<LanguageCode, () => Promise<{ default: Strings }>> = {
+  ar: () => import("./strings/ar.json"),
+  be: () => import("./strings/be.json"),
+  bg: () => import("./strings/bg.json"),
+  bn: () => import("./strings/bn.json"),
+  ca: () => import("./strings/ca.json"),
+  cs: () => import("./strings/cs.json"),
+  da: () => import("./strings/da.json"),
+  de: () => import("./strings/de.json"),
+  "en-us": () => import("./strings/en-us.json"),
+  es: () => import("./strings/es.json"),
+  fi: () => import("./strings/fi.json"),
+  fr: () => import("./strings/fr.json"),
+  he: () => import("./strings/he.json"),
+  hr: () => import("./strings/hr.json"),
+  hu: () => import("./strings/hu.json"),
+  it: () => import("./strings/it.json"),
+  ko: () => import("./strings/ko.json"),
+  lt: () => import("./strings/lt.json"),
+  nl: () => import("./strings/nl.json"),
+  no: () => import("./strings/no.json"),
+  pl: () => import("./strings/pl.json"),
+  "pt-br": () => import("./strings/pt-br.json"),
+  ru: () => import("./strings/ru.json"),
+  sk: () => import("./strings/sk.json"),
+  sl: () => import("./strings/sl.json"),
+  sv: () => import("./strings/sv.json"),
+  tr: () => import("./strings/tr.json"),
+  uk: () => import("./strings/uk.json"),
+  "vi-vn": () => import("./strings/vi-vn.json"),
+  "zh-cn": () => import("./strings/zh-cn.json"),
+};
