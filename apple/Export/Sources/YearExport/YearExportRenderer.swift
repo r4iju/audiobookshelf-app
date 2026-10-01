@@ -34,18 +34,19 @@ public enum YearExportRenderer {
         default: suffix = ""
         }
         return artifact(id: snapshot.id, year: snapshot.year, layout: layout, data: data,
-                        fileName: "audiobookshelf_my_\(snapshot.year)\(suffix).png", shareText: snapshot.shareText)
+                        fileName: "audiobookshelf_my_\(snapshot.year)\(suffix).png", shareText: snapshot.shareText, copy: snapshot.copy)
     }
 
     public static func render(_ snapshot: YearExportServerSnapshot, layout: YearExportLayout) -> YearExportArtifact {
         let size = layout.shape.pixelSize
+        let copy = snapshot.copy
         let data = png(size: size) { context in
             let canvas = ServerCanvas(context: context, size: size, snapshot: snapshot)
             canvas.background()
             switch layout.design {
             case .serverAdditions: canvas.additions(portrait: layout.shape == .portrait)
-            case .serverPeople: canvas.lists([("TOP AUTHORS", snapshot.topAuthors), ("TOP NARRATORS", snapshot.topNarrators)], portrait: layout.shape == .portrait)
-            case .serverGenres: canvas.lists([("TOP AUTHORS", snapshot.topAuthors), ("TOP GENRES", snapshot.topGenres)], portrait: layout.shape == .portrait)
+            case .serverPeople: canvas.lists([(copy("Top authors"), snapshot.topAuthors), (copy("Top narrators"), snapshot.topNarrators)], portrait: layout.shape == .portrait)
+            case .serverGenres: canvas.lists([(copy("Top authors"), snapshot.topAuthors), (copy("Top genres"), snapshot.topGenres)], portrait: layout.shape == .portrait)
             default: break
             }
         }
@@ -57,7 +58,7 @@ public enum YearExportRenderer {
         }
         if layout.shape == .portrait { suffix += "_story" }
         return artifact(id: snapshot.id, year: snapshot.year, layout: layout, data: data,
-                        fileName: "audiobookshelf_server_\(snapshot.year)\(suffix).png", shareText: snapshot.shareText)
+                        fileName: "audiobookshelf_server_\(snapshot.year)\(suffix).png", shareText: snapshot.shareText, copy: copy)
     }
 
     private static func png(size: CGSize, draw: (CGContext) -> Void) -> Data {
@@ -68,10 +69,11 @@ public enum YearExportRenderer {
         return UIGraphicsImageRenderer(size: size, format: format).pngData { draw($0.cgContext) }
     }
 
-    private static func artifact(id: UUID, year: Int, layout: YearExportLayout, data: Data, fileName: String, shareText: String) -> YearExportArtifact {
+    private static func artifact(id: UUID, year: Int, layout: YearExportLayout, data: Data, fileName: String, shareText: String, copy: YearExportCopy) -> YearExportArtifact {
         YearExportArtifact(
             snapshotID: id, year: year, layout: layout, pngData: data, fileName: fileName, shareText: shareText,
-            accessibilityLabel: "\(layout.design.title) \(layout.shape.title.lowercased()) image. " + shareText.replacingOccurrences(of: "\n", with: ". ")
+            accessibilityLabel: copy("{0}, {1} image", copy.title(of: layout.design), copy.title(of: layout.shape)) + ". "
+                + shareText.replacingOccurrences(of: "\n", with: ". ")
         )
     }
 }
@@ -82,6 +84,7 @@ private struct ListenerCanvas: Canvas {
     let snapshot: YearExportSnapshot
     var year: Int { snapshot.year }
     var mosaic: [CGImage] { snapshot.mosaic }
+    var copy: YearExportCopy { snapshot.copy }
 
     // MARK: Layouts
 
@@ -105,9 +108,10 @@ private struct ListenerCanvas: Canvas {
     func highlightsPortrait() {
         header(y: 112)
         let time = snapshot.listeningTime
-        text("TIME LISTENING", font: font(28, .bold), color: Self.accent, in: CGRect(x: margin, y: 300, width: contentWidth, height: 36), kern: 4)
+        text(copy.heading(copy("Time listening")), font: font(28, .bold), color: Self.accent, in: CGRect(x: margin, y: 300, width: contentWidth, height: 36), kern: 4)
         text(time.value, font: fitted(time.value, size: 240, weight: .heavy, width: contentWidth), color: .white, in: CGRect(x: margin, y: 336, width: contentWidth, height: 280))
-        text(time.unit, font: font(56, .semibold), color: Self.secondary, in: CGRect(x: margin, y: 610, width: contentWidth, height: 70))
+        let unit = time.hours ? (time.one ? copy("hour") : copy("hours")) : (time.one ? copy("minute") : copy("minutes"))
+        text(unit, font: font(56, .semibold), color: Self.secondary, in: CGRect(x: margin, y: 610, width: contentWidth, height: 70))
         let cards = statCards(includeTime: false)
         let width = (contentWidth - 48) / 3
         for (index, card) in cards.enumerated() {
@@ -159,7 +163,7 @@ private struct ListenerCanvas: Canvas {
         for (index, card) in cards.enumerated() {
             statCard(card, in: CGRect(x: margin + CGFloat(index) * (width + 24), y: 208, width: width, height: 240), compact: true)
         }
-        text("SOME BOOKS FINISHED THIS YEAR", font: font(26, .bold), color: Self.accent, in: CGRect(x: margin, y: 492, width: contentWidth, height: 34), kern: 3)
+        text(copy.heading(copy("Some books finished this year")), font: font(26, .bold), color: Self.accent, in: CGRect(x: margin, y: 492, width: contentWidth, height: 34), kern: 3)
         coverGrid(snapshot.finishedCovers, in: CGRect(x: margin, y: 548, width: contentWidth, height: 460))
     }
 
@@ -169,7 +173,7 @@ private struct ListenerCanvas: Canvas {
         for (index, card) in statCards(includeTime: true).enumerated() {
             statCard(card, in: CGRect(x: margin + CGFloat(index % 2) * (width + 24), y: 260 + CGFloat(index / 2) * 224, width: width, height: 200))
         }
-        text("SOME BOOKS FINISHED THIS YEAR", font: font(28, .bold), color: Self.accent, in: CGRect(x: margin, y: 760, width: contentWidth, height: 36), kern: 3)
+        text(copy.heading(copy("Some books finished this year")), font: font(28, .bold), color: Self.accent, in: CGRect(x: margin, y: 760, width: contentWidth, height: 36), kern: 3)
         coverGrid(snapshot.finishedCovers, in: CGRect(x: margin, y: 820, width: contentWidth, height: 1000))
     }
 
@@ -178,8 +182,8 @@ private struct ListenerCanvas: Canvas {
         header(y: 72, width: headerWidth)
         text(String(snapshot.year), font: font(150, .heavy), color: UIColor(white: 1, alpha: 0.12), in: CGRect(x: margin - 6, y: 250, width: headerWidth, height: 180))
         let cards = [
-            StatCard(symbol: "checkmark.seal.fill", value: snapshot.number(snapshot.booksFinished), label: snapshot.booksFinished == 1 ? "book finished" : "books finished"),
-            StatCard(symbol: "books.vertical.fill", value: snapshot.number(snapshot.booksListened), label: snapshot.booksListened == 1 ? "book listened to" : "books listened to")
+            StatCard(symbol: "checkmark.seal.fill", value: snapshot.number(snapshot.booksFinished), label: snapshot.booksFinished == 1 ? copy("book finished") : copy("books finished")),
+            StatCard(symbol: "books.vertical.fill", value: snapshot.number(snapshot.booksListened), label: snapshot.booksListened == 1 ? copy("book listened to") : copy("books listened to"))
         ]
         let x = margin + headerWidth + 24
         let width = (size.width - margin - x - 24) / 2
@@ -193,26 +197,26 @@ private struct ListenerCanvas: Canvas {
     func statCards(includeTime: Bool) -> [StatCard] {
         let time = snapshot.listeningTime
         var cards = [
-            StatCard(symbol: "checkmark.seal.fill", value: snapshot.number(snapshot.booksFinished), label: snapshot.booksFinished == 1 ? "book finished" : "books finished"),
-            StatCard(symbol: "books.vertical.fill", value: snapshot.number(snapshot.booksListened), label: snapshot.booksListened == 1 ? "book listened to" : "books listened to"),
-            StatCard(symbol: "headphones", value: snapshot.number(snapshot.sessions), label: snapshot.sessions == 1 ? "session" : "sessions")
+            StatCard(symbol: "checkmark.seal.fill", value: snapshot.number(snapshot.booksFinished), label: snapshot.booksFinished == 1 ? copy("book finished") : copy("books finished")),
+            StatCard(symbol: "books.vertical.fill", value: snapshot.number(snapshot.booksListened), label: snapshot.booksListened == 1 ? copy("book listened to") : copy("books listened to")),
+            StatCard(symbol: "headphones", value: snapshot.number(snapshot.sessions), label: snapshot.sessions == 1 ? copy("session") : copy("sessions"))
         ]
-        if includeTime { cards.insert(StatCard(symbol: "clock.fill", value: time.value, label: "\(time.unit) listening"), at: 1) }
+        if includeTime { cards.insert(StatCard(symbol: "clock.fill", value: time.value, label: time.hours ? (time.one ? copy("hour listening") : copy("hours listening")) : (time.one ? copy("minute listening") : copy("minutes listening"))), at: 1) }
         return cards
     }
 
     func highlightFacts(includeLongest: Bool) -> [Fact] {
         var facts: [Fact] = []
-        if let value = snapshot.narrator { facts.append(Fact(title: "TOP NARRATOR", value: value.name, detail: snapshot.duration(value.seconds))) }
-        if let value = snapshot.topGenres.first { facts.append(Fact(title: "TOP GENRE", value: value.name, detail: snapshot.duration(value.seconds))) }
-        if let value = snapshot.topAuthors.first { facts.append(Fact(title: "TOP AUTHOR", value: value.name, detail: snapshot.duration(value.seconds))) }
-        if let value = snapshot.month { facts.append(Fact(title: "TOP MONTH", value: value.name, detail: snapshot.duration(value.seconds))) }
-        if includeLongest, let value = snapshot.longestBook { facts.append(Fact(title: "LONGEST BOOK FINISHED", value: value.name, detail: snapshot.duration(value.seconds))) }
+        if let value = snapshot.narrator { facts.append(Fact(title: copy.heading(copy("Top narrator")), value: value.name, detail: snapshot.duration(value.seconds))) }
+        if let value = snapshot.topGenres.first { facts.append(Fact(title: copy.heading(copy("Top genre")), value: value.name, detail: snapshot.duration(value.seconds))) }
+        if let value = snapshot.topAuthors.first { facts.append(Fact(title: copy.heading(copy("Top author")), value: value.name, detail: snapshot.duration(value.seconds))) }
+        if let value = snapshot.month { facts.append(Fact(title: copy.heading(copy("Top month")), value: value.name, detail: snapshot.duration(value.seconds))) }
+        if includeLongest, let value = snapshot.longestBook { facts.append(Fact(title: copy.heading(copy("Longest book finished")), value: value.name, detail: snapshot.duration(value.seconds))) }
         return facts
     }
 
     func rankedLists() -> [(title: String, items: [YearExportSnapshot.Ranked])] {
-        [("TOP AUTHORS", snapshot.topAuthors), ("TOP GENRES", snapshot.topGenres)].filter { !$0.1.isEmpty }
+        [(copy("Top authors"), snapshot.topAuthors), (copy("Top genres"), snapshot.topGenres)].filter { !$0.1.isEmpty }
     }
 
     func rankedList(_ title: String, _ items: [YearExportSnapshot.Ranked], in rect: CGRect, rowHeight: CGFloat) {
@@ -224,8 +228,8 @@ private struct ListenerCanvas: Canvas {
         panel(rect)
         let inner = rect.insetBy(dx: 40, dy: 40)
         symbol("sparkles", color: Self.accent, in: CGRect(x: inner.midX - 32, y: inner.midY - 96, width: 64, height: 64))
-        text("No listening recorded in \(snapshot.year)", font: font(40, .bold), color: .white, in: CGRect(x: inner.minX, y: inner.midY - 12, width: inner.width, height: 52), alignment: .center)
-        text("Press play and your year will fill in here.", font: font(28, .regular), color: Self.secondary, in: CGRect(x: inner.minX, y: inner.midY + 46, width: inner.width, height: 72), alignment: .center, lines: 2)
+        text(copy("No listening recorded in {0}", String(snapshot.year)), font: font(40, .bold), color: .white, in: CGRect(x: inner.minX, y: inner.midY - 12, width: inner.width, height: 52), alignment: .center)
+        text(copy("Press play and your year will fill in here."), font: font(28, .regular), color: Self.secondary, in: CGRect(x: inner.minX, y: inner.midY + 46, width: inner.width, height: 72), alignment: .center, lines: 2)
     }
 }
 
@@ -236,6 +240,7 @@ private struct ServerCanvas: Canvas {
     let snapshot: YearExportServerSnapshot
     var year: Int { snapshot.year }
     var mosaic: [CGImage] { snapshot.covers }
+    var copy: YearExportCopy { snapshot.copy }
 
     func additions(portrait: Bool) {
         let y = top(portrait: portrait)
@@ -243,11 +248,12 @@ private struct ServerCanvas: Canvas {
         let covers = Array(snapshot.covers.prefix(5))
         guard !covers.isEmpty else {
             let format = snapshot.format
-            factCell(Fact(title: "IN YOUR LIBRARY", value: format.count(snapshot.libraryBooks, "book", "books"),
-                          detail: "\(format.duration(snapshot.listeningSeconds)) listened this year"), in: CGRect(x: margin, y: y, width: contentWidth, height: 132))
+            let books = snapshot.number(snapshot.libraryBooks)
+            factCell(Fact(title: copy.heading(copy("In your library")), value: snapshot.libraryBooks == 1 ? copy("{0} book", books) : copy("{0} books", books),
+                          detail: copy("{0} listened this year", format.duration(snapshot.listeningSeconds))), in: CGRect(x: margin, y: y, width: contentWidth, height: 132))
             return
         }
-        text("SOME ADDITIONS INCLUDE", font: font(portrait ? 28 : 26, .bold), color: Self.accent, in: CGRect(x: margin, y: area.minY, width: contentWidth, height: 36), kern: 3)
+        text(copy.heading(copy("Some additions include")), font: font(portrait ? 28 : 26, .bold), color: Self.accent, in: CGRect(x: margin, y: area.minY, width: contentWidth, height: 36), kern: 3)
         coverGrid(covers, in: CGRect(x: margin, y: area.minY + 56, width: contentWidth, height: area.height - 56))
     }
 
@@ -273,12 +279,12 @@ private struct ServerCanvas: Canvas {
 
     /// Header, the three legacy boxes and the collection totals; returns where the variant starts.
     private func top(portrait: Bool) -> CGFloat {
-        header(y: portrait ? 112 : 72, title: "\(snapshot.year) SERVER YEAR IN REVIEW")
+        header(y: portrait ? 112 : 72, title: copy.heading(copy("{0} server year in review", String(snapshot.year))))
         let format = snapshot.format
         let cards = [
-            StatCard(symbol: "plus.square.on.square", value: format.number(Double(snapshot.booksAdded)), label: snapshot.booksAdded == 1 ? "book added" : "books added"),
-            StatCard(symbol: "person.2.fill", value: format.number(Double(snapshot.authorsAdded)), label: snapshot.authorsAdded == 1 ? "author added" : "authors added"),
-            StatCard(symbol: "headphones", value: format.number(Double(snapshot.sessions)), label: snapshot.sessions == 1 ? "session" : "sessions")
+            StatCard(symbol: "plus.square.on.square", value: format.number(Double(snapshot.booksAdded)), label: snapshot.booksAdded == 1 ? copy("book added") : copy("books added")),
+            StatCard(symbol: "person.2.fill", value: format.number(Double(snapshot.authorsAdded)), label: snapshot.authorsAdded == 1 ? copy("author added") : copy("authors added")),
+            StatCard(symbol: "headphones", value: format.number(Double(snapshot.sessions)), label: snapshot.sessions == 1 ? copy("session") : copy("sessions"))
         ]
         let cardsY: CGFloat = portrait ? 260 : 208
         let width = (contentWidth - 48) / 3
@@ -287,10 +293,10 @@ private struct ServerCanvas: Canvas {
         }
         var facts: [Fact] = []
         if snapshot.collectionBytes > 0 || snapshot.addedBytes > 0 {
-            facts.append(Fact(title: "COLLECTION GREW TO", value: format.bytes(snapshot.collectionBytes), detail: "+\(format.bytes(snapshot.addedBytes)) this year"))
+            facts.append(Fact(title: copy.heading(copy("Collection grew to")), value: format.bytes(snapshot.collectionBytes), detail: copy("+{0} this year", format.bytes(snapshot.addedBytes))))
         }
         if snapshot.collectionSeconds > 0 || snapshot.addedSeconds > 0 {
-            facts.append(Fact(title: "TOTAL DURATION", value: format.longDuration(snapshot.collectionSeconds), detail: "+\(format.longDuration(snapshot.addedSeconds)) this year"))
+            facts.append(Fact(title: copy.heading(copy("Total duration")), value: format.longDuration(snapshot.collectionSeconds), detail: copy("+{0} this year", format.longDuration(snapshot.addedSeconds))))
         }
         var y = cardsY + (portrait ? 250 : 220) + 40
         if portrait {
@@ -316,6 +322,7 @@ private protocol Canvas {
     var size: CGSize { get }
     var year: Int { get }
     var mosaic: [CGImage] { get }
+    var copy: YearExportCopy { get }
 }
 
 private struct StatCard { let symbol: String; let value: String; let label: String }
@@ -354,7 +361,7 @@ extension Canvas {
         symbol("headphones", color: UIColor(white: 0.08, alpha: 1), in: badge.insetBy(dx: 20, dy: 20))
         let x = badge.maxX + 24
         text("audiobookshelf", font: font(40, .semibold), color: Self.accent, in: CGRect(x: x, y: y + 2, width: width - x + margin, height: 50))
-        text(title ?? "\(year) YEAR IN REVIEW", font: font(28, .heavy), color: .white, in: CGRect(x: x, y: y + 54, width: width - x + margin, height: 36), kern: 3)
+        text(title ?? copy.heading(copy("{0} year in review", String(year))), font: font(28, .heavy), color: .white, in: CGRect(x: x, y: y + 54, width: width - x + margin, height: 36), kern: 3)
     }
 
     func statCard(_ card: StatCard, in rect: CGRect, compact: Bool = false) {
@@ -380,7 +387,7 @@ extension Canvas {
     }
 
     func rankedList(_ title: String, _ items: [(name: String, detail: String)], in rect: CGRect, rowHeight: CGFloat) {
-        text(title, font: font(26, .bold), color: Self.accent, in: CGRect(x: rect.minX, y: rect.minY, width: rect.width, height: 34), kern: 3)
+        text(copy.heading(title), font: font(26, .bold), color: Self.accent, in: CGRect(x: rect.minX, y: rect.minY, width: rect.width, height: 34), kern: 3)
         for (index, item) in items.prefix(5).enumerated() {
             let row = CGRect(x: rect.minX, y: rect.minY + 56 + CGFloat(index) * rowHeight, width: rect.width, height: rowHeight - 12)
             text("\(index + 1)", font: font(40, .heavy), color: Self.accent.withAlphaComponent(0.85), in: CGRect(x: row.minX, y: row.minY + 4, width: 52, height: 50))

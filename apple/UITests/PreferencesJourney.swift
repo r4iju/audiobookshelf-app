@@ -1,6 +1,34 @@
 import XCTest
 
 @MainActor final class PreferencesJourney: NativeJourney {
+    func testLegacyImportOpensBeforeSigningIntoAServer() async throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--reset-preview-account"]
+        app.launch()
+        XCTAssertTrue(app.textFields["server"].waitForExistence(timeout: 8))
+        app.swipeUp()
+        let migration = app.buttons["Import previous app data"]
+        XCTAssertTrue(migration.waitForExistence(timeout: 3))
+        guard migration.exists else { return }
+        migration.tap()
+        XCTAssertTrue(app.buttons["Choose export"].waitForExistence(timeout: 3))
+    }
+
+    func testLegacyImportExplainsExportAndReauthentication() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["account"].tap(); app.buttons["Settings"].tap(); app.swipeUp()
+        let migration = app.buttons["Import previous app data"]
+        XCTAssertTrue(migration.waitForExistence(timeout: 3))
+        guard migration.exists else { return }
+        migration.tap()
+        XCTAssertTrue(app.buttons["Choose export"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Sign in again after importing to access each account."].exists)
+        XCTAssertTrue(app.staticTexts["Your previous app and its original files stay available."].exists)
+        capture("Native legacy import")
+    }
+
     func testSeparateStreamingAndDownloadNetworkChoicesPersist() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)

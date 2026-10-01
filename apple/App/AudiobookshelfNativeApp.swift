@@ -9,6 +9,7 @@ import SwiftUI
     @StateObject private var downloads: NativeDownloads
     @StateObject private var connection: ConnectionStore
     @StateObject private var player: ApplePlayback
+    @StateObject private var migration: NativeMigrationStore
 
     init() {
         UITableView.appearance().backgroundColor = .clear
@@ -20,8 +21,12 @@ import SwiftUI
             try? FileManager.default.removeItem(at: NativePodcastQueue.file)
             try? FileManager.default.removeItem(at: ReadingStore.file)
             try? FileManager.default.removeItem(at: NativeDownloads.directory)
+            try? FileManager.default.removeItem(at: NativeMigrationStore.root)
+            try? FileManager.default.removeItem(at: NativeMigrationAdoption.directory)
             UserDefaults.standard.removeObject(forKey: "previewTheme")
             UserDefaults.standard.removeObject(forKey: "previewHaptic")
+            UserDefaults.standard.removeObject(forKey: NativeStrings.savedKey)
+            try? FileManager.default.removeItem(at: NativeDiagnostics.file)
             UserDefaults.standard.removeObject(forKey: AppleNetworkPolicy.streamingKey)
             UserDefaults.standard.removeObject(forKey: AppleNetworkPolicy.downloadsKey)
             UserDefaults.standard.removeObject(forKey: "previewDownloadCellular")
@@ -30,6 +35,7 @@ import SwiftUI
             UserDefaults.standard.removeObject(forKey: "previewServer")
             UserDefaults.standard.removeObject(forKey: "previewUsername")
             UserDefaults.standard.removeObject(forKey: "previewPlaybackSpeed")
+            UserDefaults.standard.removeObject(forKey: "previewChapterTrack")
             UserDefaults.standard.removeObject(forKey: "previewSleepFade")
             UserDefaults.standard.removeObject(forKey: "previewSkipForward")
             UserDefaults.standard.removeObject(forKey: "previewSkipBackward")
@@ -54,9 +60,13 @@ import SwiftUI
         #endif
         let api = APIClient(store: vault)
         _serverQueue = StateObject(wrappedValue: NativePodcastQueue(api: api))
-        _downloads = StateObject(wrappedValue: NativeDownloads(api: api))
+        let downloads = NativeDownloads(api: api)
+        _downloads = StateObject(wrappedValue: downloads)
         let playback = ApplePlayback(api: api)
-        _reading = StateObject(wrappedValue: ReadingStore(player: playback))
+        let reading = ReadingStore(player: playback)
+        _reading = StateObject(wrappedValue: reading)
+        let adoption = NativeMigrationAdoption(downloads: downloads, reading: reading, api: api)
+        _migration = StateObject(wrappedValue: NativeMigrationStore(adopter: adoption, player: playback))
         _player = StateObject(wrappedValue: playback)
         _connection = StateObject(wrappedValue: ConnectionStore(api: api, playback: playback, vault: vault))
     }
@@ -65,13 +75,20 @@ import SwiftUI
         WindowGroup {
             PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player).environmentObject(downloads).environmentObject(reading).environmentObject(serverQueue)
                 .accentColor(ShelfStyle.accent)
-                .onAppear { Task { await connection.restore(); serverQueue.connect(); downloads.refresh(); reading.sync(api: connection.api) } }
-                .onChange(of: scenePhase) { phase in if phase == .active { serverQueue.connect(); serverQueue.retrySavingResults() } }
+                .onAppear { Task { await connection.restore(); serverQueue.connect(); downloads.refresh(); reading.sync(api: connection.api); await restoreImportedData() } }
+                .onChange(of: scenePhase) { phase in if phase == .active { serverQueue.connect(); serverQueue.retrySavingResults(); Task { await migration.sync() } } }
                 .onChange(of: player.canPublishReading) { available in if available { reading.sync(api: connection.api) } }
-                .onChange(of: connection.activeAccount) { _ in serverQueue.connect(); reading.sync(api: connection.api) }
+                .onChange(of: connection.activeAccount) { _ in serverQueue.connect(); reading.sync(api: connection.api); Task { await migration.sync() } }
                 .sheet(isPresented: $downloads.presented) { DownloadsView().environmentObject(downloads).environmentObject(player).environmentObject(reading) }
+                .environmentObject(migration)
+                .nativeLocalization()
                 .environment(\.shelfAppearance, NativeAppearance(rawValue: theme) ?? .system)
                 .preferredColorScheme((NativeAppearance(rawValue: theme) ?? .system).scheme)
         }
     }
+    private func restoreImportedData() async {
+        await migration.loadCommitted()
+        await migration.sync()
+    }
+
 }

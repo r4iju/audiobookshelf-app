@@ -25,7 +25,7 @@ import SwiftUI
             selected = result
             if let index = groups.firstIndex(where: { $0.id == result.id }) { groups[index] = result } else { groups.append(result) }
             return true
-        } catch { if generation == request { self.error = "Changes could not be completed. Some membership changes may already be saved. " + ConnectionStore.recovery(for: error) }; return false }
+        } catch { if generation == request { self.error = NativeStrings.current("Changes could not be completed. Some membership changes may already be saved. {0}", ConnectionStore.recovery(for: error)) }; return false }
     }
     func delete(id: String) async -> Bool {
         guard !saving, canDelete, let owner else { return false }
@@ -97,7 +97,7 @@ import SwiftUI
                 guard unreachable, generation == revision, try await catalog.api.currentAccount() == owner,
                       try nextChoice(in: group, downloads: downloads, player: player)?.audio != nil else { throw error }
             }
-            guard let choice = try nextChoice(in: group, downloads: downloads, player: player), let item = choice.member.libraryItem else { error = "Every playable title in this group is finished."; return }
+            guard let choice = try nextChoice(in: group, downloads: downloads, player: player), let item = choice.member.libraryItem else { error = NativeStrings.current("Every playable title in this group is finished."); return }
             let member = choice.member
             if let audio = choice.audio {
                 try await player.resumeOffline(audio)
@@ -109,29 +109,35 @@ import SwiftUI
     }
 }
 
+private extension AudioGroupKind {
+    /// Whole phrases per kind, because translations cannot be assembled from a shared noun.
+    func text(_ collection: String, _ playlist: String) -> String { self == .collection ? collection : playlist }
+}
+
 struct AudioGroupList: View {
     @StateObject private var store: AudioGroupStore
     @State private var creating = false
+    @Environment(\.nativeStrings) private var l10n
     init(catalog: CatalogStore, kind: AudioGroupKind) { _store = StateObject(wrappedValue: AudioGroupStore(catalog: catalog, kind: kind)) }
     var body: some View {
         ShelfList {
-            if store.loading { ProgressView("Opening \(store.kind.title.lowercased())…") }
+            if store.loading { ProgressView(l10n(store.kind.text("Opening collections…", "Opening playlists…"))) }
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load() } } }
             ForEach(store.groups) { group in
                 NavigationLink(destination: AudioGroupDetails(catalog: store.catalog, kind: store.kind, group: group)) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(group.name).font(.headline)
-                        Text("\(group.members.count) titles").font(.caption).foregroundColor(.secondary)
+                        Text(l10n("{0} titles", group.members.count)).font(.caption).foregroundColor(.secondary)
                     }.padding(.vertical, 6)
                 }.accessibilityIdentifier("group-\(group.id)")
             }
-            if !store.loading, store.error == nil, store.groups.isEmpty { Text("No \(store.kind.title.lowercased()) yet.").foregroundColor(.secondary) }
-        }.listStyle(InsetGroupedListStyle()).navigationTitle(store.kind.title)
+            if !store.loading, store.error == nil, store.groups.isEmpty { Text(l10n(store.kind.text("No collections yet.", "No playlists yet."))).foregroundColor(.secondary) }
+        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n(store.kind.title))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
-                        Button("Refresh") { Task { await store.load() } }
-                        if store.canEdit { Button("New \(store.kind.singular)") { creating = true } }
+                        Button(l10n("Refresh")) { Task { await store.load() } }
+                        if store.canEdit { Button(l10n(store.kind.text("New collection", "New playlist"))) { creating = true } }
                     }
                 }
             }
@@ -147,6 +153,7 @@ struct AudioGroupDetails: View {
     @Environment(\.presentationMode) private var presentation
     @State private var editing = false
     @State private var deleting = false
+    @Environment(\.nativeStrings) private var l10n
     let initial: AudioGroup
     init(catalog: CatalogStore, kind: AudioGroupKind, group: AudioGroup) {
         initial = group; _store = StateObject(wrappedValue: AudioGroupStore(catalog: catalog, kind: kind))
@@ -157,7 +164,7 @@ struct AudioGroupDetails: View {
         ShelfList {
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load(id: initial.id) } } }
             if let description = group.description, !description.isEmpty { Text(description).foregroundColor(.secondary) }
-            Button("\(active ? "Pause" : "Play") \(store.kind.singular)") { Task { await store.play(group, player: player, downloads: downloads) } }
+            Button(l10n(active ? store.kind.text("Pause collection", "Pause playlist") : store.kind.text("Play collection", "Play playlist"))) { NativeHaptic.impact("play"); Task { await store.play(group, player: player, downloads: downloads) } }
                 .disabled(store.loading || store.saving || store.starting || store.error != nil || player.preparing || !group.members.contains(where: \.playable))
             ForEach(group.members) { member in
                 if let item = member.libraryItem {
@@ -171,19 +178,20 @@ struct AudioGroupDetails: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
-                    if store.canEdit { Button("Edit \(store.kind.singular)") { editing = true } }
+                    if store.canEdit { Button(l10n(store.kind.text("Edit collection", "Edit playlist"))) { editing = true } }
                     Menu {
-                        Button("Refresh") { Task { await store.load(id: initial.id) } }
-                        if store.canDelete { Button("Delete \(store.kind.singular)") { deleting = true } }
-                    } label: { Image(systemName: "ellipsis.circle") }.accessibilityLabel("Group actions")
+                        Button(l10n("Refresh")) { Task { await store.load(id: initial.id) } }
+                        if store.canDelete { Button(l10n(store.kind.text("Delete collection", "Delete playlist"))) { deleting = true } }
+                    } label: { Image(systemName: "ellipsis.circle") }.accessibilityLabel(l10n("Group actions"))
                     }
                 }
             }
             .sheet(isPresented: $editing) { AudioGroupEditor(store: store, group: store.selected ?? initial, presented: $editing) }
             .alert(isPresented: $deleting) {
-                Alert(title: Text("Delete \(store.kind.singular)?"), message: Text("The audio files stay in your library."), primaryButton: .destructive(Text("Delete")) {
+                Alert(title: Text(l10n(store.kind.text("Delete collection?", "Delete playlist?"))), message: Text(l10n("The audio files stay in your library.")), primaryButton: .destructive(Text(l10n("Delete"))) {
+                    NativeHaptic.impact("group-delete")
                     Task { if await store.delete(id: initial.id) { presentation.wrappedValue.dismiss() } }
-                }, secondaryButton: .cancel())
+                }, secondaryButton: .cancel(Text(l10n("Cancel"))))
             }
             .onAppear { Task { await store.load(id: initial.id) } }
     }
@@ -197,6 +205,7 @@ struct AudioGroupEditor: View {
     @State private var description: String
     @State private var members: [AudioGroupMember]
     @State private var choosing = false
+    @Environment(\.nativeStrings) private var l10n
     init(store: AudioGroupStore, group: AudioGroup?, presented: Binding<Bool>) {
         self.store = store; self.group = group; _presented = presented
         _name = State(initialValue: group?.name ?? ""); _description = State(initialValue: group?.description ?? "")
@@ -205,11 +214,11 @@ struct AudioGroupEditor: View {
     var body: some View {
         NavigationView {
             ShelfForm {
-                Section(header: Text("Details")) {
-                    TextField("Name", text: $name).accessibilityIdentifier("group-name")
-                    TextField("Description", text: $description).accessibilityIdentifier("group-description")
+                Section(header: Text(l10n("Details"))) {
+                    TextField(l10n("Name"), text: $name).accessibilityIdentifier("group-name")
+                    TextField(l10n("Description"), text: $description).accessibilityIdentifier("group-description")
                 }
-                Section(header: Text("Listening order")) {
+                Section(header: Text(l10n("Listening order"))) {
                     ForEach(members) { member in
                         HStack {
                             Text(member.title)
@@ -217,23 +226,24 @@ struct AudioGroupEditor: View {
                             Button {
                                 if let index = members.firstIndex(where: { $0.id == member.id }), index > 0 { members.swapAt(index, index - 1) }
                             } label: { Image(systemName: "arrow.up") }.buttonStyle(BorderlessButtonStyle())
-                                .accessibilityLabel("Move \(member.title) up").accessibilityIdentifier("move-up-\(member.id)")
+                                .accessibilityLabel(l10n("Move {0} up", member.title)).accessibilityIdentifier("move-up-\(member.id)")
                                 .disabled(members.first?.id == member.id)
                             Button { members.removeAll { $0.id == member.id } } label: { Image(systemName: "minus.circle") }.buttonStyle(BorderlessButtonStyle())
-                                .accessibilityLabel("Remove \(member.title)").accessibilityIdentifier("remove-\(member.id)")
+                                .accessibilityLabel(l10n("Remove {0}", member.title)).accessibilityIdentifier("remove-\(member.id)")
                                 .disabled(store.kind == .playlist && group != nil && members.count == 1)
                         }
                     }
-                    Button("Choose titles") { choosing = true }
-                    if store.kind == .playlist, group != nil, members.count == 1 { Text("To remove the last title, delete this playlist from its actions menu.").font(.caption).foregroundColor(.secondary) }
+                    Button(l10n("Choose titles")) { choosing = true }
+                    if store.kind == .playlist, group != nil, members.count == 1 { Text(l10n("To remove the last title, delete this playlist from its actions menu.")).font(.caption).foregroundColor(.secondary) }
                 }
                 if let error = store.error { Text(error).foregroundColor(.red).accessibilityIdentifier("group-save-error") }
-                if store.saving { ProgressView("Saving changes…") }
-            }.disabled(store.saving).navigationTitle(group == nil ? "New \(store.kind.singular)" : "Edit \(store.kind.singular)")
+                if store.saving { ProgressView(l10n("Saving changes…")) }
+            }.disabled(store.saving).navigationTitle(l10n(group == nil ? store.kind.text("New collection", "New playlist") : store.kind.text("Edit collection", "Edit playlist")))
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) { Button("Cancel") { presented = false }.disabled(store.saving) }
+                    ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Cancel")) { presented = false }.disabled(store.saving) }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Save group") {
+                        Button(l10n("Save group")) {
+                            NativeHaptic.impact("group-save")
                             Task { if await store.save(id: group?.id, name: name.trimmingCharacters(in: .whitespacesAndNewlines), description: description, members: members) { presented = false } }
                         }.disabled(store.saving || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (members.isEmpty && (group == nil || store.kind == .playlist)))
                     }
@@ -247,6 +257,7 @@ struct AudioGroupMemberPicker: View {
     @StateObject private var catalog: CatalogStore
     @Binding var members: [AudioGroupMember]
     @Binding var presented: Bool
+    @Environment(\.nativeStrings) private var l10n
     init(catalog: CatalogStore, members: Binding<[AudioGroupMember]>, presented: Binding<Bool>) {
         _catalog = StateObject(wrappedValue: CatalogStore(api: catalog.api, library: catalog.library)); _members = members; _presented = presented
     }
@@ -254,7 +265,7 @@ struct AudioGroupMemberPicker: View {
         NavigationView {
             ShelfList {
                 switch catalog.state {
-                case .loading: ProgressView("Opening titles…")
+                case .loading: ProgressView(l10n("Opening titles…"))
                 case .failed(let error): RecoveryCard(message: error) { Task { await catalog.reload() } }
                 case .content(let content):
                     ForEach(content.items) { item in
@@ -270,10 +281,10 @@ struct AudioGroupMemberPicker: View {
                         }
                     }
                     if let error = content.pageError { RecoveryCard(message: error) { Task { await catalog.loadMore() } } }
-                    if content.hasMore { Button("More titles") { Task { await catalog.loadMore() } } }
+                    if content.hasMore { Button(l10n("More titles")) { Task { await catalog.loadMore() } } }
                 }
-            }.navigationTitle("Choose titles")
-                .toolbar { Button("Done choosing") { presented = false } }
+            }.navigationTitle(l10n("Choose titles"))
+                .toolbar { Button(l10n("Done choosing")) { presented = false } }
                 .onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
         }.navigationViewStyle(StackNavigationViewStyle())
     }
@@ -285,6 +296,7 @@ struct AudioGroupEpisodePicker: View {
     @Binding var members: [AudioGroupMember]
     @State private var expanded: LibraryItem?
     @State private var error: String?
+    @Environment(\.nativeStrings) private var l10n
     var body: some View {
         ShelfList {
             if let error { RecoveryCard(message: error) { Task { await load() } } }
@@ -297,7 +309,7 @@ struct AudioGroupEpisodePicker: View {
                         HStack { Text(episode.title); Spacer(); if members.contains(where: { $0.libraryItemId == item.id && $0.episodeId == episode.id }) { Image(systemName: "checkmark") } }
                     }.accessibilityIdentifier("choose-episode-\(episode.id)")
                 }
-            } else if error == nil { ProgressView("Opening episodes…") }
+            } else if error == nil { ProgressView(l10n("Opening episodes…")) }
         }.navigationTitle(item.title).onAppear { Task { await load() } }
     }
     private func load() async {

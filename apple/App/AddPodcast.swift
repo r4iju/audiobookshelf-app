@@ -17,6 +17,7 @@ struct AddPodcast: View {
     @State private var results: [PodcastDiscovery] = []
     @State private var searchCompleted = false
     @State private var discovery: PodcastDiscovery?
+    @Environment(\.nativeStrings) private var l10n
     private var folders: [LibraryFolder] { catalog.library.folders ?? [] }
     private var permitted: Bool {
         if case .content(let content) = catalog.state { return content.user.canManagePodcasts }
@@ -26,10 +27,10 @@ struct AddPodcast: View {
         NavigationView {
             ShelfForm {
                 if feed == nil {
-                    Section(header: Text("Discover a podcast")) {
-                        TextField("Podcast name", text: $query).accessibilityIdentifier("podcast-discovery-query").disabled(busy)
-                        Button("Search podcasts", action: search).disabled(busy || !permitted || query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        if searchCompleted, results.isEmpty { Text("No podcasts found").foregroundColor(.secondary) }
+                    Section(header: Text(l10n("Discover a podcast"))) {
+                        TextField(l10n("Podcast name"), text: $query).accessibilityIdentifier("podcast-discovery-query").disabled(busy)
+                        Button(l10n("Search podcasts"), action: search).disabled(busy || !permitted || query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        if searchCompleted, results.isEmpty { Text(l10n("No podcasts found")).foregroundColor(.secondary) }
                         ForEach(results) { result in
                             Button {
                                 guard let url = result.feedUrl else { return }
@@ -45,28 +46,28 @@ struct AddPodcast: View {
                         }
                     }
                 }
-                Section(header: Text("Podcast feed")) {
-                    TextField("RSS feed URL", text: $feedURL).keyboardType(.URL).autocapitalization(.none).disableAutocorrection(true)
+                Section(header: Text(l10n("Podcast feed"))) {
+                    TextField(l10n("RSS feed URL"), text: $feedURL).keyboardType(.URL).autocapitalization(.none).disableAutocorrection(true)
                         .accessibilityIdentifier("podcast-feed-url").disabled(busy)
-                    Button("Preview feed", action: preview).disabled(busy || !permitted || feedURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Button(l10n("Preview feed"), action: preview).disabled(busy || !permitted || feedURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
                 if feed != nil {
-                    Section(header: Text("Add to your library")) {
-                        TextField("Title", text: $title).accessibilityIdentifier("podcast-title")
-                        TextField("Author", text: $author)
-                        TextEditor(text: $description).frame(minHeight: 100).accessibilityLabel("Description")
-                        Picker("Server folder", selection: $folderID) {
+                    Section(header: Text(l10n("Add to your library"))) {
+                        TextField(l10n("Title"), text: $title).accessibilityIdentifier("podcast-title")
+                        TextField(l10n("Author"), text: $author)
+                        TextEditor(text: $description).frame(minHeight: 100).accessibilityLabel(l10n("Description"))
+                        Picker(l10n("Server folder"), selection: $folderID) {
                             ForEach(folders) { folder in Text(folder.fullPath).tag(folder.id) }
                         }
-                        Toggle("Automatically download new episodes", isOn: $autoDownload)
-                        Button("Create podcast", action: create).disabled(!permitted || busy || folders.isEmpty || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        Toggle(l10n("Automatically download new episodes"), isOn: $autoDownload)
+                        Button(l10n("Create podcast"), action: create).disabled(!permitted || busy || folders.isEmpty || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }.disabled(busy)
-                    if folders.isEmpty { Text("This library has no server folder. Add one in server settings before creating a podcast.").foregroundColor(.secondary) }
+                    if folders.isEmpty { Text(l10n("This library has no server folder. Add one in server settings before creating a podcast.")).foregroundColor(.secondary) }
                 }
-                if busy { ProgressView("Contacting your server…") }
+                if busy { ProgressView(l10n("Contacting your server…")) }
                 if let error { Text(error).foregroundColor(.red).accessibilityIdentifier("podcast-action-error") }
-            }.navigationTitle("Add podcast").navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button("Cancel") { request?.cancel(); presented = false } } }
+            }.navigationTitle(l10n("Add podcast")).navigationBarTitleDisplayMode(.inline)
+                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Cancel")) { request?.cancel(); presented = false } } }
         }.navigationViewStyle(StackNavigationViewStyle())
             .onChange(of: feedURL) { _ in if !busy { feed = nil; discovery = nil } }
             .onDisappear { request?.cancel() }
@@ -90,7 +91,7 @@ struct AddPodcast: View {
         guard permitted, !busy else { return }
         let url = feedURL.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let parsed = URL(string: url), ["http", "https"].contains(parsed.scheme?.lowercased() ?? ""), parsed.host != nil else {
-            error = "Enter a complete HTTP or HTTPS RSS feed URL."
+            error = l10n("Enter a complete HTTP or HTTPS RSS feed URL.")
             return
         }
         busy = true; error = nil
@@ -110,6 +111,7 @@ struct AddPodcast: View {
     }
     private func create() {
         guard permitted, !busy, let feed, let folder = folders.first(where: { $0.id == folderID }) else { return }
+        NativeHaptic.impact("podcast-create")
         busy = true; error = nil
         request = Task {
             defer { busy = false }

@@ -141,10 +141,16 @@ public struct YearExportServerSnapshot: Identifiable, Sendable {
 
     /// `artwork` is used only when it was loaded for this year's `booksAddedWithCovers`
     /// (passed as the loader's `secondary` list).
-    public init?(stats: ServerYearStats, year: Int, artwork: YearExportArtwork?, locale: Locale = .current) {
+    /// English text with the given locale's numbers and durations.
+    public init?(stats: ServerYearStats, year: Int, artwork: YearExportArtwork?, locale: Locale) {
+        self.init(stats: stats, year: year, artwork: artwork, copy: YearExportCopy(locale: locale))
+    }
+
+    /// `copy` is kept with the snapshot, so its images and text stay in that language. English by default.
+    public init?(stats: ServerYearStats, year: Int, artwork: YearExportArtwork?, copy: YearExportCopy = .english) {
         guard (2000...9999).contains(year) else { return nil }
         self.year = year
-        format = YearExportFormat(locale: locale)
+        format = YearExportFormat(copy: copy)
         booksAdded = max(stats.numBooksAdded, 0)
         authorsAdded = max(stats.numAuthorsAdded, 0)
         sessions = max(stats.numListeningSessions, 0)
@@ -174,16 +180,21 @@ public struct YearExportServerSnapshot: Identifiable, Sendable {
             .flatMap { design in design.shapes.compactMap { YearExportLayout(design: design, shape: $0) } }
     }
 
+    var copy: YearExportCopy { format.copy }
+    func number(_ value: Int) -> String { format.number(Double(value)) }
+
     public var shareText: String {
         var lines = [
-            "Audiobookshelf server \(year) in review",
-            format.count(booksAdded, "book added", "books added"),
-            format.count(authorsAdded, "author added", "authors added"),
-            format.count(sessions, "listening session", "listening sessions")
+            copy("Audiobookshelf server {0} in review", String(year)),
+            booksAdded == 1 ? copy("{0} book added", number(booksAdded)) : copy("{0} books added", number(booksAdded)),
+            authorsAdded == 1 ? copy("{0} author added", number(authorsAdded)) : copy("{0} authors added", number(authorsAdded)),
+            sessions == 1 ? copy("{0} listening session", number(sessions)) : copy("{0} listening sessions", number(sessions))
         ]
-        if collectionBytes > 0 { lines.append("Collection: \(format.bytes(collectionBytes)) (+\(format.bytes(addedBytes)) this year)") }
-        if collectionSeconds > 0 { lines.append("Total duration: \(format.longDuration(collectionSeconds)) (+\(format.longDuration(addedSeconds)) this year)") }
-        if let author = topAuthors.first { lines.append("Top author: \(author.name)") }
+        if collectionBytes > 0 { lines.append(copy("Collection: {0} (+{1} this year)", format.bytes(collectionBytes), format.bytes(addedBytes))) }
+        if collectionSeconds > 0 {
+            lines.append(copy("Total duration: {0} (+{1} this year)", format.longDuration(collectionSeconds), format.longDuration(addedSeconds)))
+        }
+        if let author = topAuthors.first { lines.append(copy("Top author: {0}", author.name)) }
         return lines.joined(separator: "\n")
     }
 }

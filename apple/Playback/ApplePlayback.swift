@@ -16,6 +16,19 @@ import UIKit
     var isProgressFailure: Bool { failureOrigin == .progress }
     @Published private(set) var needsSignIn = false
     @Published var speed: Float = 1
+    private static var defaultChapterTrack: Bool {
+        #if os(iOS)
+        return true
+        #else
+        return false
+        #endif
+    }
+    @Published var chapterTrack = UserDefaults.standard.object(forKey: "previewChapterTrack") as? Bool ?? ApplePlayback.defaultChapterTrack {
+        didSet {
+            UserDefaults.standard.set(chapterTrack, forKey: "previewChapterTrack")
+            updateNowPlaying()
+        }
+    }
     @Published var forwardInterval = UserDefaults.standard.object(forKey: "previewSkipForward") as? Int ?? 10 {
         didSet { UserDefaults.standard.set(forwardInterval, forKey: "previewSkipForward"); updateSkipCommands() }
     }
@@ -147,7 +160,7 @@ import UIKit
             let position = event.positionTime
             Task { @MainActor in
                 guard let self, self.allowMediaSeeking else { return }
-                do { try await self.seek(to: position, autoplay: self.wantsPlayback) } catch { self.failed(error) }
+                do { try await self.seekFromMediaControls(to: position) } catch { self.failed(error) }
             }
             return .success
         }))
@@ -313,6 +326,14 @@ import UIKit
         let commands = MPRemoteCommandCenter.shared()
         commands.skipForwardCommand.preferredIntervals = [NSNumber(value: forwardInterval)]
         commands.skipBackwardCommand.preferredIntervals = [NSNumber(value: backwardInterval)]
+    }
+    func seekFromMediaControls(to position: Double) async throws {
+        guard position.isFinite else { return }
+        let target: Double
+        if let window = mediaChapterWindow {
+            target = window.start + min(max(position, 0), window.end - window.start)
+        } else { target = position }
+        try await seek(to: target, autoplay: wantsPlayback)
     }
     func skip(_ amount: Double) async {
         do { try await seek(to: currentTime + amount, autoplay: wantsPlayback) }
@@ -632,15 +653,30 @@ import UIKit
         }
     }
 
+    var mediaChapterWindow: (start: Double, end: Double)? {
+        guard chapterTrack, let session, let chapter = currentChapter,
+              chapter.start.isFinite, chapter.end.isFinite, chapter.start >= 0,
+              chapter.end > chapter.start, chapter.start < session.duration else { return nil }
+        return (chapter.start, min(chapter.end, session.duration))
+    }
+
     private func updateNowPlaying() {
         guard let session else { return }
+        let window = mediaChapterWindow
         var information: [String: Any] = [
             MPMediaItemPropertyTitle: title,
+            MPMediaItemPropertyAlbumTitle: title,
             MPMediaItemPropertyArtist: author,
-            MPMediaItemPropertyPlaybackDuration: session.duration,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
+            MPMediaItemPropertyPlaybackDuration: window.map { $0.end - $0.start } ?? session.duration,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: window.map { min(max(currentTime - $0.start, 0), $0.end - $0.start) } ?? currentTime,
             MPNowPlayingInfoPropertyPlaybackRate: playing ? speed : 0
         ]
+        if window != nil, let chapter = currentChapter, let chapters = session.chapters,
+           let index = chapters.lastIndex(where: { $0.id == chapter.id && $0.start == chapter.start && $0.end == chapter.end }) {
+            information[MPMediaItemPropertyTitle] = chapter.title.isEmpty ? title : chapter.title
+            information[MPNowPlayingInfoPropertyChapterNumber] = index + 1
+            information[MPNowPlayingInfoPropertyChapterCount] = chapters.count
+        }
         if let nowPlayingArtwork { information[MPMediaItemPropertyArtwork] = nowPlayingArtwork }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = information
     }

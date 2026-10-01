@@ -75,6 +75,142 @@ schemes, plus `_finished`, `_top`, `_people`, `_genres` and `_story` suffixes.
   (non-finite or negative become 0) and byte counts clamp before `Int64` overflow, so `1e300` renders safely.
 - `YearExportComposer(server:)` and `YearExportSheet(server:onDone:)` mirror the listener initialisers.
 
+## Localized copy
+
+The legacy canvases (`YearInReview.vue`, `YearInReviewShort.vue`, `YearInReviewServer.vue`) draw hard-coded English with
+`addText('books finished', …)` and English `$bytesPretty` units; they use no `$strings` key. So the export's text has no
+legacy translation of its own. A translation is shown only where `apple/Localization/legacy-equivalents.json` (owned by
+the presentation worker) maps a template to a legacy key with the same meaning. Everything else stays English.
+
+- `YearExportCopy(translations:locale:)` is an immutable value: translations keyed by the English templates in
+  `YearExportCopy.templates`, plus the locale for numbers, month names, durations and sizes. `YearExportCopy.english`
+  (the default) is English with `en_US`, independent of the device.
+- It keeps only translations of known templates that are non-empty and use exactly the template's `90` placeholders, so
+  a translation can neither drop a value nor show an argument that was never supplied. Arguments are filled in one pass,
+  so names containing `{0}` are shown as written. Unknown keys are ignored. Cover IDs never reach any template.
+- The snapshot keeps the copy (`YearExportSnapshot(stats:year:artwork:copy:)`, `YearExportServerSnapshot(stats:year:artwork:copy:)`).
+  Images, share text, the accessibility label and the composer's own labels all read it from the snapshot, so a share
+  keeps the language chosen when the snapshot was built even if the app language changes while the composer is open.
+  The `locale:` initialisers remain for English text with another locale.
+- Headings are drawn upper-cased with the copy's locale (`uppercased(with:)`), so templates are written in sentence case.
+- Sizes follow `$bytesPretty` (base 1024, at most two decimals, `Bytes`/`KB`/`MB`/... symbols) with the locale's digits.
+- Plurals use separate singular and plural templates, as the rest of the native app does.
+- Not localized: the `audiobookshelf` wordmark, size unit symbols (as in legacy), file names, and the canvas layout,
+  which stays left-to-right for Arabic and Hebrew (the composer chrome follows the app's layout direction).
+
+Root call, once the presentation sources are registered in the app target:
+
+```swift
+let strings = NativeLanguageSetting.shared.strings          // or the view's @Environment(\.nativeStrings)
+let copy = YearExportCopy(translations: strings.copy(YearExportCopy.templates), locale: strings.language.locale)
+export = YearExportSnapshot(stats: value, year: year, copy: copy)
+// covers: YearExportSnapshot(stats: stats, year: year, artwork: art, copy: copy)  (reuse the same copy)
+// admin:  YearExportServerSnapshot(stats: server, year: year, artwork: art, copy: copy)
+```
+
+Build the copy once per load, next to the snapshot, and reuse it when covers upgrade the snapshot, so one load never mixes
+languages. `apple/Localization/generate.py` already scans `apple/Export/Sources` for bare `copy("…")` calls; run it after
+integration so the English table and `COVERAGE.md` include these templates. Its scanner finds exactly the
+90 templates listed in `YearExportCopy.templates`.
+
+Legacy equivalents today: `Finished` (style name) maps to `LabelFinished` and `Genres` to `LabelGenres` through existing
+entries. `minutes listening` / `LabelStatsMinutesListening` ("Minutes Listening") and `minutes` / `LabelStatsMinutes`
+("minutes") have the same meaning and could be added by the presentation worker. No other template has a legacy key with
+the same meaning; `LabelYearReviewShow` ("See Year in Review") is a button, not the canvas heading.
+
+Templates (90):
+
+- `Share {0}`
+- `Share Server {0}`
+- `Done`
+- `Style`
+- `Format`
+- `Share Image`
+- `Creating image`
+- `Opens the share sheet with this image and a text summary.`
+- `The image is created on this device from your {0} statistics.`
+- `The image is created on this device from this server's {0} statistics.`
+- `Highlights`
+- `Finished`
+- `Top Lists`
+- `Compact`
+- `Additions`
+- `People`
+- `Genres`
+- `Your totals with top narrator, genre, author and month.`
+- `Your totals with covers of books you finished.`
+- `Your totals with your top authors and genres.`
+- `A short banner with your book counts.`
+- `Server totals with covers of books added this year.`
+- `Server totals with top authors and narrators.`
+- `Server totals with top authors and genres.`
+- `Square`
+- `Story`
+- `Banner`
+- `{0}, {1} image`
+- `My {0} in Audiobookshelf`
+- `{0} hour of listening`
+- `{0} hours of listening`
+- `{0} minute of listening`
+- `{0} minutes of listening`
+- `{0} book finished`
+- `{0} books finished`
+- `{0} book listened to`
+- `{0} books listened to`
+- `{0} listening session`
+- `{0} listening sessions`
+- `Top author: {0}`
+- `Top narrator: {0}`
+- `Top genre: {0}`
+- `Audiobookshelf server {0} in review`
+- `{0} book added`
+- `{0} books added`
+- `{0} author added`
+- `{0} authors added`
+- `Collection: {0} (+{1} this year)`
+- `Total duration: {0} (+{1} this year)`
+- `{0} year in review`
+- `{0} server year in review`
+- `book finished`
+- `books finished`
+- `book listened to`
+- `books listened to`
+- `session`
+- `sessions`
+- `hour listening`
+- `hours listening`
+- `minute listening`
+- `minutes listening`
+- `Time listening`
+- `hour`
+- `hours`
+- `minute`
+- `minutes`
+- `Top narrator`
+- `Top genre`
+- `Top author`
+- `Top month`
+- `Longest book finished`
+- `Top authors`
+- `Top genres`
+- `Top narrators`
+- `Some books finished this year`
+- `No listening recorded in {0}`
+- `Press play and your year will fill in here.`
+- `book added`
+- `books added`
+- `author added`
+- `authors added`
+- `In your library`
+- `{0} book`
+- `{0} books`
+- `{0} listened this year`
+- `Some additions include`
+- `Collection grew to`
+- `Total duration`
+- `+{0} this year`
+- `{0} days`
+
 ## Model types for root wiring
 
 All in `tvos/Core` (TVCore) unless noted:
@@ -162,6 +298,12 @@ Synthetic examples, rendered with no owner data:
     build with the wired view succeeds.
 - Synthetic-cover renders of every listener and server layout were inspected locally (`/tmp/yearexport-evidence/covers`,
   not committed). That pass found and fixed a mosaic drawn at full opacity and a divider drawn in copy blend mode.
+- Localized copy, red first: `YearExportCopyTests` (4 tests) failed 4 of 4 (147 assertions) against a stub that ignored
+  translations: an empty template list, English share lines, labels and composer text, identical PNGs, German digits
+  missing, and placeholder checks. All 28 Export tests pass now. A read-only run of the presentation generator's scanner
+  over `apple/Export/Sources` finds exactly the 90 listed templates. A German sample with the real legacy translations
+  (`/tmp/yearexport-evidence/copy`, not committed) drew "Gehörte Minuten", "Minuten" and `1.214`. Abbreviated durations
+  stayed `25min` in the test host, which has no German localization; whether the app bundle localizes them is unverified.
 - Not verified: a live server. Loading covers and the admin year from a real account is an owner-data operation and
   needs root review first; nothing here contacted a server. Also not verified: an iOS 14 or 15 runtime (none is installed), the iPad popover on a device, saving to Photos, and physical devices.
   All physical acceptance and migration gates remain open.

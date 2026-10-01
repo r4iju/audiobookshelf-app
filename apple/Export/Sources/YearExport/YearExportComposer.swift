@@ -24,11 +24,12 @@ public struct YearExportSheet: View {
         self.onDone = onDone
     }
     public var body: some View {
-        NavigationView {
+        let copy = source.copy
+        return NavigationView {
             ComposerContent(source: source).id(source.id)
                 .navigationTitle(source.title)
                 .navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done", action: onDone) } }
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button(copy("Done"), action: onDone) } }
         }.navigationViewStyle(StackNavigationViewStyle())
     }
 }
@@ -56,16 +57,23 @@ enum YearExportSource: Sendable {
         case .server(let snapshot): return snapshot.availableLayouts
         }
     }
+    /// The language captured in the snapshot; the composer's own labels use it too.
+    var copy: YearExportCopy {
+        switch self {
+        case .listener(let snapshot): return snapshot.copy
+        case .server(let snapshot): return snapshot.copy
+        }
+    }
     var title: String {
         switch self {
-        case .listener: return "Share \(String(year))"
-        case .server: return "Share Server \(String(year))"
+        case .listener: return copy("Share {0}", String(year))
+        case .server: return copy("Share Server {0}", String(year))
         }
     }
     var footnote: String {
         switch self {
-        case .listener: return "The image is created on this device from your \(String(year)) statistics."
-        case .server: return "The image is created on this device from this server's \(String(year)) statistics."
+        case .listener: return copy("The image is created on this device from your {0} statistics.", String(year))
+        case .server: return copy("The image is created on this device from this server's {0} statistics.", String(year))
         }
     }
     func render(_ layout: YearExportLayout) -> YearExportArtifact {
@@ -122,28 +130,29 @@ private struct ComposerContent: View {
     init(source: YearExportSource) { _model = StateObject(wrappedValue: YearExportComposerModel(source: source)) }
 
     var body: some View {
-        ScrollView {
+        let copy = model.source.copy
+        return ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 preview
                 if model.designs.count > 1 {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Style").font(.headline)
-                        Picker("Style", selection: Binding(get: { model.layout.design }, set: model.select(design:))) {
-                            ForEach(model.designs) { Text($0.title).tag($0) }
+                        Text(copy("Style")).font(.headline)
+                        Picker(copy("Style"), selection: Binding(get: { model.layout.design }, set: model.select(design:))) {
+                            ForEach(model.designs) { Text(copy.title(of: $0)).tag($0) }
                         }.pickerStyle(SegmentedPickerStyle())
-                        Text(model.layout.design.summary).font(.footnote).foregroundColor(.secondary)
+                        Text(copy.summary(of: model.layout.design)).font(.footnote).foregroundColor(.secondary)
                     }
                 }
                 if model.layout.design.shapes.count > 1 {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Format").font(.headline)
-                        Picker("Format", selection: Binding(get: { model.layout.shape }, set: model.select(shape:))) {
-                            ForEach(model.layout.design.shapes) { Text($0.title).tag($0) }
+                        Text(copy("Format")).font(.headline)
+                        Picker(copy("Format"), selection: Binding(get: { model.layout.shape }, set: model.select(shape:))) {
+                            ForEach(model.layout.design.shapes) { Text(copy.title(of: $0)).tag($0) }
                         }.pickerStyle(SegmentedPickerStyle())
                     }
                 }
                 Button(action: share) {
-                    Label("Share Image", systemImage: "square.and.arrow.up")
+                    Label(copy("Share Image"), systemImage: "square.and.arrow.up")
                         .font(.headline)
                         .frame(maxWidth: .infinity, minHeight: 50)
                         .foregroundColor(.black)
@@ -151,7 +160,7 @@ private struct ComposerContent: View {
                         .cornerRadius(14)
                 }
                 .background(ActivityPresenter(request: $request))
-                .accessibilityHint("Opens the share sheet with this image and a text summary.")
+                .accessibilityHint(copy("Opens the share sheet with this image and a text summary."))
                 Text(model.source.footnote)
                     .font(.footnote).foregroundColor(.secondary)
             }
@@ -165,13 +174,14 @@ private struct ComposerContent: View {
 
     private var preview: some View {
         let size = model.layout.shape.pixelSize
+        let copy = model.source.copy
         return ZStack {
             if let artifact = model.preview, artifact.layout == model.layout, let image = UIImage(data: artifact.pngData) {
                 Image(uiImage: image).resizable().interpolation(.high)
                     .accessibilityLabel(Text(artifact.accessibilityLabel))
             } else {
                 Color(white: 0.12)
-                ProgressView().accessibilityLabel("Creating image")
+                ProgressView().accessibilityLabel(copy("Creating image"))
             }
         }
         .aspectRatio(size.width / size.height, contentMode: .fit)

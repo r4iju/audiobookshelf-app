@@ -12,11 +12,11 @@ import UIKit
         case canceled, invalidResponse, cannotPresent, randomness, notEnabled
         var errorDescription: String? {
             switch self {
-            case .canceled: return "Browser sign-in was canceled. Your saved account is retained."
-            case .invalidResponse: return "The browser sign-in response could not be verified. Retry sign-in and check the server's OpenID redirects."
-            case .cannotPresent: return "The sign-in browser could not open. Return to the app and try again."
-            case .randomness: return "Secure sign-in could not be prepared. Try again."
-            case .notEnabled: return "OpenID sign-in is not enabled on this server. Use your username and password."
+            case .canceled: return NativeStrings.current("Browser sign-in was canceled. Your saved account is retained.")
+            case .invalidResponse: return NativeStrings.current("The browser sign-in response could not be verified. Retry sign-in and check the server's OpenID redirects.")
+            case .cannotPresent: return NativeStrings.current("The sign-in browser could not open. Return to the app and try again.")
+            case .randomness: return NativeStrings.current("Secure sign-in could not be prepared. Try again.")
+            case .notEnabled: return NativeStrings.current("OpenID sign-in is not enabled on this server. Use your username and password.")
             }
         }
     }

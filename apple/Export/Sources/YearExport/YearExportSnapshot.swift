@@ -9,28 +9,9 @@ import CoreGraphics
 public enum YearExportDesign: String, CaseIterable, Identifiable, Sendable {
     case highlights, finishedBooks, topLists, compact, serverAdditions, serverPeople, serverGenres
     public var id: String { rawValue }
-    public var title: String {
-        switch self {
-        case .highlights: return "Highlights"
-        case .topLists: return "Top Lists"
-        case .compact: return "Compact"
-        case .finishedBooks: return "Finished"
-        case .serverAdditions: return "Additions"
-        case .serverPeople: return "People"
-        case .serverGenres: return "Genres"
-        }
-    }
-    public var summary: String {
-        switch self {
-        case .highlights: return "Your totals with top narrator, genre, author and month."
-        case .topLists: return "Your totals with your top authors and genres."
-        case .compact: return "A short banner with your book counts."
-        case .finishedBooks: return "Your totals with covers of books you finished."
-        case .serverAdditions: return "Server totals with covers of books added this year."
-        case .serverPeople: return "Server totals with top authors and narrators."
-        case .serverGenres: return "Server totals with top authors and genres."
-        }
-    }
+    /// English names; the composer shows `YearExportCopy.title(of:)` and `summary(of:)`.
+    public var title: String { YearExportCopy.english.title(of: self) }
+    public var summary: String { YearExportCopy.english.summary(of: self) }
     public var shapes: [YearExportShape] {
         switch self {
         case .compact: return [.banner]
@@ -42,13 +23,7 @@ public enum YearExportDesign: String, CaseIterable, Identifiable, Sendable {
 public enum YearExportShape: String, CaseIterable, Identifiable, Sendable {
     case square, portrait, banner
     public var id: String { rawValue }
-    public var title: String {
-        switch self {
-        case .square: return "Square"
-        case .portrait: return "Story"
-        case .banner: return "Banner"
-        }
-    }
+    public var title: String { YearExportCopy.english.title(of: self) }
     public var pixelSize: CGSize {
         switch self {
         case .square: return CGSize(width: 1080, height: 1080)
@@ -92,10 +67,17 @@ public struct YearExportSnapshot: Identifiable, Sendable {
 
     /// `artwork` is used only when it was loaded for this year with the stats' own cover lists
     /// (`finishedBooksWithCovers` as primary, `booksWithCovers` as secondary); otherwise it is dropped.
-    public init?(stats: YearListeningStats, year: Int, artwork: YearExportArtwork? = nil, locale: Locale = .current) {
+    /// English text with the given locale's numbers, months and durations.
+    public init?(stats: YearListeningStats, year: Int, artwork: YearExportArtwork? = nil, locale: Locale) {
+        self.init(stats: stats, year: year, artwork: artwork, copy: YearExportCopy(locale: locale))
+    }
+
+    /// `copy` is kept with the snapshot, so its images and text stay in that language. English by default.
+    public init?(stats: YearListeningStats, year: Int, artwork: YearExportArtwork? = nil, copy: YearExportCopy = .english) {
         guard (2000...9999).contains(year) else { return nil }
         self.year = year
-        format = YearExportFormat(locale: locale)
+        let locale = copy.locale
+        format = YearExportFormat(copy: copy)
         self.artwork = artwork.flatMap {
             $0.matches(year: year, primary: stats.finishedBooksWithCovers, secondary: stats.booksWithCovers) ? $0 : nil
         }
@@ -133,37 +115,42 @@ public struct YearExportSnapshot: Identifiable, Sendable {
             .flatMap { design in design.shapes.compactMap { YearExportLayout(design: design, shape: $0) } }
     }
 
+    var copy: YearExportCopy { format.copy }
+
     public var shareText: String {
+        let time = listeningTime
         var lines = [
-            "My \(year) in Audiobookshelf",
-            "\(listeningTime.value) \(listeningTime.unit) of listening",
-            count(booksFinished, "book finished", "books finished"),
-            count(booksListened, "book listened to", "books listened to"),
-            count(sessions, "listening session", "listening sessions")
+            copy("My {0} in Audiobookshelf", String(year)),
+            time.hours ? (time.one ? copy("{0} hour of listening", time.value) : copy("{0} hours of listening", time.value))
+                : (time.one ? copy("{0} minute of listening", time.value) : copy("{0} minutes of listening", time.value)),
+            booksFinished == 1 ? copy("{0} book finished", number(booksFinished)) : copy("{0} books finished", number(booksFinished)),
+            booksListened == 1 ? copy("{0} book listened to", number(booksListened)) : copy("{0} books listened to", number(booksListened)),
+            sessions == 1 ? copy("{0} listening session", number(sessions)) : copy("{0} listening sessions", number(sessions))
         ]
-        if let author = topAuthors.first { lines.append("Top author: \(author.name)") }
-        if let narrator { lines.append("Top narrator: \(narrator.name)") }
-        if let genre = topGenres.first { lines.append("Top genre: \(genre.name)") }
+        if let author = topAuthors.first { lines.append(copy("Top author: {0}", author.name)) }
+        if let narrator { lines.append(copy("Top narrator: {0}", narrator.name)) }
+        if let genre = topGenres.first { lines.append(copy("Top genre: {0}", genre.name)) }
         return lines.joined(separator: "\n")
     }
 
-    var listeningTime: (value: String, unit: String) {
+    /// Whole hours, or whole minutes under an hour; the caller picks the matching template.
+    var listeningTime: (value: String, hours: Bool, one: Bool) {
         let hours = (listeningSeconds / 3600).rounded(.down)
-        if hours >= 1 { return (number(hours), hours == 1 ? "hour" : "hours") }
+        if hours >= 1 { return (number(hours), true, hours == 1) }
         let minutes = (listeningSeconds / 60).rounded(.down)
-        return (number(minutes), minutes == 1 ? "minute" : "minutes")
+        return (number(minutes), false, minutes == 1)
     }
 
     func number(_ value: Int) -> String { format.number(Double(value)) }
     func number(_ value: Double) -> String { format.number(value) }
-    func count(_ value: Int, _ singular: String, _ plural: String) -> String { format.count(value, singular, plural) }
     func duration(_ seconds: Double) -> String { format.duration(seconds) }
 }
 
 /// Locale-bound formatting shared by listener and server snapshots. Decoded totals can be
 /// finite yet far beyond Int or Int64, so nothing here converts them to an integer type unchecked.
 struct YearExportFormat: Sendable {
-    let locale: Locale
+    let copy: YearExportCopy
+    var locale: Locale { copy.locale }
 
     func number(_ value: Double) -> String {
         let formatter = NumberFormatter()
@@ -171,10 +158,6 @@ struct YearExportFormat: Sendable {
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 0
         return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.0f", value)
-    }
-
-    func count(_ value: Int, _ singular: String, _ plural: String) -> String {
-        "\(number(Double(value))) \(value == 1 ? singular : plural)"
     }
 
     func duration(_ seconds: Double) -> String {
@@ -188,7 +171,7 @@ struct YearExportFormat: Sendable {
 
     /// Days, hours and minutes, like the legacy server canvas; very long totals fall back to whole days.
     func longDuration(_ seconds: Double) -> String {
-        guard seconds < 1e9 else { return "\(number((seconds / 86_400).rounded(.down))) days" }
+        guard seconds < 1e9 else { return copy("{0} days", number((seconds / 86_400).rounded(.down))) }
         let formatter = DateComponentsFormatter()
         formatter.calendar = calendar
         formatter.unitsStyle = .abbreviated
@@ -197,12 +180,18 @@ struct YearExportFormat: Sendable {
         return formatter.string(from: seconds) ?? ""
     }
 
-    /// Binary units like the legacy `$bytesPretty`; clamped below Int64 overflow.
+    /// The legacy `$bytesPretty`: base 1024, at most two decimals, its unit symbols, and the locale's
+    /// digits. Computed in `Double`, so totals of any finite size format without overflow.
     func bytes(_ value: Double) -> String {
-        let count: Int64 = value >= 9.2e18 ? .max : Int64(max(value, 0))
-        let formatter = ByteCountFormatter()
-        formatter.countStyle = .binary
-        return formatter.string(fromByteCount: count)
+        let units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+        guard value >= 1 else { return "0 Bytes" }
+        let index = min(Int((log(value) / log(1024)).rounded(.down)), units.count - 1)
+        let formatter = NumberFormatter()
+        formatter.locale = locale
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        let scaled = value / pow(1024, Double(index))
+        return "\(formatter.string(from: NSNumber(value: scaled)) ?? String(format: "%.2f", scaled)) \(units[index])"
     }
 
     private var calendar: Calendar {

@@ -167,21 +167,30 @@ import Combine
         }
     }
 
+    /// The message shown for a failure. Its technical cause is kept in diagnostics, redacted, for later recovery.
     static func recovery(for error: Error) -> String {
+        let message = recoveryMessage(for: error)
+        let category: DiagnosticCategory = error is URLError ? .connection : .server
+        NativeDiagnostics.shared.record(category, message, detail: DiagnosticRedactor.describe(error))
+        return message
+    }
+
+    private static func recoveryMessage(for error: Error) -> String {
+        let l10n = NativeStrings.current
         if let failure = error as? URLError {
             switch failure.code {
             case .serverCertificateUntrusted, .serverCertificateHasBadDate, .serverCertificateHasUnknownRoot, .serverCertificateNotYetValid:
-                return "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry."
+                return l10n("This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry.")
             case .secureConnectionFailed:
-                return "A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry."
+                return l10n("A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry.")
             case .appTransportSecurityRequiresSecureConnection:
-                return "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server."
+                return l10n("This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server.")
             case .notConnectedToInternet, .cannotConnectToHost, .cannotFindHost, .timedOut, .networkConnectionLost:
-                return "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained."
-            default: return "The connection failed. Check the server address and network, then retry."
+                return l10n("The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained.")
+            default: return l10n("The connection failed. Check the server address and network, then retry.")
             }
         }
-        if error as? APIError == .signInRequired { return "The server no longer accepts this login. Sign in again to continue." }
+        if error as? APIError == .signInRequired { return l10n("The server no longer accepts this login. Sign in again to continue.") }
         return error.localizedDescription
     }
 }
