@@ -1,0 +1,151 @@
+import SwiftUI
+
+struct HomeShelf: Identifiable {
+    let id: String
+    let shelfID: String
+    let title: String
+    let items: [LibraryItem]
+}
+
+/// Account, libraries, home shelves, listening progress and artwork shared by every TV tab.
+@MainActor final class CatalogStore: ObservableObject {
+    let api: APIClient
+    @Published private(set) var signedIn: Bool
+    @Published var needsSignIn = false
+    @Published private(set) var signingIn = false
+    @Published private(set) var signInError: String?
+    @Published private(set) var libraries: [Library] = []
+    @Published private(set) var shelves: [HomeShelf] = []
+    @Published private(set) var loadingCatalog = false
+    @Published private(set) var catalogError: String?
+    @Published private(set) var progress: [String: MediaProgress] = [:]
+    private var generation = UUID()
+    private var covers: [String: UIImage] = [:]
+    private var missingCovers: Set<String> = []
+
+    init(api: APIClient) {
+        self.api = api
+        signedIn = api.credentials != nil
+    }
+
+    var serverAddress: String { api.credentials?.server ?? "" }
+    var username: String { api.credentials?.username ?? "" }
+
+    func login(server: String, username: String, password: String) async {
+        signingIn = true
+        signInError = nil
+        defer { signingIn = false }
+        do {
+            try await api.login(server: server, username: username, password: password)
+            UserDefaults.standard.set(server, forKey: "lastServer")
+            UserDefaults.standard.set(username, forKey: "lastUsername")
+            needsSignIn = false
+            signedIn = true
+        } catch { signInError = Self.recovery(for: error) }
+    }
+
+    func loadCatalog() async {
+        let request = generation
+        loadingCatalog = true
+        catalogError = nil
+        defer { if request == generation { loadingCatalog = false } }
+        do {
+            let found = try await api.libraries()
+            guard request == generation else { return }
+            libraries = found
+            async let user = api.me()
+            var loaded: [HomeShelf] = []
+            for library in found {
+                let personalized = try await api.personalized(libraryID: library.id)
+                loaded += personalized.filter { !$0.entities.isEmpty }.map {
+                    HomeShelf(id: library.id + "." + $0.id, shelfID: $0.id, title: Self.shelfTitle($0.id, library: library, among: found), items: $0.entities)
+                }
+            }
+            let current = try await user
+            guard request == generation else { return }
+            shelves = loaded
+            remember(current)
+        } catch {
+            guard request == generation else { return }
+            fail(error)
+        }
+    }
+
+    func refreshProgress() async {
+        guard let user = try? await api.me() else { return }
+        remember(user)
+    }
+
+    func remember(_ user: CurrentUser) {
+        progress = Dictionary(user.mediaProgress.map { ($0.id, $0) }, uniquingKeysWith: { $1 })
+    }
+
+    func progress(itemID: String, episodeID: String? = nil) -> MediaProgress? {
+        progress[itemID + ":" + (episodeID ?? "book")]
+    }
+
+    func search(_ text: String) async throws -> [LibraryItem] {
+        var results: [LibraryItem] = []
+        for library in libraries {
+            let response = try await api.search(libraryID: library.id, query: text, limit: 25)
+            results += response.items + (response.episodes ?? []).map(\.libraryItem)
+        }
+        var seen = Set<String>()
+        return results.filter { seen.insert($0.id).inserted }
+    }
+
+    func cover(itemID: String) async -> UIImage? {
+        if let cached = covers[itemID] { return cached }
+        if missingCovers.contains(itemID) { return nil }
+        guard let data = try? await api.coverData(itemID: itemID), let image = UIImage(data: data) else {
+            missingCovers.insert(itemID)
+            return nil
+        }
+        if covers.count >= 240 { covers.removeAll() }
+        covers[itemID] = image
+        return image
+    }
+
+    func signOut() throws {
+        try api.signOut()
+        generation = UUID()
+        libraries = []; shelves = []; progress = [:]; covers = [:]; missingCovers = []
+        catalogError = nil
+        signedIn = false
+        needsSignIn = false
+    }
+
+    private func fail(_ failure: Error) {
+        if failure is CancellationError { return }
+        noteAuthentication(failure)
+        catalogError = Self.recovery(for: failure)
+    }
+
+    func noteAuthentication(_ failure: Error) {
+        if failure as? APIError == .signInRequired { needsSignIn = true }
+    }
+
+    /// Explains connection failures in terms of what the person can change on the TV or server.
+    static func recovery(for failure: Error) -> String {
+        if let failure = failure as? URLError {
+            switch failure.code {
+            case .serverCertificateUntrusted, .serverCertificateHasUnknownRoot, .serverCertificateHasBadDate, .serverCertificateNotYetValid, .secureConnectionFailed:
+                return "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address."
+            case .cannotFindHost, .dnsLookupFailed:
+                return "The server address could not be found. Check the host name and that the TV is on the same network."
+            case .cannotConnectToHost, .networkConnectionLost, .notConnectedToInternet, .timedOut:
+                return "The server could not be reached. Check that it is running and that the TV is on the network, then try again."
+            default: break
+            }
+        }
+        if failure as? APIError == .http(404) { return "No Audiobookshelf server answered at this address. Include any reverse-proxy path, such as https://example.com/audiobookshelf." }
+        return failure.localizedDescription
+    }
+
+    private static func shelfTitle(_ id: String, library: Library, among libraries: [Library]) -> String {
+        let known = ["continue-listening": "Continue Listening", "continue-series": "Continue Series", "recently-added": "Recently Added",
+                     "listen-again": "Listen Again", "discover": "Discover", "newest-episodes": "Newest Episodes", "episodes-recently-added": "Newest Episodes"]
+        let title = known[id] ?? id.split(separator: "-").map { $0.capitalized }.joined(separator: " ")
+        return libraries.count > 1 ? "\(title) · \(library.name)" : title
+    }
+}

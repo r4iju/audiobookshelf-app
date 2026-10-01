@@ -1,0 +1,23 @@
+# Apple TV completion handoff
+
+Scope: stories #26–#30 (TV browsing, playback controls, durable progress, podcasts, readiness). The TV slice changed only `tvos/App`, `tvos/UITests`, `tvos/scripts/verify-ui.sh`, `tvos/project.yml`, the generated TV project and TV docs. `apple/Playback`, `tvos/Core/Sources/TVCore`, `verification/` and `apple/App` were read, not edited. The recommendations below are for their owners.
+
+## Recommendations for shared code owners
+
+1. **Listening journal storage on tvOS (`apple/Playback/ListeningSync.swift`).** `ListeningSync.file` is fixed to Application Support. On tvOS, Apple guarantees only about 500 KB of persistent `UserDefaults` storage. Other local files may be purged when the device runs short of space. The simulator journey proves that the journal survives termination; it cannot prove that the file survives purging on hardware. Recommended change: inject the journal URL, for example `ListeningSync(api:file:)` with today's path as the default, so the TV owns the location and can add a purge-resistant mirror for unacknowledged records if the physical check below shows any loss. Until that check runs, treat the TV journal as durable across termination, not across storage pressure.
+2. **Failure origin (`ApplePlayback`).** `failureOrigin` is private, so the TV cannot tell whether `error` came from a progress failure (retrying the sync helps) or a media failure (playback must restart). Now Playing currently offers "Save progress again" for both. Recommended: expose a read-only `progressFailure: Bool` or a `retry()` that dispatches on the origin.
+3. **Deprecated interruption reason.** `ApplePlayback.swift:624` uses `AVAudioSession.InterruptionReason.appWasSuspended`, deprecated since tvOS/iOS 16; it builds with a warning on the TV target.
+4. **Filter value encoding (`apple/App/CatalogOptions.swift`).** Mobile sends `group.<base64>` through `URLQueryItem`, so a `+` in the base64 reaches the server as a space, and the server URL-decodes the value before base64-decoding it. The TV escapes `+` as `%2B` (`tvos/App/LibraryBrowser.swift`, `LibraryFilter.parameter`). Recommended: use the same escaping on mobile. The synthetic fixture's own genres contain no `+`, so neither client's journeys exercise this today.
+5. **Fixture observations (`verification/fixture.py`).** Recorded requests keep only `method`, `path` and `page`. Recording the `filter`, `sort` and `desc` query values would let journeys assert the server request directly, rather than only the server's filtered result.
+6. **Parity matrix (`verification/parity.json`).** Proposed `replacementEvidence.tv` entries. These are simulator and fixture evidence only, and each story still needs the physical gates listed below:
+   - `story-05`, `story-55`: `TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus`, `testLibraryLoadsNextPageAsFocusMovesDown`.
+   - `story-56`: `CatalogJourney/testTrustedHTTPSServerAndLongMetadata` (long title, missing cover).
+   - `story-57`: `PlaybackJourney/*`, `PodcastJourney/*`, `RecoveryJourney/testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch`, `CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage`, `testFilterAndSortAreAppliedByTheServer`.
+   - `local-builds`, `internal-distribution`: `./tvos/scripts/verify-ui.sh` and `./tvos/scripts/deploy.sh`.
+
+## Integration notes
+
+- TV journeys use ports 20765 (HTTP) and 20767 (HTTPS) and simulator `00DD108F-2435-4FEC-9C37-3E62861A0EF6`. They do not touch 19765–19769 or the iPhone/iPad QA simulators.
+- The HTTPS fixture uses a throwaway CA generated for each run and trusted only in the TV QA simulator (`simctl keychain add-root-cert`). This mirrors a homelab CA profile installed on the TV. The app adds no pinning or trust exceptions.
+- `tvos/App/LibraryStore.swift` and `Views.swift` were replaced by `CatalogStore`, `LibraryBrowser` and per-screen views. Nothing outside `tvos/App` referenced them.
+- The TV still compiles `apple/Playback` and `tvos/Core/Sources/TVCore` directly. It relies on these public members of `ApplePlayback`: `start`, `toggle`, `pause`, `skip`, `seek`, `changeSpeed`, `stop`, `sync`, `restoreListening`, `setFinished`, the sleep-timer API, `authenticationRestored`, and the published state used in `NowPlayingView`. Changing their behaviour requires rerunning `./tvos/scripts/verify-ui.sh`.
