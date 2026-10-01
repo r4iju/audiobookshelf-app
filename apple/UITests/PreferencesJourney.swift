@@ -1,6 +1,63 @@
 import XCTest
 
 @MainActor final class PreferencesJourney: NativeJourney {
+    func testLiveBookProgressRequiresCompletionConfirmationWithoutLeavingDetails() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-1"].tap(); app.buttons["play-book"].tap()
+        let elapsed = XCTNSPredicateExpectation(predicate: NSPredicate { element, _ in
+            guard let button = element as? XCUIElement else { return false }
+            return button.staticTexts.allElementsBoundByIndex.contains { label in
+                label.label.contains(" of ") && (Int(label.label.split(separator: " ").first ?? "") ?? 0) > 0
+            }
+        }, object: app.buttons["mini-player"])
+        await fulfillment(of: [elapsed], timeout: 8)
+        app.buttons["Mark finished"].tap()
+        XCTAssertTrue(app.alerts["Mark book finished?"].waitForExistence(timeout: 3), "Live progress must not bypass the saved-progress confirmation")
+        if app.alerts["Mark book finished?"].exists { app.alerts["Mark book finished?"].buttons["Cancel"].tap() }
+        XCTAssertTrue(app.buttons["mini-pause-playback"].exists, "Canceling completion must preserve listening")
+    }
+    func testFinishedBookLeavesNotFinishedFilterWhenReturningToCatalog() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["Filter library"].tap(); app.buttons["Progress"].tap(); app.buttons["Not finished"].tap()
+        XCTAssertTrue(app.buttons["book-book-0"].waitForExistence(timeout: 8))
+        app.buttons["book-book-0"].tap(); app.buttons["Mark finished"].tap()
+        app.alerts["Mark book finished?"].buttons["Mark finished"].tap()
+        XCTAssertTrue(app.buttons["Mark unfinished"].waitForExistence(timeout: 8))
+        app.navigationBars.buttons["BackButton"].tap()
+        let removed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: app.buttons["book-book-0"])
+        await fulfillment(of: [removed], timeout: 8)
+        XCTAssertTrue(app.staticTexts["60"].exists, "The filtered total must reflect completion")
+    }
+    func testBookCompletionAfterListeningSurvivesRelaunchAndCanBeReversed() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap(); app.buttons["play-book"].tap(); app.buttons["mini-player"].tap()
+        XCTAssertTrue(app.buttons["pause-playback"].waitForExistence(timeout: 8))
+        try await Task.sleep(nanoseconds: 2_000_000_000)
+        app.navigationBars.buttons["Done"].tap()
+        let finish = app.buttons["Mark finished"]
+        XCTAssertTrue(finish.waitForExistence(timeout: 3))
+        guard finish.exists else { return }
+        finish.tap()
+        XCTAssertTrue(app.alerts["Mark book finished?"].waitForExistence(timeout: 3))
+        app.alerts["Mark book finished?"].buttons["Mark finished"].tap()
+        XCTAssertTrue(app.buttons["Mark unfinished"].waitForExistence(timeout: 8))
+        XCTAssertFalse(app.buttons["mini-pause-playback"].exists, "Close matching listening before explicit completion")
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["book-book-0"].tap()
+        XCTAssertTrue(app.buttons["Mark unfinished"].waitForExistence(timeout: 8))
+        app.buttons["Mark unfinished"].tap()
+        XCTAssertTrue(app.buttons["Mark finished"].waitForExistence(timeout: 8))
+        let requests = try await fixtureRequests()
+        XCTAssertEqual(requests.filter { $0.method == "PATCH" && $0.path == "/api/me/progress/book-0" }.count, 2)
+        app.terminate(); app.launch(); app.buttons["book-book-0"].tap()
+        XCTAssertTrue(app.buttons["Mark finished"].waitForExistence(timeout: 8))
+    }
     func testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)

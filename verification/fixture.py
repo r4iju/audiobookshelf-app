@@ -7,12 +7,14 @@ import html
 import io
 import json
 import math
+import os
 import re
 import struct
 import ssl
 import time
 import wave
 import zipfile
+import zlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
@@ -293,6 +295,14 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if selected_filter.startswith('genres.'):
                     genre = base64.b64decode(selected_filter.split('.', 1)[1]).decode()
                     filtered = [entry for entry in filtered if genre in entry['media']['metadata']['genres']]
+                if selected_filter.startswith('progress.'):
+                    value = base64.b64decode(selected_filter.split('.', 1)[1]).decode()
+                    def matches(entry):
+                        state = self.progress.get((entry['id'], None), {})
+                        finished = bool(state.get('isFinished'))
+                        started = state.get('currentTime', 0) > 0 or state.get('ebookProgress', 0) > 0
+                        return finished if value == 'finished' else not finished if value == 'not-finished' else started and not finished if value == 'in-progress' else not started and not finished
+                    filtered = [entry for entry in filtered if matches(entry)]
                 if query.get('desc') == ['1']:
                     filtered.reverse()
                 return self.respond(200, {'items' if scenario == 'library-schema-change' else 'results': filtered[page * limit:(page + 1) * limit], 'total': len(filtered), 'limit': limit, 'page': page})
@@ -341,6 +351,16 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 except (ValueError, IndexError):
                     return self.respond(404, {})
             if path and path.endswith('/cover'):
+                if configuration['mode'] == 'large-cover-art':
+                    if directory := os.environ.get('ABS_QA_COVER_DIRECTORY'):
+                        index = 0 if path.endswith('book-0/cover') else 1
+                        return self.respond(200, (Path(directory) / f'{index}.jpg').read_bytes(), 'image/jpeg')
+                    width, height = (1800, 1800) if path.endswith('book-0/cover') else (1200, 1800)
+                    def chunk(kind, data):
+                        return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data) & 0xffffffff)
+                    pixels = b''.join(b'\x00' + bytes((25, 90 + y % 100, 160)) * width for y in range(height))
+                    image = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(pixels)) + chunk(b'IEND', b'')
+                    return self.respond(200, image, 'image/png')
                 if configuration['mode'] == 'edge-metadata':
                     return self.respond(404, {})
                 image = Path(__file__).resolve().parents[1] / 'static/book_placeholder.jpg'
@@ -402,7 +422,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'userId': identity})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
                 if mode in ('pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
@@ -439,6 +459,14 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 podcast['media']['metadata']['feedUrl'] = 'http://127.0.0.1/feed.xml'
                 podcast['media']['episodes'] = [episode for episode in podcast['media']['episodes'] if episode['id'] != 'episode-new']
                 items[0]['media']['metadata']['title'] = 'A Very Long Story Title About Finding Your Way Home Through A City Of Unexpected Doors And Forgotten Libraries' if mode == 'edge-metadata' else 'Stories for Tomorrow 01'
+                for item in items[:2]: item['media']['metadata']['authorName'] = 'Audiobookshelf QA'
+                items[1]['media']['metadata']['title'] = 'Stories for Tomorrow 02'
+                if mode == 'large-cover-art':
+                    items[0]['media']['metadata']['title'] = 'Tomorrow'
+                    items[1]['media']['metadata'].update(title='A Longer Story About Finding Your Way Home', authorName='A narrator and author with a longer name')
+                if mode == 'large-cover-art' and (directory := os.environ.get('ABS_QA_COVER_DIRECTORY')):
+                    for item, display in zip(items, json.loads((Path(directory) / 'display.json').read_text())):
+                        item['media']['metadata'].update(title=display['title'], authorName=display['author'])
                 items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else 60 if mode == 'pdf-audio' else 20
                 if mode in ('baseline', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress'):
                     reports.clear()
@@ -526,14 +554,14 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 self.progress[key] = {**current, 'libraryItemId': key[0], 'ebookLocation': data['ebookLocation'], 'ebookProgress': data.get('ebookProgress', 0), 'lastUpdate': int(time.time() * 1000)}
                 self.account['mediaProgress'] = list(self.progress.values())
                 return self.respond(503 if lost_reading_ack else 200, {})
-            completion = re.fullmatch(r'/api/me/progress/podcast/(episode|episode-morning)', path or '')
+            completion = re.fullmatch(r'/api/me/progress/(book-[0-9]+|podcast)(?:/(episode|episode-morning))?', path or '')
             if completion and self.command == 'PATCH':
                 if not isinstance(data.get('isFinished'), bool):
                     return self.respond(400, {})
-                key = ('podcast', completion.group(1))
+                key = (completion.group(1), completion.group(2))
                 current = self.progress.get(key, {})
                 finished = data['isFinished']
-                self.progress[key] = {**current, 'libraryItemId': 'podcast', 'episodeId': key[1], 'duration': 20,
+                self.progress[key] = {**current, 'libraryItemId': key[0], 'episodeId': key[1], 'duration': 20,
                     'currentTime': 20 if finished else 0, 'progress': 1 if finished else 0, 'isFinished': finished, 'lastUpdate': int(time.time() * 1000)}
                 self.account['mediaProgress'] = list(self.progress.values())
                 return self.respond(200, self.progress[key])

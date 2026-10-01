@@ -493,6 +493,18 @@ import UIKit
         try await closeCurrentSession()
     }
 
+    func setFinished(itemID: String, episodeID: String?, finished: Bool) async throws -> CurrentUser {
+        let owner = try await api.currentAccount()
+        try await prepareProgressEdit(itemID: itemID, episodeID: episodeID)
+        try Task.checkCancellation()
+        guard try await api.currentAccount() == owner else { throw CancellationError() }
+        try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished)
+        let user = try await api.me()
+        guard try await api.currentAccount() == owner else { throw CancellationError() }
+        try listening.rememberRemoteProgress(user, account: owner)
+        return user
+    }
+
     func prepareProgressEdit(itemID: String, episodeID: String?) async throws {
         if self.itemID == itemID, self.episodeID == episodeID { try await stop() }
         try await listening.flush()

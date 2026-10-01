@@ -12,9 +12,9 @@ The owner wants modern native apps across phone, tablet, and Apple TV, without l
 
 ## Solution
 
-Deliver the migration sequentially in the owner's Audiobookshelf app fork: Apple first, Android second, then Next.js. Keep the original two-phase architecture:
+Deliver the migration in the owner's Audiobookshelf app fork with Apple, Android and Next.js implementation running in parallel in isolated worktrees, as authorized on October 1, 2026. Keep the original two-phase architecture and platform acceptance gates:
 
-- **Phase 1:** First complete fully native SwiftUI apps for iPhone/iPad and Apple TV, including migration and physical-device acceptance. Only after Apple readiness passes, implement and validate the Kotlin/Jetpack Compose Android app. Provide a consistent modern design while respecting touch, accessibility, and TV remote navigation. Achieve the applicable mobile parity baseline, with PDF required and remaining ebook/comic reading deferred as approved above, before replacing it. Apple TV implements the features appropriate to a television rather than copying every mobile capability.
+- **Phase 1:** Complete fully native SwiftUI apps for iPhone/iPad and Apple TV, including migration and physical-device acceptance, while a separate worktree implements and validates the Kotlin/Jetpack Compose Android app. Provide a consistent modern design while respecting touch, accessibility, and TV remote navigation. Achieve the applicable mobile parity baseline, with PDF required and remaining ebook/comic reading deferred as approved above, before replacing it. Apple TV implements the features appropriate to a television rather than copying every mobile capability.
 - **Phase 2:** Deliver a Next.js browser client against the existing Audiobookshelf server, carrying forward the modern design and relevant client capabilities. The existing Audiobookshelf browser interface remains available during phase 1. Native apps never depend on a new Next.js service to reach the user's server.
 
 Build replacements alongside the legacy application. Internal milestones can demonstrate individual workflows, but an audio-only milestone is not the mobile replacement release; PDF and all other non-deferred capabilities remain required. Publish a platform parity matrix and migration evidence before cutover.
@@ -89,7 +89,7 @@ Build replacements alongside the legacy application. Internal milestones can dem
 
 ## Implementation Decisions
 
-- **Confirmed sequencing:** Implement Apple (iPhone/iPad and TV) to acceptance first, then Android to acceptance, then the Next.js browser client. Phase 1 contains the two sequential native stages; phase 2 contains Next.js. Android implementation is blocked by Apple mobile and TV readiness; Next.js implementation is blocked by Android readiness. The owner confirmed full mobile feature parity, the sequencing, migration preservation requirements, and the primary testing boundary.
+- **Confirmed parallel implementation:** On October 1, 2026, the owner authorized separate Android and Next.js agents to implement concurrently in isolated worktrees while Apple work continues. This overrides the earlier Apple → Android → Next.js implementation-start dependencies. Phase 1 remains native clients and phase 2 remains the browser migration. Each platform must independently pass its applicable acceptance and preservation requirements before replacing a working client; parallel development does not waive readiness or server compatibility checks.
 - **Parity baseline:** Use upstream v0.14.2-beta at commit 7014e04e as the initial mobile feature baseline. Inventory actual behaviour by platform, including server permissions and feature availability, before implementation. Cover the entire current mobile app, not only the stories explicitly enumerated here. Later upstream changes enter through an explicit compatibility review rather than silently expanding or shrinking the baseline.
 - **Release gate:** Maintain a platform parity matrix linking each baseline capability to an implementation and observable acceptance evidence. Every applicable mobile capability must pass before that platform replaces the legacy app. Missing baseline functionality cannot be waived as an audio-first release without an explicit scope change. Internal incremental builds are allowed.
 - **Apple architecture:** SwiftUI interfaces with shared Apple API/domain, credentials, playback, progress, and applicable persistence capabilities. Keep TV layout and focus behaviour separate from mobile presentation. Extract useful existing Swift code and the new TV core behind cohesive interfaces rather than retaining Capacitor as the native shell.
@@ -135,7 +135,7 @@ Build replacements alongside the legacy application. Internal milestones can dem
 - React Native as the phase 1 mobile UI architecture, or replacing Nuxt with Next.js inside a Capacitor mobile shell.
 - Replacing the Audiobookshelf server, its database, or its identity provider; requiring a new hosted backend to use native apps.
 - Making an incomplete audio-only native app the replacement release.
-- Building the Next.js browser client during phase 1. It is explicitly in scope for phase 2.
+- Replacing the working browser client before Next.js phase 2 acceptance. Parallel implementation is authorized.
 - Automatically requiring downloads, ebook reading, or every mobile management action on Apple TV.
 - Adding new car integrations or other platform features that are not part of the existing mobile parity baseline.
 - Rebuilding all upstream server administration capabilities in the phase 2 browser client.
@@ -145,7 +145,7 @@ Build replacements alongside the legacy application. Internal milestones can dem
 
 ## Further Notes
 
-- Subsequent confirmed requirements: Apple → Android → Next.js implementation order; all builds and verification local; internal-only distribution is sufficient; compatibility checks and affected-client alignment precede adoption of new upstream server releases.
+- Subsequent confirmed requirements: parallel implementation in isolated Apple, Android and Next.js worktrees (superseding the earlier sequential implementation order); all builds and verification local; internal-only distribution is sufficient; compatibility checks and affected-client alignment precede adoption of new upstream server releases.
 - Confirmed in the interview: fully native apps; existing web interface during phase 1; full mobile parity before replacement; Next.js migration specified now as phase 2. The owner also confirmed the app-level testing seam and preservation requirements. No further interview is required to publish this spec.
 - The fork is https://github.com/r4iju/audiobookshelf-app. The existing TV foundation is published on the fork's native-TV branch at commit 1a673463. Upstream remains https://github.com/advplyr/audiobookshelf-app.
 - Initial source measurement: 27,916 lines of mobile UI/JavaScript/CSS, 14,665 Android Kotlin/Java lines, and 7,036 iOS Swift lines; the new TV production Swift adds 1,041 lines. This excludes dependency and build output. Size is not a substitute for a capability inventory.
