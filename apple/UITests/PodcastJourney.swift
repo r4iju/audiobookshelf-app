@@ -1,6 +1,62 @@
 import XCTest
 
 @MainActor final class PodcastJourney: NativeJourney {
+    func testDelayedPriorFailureCannotFailRetriedServerDownload() async throws {
+        let app = try await queueFailingEpisode(mode: "podcast-retry-delayed-failure")
+        try await finishDownloads()
+        XCTAssertTrue(app.staticTexts["Failed"].waitForExistence(timeout: 8))
+        app.buttons["Retry failed episodes"].tap()
+        XCTAssertTrue(app.buttons["The Next Story"].waitForExistence(timeout: 5))
+        app.buttons["The Next Story"].tap(); app.buttons["Add selected episodes to server"].tap()
+        XCTAssertTrue(app.staticTexts["server-download-pending"].waitForExistence(timeout: 5))
+        try await Task.sleep(nanoseconds: 2_000_000_000)
+        XCTAssertFalse(app.staticTexts["Failed"].exists, "A delayed receipt for the old job must not fail the new request")
+        XCTAssertTrue(app.staticTexts["server-download-pending"].exists)
+        try await finishDownloads()
+        XCTAssertTrue(app.buttons["episode-episode-new"].waitForExistence(timeout: 8))
+        XCTAssertFalse(app.staticTexts["Failed"].exists)
+        XCTAssertFalse(app.staticTexts["server-download-pending"].exists)
+    }
+    private func finishDownloads() async throws {
+        var request = URLRequest(url: URL(string: "http://127.0.0.1:19765/abs/__fixture__/finish-downloads")!)
+        request.httpMethod = "POST"
+        let (_, response) = try await URLSession.shared.data(for: request)
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+    }
+    func testFailedServerDownloadWhileBrowsingIsRecoveredOnReturningToPodcast() async throws {
+        let app = try await queueFailingEpisode(mode: "podcast-held-download-failure")
+        app.navigationBars.buttons["BackButton"].tap()
+        XCTAssertTrue(app.buttons["book-podcast"].waitForExistence(timeout: 5))
+        var request = URLRequest(url: URL(string: "http://127.0.0.1:19765/abs/__fixture__/finish-downloads")!)
+        request.httpMethod = "POST"
+        let (_, response) = try await URLSession.shared.data(for: request)
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+        try await Task.sleep(nanoseconds: 2_000_000_000)
+        app.buttons["book-podcast"].tap()
+        XCTAssertTrue(app.staticTexts["Failed"].waitForExistence(timeout: 5), "A completed server event must be saved while its podcast screen is closed")
+        XCTAssertFalse(app.staticTexts["server-download-pending"].exists)
+    }
+    private func queueFailingEpisode(mode: String = "podcast-download-failure") async throws -> XCUIApplication {
+        try await FixtureControl.configure(mode)
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["account"].tap(); app.buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
+        app.buttons["book-podcast"].tap(); app.buttons["Feed episodes"].tap()
+        XCTAssertTrue(app.buttons["The Next Story"].waitForExistence(timeout: 5))
+        app.buttons["The Next Story"].tap(); app.buttons["Add selected episodes to server"].tap()
+        return app
+    }
+    func testFailedActiveServerDownloadStopsWaitingAndRetainsRecoveryAfterRelaunch() async throws {
+        let app = try await queueFailingEpisode()
+        XCTAssertTrue(app.staticTexts["Failed"].waitForExistence(timeout: 12), "A failed active job is absent from the queue and must be recovered through its server event. " + app.debugDescription)
+        guard app.staticTexts["Failed"].exists else { return }
+        XCTAssertFalse(app.staticTexts["server-download-pending"].exists)
+        XCTAssertTrue(app.buttons["Retry failed episodes"].exists)
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["book-podcast"].tap()
+        XCTAssertTrue(app.staticTexts["Failed"].waitForExistence(timeout: 5), "Keep the recovery state when the server no longer has the completed job")
+        XCTAssertFalse(app.staticTexts["server-download-pending"].exists)
+    }
     func testAdminDiscoversAPodcastByNameAndCreatesTheSelectedFeed() async throws {
         try await FixtureControl.configure("podcast-admin")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)

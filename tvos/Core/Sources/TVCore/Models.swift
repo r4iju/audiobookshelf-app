@@ -256,6 +256,7 @@ public struct PodcastDownloads: Decodable {
 }
 public struct PodcastDownload: Decodable, Identifiable {
     public let id: String
+    public let libraryItemId: String?
     public let episodeDisplayTitle: String?
     public let isFinished: Bool
     public let failed: Bool

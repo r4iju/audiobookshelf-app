@@ -91,6 +91,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     openid_sessions = {}
     login_outcomes = []
     requests = []
+    realtime_authentications = []
     configuration = {'mode': 'baseline', 'failed': False}
     collections = [{'id': 'collection-evening', 'libraryId': 'books', 'name': 'Evening shelf', 'description': 'An established listening order.', 'books': [items[2], items[1]]}]
     playlists = [{'id': 'playlist-evening', 'libraryId': 'books', 'userId': user['id'], 'name': 'Evening queue', 'description': 'Personal listening.', 'items': [{'libraryItemId': item['id'], 'libraryItem': item} for item in [items[1], items[2]]]}]
@@ -200,6 +201,14 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
 
         def do_GET(self):
             path, query = self.route()
+            if path == '/__fixture__/realtime-events':
+                events = []
+                for download in pending_feed_downloads:
+                    if (configuration['mode'] in ('podcast-download-failure', 'podcast-held-download-failure') or configuration['mode'] == 'podcast-retry-delayed-failure' and download['id'] == 'download-1') and time.monotonic() >= download['readyAt'] and (not download.get('emitted') or configuration['mode'] == 'podcast-retry-delayed-failure' and len(pending_feed_downloads) > 1 and not download.get('duplicateEmitted')):
+                        if download.get('emitted'): download['duplicateEmitted'] = True
+                        download['emitted'] = True
+                        events.append({'name': 'episode_download_finished', 'data': {'id': download['id'], 'libraryItemId': 'podcast', 'libraryId': 'podcasts', 'url': download['episode']['enclosure']['url'], 'episodeDisplayTitle': download['episode']['title'], 'isFinished': True, 'failed': True}})
+                return self.respond(200, events)
             if path == '/status':
                 return self.respond(200, {'isInit': True, 'version': '2.30.0-fixture', 'authMethods': ['local', 'openid'] if configuration['mode'].startswith('openid') else ['local'], 'language': 'en-us', 'serverSettings': {}})
             if path == '/auth/openid' and configuration['mode'].startswith('openid'):
@@ -237,7 +246,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     return self.respond(401, {})
                 return self.respond(200, {'user': {**user, 'accessToken': 'expired', 'refreshToken': 'refresh'}})
             if path == '/__fixture__/observations':
-                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None], 'collections': collections, 'playlists': playlists})
+                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None], 'collections': collections, 'playlists': playlists, 'realtimeAuthentications': realtime_authentications})
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
@@ -305,7 +314,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if configuration['mode'] == 'podcast-slow-detail':
                     time.sleep(5)
                 for download in list(pending_feed_downloads):
-                    if time.monotonic() >= download['readyAt']:
+                    if (configuration['mode'] not in ('podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure') or configuration['mode'] == 'podcast-retry-delayed-failure' and download['id'] != 'download-1') and time.monotonic() >= download['readyAt']:
                         podcast['media']['episodes'].append(download['episode'])
                         pending_feed_downloads.remove(download)
                 return self.respond(200, podcast)
@@ -380,9 +389,20 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
             except (ValueError, TypeError):
                 return self.respond(400, {})
+            if path == '/__fixture__/finish-downloads':
+                for download in pending_feed_downloads:
+                    download['readyAt'] = time.monotonic()
+                return self.respond(200, {})
+            if path == '/__fixture__/realtime-auth':
+                token = data.get('token')
+                if token not in ('fresh', 'fresh-other'):
+                    return self.respond(401, {})
+                identity = other_user['id'] if token == 'fresh-other' else user['id']
+                realtime_authentications.append(identity)
+                return self.respond(200, {'userId': identity})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
                 if mode in ('pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
@@ -413,7 +433,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if mode != 'offline-library':
                     tracks[1] = audio(52 if mode == 'pdf-audio' else 12)
                     items[0]['media']['tracks'][1]['duration'] = 52 if mode == 'pdf-audio' else 12
-                user['type'] = 'admin' if mode == 'podcast-admin' else 'user'
+                user['type'] = 'admin' if mode in ('podcast-admin', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure') else 'user'
                 created_podcasts.clear()
                 pending_feed_downloads.clear()
                 podcast['media']['metadata']['feedUrl'] = 'http://127.0.0.1/feed.xml'
@@ -478,7 +498,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     return self.respond(403, {})
                 if not isinstance(data, list) or len(data) != 1 or data[0].get('guid') != 'rss-next' or data[0].get('customMetadata') != {'retain': True} or data[0].get('enclosure', {}).get('url') != 'http://127.0.0.1/audio-next.mp3':
                     return self.respond(400, {})
-                pending_feed_downloads.append({'readyAt': time.monotonic() + 5, 'episode': {'id': 'episode-new', 'title': data[0]['title'], 'duration': 20, 'publishedAt': data[0]['publishedAt'], 'enclosure': data[0]['enclosure']}})
+                pending_feed_downloads.append({'id': 'download-' + str(len(pending_feed_downloads) + 1), 'readyAt': time.monotonic() + (10000 if configuration['mode'] in ('podcast-held-download-failure', 'podcast-retry-delayed-failure') else 5), 'episode': {'id': 'episode-new', 'title': data[0]['title'], 'duration': 20, 'publishedAt': data[0]['publishedAt'], 'enclosure': data[0]['enclosure']}})
                 return self.respond(200, {})
             if path == '/api/podcasts':
                 if self.account['type'] not in ('root', 'admin'):

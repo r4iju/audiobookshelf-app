@@ -4,7 +4,8 @@ struct FeedEpisodes: View {
     let api: APIClient
     let item: LibraryItem
     @Binding var presented: Bool
-    let onQueued: ([String]) -> Void
+    enum QueueChange { case requested([PodcastFeedEpisode]), accepted, rejected([PodcastFeedEpisode]) }
+    let onQueueChange: (QueueChange) throws -> Void
     @State private var episodes: [PodcastFeedEpisode] = []
     @State private var selected: Set<String> = []
     @State private var loading = true
@@ -65,11 +66,17 @@ struct FeedEpisodes: View {
         request = Task {
             defer { adding = false }
             do {
+                try onQueueChange(.requested(choices))
                 try await api.downloadFeedEpisodes(itemID: item.id, episodes: choices)
                 guard !Task.isCancelled else { return }
-                onQueued(choices.compactMap(\.enclosureURL))
+                try onQueueChange(.accepted)
                 presented = false
-            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
+            } catch {
+                if !Task.isCancelled {
+                    if case APIError.http(let code) = error, [400, 401, 403, 404, 413].contains(code) { try? onQueueChange(.rejected(choices)) }
+                    self.error = ConnectionStore.recovery(for: error)
+                }
+            }
         }
     }
 }

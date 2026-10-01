@@ -1,7 +1,9 @@
 import SwiftUI
 
 @main struct AudiobookshelfNativeApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     @UIApplicationDelegateAdaptor(NativeDownloadAppDelegate.self) private var appDelegate
+    @StateObject private var serverQueue: NativePodcastQueue
     @StateObject private var reading: ReadingStore
     @StateObject private var downloads: NativeDownloads
     @StateObject private var connection: ConnectionStore
@@ -13,6 +15,7 @@ import SwiftUI
         if CommandLine.arguments.contains("--reset-preview-account") {
             try? vault.resetPreviewAccounts()
             try? FileManager.default.removeItem(at: ListeningSync.file)
+            try? FileManager.default.removeItem(at: NativePodcastQueue.file)
             try? FileManager.default.removeItem(at: ReadingStore.file)
             try? FileManager.default.removeItem(at: NativeDownloads.directory)
             UserDefaults.standard.removeObject(forKey: "previewListLayout")
@@ -43,6 +46,7 @@ import SwiftUI
         }
         #endif
         let api = APIClient(store: vault)
+        _serverQueue = StateObject(wrappedValue: NativePodcastQueue(api: api))
         _downloads = StateObject(wrappedValue: NativeDownloads(api: api))
         let playback = ApplePlayback(api: api)
         _reading = StateObject(wrappedValue: ReadingStore(player: playback))
@@ -52,11 +56,12 @@ import SwiftUI
 
     var body: some Scene {
         WindowGroup {
-            PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player).environmentObject(downloads).environmentObject(reading)
+            PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player).environmentObject(downloads).environmentObject(reading).environmentObject(serverQueue)
                 .accentColor(ShelfStyle.accent)
-                .onAppear { Task { await connection.restore(); downloads.refresh(); reading.sync(api: connection.api) } }
+                .onAppear { Task { await connection.restore(); serverQueue.connect(); downloads.refresh(); reading.sync(api: connection.api) } }
+                .onChange(of: scenePhase) { phase in if phase == .active { serverQueue.connect(); serverQueue.retrySavingResults() } }
                 .onChange(of: player.canPublishReading) { available in if available { reading.sync(api: connection.api) } }
-                .onChange(of: connection.activeAccount) { _ in reading.sync(api: connection.api) }
+                .onChange(of: connection.activeAccount) { _ in serverQueue.connect(); reading.sync(api: connection.api) }
                 .sheet(isPresented: $downloads.presented) { DownloadsView().environmentObject(downloads).environmentObject(player).environmentObject(reading) }
         }
     }

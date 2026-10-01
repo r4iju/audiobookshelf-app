@@ -1,8 +1,8 @@
 import SwiftUI
-import CryptoKit
 import UIKit
 
 struct BookDetails: View {
+    @EnvironmentObject private var serverQueue: NativePodcastQueue
     @EnvironmentObject private var readingStore: ReadingStore
     @State private var reader: ReadingSource?
     @EnvironmentObject private var localDownloads: NativeDownloads
@@ -25,8 +25,7 @@ struct BookDetails: View {
     @State private var showingFeed = false
     @State private var downloads: [PodcastDownload] = []
     @State private var downloadRequest: Task<Void, Never>?
-    @State private var requestedDownloads: Set<String> = []
-    @State private var downloadStorageKey: String?
+    private var requestedDownloads: Set<String> { serverQueue.pending(itemID: item.id) }
     @State private var detailRevision = UUID()
     private var book: LibraryItem { expanded ?? item }
 
@@ -124,13 +123,16 @@ struct BookDetails: View {
             .onAppear { load(monitorDownloads: true) }
             .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel() }
             .sheet(isPresented: $showingFeed) {
-                FeedEpisodes(api: catalog.api, item: book, presented: $showingFeed) { urls in
-                    requestedDownloads.formUnion(urls.map(downloadIdentity))
-                    saveDownloadRequests()
-                    watchDownloads()
+                FeedEpisodes(api: catalog.api, item: book, presented: $showingFeed) { change in
+                    switch change {
+                    case .requested(let episodes): try serverQueue.begin(itemID: item.id, episodes: episodes)
+                    case .accepted: watchDownloads()
+                    case .rejected(let episodes): try serverQueue.reject(itemID: item.id, episodes: episodes)
+                    }
                 }
             }
             .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: catalog.api, store: readingStore) }
+            .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
     }
 
@@ -219,6 +221,12 @@ struct BookDetails: View {
                     Text(download.failed ? "Failed" : download.isFinished ? "Ready" : "Downloading on server").font(.caption).foregroundColor(.secondary)
                 }
             }
+            if let error = serverQueue.error { Text(error).font(.caption).foregroundColor(.red) }
+            if serverQueue.hasUnsavedResults { Button("Retry saving download results", action: serverQueue.retrySavingResults) }
+            ForEach(serverQueue.failures(itemID: item.id)) { failure in
+                HStack { Image(systemName: "exclamationmark.triangle"); Text(failure.title); Spacer(); Text("Failed").font(.caption).foregroundColor(.secondary) }
+            }
+            if !serverQueue.failures(itemID: item.id).isEmpty { Button("Retry failed episodes") { showingFeed = true } }
             if !requestedDownloads.isEmpty {
                 Text("Waiting for \(requestedDownloads.count) episode(s) from your server").font(.caption).foregroundColor(.secondary).accessibilityIdentifier("server-download-pending")
                 Button("Refresh downloads", action: watchDownloads)
@@ -247,17 +255,15 @@ struct BookDetails: View {
         downloadRequest = Task {
             do {
                 while !Task.isCancelled {
+                    let owner = try await catalog.api.currentAccount()
                     async let queue = catalog.api.podcastDownloads(itemID: book.id)
                     async let detail = catalog.api.item(id: book.id)
                     let (jobs, value) = try await (queue, detail)
-                    guard !Task.isCancelled else { return }
-                    downloads = jobs
+                    guard !Task.isCancelled, try await catalog.api.currentAccount() == owner else { return }
+                    downloads = jobs.filter { !$0.failed }
+                    for job in jobs where job.failed { try serverQueue.receiveFailure(itemID: item.id, job: job) }
                     expanded = value
-                    requestedDownloads.formUnion(jobs.filter { !$0.failed }.compactMap { $0.url }.map(downloadIdentity))
-                    let available = Set((value.media.episodes ?? []).compactMap { $0.enclosure?.url }.map(downloadIdentity))
-                    requestedDownloads.subtract(available)
-                    requestedDownloads.subtract(jobs.filter(\.failed).compactMap { $0.url }.map(downloadIdentity))
-                    saveDownloadRequests()
+                    try serverQueue.reconcile(itemID: item.id, episodes: value.media.episodes ?? [])
                     if requestedDownloads.isEmpty, jobs.allSatisfy({ $0.isFinished || $0.failed }) { return }
                     try await Task.sleep(nanoseconds: 2_000_000_000)
                 }
@@ -272,20 +278,17 @@ struct BookDetails: View {
         detailRevision = revision
         request = Task {
             do {
+                let owner = try await catalog.api.currentAccount()
                 async let detail = catalog.api.item(id: item.id)
                 async let account = catalog.api.me()
                 let (value, user) = try await (detail, account)
-                guard !Task.isCancelled, detailRevision == revision else { return }
+                guard !Task.isCancelled, detailRevision == revision, try await catalog.api.currentAccount() == owner else { return }
                 expanded = value
                 episodeProgress = user.mediaProgress
                 canManagePodcasts = user.canManagePodcasts
-                if let server = catalog.api.credentials?.server {
-                    let account = try AccountIdentity(server: server, userID: user.id)
-                    let key = "previewServerPodcastRequests." + downloadIdentity(account.server + "\n" + account.userID + "\n" + book.id)
-                    downloadStorageKey = key
-                    requestedDownloads.formUnion(UserDefaults.standard.stringArray(forKey: key) ?? [])
-                    requestedDownloads.subtract((book.media.episodes ?? []).compactMap { $0.enclosure?.url }.map(downloadIdentity))
-                    saveDownloadRequests()
+                if book.mediaType == "podcast", episode == nil {
+                    try serverQueue.adoptLegacy(itemID: item.id)
+                    try serverQueue.reconcile(itemID: item.id, episodes: book.media.episodes ?? [])
                 }
                 error = nil
                 if monitorDownloads, book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() }
@@ -294,13 +297,6 @@ struct BookDetails: View {
                 self.error = ConnectionStore.recovery(for: error)
             }
         }
-    }
-
-    private func downloadIdentity(_ value: String) -> String {
-        SHA256.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
-    }
-    private func saveDownloadRequests() {
-        if let downloadStorageKey { UserDefaults.standard.set(Array(requestedDownloads), forKey: downloadStorageKey) }
     }
 
     private static func plainDescription(_ html: String) -> String {

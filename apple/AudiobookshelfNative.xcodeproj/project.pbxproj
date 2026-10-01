@@ -40,11 +40,13 @@
 		994506014AC88B1940D1F095 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27172291A78804715DCC8B07 /* DownloadsView.swift */; };
 		9E87AA39139252A49A463254 /* CatalogOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5AD9145C4C2A8FFC022546 /* CatalogOptions.swift */; };
 		A7FCD96A6AB282197446E404 /* NativeJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3269F2BF0A79D70A7DDA479 /* NativeJourney.swift */; };
+		B7087685B20CC875DDF2759C /* NativePodcastQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66117F51540A95F01ED0EAA3 /* NativePodcastQueue.swift */; };
 		B86C69E5D15DA92377A9859B /* BookDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A19219CBB98F877315C1125 /* BookDetails.swift */; };
 		C08750A2C00D9DEEBC6B545D /* PodcastFeedEpisode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED963E2BB67CF0C2512E188 /* PodcastFeedEpisode.swift */; };
 		CE49EB3F1C6A1C10E099D2DC /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B6CC0E695DC31E590D3C2B /* APIClient.swift */; };
 		D9BA7FE22537DCE7E5F74F22 /* PlaybackViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AC840B99BF9E4C5E8634AC /* PlaybackViews.swift */; };
 		DE99C8824C14EF1CB284986E /* CatalogRecoveryJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440FCD5B29796AC12E0E0788 /* CatalogRecoveryJourney.swift */; };
+		E00EF93C2285FE0ED68DB1DD /* ServerEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D716B41B49708E6A00605567 /* ServerEvents.swift */; };
 		E5086F9B19216BD7283F0FD6 /* ConnectionJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CAC9658FF3F40EF409324C /* ConnectionJourney.swift */; };
 		E7868F696560654E9E242357 /* ListeningSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E779620640E22D9796AD5963 /* ListeningSync.swift */; };
 		E81A987945C2C18BD154A1C9 /* PodcastJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA18B9C7D52A542335C9F63 /* PodcastJourney.swift */; };
@@ -90,6 +92,7 @@
 		555E32B34297E5993C20AE0B /* NativeDownloads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeDownloads.swift; sourceTree = "<group>"; };
 		612D1953AEA2C0DB8083C470 /* ReaderVolume.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderVolume.swift; sourceTree = "<group>"; };
 		648832F721FE449B09116AC8 /* DurableProgressJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurableProgressJourney.swift; sourceTree = "<group>"; };
+		66117F51540A95F01ED0EAA3 /* NativePodcastQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativePodcastQueue.swift; sourceTree = "<group>"; };
 		67AC840B99BF9E4C5E8634AC /* PlaybackViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackViews.swift; sourceTree = "<group>"; };
 		6A19219CBB98F877315C1125 /* BookDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetails.swift; sourceTree = "<group>"; };
 		7CB589548138556B32D60EDD /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -105,6 +108,7 @@
 		C645D6AE0D674A57C0773628 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1C2CFEF2D5FBC6F4EC51932 /* Preview.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Preview.entitlements; sourceTree = "<group>"; };
 		D1D2451CCE26A54E231EE326 /* ListeningStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningStats.swift; sourceTree = "<group>"; };
+		D716B41B49708E6A00605567 /* ServerEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerEvents.swift; sourceTree = "<group>"; };
 		DED963E2BB67CF0C2512E188 /* PodcastFeedEpisode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastFeedEpisode.swift; sourceTree = "<group>"; };
 		DFD50815ACE665566CE9977C /* ReaderAssets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ReaderAssets; path = App/ReaderAssets; sourceTree = SOURCE_ROOT; };
 		E779620640E22D9796AD5963 /* ListeningSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningSync.swift; sourceTree = "<group>"; };
@@ -157,6 +161,7 @@
 				FAB2B0D3551E87A9FB4A17E2 /* KeychainCredentials.swift */,
 				F1F86C6F6039D0FDDE1C1243 /* LibrarySearch.swift */,
 				555E32B34297E5993C20AE0B /* NativeDownloads.swift */,
+				66117F51540A95F01ED0EAA3 /* NativePodcastQueue.swift */,
 				297B85D6B7A67F973912B0E8 /* OpenIDSignIn.swift */,
 				89D370E0E2EBBE61D284F30A /* PDFReader.swift */,
 				67AC840B99BF9E4C5E8634AC /* PlaybackViews.swift */,
@@ -179,6 +184,7 @@
 				7CB589548138556B32D60EDD /* Models.swift */,
 				2D898927D36409D75E586B20 /* OfflineAudio.swift */,
 				DED963E2BB67CF0C2512E188 /* PodcastFeedEpisode.swift */,
+				D716B41B49708E6A00605567 /* ServerEvents.swift */,
 			);
 			path = TVCore;
 			sourceTree = "<group>";
@@ -385,6 +391,7 @@
 				E7868F696560654E9E242357 /* ListeningSync.swift in Sources */,
 				31260902F1F2030E7F0E2C82 /* Models.swift in Sources */,
 				1D04F1C76DAF3872336653B7 /* NativeDownloads.swift in Sources */,
+				B7087685B20CC875DDF2759C /* NativePodcastQueue.swift in Sources */,
 				404C3E6F9436C6DBD84FAA7E /* OfflineAudio.swift in Sources */,
 				4F8A3AF97ADB6DB816C3DDA2 /* OpenIDSignIn.swift in Sources */,
 				58DE29D2234932F4A0AE2702 /* PDFReader.swift in Sources */,
@@ -392,6 +399,7 @@
 				C08750A2C00D9DEEBC6B545D /* PodcastFeedEpisode.swift in Sources */,
 				3CDEA26939627C729F5D7C0E /* ReaderVolume.swift in Sources */,
 				5E3420D9B864D407CD1D6C6A /* ReadingStore.swift in Sources */,
+				E00EF93C2285FE0ED68DB1DD /* ServerEvents.swift in Sources */,
 				3F33E769B7B6FE27B0786A21 /* StatisticsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
