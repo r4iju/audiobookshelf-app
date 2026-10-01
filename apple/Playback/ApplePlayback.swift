@@ -678,6 +678,8 @@ import UIKit
         return resets.contains { $0.covers(account: account, itemID: itemID, episodeID: episodeID) }
     }
 
+    func confirmServerRestarted(account: AccountIdentity) throws {}
+
     /// Finishes the signed-in account's resets that a failure or relaunch left unfinished.
     func resumeProgressResets() async {
         if let progressReset { _ = try? await progressReset.value }

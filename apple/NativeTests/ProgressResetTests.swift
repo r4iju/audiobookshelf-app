@@ -23,6 +23,8 @@ import XCTest
         var acceptListening = true
         func key(_ item: String, _ episode: String?) -> String { episode.map { item + "/" + $0 } ?? item }
         func id(_ item: String, _ episode: String?) -> String { "mp-" + key(item, episode).replacingOccurrences(of: "/", with: "-") }
+        /// A row created after the first was deleted; 2.30 gives it a new ID.
+        func recreatedID(_ item: String, _ episode: String?) -> String { id(item, episode) + "-recreated" }
         subscript(item: String, episode: String?) -> Row? {
             get { lock.lock(); defer { lock.unlock() }; return rows[key(item, episode)] }
             set { lock.lock(); rows[key(item, episode)] = newValue; lock.unlock() }
@@ -36,6 +38,37 @@ import XCTest
         private var usersBeforeHold = 0
         /// Holds a later `/api/me` request, after letting `skipping` pass, until `release`.
         func holdUser(skipping: Int = 0) { lock.lock(); holdingUser = true; usersBeforeHold = skipping; lock.unlock() }
+        /// Server 2.30 has no request barrier: a handler whose client timed out still runs to the
+        /// end. The next write taken here is answered with a client timeout while its handler
+        /// waits, before its progress lookup, until `releaseWrite`.
+        private var holdingWrite = false
+        private(set) var heldWrites = 0
+        private let writeReleased = DispatchSemaphore(value: 0)
+        private let writeApplied = DispatchSemaphore(value: 0)
+        func holdNextWrite() { lock.lock(); holdingWrite = true; lock.unlock() }
+        func takeWriteHold() -> Bool {
+            lock.lock(); defer { lock.unlock() }
+            guard holdingWrite else { return false }
+            holdingWrite = false; heldWrites += 1
+            return true
+        }
+        func runHeld(_ work: @escaping () -> Void) {
+            DispatchQueue.global().async { self.writeReleased.wait(); work(); self.writeApplied.signal() }
+        }
+        /// Lets the held handler finish and waits until it has.
+        func releaseWrite() {
+            writeReleased.signal()
+            _ = writeApplied.wait(timeout: .now() + 5)
+        }
+        /// 2.30's progress step of a local session sync (`syncLocalSession`): a strictly newer row
+        /// is kept, an existing one updated, and a missing one created under a new ID.
+        func applySession(_ session: [String: Any], newRowID: Bool) {
+            let item = session["libraryItemId"] as! String, episode = session["episodeId"] as? String
+            let updated = session["updatedAt"] as! Double
+            if let row = self[item, episode], row.updatedAt > updated { return }
+            let id = self[item, episode]?.id ?? (newRowID ? recreatedID(item, episode) : self.id(item, episode))
+            self[item, episode] = Row(id: id, time: session["currentTime"] as! Double, updatedAt: updated, ebookLocation: self[item, episode]?.ebookLocation)
+        }
         func passUser() {
             lock.lock()
             var wait = false
@@ -63,12 +96,11 @@ import XCTest
         harness.stub.route("POST", api + "/session/local-all") { request in
             guard server.acceptListening else { return .status(500) }
             let sessions = request.json?["sessions"] as? [[String: Any]] ?? []
-            for session in sessions {
-                let item = session["libraryItemId"] as! String, episode = session["episodeId"] as? String
-                let updated = session["updatedAt"] as! Double
-                if let row = server[item, episode], row.updatedAt > updated { continue }
-                server[item, episode] = Row(id: server.id(item, episode), time: session["currentTime"] as! Double, updatedAt: updated, ebookLocation: server[item, episode]?.ebookLocation)
+            if server.takeWriteHold() {
+                server.runHeld { sessions.forEach { server.applySession($0, newRowID: true) } }
+                return .timedOut
             }
+            sessions.forEach { server.applySession($0, newRowID: false) }
             return .json(200, ["results": sessions.map { ["id": $0["id"] as! String, "success": true] }])
         }
         for (item, episode) in [(book, nil), (other, nil), (podcast, "ep-1"), (podcast, "ep-2")] as [(String, String?)] {
@@ -78,14 +110,15 @@ import XCTest
                 guard let row = server[item, episode] else { return .status(404) }
                 return .json(200, ["id": row.id, "libraryItemId": item, "episodeId": episode as Any? ?? NSNull(), "currentTime": row.time, "lastUpdate": row.updatedAt])
             }
-            harness.stub.route("DELETE", api + "/me/progress/" + server.id(item, episode)) { request in
-                server.remove(id: server.id(item, episode)); return .status(200)
+            for id in [server.id(item, episode), server.recreatedID(item, episode)] {
+                harness.stub.route("DELETE", api + "/me/progress/" + id) { _ in server.remove(id: id); return .status(200) }
             }
         }
     }
 
     override func tearDown() async throws {
         server.release()
+        server.releaseWrite()
         try? await harness.player.stop()
         harness.cleanUp()
     }
@@ -418,5 +451,111 @@ import XCTest
         XCTAssertEqual(harness.player.currentTime, 0, accuracy: 0.05)
         try await settleListening()
         XCTAssertEqual(server[book, nil]?.time ?? 0, 0, accuracy: 0.05, "Old listening restored the reset")
+    }
+
+    private var publications: URL { harness.base.appendingPathComponent("Native/NativeListening/publications.json") }
+
+    private func expectRefusedReset(_ item: String, _ message: String, file: StaticString = #filePath, line: UInt = #line) async {
+        do { _ = try await reset(item); XCTFail(message, file: file, line: line) } catch {}
+    }
+
+    func testListeningWhoseFirstSyncGotNoAnswerKeepsTheResetRefusedAfterItsReplayIsAccepted() async throws {
+        server[book, nil] = Row(id: server.id(book, nil), time: 3, updatedAt: old)
+        try await open(book, at: 12)
+        server.holdNextWrite()
+        // A flush can join the transfer opening started; the next one sends the position.
+        for _ in 0..<5 where server.heldWrites == 0 {
+            await harness.player.restoreListening()
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the first sync reached the server and was held")
+        XCTAssertNotEqual(server[book, nil]?.time, 12, "Precondition: the held sync was not applied yet")
+        try await settleListening()
+        XCTAssertEqual(try XCTUnwrap(server[book, nil]).time, 12, accuracy: 0.05, "Precondition: the replay was accepted")
+
+        var discarded = false
+        do { _ = try await reset(book); discarded = true; XCTFail("The reset ran while the first sync could still be applied") } catch {}
+        server.releaseWrite()
+        if discarded {
+            XCTAssertNil(server[book, nil], "The first sync recreated the discarded progress as \(server[book, nil]?.id ?? "")")
+        } else {
+            XCTAssertEqual(deletes(), [])
+            XCTAssertEqual(try XCTUnwrap(server[book, nil], "The listened position was lost").time, 12, accuracy: 0.05)
+        }
+
+        // Nothing on the server shows that the held handler finished, so a relaunch keeps it refused.
+        try await harness.player.stop()
+        harness.openStores()
+        await expectRefusedReset(book, "After a relaunch the reset ran while the first sync could still be applied")
+        // Other titles are unaffected.
+        server[other, nil] = Row(id: server.id(other, nil), time: 4, updatedAt: old)
+        _ = try await reset(other)
+        XCTAssertNil(server[other, nil])
+
+        // Unreadable records count as unresolved.
+        try Data("{not json".utf8).write(to: publications)
+        harness.openStores()
+        await expectRefusedReset(book, "The reset ran though the record of earlier writes could not be read")
+        XCTAssertEqual(deletes(), [api + "/me/progress/" + server.id(other, nil)])
+
+        // A restart ends every handler still running, which the owner confirms.
+        try harness.player.confirmServerRestarted(account: alice)
+        _ = try await reset(book)
+        XCTAssertNil(server[book, nil])
+    }
+
+    func testAPrimaryPDFPageWhosePublicationGotNoAnswerKeepsTheResetRefusedAfterItsReplayIsAccepted() async throws {
+        server[book, nil] = Row(id: server.id(book, nil), time: 0, updatedAt: old, ebookLocation: "2")
+        let server = server, book = book
+        // 2.30's progress PATCH: updates the row, or creates one under a new ID.
+        harness.stub.route("PATCH", api + "/me/progress/" + book) { request in
+            let apply = {
+                server[book, nil] = Row(id: server[book, nil]?.id ?? server.recreatedID(book, nil), time: server[book, nil]?.time ?? 0,
+                                        updatedAt: Date().timeIntervalSince1970 * 1_000, ebookLocation: request.json?["ebookLocation"] as? String)
+            }
+            if server.takeWriteHold() { server.runHeld(apply); return .timedOut }
+            apply()
+            return .status(200)
+        }
+        try harness.reading.update(account: alice, itemID: book, format: "pdf", location: "7", fraction: 0.5, rotation: 0)
+        server.holdNextWrite()
+        try await publishReading()
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the page reached the server and was held")
+        XCTAssertEqual(server[book, nil]?.ebookLocation, "2", "Precondition: the held page was not applied yet")
+        try await publishReading()
+        XCTAssertEqual(harness.reading.position(account: alice, itemID: book, format: "pdf")?.pending, false, "Precondition: the replay was accepted")
+
+        var discarded = false
+        do { _ = try await reset(book); discarded = true; XCTFail("The reset ran while the first page could still be applied") } catch {}
+        server.releaseWrite()
+        if discarded {
+            XCTAssertNil(server[book, nil], "The first page recreated the discarded progress at \(server[book, nil]?.ebookLocation ?? "")")
+        } else {
+            XCTAssertEqual(deletes(), [])
+            XCTAssertEqual(server[book, nil]?.ebookLocation, "7")
+            XCTAssertEqual(harness.reading.position(account: alice, itemID: book, format: "pdf")?.location, "7", "This device's page was discarded")
+        }
+    }
+
+    func testCarriedOverListeningWhoseFirstSendGotNoAnswerKeepsTheResetRefusedAfterItsReplayIsAccepted() async throws {
+        harness.addSession("legacy-\(UUID().uuidString)", item: book, account: AdoptionHarness.alice, streamed: true, listened: 30, position: 400)
+        _ = try await harness.adoption.apply(outcome: try harness.migrate(), migrator: harness.migrator)
+        harness.stub.route("GET", api + "/me/item/listening-sessions/" + book) { _ in .json(200, ["sessions": [], "numPages": 0]) }
+        server[book, nil] = Row(id: server.id(book, nil), time: 12, updatedAt: old)
+        server.holdNextWrite()
+        _ = await harness.adoption.sync()
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the carried-over session reached the server and was held")
+        let replay = await harness.adoption.sync()
+        XCTAssertEqual(replay.sessionsAcknowledged, 1, "Precondition: the replay was accepted")
+
+        var discarded = false
+        do { _ = try await reset(book); discarded = true; XCTFail("The reset ran while the first send could still be applied") } catch {}
+        server.releaseWrite()
+        if discarded {
+            XCTAssertNil(server[book, nil], "The first send recreated the discarded progress at \(server[book, nil]?.time ?? 0)")
+        } else {
+            XCTAssertEqual(deletes(), [])
+            XCTAssertNotNil(server[book, nil])
+        }
     }
 }
