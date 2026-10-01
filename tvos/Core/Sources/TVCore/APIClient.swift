@@ -59,6 +59,11 @@ import Foundation
         return try await get("api/me/stats/year/\(year)")
     }
 
+    public func serverYearStats(_ year: Int) async throws -> ServerYearStats {
+        guard (2000...9999).contains(year) else { throw APIError.http(400) }
+        return try await get("api/stats/year/\(year)")
+    }
+
     public func me() async throws -> CurrentUser { try await get("api/me") }
 
     public func setFinished(itemID: String, episodeID: String?, finished: Bool) async throws {
