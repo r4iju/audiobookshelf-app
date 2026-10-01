@@ -105,16 +105,22 @@ All in `tvos/Core` (TVCore) unless noted:
 - The share button (a menu with "Share My Year" and "Share Server Year" for admins) captures the snapshot when tapped and
   presents one `.sheet(item:)`. Covers arriving later never change an open composer.
 
-Still for the root, which owns these files:
+The integrated app registers `Export/Sources/YearExport` in `apple/project.yml` and its generated project, and declares
+`NSPhotoLibraryAddUsageDescription`. Physical Save Image and iPad share presentation remain acceptance gates.
 
-1. Add `Export/Sources/YearExport` to the `AudiobookshelfNative` sources in `apple/project.yml` and regenerate.
-   The sources use `#if canImport(TVCore)`, so they compile both inside the app target and in the standalone package.
-2. Add `NSPhotoLibraryAddUsageDescription` to the app's `info.properties` (for example "Save your year in review image
-   to Photos."). Neither the app nor the QA host declares it, and the QA share sheet offered no Save Image action.
-   The root should confirm Save Image on a device after adding it.
+The coordinator reran the reviewed, integrated branch after merging Apple TV completion:
 
-A scratch copy with step 1 applied builds `AudiobookshelfNative` with the wired view on Xcode 27
-(`IPHONEOS_DEPLOYMENT_TARGET=15.0` build-only override; Xcode 27 rejects 14.0).
+- 24 Export tests passed on the dedicated year-export simulator.
+- 27 shared TVCore tests passed, including pinned-cover account switching.
+- All native app, shared playback, core and export sources typechecked for iOS 14.
+- The actual `AudiobookshelfNative` simulator target built successfully on Xcode 27 (15.0 build-only override).
+- Local logs: `/tmp/abs-year-final-export.log`, `/tmp/abs-year-final-core.log`, `/tmp/abs-year-final-minimum.log`,
+  `/tmp/abs-year-final-build.log`.
+
+Synthetic examples, rendered with no owner data:
+
+![Finished books story](evidence/year-sharing/listener-finished.png)
+![Admin server year](evidence/year-sharing/server-year.png)
 
 ## Verification
 
