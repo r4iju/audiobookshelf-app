@@ -502,6 +502,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
             except (ValueError, TypeError):
                 return self.respond(400, {})
+            if path and path.startswith('/api/'):
+                # What the client sent, so a journey can tell which revision of its progress reached the server.
+                self.observed_request['body'] = copy.deepcopy(data)
             if path == '/__fixture__/finish-downloads':
                 for download in pending_feed_downloads:
                     download['readyAt'] = time.monotonic()

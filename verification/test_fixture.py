@@ -194,5 +194,23 @@ class MidSessionTokenJourney(FixtureJourneyBase):
         self.assertEqual(self.request('/auth/refresh', {}, headers={'x-refresh-token': 'refresh'})['user']['accessToken'], 'fresh')
 
 
+class ProgressWriteOutcomeJourney(FixtureJourneyBase):
+    session = {'id': 'local-book-0', 'libraryItemId': 'book-0', 'episodeId': None, 'currentTime': 12, 'duration': 20, 'updatedAt': 1, 'timeListening': 6}
+
+    def status(self, path, data=None, method=None):
+        value = Request(self.address + path, json.dumps(data).encode() if data is not None else None,
+                        {'Content-Type': 'application/json', 'Authorization': 'Bearer fresh'}, method=method)
+        try:
+            with urlopen(value, timeout=3) as response:
+                return response.status
+        except HTTPError as error:
+            error.close()
+            return error.code
+
+    def test_observed_writes_keep_the_body_that_was_sent(self):
+        self.request('/api/session/local-all', {'sessions': [self.session]}, 'fresh')
+        sent = [entry for entry in self.request('/__fixture__/observations')['requests'] if entry['path'] == '/api/session/local-all']
+        self.assertEqual([entry.get('body') for entry in sent], [{'sessions': [self.session]}])
+
 if __name__ == '__main__':
     unittest.main()
