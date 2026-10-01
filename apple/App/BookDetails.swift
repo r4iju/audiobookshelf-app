@@ -3,6 +3,8 @@ import CryptoKit
 import UIKit
 
 struct BookDetails: View {
+    @EnvironmentObject private var readingStore: ReadingStore
+    @State private var reader: ReadingSource?
     @EnvironmentObject private var localDownloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
     let item: LibraryItem
@@ -61,6 +63,29 @@ struct BookDetails: View {
                     if progressBusy { ProgressView("Saving your progress…") }
                 }
                 if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
+                if let ebook = book.media.ebookFile, ebook.format == "pdf", episode == nil {
+                    Button("Read PDF") {
+                        Task {
+                            do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil) }
+                            catch { self.error = error.localizedDescription }
+                        }
+                    }
+                }
+                if episode == nil {
+                    ForEach(book.supplementaryEbooks.filter { $0.ebook?.format == "pdf" }) { file in
+                        if let ebook = file.ebook {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Button("Read " + (file.metadata?.filename ?? "supplementary PDF")) {
+                                    Task {
+                                        do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: file.metadata?.filename ?? book.title, ebook: ebook, file: nil, fileID: file.ino) }
+                                        catch { self.error = error.localizedDescription }
+                                    }
+                                }
+                                Button("Download " + (file.metadata?.filename ?? "supplementary PDF")) { Task { await localDownloads.enqueue(item: book, episode: nil, supplementaryID: file.ino) } }
+                            }
+                        }
+                    }
+                }
                 if book.mediaType == "book" || episode != nil {
                     Button("Download for offline") { Task { await localDownloads.enqueue(item: book, episode: episode) } }
                     if let error = localDownloads.error { Text(error).foregroundColor(.red) }
@@ -105,6 +130,7 @@ struct BookDetails: View {
                     watchDownloads()
                 }
             }
+            .fullScreenCover(item: $reader) { source in PDFReader(source: source, api: catalog.api, store: readingStore) }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
     }
 

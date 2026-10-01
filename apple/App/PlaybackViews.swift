@@ -214,7 +214,7 @@ struct ListeningControls: View {
     }
 }
 
-@MainActor @ViewBuilder private func playbackToggle(_ player: ApplePlayback, large: Bool = false) -> some View {
+@MainActor @ViewBuilder func playbackToggle(_ player: ApplePlayback, large: Bool = false, prefix: String? = nil) -> some View {
     Button { player.toggle() } label: {
         Image(systemName: player.wantsPlayback ? "pause.fill" : "play.fill")
             .font(large ? .system(size: 34) : .title2)
@@ -222,5 +222,5 @@ struct ListeningControls: View {
             .background(large ? ShelfStyle.accent : .clear).foregroundColor(large ? .white : ShelfStyle.accent)
             .clipShape(Circle())
     }.accessibilityLabel(player.wantsPlayback ? "Pause" : "Play")
-        .accessibilityIdentifier((large ? "" : "mini-") + (player.wantsPlayback ? "pause-playback" : "resume-playback"))
+        .accessibilityIdentifier((prefix ?? (large ? "" : "mini-")) + (player.wantsPlayback ? "pause-playback" : "resume-playback"))
 }

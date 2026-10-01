@@ -75,4 +75,13 @@ Download a book or episode from its details and open Downloads from the account 
 
 Offline playback uses owned file URLs in the shared player. It retains multi-file seeking, chapters, speed and skip preferences, and writes listening to the local journal before attempting publication. Resume positions remain cached after history is acknowledged. Reconnection records timestamped remote progress so a later offline start can adopt a newer position from another client without downloading the audio again. Saved media remains scoped to canonical server plus user ID.
 
-Ebook downloads/readers, expanded transfer interruption/storage/device acceptance, preference/data migration and final physical-device acceptance remain tracked separately. This preview is a delivery slice, not a replacement readiness claim. Synthetic fixture coverage does not establish live-server or physical-device readiness.
+EPUB, MOBI/AZW3 and comic readers, expanded transfer interruption/storage/device acceptance, preference/data migration and final physical-device acceptance remain tracked separately. This preview is a delivery slice, not a replacement readiness claim. Synthetic fixture coverage does not establish live-server or physical-device readiness.
+
+
+## PDF reading
+
+Book details open the primary or supplementary PDF using PDFKit, with native zoom and links, page navigation, continuous display, and rotation relative to the document's original orientation. Downloaded PDFs open without a library request. Primary reading uses server ebook progress; supplementary documents retain separate local locations and never replace primary progress. Download snapshots retain the server page even when the first opening happens offline.
+
+Reading locations and rotation are atomically persisted per server/user/item/document. Reading publication waits for an open listening session to close, flushes durable listening first, and reserves publication before another listening session begins. The installed server (2.30.0) exposes one modification timestamp shared by audio and ebook progress. Recognized echoes of our older publications advance the durable server baseline while retaining newer local pages, including a lost response followed by a rejected retry.
+
+The ten-scenario iPhone PDF journey passed, covering invalid files, a 120-page document, authored rotation, offline relaunch, downloaded audio upgrades, newer remote progress, supplementary PDFs, active audio and display preferences, and delayed/lost responses. A separate double-failure regression first failed by losing page 3, then passed after the baseline fix. These fixtures do not establish physical-device, actual PDF annotation-link, or multi-device live-server acceptance. Run `bash apple/scripts/verify-ui.sh -only-testing:NativeJourneyTests/ReaderJourney` locally. No hosted build service is required.

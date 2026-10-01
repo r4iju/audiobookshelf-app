@@ -27,8 +27,28 @@ def audio(seconds):
     return data.getvalue()
 
 
+def pdf(pages=4, rotation=0, title='Stories for Tomorrow'):
+    objects = [b'<< /Type /Catalog /Pages 2 0 R >>',
+               f'<< /Type /Pages /Kids [{" ".join(f"{4 + i * 2} 0 R" for i in range(pages))}] /Count {pages} >>'.encode(),
+               b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>']
+    for index in range(pages):
+        content = f'BT /F1 24 Tf 60 700 Td ({title} - Passage {index + 1}) Tj ET'.encode()
+        objects.append(f'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Rotate {rotation} /Resources << /Font << /F1 3 0 R >> >> /Contents {5 + index * 2} 0 R >>'.encode())
+        objects.append(f'<< /Length {len(content)} >>\nstream\n'.encode() + content + b'\nendstream')
+    data = b'%PDF-1.4\n'
+    offsets = [0]
+    for index, value in enumerate(objects, 1):
+        offsets.append(len(data)); data += f'{index} 0 obj\n'.encode() + value + b'\nendobj\n'
+    xref = len(data)
+    data += f'xref\n0 {len(offsets)}\n0000000000 65535 f \n'.encode()
+    data += b''.join(f'{offset:010} 00000 n \n'.encode() for offset in offsets[1:])
+    data += f'trailer\n<< /Size {len(offsets)} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n'.encode()
+    return data
+
+
 def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='modern', bind='127.0.0.1'):
     tracks = [audio(8), audio(12)]
+    document = pdf()
     chapters = [{'id': 0, 'title': 'Opening', 'start': 0, 'end': 8}, {'id': 1, 'title': 'Next chapter', 'start': 8, 'end': 20}]
     items = [{'id': f'book-{i}', 'mediaType': 'book', 'media': {
         'metadata': {'title': f'Stories for Tomorrow {i + 1:02}', 'authorName': 'Audiobookshelf QA', 'authors': [{'id': 'author', 'name': 'Audiobookshelf QA'}],
@@ -140,7 +160,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     return self.respond(401, {})
                 return self.respond(200, {'user': {**user, 'accessToken': 'expired', 'refreshToken': 'refresh'}})
             if path == '/__fixture__/observations':
-                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values())})
+                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None]})
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
@@ -199,7 +219,11 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'downloads': []})
             if path == '/api/search/podcast':
                 return self.respond(200, [{'id': 42, 'title': 'New Voices Discovery', 'artistName': 'Fixture Studio', 'feedUrl': 'http://127.0.0.1:19765/feed.xml', 'genres': ['Stories']}])
-            downloaded_file = re.fullmatch(r'/api/items/book-[0-9]+/file/([01])/download', path or '')
+            downloaded_file = re.fullmatch(r'/api/items/book-[0-9]+/file/([01]|pdf)/download', path or '')
+            if path in ('/api/items/book-0/file/notes', '/api/items/book-0/file/notes/download'):
+                return self.respond(200, pdf(pages=2, title='Listening notes'), 'application/pdf')
+            if path == '/api/items/book-0/file/pdf' or downloaded_file and downloaded_file[1] == 'pdf':
+                return self.respond(200, document, 'application/pdf')
             if downloaded_file:
                 if configuration['mode'] == 'download-error-page':
                     return self.respond(200, {'error': 'Synthetic proxy error page'})
@@ -252,6 +276,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             self.respond(404, {'error': 'Not found'})
 
         def do_POST(self):
+            nonlocal document
             path, _ = self.route()
             try:
                 data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
@@ -259,16 +284,34 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(400, {})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
                     return self.respond(400, {})
-                configuration.update(mode=mode, failed=False)
+                configuration.update(mode=mode, failed=False, reading_attempts=0)
+                if mode in ('pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
+                    document = b'not a PDF' if mode == 'pdf-invalid' else pdf(pages=120 if mode == 'pdf-long' else 4, rotation=90 if mode == 'pdf-rotated' else 0)
+                    items[0]['media']['ebookFile'] = {'ino': 'pdf', 'ebookFormat': 'pdf', 'metadata': {'filename': 'stories.pdf', 'ext': '.pdf', 'size': len(document)}}
+                    if mode in ('pdf-reader', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-rotated', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure'):
+                        for account in users.values():
+                            for entry in progress_by_user[account['id']].values():
+                                entry.pop('ebookLocation', None); entry.pop('ebookProgress', None)
+                            duration = 60 if mode == 'pdf-audio' else 20
+                            progress_by_user[account['id']][('book-0', None)].update(currentTime=6, duration=duration, progress=6 / duration, isFinished=False, lastUpdate=0)
+                elif mode != 'offline-library':
+                    items[0]['media'].pop('ebookFile', None)
+                if mode == 'pdf-supplementary':
+                    items[0]['libraryFiles'] = [{'ino': 'notes', 'fileType': 'ebook', 'isSupplementary': True, 'metadata': {'filename': 'Listening notes.pdf', 'ext': '.pdf'}}]
+                elif mode != 'offline-library':
+                    items[0].pop('libraryFiles', None)
+                if mode != 'offline-library':
+                    tracks[1] = audio(52 if mode == 'pdf-audio' else 12)
+                    items[0]['media']['tracks'][1]['duration'] = 52 if mode == 'pdf-audio' else 12
                 user['type'] = 'admin' if mode == 'podcast-admin' else 'user'
                 created_podcasts.clear()
                 pending_feed_downloads.clear()
                 podcast['media']['metadata']['feedUrl'] = 'http://127.0.0.1/feed.xml'
                 podcast['media']['episodes'] = [episode for episode in podcast['media']['episodes'] if episode['id'] != 'episode-new']
                 items[0]['media']['metadata']['title'] = 'A Very Long Story Title About Finding Your Way Home Through A City Of Unexpected Doors And Forgotten Libraries' if mode == 'edge-metadata' else 'Stories for Tomorrow 01'
-                items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else 20
+                items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else 60 if mode == 'pdf-audio' else 20
                 if mode in ('baseline', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress'):
                     reports.clear()
                     local_sessions.clear()
@@ -277,9 +320,15 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                             if key[0] == 'podcast':
                                 del progress_by_user[account['id']][key]
                         account['bookmarks'] = []
+                        if mode == 'baseline':
+                            for entry in progress_by_user[account['id']].values():
+                                entry.pop('ebookLocation', None); entry.pop('ebookProgress', None)
                         position = 6 if account['username'] == 'qa' else 2
                         progress_by_user[account['id']][('book-0', None)].update(currentTime=position, duration=20, progress=position / 20, isFinished=False, lastUpdate=0)
                         account['mediaProgress'] = list(progress_by_user[account['id']].values())
+                if mode == 'pdf-remote':
+                    progress[('book-0', None)].update(ebookLocation='4', ebookProgress=0.75, lastUpdate=time.time() * 1000)
+                    user['mediaProgress'] = list(progress.values())
                 if mode == 'remote-rewind':
                     progress[('book-0', None)].update(currentTime=2, duration=20, progress=0.1, isFinished=False, lastUpdate=time.time() * 1000)
                     user['mediaProgress'] = list(progress.values())
@@ -325,6 +374,20 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 value = {'id': 'podcast-new', 'mediaType': 'podcast', 'media': {**data['media'], 'episodes': []}}
                 created_podcasts.append(value)
                 return self.respond(200, value)
+            reading = re.fullmatch(r'/api/me/progress/(book-[0-9]+)', path or '')
+            if reading and self.command == 'PATCH' and isinstance(data.get('ebookLocation'), str):
+                configuration['reading_attempts'] = configuration.get('reading_attempts', 0) + 1
+                if configuration['mode'] == 'pdf-double-failure' and configuration['reading_attempts'] == 2:
+                    return self.respond(503, {})
+                lost_reading_ack = configuration['mode'] in ('pdf-lost-ack', 'pdf-double-failure') and not configuration['failed']
+                if configuration['mode'] in ('pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure') and not configuration['failed']:
+                    configuration['failed'] = True
+                    time.sleep(3)
+                key = (reading[1], None)
+                current = self.progress.get(key, {})
+                self.progress[key] = {**current, 'libraryItemId': key[0], 'ebookLocation': data['ebookLocation'], 'ebookProgress': data.get('ebookProgress', 0), 'lastUpdate': int(time.time() * 1000)}
+                self.account['mediaProgress'] = list(self.progress.values())
+                return self.respond(503 if lost_reading_ack else 200, {})
             completion = re.fullmatch(r'/api/me/progress/podcast/(episode|episode-morning)', path or '')
             if completion and self.command == 'PATCH':
                 if not isinstance(data.get('isFinished'), bool):
@@ -348,7 +411,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     if not newer_remote:
                         duration = record['duration']
                         position = record['currentTime']
-                        self.progress[key] = {'libraryItemId': key[0], 'episodeId': key[1], 'duration': duration, 'currentTime': position,
+                        self.progress[key] = {**current, 'libraryItemId': key[0], 'episodeId': key[1], 'duration': duration, 'currentTime': position,
                                          'progress': min(max(position / duration, 0), 1), 'isFinished': position >= duration, 'lastUpdate': record['updatedAt']}
                     reports.append({'path': path, 'currentTime': record['currentTime'], 'timeListened': record['timeListening'], 'sessionId': record['id'], 'userId': self.account['id']})
                     results.append({'id': record['id'], 'success': True, 'progressSynced': not newer_remote})
@@ -389,6 +452,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     'displayTitle': title, 'displayAuthor': 'QA Studio', 'audioTracks': [
                         {'contentUrl': '/audio/0', 'startOffset': 0, 'duration': 8, 'mimeType': 'audio/wav'},
                         {'contentUrl': '/audio/1', 'startOffset': 8, 'duration': 12, 'mimeType': 'audio/wav'}], 'chapters': chapters}
+                if configuration['mode'] == 'pdf-audio':
+                    result['duration'] = 60
+                    result['audioTracks'][1]['duration'] = 52
+                    result['chapters'] = [chapters[0], {**chapters[1], 'end': 60}]
                 sessions[session_id] = result
                 if configuration['mode'] == 'no-audio':
                     result['audioTracks'] = []
@@ -407,7 +474,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if not data:
                     return self.respond(200, {})
                 key = (session['libraryItemId'], session['episodeId'])
-                self.progress[key] = {'libraryItemId': key[0], 'episodeId': key[1], **data}
+                current = self.progress.get(key, {})
+                self.progress[key] = {**current, 'libraryItemId': key[0], 'episodeId': key[1], **data}
                 position = float(data.get('currentTime', 0))
                 duration = float(data.get('duration', session['duration']))
                 self.progress[key]['progress'] = min(max(position / duration, 0), 1) if duration > 0 else 0

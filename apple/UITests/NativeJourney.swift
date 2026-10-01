@@ -40,6 +40,7 @@ import XCTest
     }
 
     struct ObservedRequest: Decodable {
+        let method: String?
         let path: String
         let page: String?
     }
@@ -53,6 +54,12 @@ import XCTest
         let requests: [ObservedRequest]
         let reports: [ProgressObservation]
         let localSessions: [LocalSessionObservation]
+        let readingProgress: [ReadingObservation]
+    }
+    struct ReadingObservation: Decodable {
+        let libraryItemId: String
+        let ebookLocation: String
+        let currentTime: Double?
     }
     struct LocalSessionObservation: Decodable {
         let id: String

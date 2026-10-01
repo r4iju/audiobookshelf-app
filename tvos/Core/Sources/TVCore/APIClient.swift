@@ -190,6 +190,15 @@ import Foundation
         return try ServerAddress(credentials.server).mediaURL(path)
     }
 
+    public func ebookData(itemID: String, ebook: EbookFile) async throws -> Data {
+        guard !ebook.ino.isEmpty, !ebook.ino.contains("/"), !ebook.ino.contains("..") else { throw APIError.unsafeMediaURL }
+        return try await request("api/items/\(itemID)/file/\(ebook.ino)")
+    }
+    public func saveReading(account: AccountIdentity, itemID: String, location: String, progress: Double) async throws {
+        guard try await currentAccount() == account else { throw APIError.signInRequired }
+        _ = try await request("api/me/progress/\(itemID)", method: "PATCH", body: ["ebookLocation": location, "ebookProgress": progress])
+    }
+
     public func coverData(itemID: String) async throws -> Data {
         try await request("api/items/\(itemID)/cover", query: [URLQueryItem(name: "width", value: "500")])
     }

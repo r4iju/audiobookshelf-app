@@ -5,7 +5,7 @@ public enum APIError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .invalidServer: return "Enter an http:// or https:// server address, without credentials, a query, or a fragment."
-        case .unsafeMediaURL: return "The server returned an audio URL outside this server."
+        case .unsafeMediaURL: return "The server returned a media URL outside this server."
         case .signInRequired: return "Your session expired. Please sign in again."
         case .http(401): return "The username or password was not accepted."
         case .http(let code): return "The server returned HTTP \(code). Please try again."
@@ -105,6 +105,8 @@ public struct LibraryItem: Decodable, Identifiable, Hashable {
     public let mediaType: String
     public let media: Media
     public let recentEpisode: Episode?
+    public let libraryFiles: [LibraryFile]?
+    public var supplementaryEbooks: [LibraryFile] { (libraryFiles ?? []).filter { $0.ebook != nil && $0.ino != media.ebookFile?.ino } }
     public var title: String { media.metadata.title }
     public var author: String { media.metadata.authorName ?? media.metadata.author ?? media.metadata.authors?.map(\.name).joined(separator: ", ") ?? "" }
     public static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
@@ -116,6 +118,24 @@ public struct Media: Decodable {
     public let episodes: [Episode]?
     public let chapters: [Chapter]?
     public let tracks: [AudioTrack]?
+    public let ebookFile: EbookFile?
+}
+public struct EbookFile: Codable {
+    public let ino: String
+    public let ebookFormat: String
+    public let metadata: AudioTrack.TrackMetadata?
+    public var format: String { ebookFormat.lowercased() }
+}
+public struct LibraryFile: Codable, Identifiable {
+    public let ino: String
+    public let fileType: String
+    public let metadata: AudioTrack.TrackMetadata?
+    public var id: String { ino }
+    public var ebook: EbookFile? {
+        guard fileType == "ebook" else { return nil }
+        let format = (metadata?.ext ?? (metadata?.filename as NSString?)?.pathExtension ?? "").trimmingCharacters(in: CharacterSet(charactersIn: ".")).lowercased()
+        return EbookFile(ino: ino, ebookFormat: format, metadata: metadata)
+    }
 }
 public struct Metadata: Decodable {
     public let title: String
@@ -288,13 +308,15 @@ public struct UserPermissions: Decodable {
     public let upload: Bool?
 }
 
-public struct MediaProgress: Decodable, Identifiable {
+public struct MediaProgress: Codable, Identifiable {
     public let libraryItemId: String
     public let episodeId: String?
     public let currentTime: Double?
     public let duration: Double?
     public let progress: Double?
     public let isFinished: Bool?
+    public let ebookLocation: String?
+    public let ebookProgress: Double?
     public let lastUpdate: Double?
     public var id: String { libraryItemId + ":" + (episodeId ?? "book") }
     public var fraction: Double { min(max(progress ?? 0, 0), 1) }

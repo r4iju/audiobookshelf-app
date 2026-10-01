@@ -65,6 +65,8 @@ import UIKit
     private var offlineFiles: [URL]?
     private let api: APIClient
     private let listening: ListeningSync
+    private var readingPublication: Task<Void, Error>?
+    var canPublishReading: Bool { session == nil && !preparing && !closing }
     private var listeningID: String?
     private let player = AVPlayer()
     @Published private(set) var trackIndex = 0
@@ -86,7 +88,7 @@ import UIKit
     private var lastSync = Date()
     private var generation = UUID()
     private var preparationID = UUID()
-    private var closing = false
+    @Published private var closing = false
     private var commandTargets: [(MPRemoteCommand, Any)] = []
 
     private static var deviceKey: String {
@@ -150,6 +152,8 @@ import UIKit
         error = nil
         defer { if preparationID == preparation { preparing = false } }
         do {
+            if let readingPublication { _ = try? await readingPublication.value }
+            guard preparationID == preparation else { return }
             try await closeCurrentSession()
             let requestGeneration = generation
             try await listening.flush()
@@ -206,6 +210,8 @@ import UIKit
         let initialIntent = playbackIntent
         defer { if preparationID == preparation { preparing = false } }
         do {
+            if let readingPublication { _ = try? await readingPublication.value }
+            guard preparationID == preparation else { return }
             guard try await api.currentAccount() == audio.account else { throw APIError.signInRequired }
             try await suspendForConnectionChange(preservingIntent: initialIntent)
             preparationID = preparation; preparing = true
@@ -436,6 +442,22 @@ import UIKit
     func restoreListening() async {
         do { try await listening.flush(); clearProgressFailure() }
         catch { failed(error, prefix: "Saved listening is waiting to sync: ", origin: .progress) }
+    }
+
+    // Legacy servers timestamp audio and reading together. Publish reading only after
+    // listening closes; new audio must wait so this write cannot age unsent listening.
+    func publishReading(account: AccountIdentity, itemID: String, location: String, fraction: Double, beforePublication: @escaping @MainActor () throws -> Void) async throws -> Bool {
+        guard canPublishReading, readingPublication == nil else { return false }
+        let publication = Task { @MainActor in
+            try await listening.flush()
+            guard try await api.currentAccount() == account else { throw CancellationError() }
+            try beforePublication()
+            try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction)
+        }
+        readingPublication = publication
+        defer { readingPublication = nil }
+        try await publication.value
+        return true
     }
 
     private func clearProgressFailure() {

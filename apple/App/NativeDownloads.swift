@@ -39,8 +39,8 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
 
 @MainActor final class NativeDownloads: ObservableObject {
     private enum Failure: LocalizedError {
-        case invalidAudio
-        var errorDescription: String? { "The server returned a page instead of audio. Check the server and retry the download." }
+        case invalidContent
+        var errorDescription: String? { "The server returned unsupported content. Check the server and retry the download." }
     }
     enum State: String, Codable { case queued, ready, failed, cancelled }
     struct Entry: Codable, Identifiable {
@@ -49,6 +49,10 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         let media: ListeningMedia
         let tracks: [AudioTrack]
         let chapters: [Chapter]
+        var ebook: EbookFile?
+        var readingProgress: MediaProgress? = nil
+        var supplementaryID: String? = nil
+        var parts: Range<Int> { 0..<(tracks.count + (ebook == nil ? 0 : 1)) }
         let serverPosition: Double
         let serverUpdatedAt: Double
         var generation: String
@@ -68,7 +72,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     @Published var cellular = UserDefaults.standard.bool(forKey: "previewDownloadCellular") {
         didSet { UserDefaults.standard.set(cellular, forKey: "previewDownloadCellular"); applyCellularPolicy() }
     }
-    private let api: APIClient
+    let api: APIClient
     private let delegate = DownloadDelegate()
     private var session: URLSession!
     private var tasks: [String: URLSessionDownloadTask] = [:]
@@ -88,10 +92,10 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                 let saved = try JSONDecoder().decode(Manifest.self, from: Data(contentsOf: manifest))
                 guard saved.version == 1, Set(saved.entries.map(\.id)).count == saved.entries.count,
                       saved.entries.allSatisfy({ entry in
-                          UUID(uuidString: entry.id) != nil && UUID(uuidString: entry.generation) != nil && !entry.tracks.isEmpty &&
-                          entry.media.duration.isFinite && entry.media.duration > 0 &&
-                          Set(entry.finished).count == entry.finished.count && entry.finished.allSatisfy(entry.tracks.indices.contains) &&
-                          (entry.state != .ready || entry.finished.count == entry.tracks.count)
+                          UUID(uuidString: entry.id) != nil && UUID(uuidString: entry.generation) != nil && !entry.parts.isEmpty &&
+                          entry.media.duration.isFinite && entry.media.duration >= 0 &&
+                          Set(entry.finished).count == entry.finished.count && entry.finished.allSatisfy(entry.parts.contains) &&
+                          (entry.state != .ready || entry.finished.count == entry.parts.count)
                       }) else { throw ListeningJournal.Failure.invalidData }
                 entries = saved.entries
                 var recovered = entries
@@ -143,8 +147,8 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         } catch { self.error = error.localizedDescription }
     }
     func fraction(for entry: Entry) -> Double {
-        let partial = entry.tracks.indices.filter { !entry.finished.contains($0) }.reduce(0.0) { $0 + (fractions[key(entry, $1)] ?? 0) }
-        return min(max((Double(entry.finished.count) + partial) / Double(entry.tracks.count), 0), 1)
+        let partial = entry.parts.filter { !entry.finished.contains($0) }.reduce(0.0) { $0 + (fractions[key(entry, $1)] ?? 0) }
+        return min(max((Double(entry.finished.count) + partial) / Double(entry.parts.count), 0), 1)
     }
     func refresh() { Task { await pump() } }
     private func save(_ values: [Entry]) throws {
@@ -152,7 +156,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         try JSONEncoder().encode(Manifest(version: 1, entries: values)).write(to: manifest, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
         entries = values
     }
-    func enqueue(item: LibraryItem, episode: Episode?) async {
+    func enqueue(item: LibraryItem, episode: Episode?, supplementaryID: String? = nil) async {
         do {
             let identity = try await api.currentAccount()
             let user = try await api.me()
@@ -161,21 +165,42 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             let detail = try await api.item(id: item.id)
             guard account == identity else { throw CancellationError() }
             let selected = episode.flatMap { old in detail.media.episodes?.first { $0.id == old.id } } ?? episode
-            let tracks = selected.map { $0.audioTrack.map { [$0] } ?? [] } ?? detail.media.tracks ?? []
-            guard !tracks.isEmpty, tracks.allSatisfy({ $0.duration.isFinite && $0.duration > 0 && $0.startOffset.isFinite && $0.startOffset >= 0 }) else { throw APIError.noAudio }
+            let attachment = supplementaryID.flatMap { id in detail.supplementaryEbooks.first { $0.ino == id }?.ebook }
+            guard supplementaryID == nil || attachment != nil else { throw APIError.http(404) }
+            let tracks = supplementaryID == nil ? (selected.map { $0.audioTrack.map { [$0] } ?? [] } ?? detail.media.tracks ?? []) : []
+            let ebook = supplementaryID == nil ? (selected == nil ? detail.media.ebookFile : nil) : attachment
+            let progress = supplementaryID == nil ? user.mediaProgress.first { $0.libraryItemId == item.id && $0.episodeId == episode?.id } : nil
+            guard !tracks.isEmpty || ebook != nil else { throw APIError.noAudio }
+            guard tracks.allSatisfy({ $0.duration.isFinite && $0.duration > 0 && $0.startOffset.isFinite && $0.startOffset >= 0 }) else { throw APIError.noAudio }
             for track in tracks { _ = try downloadURL(track, account: identity, itemID: item.id) }
-            if entries.contains(where: { $0.account == identity && $0.media.libraryItemID == item.id && $0.media.episodeID == episode?.id }) { presented = true; return }
-            let progress = user.mediaProgress.first { $0.libraryItemId == item.id && $0.episodeId == episode?.id }
-            let duration = tracks.map { $0.startOffset + $0.duration }.max()!
-            let media = ListeningMedia(itemID: item.id, episodeID: episode?.id, title: selected?.title ?? item.title, author: item.author, mediaType: item.mediaType, duration: duration, startTime: progress?.currentTime ?? 0)
-            let entry = Entry(id: UUID().uuidString, account: identity, media: media, tracks: tracks, chapters: selected?.chapters ?? detail.media.chapters ?? [], serverPosition: progress?.currentTime ?? 0, serverUpdatedAt: progress?.lastUpdate ?? 0, generation: UUID().uuidString, finished: [], state: .queued, error: nil)
+            if let index = entries.firstIndex(where: { $0.account == identity && $0.media.libraryItemID == item.id && $0.media.episodeID == episode?.id && $0.supplementaryID == supplementaryID }) {
+                if entries[index].ebook == nil, let ebook {
+                    _ = try downloadURL(path: "/api/items/" + item.id + "/file/" + ebook.ino, account: identity, itemID: item.id)
+                    var next = entries
+                    let oldGeneration = next[index].generation
+                    next[index].ebook = ebook; next[index].generation = UUID().uuidString
+                    next[index].readingProgress = progress
+                    next[index].state = .queued; next[index].error = nil
+                    try save(next)
+                    for (key, task) in tasks where key.hasPrefix(next[index].id + ":" + oldGeneration + ":") { task.cancel() }
+                    refresh()
+                }
+                presented = true
+                return
+            }
+            if let ebook { _ = try downloadURL(path: "/api/items/" + item.id + "/file/" + ebook.ino, account: identity, itemID: item.id) }
+            let duration = tracks.map { $0.startOffset + $0.duration }.max() ?? 0
+            let media = ListeningMedia(itemID: item.id, episodeID: episode?.id, title: attachment?.metadata?.filename ?? selected?.title ?? item.title, author: item.author, mediaType: item.mediaType, duration: duration, startTime: progress?.currentTime ?? 0)
+            let entry = Entry(id: UUID().uuidString, account: identity, media: media, tracks: tracks, chapters: supplementaryID == nil ? (selected?.chapters ?? detail.media.chapters ?? []) : [], ebook: ebook, readingProgress: progress, supplementaryID: supplementaryID, serverPosition: progress?.currentTime ?? 0, serverUpdatedAt: progress?.lastUpdate ?? 0, generation: UUID().uuidString, finished: [], state: .queued, error: nil)
             try FileManager.default.createDirectory(at: Self.directory.appendingPathComponent(entry.id), withIntermediateDirectories: true)
             try save(entries + [entry])
             refresh()
         } catch { self.error = error.localizedDescription }
     }
     private func downloadURL(_ track: AudioTrack, account: AccountIdentity, itemID: String) throws -> URL {
-        let path = track.contentUrl
+        return try downloadURL(path: track.contentUrl, account: account, itemID: itemID)
+    }
+    private func downloadURL(path: String, account: AccountIdentity, itemID: String) throws -> URL {
         let prefix = "/api/items/" + itemID + "/file/"
         guard path.hasPrefix(prefix), !path.contains("?"), !path.contains("#") else { throw APIError.unsafeMediaURL }
         let fileID = String(path.dropFirst(prefix.count))
@@ -183,6 +208,11 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         return try ServerAddress(account.server).url(path: path + "/download")
     }
     private func localFile(_ entry: Entry, _ index: Int) -> URL {
+        if index == entry.tracks.count, let ebook = entry.ebook {
+            let ext = ebook.format.trimmingCharacters(in: CharacterSet(charactersIn: "."))
+            let safe = !ext.isEmpty && ext.count <= 10 && ext.unicodeScalars.allSatisfy(CharacterSet.alphanumerics.contains) ? ext : "ebook"
+            return Self.directory.appendingPathComponent(entry.id).appendingPathComponent("ebook." + safe)
+        }
         let track = entry.tracks[index]
         let known: [String: String] = ["audio/wav": "wav", "audio/x-wav": "wav", "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/aac": "aac", "audio/flac": "flac", "audio/ogg": "ogg"]
         let raw = track.metadata?.ext ?? track.metadata?.filename.map { URL(fileURLWithPath: $0).pathExtension } ?? known[track.mimeType ?? ""] ?? "m4b"
@@ -193,7 +223,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     private func key(_ entry: Entry, _ index: Int) -> String { entry.id + ":" + entry.generation + ":" + String(index) }
     private func part(for key: String) -> (Int, Int)? {
         let parts = key.split(separator: ":")
-        guard parts.count == 3, let index = Int(parts[2]), let entry = entries.firstIndex(where: { $0.id == parts[0] && $0.generation == parts[1] }), entries[entry].tracks.indices.contains(index), entries[entry].state == .queued else { return nil }
+        guard parts.count == 3, let index = Int(parts[2]), let entry = entries.firstIndex(where: { $0.id == parts[0] && $0.generation == parts[1] }), entries[entry].parts.contains(index), entries[entry].state == .queued else { return nil }
         return (entry, index)
     }
     private func pump() async {
@@ -204,11 +234,12 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             let token = try await api.validToken()
             guard identity == account else { return }
             for entry in entries where entry.account == identity && entry.state == .queued {
-                for index in entry.tracks.indices where !entry.finished.contains(index) {
+                for index in entry.parts where !entry.finished.contains(index) {
                     let key = key(entry, index)
                     guard tasks[key] == nil else { continue }
                     if tasks.count >= 2 { return }
-                    var request = URLRequest(url: try downloadURL(entry.tracks[index], account: identity, itemID: entry.media.libraryItemID))
+                    let path = index < entry.tracks.count ? entry.tracks[index].contentUrl : "/api/items/" + entry.media.libraryItemID + "/file/" + entry.ebook!.ino
+                    var request = URLRequest(url: try downloadURL(path: path, account: identity, itemID: entry.media.libraryItemID))
                     request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
                     request.allowsCellularAccess = cellular
                     let task = session.downloadTask(with: request); task.taskDescription = key
@@ -231,7 +262,9 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             if let error { throw error }
             guard let response = task.response as? HTTPURLResponse, response.statusCode == 200, let file else { throw APIError.http((task.response as? HTTPURLResponse)?.statusCode ?? 0) }
             let type = response.mimeType?.lowercased() ?? ""
-            guard type.hasPrefix("audio/") || type == "application/octet-stream" || type == "video/mp4" else { throw Failure.invalidAudio }
+            let ebook = index == entries[entry].tracks.count && entries[entry].ebook != nil
+            let valid = ebook ? ["application/pdf", "application/epub+zip", "application/zip", "application/vnd.amazon.ebook", "application/x-mobipocket-ebook", "application/x-cbz", "application/x-cbr", "application/x-rar-compressed"].contains(type) : type.hasPrefix("audio/") || type == "video/mp4"
+            guard valid || type == "application/octet-stream" else { throw Failure.invalidContent }
             let size = try file.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
             guard size > 0, response.expectedContentLength < 0 || response.expectedContentLength == size else { throw ListeningJournal.Failure.invalidData }
             let target = localFile(entries[entry], index)
@@ -239,7 +272,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             try FileManager.default.moveItem(at: file, to: target)
             var next = entries
             if !next[entry].finished.contains(index) { next[entry].finished.append(index) }
-            if next[entry].finished.count == next[entry].tracks.count { next[entry].state = .ready }
+            if next[entry].finished.count == next[entry].parts.count { next[entry].state = .ready }
             try save(next)
         } catch {
             var next = entries; next[entry].state = .failed; next[entry].error = error.localizedDescription
@@ -273,6 +306,12 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             try save(entries.filter { $0.id != entry.id })
             try FileManager.default.removeItem(at: Self.directory.appendingPathComponent(entry.id))
         } catch { self.error = error.localizedDescription }
+    }
+    func ebookURL(_ entry: Entry) throws -> URL {
+        guard entry.account == account, entry.state == .ready, entry.ebook != nil else { throw APIError.signInRequired }
+        let file = localFile(entry, entry.tracks.count)
+        guard FileManager.default.fileExists(atPath: file.path) else { throw ListeningJournal.Failure.invalidData }
+        return file
     }
     func audio(_ entry: Entry) throws -> OfflineAudio {
         guard entry.account == account, entry.state == .ready else { throw APIError.signInRequired }

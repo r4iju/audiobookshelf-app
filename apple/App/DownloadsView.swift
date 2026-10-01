@@ -16,13 +16,13 @@ struct DownloadsView: View {
                                 Text(entry.media.title).font(.headline)
                                 Label("Available offline", systemImage: "checkmark.circle.fill").font(.caption).foregroundColor(.secondary)
                             }
-                        }.accessibilityIdentifier("offline-" + entry.media.libraryItemID)
+                        }.accessibilityIdentifier("offline-" + entry.media.libraryItemID + (entry.supplementaryID.map { "-" + $0 } ?? ""))
                     } else {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(entry.media.title).font(.headline)
                             Text(entry.error ?? entry.state.rawValue.capitalized).font(.caption).foregroundColor(.secondary)
                             if entry.state == .queued {
-                                Text("\(entry.finished.count) of \(entry.tracks.count) files saved").font(.caption)
+                                Text("\(entry.finished.count) of \(entry.parts.count) files saved").font(.caption)
                                 ProgressView(value: downloads.fraction(for: entry))
                                 Button("Cancel download") { downloads.cancel(entry) }
                             } else { Button("Retry download") { downloads.retry(entry) } }
@@ -39,6 +39,8 @@ struct DownloadsView: View {
 private struct OfflineDetails: View {
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
+    @EnvironmentObject private var readingStore: ReadingStore
+    @State private var reader: ReadingSource?
     @Environment(\.presentationMode) private var presentation
     let entry: NativeDownloads.Entry
     @State private var error: String?
@@ -49,16 +51,23 @@ private struct OfflineDetails: View {
                 Text(entry.media.title).font(.system(.largeTitle, design: .serif).bold())
                 Text(entry.media.author).foregroundColor(.secondary)
                 Label("Available offline", systemImage: "checkmark.circle.fill")
-                Button("Play offline") {
+                if let ebook = entry.ebook, ebook.format == "pdf" {
+                    Button("Read PDF") {
+                        do { reader = ReadingSource(account: entry.account, itemID: entry.media.libraryItemID, title: entry.media.title, ebook: ebook, file: try downloads.ebookURL(entry), progress: entry.readingProgress, fileID: entry.supplementaryID) }
+                        catch { self.error = error.localizedDescription }
+                    }.accessibilityIdentifier("read-downloaded-ebook")
+                }
+                if !entry.tracks.isEmpty { Button("Play offline") {
                     do {
                         let audio = try downloads.audio(entry)
                         Task { await player.startOffline(audio); if player.offlineID == entry.id { downloads.presented = false } }
                     } catch { self.error = error.localizedDescription }
-                }.font(.headline)
+                }.font(.headline) }
                 ForEach(entry.chapters) { chapter in Text(chapter.title) }
                 if let error { Text(error).foregroundColor(.red) }
                 Button("Remove download") { Task { await downloads.remove(entry, player: player); presentation.wrappedValue.dismiss() } }.foregroundColor(.red)
             }.padding(24).frame(maxWidth: 800, alignment: .leading).frame(maxWidth: .infinity)
         }.background(ShelfStyle.background).navigationTitle(entry.media.title).navigationBarTitleDisplayMode(.inline)
+            .fullScreenCover(item: $reader) { source in PDFReader(source: source, api: downloads.api, store: readingStore) }
     }
 }

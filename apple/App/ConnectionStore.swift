@@ -13,6 +13,7 @@ import Combine
     @Published var username: String
     @Published var savedConnectionsPresented = false
     @Published private(set) var savedConnections: [KeychainCredentials.Summary] = []
+    @Published private(set) var activeAccount: AccountIdentity?
     @Published var managementError: String?
     let api: APIClient
     private let vault: KeychainCredentials
@@ -96,6 +97,9 @@ import Combine
         let request = generation
         screen = .loading
         do {
+            let account = try await api.currentAccount()
+            guard request == generation else { return }
+            activeAccount = account
             let libraries = try await api.libraries()
             guard request == generation else { return }
             if let id = try vault.activeConnection()?.libraryID, let library = libraries.first(where: { $0.id == id }) {
@@ -154,6 +158,7 @@ import Combine
             do {
                 try await playback.suspendForConnectionChange()
                 try api.signOut()
+                activeAccount = nil
                 generation = UUID()
                 defaults.removeObject(forKey: "previewLibrary")
                 refreshSavedConnections()
