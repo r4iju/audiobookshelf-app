@@ -27,6 +27,7 @@ struct DownloadsView: View {
                                 ProgressView(value: downloads.fraction(for: entry))
                                 Button(l10n("Cancel download")) { NativeHaptic.impact("download"); downloads.cancel(entry) }
                             } else { Button(l10n("Retry download")) { NativeHaptic.impact("download"); Task { await downloads.retry(entry) } } }
+                            if entry.audioAvailable { NavigationLink(l10n("Play offline"), destination: OfflineDetails(entry: entry)).accessibilityIdentifier("offline-audio-" + entry.media.libraryItemID) }
                             Button(l10n("Remove download")) { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player) } }
                         }.padding(.vertical, 8)
                     }
@@ -54,7 +55,7 @@ private struct OfflineDetails: View {
                 Text(entry.media.title).font(.system(.largeTitle, design: .serif).bold())
                 Text(entry.media.author).foregroundColor(ShelfStyle.secondaryText)
                 Label(l10n("Available offline"), systemImage: "checkmark.circle.fill")
-                if let ebook = entry.ebook, ["pdf", "epub"].contains(ebook.format) {
+                if let ebook = entry.ebook, entry.ebookAvailable, ["pdf", "epub"].contains(ebook.format) {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         do { reader = ReadingSource(account: entry.account, itemID: entry.media.libraryItemID, title: entry.media.title, ebook: ebook, file: try downloads.ebookURL(entry), progress: entry.readingProgress, fileID: entry.supplementaryID) }
                         catch { self.error = error.localizedDescription }

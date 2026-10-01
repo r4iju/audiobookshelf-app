@@ -70,7 +70,7 @@ import SwiftUI
     private func nextChoice(in group: AudioGroup, downloads: NativeDownloads, player: ApplePlayback) throws -> (member: AudioGroupMember, audio: OfflineAudio?)? {
         for member in group.members where member.playable {
             let progress = user?.mediaProgress.first { $0.libraryItemId == member.libraryItemId && $0.episodeId == member.episodeId }
-            if let entry = downloads.visible.first(where: { $0.account == owner && $0.state == .ready && !$0.tracks.isEmpty && $0.supplementaryID == nil && $0.media.libraryItemID == member.libraryItemId && $0.media.episodeID == member.episodeId }) {
+            if let entry = downloads.visible.first(where: { $0.account == owner && $0.audioAvailable && $0.supplementaryID == nil && $0.media.libraryItemID == member.libraryItemId && $0.media.episodeID == member.episodeId }) {
                 let audio = try downloads.audio(entry, progress: progress)
                 let serverFinished = progress?.isFinished == true && (progress?.lastUpdate ?? 0) >= audio.serverUpdatedAt
                 if try player.hasFinishedOffline(audio, serverFinished: serverFinished) { continue }

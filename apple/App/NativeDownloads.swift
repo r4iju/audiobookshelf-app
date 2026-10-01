@@ -56,6 +56,9 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         var cellularConsent: Bool? = nil
         var networkPolicy: String? = nil
         var parts: Range<Int> { 0..<(tracks.count + (ebook == nil ? 0 : 1)) }
+        /// Every audio part is saved, even if the ebook part is still queued or failed.
+        var audioAvailable: Bool { !tracks.isEmpty && tracks.indices.allSatisfy(finished.contains) }
+        var ebookAvailable: Bool { ebook != nil && finished.contains(tracks.count) }
         let serverPosition: Double
         let serverUpdatedAt: Double
         var generation: String
@@ -430,13 +433,13 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     }
 
     func ebookURL(_ entry: Entry) throws -> URL {
-        guard entry.account == account, entry.state == .ready, entry.ebook != nil else { throw APIError.signInRequired }
+        guard entry.account == account, entry.ebookAvailable else { throw APIError.signInRequired }
         let file = localFile(entry, entry.tracks.count)
         guard FileManager.default.fileExists(atPath: file.path) else { throw ListeningJournal.Failure.invalidData }
         return file
     }
     func audio(_ entry: Entry, progress: MediaProgress? = nil) throws -> OfflineAudio {
-        guard entry.account == account, entry.state == .ready else { throw APIError.signInRequired }
+        guard entry.account == account, entry.audioAvailable else { throw APIError.signInRequired }
         let files = entry.tracks.indices.map { localFile(entry, $0) }
         guard files.allSatisfy({ FileManager.default.fileExists(atPath: $0.path) }) else { throw ListeningJournal.Failure.invalidData }
         let latest = progress.flatMap { value in
