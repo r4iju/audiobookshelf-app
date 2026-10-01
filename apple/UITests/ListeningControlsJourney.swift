@@ -1,6 +1,53 @@
 import XCTest
 
 @MainActor final class ListeningControlsJourney: NativeJourney {
+    func testTimerAdjustmentChangesActualStopAndResetKeepsOriginalDuration() async throws {
+        let app = try await openPlayer()
+        app.buttons["Sleep timer"].tap()
+        app.textFields["timer-seconds"].tap()
+        app.textFields["timer-seconds"].typeText("3")
+        app.buttons["Start timer"].tap()
+        app.buttons["Sleep timer"].tap()
+        let extend = app.buttons["Add 5 minutes"]
+        XCTAssertTrue(extend.waitForExistence(timeout: 3))
+        guard extend.exists else { return }
+        extend.tap()
+        app.navigationBars["Sleep"].buttons["Done"].tap()
+        app.buttons["resume-playback"].tap()
+        try await Task.sleep(nanoseconds: 4_000_000_000)
+        XCTAssertTrue(app.buttons["pause-playback"].exists)
+        app.buttons["Sleep timer"].tap()
+        app.buttons["Reset timer"].tap()
+        XCTAssertTrue(app.buttons["resume-playback"].waitForExistence(timeout: 7))
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Sleep in ")).firstMatch.exists)
+    }
+
+    func testResumeRewindsAfterAPauseAndCanBeDisabledPersistently() async throws {
+        let app = try await openPlayer()
+        let before = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        try await Task.sleep(nanoseconds: 11_000_000_000)
+        app.buttons["resume-playback"].tap()
+        app.buttons["pause-playback"].tap()
+        let rewound = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        XCTAssertLessThan(rewound, before)
+        app.buttons["Playback settings"].tap()
+        let rewind = app.switches["Rewind after a pause"]
+        XCTAssertTrue(rewind.waitForExistence(timeout: 3))
+        guard rewind.exists else { return }
+        rewind.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        XCTAssertEqual(rewind.value as? String, "0")
+        app.navigationBars["Settings"].buttons["Done"].tap()
+        app.terminate()
+        app.launchArguments = []
+        app.launch()
+        app.buttons["book-book-0"].tap()
+        app.buttons["play-book"].tap()
+        app.buttons["mini-player"].tap()
+        app.buttons["pause-playback"].tap()
+        app.buttons["Playback settings"].tap()
+        XCTAssertEqual(app.switches["Rewind after a pause"].value as? String, "0")
+    }
+
     func testDeletingFractionalBookmarkPreservesItsIntegerNeighbor() async throws {
         try await FixtureControl.configure("baseline")
         for (time, title) in [(6.0, "Whole second"), (6.5, "Half second")] {

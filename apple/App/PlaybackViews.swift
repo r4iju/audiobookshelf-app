@@ -174,6 +174,19 @@ struct ListeningControls: View {
                         }.buttonStyle(BorderlessButtonStyle()).disabled(player.bookmarkBusy)
                     }
                 case .sleep:
+                    if player.sleepRemaining != nil || player.sleepChapterEnd != nil {
+                        Section(header: Text("Active timer")) {
+                            if let remaining = player.sleepRemaining {
+                                Text("Sleep in " + ShelfTime.describe(remaining))
+                                Button("Add 5 minutes") { player.adjustSleepTimer(by: 300) }
+                                Button("Subtract 5 minutes") { player.adjustSleepTimer(by: -300) }
+                            } else { Text("Sleep at chapter end") }
+                            Button("Reset timer") { player.resetSleepTimer(); panel = nil }
+                            Button("Cancel timer") { player.cancelSleepTimer(); panel = nil }
+                        }
+                    }
+                    Toggle("Fade audio in the last minute", isOn: $player.fadeSleepTimer)
+                    if player.sleepRemaining != nil { Text("Audio volume: \(Int(player.audioVolume * 100))%").accessibilityIdentifier("fade-volume") }
                     Section(header: Text("Sleep after listening")) {
                         ForEach([5, 10, 15, 30, 45, 60], id: \.self) { minutes in
                             Button("\(minutes) minutes") { player.setSleepTimer(seconds: Double(minutes * 60)); panel = nil }
@@ -183,13 +196,9 @@ struct ListeningControls: View {
                             .disabled((Double(seconds) ?? 0) <= 0)
                         Button("End of chapter") { player.setChapterSleepTimer(); panel = nil }.disabled(player.currentChapter == nil)
                     }
-                    Toggle("Fade audio in the last minute", isOn: $player.fadeSleepTimer)
-                    if player.sleepRemaining != nil { Text("Audio volume: \(Int(player.audioVolume * 100))%").accessibilityIdentifier("fade-volume") }
-                    if player.sleepRemaining != nil || player.sleepChapterEnd != nil {
-                        Button("Reset timer") { player.resetSleepTimer(); panel = nil }
-                        Button("Cancel timer") { player.cancelSleepTimer(); panel = nil }
-                    }
                 case .settings:
+                    Toggle("Rewind after a pause", isOn: $player.rewindAfterPause)
+                    Toggle("Allow seeking from system media controls", isOn: $player.allowMediaSeeking)
                     Picker("Forward interval", selection: $player.forwardInterval) {
                         ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text("\(seconds) seconds").tag(seconds) }
                     }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Forward interval")

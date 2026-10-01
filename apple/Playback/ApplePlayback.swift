@@ -1,6 +1,7 @@
 import AVFoundation
 import MediaPlayer
 import SwiftUI
+import UIKit
 
 @MainActor final class ApplePlayback: ObservableObject {
     @Published private(set) var session: PlaybackSession?
@@ -35,10 +36,25 @@ import SwiftUI
     private var sleepID = UUID()
     private var sleepLength: Double?
     private var sleepTick = Date()
+    private var fadeStartPosition: Double?
+    private var pausedAt: Date?
+    private var interruptedGeneration: UUID?
+    private var playbackIntent = UUID()
+    private var audioObservers: [NSObjectProtocol] = []
+    private var nowPlayingArtwork: MPMediaItemArtwork?
+    @Published var rewindAfterPause = UserDefaults.standard.object(forKey: "previewResumeRewind") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(rewindAfterPause, forKey: "previewResumeRewind") }
+    }
+    @Published var allowMediaSeeking = UserDefaults.standard.bool(forKey: "previewMediaSeeking") {
+        didSet {
+            UserDefaults.standard.set(allowMediaSeeking, forKey: "previewMediaSeeking")
+            MPRemoteCommandCenter.shared().changePlaybackPositionCommand.isEnabled = allowMediaSeeking
+        }
+    }
     @Published var fadeSleepTimer = UserDefaults.standard.object(forKey: "previewSleepFade") as? Bool ?? true {
         didSet {
             UserDefaults.standard.set(fadeSleepTimer, forKey: "previewSleepFade")
-            if !fadeSleepTimer { player.volume = 1 }
+            if !fadeSleepTimer { player.volume = 1; fadeStartPosition = nil }
         }
     }
     var currentChapter: Chapter? {
@@ -99,6 +115,20 @@ import SwiftUI
         commandTargets.append((commands.pauseCommand, commands.pauseCommand.addTarget { [weak self] _ in
             Task { @MainActor in self?.pause() }; return .success
         }))
+        commandTargets.append((commands.togglePlayPauseCommand, commands.togglePlayPauseCommand.addTarget { [weak self] _ in
+            Task { @MainActor in self?.toggle() }; return .success
+        }))
+        commands.changePlaybackPositionCommand.isEnabled = allowMediaSeeking
+        commandTargets.append((commands.changePlaybackPositionCommand, commands.changePlaybackPositionCommand.addTarget { [weak self] event in
+            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+            let position = event.positionTime
+            Task { @MainActor in
+                guard let self, self.allowMediaSeeking else { return }
+                do { try await self.seek(to: position, autoplay: self.wantsPlayback) } catch { self.failed(error) }
+            }
+            return .success
+        }))
+        observeAudioSession()
         updateSkipCommands()
         commandTargets.append((commands.skipForwardCommand, commands.skipForwardCommand.addTarget { [weak self] _ in
             Task { @MainActor in guard let self else { return }; await self.skip(Double(self.forwardInterval)) }; return .success
@@ -139,6 +169,9 @@ import SwiftUI
                 return
             }
             session = result
+            pausedAt = nil
+            interruptedGeneration = nil
+            nowPlayingArtwork = nil
             currentTime = result.currentTime
             generation = UUID()
             itemID = item.id
@@ -147,6 +180,12 @@ import SwiftUI
             listeningID = try await listening.begin(media: ListeningMedia(item: item, episode: episode, session: result), deviceID: deviceID)
             lastTick = Date(); lastSync = Date()
             try await seek(to: result.currentTime, autoplay: wantsPlayback)
+            Task { @MainActor [weak self] in
+                guard let self, let data = try? await self.api.coverData(itemID: item.id),
+                      self.session?.id == result.id, let image = UIImage(data: data) else { return }
+                self.nowPlayingArtwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+                self.updateNowPlaying()
+            }
         } catch {
             guard preparationID == preparation else { return }
             wantsPlayback = false
@@ -156,10 +195,14 @@ import SwiftUI
 
     func toggle() { if wantsPlayback { pause() } else { resume() } }
     func resume() {
+        playbackIntent = UUID()
+        let pausedDuration = pausedAt.map { Date().timeIntervalSince($0) } ?? 0
+        let rewind: Double = !rewindAfterPause || pausedDuration < 10 ? 0 : pausedDuration < 60 ? 3 : pausedDuration < 300 ? 10 : pausedDuration < 1800 ? 20 : 30
+        pausedAt = nil
         wantsPlayback = true
         guard let session, !seeking, !closing, player.currentItem != nil else { return }
-        if currentTime >= session.duration - 0.1 || session.position(at: currentTime)?.trackIndex != trackIndex {
-            let target = currentTime >= session.duration - 0.1 ? 0 : currentTime
+        if rewind > 0 || currentTime >= session.duration - 0.1 || session.position(at: currentTime)?.trackIndex != trackIndex {
+            let target = currentTime >= session.duration - 0.1 ? 0 : max(0, currentTime - rewind)
             Task { do { try await seek(to: target, autoplay: wantsPlayback) } catch { failed(error) } }
         } else {
             lastTick = Date()
@@ -168,6 +211,9 @@ import SwiftUI
         }
     }
     func pause() {
+        playbackIntent = UUID()
+        if wantsPlayback { pausedAt = Date() }
+        interruptedGeneration = nil
         wantsPlayback = false
         tick(player.currentTime())
         player.pause()
@@ -194,6 +240,7 @@ import SwiftUI
     }
     func seek(to time: Double, autoplay: Bool) async throws {
         guard !closing, let session, session.position(at: time) != nil else { return }
+        playbackIntent = UUID()
         wantsPlayback = autoplay
         pendingSeek = SeekRequest(time: min(max(time.isFinite ? time : 0, 0), session.duration), generation: generation)
         if let seekLoop { return try await seekLoop.value }
@@ -358,6 +405,8 @@ import SwiftUI
     }
 
     func stop() async throws {
+        playbackIntent = UUID()
+        interruptedGeneration = nil
         wantsPlayback = false
         cancelSleepTimer()
         try await closeCurrentSession()
@@ -366,6 +415,9 @@ import SwiftUI
     func suspendForConnectionChange() async throws {
         guard !closing else { throw CancellationError() }
         wantsPlayback = false
+        playbackIntent = UUID()
+        interruptedGeneration = nil
+        pausedAt = nil
         cancelSleepTimer()
         tick(player.currentTime())
         closing = true
@@ -393,6 +445,9 @@ import SwiftUI
     }
 
     private func closeCurrentSession() async throws {
+        playbackIntent = UUID()
+        interruptedGeneration = nil
+        pausedAt = nil
         cancelSleepTimer()
         tick(player.currentTime())
         closing = true
@@ -431,13 +486,56 @@ import SwiftUI
 
     private func updateNowPlaying() {
         guard let session else { return }
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = [
+        var information: [String: Any] = [
             MPMediaItemPropertyTitle: title,
             MPMediaItemPropertyArtist: author,
             MPMediaItemPropertyPlaybackDuration: session.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
             MPNowPlayingInfoPropertyPlaybackRate: playing ? speed : 0
         ]
+        if let nowPlayingArtwork { information[MPMediaItemPropertyArtwork] = nowPlayingArtwork }
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = information
+    }
+
+    private func observeAudioSession() {
+        let center = NotificationCenter.default
+        audioObservers.append(center.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] notification in
+            let type = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
+            let options = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
+            var reason: UInt?
+            if #available(iOS 14.5, tvOS 14.5, *) {
+                reason = notification.userInfo?[AVAudioSessionInterruptionReasonKey] as? UInt
+            }
+            Task { @MainActor in
+                guard let self, let type, let interruption = AVAudioSession.InterruptionType(rawValue: type) else { return }
+                if interruption == .began {
+                    var suspended = false
+                    if #available(iOS 14.5, tvOS 14.5, *) {
+                        suspended = reason == AVAudioSession.InterruptionReason.appWasSuspended.rawValue
+                    }
+                    let resumeGeneration = self.wantsPlayback && !suspended ? self.generation : nil
+                    self.pause()
+                    self.interruptedGeneration = resumeGeneration
+                } else {
+                    let resumeGeneration = self.interruptedGeneration
+                    self.interruptedGeneration = nil
+                    guard resumeGeneration == self.generation,
+                          AVAudioSession.InterruptionOptions(rawValue: options).contains(.shouldResume), self.session != nil else { return }
+                    let intent = self.playbackIntent
+                    do {
+                        try await Self.activateAudioSession()
+                        guard resumeGeneration == self.generation, intent == self.playbackIntent, !self.wantsPlayback else { return }
+                        self.resume()
+                    } catch { self.failed(error) }
+                }
+            }
+        })
+        audioObservers.append(center.addObserver(forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main) { [weak self] notification in
+            let reason = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt
+            Task { @MainActor in
+                if reason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue { self?.pause() }
+            }
+        })
     }
 
     func loadBookmarks() async {
@@ -491,7 +589,10 @@ import SwiftUI
                 guard self.player.timeControlStatus == .playing else { continue }
                 let updated = max(0, remaining - max(elapsed, 0))
                 self.sleepRemaining = updated
-                if self.fadeSleepTimer { self.player.volume = Float(min(updated / 60, 1)) }
+                if self.fadeSleepTimer, updated < 60 {
+                    if self.fadeStartPosition == nil { self.fadeStartPosition = self.currentTime }
+                    self.player.volume = Float(min(updated / 60, 1))
+                }
                 if updated <= 0 { self.endSleepTimer(); return }
             }
         }
@@ -509,12 +610,21 @@ import SwiftUI
         else if sleepChapterEnd != nil { setChapterSleepTimer() }
     }
 
+    func adjustSleepTimer(by seconds: Double) {
+        guard seconds.isFinite, let remaining = sleepRemaining else { return }
+        sleepRemaining = max(0, remaining + seconds)
+        sleepTick = Date()
+        if sleepRemaining == 0 { endSleepTimer() }
+        else if (sleepRemaining ?? 0) >= 60 { player.volume = 1; fadeStartPosition = nil }
+    }
+
     func cancelSleepTimer() {
         sleepID = UUID()
         sleepTask?.cancel(); sleepTask = nil
         if let sleepBoundary { player.removeTimeObserver(sleepBoundary) }
         sleepBoundary = nil
         sleepRemaining = nil; sleepChapterEnd = nil; sleepLength = nil
+        fadeStartPosition = nil
         player.volume = 1
     }
 
@@ -537,7 +647,16 @@ import SwiftUI
     }
 
     private func endSleepTimer() {
+        let rewindPosition = fadeStartPosition
+        let timerGeneration = generation
         pause()
         cancelSleepTimer()
+        let stoppedIntent = playbackIntent
+        if let rewindPosition {
+            Task {
+                guard generation == timerGeneration, playbackIntent == stoppedIntent, !wantsPlayback else { return }
+                do { try await seek(to: rewindPosition, autoplay: false) } catch { failed(error) }
+            }
+        }
     }
 }
