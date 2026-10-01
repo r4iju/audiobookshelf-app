@@ -37,7 +37,12 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
     var confirming by remember { mutableStateOf(false) }
     val finished = progress?.isFinished == true
     val resets by graph.resets.requested.collectAsState()
-    val discarding = resets.any { it.matches(active.client.account, itemId, episodeId) }
+    val reset = resets.firstOrNull { it.matches(active.client.account, itemId, episodeId) }
+    val discarding = reset != null
+    val unanswered by graph.publications.attempts.collectAsState()
+    val unreadable by graph.publications.unreadable.collectAsState()
+    val uncertain = discarding && (unreadable || unanswered.any { it.holds(active.client.account, itemId, episodeId) })
+    var confirmingAnyway by remember { mutableStateOf(false) }
     var wasDiscarding by remember { mutableStateOf(false) }
     // A discard completed in the background removes the progress shown here too.
     LaunchedEffect(discarding) {
@@ -58,14 +63,21 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
         OutlinedButton(
             onClick = {
                 run {
-                    val saved = active.client.setFinished(itemId, episodeId, !finished)
+                    val saved = graph.setFinished(active.client, itemId, episodeId, !finished)
                     catalog.applyProgress(saved ?: MediaProgress(libraryItemId = itemId, episodeId = episodeId, isFinished = !finished, progress = if (finished) 0.0 else 1.0))
                 }
             },
             enabled = !saving && !discarding,
             modifier = Modifier.fillMaxWidth().testTag(if (finished) "$tagPrefix-unfinish" else "$tagPrefix-finish"),
         ) { Text(if (finished) "Mark unfinished" else "Mark finished") }
-        if (discarding) {
+        if (uncertain) {
+            Text("An earlier save of this title's progress got no answer and may still reach your server. If it arrives after the discard, it brings the progress back. Your server cannot tell this app whether it will.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("discard-uncertain"))
+            if (!unreadable) TextButton(onClick = { confirmingAnyway = true }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("discard-anyway")) { Text("Discard anyway") }
+            if (reset?.observed == false) TextButton(onClick = {
+                run { if (!graph.resolveUncertainDiscard(active.client, itemId, episodeId, discard = false)) error = "This discard is already under way and cannot be withdrawn." }
+            }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("keep-progress")) { Text("Keep progress") }
+        } else if (discarding) {
             Text("Discarding progress. This finishes once your server can be reached and this title's listening is sent.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("discard-pending"))
         } else if (progress != null) {
@@ -73,6 +85,18 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
         }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
     }
+    if (confirmingAnyway) AlertDialog(
+        onDismissRequest = { confirmingAnyway = false },
+        title = { Text("Discard anyway?") },
+        text = { Text("The progress is removed now. If the earlier save reaches your server afterwards, this title's progress comes back and you can discard it again.") },
+        confirmButton = {
+            TextButton(onClick = {
+                confirmingAnyway = false
+                run { graph.resolveUncertainDiscard(active.client, itemId, episodeId, discard = true) }
+            }, modifier = Modifier.testTag("confirm-discard-anyway")) { Text("Discard") }
+        },
+        dismissButton = { TextButton(onClick = { confirmingAnyway = false }) { Text("Cancel") } },
+    )
     if (confirming) AlertDialog(
         onDismissRequest = { confirming = false },
         title = { Text("Discard progress?") },

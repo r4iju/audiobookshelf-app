@@ -287,6 +287,8 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
     val unreadableResets by graph.resets.unreadable.collectAsState()
     var resolving by remember { mutableStateOf(false) }
     var resolveError by remember { mutableStateOf<String?>(null) }
+    val unreadableWrites by graph.publications.unreadable.collectAsState()
+    var settingAside by remember { mutableStateOf(false) }
     LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("diagnostics"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (unreadableResets) item {
             Column(Modifier.testTag("unreadable-resets"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -295,6 +297,14 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
                     style = MaterialTheme.typography.bodyMedium)
                 TextButton(onClick = { resolving = true }, modifier = Modifier.testTag("resolve-unreadable-resets")) { Text("Set them aside") }
                 resolveError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            }
+        }
+        if (unreadableWrites) item {
+            Column(Modifier.testTag("unreadable-writes"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Records of unanswered progress saves could not be read", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+                Text("A save of any title may still reach your server, so no listening or reading is sent and no progress is discarded until you decide. Setting them aside keeps the file on this device; a late save may then bring back progress you discard.",
+                    style = MaterialTheme.typography.bodyMedium)
+                TextButton(onClick = { settingAside = true }, modifier = Modifier.testTag("resolve-unreadable-writes")) { Text("Set them aside") }
             }
         }
         item {
@@ -320,6 +330,19 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
             HorizontalDivider(Modifier.padding(top = 8.dp))
         }
     }
+    if (settingAside) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { settingAside = false },
+        title = { Text("Set unreadable records aside?") },
+        text = { Text("Listening and reading positions are sent again and discards can go ahead.") },
+        confirmButton = {
+            TextButton(onClick = {
+                settingAside = false
+                runCatching { graph.publications.setAsideUnreadable(); graph.progressSync.publishAll(); graph.readingSync.publishAll(); graph.completeResets() }
+                    .onFailure { resolveError = it.message ?: "Could not be set aside. Try again." }
+            }, modifier = Modifier.testTag("confirm-resolve-unreadable-writes")) { Text("Set aside") }
+        },
+        dismissButton = { TextButton(onClick = { settingAside = false }) { Text("Cancel") } },
+    )
     if (resolving) androidx.compose.material3.AlertDialog(
         onDismissRequest = { resolving = false },
         title = { Text("Set unreadable discards aside?") },

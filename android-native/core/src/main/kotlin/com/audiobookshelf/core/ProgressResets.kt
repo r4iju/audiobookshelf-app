@@ -82,6 +82,19 @@ class ProgressResets(
     fun pendingAccounts(): Set<AccountIdentity> = state.value.map { it.account }.toSet()
 
     /**
+     * Withdraws a reset nothing has been done for yet, at the user's request; false, keeping it, once
+     * the server progress was looked at, since this device may already have forgotten the title.
+     */
+    @Synchronized
+    fun withdraw(account: AccountIdentity, itemId: String, episodeId: String?): Boolean {
+        if (unreadableState.value) return false
+        val reset = state.value.firstOrNull { it.matches(account, itemId, episodeId) } ?: return true
+        if (reset.observed) return false
+        commit(state.value - reset)
+        return true
+    }
+
+    /**
      * Gives up the unreadable resets at the user's explicit request. The file is kept beside the
      * new one for recovery; titles play and publish again, and progress they were to discard stays.
      */
@@ -107,7 +120,7 @@ class ProgressResets(
     private suspend fun finish(remote: ProgressRemote, requested: Reset) {
         val server = remote.progress(requested.itemId, requested.episodeId)
         val reset = if (requested.observed) requested else
-            requested.copy(observed = true, progressId = server?.id, seenLastUpdate = server?.lastUpdate).also { replace(requested, it) }
+            requested.copy(observed = true, progressId = server?.id, seenLastUpdate = server?.lastUpdate).also { if (!replace(requested, it)) return }
         cleanup(reset, reset.resetAt)
         // Progress updated after the first look was made after the reset, for example by another
         // device while this one had not yet learned that its delete succeeded.
@@ -122,8 +135,13 @@ class ProgressResets(
         synchronized(this) { commit(state.value.filterNot { it.matches(reset.account, reset.itemId, reset.episodeId) }) }
     }
 
+    /** False when [old] is no longer requested, having been withdrawn meanwhile. */
     @Synchronized
-    private fun replace(old: Reset, new: Reset) = commit(state.value.map { if (it == old) new else it })
+    private fun replace(old: Reset, new: Reset): Boolean {
+        if (old !in state.value) return false
+        commit(state.value.map { if (it == old) new else it })
+        return true
+    }
 
     private fun commit(next: List<Reset>) {
         writeAtomically(file, AbsJson.encodeToString(Document.serializer(), Document(resets = next)).toByteArray())

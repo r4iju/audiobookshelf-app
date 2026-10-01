@@ -85,4 +85,24 @@ class ApiClientTest {
         val failure = runCatching { client.libraries() }.exceptionOrNull()
         assertTrue("$failure", failure is ApiError.Offline)
     }
+
+    @Test
+    fun aWriteWhoseConnectionDropsIsNotSentAgainBehindTheCallersBack() = runBlocking {
+        val writes = AtomicInteger()
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                if (request.method == "GET") return MockResponse().setBody("""{"libraries":[]}""")
+                // The first write is received, then its connection drops before any answer.
+                return if (writes.incrementAndGet() == 1) MockResponse().setSocketPolicy(okhttp3.mockwebserver.SocketPolicy.DISCONNECT_AFTER_REQUEST)
+                else MockResponse().setBody("""{"results":[{"id":"s1","success":true}]}""")
+            }
+        }
+        server.start()
+        val address = ServerAddress.parse(server.url("/abs").toString())
+        val client = ApiClient(OkHttpClient(), Credentials(address.canonical, "u1", "qa", "fresh", "refresh"), { _, _ -> }, DeviceInfo("device"))
+        client.libraries()
+        val outcome = runCatching { client.syncLocal(listOf(kotlinx.serialization.json.buildJsonObject { put("id", kotlinx.serialization.json.JsonPrimitive("s1")) })) }
+        assertTrue("The caller must learn that the answer was lost, got $outcome", outcome.isFailure)
+        assertEquals("Sent once; the server may still apply it", 1, writes.get())
+    }
 }

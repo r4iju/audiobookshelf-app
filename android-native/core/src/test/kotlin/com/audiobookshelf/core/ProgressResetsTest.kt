@@ -110,4 +110,22 @@ class ProgressResetsTest {
         // A restart reads the same file and still holds every title.
         assertTrue(resets(mapOf(qa to server)).pending(qa, "book-0", null))
     }
+
+    @Test
+    fun aDiscardNothingWasDoneForCanBeWithdrawnButOneUnderWayCannot() = runBlocking {
+        val server = Server(MediaProgress(id = "p1", libraryItemId = "book-0", currentTime = 10.0, lastUpdate = 2_000.0))
+        val file = folder.root.resolve("resets.json")
+        val held = ProgressResets(file, remoteFor = { server }, exclusive = { _, _ -> false }, cleanup = { _, _ -> })
+        held.request(qa, "book-0", null, now = 5_000)
+        held.complete(qa)
+        assertTrue(held.withdraw(qa, "book-0", null))
+        assertFalse(ProgressResets(file, remoteFor = { server }, exclusive = { _, _ -> false }, cleanup = { _, _ -> }).pending(qa, "book-0", null))
+
+        val underWay = ProgressResets(file, remoteFor = { server }, exclusive = { _, block -> block(); true }, cleanup = { _, _ -> throw IOException("storage") })
+        underWay.request(qa, "book-0", null, now = 6_000)
+        runCatching { underWay.complete(qa) }
+        assertFalse("Its cleanup on this device has begun", underWay.withdraw(qa, "book-0", null))
+        assertTrue(underWay.pending(qa, "book-0", null))
+        assertEquals(listOf<String>(), server.removed)
+    }
 }

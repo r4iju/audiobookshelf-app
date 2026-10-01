@@ -249,8 +249,14 @@ class ApiClient(
             val payload = body?.toString()?.toRequestBody(JsonType)
             val request = Request.Builder().url(address.url(path, query)).header("Authorization", "Bearer $token")
                 .method(method, payload ?: if (method == "GET" || method == "DELETE") null else ByteArray(0).toRequestBody(JsonType)).build()
-            http.execute(request)
+            (if (method == "GET") http else writes).execute(request)
         }
+
+    /**
+     * OkHttp sends a request again by itself when a reused connection fails, even after the request
+     * was written. For a write that hides a lost answer while the server may still apply the original.
+     */
+    private val writes by lazy { http.newBuilder().retryOnConnectionFailure(false).build() }
 
     private suspend fun <T> authorized(path: String, call: suspend (String) -> T): T {
         val used = bearer()

@@ -503,9 +503,9 @@ class PlaybackEngine(
      * Runs [block] once the title's listening is on the server, with no reading write under way and no
      * title starting until it returns. False, running nothing, while that listening is not yet sent.
      */
-    suspend fun excludingTitle(account: AccountIdentity, itemId: String, episodeId: String?, block: suspend () -> Unit): Boolean =
+    suspend fun excludingTitle(account: AccountIdentity, itemId: String, episodeId: String?, ready: () -> Boolean = { true }, block: suspend () -> Unit): Boolean =
         readingPublication.withLock {
-            if (!settleListening(account, itemId, episodeId)) return@withLock false
+            if (!settleListening(account, itemId, episodeId) || !ready()) return@withLock false
             withContext(NonCancellable) { block() }
             true
         }

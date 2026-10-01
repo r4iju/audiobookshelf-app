@@ -44,9 +44,16 @@ class AppGraph private constructor(val context: Context) {
 
     /** Serializes journal file writes off the main thread, preserving their order. */
     val io = kotlinx.coroutines.Dispatchers.IO.limitedParallelism(1)
-    val journal: ListeningJournal by lazy { openJournal(File(context.filesDir, "listening-journal.json")) }
+    /** Progress writes that may still be applied by the server; see [com.audiobookshelf.core.PublicationLedger]. */
+    val publications by lazy { com.audiobookshelf.core.PublicationLedger(File(context.filesDir, "publication-ledger.json")) }
+    val journal: ListeningJournal by lazy {
+        openJournal(File(context.filesDir, "listening-journal.json")).also { journal ->
+            // Listening that was out when the process ended is kept as it was sent.
+            publications.attempts.value.flatMap { it.listening }.forEach(journal::freeze)
+        }
+    }
     val progressSync by lazy {
-        ProgressSync(scope, journal, accounts, io, diagnostics::record).also { sync ->
+        ProgressSync(scope, journal, accounts, io, publications, diagnostics::record).also { sync ->
             context.getSystemService(ConnectivityManager::class.java)?.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) = sync.publishAll()
             })
@@ -76,7 +83,10 @@ class AppGraph private constructor(val context: Context) {
             accounts.clientFor(account)?.let { client ->
                 object : com.audiobookshelf.android.reader.ReadingRemote {
                     override suspend fun progress(itemId: String) = client.progress(itemId, null)
-                    override suspend fun save(itemId: String, location: String, progress: Double) = client.saveEbookProgress(itemId, location, progress)
+                    override suspend fun save(itemId: String, location: String, progress: Double) =
+                        publications.publish(account, com.audiobookshelf.core.PublicationLedger.Kind.READING, listOf(com.audiobookshelf.core.PublicationLedger.Title(itemId, null))) {
+                            client.saveEbookProgress(itemId, location, progress)
+                        }
                 }
             }
         }, onSignInRequired = accounts::handle, report = diagnostics::record,
@@ -98,7 +108,10 @@ class AppGraph private constructor(val context: Context) {
                     override suspend fun remove(progressId: String) = client.removeProgress(progressId)
                 }
             }
-        }, exclusive = { reset, block -> playback.excludingTitle(reset.account, reset.itemId, reset.episodeId, block) },
+        }, exclusive = { reset, block ->
+            // An earlier write that may still land would bring the progress back after the delete.
+            playback.excludingTitle(reset.account, reset.itemId, reset.episodeId, ready = { !publications.uncertain(reset.account, reset.itemId, reset.episodeId) }, block)
+        },
             cleanup = { reset, at ->
                 journal.resetPosition(reset.account, reset.itemId, reset.episodeId, at)
                 if (reset.episodeId == null) reading.forget(reset.account, reset.itemId)
@@ -145,6 +158,24 @@ class AppGraph private constructor(val context: Context) {
             resetBackoffMs = (resetBackoffMs * 2).coerceAtMost(60_000L)
             resetRetry = scope.launch { kotlinx.coroutines.delay(wait); resetRetry = null; completeResets() }
         }
+    }
+
+    /** Marks a title finished or not; the write is recorded so a discard cannot be overtaken by it. */
+    suspend fun setFinished(client: ApiClient, itemId: String, episodeId: String?, finished: Boolean) =
+        publications.publish(client.account, com.audiobookshelf.core.PublicationLedger.Kind.FINISHED, listOf(com.audiobookshelf.core.PublicationLedger.Title(itemId, episodeId))) {
+            client.setFinished(itemId, episodeId, finished)
+        }
+
+    /**
+     * The user's choice to discard a title's progress although an earlier write for it went
+     * unanswered and may still reach the server, or to keep the progress instead.
+     */
+    suspend fun resolveUncertainDiscard(client: ApiClient, itemId: String, episodeId: String?, discard: Boolean): Boolean {
+        val account = client.account
+        if (!discard) return kotlinx.coroutines.withContext(io) { resets.withdraw(account, itemId, episodeId) }
+        kotlinx.coroutines.withContext(io) { publications.accept(account, itemId, episodeId) }
+        completeResets()
+        return true
     }
 
     /**

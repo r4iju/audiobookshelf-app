@@ -9,9 +9,13 @@ import copy
 import io
 import json
 import re
+import socket
 import ssl
 import sys
+import threading
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -26,6 +30,9 @@ def android_server(port, prefix, bind='127.0.0.1'):
     # ordering is observable with a document present. Any reconfiguration accepts listening again.
     refusal = {'listening': False, 'reading': False}
     discard_delay = {'seconds': 0}
+    # A write whose answer never reaches the client while the server applies it later, as when a
+    # server handler is still waiting on its database after the client's connection has failed.
+    late = {'armed': {}, 'applied': []}
     # The shared fixture reconfigures progress entries it assumes exist, and keeps progress and
     # bookmarks one journey class added for the next. Reconfiguring restores the titles that had
     # progress at startup, drops progress added since and clears bookmarks, so classes pass alone and
@@ -118,6 +125,36 @@ def android_server(port, prefix, bind='127.0.0.1'):
         def body(self):
             return json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
 
+        def hold_late(self, kind, body):
+            """Drops the connection without an answer and applies the same request later; true when held."""
+            seconds = late['armed'].pop(kind, None)
+            if seconds is None:
+                return False
+            self.route()
+            self.observed_request['heldLate'] = True
+            scheme = 'https' if isinstance(self.connection, ssl.SSLSocket) else 'http'
+            url = f"{scheme}://127.0.0.1:{self.server.server_port}{self.path}"
+            headers = {key: value for key, value in self.headers.items() if key.lower() in ('authorization', 'content-type')}
+            method = self.command
+
+            def apply():
+                time.sleep(seconds)
+                request = urllib.request.Request(url, data=body, headers=headers, method=method)
+                context = ssl._create_unverified_context() if scheme == 'https' else None
+                try:
+                    with urllib.request.urlopen(request, context=context) as response:
+                        status = response.status
+                except urllib.error.HTTPError as failure:
+                    status = failure.code
+                late['applied'].append({'kind': kind, 'status': status, 'at': int(time.time() * 1000)})
+            threading.Thread(target=apply, daemon=True).start()
+            self.close_connection = True
+            try:
+                self.connection.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+            return True
+
         def do_GET(self):
             # Handlers are reused across keep-alive requests, so the marker is cleared for each one.
             self.feed_item = None
@@ -181,10 +218,14 @@ def android_server(port, prefix, bind='127.0.0.1'):
                     self.identify_progress()
                     self.account['mediaProgress'] = list(self.progress.values())
                     return self.respond(200, current)
+                if 'ebookLocation' in data and self.hold_late('reading', body):
+                    return
                 if refusal['reading'] and 'ebookLocation' in data:
                     self.route()
                     self.observed_request.update(ebookLocation=data['ebookLocation'], applied=False)
-                    return self.respond(503, {})
+                    # Answered by the server itself, so the client knows the write was not applied;
+                    # a 503 could also come from a proxy that had already forwarded it.
+                    return self.respond(500, {})
                 self.rfile = io.BytesIO(body)
             super().do_PATCH()
 
@@ -245,6 +286,19 @@ def android_server(port, prefix, bind='127.0.0.1'):
                     return self.respond(404, {})
                 del actions['feeds'][item_id]
                 return self.respond(200, {})
+            if path == '/__android__/hold-late':
+                data = self.body()
+                late['armed'][data['kind']] = float(data.get('seconds', 10))
+                self.route()
+                return self.respond(200, {})
+            if path == '/__android__/late-applied':
+                self.rfile.read(int(self.headers.get('Content-Length', 0)))
+                self.route()
+                return self.respond(200, {'applied': late['applied']})
+            if path == '/api/session/local-all' and 'local-all' in late['armed']:
+                body = self.rfile.read(int(self.headers.get('Content-Length', 0)))
+                if self.hold_late('local-all', body):
+                    return
             if path == '/__android__/slow-discard':
                 discard_delay['seconds'] = float(self.body().get('seconds', 0))
                 self.route()
@@ -269,6 +323,8 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 refusal['listening'] = False
                 refusal['reading'] = False
                 discard_delay['seconds'] = 0
+                late['armed'].clear()
+                late['applied'].clear()
                 ebook_format['format'] = None
                 for probe, entries, original in zip(probes, accounts, originals):
                     for key in [key for key in entries if key not in original]:
@@ -280,7 +336,7 @@ def android_server(port, prefix, bind='127.0.0.1'):
             if path == '/api/session/local-all' and refusal['listening']:
                 self.rfile.read(int(self.headers.get('Content-Length', 0)))
                 self.route()
-                return self.respond(503, {})
+                return self.respond(500, {})
             super().do_POST()
 
         def do_DELETE(self):

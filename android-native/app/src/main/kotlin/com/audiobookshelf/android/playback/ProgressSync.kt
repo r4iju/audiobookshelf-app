@@ -5,6 +5,7 @@ import com.audiobookshelf.android.data.AccountStore
 import com.audiobookshelf.core.AccountIdentity
 import com.audiobookshelf.core.ApiError
 import com.audiobookshelf.core.ListeningJournal
+import com.audiobookshelf.core.PublicationLedger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -20,13 +21,16 @@ import kotlinx.coroutines.withContext
 
 /**
  * Publishes journaled listening through `/api/session/local-all`. Each record is an absolute total
- * for a stable session ID, so a retry after a lost acknowledgment cannot double count.
+ * for a stable session ID, so a retry after a lost acknowledgment cannot double count. A write left
+ * without an answer may still be applied after any later one, so its sessions are frozen as sent
+ * and later listening goes to new sessions ([ListeningJournal.freeze]).
  */
 class ProgressSync(
     private val scope: CoroutineScope,
     private val journal: ListeningJournal,
     private val accounts: AccountStore,
     private val io: CoroutineDispatcher,
+    private val publications: PublicationLedger,
     private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
 ) {
     private val lock = Mutex()
@@ -59,16 +63,29 @@ class ProgressSync(
 
     suspend fun publish(account: AccountIdentity): Boolean = lock.withLock {
         val client = accounts.clientFor(account) ?: return@withLock false
-        val pending = withContext(io) { journal.pending(account) }
+        val pending = try {
+            withContext(io) {
+                // Sessions sent without an answer stay as sent, also when freezing them failed before.
+                publications.attempts.value.flatMap { it.listening }.filter { it.account == account }.forEach(journal::freeze)
+                journal.pending(account)
+            }
+        } catch (failure: Exception) {
+            report(com.audiobookshelf.android.data.Diagnostics.Area.SYNC, "Listening could not be prepared for sending; it is kept and retried", failure)
+            failing.value = true
+            scheduleRetry()
+            return@withLock false
+        }
         if (pending.isEmpty()) return@withLock true
         try {
-            val acknowledged = client.syncLocal(pending.map { it.payload() })
+            val titles = pending.map { PublicationLedger.Title(it.media.libraryItemId, it.media.episodeId) }
+            val acknowledged = publications.publish(account, PublicationLedger.Kind.LISTENING, titles, pending) { client.syncLocal(pending.map { it.payload() }) }
             withContext(io) { pending.filter { it.id in acknowledged }.forEach(journal::acknowledge) }
             if (acknowledged.isNotEmpty()) acknowledgedFor.tryEmit(account)
             failing.value = acknowledged.size < pending.size
             if (failing.value) scheduleRetry() else backoffMs = FIRST_RETRY_MS
             !failing.value
         } catch (failure: Exception) {
+            if (failure !is PublicationLedger.Unreadable && PublicationLedger.mayStillApply(failure)) withContext(io) { runCatching { pending.forEach(journal::freeze) } }
             Log.i("AbsProgress", "Listening kept for retry: ${failure.javaClass.simpleName}")
             report(com.audiobookshelf.android.data.Diagnostics.Area.SYNC, "Listening could not be sent to ${account.server}; it is kept and retried", failure)
             failing.value = true

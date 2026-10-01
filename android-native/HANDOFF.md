@@ -114,7 +114,34 @@ Evidence for 13ca2ed5121f9c3b50d5fbb4b901882bc2ef66b2:
 - **Regression:** Playback, Settings, Browse and Podcast journeys pass 17 of 17; unit tests pass.
 - **Not verified:** a physical car or the Desktop Head Unit. The MediaBrowser contract is checked on the emulator only.
 
-## Evidence for 2b3227dc (emulator and fixture only)
+## Writes whose answer was lost (publication uncertainty)
+
+Server 2.30 neither orders requests for one session or title nor says whether an earlier request has finished. Only the answer to a request shows that its handler is done. A retry being answered, a fresh GET, a timeout or the client coroutine ending does not.
+
+| Defect | Fix | RED observed before the fix |
+| --- | --- | --- |
+| OkHttp silently sent a POST or PATCH again when a reused connection dropped after the request was written, so the app saw success and never learned the original might still land | Non-GET requests use a client derived with `retryOnConnectionFailure(false)` | `ApiClientTest.aWriteWhoseConnectionDropsIsNotSentAgainBehindTheCallersBack`: the write was sent twice and reported as a success |
+| A late original listening write recreated progress after a discard | `PublicationLedger` (core) records every listening, page and mark-finished write before sending. It settles the record only on that request's own answer. 502, 503 and 504 count as unanswered (proxies send them after forwarding), and so do transport failures after connecting. A write that was out when the process died is unanswered after restart. A discard runs only while none of the title's writes is unanswered; otherwise the item screen explains the risk and offers **Discard anyway** or **Keep progress** (only while nothing was done for the discard). Nothing expires on its own. | `LatePublicationJourney.listeningThatReachesTheServerAfterADiscardDoesNotBringProgressBack`: progress came back at 10.47 s |
+| A late original page write recreated reading progress after a discard | Same ledger around the ebook PATCH. Supplementary documents, other titles and history are unaffected. | `LatePublicationJourney.aPageThatReachesTheServerAfterADiscardDoesNotBringProgressBack`: `ebookLocation` 1 came back |
+| A late older cumulative total replaced a newer one for the same session | A session with an unanswered write is frozen (`ListeningJournal.freeze`) and only ever sent again exactly as sent. Later listening continues in a new session holding only the new time. Each publish re-applies freezes recorded in the ledger, so a failed freeze or a restart cannot send another total for that session. | `LatePublicationJourney.listeningThatArrivesLateDoesNotShrinkTheListeningHistory`: sessions kept 5.5 s of about 10 s |
+
+- The ledger fails closed. If its file cannot be read, every title counts as uncertain: no listening or page is sent, no discard runs and the file is never overwritten. Diagnostics offers an explicit **Set them aside**, which keeps the file.
+- Core unit REDs:
+  - `PublicationLedgerTest`, 5 tests: classification, restart, per title and account, kept listening snapshot, unreadable.
+  - `ListeningJournalTest.listeningAfterAWriteWithoutAnAnswerGoesToANewSessionAndTheSentOneIsResentUnchanged`.
+  - `ProgressResetsTest.aDiscardNothingWasDoneForCanBeWithdrawnButOneUnderWayCannot`.
+  - The 503 case was first expected to be conclusive. It was made uncertain, RED first, once the GREEN run showed the shared proxy answering 503 for a dropped upstream.
+- **Fixture wrapper:**
+  - `/__android__/hold-late {kind, seconds}` drops the connection without an answer and replays the same request to the server later. `/__android__/late-applied` reports when it landed.
+  - The wrapper's deliberate refusals (`refuse-reading`, `refuse-listening`) now answer 500. An answer from the server itself means not applied, which keeps those journeys' meaning.
+- **GREEN:**
+  - `LatePublicationJourney` 3 of 3; unit tests pass.
+  - Full suite: 71 of 79 in one run. The 8 failures came from a transient fixture outage: the proxy answered 503 to fixture control calls such as `/__fixture__/configure`, and sign-ins timed out.
+  - Rerun on the final build: ItemActions, Pdf, ReadingListening and Settings 19 of 19; LatePublication, ProgressReset, ListeningDurability and Playback 15 of 15.
+- **Limits:**
+  - An uncertain title stays uncertain until the user chooses. Server 2.30 offers no way to prove an earlier request has finished, and no backend change is assumed.
+  - A late older page can still overwrite a newer page on the server. The next sync sees a server change it did not make and asks the reader, rather than overwriting silently.
+  - The listening snapshots in the ledger are kept until the user accepts the risk for their titles.## Evidence for 2b3227dc (emulator and fixture only)
 
 - Unit tests: `./gradlew :core:test :app:testDebugUnitTest`, 24 tests, 0 failures.
 - Journeys on `emulator-5584` (API 36) against the local fixture on ports 28765/28766/28767/28769:

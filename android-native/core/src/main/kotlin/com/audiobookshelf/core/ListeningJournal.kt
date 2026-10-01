@@ -34,7 +34,13 @@ import java.util.UUID
     val revision: Long,
     val acknowledged: Long,
     val closed: Boolean,
+    /** The player's name for its listening, kept when that listening moves to a new session; null means [id]. */
+    val handle: String? = null,
+    /** A write of this record went unanswered, so it is only ever sent again exactly as it was. */
+    val frozen: Boolean = false,
 ) {
+    val player get() = handle ?: id
+
     /** Body accepted by `/api/session/local-all`; listening is an absolute total for this session ID. */
     fun payload(): JsonObject = buildJsonObject {
         put("id", id)
@@ -97,7 +103,7 @@ class ListeningJournal(private val file: File) {
     @Synchronized
     fun record(id: String, position: Double, listened: Double, now: Long = System.currentTimeMillis()) {
         require(position.isFinite() && listened.isFinite() && listened >= 0)
-        val index = records.indexOfFirst { it.id == id && !it.closed }
+        val index = records.indexOfFirst { it.player == id && !it.closed && !it.frozen }
         require(index >= 0) { "No open listening record" }
         val current = records[index]
         val next = current.copy(
@@ -111,7 +117,7 @@ class ListeningJournal(private val file: File) {
 
     @Synchronized
     fun finish(id: String) {
-        val index = records.indexOfFirst { it.id == id && !it.closed }
+        val index = records.indexOfFirst { it.player == id && !it.closed && !it.frozen }
         if (index < 0) return
         val closed = records[index].copy(closed = true)
         commit(records.toMutableList().also { if (closed.acknowledged == closed.revision) it.removeAt(index) else it[index] = closed })
@@ -125,7 +131,7 @@ class ListeningJournal(private val file: File) {
     fun pendingAccounts(): Set<AccountIdentity> = records.filter { it.revision > it.acknowledged }.map { it.account }.toSet()
 
     @Synchronized
-    fun open(id: String): ListeningRecord? = records.firstOrNull { it.id == id }
+    fun open(id: String): ListeningRecord? = records.firstOrNull { it.player == id && !it.frozen } ?: records.firstOrNull { it.id == id }
 
     @Synchronized
     fun acknowledge(sent: ListeningRecord) {
@@ -134,6 +140,26 @@ class ListeningJournal(private val file: File) {
         val current = records[index]
         val next = current.copy(acknowledged = maxOf(current.acknowledged, minOf(sent.revision, current.revision)))
         commit(records.toMutableList().also { if (next.closed && next.acknowledged == next.revision) it.removeAt(index) else it[index] = next })
+    }
+
+    /**
+     * Keeps [sent], whose write went unanswered, exactly as it was sent: the server may still apply
+     * that write after any later one for the same session, so the session is never sent with another
+     * total. Listening after it continues in a new session holding only what came after. Freezing a
+     * record already frozen, as after a restart, changes nothing.
+     */
+    @Synchronized
+    fun freeze(sent: ListeningRecord) {
+        val index = records.indexOfFirst { it.id == sent.id && it.account == sent.account && !it.frozen }
+        if (index < 0) return
+        val current = records[index]
+        val next = records.toMutableList()
+        next[index] = sent.copy(handle = null, frozen = true, closed = true, acknowledged = current.acknowledged)
+        if (!current.closed || current.revision > sent.revision) next.add(index + 1, current.copy(
+            id = UUID.randomUUID().toString(), handle = current.player, media = current.media.copy(startTime = sent.currentTime),
+            startedAt = sent.updatedAt, timeListening = (current.timeListening - sent.timeListening).coerceAtLeast(0.0), acknowledged = sent.revision,
+        ))
+        commit(next)
     }
 
     /** After process death, open records belong to no live player: close them so they can retire once published. */

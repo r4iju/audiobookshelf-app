@@ -85,4 +85,30 @@ class ListeningJournalTest {
         reopened.adoptRemotePosition(qa, "book-0", null, time = 2.0, updatedAt = 6_000.0)
         assertEquals(2.0, reopened.cachedPosition(qa, "book-0", null, newerThan = Double.NEGATIVE_INFINITY)!!, 0.0)
     }
+
+    @Test
+    fun listeningAfterAWriteWithoutAnAnswerGoesToANewSessionAndTheSentOneIsResentUnchanged() {
+        val file = folder.root.resolve("journal.json")
+        val journal = ListeningJournal(file)
+        val id = journal.begin(qa, book, "device", now = 1_000)
+        journal.record(id, 10.0, 4.0, now = 2_000)
+        val sent = journal.pending(qa).single()
+        journal.freeze(sent)
+        journal.record(id, 13.0, 3.0, now = 3_000)
+
+        val pending = ListeningJournal(file).pending(qa)
+        assertEquals("The unanswered write is resent exactly as it was", sent.payload(), pending.single { it.id == sent.id }.payload())
+        val later = pending.single { it.id != sent.id }
+        assertEquals("Only listening after it, so the server never counts it twice", 3.0, later.timeListening, 0.0)
+        assertEquals(13.0, later.currentTime, 0.0)
+        assertEquals(10.0, later.media.startTime, 0.0)
+
+        journal.finish(id)
+        journal.acknowledge(pending.single { it.id == sent.id })
+        journal.acknowledge(later)
+        assertTrue(journal.pending(qa).isEmpty())
+        // Freezing again, as after a restart, changes nothing.
+        journal.freeze(sent)
+        assertTrue(journal.pending(qa).isEmpty())
+    }
 }
