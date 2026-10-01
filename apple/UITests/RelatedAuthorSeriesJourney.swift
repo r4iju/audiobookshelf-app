@@ -78,12 +78,12 @@ import XCTest
         XCTAssertEqual(series.label, "The Tomorrow Saga, book 2")
         series.tap()
         XCTAssertTrue(app.buttons["series-book.book-2"].waitForExistence(timeout: 10))
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.navigationBars.buttons["BackButton"].firstMatch.tap()
         let author = app.buttons["detail-author.author"]
         XCTAssertTrue(author.waitForExistence(timeout: 10))
         author.tap()
         XCTAssertTrue(app.staticTexts["author-name"].waitForExistence(timeout: 10))
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.navigationBars.buttons["BackButton"].firstMatch.tap()
         XCTAssertTrue(app.buttons["detail-series.series-saga"].waitForExistence(timeout: 10), "Back returns to the details that opened the author")
     }
 
