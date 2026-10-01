@@ -13,7 +13,7 @@ import RealmSwift
 import UIKit
 
 @objc(LegacyMigrationExport)
-public class LegacyMigrationExportPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelegate, UIAdaptivePresentationControllerDelegate {
+public class LegacyMigrationExportPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelegate {
     public var identifier = "LegacyMigrationExportPlugin"
     public var jsName = "LegacyMigrationExport"
     public let pluginMethods: [CAPPluginMethod] = [
@@ -90,10 +90,14 @@ public class LegacyMigrationExportPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumen
         picker.delegate = self
         activeSave = (picker, done)
         presenter.present(picker, animated: true)
-        picker.presentationController?.delegate = self
-        // UIKit refuses a presentation it cannot perform without calling back.
-        if presenter.presentedViewController !== picker {
-            finishSave(picker, .failure(.saveUnavailable))
+        // UIKit may defer this presentation (the picker loads out of process) and refuses one it
+        // cannot perform without calling back, so it is checked once it should have begun. The
+        // picker can sit inside a system container: any presentation counts, there was none before.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self, weak presenter] in
+            guard let self, self.activeSave?.picker === picker,
+                  presenter?.presentedViewController == nil, picker.viewIfLoaded?.window == nil
+            else { return }
+            self.finishSave(picker, .failure(.saveUnavailable))
         }
     }
 
@@ -109,10 +113,6 @@ public class LegacyMigrationExportPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumen
 
     public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
         finishSave(controller, .success(false))
-    }
-
-    public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        finishSave(presentationController.presentedViewController, .success(false))
     }
 
     private static func reject(_ call: CAPPluginCall, _ error: Error, code: String) {

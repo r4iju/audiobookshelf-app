@@ -72,6 +72,13 @@ final class LegacyExportJourneyUITests: XCTestCase {
         XCTAssertTrue(pickerSave.waitForExistence(timeout: 15), "the Files save dialog opened")
         XCTAssertFalse(text(beginningWith: "The save dialog could not be shown").exists,
                        "an open save dialog is not reported as failed")
+
+        // Swiping the dialog away resolves the save, so it can be opened again.
+        app.swipeDown(velocity: .fast)
+        XCTAssertTrue(pickerSave.waitForNonExistence(timeout: 10), "the save dialog was dismissed")
+        tapWhenReady(save)
+        XCTAssertTrue(pickerSave.waitForExistence(timeout: 15), "the save dialog opens again after a dismissal")
+        XCTAssertFalse(text(beginningWith: "The export is busy").exists)
         let location = app.staticTexts["On My iPhone"].firstMatch
         if !location.exists {
             tapWhenReady(app.buttons["BackButton"])
