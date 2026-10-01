@@ -53,11 +53,13 @@ import XCTest
     func testALookupThatFailsAfterAnotherSignInLeavesTheNewerAnswer() async throws {
         let api = client(userID: nil)
         let writes = WaitingWrites()
+        writes.activate()
+        let appearance = writes.lifecycle
         try hold(bob)
-        let stale = try await started { await writes.refresh(api: api, ledger: self.ledger, owner: self.bob, itemID: "book-0", episodeID: nil) }
+        let stale = try await started { await writes.refresh(api: api, ledger: self.ledger, owner: self.bob, itemID: "book-0", episodeID: nil, during: appearance) }
         credentials.value = Credentials(server: server, accessToken: "SYNTHETIC-2", refreshToken: nil, userID: "user-2", username: "user-2")
         try api.restoreSavedCredentials()
-        await writes.refresh(api: api, ledger: ledger, owner: bob, itemID: "book-0", episodeID: nil)
+        await writes.refresh(api: api, ledger: ledger, owner: bob, itemID: "book-0", episodeID: nil, during: appearance)
         XCTAssertTrue(writes.waiting, "Precondition: bob's save is waiting")
         gate.signal()
         await stale.value
@@ -67,9 +69,11 @@ import XCTest
     func testALookupForAnEarlierTitleLeavesTheAnswerForTheShownOne() async throws {
         let api = client(userID: nil)
         let writes = WaitingWrites()
+        writes.activate()
+        let appearance = writes.lifecycle
         try hold(alice, itemID: "book-0")
-        let stale = try await started { await writes.refresh(api: api, ledger: self.ledger, owner: self.alice, itemID: "book-0", episodeID: nil) }
-        await writes.refresh(api: api, ledger: ledger, owner: alice, itemID: "book-1", episodeID: nil)
+        let stale = try await started { await writes.refresh(api: api, ledger: self.ledger, owner: self.alice, itemID: "book-0", episodeID: nil, during: appearance) }
+        await writes.refresh(api: api, ledger: ledger, owner: alice, itemID: "book-1", episodeID: nil, during: appearance)
         gate.signal()
         await stale.value
         XCTAssertFalse(writes.waiting, "Nothing waits for the title shown now")
@@ -78,8 +82,10 @@ import XCTest
     func testALookupThatEndsAfterTheDetailsLeftPublishesNothing() async throws {
         let api = client(userID: nil)
         let writes = WaitingWrites()
+        writes.activate()
+        let appearance = writes.lifecycle
         try hold(alice)
-        let stale = try await started { await writes.refresh(api: api, ledger: self.ledger, owner: self.alice, itemID: "book-0", episodeID: nil) }
+        let stale = try await started { await writes.refresh(api: api, ledger: self.ledger, owner: self.alice, itemID: "book-0", episodeID: nil, during: appearance) }
         writes.stop()
         gate.signal()
         await stale.value
@@ -89,8 +95,38 @@ import XCTest
     func testDetailsOpenedForAnotherAccountShowNothingOfTheSignedInOne() async throws {
         let api = client(userID: "user-2")
         let writes = WaitingWrites()
+        writes.activate()
+        let appearance = writes.lifecycle
         try hold(bob)
-        await writes.refresh(api: api, ledger: ledger, owner: alice, itemID: "book-0", episodeID: nil)
+        await writes.refresh(api: api, ledger: ledger, owner: alice, itemID: "book-0", episodeID: nil, during: appearance)
         XCTAssertFalse(writes.waiting, "Bob's waiting save is not alice's")
+    }
+
+    func testARefreshQueuedBeforeTheDetailsLeftButStartingAfterPublishesNothing() async throws {
+        let api = client(userID: "user-1")
+        let writes = WaitingWrites()
+        writes.activate()
+        let queued = writes.lifecycle
+        try hold(alice)
+        writes.stop()
+        await writes.refresh(api: api, ledger: ledger, owner: alice, itemID: "book-0", episodeID: nil, during: queued)
+        XCTAssertFalse(writes.waiting, "Details that left must not change")
+    }
+
+    func testARefreshQueuedBeforeTheDetailsLeftDoesNotJoinTheirReappearance() async throws {
+        let api = client(userID: "user-1")
+        let writes = WaitingWrites()
+        writes.activate()
+        let queued = writes.lifecycle
+        writes.stop()
+        writes.activate()
+        let shown = writes.lifecycle
+        await writes.refresh(api: api, ledger: ledger, owner: alice, itemID: "book-0", episodeID: nil, during: shown)
+        XCTAssertFalse(writes.waiting, "Precondition: nothing waits yet")
+        try hold(alice)
+        await writes.refresh(api: api, ledger: ledger, owner: alice, itemID: "book-0", episodeID: nil, during: queued)
+        XCTAssertFalse(writes.waiting, "A refresh asked for before the details left must not publish into their reappearance")
+        await writes.refresh(api: api, ledger: ledger, owner: alice, itemID: "book-0", episodeID: nil, during: shown)
+        XCTAssertTrue(writes.waiting, "The reappeared details still refresh")
     }
 }

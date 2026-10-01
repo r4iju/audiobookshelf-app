@@ -151,7 +151,7 @@ struct BookDetails: View {
                 }
             }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
         }.background(appearance.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
-            .onAppear { load(monitorDownloads: true) }
+            .onAppear { writesWaiting.activate(); load(monitorDownloads: true) }
             .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel(); writesWaiting.stop() }
             .sheet(isPresented: $showingFeed) {
                 FeedEpisodes(api: catalog.api, item: book, presented: $showingFeed) { change in
@@ -177,7 +177,10 @@ struct BookDetails: View {
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
             .onReceive(realtime.events) { event in receive(event) }
             // A save made in the background, such as the player's on pause, can leave a write unknown while these are open.
-            .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in Task { await refreshWaitingWrites() } }
+            .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in
+                let appearance = writesWaiting.lifecycle
+                Task { await refreshWaitingWrites(during: appearance) }
+            }
     }
 
     @ViewBuilder private var header: some View {
@@ -218,6 +221,7 @@ struct BookDetails: View {
     }
     private func applyFinished(_ finished: Bool) {
         guard !progressBusy else { return }
+        let appearance = writesWaiting.lifecycle
         request?.cancel()
         detailRevision = UUID()
         progressBusy = true
@@ -231,7 +235,7 @@ struct BookDetails: View {
                 catalog.applyProgress(user)
             } catch {
                 if !Task.isCancelled { recordLoadFailure(ConnectionStore.recovery(for: error)) }
-                await refreshWaitingWrites()
+                await refreshWaitingWrites(during: appearance)
             }
         }
     }
@@ -271,6 +275,7 @@ struct BookDetails: View {
 
     private func confirmRestart() {
         guard !progressBusy else { return }
+        let appearance = writesWaiting.lifecycle
         Task {
             do {
                 try player.confirmServerRestarted(account: try await catalog.api.currentAccount())
@@ -278,14 +283,14 @@ struct BookDetails: View {
                 // Sends what waited.
                 await player.restoreListening()
                 readingStore.sync(api: catalog.api)
-                await refreshWaitingWrites()
+                await refreshWaitingWrites(during: appearance)
                 load()
             } catch { self.error = .discard(ConnectionStore.recovery(for: error)) }
         }
     }
 
-    private func refreshWaitingWrites() async {
-        await writesWaiting.refresh(api: catalog.api, ledger: player.publications, owner: catalog.owner, itemID: book.id, episodeID: episode?.id)
+    private func refreshWaitingWrites(during appearance: UUID?) async {
+        await writesWaiting.refresh(api: catalog.api, ledger: player.publications, owner: catalog.owner, itemID: book.id, episodeID: episode?.id, during: appearance)
     }
 
     // After a discard the progress this view was opened with is stale.
@@ -427,6 +432,7 @@ struct BookDetails: View {
     private func load(monitorDownloads: Bool = false, for event: NativeRealtime.Event? = nil) {
         guard !progressBusy, event.map(catalog.owns) != false else { return }
         request?.cancel()
+        let appearance = writesWaiting.lifecycle
         let revision = UUID()
         detailRevision = revision
         request = Task {
@@ -438,7 +444,7 @@ struct BookDetails: View {
                 guard !Task.isCancelled, detailRevision == revision, try await catalog.api.currentAccount() == owner, event.map(catalog.owns) != false else { return }
                 expanded = value
                 mediaProgress = user.mediaProgress
-                await refreshWaitingWrites()
+                await refreshWaitingWrites(during: appearance)
                 canManagePodcasts = user.canManagePodcasts
                 if book.mediaType == "podcast", episode == nil {
                     try serverQueue.adoptLegacy(itemID: item.id)
