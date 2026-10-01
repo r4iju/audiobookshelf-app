@@ -46,32 +46,34 @@ def api_client():
     return call
 
 
-def provision(udid=None, inspect=False):
+def provision(udid=None, inspect=False, platform="tvOS", bundle_identifier=BUNDLE, display_name="Audiobookshelf TV"):
+    allowed_classes = {"APPLE_TV"} if platform == "tvOS" else {"IPHONE", "IPAD"}
+    profile_type = "TVOS_APP_DEVELOPMENT" if platform == "tvOS" else "IOS_APP_DEVELOPMENT"
     api = api_client()
     devices = api("devices?limit=200")["data"]
-    tvs = [device for device in devices if device["attributes"].get("deviceClass") == "APPLE_TV"]
+    tvs = [device for device in devices if device["attributes"].get("deviceClass") in allowed_classes]
     if inspect:
         print(json.dumps([{"id": d["id"], **d["attributes"]} for d in tvs], indent=2))
         return
     if udid:
         matches = [d for d in devices if d["attributes"]["udid"] == udid]
         if matches:
-            if matches[0]["attributes"].get("deviceClass") != "APPLE_TV":
-                raise RuntimeError("The supplied UDID is not an Apple TV.")
+            if matches[0]["attributes"].get("deviceClass") not in allowed_classes:
+                raise RuntimeError("The supplied UDID does not match the requested device platform.")
             tvs = matches
         else:
-            device = api("devices", "POST", {"data": {"type": "devices", "attributes": {"name": "Audiobookshelf Apple TV", "udid": udid, "platform": "IOS"}}})["data"]
-            if device["attributes"].get("deviceClass") != "APPLE_TV":
-                raise RuntimeError("Apple did not identify this UDID as an Apple TV.")
+            device = api("devices", "POST", {"data": {"type": "devices", "attributes": {"name": display_name, "udid": udid, "platform": "IOS"}}})["data"]
+            if device["attributes"].get("deviceClass") not in allowed_classes:
+                raise RuntimeError("Apple did not identify this UDID as the requested device platform.")
             tvs = [device]
     if not tvs:
-        raise RuntimeError("No Apple TV is registered. Pair the TV, then pass its UDID with --udid.")
+        raise RuntimeError("No matching Apple device is registered. Pair it, then pass its UDID with --udid.")
     for device in tvs:
         if device["attributes"]["status"] == "DISABLED":
             api("devices/" + device["id"], "PATCH", {"data": {"type": "devices", "id": device["id"], "attributes": {"status": "ENABLED"}}})
 
-    bundles = api("bundleIds?filter[identifier]=" + BUNDLE)["data"]
-    bundle = bundles[0] if bundles else api("bundleIds", "POST", {"data": {"type": "bundleIds", "attributes": {"identifier": BUNDLE, "name": "Audiobookshelf TV", "platform": "IOS"}}})["data"]
+    bundles = api("bundleIds?filter[identifier]=" + bundle_identifier)["data"]
+    bundle = bundles[0] if bundles else api("bundleIds", "POST", {"data": {"type": "bundleIds", "attributes": {"identifier": bundle_identifier, "name": display_name, "platform": "IOS"}}})["data"]
     local_pem = subprocess.check_output(["security", "find-certificate", "-c", "Apple Development: Emanuel Franzen", "-p"])
     from cryptography import x509
     local_cert = x509.load_pem_x509_certificate(local_pem).public_bytes(serialization.Encoding.DER)
@@ -79,9 +81,9 @@ def provision(udid=None, inspect=False):
     matches = [c for c in certificates if c["attributes"]["certificateType"] == "DEVELOPMENT" and base64.b64decode(c["attributes"]["certificateContent"]) == local_cert]
     if not matches:
         raise RuntimeError("The installed Apple Development certificate does not match an active developer certificate.")
-    name = "Audiobookshelf TV Development " + time.strftime("%Y%m%d-%H%M%S")
+    name = display_name + " Development " + time.strftime("%Y%m%d-%H%M%S")
     profile = api("profiles", "POST", {"data": {
-        "type": "profiles", "attributes": {"name": name, "profileType": "TVOS_APP_DEVELOPMENT"},
+        "type": "profiles", "attributes": {"name": name, "profileType": profile_type},
         "relationships": {
             "bundleId": {"data": {"type": "bundleIds", "id": bundle["id"]}},
             "certificates": {"data": [{"type": "certificates", "id": matches[0]["id"]}]},
@@ -100,5 +102,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--udid")
     parser.add_argument("--inspect", action="store_true")
+    parser.add_argument("--platform", choices=["tvOS", "iOS"], default="tvOS")
+    parser.add_argument("--bundle", default=BUNDLE)
+    parser.add_argument("--name", default="Audiobookshelf TV")
     arguments = parser.parse_args()
-    provision(arguments.udid, arguments.inspect)
+    provision(arguments.udid, arguments.inspect, arguments.platform, arguments.bundle, arguments.name)

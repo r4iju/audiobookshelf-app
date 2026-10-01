@@ -34,6 +34,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     sessions = {}
     progress = {}
     reports = []
+    login_outcomes = []
     requests = []
     prefix = '/' + prefix.strip('/') if prefix.strip('/') else ''
 
@@ -74,7 +75,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if path == '/status':
                 return self.respond(200, {'isInit': True, 'version': '2.30.0-fixture', 'authMethods': ['local'], 'language': 'en-us', 'serverSettings': {}})
             if path == '/__fixture__/observations':
-                return self.respond(200, {'reports': reports, 'requests': requests})
+                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes})
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
             if path == '/api/libraries':
@@ -136,6 +137,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             except (ValueError, TypeError):
                 return self.respond(400, {})
             if path == '/login':
+                login_outcomes.append({'accepted': data == {'username': 'qa', 'password': 'qa'}, 'usernameMatches': data.get('username') == 'qa', 'passwordMatches': data.get('password') == 'qa'})
                 if data != {'username': 'qa', 'password': 'qa'}:
                     return self.respond(401, {})
                 return self.respond(200, {'user': {**user, **({'token': 'fresh'} if auth_mode == 'legacy' else {'token': 'expired', 'accessToken': 'expired', 'refreshToken': 'refresh'})},

@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "TVCore",
-    platforms: [.macOS(.v13), .tvOS(.v17)],
+    platforms: [.iOS(.v14), .macOS(.v13), .tvOS(.v17)],
     products: [.library(name: "TVCore", targets: ["TVCore"])],
     targets: [
         .target(name: "TVCore"),

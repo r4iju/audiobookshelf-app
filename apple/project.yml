@@ -1,0 +1,53 @@
+name: AudiobookshelfNative
+options:
+  deploymentTarget:
+    iOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: C7X9BCC7LP
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: 1
+targets:
+  AudiobookshelfNative:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - ../tvos/Core/Sources/TVCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.native.preview
+        CODE_SIGN_ENTITLEMENTS: App/Preview.entitlements
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Audiobookshelf Native
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    info:
+      path: App/Info.plist
+      properties:
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+          NSAllowsLocalNetworking: true
+        NSLocalNetworkUsageDescription: Connect directly to your Audiobookshelf server on your local network.
+        UIBackgroundModes: [audio]
+  NativeJourneyTests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: AudiobookshelfNative
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.native.preview.uitests
+schemes:
+  AudiobookshelfNative:
+    build:
+      targets:
+        AudiobookshelfNative: all
+        NativeJourneyTests: [test]
+    test:
+      targets: [NativeJourneyTests]
