@@ -28,7 +28,7 @@ final class LegacyMigratorTests: XCTestCase {
 
     private func contents(_ migrator: LegacyMigrator, _ file: MigratedFile?) throws -> String {
         let file = try XCTUnwrap(file)
-        return String(decoding: try Data(contentsOf: migrator.fileURL(for: file)), as: UTF8.self)
+        return String(decoding: try Data(contentsOf: try migrator.fileURL(for: file)), as: UTF8.self)
     }
 
     private func issues(_ outcome: MigrationOutcome, _ code: MigrationIssue.Code) -> [MigrationIssue] {
@@ -296,7 +296,7 @@ final class LegacyMigratorTests: XCTestCase {
         for download in outcome.downloads {
             for file in download.tracks.compactMap(\.file) + [download.cover, download.ebook?.file].compactMap({ $0 }) {
                 let legacy = try Data(contentsOf: fixture.documents.appendingPathComponent(file.legacyPath))
-                XCTAssertEqual(try Data(contentsOf: migrator.fileURL(for: file)), legacy, file.legacyPath)
+                XCTAssertEqual(try Data(contentsOf: try migrator.fileURL(for: file)), legacy, file.legacyPath)
             }
         }
     }

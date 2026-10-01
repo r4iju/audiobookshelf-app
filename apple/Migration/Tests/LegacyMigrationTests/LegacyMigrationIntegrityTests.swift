@@ -22,7 +22,12 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
     }
 
     private func contents(_ migrator: LegacyMigrator, _ file: MigratedFile?) throws -> String {
-        String(decoding: try Data(contentsOf: migrator.fileURL(for: try XCTUnwrap(file))), as: UTF8.self)
+        String(decoding: try Data(contentsOf: try migrator.fileURL(for: try XCTUnwrap(file))), as: UTF8.self)
+    }
+
+    /// Where an adopted file sits, without the checks `fileURL(for:)` applies, for tampering.
+    private func stored(_ migrator: LegacyMigrator, _ file: MigratedFile) -> URL {
+        migrator.root.appendingPathComponent("Files").appendingPathComponent(file.path)
     }
 
     private func allFiles(_ outcome: MigrationOutcome) -> [MigratedFile] {
@@ -57,7 +62,7 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
         let aliceDirectory = try XCTUnwrap(try local(outcome, "local_li-audio").tracks.first?.file?.path.split(separator: "/").first)
         for file in allFiles(outcome) {
             XCTAssertFalse(file.path.split(separator: "/").contains { $0 == ".." || $0 == "." }, file.path)
-            XCTAssertTrue(migrator.fileURL(for: file).standardizedFileURL.path.hasPrefix(files + "/"), file.path)
+            XCTAssertTrue(try migrator.fileURL(for: file).standardizedFileURL.path.hasPrefix(files + "/"), file.path)
         }
         for id in ["a/b", "a_b", ".."] {
             XCTAssertEqual(try local(outcome, id).tracks.first?.file?.path.split(separator: "/").first, aliceDirectory, id)
@@ -104,9 +109,9 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
         let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
         let track = try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)
         let pdf = try XCTUnwrap(try local(first, "local_li-pdf").ebook?.file)
-        try FileManager.default.removeItem(at: migrator.fileURL(for: track))
-        try FileManager.default.removeItem(at: migrator.fileURL(for: pdf))
-        try Data("%PDF-1.7 replaced!".utf8).write(to: migrator.fileURL(for: pdf))
+        try FileManager.default.removeItem(at: stored(migrator, track))
+        try FileManager.default.removeItem(at: stored(migrator, pdf))
+        try Data("%PDF-1.7 replaced!".utf8).write(to: stored(migrator, pdf))
 
         XCTAssertThrowsError(try migrator.committedOutcome()) { error in
             XCTAssertEqual(error as? LegacyMigrationError, .committedMigrationDamaged)
@@ -124,7 +129,7 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
         let migrator = LegacyMigrator(root: fixture.migrationRoot())
         let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
         let epub = try XCTUnwrap(try local(first, "local_li-epub").ebook?.file)
-        let handle = try FileHandle(forWritingTo: migrator.fileURL(for: epub))
+        let handle = try FileHandle(forWritingTo: stored(migrator, epub))
         handle.write(Data("XX".utf8))
         try handle.close()
 
@@ -141,10 +146,10 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
         let migrator = LegacyMigrator(root: fixture.migrationRoot(), fileSystem: fileSystem)
         let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
         let epub = try XCTUnwrap(try local(first, "local_li-epub").ebook?.file)
-        let handle = try FileHandle(forWritingTo: migrator.fileURL(for: epub))
+        let handle = try FileHandle(forWritingTo: stored(migrator, epub))
         handle.write(Data("XX".utf8))
         try handle.close()
-        try FileManager.default.removeItem(at: migrator.fileURL(for: try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)))
+        try FileManager.default.removeItem(at: stored(migrator, try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)))
 
         fileSystem.failAfterTransfers = fileSystem.transfers.count
         XCTAssertThrowsError(try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink()))
@@ -175,7 +180,7 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
         let fileSystem = FaultInjectingFileSystem()
         let migrator = LegacyMigrator(root: fixture.migrationRoot(), fileSystem: fileSystem)
         let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
-        try FileManager.default.removeItem(at: migrator.fileURL(for: try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)))
+        try FileManager.default.removeItem(at: stored(migrator, try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)))
 
         fileSystem.failAfterTransfers = fileSystem.transfers.count
         XCTAssertThrowsError(try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink()))
@@ -196,7 +201,7 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
         let migrator = LegacyMigrator(root: fixture.migrationRoot())
         let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
         let track = try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)
-        try FileManager.default.removeItem(at: migrator.fileURL(for: track))
+        try FileManager.default.removeItem(at: stored(migrator, track))
         try FileManager.default.removeItem(at: fixture.documents.appendingPathComponent("li-pdf/companion.pdf"))
 
         let repaired = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
