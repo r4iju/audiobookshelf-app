@@ -156,7 +156,12 @@ import XCTest
         revealed("diagnostic-share", in: app).tap()
         let shareSheet = app.otherElements["ActivityListView"]
         XCTAssertTrue(shareSheet.waitForExistence(timeout: 5), "Export must use the user-initiated system share sheet")
-        if shareSheet.exists { app.buttons["Close"].firstMatch.tap() }
+        // On iPad the share sheet is a card whose Close button ignores a tap while it is still presenting.
+        let closeShare = shareSheet.buttons["Close"].firstMatch
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: closeShare)
+        if shareSheet.exists, XCTWaiter().wait(for: [ready], timeout: 5) == .completed { closeShare.tap() }
+        let shareClosed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: shareSheet)
+        XCTAssertEqual(XCTWaiter().wait(for: [shareClosed], timeout: 5), .completed, "The share sheet must close")
 
         revealed("diagnostic-clear", in: app).tap()
         app.alerts.buttons["Clear"].tap()
