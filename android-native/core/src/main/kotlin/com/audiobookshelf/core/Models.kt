@@ -247,7 +247,9 @@ object LenientDoubleSerializer : KSerializer<Double> {
     val narrators: List<NarratorResult> = emptyList(),
     val tags: List<TagResult> = emptyList(),
     val genres: List<TagResult> = emptyList(),
-)
+) {
+    val isEmpty get() = book.isEmpty() && podcast.isEmpty() && episodes.isEmpty() && authors.isEmpty() && series.isEmpty() && narrators.isEmpty() && tags.isEmpty()
+}
 
 @Serializable data class FilterData(
     val genres: List<String> = emptyList(),

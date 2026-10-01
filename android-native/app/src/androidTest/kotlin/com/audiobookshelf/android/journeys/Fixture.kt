@@ -8,6 +8,9 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
@@ -140,4 +143,17 @@ object Browser {
     private fun dismissFirstRun() {
         for (label in firstRun) device.findObject(androidx.test.uiautomator.By.text(label))?.let { it.click(); return }
     }
+}
+
+/** Scrolls a lazy container until [tag] is composed, letting pagination load as a person would. */
+fun ComposeTestRule.scrollTo(container: String, tag: String, timeoutMs: Long = 30_000) {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    // Lazy containers can scroll to any already-loaded key directly, in either direction.
+    if (runCatching { onNodeWithTag(container).performScrollToNode(hasTestTag(tag)) }.isSuccess) return
+    while (!isShown(tag)) {
+        if (System.currentTimeMillis() > deadline) throw ComposeTimeoutException("$tag never appeared in $container")
+        onNodeWithTag(container).performTouchInput { swipeUp() }
+        waitForIdle()
+    }
+    onNodeWithTag(container).performScrollToNode(hasTestTag(tag))
 }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.audiobookshelf.core.ApiClient
 import com.audiobookshelf.core.ApiError
+import com.audiobookshelf.core.FilterData
 import com.audiobookshelf.core.Library
 import com.audiobookshelf.core.LibraryItem
 import com.audiobookshelf.core.MediaProgress
@@ -35,6 +36,7 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
     var pageError by mutableStateOf<String?>(null); private set
     var user by mutableStateOf<User?>(null); private set
     var query by mutableStateOf(initialQuery); private set
+    var filterData by mutableStateOf<FilterData?>(null); private set
 
     private var generation = 0
     private var nextPage = 0
@@ -70,6 +72,7 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
         accounts.selectLibrary(target.id)
         preferredLibraryId = target.id
         library = target
+        filterData = null
         query = CatalogQuery(query.sort, query.descending)
         val current = ++generation
         pageJob?.cancel()
@@ -109,6 +112,11 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
                 if (current == generation) pageLoading = false
             }
         }
+    }
+
+    fun loadFilterData() {
+        val target = library ?: return
+        scope.launch { runCatching { client.filterData(target.id) }.onSuccess { if (library?.id == target.id) filterData = it }.onFailure { accounts.handle(it) } }
     }
 
     fun retryPage() { pageError = null; loadMore() }

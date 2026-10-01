@@ -2,18 +2,27 @@ package com.audiobookshelf.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.LibraryBooks
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,6 +30,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.graph
+import com.audiobookshelf.core.ApiClient
+import com.audiobookshelf.core.LibraryItem
 
 @Composable
 fun AppRoot() {
@@ -39,19 +50,78 @@ fun AppRoot() {
 @Composable
 private fun SignedIn(active: SessionState.Active) {
     val model: MainViewModel = viewModel()
+    val graph = LocalContext.current.graph
     val catalog = model.catalogFor(active)
     val route = model.stack.lastOrNull()
+    val pop: () -> Unit = { model.pop() }
     BackHandler(enabled = route != null) { model.pop() }
-    when (route) {
-        null -> Scaffold(
-            topBar = {
-                LibraryTopBar(catalog) {
-                    IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, "Accounts") }
-                    IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, "Settings") }
+    BackHandler(enabled = route == null && model.tab.value != Tab.Library) { model.tab.value = Tab.Library }
+
+    val open: (LibraryItem) -> Unit = { item ->
+        val episode = item.recentEpisode
+        model.push(if (episode != null) Route.Episode(item.id, episode.id) else Route.Item(item.id))
+    }
+    val openFiltered: (String, String) -> Unit = { filter, label -> model.push(Route.Filtered(filter, label)) }
+    val itemActions = ItemActions(
+        onAuthor = { id, name -> openFiltered(ApiClient.filter("authors", id), name) },
+        onSeries = { id, name -> openFiltered(ApiClient.filter("series", id), name) },
+        onNarrator = { name -> openFiltered(ApiClient.filter("narrators", name), name) },
+        onGenre = { name -> openFiltered(ApiClient.filter("genres", name), name) },
+    )
+
+    Column(Modifier.fillMaxSize()) {
+        Box(Modifier.weight(1f)) {
+            when (route) {
+                null -> Home(model, active, open, openFiltered)
+                Route.Accounts -> RouteScaffold("Accounts", pop) { AccountsScreen(active, it) }
+                is Route.Item -> RouteScaffold("", pop) { padding ->
+                    LoadItem(active.client, route.id, padding, graph.accounts::handle) { item, _ ->
+                        ItemDetail(item, active.client.coverUrl(item.id).toString(), catalog.progressFor(item.id), padding, itemActions, primary = {})
+                    }
                 }
-            },
-        ) { padding -> LibraryScreen(catalog, padding, open = { model.push(Route.Item(it.id)) }) }
-        Route.Accounts -> RouteScaffold("Accounts", onBack = { model.pop() }) { AccountsScreen(active, it) }
-        else -> LaunchedEffect(route) { model.pop() }
+                is Route.Filtered -> RouteScaffold(route.label, pop) { padding ->
+                    val libraryId = catalog.library?.id
+                    if (libraryId != null) FilteredScreen(model.filtered(active, libraryId, route), padding, { catalog.progressFor(it) }, open)
+                }
+                else -> RouteScaffold("", pop) { padding ->
+                    Box(Modifier.padding(padding)) { MessageState("Not available yet", "This part of the preview is still being built.", tag = "unavailable") }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Home(model: MainViewModel, active: SessionState.Active, open: (LibraryItem) -> Unit, openFiltered: (String, String) -> Unit) {
+    val graph = LocalContext.current.graph
+    val catalog = model.catalogFor(active)
+    var sheet by remember { mutableStateOf<String?>(null) }
+    val tab = model.tab.value
+    Scaffold(
+        topBar = {
+            if (tab == Tab.Library) LibraryTopBar(catalog) {
+                IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, "Accounts") }
+                IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, "Settings") }
+            }
+        },
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(selected = tab == Tab.Library, onClick = { model.tab.value = Tab.Library }, icon = { Icon(Icons.Outlined.LibraryBooks, null) }, label = { Text("Library") }, modifier = Modifier.testTag("tab-library"))
+                NavigationBarItem(selected = tab == Tab.Search, onClick = { model.tab.value = Tab.Search }, icon = { Icon(Icons.Outlined.Search, null) }, label = { Text("Search") }, modifier = Modifier.testTag("tab-search"))
+            }
+        },
+    ) { padding ->
+        when (tab) {
+            Tab.Library -> LibraryScreen(catalog, padding, open, onFilter = { sheet = "filter" }, onSort = { sheet = "sort" })
+            Tab.Search -> SearchScreen(model.search(active), catalog, padding, open, openFiltered)
+            Tab.Downloads -> Unit
+        }
+    }
+    when (sheet) {
+        "filter" -> FilterSheet(catalog) { sheet = null }
+        "sort" -> SortSheet(catalog, onChange = { sort, descending ->
+            graph.settings.update { it.copy(catalogSort = sort, catalogDescending = descending) }
+            catalog.apply(catalog.query.copy(sort = sort, descending = descending))
+        }) { sheet = null }
     }
 }

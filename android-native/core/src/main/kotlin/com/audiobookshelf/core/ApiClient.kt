@@ -22,6 +22,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 import java.security.cert.CertPathValidatorException
+import okio.ByteString.Companion.encodeUtf8
 import okio.ByteString.Companion.decodeBase64
 import javax.net.ssl.SSLHandshakeException
 import javax.net.ssl.SSLPeerUnverifiedException
@@ -261,6 +262,8 @@ class ApiClient(
     @kotlinx.serialization.Serializable private data class LocalSyncResponse(val results: List<LocalSyncResult> = emptyList())
 
     companion object {
+        /** Library filter value as the server expects it: `group.base64(value)`. */
+        fun filter(group: String, value: String): String = "$group." + value.encodeUtf8().base64()
         fun formatTime(time: Double): String = if (time == Math.floor(time)) time.toLong().toString() else time.toString()
     }
 }

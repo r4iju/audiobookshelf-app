@@ -22,6 +22,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.automirrored.outlined.Sort
+import androidx.compose.material3.InputChip
 import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -82,7 +86,7 @@ fun LibraryTopBar(catalog: CatalogModel, actions: @Composable () -> Unit) {
 }
 
 @Composable
-fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryItem) -> Unit, header: @Composable () -> Unit = {}) {
+fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryItem) -> Unit, onFilter: () -> Unit, onSort: () -> Unit) {
     val graph = LocalContext.current.graph
     val settings by graph.settings.settings.collectAsState()
     val list = settings.listLayout
@@ -97,7 +101,6 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
             verticalArrangement = Arrangement.spacedBy(if (list) 4.dp else 18.dp),
             modifier = Modifier.fillMaxSize().testTag("catalog-grid"),
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) { header() }
             val error = catalog.error
             when {
                 error != null -> item(span = { GridItemSpan(maxLineSpan) }) {
@@ -125,10 +128,17 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
                                 (catalog.query.filterLabel ?: if (catalog.library?.isPodcast == true) "All podcasts" else "All titles") + " · ${catalog.total}",
                                 style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f),
                             )
+                            IconButton(onClick = onFilter, modifier = Modifier.testTag("open-filter")) { Icon(Icons.Outlined.FilterList, "Filter") }
+                            IconButton(onClick = onSort, modifier = Modifier.testTag("open-sort")) { Icon(Icons.AutoMirrored.Outlined.Sort, "Sort") }
                             IconButton(onClick = { graph.settings.update { it.copy(listLayout = !it.listLayout) } }, modifier = Modifier.testTag("toggle-layout")) {
                                 Icon(if (list) Icons.Outlined.GridView else Icons.AutoMirrored.Outlined.ViewList, if (list) "Show covers" else "Show list")
                             }
                         }
+                    }
+                    if (catalog.query.filter != null) item(span = { GridItemSpan(maxLineSpan) }) {
+                        Row { InputChip(selected = true, onClick = { catalog.apply(catalog.query.copy(filter = null, filterLabel = null)) },
+                            label = { Text(catalog.query.filterLabel ?: "Filtered") }, trailingIcon = { Icon(Icons.Outlined.Close, "Clear filter") },
+                            modifier = Modifier.testTag("clear-filter")) }
                     }
                     if (catalog.items.isEmpty()) item(span = { GridItemSpan(maxLineSpan) }) {
                         MessageState("Nothing here yet", "This library has no items you can access.", tag = "catalog-empty")

@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.audiobookshelf.android.data.CatalogModel
 import com.audiobookshelf.android.data.CatalogQuery
+import com.audiobookshelf.android.data.PagedItems
+import com.audiobookshelf.android.data.SearchModel
 import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.graph
 
@@ -38,15 +40,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val stack = mutableStateListOf<Route>()
     val tab = androidx.compose.runtime.mutableStateOf(Tab.Library)
     private var catalog: CatalogModel? = null
+    private var searchModel: SearchModel? = null
+    private val retained = mutableMapOf<Route, Any>()
 
     fun push(route: Route) { stack.add(route) }
-    fun pop(): Boolean = stack.removeLastOrNull() != null
-    fun resetNavigation() { stack.clear(); tab.value = Tab.Library }
+    fun pop(): Boolean {
+        val removed = stack.removeLastOrNull() ?: return false
+        if (removed !in stack) retained.remove(removed)
+        return true
+    }
+    fun resetNavigation() { stack.clear(); retained.clear(); tab.value = Tab.Library }
+
+    /** Per-route state that survives configuration changes and is dropped when the route is popped. */
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Any> retain(route: Route, create: () -> T): T = retained.getOrPut(route, create) as T
+
+    fun search(active: SessionState.Active): SearchModel {
+        val existing = searchModel
+        if (existing != null && existing.client === active.client) return existing
+        return SearchModel(viewModelScope, active.client, graph.accounts).also { searchModel = it }
+    }
+
+    fun filtered(active: SessionState.Active, libraryId: String, route: Route.Filtered): PagedItems =
+        retain(route) { PagedItems(viewModelScope, active.client, graph.accounts, libraryId, route.filter, graph.settings.current.catalogSort) }
 
     fun catalogFor(active: SessionState.Active): CatalogModel {
         val existing = catalog
         if (existing != null && existing.client === active.client) return existing
-        stack.clear()
+        stack.clear(); retained.clear(); tab.value = Tab.Library
         val settings = graph.settings.current
         return CatalogModel(viewModelScope, active.client, graph.accounts, active.connection.libraryId, CatalogQuery(settings.catalogSort, settings.catalogDescending))
             .also { catalog = it; it.reload() }
