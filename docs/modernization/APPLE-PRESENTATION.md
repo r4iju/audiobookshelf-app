@@ -12,8 +12,8 @@ then English. A change applies to open screens without relaunch, and Arabic and 
 
 Native text is keyed by its English wording. A language shows a translation only where `legacy-equivalents.json` names a
 legacy key with the same meaning and that language's legacy file has a usable value (non-empty, no markup, same
-placeholders). Native screens, tvOS and the year export together show 635 distinct texts, and 159 have such a key, so
-each language is between 18% (`lt`) and 25% translated (`COVERAGE.md`). The rest stays English, and the Language screen
+placeholders). Native screens, tvOS and the year export together show 638 distinct texts, and 167 have such a key, so
+each language is between 19% (`lt`) and 26% translated (`COVERAGE.md`). The rest stays English, and the Language screen
 shows each language's share and says so. System controls follow the device language. Dates and durations use the chosen
 locale. This is partial localization, not parity with the legacy app's coverage.
 
@@ -43,17 +43,33 @@ label a legacy screen used for the same control or message (RED `c42f43c5`, fix 
 | Loading (tvOS player state) | `MessageLoading` | loading indicators |
 | Yes, No (RSS feed values) | `ButtonYes`, `LabelNo` | |
 
+A second pass (RED `0217f5b1`, fix `31176905`) added five texts the legacy app named differently for the same action or
+state:
+
+- Sign out uses `ButtonDisconnect`. The legacy Disconnect (`SideDrawer.vue`) ran `user/logout`, which cleared the active
+  server login (`AbsDatabase.logout`) without asking the server, and returned to the connection screen with saved servers
+  kept, as native Sign out does.
+- Connecting… (the tvOS sign-in button) and Connecting (the Diagnostics connection state) use
+  `MessageAttemptingServerConnection`, the legacy text shown during the same attempt.
+- Not connected (the Diagnostics server value) uses `MessageAudiobookshelfServerNotConnected`.
+- Mark book finished? uses `MessageConfirmMarkAsFinished`, the legacy confirmation for the same action.
+
+**Wording with several meanings.** `Light` names both a theme and a haptic strength, and the legacy app has a key for each
+(`LabelThemeLight`, `LabelLight`), which 17 of the 29 translated languages word differently (de *Hell* and *Leicht*). Native
+text with such wording is looked up with a `NativeTextContext`: `l10n(choice.name, context: .theme)` reads the table key
+`theme::Light`, and `.hapticStrength` reads `hapticStrength::Light`. The English table maps both back to `Light`, so English
+labels and accessibility selectors are unchanged, and a meaning without a translation stays English rather than borrowing
+the other's. The theme names in Settings and the reader, and the haptic strengths, use it. Theme `System` still has no
+legacy key.
+
 Considered and left English, because the legacy text means something else in at least one language or names a different
 action:
 
-- `Light` is both a theme and a haptic strength in one native key. The legacy app has `LabelThemeLight` and `LabelLight`,
-  and 17 of the 29 translated languages translate them differently (de *Hell* and *Leicht*). Either one would be wrong in one list, so both
-  lists show English `Light` until the two uses have separate texts. `System` has no legacy key.
-- Sign out (legacy Disconnect), Connecting… (Attempting server connection), Diagnostics (Logs), No problems recorded
-  (No logs), Podcast feed (`HeaderRSSFeed` is a feed the server publishes for an item), Mark as not finished (the legacy
+- Diagnostics (Logs), No problems recorded (No logs): the native screen lists failures and status, not the app log.
+- Podcast feed (`HeaderRSSFeed` is a feed the server publishes for an item), Mark as not finished (the legacy
   has only the failure toast), and the year headings Top authors and Top genres (as `HANDOFF.md` explains).
 
-The other 476 texts have no legacy equivalent and stay English in every language: connection, sign-in and certificate
+The other 471 texts have no legacy equivalent and stay English in every language: connection, sign-in and certificate
 recovery, migration import, diagnostics, downloads and storage states, collection and podcast management, PDF and EPUB
 reader messages, 71 tvOS-only texts and 78 year export templates. They need translators; no machine translation or
 generic fallback is presented as complete.
