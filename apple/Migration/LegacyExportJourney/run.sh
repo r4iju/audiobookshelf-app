@@ -38,10 +38,12 @@ cp -R "$out/Documents" "$container/Documents"
 devices=${container%%/data/Containers/*}/data
 find "$devices/Containers/Shared/AppGroup" -path '*File Provider Storage*' -name '*.absmigration' -prune -exec rm -rf {} + 2> /dev/null || true
 
+mkdir -p "$out/runner"
 xcodegen --spec "$here/project.yml" --project "$out/runner" --quiet
 rm -rf "$out/journey.xcresult"
 xcodebuild test -project "$out/runner/LegacyExportJourney.xcodeproj" -scheme LegacyExportJourneyUITests \
   -destination "id=$udid" -derivedDataPath "$out/dd" -resultBundlePath "$out/journey.xcresult" \
+  -only-testing:LegacyExportJourneyUITests/LegacyExportJourneyUITests \
   -collect-test-diagnostics never > "$out/journey.log" 2>&1 \
   || { grep -E "error:" "$out/journey.log" | head; echo "FAIL: journey (log: $out/journey.log, results: $out/journey.xcresult)"; exit 1; }
 

@@ -25,6 +25,12 @@ final class LegacyExportJourneyUITests: XCTestCase {
     }
 
     /// The reader hides its toolbar until the page is tapped.
+    /// On iOS 26 the save dialog can leave the settings page scrolled.
+    private func scrollToAndTap(_ element: XCUIElement) {
+        for _ in 0..<6 where !element.isHittable { app.swipeUp() }
+        tapWhenReady(element)
+    }
+
     private func revealReaderToolbar(_ control: XCUIElement) {
         if !control.isHittable {
             app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
@@ -68,23 +74,34 @@ final class LegacyExportJourneyUITests: XCTestCase {
         attachScreenshot("export-ready")
         save.tap()
 
-        let pickerSave = app.buttons["DOCPicker.actionButton"]
+        // Identified on iOS 27, only labelled on iOS 26.
+        let pickerSave = app.buttons.matching(NSPredicate(format: "identifier == 'DOCPicker.actionButton' OR label == 'Save'")).firstMatch
         XCTAssertTrue(pickerSave.waitForExistence(timeout: 15), "the Files save dialog opened")
         XCTAssertFalse(text(beginningWith: "The save dialog could not be shown").exists,
                        "an open save dialog is not reported as failed")
 
-        // Past the plugin's presentation check, only the dialog can end the save: a swipe must not
-        // dismiss it without a decision, and Cancel releases the save so it can be opened again.
+        // Past the plugin's presentation check, only the dialog can end the save: swiping it away
+        // must release the save as not saved, so it can be opened again.
         sleep(7)
         app.swipeDown(velocity: .fast)
-        sleep(2)
-        XCTAssertTrue(pickerSave.exists, "a swipe does not dismiss the save dialog")
-        tapWhenReady(app.buttons["Cancel"].firstMatch)
-        XCTAssertTrue(pickerSave.waitForNonExistence(timeout: 10), "Cancel dismissed the save dialog")
-        XCTAssertFalse(text(beginningWith: "Saved.").exists, "a cancelled save is not reported as saved")
-        tapWhenReady(save)
+        XCTAssertTrue(pickerSave.waitForNonExistence(timeout: 10), "the save dialog was swiped away")
+        sleep(1)
+        XCTAssertFalse(text(beginningWith: "Saved.").exists, "a dismissed save is not reported as saved")
+        XCTAssertFalse(text(beginningWith: "The save dialog could not be shown").exists)
+        scrollToAndTap(save)
         XCTAssertTrue(pickerSave.waitForExistence(timeout: 15), "the save dialog opens again after a dismissal")
-        XCTAssertFalse(text(beginningWith: "The export is busy").exists)
+        XCTAssertFalse(text(beginningWith: "The export is busy").exists, "the swiped-away save was released")
+
+        // Cancel, at the top of the dialog, releases it the same way.
+        let cancel = app.buttons["Cancel"].firstMatch
+        if !cancel.exists { tapWhenReady(app.buttons["BackButton"]) }
+        tapWhenReady(cancel)
+        XCTAssertTrue(cancel.waitForNonExistence(timeout: 10), "Cancel dismissed the save dialog")
+        sleep(1)
+        XCTAssertFalse(text(beginningWith: "Saved.").exists, "a cancelled save is not reported as saved")
+        scrollToAndTap(save)
+        XCTAssertTrue(pickerSave.waitForExistence(timeout: 15), "the save dialog opens again after Cancel")
+        XCTAssertFalse(text(beginningWith: "The export is busy").exists, "the cancelled save was released")
         let location = app.staticTexts["On My iPhone"].firstMatch
         if !location.exists {
             tapWhenReady(app.buttons["BackButton"])
@@ -95,7 +112,7 @@ final class LegacyExportJourneyUITests: XCTestCase {
 
         XCTAssertTrue(text(beginningWith: "Saved.").waitForExistence(timeout: 30), "the app reports the package saved")
         attachScreenshot("saved")
-        tapWhenReady(button("Remove export"))
+        scrollToAndTap(button("Remove export"))
         XCTAssertTrue(button("Export for the new app").waitForExistence(timeout: 10), "the export was removed")
     }
 }
