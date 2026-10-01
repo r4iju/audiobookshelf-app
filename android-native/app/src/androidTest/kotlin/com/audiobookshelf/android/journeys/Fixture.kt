@@ -40,6 +40,11 @@ object Fixture {
         post("$base/__android__/refuse-listening", JSONObject().put("refuse", refuse).toString())
     }
 
+    /** Makes the server refuse reading positions, whatever the configured mode, until reconfigured. */
+    fun refuseReading(refuse: Boolean, base: String = server) {
+        post("$base/__android__/refuse-reading", JSONObject().put("refuse", refuse).toString())
+    }
+
     /** The signed-in account's server progress for one book, or null when it has none. */
     fun serverProgress(itemId: String, base: String = server): JSONObject? =
         JSONObject(get("$base/__android__/progress")).getJSONArray("progress").objects()

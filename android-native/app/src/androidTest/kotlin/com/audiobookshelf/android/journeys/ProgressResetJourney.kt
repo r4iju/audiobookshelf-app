@@ -7,6 +7,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.audiobookshelf.android.MainActivity
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import androidx.test.platform.app.InstrumentationRegistry
+import java.io.File
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -131,6 +134,66 @@ class ProgressResetJourney {
             compose.tap("play-pause")
             compose.waitForTag("player-paused")
             assertTrue(compose.shownSeconds() <= 2)
+        }
+    }
+
+    @Test
+    fun aPageLeftUnsentByAFailedResetIsNeverSentForIt() {
+        Fixture.resetAppData()
+        Fixture.configure("pdf-reader")
+        Fixture.refuseReading(true)
+        val journal = File(InstrumentationRegistry.getInstrumentation().targetContext.filesDir, "listening-journal.json")
+        ActivityScenario.launch(MainActivity::class.java).use {
+            compose.signIn()
+            compose.tap("item-book-0")
+            compose.tap("read-ebook")
+            compose.tap("pdf-next")
+            eventually { Fixture.requests().any { it.optString("ebookLocation") == "2" } }
+            compose.tap("reader-close")
+            try {
+                // Only the reset's cleanup on this device fails: its listening journal cannot be replaced.
+                journal.delete()
+                check(journal.mkdir())
+                compose.discard()
+                compose.waitForTag("discard-pending")
+                Fixture.refuseReading(false)
+                // Reading publication retries meanwhile; a stale page would reach the server here.
+                Thread.sleep(8_000)
+            } finally {
+                journal.delete()
+            }
+            compose.waitForDiscard()
+            Thread.sleep(3_000)
+            assertNull("A page from before the discard must not be sent for it", Fixture.serverProgress("book-0"))
+        }
+    }
+
+    @Test
+    fun unreadableDiscardRequestsKeepTitlesFromPlayingAfterStartUntilResolved() {
+        Fixture.resetAppData()
+        Fixture.configure("baseline")
+        File(InstrumentationRegistry.getInstrumentation().targetContext.filesDir, "progress-resets.json").writeText("{\"version\":1,\"resets\":[{\"account\"")
+        ActivityScenario.launch(MainActivity::class.java).use {
+            compose.signIn()
+            compose.tap("item-book-0")
+            compose.tap("play")
+            val played = runCatching { compose.waitForTag("player-playing", 8_000) }.isSuccess
+            assertFalse("A discard that cannot be read may be for this title, so it must not play", played)
+
+            // Setting them aside is an explicit choice in Diagnostics, and keeps the unreadable file.
+            compose.pressBack()
+            compose.tap("open-settings")
+            compose.scrollTo("settings", "open-diagnostics")
+            compose.tap("open-diagnostics")
+            compose.tap("resolve-unreadable-resets")
+            compose.tap("confirm-resolve-unreadable-resets")
+            compose.waitUntil(5_000) { !compose.isShown("unreadable-resets") }
+            val kept = InstrumentationRegistry.getInstrumentation().targetContext.filesDir.listFiles().orEmpty().map { it.name }
+            assertTrue("The unreadable file is kept: $kept", kept.any { it.startsWith("progress-resets.json.unreadable-") })
+            compose.pressBack(); compose.pressBack()
+            compose.tap("item-book-0")
+            compose.tap("play")
+            compose.waitForTag("player-playing", 15_000)
         }
     }
 }

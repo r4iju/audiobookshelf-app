@@ -51,27 +51,54 @@ class ProgressResets(
 
     @Serializable private data class Document(val version: Int = 1, val resets: List<Reset> = emptyList())
 
-    private val state = MutableStateFlow(read())
+    class Unreadable : java.io.IOException("Saved progress discards could not be read. Resolve them in Diagnostics first.")
+
+    private val state = MutableStateFlow(emptyList<Reset>())
     /** Resets requested and not yet complete. */
     val requested: StateFlow<List<Reset>> = state
+    private val unreadableState = MutableStateFlow(false)
+    /**
+     * True while saved resets exist but cannot be read. Any title may be among them, so every title
+     * counts as being reset until [abandonUnreadable] is chosen; the file is never overwritten meanwhile.
+     */
+    val unreadable: StateFlow<Boolean> = unreadableState
     private val running = Mutex()
+
+    init {
+        read()
+    }
 
     /** Saves a reset of the title; an existing one for it is kept as it is. */
     @Synchronized
     fun request(account: AccountIdentity, itemId: String, episodeId: String?, now: Long = System.currentTimeMillis()): Reset {
+        if (unreadableState.value) throw Unreadable()
         state.value.firstOrNull { it.matches(account, itemId, episodeId) }?.let { return it }
         return Reset(account, itemId, episodeId, now.toDouble()).also { commit(state.value + it) }
     }
 
-    fun pending(account: AccountIdentity, itemId: String, episodeId: String?): Boolean = state.value.any { it.matches(account, itemId, episodeId) }
+    fun pending(account: AccountIdentity, itemId: String, episodeId: String?): Boolean =
+        unreadableState.value || state.value.any { it.matches(account, itemId, episodeId) }
 
     fun pendingAccounts(): Set<AccountIdentity> = state.value.map { it.account }.toSet()
+
+    /**
+     * Gives up the unreadable resets at the user's explicit request. The file is kept beside the
+     * new one for recovery; titles play and publish again, and progress they were to discard stays.
+     */
+    @Synchronized
+    fun abandonUnreadable(now: Long = System.currentTimeMillis()) {
+        if (!unreadableState.value) return
+        if (file.exists() && !file.renameTo(File(file.parentFile, "${file.name}.unreadable-$now"))) throw java.io.IOException("The unreadable discards could not be set aside")
+        state.value = emptyList()
+        unreadableState.value = false
+    }
 
     /**
      * Completes the account's requested resets; true when none is left. False without trying while
      * the account is signed out. A failure is thrown after the reset is kept for a later attempt.
      */
     suspend fun complete(account: AccountIdentity): Boolean = running.withLock {
+        if (unreadableState.value) return@withLock false
         val remote = remoteFor(account) ?: return@withLock false
         for (reset in state.value.filter { it.account == account }) exclusive(reset) { finish(remote, reset) }
         state.value.none { it.account == account }
@@ -103,14 +130,14 @@ class ProgressResets(
         state.value = next
     }
 
-    private fun read(): List<Reset> {
-        if (!file.exists()) return emptyList()
-        return try {
-            AbsJson.decodeFromString(Document.serializer(), file.readText()).resets
-        } catch (unreadable: Exception) {
-            // Kept for recovery instead of being overwritten by the next request.
-            file.renameTo(File(file.parentFile, "${file.name}.unreadable-${System.currentTimeMillis()}"))
-            emptyList()
+    private fun read() {
+        if (!file.exists()) return
+        try {
+            val document = AbsJson.decodeFromString(Document.serializer(), file.readText())
+            if (document.version != 1) throw IllegalStateException("Unknown version ${document.version}")
+            state.value = document.resets
+        } catch (failure: Exception) {
+            unreadableState.value = true
         }
     }
 }

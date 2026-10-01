@@ -270,7 +270,19 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
     val graph = LocalContext.current.graph
     val entries by graph.diagnostics.entries.collectAsState()
     val time = remember { DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM) }
+    val unreadableResets by graph.resets.unreadable.collectAsState()
+    var resolving by remember { mutableStateOf(false) }
+    var resolveError by remember { mutableStateOf<String?>(null) }
     LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("diagnostics"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (unreadableResets) item {
+            Column(Modifier.testTag("unreadable-resets"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Saved progress discards could not be read", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+                Text("Any title may be among them, so nothing plays and no reading position is sent until you decide. Setting them aside keeps the file on this device, and any progress they were to discard stays on your server.",
+                    style = MaterialTheme.typography.bodyMedium)
+                TextButton(onClick = { resolving = true }, modifier = Modifier.testTag("resolve-unreadable-resets")) { Text("Set them aside") }
+                resolveError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            }
+        }
         item {
             Column(Modifier.semantics(mergeDescendants = true) {}.testTag("diagnostic-connection"), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text("Connection", style = MaterialTheme.typography.titleSmall)
@@ -294,4 +306,17 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
             HorizontalDivider(Modifier.padding(top = 8.dp))
         }
     }
+    if (resolving) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { resolving = false },
+        title = { Text("Set unreadable discards aside?") },
+        text = { Text("Titles play and reading positions are sent again. Discard progress again for any title you still want to start over.") },
+        confirmButton = {
+            TextButton(onClick = {
+                resolving = false
+                runCatching { graph.resets.abandonUnreadable(); graph.readingSync.publishAll() }
+                    .onFailure { resolveError = it.message ?: "Could not be set aside. Try again." }
+            }, modifier = Modifier.testTag("confirm-resolve-unreadable-resets")) { Text("Set aside") }
+        },
+        dismissButton = { TextButton(onClick = { resolving = false }) { Text("Cancel") } },
+    )
 }

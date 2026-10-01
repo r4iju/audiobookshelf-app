@@ -211,6 +211,8 @@ class ReadingSync(
      * Legacy servers time audio and reading progress together, so listening decides when reading may go.
      */
     private val listeningGate: suspend (AccountIdentity, suspend () -> Unit) -> Boolean = { _, publication -> publication(); true },
+    /** True while the title's progress is being discarded; its pages wait and other titles go ahead. */
+    private val held: (AccountIdentity, String) -> Boolean = { _, _ -> false },
 ) {
     private val lock = Mutex()
     private var retry: Job? = null
@@ -223,12 +225,12 @@ class ReadingSync(
     suspend fun publish(account: AccountIdentity) = lock.withLock {
         val remote = remoteFor(account) ?: return@withLock
         while (true) {
-            if (store.publishable(account).isEmpty()) break
+            if (store.publishable(account).none { !held(account, it.itemId) }) break
             try {
                 // The page is chosen inside the gate: a progress reset that held it may have forgotten the page meanwhile.
                 var chosen: ReadingStore.Entry? = null
                 val allowed = listeningGate(account) {
-                    val next = store.publishable(account).firstOrNull() ?: return@listeningGate
+                    val next = store.publishable(account).firstOrNull { !held(account, it.itemId) } ?: return@listeningGate
                     chosen = next
                     when (store.preflight(next, remote.progress(next.itemId))) {
                         ReadingStore.Preflight.CONFLICT -> Unit

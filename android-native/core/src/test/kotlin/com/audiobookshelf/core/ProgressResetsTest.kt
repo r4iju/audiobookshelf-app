@@ -92,4 +92,22 @@ class ProgressResetsTest {
         assertTrue(resets.complete(qa))
         assertTrue("Reset at ${cleaned.single().second}", cleaned.single().second >= 8_000.0)
     }
+
+    @Test
+    fun unreadableResetsHoldEveryTitleAndAreNeitherDiscardedNorOverwritten() = runBlocking {
+        val file = folder.root.resolve("resets.json")
+        file.writeText("{\"version\":1,\"resets\":[{\"account\"")
+        val server = Server(MediaProgress(id = "p1", libraryItemId = "book-0", currentTime = 10.0, lastUpdate = 2_000.0))
+        val resets = resets(mapOf(qa to server))
+
+        assertTrue("An unreadable reset may be for any title", resets.pending(qa, "book-0", null))
+        assertTrue(resets.pending(other, "book-9", "episode"))
+        runCatching { resets.request(qa, "book-1", null) }
+        assertFalse(resets.complete(qa))
+        assertEquals(listOf<String>(), server.removed)
+        assertEquals("{\"version\":1,\"resets\":[{\"account\"", file.readText())
+
+        // A restart reads the same file and still holds every title.
+        assertTrue(resets(mapOf(qa to server)).pending(qa, "book-0", null))
+    }
 }

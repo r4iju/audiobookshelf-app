@@ -126,8 +126,8 @@ class PlaybackEngine(
     private val device: () -> DeviceInfo,
     private val io: CoroutineDispatcher,
     private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
-    /** True while the title's progress is being discarded; it does not start until that is complete. */
-    private val resetPending: (AccountIdentity, String, String?) -> Boolean = { _, _, _ -> false },
+    /** Why the title may not start while progress is being discarded, or null when it may. */
+    private val resetPending: (AccountIdentity, String, String?) -> String? = { _, _, _ -> null },
 ) {
     private class Loaded(
         val source: PlaySource,
@@ -208,7 +208,7 @@ class PlaybackEngine(
                 // A reading write or progress reset already under way finishes first; neither starts once
                 // this open is loading.
                 readingPublication.withLock {
-                    if (resetPending(source.account, source.itemId, source.episodeId)) throw ResetPending()
+                    resetPending(source.account, source.itemId, source.episodeId)?.let { throw ResetPending(it) }
                 }
                 if (request != generation) return@launch
                 open(source, request, transcode = false, at = null)
@@ -529,7 +529,7 @@ class PlaybackEngine(
         true
     }
 
-    class ResetPending : java.io.IOException("Progress for this title is still being discarded. It plays from the beginning once that is done.")
+    class ResetPending(message: String) : java.io.IOException(message)
 
     private suspend fun closeStream(client: ApiClient, sessionId: String) {
         runCatching { client.closeSession(sessionId) }.onFailure { Log.i(TAG, "Stream session close deferred: ${it.javaClass.simpleName}") }

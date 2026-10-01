@@ -23,7 +23,7 @@ def android_server(port, prefix, bind='127.0.0.1'):
     base = server.RequestHandlerClass
     # Listening sync can be refused on its own, whatever the shared mode, so reading and listening
     # ordering is observable with a document present. Any reconfiguration accepts listening again.
-    refusal = {'listening': False}
+    refusal = {'listening': False, 'reading': False}
     discard_delay = {'seconds': 0}
     # The shared fixture reconfigures progress entries it assumes exist, and keeps progress and
     # bookmarks one journey class added for the next. Reconfiguring restores the titles that had
@@ -113,6 +113,10 @@ def android_server(port, prefix, bind='127.0.0.1'):
                     self.identify_progress()
                     self.account['mediaProgress'] = list(self.progress.values())
                     return self.respond(200, current)
+                if refusal['reading'] and 'ebookLocation' in data:
+                    self.route()
+                    self.observed_request.update(ebookLocation=data['ebookLocation'], applied=False)
+                    return self.respond(503, {})
                 self.rfile = io.BytesIO(body)
             super().do_PATCH()
 
@@ -177,6 +181,10 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 discard_delay['seconds'] = float(self.body().get('seconds', 0))
                 self.route()
                 return self.respond(200, discard_delay)
+            if path == '/__android__/refuse-reading':
+                refusal['reading'] = bool(self.body().get('refuse'))
+                self.route()
+                return self.respond(200, refusal)
             if path == '/__android__/refuse-listening':
                 data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
                 refusal['listening'] = bool(data.get('refuse'))
@@ -187,6 +195,7 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 self.rfile = io.BytesIO(body)
                 reset_actions(json.loads(body or b'{}').get('mode', ''))
                 refusal['listening'] = False
+                refusal['reading'] = False
                 discard_delay['seconds'] = 0
                 for probe, entries, original in zip(probes, accounts, originals):
                     for key in [key for key in entries if key not in original]:

@@ -56,7 +56,13 @@ class AppGraph private constructor(val context: Context) {
     val playback: PlaybackEngine by lazy {
         journal.finishRecoveredSessions()
         PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io, diagnostics::record,
-            resetPending = { account, itemId, episodeId -> resets.pending(account, itemId, episodeId) }).also { progressSync.publishAll() }
+            resetPending = { account, itemId, episodeId ->
+                when {
+                    resets.unreadable.value -> "Saved progress discards could not be read, so nothing plays until they are resolved in Diagnostics."
+                    resets.pending(account, itemId, episodeId) -> "Progress for this title is still being discarded. It plays from the beginning once that is done."
+                    else -> null
+                }
+            }).also { progressSync.publishAll() }
     }
 
     val downloads by lazy {
@@ -73,7 +79,8 @@ class AppGraph private constructor(val context: Context) {
                 }
             }
         }, onSignInRequired = accounts::handle, report = diagnostics::record,
-            listeningGate = { account, publication -> playback.publishReading(account, publication) }).also { sync ->
+            listeningGate = { account, publication -> playback.publishReading(account, publication) },
+            held = { account, itemId -> resets.pending(account, itemId, null) }).also { sync ->
             context.getSystemService(ConnectivityManager::class.java)?.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) = sync.publishAll()
             })
@@ -129,6 +136,8 @@ class AppGraph private constructor(val context: Context) {
                 }
                 failed = failed || !done
             }
+            // Pages held for completed resets, and for other titles, can go now.
+            readingSync.publishAll()
             if (!failed) { resetBackoffMs = 1_000L; return@launch }
             if (resetRetry?.isActive == true) return@launch
             val wait = resetBackoffMs
@@ -151,7 +160,7 @@ class AppGraph private constructor(val context: Context) {
             accounts.handle(failure)
             false
         }
-        if (!done) completeResets()
+        if (done) readingSync.publishAll() else completeResets()
         return done
     }
 
