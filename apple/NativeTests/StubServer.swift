@@ -14,6 +14,8 @@ final class StubServer {
     enum Response {
         case json(Int, Any)
         case status(Int)
+        /// A file body with its content type.
+        case file(Int, String, Data)
         /// The server handled the request but the client never saw the answer.
         case lost
     }
@@ -82,11 +84,13 @@ final class StubProtocol: URLProtocol {
             respond(code, Data())
         case .json(let code, let value):
             respond(code, try! JSONSerialization.data(withJSONObject: value))
+        case .file(let code, let type, let data):
+            respond(code, data, headers: ["Content-Type": type, "Content-Length": String(data.count)])
         }
     }
 
-    private func respond(_ code: Int, _ data: Data) {
-        let response = HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: "HTTP/1.1", headerFields: ["Content-Type": "application/json"])!
+    private func respond(_ code: Int, _ data: Data, headers: [String: String] = ["Content-Type": "application/json"]) {
+        let response = HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: "HTTP/1.1", headerFields: headers)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: data)
         client?.urlProtocolDidFinishLoading(self)
