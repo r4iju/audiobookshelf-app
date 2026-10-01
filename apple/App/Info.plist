@@ -36,6 +36,8 @@
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Connect directly to your Audiobookshelf server on your local network.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save your year in review image to Photos.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

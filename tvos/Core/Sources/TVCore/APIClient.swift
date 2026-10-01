@@ -6,6 +6,9 @@ import Foundation
     private let session: URLSession
     private var refreshTask: Task<Void, Error>?
     private var authGeneration = UUID()
+    /// Changes on every sign-in, sign-out and credential restore (never on token refresh). Compare it before and
+    /// after a sequence of requests to know they all ran for the same signed-in account.
+    public var authorizationRevision: UUID { authGeneration }
 
     public init(store: CredentialStore, session: URLSession = .shared) {
         self.store = store
@@ -57,6 +60,11 @@ import Foundation
     public func yearListeningStats(_ year: Int) async throws -> YearListeningStats {
         guard (2000...9999).contains(year) else { throw APIError.http(400) }
         return try await get("api/me/stats/year/\(year)")
+    }
+
+    public func serverYearStats(_ year: Int) async throws -> ServerYearStats {
+        guard (2000...9999).contains(year) else { throw APIError.http(400) }
+        return try await get("api/stats/year/\(year)")
     }
 
     public func me() async throws -> CurrentUser { try await get("api/me") }
@@ -258,6 +266,13 @@ import Foundation
         try await request("api/items/\(itemID)/cover", query: [URLQueryItem(name: "width", value: "500")])
     }
 
+    /// Like `coverData(itemID:)`, but only for the sign-in identified by `authorization` (an earlier
+    /// `authorizationRevision`). Throws `CancellationError` without sending, or before returning data, once it changed,
+    /// including after a 401 refresh retry.
+    public func coverData(itemID: String, authorization: UUID) async throws -> Data {
+        try await request("api/items/\(itemID)/cover", query: [URLQueryItem(name: "width", value: "500")], pinned: authorization)
+    }
+
     public func validToken() async throws -> String {
         if let refreshTask { try await refreshTask.value }
         if let value = credentials, value.refreshToken != nil, Self.expiresSoon(value.accessToken) {
@@ -282,7 +297,8 @@ import Foundation
         try JSONDecoder().decode(T.self, from: await request(path, query: query))
     }
 
-    private func request(_ path: String, method: String = "GET", query: [URLQueryItem] = [], body: [String: Any]? = nil, bodyData: Data? = nil, retry: Bool = true) async throws -> Data {
+    private func request(_ path: String, method: String = "GET", query: [URLQueryItem] = [], body: [String: Any]? = nil, bodyData: Data? = nil, retry: Bool = true, pinned: UUID? = nil) async throws -> Data {
+        if let pinned, pinned != authGeneration { throw CancellationError() }
         guard let credentials else { throw APIError.signInRequired }
         let generation = authGeneration
         var request = URLRequest(url: try ServerAddress(credentials.server).url(path: path, query: query))
@@ -302,7 +318,7 @@ import Foundation
             guard retry, credentials.refreshToken != nil else { throw APIError.signInRequired }
             // Concurrent cover and library requests share one refresh; a completed refresh also satisfies an older 401.
             if self.credentials?.accessToken == credentials.accessToken { try await refresh() }
-            return try await self.request(path, method: method, query: query, body: body, bodyData: bodyData, retry: false)
+            return try await self.request(path, method: method, query: query, body: body, bodyData: bodyData, retry: false, pinned: pinned)
         }
     }
 

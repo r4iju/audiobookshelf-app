@@ -3,29 +3,71 @@ import UIKit
 
 @MainActor private final class YearReviewStore: ObservableObject {
     @Published private(set) var stats: YearListeningStats?
+    /// Export snapshots for the loaded year and account; replaced (never mutated) when covers arrive.
+    @Published private(set) var export: YearExportSnapshot?
+    /// Present only for admin and root accounts whose server granted `api/stats/year`.
+    @Published private(set) var serverExport: YearExportServerSnapshot?
     @Published private(set) var loading = false
     @Published private(set) var error: String?
     @Published private(set) var year = Calendar(identifier: .gregorian).component(.year, from: Date())
     private let api: APIClient
     private var revision = UUID()
+    private var extras: Task<Void, Never>?
     init(api: APIClient) { self.api = api }
     func load(year: Int) async {
         let request = UUID(); revision = request
-        self.year = year; stats = nil; error = nil; loading = true
+        extras?.cancel(); extras = nil
+        self.year = year; stats = nil; export = nil; serverExport = nil; error = nil; loading = true
         defer { if revision == request { loading = false } }
         do {
+            // The authorization revision changes on every sign-in, so it also catches A -> B -> A switches.
+            let authorization = api.authorizationRevision
             let owner = try await api.currentAccount()
             let value = try await api.yearListeningStats(year)
-            guard revision == request, try await api.currentAccount() == owner else { return }
+            guard revision == request, api.authorizationRevision == authorization, try await api.currentAccount() == owner else { return }
             stats = value
+            export = YearExportSnapshot(stats: value, year: year)
+            extras = Task { [weak self] in await self?.loadExports(year: year, stats: value, authorization: authorization, request: request) }
         } catch { if revision == request { self.error = ConnectionStore.recovery(for: error) } }
     }
-    func invalidate() { revision = UUID(); stats = nil; loading = false }
+    func invalidate() { revision = UUID(); extras?.cancel(); extras = nil; stats = nil; export = nil; serverExport = nil; loading = false }
+
+    /// Covers and the admin server year are optional: any failure, including a 403 or a missing
+    /// cover, leaves the export without them. Every step is scoped to the request and to the
+    /// authorization revision the stats were loaded under; any sign-in change ends the sequence.
+    private func loadExports(year: Int, stats: YearListeningStats, authorization: UUID, request: UUID) async {
+        func valid() -> Bool { revision == request && api.authorizationRevision == authorization && !Task.isCancelled }
+        if let art = try? await YearExportArtworkLoader.load(
+            year: year, primary: stats.finishedBooksWithCovers, secondary: stats.booksWithCovers,
+            api: api, authorization: authorization), valid() {
+            export = YearExportSnapshot(stats: stats, year: year, artwork: art)
+        }
+        guard valid(), let user = try? await api.me(), valid(), user.canViewServerYearStats,
+              let server = try? await api.serverYearStats(year), valid() else { return }
+        serverExport = YearExportServerSnapshot(stats: server, year: year, artwork: nil)
+        if let art = try? await YearExportArtworkLoader.load(
+            year: year, primary: [], secondary: server.booksAddedWithCovers,
+            api: api, authorization: authorization), valid() {
+            serverExport = YearExportServerSnapshot(stats: server, year: year, artwork: art)
+        }
+    }
+}
+
+/// The snapshot captured when a share is tapped; later loads never change an open composer.
+private enum YearReviewExport: Identifiable {
+    case listener(YearExportSnapshot)
+    case server(YearExportServerSnapshot)
+    var id: UUID {
+        switch self {
+        case .listener(let snapshot): return snapshot.id
+        case .server(let snapshot): return snapshot.id
+        }
+    }
 }
 
 struct YearReviewView: View {
     @StateObject private var store: YearReviewStore
-    @State private var share = false
+    @State private var exporting: YearReviewExport?
     init(api: APIClient) { _store = StateObject(wrappedValue: YearReviewStore(api: api)) }
     private func minutes(_ value: Double) -> String {
         let formatter = NumberFormatter(); formatter.numberStyle = .decimal; formatter.maximumFractionDigits = 0
@@ -37,10 +79,6 @@ struct YearReviewView: View {
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = .current
         return formatter.monthSymbols[value]
-    }
-    private var shareText: String {
-        guard let stats = store.stats else { return "" }
-        return "Audiobookshelf • \(store.year)\n\(minutes(stats.totalListeningTime)) minutes listened\n\(stats.numBooksFinished) books finished\n\(stats.numBooksListened) books listened to\n\(stats.totalListeningSessions) listening sessions"
     }
     var body: some View {
         ShelfList {
@@ -89,10 +127,28 @@ struct YearReviewView: View {
                 }
             }
         }.listStyle(InsetGroupedListStyle()).navigationTitle("Year in review")
-            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button { share = true } label: { Image(systemName: "square.and.arrow.up") }.accessibilityLabel("Share year in review").disabled(store.stats == nil) } }
-            .sheet(isPresented: $share) { YearReviewShare(text: shareText) }
+            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { shareButton } }
+            .sheet(item: $exporting) { export in
+                switch export {
+                case .listener(let snapshot): YearExportSheet(snapshot: snapshot) { exporting = nil }
+                case .server(let snapshot): YearExportSheet(server: snapshot) { exporting = nil }
+                }
+            }
             .onAppear { Task { await store.load(year: store.year) } }
             .onDisappear { store.invalidate() }
+    }
+    @ViewBuilder private var shareButton: some View {
+        if let server = store.serverExport {
+            Menu {
+                Button { exporting = store.export.map(YearReviewExport.listener) } label: { Label("Share My Year", systemImage: "person") }
+                    .disabled(store.export == nil)
+                Button { exporting = .server(server) } label: { Label("Share Server Year", systemImage: "server.rack") }
+            } label: { Image(systemName: "square.and.arrow.up") }
+                .accessibilityLabel("Share year in review")
+        } else {
+            Button { exporting = store.export.map(YearReviewExport.listener) } label: { Image(systemName: "square.and.arrow.up") }
+                .accessibilityLabel("Share year in review").disabled(store.export == nil)
+        }
     }
     private func ranked(_ name: String, time: Double) -> some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -100,10 +156,4 @@ struct YearReviewView: View {
             Text("\(minutes(time)) minutes").font(.caption).foregroundColor(.secondary)
         }.padding(.vertical, 4)
     }
-}
-
-private struct YearReviewShare: UIViewControllerRepresentable {
-    let text: String
-    func makeUIViewController(context: Context) -> UIActivityViewController { UIActivityViewController(activityItems: [text], applicationActivities: nil) }
-    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
 }
