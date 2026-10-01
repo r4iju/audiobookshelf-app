@@ -212,5 +212,20 @@ class ProgressWriteOutcomeJourney(FixtureJourneyBase):
         sent = [entry for entry in self.request('/__fixture__/observations')['requests'] if entry['path'] == '/api/session/local-all']
         self.assertEqual([entry.get('body') for entry in sent], [{'sessions': [self.session]}])
 
+    def test_an_offline_library_refuses_writes_in_its_own_handler_and_reads_through_a_gateway(self):
+        # A write refused before anything is stored is answered by the server itself, so a client may
+        # resend it; reads keep the gateway's 503.
+        self.request('/__fixture__/configure', {'mode': 'offline-library'})
+        self.assertEqual(self.status('/api/session/local-all', {'sessions': [self.session]}), 500)
+        self.assertEqual(self.status('/api/me/item/book-0/bookmark', {'title': 'Mark', 'time': 3}, 'PATCH'), 500)
+        self.assertEqual(self.status('/api/me'), 503)
+        self.assertEqual(self.request('/__fixture__/observations')['localSessions'], [])
+
+    def test_a_lost_acknowledgment_stores_the_session_and_answers_through_a_gateway(self):
+        self.request('/__fixture__/configure', {'mode': 'lost-ack'})
+        self.assertEqual(self.status('/api/session/local-all', {'sessions': [self.session]}), 503)
+        self.assertEqual(self.request('/__fixture__/observations')['localSessions'], [self.session])
+
+
 if __name__ == '__main__':
     unittest.main()

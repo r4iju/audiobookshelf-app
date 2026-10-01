@@ -651,7 +651,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if not self.authorized():
                 return self.respond(401, {})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
-                return self.respond(503, {})
+                # The server's own handler refuses the write before storing anything, so the client knows it
+                # was not applied. Reads keep the gateway's 503.
+                return self.respond(500, {'error': 'Synthetic offline library'})
             if path == '/api/authorize':
                 return self.respond(200, {'user': self.account, 'ereaderDevices': [],
                     'serverSettings': {'version': '2.30.0-fixture', 'language': 'en-us'}, 'userDefaultLibraryId': 'books'})
