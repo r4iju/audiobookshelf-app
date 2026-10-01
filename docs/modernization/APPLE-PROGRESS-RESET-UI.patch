@@ -1,0 +1,1007 @@
+diff --git a/apple/App/BookDetails.swift b/apple/App/BookDetails.swift
+index adac576f..4d17af48 100644
+--- a/apple/App/BookDetails.swift
++++ b/apple/App/BookDetails.swift
+@@ -9,6 +9,7 @@ struct BookDetails: View {
+     @State private var reader: ReadingSource?
+     @EnvironmentObject private var localDownloads: NativeDownloads
+     @EnvironmentObject private var player: ApplePlayback
++    @EnvironmentObject private var migration: NativeMigrationStore
+     @Environment(\.nativeStrings) private var l10n
+     let item: LibraryItem
+     let catalog: CatalogStore
+@@ -23,6 +24,8 @@ struct BookDetails: View {
+     @AppStorage("previewEpisodeDescending") private var episodeDescending = true
+     @State private var episodeFilter = "all"
+     @State private var confirmCompletion = false
++    @State private var confirmDiscard = false
++    @State private var progressDiscarded = false
+     @State private var progressBusy = false
+     @State private var progressRequest: Task<Void, Never>?
+     @State private var canManagePodcasts = false
+@@ -52,6 +55,13 @@ struct BookDetails: View {
+                 }
+                 if episode != nil || book.mediaType == "book" {
+                     Button(l10n(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished"), action: toggleFinished).disabled(progressBusy)
++                    if let progress = selectedProgress, (progress.progress ?? 0) > 0 || (progress.ebookProgress ?? 0) > 0 {
++                        Button(l10n("Discard progress")) { NativeHaptic.impact("discard-progress"); confirmDiscard = true }
++                            .disabled(progressBusy).accessibilityIdentifier("discard-progress")
++                            .alert(isPresented: $confirmDiscard) {
++                                Alert(title: Text(l10n("Confirm")), message: Text(l10n("Are you sure you want to reset your progress?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
++                            }
++                    }
+                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
+                 }
+                 if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
+@@ -184,8 +194,28 @@ struct BookDetails: View {
+         }
+     }
+ 
++    private func discardProgress() {
++        guard !progressBusy else { return }
++        request?.cancel()
++        detailRevision = UUID()
++        progressBusy = true
++        error = nil
++        progressRequest = Task {
++            defer { progressBusy = false }
++            do {
++                let account = try await catalog.api.currentAccount()
++                let user = try await migration.resetProgress(account: account, itemID: book.id, episodeID: episode?.id, reading: readingStore)
++                guard !Task.isCancelled else { return }
++                progressDiscarded = true
++                mediaProgress = user.mediaProgress
++                catalog.discardProgress(user, itemID: book.id, episodeID: episode?.id)
++            } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
++        }
++    }
++
++    // After a discard the progress this view was opened with is stale.
+     private var selectedProgress: MediaProgress? {
+-        mediaProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? progress
++        mediaProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? (progressDiscarded ? nil : progress)
+     }
+     private var listeningDuration: Double? {
+         if let episode { return episode.duration ?? episode.audioFile?.duration }
+diff --git a/apple/App/CatalogStore.swift b/apple/App/CatalogStore.swift
+index 8f812164..6df876a7 100644
+--- a/apple/App/CatalogStore.swift
++++ b/apple/App/CatalogStore.swift
+@@ -92,6 +92,15 @@ import SwiftUI
+         state = .content(content)
+     }
+ 
++    /// Applies the user after a progress reset; Continue Listening keeps items without progress
++    /// otherwise, so the reset book or episode is removed explicitly.
++    func discardProgress(_ user: CurrentUser, itemID: String, episodeID: String?) {
++        applyProgress(user)
++        guard case .content(var content) = state, content.user.id == user.id else { return }
++        content.continuing.removeAll { $0.id == itemID && $0.recentEpisode?.id == episodeID }
++        state = .content(content)
++    }
++
+     func refreshProgressIfNeeded() async {
+         guard needsProgressRefresh, case .content(var current) = state, !current.loadingMore else { return }
+         let request = generation
+diff --git a/apple/App/NativeMigrationImport.swift b/apple/App/NativeMigrationImport.swift
+index a7b05e82..35497eb4 100644
+--- a/apple/App/NativeMigrationImport.swift
++++ b/apple/App/NativeMigrationImport.swift
+@@ -19,6 +19,11 @@ import UniformTypeIdentifiers
+         self.adopter = adopter
+         self.player = player
+     }
++    /// Discards the user's progress for the media so that carried-over legacy listening and
++    /// positions cannot bring it back.
++    func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?, reading: ReadingStore) async throws -> CurrentUser {
++        try await player.resetProgress(account: account, itemID: itemID, episodeID: episodeID, reading: reading, adoption: adopter)
++    }
+     private var selectedURL: URL?
+     private var selectedFingerprint: String?
+     private var syncPending = false
+diff --git a/apple/Localization/COVERAGE.md b/apple/Localization/COVERAGE.md
+index a160258a..98a1ef9b 100644
+--- a/apple/Localization/COVERAGE.md
++++ b/apple/Localization/COVERAGE.md
+@@ -1,36 +1,36 @@
+ # Native localization coverage
+ 
+-Generated by `apple/Localization/generate.py`. Native screens show 506 distinct texts. 98 of them have a legacy key with the same meaning (`legacy-equivalents.json`); a language shows a translation only where its legacy file has a usable value for that key. All other text stays in English, and the Language screen says so.
++Generated by `apple/Localization/generate.py`. Native screens show 509 distinct texts. 101 of them have a legacy key with the same meaning (`legacy-equivalents.json`); a language shows a translation only where its legacy file has a usable value for that key. All other text stays in English, and the Language screen says so.
+ 
+ | Language | Resources | Translated texts | Share |
+ | --- | --- | ---: | ---: |
+-| `en-us` | `en.lproj` | 506 | 100% |
+-| `ar` | `ar.lproj` | 98 | 19% |
+-| `be` | `be.lproj` | 98 | 19% |
+-| `bg` | `bg.lproj` | 98 | 19% |
+-| `bn` | `bn.lproj` | 98 | 19% |
+-| `ca` | `ca.lproj` | 93 | 18% |
+-| `cs` | `cs.lproj` | 98 | 19% |
+-| `da` | `da.lproj` | 98 | 19% |
+-| `de` | `de.lproj` | 98 | 19% |
+-| `es` | `es.lproj` | 98 | 19% |
+-| `fi` | `fi.lproj` | 98 | 19% |
+-| `fr` | `fr.lproj` | 98 | 19% |
+-| `he` | `he.lproj` | 95 | 19% |
+-| `hr` | `hr.lproj` | 98 | 19% |
+-| `it` | `it.lproj` | 98 | 19% |
+-| `lt` | `lt.lproj` | 66 | 13% |
+-| `hu` | `hu.lproj` | 98 | 19% |
+-| `ko` | `ko.lproj` | 95 | 19% |
+-| `nl` | `nl.lproj` | 98 | 19% |
+-| `no` | `nb.lproj` | 98 | 19% |
+-| `pl` | `pl.lproj` | 98 | 19% |
+-| `pt-br` | `pt-BR.lproj` | 98 | 19% |
+-| `ru` | `ru.lproj` | 98 | 19% |
+-| `sk` | `sk.lproj` | 98 | 19% |
+-| `sl` | `sl.lproj` | 98 | 19% |
+-| `sv` | `sv.lproj` | 98 | 19% |
+-| `tr` | `tr.lproj` | 93 | 18% |
+-| `uk` | `uk.lproj` | 98 | 19% |
+-| `vi-vn` | `vi.lproj` | 85 | 17% |
+-| `zh-cn` | `zh-Hans.lproj` | 98 | 19% |
++| `en-us` | `en.lproj` | 509 | 100% |
++| `ar` | `ar.lproj` | 101 | 20% |
++| `be` | `be.lproj` | 101 | 20% |
++| `bg` | `bg.lproj` | 101 | 20% |
++| `bn` | `bn.lproj` | 101 | 20% |
++| `ca` | `ca.lproj` | 96 | 19% |
++| `cs` | `cs.lproj` | 101 | 20% |
++| `da` | `da.lproj` | 101 | 20% |
++| `de` | `de.lproj` | 101 | 20% |
++| `es` | `es.lproj` | 101 | 20% |
++| `fi` | `fi.lproj` | 101 | 20% |
++| `fr` | `fr.lproj` | 101 | 20% |
++| `he` | `he.lproj` | 97 | 19% |
++| `hr` | `hr.lproj` | 101 | 20% |
++| `it` | `it.lproj` | 101 | 20% |
++| `lt` | `lt.lproj` | 69 | 14% |
++| `hu` | `hu.lproj` | 101 | 20% |
++| `ko` | `ko.lproj` | 97 | 19% |
++| `nl` | `nl.lproj` | 101 | 20% |
++| `no` | `nb.lproj` | 101 | 20% |
++| `pl` | `pl.lproj` | 101 | 20% |
++| `pt-br` | `pt-BR.lproj` | 101 | 20% |
++| `ru` | `ru.lproj` | 101 | 20% |
++| `sk` | `sk.lproj` | 101 | 20% |
++| `sl` | `sl.lproj` | 101 | 20% |
++| `sv` | `sv.lproj` | 101 | 20% |
++| `tr` | `tr.lproj` | 95 | 19% |
++| `uk` | `uk.lproj` | 101 | 20% |
++| `vi-vn` | `vi.lproj` | 87 | 17% |
++| `zh-cn` | `zh-Hans.lproj` | 101 | 20% |
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/ar.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/ar.lproj/NativeStrings.strings
+index ee1e6f26..407a1ef0 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/ar.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/ar.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "السماح بالبحث عن الموضع في التحكم بإشعارات الوسائط";
+ "Always" = "دائماً";
++"Are you sure you want to reset your progress?" = "هل أنت متأكد أنك تريد إعادة تعيين تقدمك؟";
+ "Ask" = "اطلب التأكيد";
+ "Author" = "المؤلف";
+ "Author, first name" = "المؤلف (الاسم الأول الأخير)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "إغلاق المشغل";
+ "Collections" = "المجموعات";
+ "Complete" = "مكتمل";
++"Confirm" = "تأكيد";
+ "Contents" = "جدول المحتويات";
+ "Continue listening" = "استمرار الاستماع";
+ "Dark" = "غامق";
+@@ -26,6 +28,7 @@
+ "Delete" = "حذف";
+ "Description" = "الوصف";
+ "Details" = "التفاصيل";
++"Discard progress" = "إلغاء التقدم";
+ "Download for offline" = "تنزيل";
+ "Downloaded" = "تم تنزيلها";
+ "Downloads" = "التنزيلات";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/be.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/be.lproj/NativeStrings.strings
+index 48fd11f4..edcba18a 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/be.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/be.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Дазволіць перамотку медыя праз элементы кіравання ў апавяшчэннях";
+ "Always" = "Заўсёды";
++"Are you sure you want to reset your progress?" = "Вы ўпэўнены, што хочаце скінуць прагрэс?";
+ "Ask" = "Запытваць пацвярджэнне";
+ "Author" = "Аўтар";
+ "Author, first name" = "Аўтар (імя, прозвішча)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Закрыць прайгравальнік";
+ "Collections" = "Калекцыі";
+ "Complete" = "Завяршыць";
++"Confirm" = "Пацвердзіць";
+ "Contents" = "Змест";
+ "Continue listening" = "Працяг праслухоўвання";
+ "Dark" = "Цёмная";
+@@ -26,6 +28,7 @@
+ "Delete" = "Выдаліць";
+ "Description" = "Апісанне";
+ "Details" = "Падрабязнасці";
++"Discard progress" = "Скінуць прагрэс";
+ "Download for offline" = "Спампаваць";
+ "Downloaded" = "Спампавана";
+ "Downloads" = "Спампоўкі";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/bg.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/bg.lproj/NativeStrings.strings
+index 55995504..05f553d5 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/bg.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/bg.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Разрешаване на търсене на позиция в контролите за медийни известия";
+ "Always" = "Винаги";
++"Are you sure you want to reset your progress?" = "Сигурни ли сте, че искате да нулирате напредъка си?";
+ "Ask" = "Изискай потвърждение";
+ "Author" = "Автор";
+ "Author, first name" = "Автор (Първи, Последен)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Затвори плейъра";
+ "Collections" = "Колекции";
+ "Complete" = "Приключено";
++"Confirm" = "Потвърди";
+ "Contents" = "Съдържание";
+ "Continue listening" = "Продължи слушане";
+ "Dark" = "Тъмна";
+@@ -26,6 +28,7 @@
+ "Delete" = "Изтрий";
+ "Description" = "Описание";
+ "Details" = "Детайли";
++"Discard progress" = "Нулирай прогреса";
+ "Download for offline" = "Свали";
+ "Downloaded" = "Свалени";
+ "Downloads" = "Свалени файлове";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/bn.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/bn.lproj/NativeStrings.strings
+index 370e6841..e4da2916 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/bn.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/bn.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "মিডিয়া বিজ্ঞপ্তি নিয়ন্ত্রণে অবস্থান খোঁজার অনুমতি দিন";
+ "Always" = "সর্বদা";
++"Are you sure you want to reset your progress?" = "আপনি কি নিশ্চিত আপনার অগ্রগতি পুনরায় সেট করতে চান?";
+ "Ask" = "নিশ্চিতকরণের জন্য জিজ্ঞাসা করুন";
+ "Author" = "লেখক";
+ "Author, first name" = "লেখক (প্রথম শেষ)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "প্লেয়ার বন্ধ করুন";
+ "Collections" = "সংগ্রহ";
+ "Complete" = "সম্পূর্ণ";
++"Confirm" = "নিশ্চিত করুন";
+ "Contents" = "বিষয়বস্তুর সারণী";
+ "Continue listening" = "শোনা চালিয়ে যান";
+ "Dark" = "অন্ধকার";
+@@ -26,6 +28,7 @@
+ "Delete" = "মুছুন";
+ "Description" = "বিবরণ";
+ "Details" = "বিস্তারিত";
++"Discard progress" = "অগ্রগতি বাতিল করুন";
+ "Download for offline" = "ডাউনলোড করুন";
+ "Downloaded" = "ডাউনলোড করা হয়েছে";
+ "Downloads" = "ডাউনলোড";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/ca.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/ca.lproj/NativeStrings.strings
+index 2f21642a..954d5346 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/ca.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/ca.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Permetre la cerca en controls de mitjans";
+ "Always" = "Sempre";
++"Are you sure you want to reset your progress?" = "Segur que voleu reinicialitzar el vostre progrés?";
+ "Ask" = "Demana confirmació";
+ "Author" = "Autor";
+ "Author, first name" = "Autor (Nom Cognom)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Tanca el reproductor";
+ "Collections" = "Col·leccions";
+ "Complete" = "Complet";
++"Confirm" = "Confirma";
+ "Contents" = "Sumari";
+ "Continue listening" = "Continuar escoltant";
+ "Dark" = "Fosc";
+@@ -26,6 +28,7 @@
+ "Delete" = "Suprimeix";
+ "Description" = "Descripció";
+ "Details" = "Detalls";
++"Discard progress" = "Descarta el progrés";
+ "Download for offline" = "Descarregar";
+ "Downloaded" = "Descarregat";
+ "Downloads" = "Baixades";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/cs.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/cs.lproj/NativeStrings.strings
+index da257122..8767bf79 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/cs.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/cs.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Povolit vyhledávání polohy v ovládacích prvcích oznámení médií";
+ "Always" = "Vždy";
++"Are you sure you want to reset your progress?" = "Opravdu chcete zahodit svůj pokrok?";
+ "Ask" = "Požádat o potvrzení";
+ "Author" = "Autor";
+ "Author, first name" = "Autor (jméno a příjmení)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Zavřít přehrávač";
+ "Collections" = "Kolekce";
+ "Complete" = "Dokončeno";
++"Confirm" = "Potvrzení";
+ "Contents" = "Obsah";
+ "Continue listening" = "Pokračovat v poslechu";
+ "Dark" = "Tmavé";
+@@ -26,6 +28,7 @@
+ "Delete" = "Smazat";
+ "Description" = "Popis";
+ "Details" = "Podrobnosti";
++"Discard progress" = "Zahodit pokrok";
+ "Download for offline" = "Stáhnout";
+ "Downloaded" = "Staženo";
+ "Downloads" = "Stahování";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/da.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/da.lproj/NativeStrings.strings
+index 7dc13415..a2838f9f 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/da.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/da.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Tillad positionssøgning på mediemeddelelseskontroller";
+ "Always" = "Altid";
++"Are you sure you want to reset your progress?" = "Er du sikker på at du vil nulstille din fremgang?";
+ "Ask" = "Bed om bekræftelse";
+ "Author" = "Forfatter";
+ "Author, first name" = "Forfatter (Fornavn Efternavn)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Luk afspiller";
+ "Collections" = "Samlinger";
+ "Complete" = "Afsluttet";
++"Confirm" = "Bekræft";
+ "Contents" = "Indholdsfortegnelse";
+ "Continue listening" = "Fortsæt med at lytte";
+ "Dark" = "Mørk";
+@@ -26,6 +28,7 @@
+ "Delete" = "Slet";
+ "Description" = "Beskrivelse";
+ "Details" = "Detaljer";
++"Discard progress" = "Kassér fremgang";
+ "Download for offline" = "Hent";
+ "Downloaded" = "Downloadet";
+ "Downloads" = "Overførsler";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/de.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/de.lproj/NativeStrings.strings
+index 19cee1cc..19a58548 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/de.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/de.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Erlaube Vor- und Zurückspulen auf dem Medienkontrollelement bei den Benachrichtigungen";
+ "Always" = "Immer";
++"Are you sure you want to reset your progress?" = "Bist du sicher, dass du deinen Fortschritt zurücksetzen willst?";
+ "Ask" = "Bestätigung anfordern";
+ "Author" = "Autor";
+ "Author, first name" = "Autor (Vorname Nachname)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Player schließen";
+ "Collections" = "Sammlungen";
+ "Complete" = "Vollständig";
++"Confirm" = "Bestätigen";
+ "Contents" = "Inhaltsverzeichnis";
+ "Continue listening" = "Weiterhören";
+ "Dark" = "Dunkel";
+@@ -26,6 +28,7 @@
+ "Delete" = "Löschen";
+ "Description" = "Beschreibung";
+ "Details" = "Details";
++"Discard progress" = "Fortschritt verwerfen";
+ "Download for offline" = "Herunterladen";
+ "Downloaded" = "Heruntergeladen";
+ "Downloads" = "Downloads";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/en.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/en.lproj/NativeStrings.strings
+index d87fe1ba..7e555e08 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/en.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/en.lproj/NativeStrings.strings
+@@ -23,6 +23,7 @@
+ "Always" = "Always";
+ "An earlier import is already saved. Choose its original export to retry or repair it." = "An earlier import is already saved. Choose its original export to retry or repair it.";
+ "Appearance" = "Appearance";
++"Are you sure you want to reset your progress?" = "Are you sure you want to reset your progress?";
+ "Ascending order" = "Ascending order";
+ "Ask" = "Ask";
+ "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions." = "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions.";
+@@ -69,6 +70,7 @@
+ "Collections" = "Collections";
+ "Compact" = "Compact";
+ "Complete" = "Complete";
++"Confirm" = "Confirm";
+ "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported.";
+ "Connect to your library" = "Connect to your library";
+ "Connecting" = "Connecting";
+@@ -98,6 +100,7 @@
+ "Details" = "Details";
+ "Diagnostics" = "Diagnostics";
+ "Diagnostics storage" = "Diagnostics storage";
++"Discard progress" = "Discard progress";
+ "Discover a podcast" = "Discover a podcast";
+ "Dismiss" = "Dismiss";
+ "Done" = "Done";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/es.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/es.lproj/NativeStrings.strings
+index a9daf339..b041e3fe 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/es.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/es.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Concede la búsqueda de posición en los controles de notificación de medios";
+ "Always" = "Siempre";
++"Are you sure you want to reset your progress?" = "¿Confirma que quiere restablecer su progreso?";
+ "Ask" = "Pedir confirmación";
+ "Author" = "Autor";
+ "Author, first name" = "Autor (Nombre Apellido)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Cerrar reproductor";
+ "Collections" = "Colecciones";
+ "Complete" = "Completo";
++"Confirm" = "Confirmar";
+ "Contents" = "Sumario";
+ "Continue listening" = "Seguir Escuchando";
+ "Dark" = "Oscuro";
+@@ -26,6 +28,7 @@
+ "Delete" = "Eliminar";
+ "Description" = "Descripción";
+ "Details" = "Detalles";
++"Discard progress" = "Descartar progreso";
+ "Download for offline" = "Descargar";
+ "Downloaded" = "Descargado";
+ "Downloads" = "Descargas";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/fi.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/fi.lproj/NativeStrings.strings
+index 448494b3..39c670f1 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/fi.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/fi.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Salli kelaaminen ilmoituksen säätimillä";
+ "Always" = "Aina";
++"Are you sure you want to reset your progress?" = "Haluatko varmasti nollata edistymisesi?";
+ "Ask" = "Kysy varmistusta";
+ "Author" = "Tekijä";
+ "Author, first name" = "Tekijä (Etunimi Sukunimi)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Sulje soitin";
+ "Collections" = "Kokoelmat";
+ "Complete" = "Valmis";
++"Confirm" = "Vahvista";
+ "Contents" = "Sisällysluettelo";
+ "Continue listening" = "Jatka kuuntelua";
+ "Dark" = "Tumma";
+@@ -26,6 +28,7 @@
+ "Delete" = "Poista";
+ "Description" = "Kuvaus";
+ "Details" = "Yksityiskohdat";
++"Discard progress" = "Hylkää edistyminen";
+ "Download for offline" = "Lataa";
+ "Downloaded" = "Ladatut";
+ "Downloads" = "Lataukset";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/fr.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/fr.lproj/NativeStrings.strings
+index 574f4443..fbce355e 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/fr.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/fr.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Autoriser la recherche de position depuis la notification du lecteur multimédia";
+ "Always" = "Toujours";
++"Are you sure you want to reset your progress?" = "Êtes-vous sûr·e de vouloir supprimer votre progression ?";
+ "Ask" = "Demander une confirmation";
+ "Author" = "Auteur";
+ "Author, first name" = "Auteur (Prénom Nom)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Fermer le lecteur";
+ "Collections" = "Collections";
+ "Complete" = "Complet";
++"Confirm" = "Confirmer";
+ "Contents" = "Table des matières";
+ "Continue listening" = "Continuer l'écoute";
+ "Dark" = "Sombre";
+@@ -26,6 +28,7 @@
+ "Delete" = "Supprimer";
+ "Description" = "Description";
+ "Details" = "Détails";
++"Discard progress" = "Supprimer la progression";
+ "Download for offline" = "Télécharger";
+ "Downloaded" = "Téléchargé";
+ "Downloads" = "Téléchargements";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/he.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/he.lproj/NativeStrings.strings
+index 25e67fb9..b91991e2 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/he.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/he.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "אפשר לשנות מיקום בבקר התראות מדיה";
+ "Always" = "תמיד";
++"Are you sure you want to reset your progress?" = "אתה בטוח שאתה רוצה לאפס את ההתקדמות שלך?";
+ "Ask" = "בקש אישור";
+ "Author" = "סופר";
+ "Author, first name" = "סופר (שם, משפחה)";
+@@ -26,6 +27,7 @@
+ "Delete" = "מחק";
+ "Description" = "תיאור";
+ "Details" = "פרטים";
++"Discard progress" = "איפוס התקדמות";
+ "Download for offline" = "הורדה";
+ "Downloaded" = "הורד";
+ "Downloads" = "הורדות";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/hr.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/hr.lproj/NativeStrings.strings
+index ff7c2251..1df19c2a 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/hr.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/hr.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Dopusti pretraživanje položaja na obavijesti s upravljanjem medijima";
+ "Always" = "Uvijek";
++"Are you sure you want to reset your progress?" = "Sigurno želite resetirati napredak?";
+ "Ask" = "Zatraži potvrdu";
+ "Author" = "Autor";
+ "Author, first name" = "Autor (Ime Prezime)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Zatvori reproduktor";
+ "Collections" = "Zbirke";
+ "Complete" = "Potpuno";
++"Confirm" = "Potvrdi";
+ "Contents" = "Sadržaj";
+ "Continue listening" = "Nastavi slušati";
+ "Dark" = "Tamna";
+@@ -26,6 +28,7 @@
+ "Delete" = "Izbriši";
+ "Description" = "Opis";
+ "Details" = "Pojedinosti";
++"Discard progress" = "Zanemari napredak";
+ "Download for offline" = "Preuzmi";
+ "Downloaded" = "Preuzeto";
+ "Downloads" = "Preuzimanja";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/hu.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/hu.lproj/NativeStrings.strings
+index a54c1200..74f5805a 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/hu.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/hu.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Pozíció keresés engedélyezése a média értesítési vezérlőkön";
+ "Always" = "Mindig";
++"Are you sure you want to reset your progress?" = "Biztosan alaphelyzetbe akarja állítani a haladást?";
+ "Ask" = "Kérjen megerősítést";
+ "Author" = "Szerző";
+ "Author, first name" = "Szerző (Keresztnév Vezetéknév)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Lejátszó bezárása";
+ "Collections" = "Gyűjtemények";
+ "Complete" = "Kész";
++"Confirm" = "Megerősítés";
+ "Contents" = "Tartalomjegyzék";
+ "Continue listening" = "Hallgatás folytatása";
+ "Dark" = "Sötét";
+@@ -26,6 +28,7 @@
+ "Delete" = "Törlés";
+ "Description" = "Leírás";
+ "Details" = "Részletek";
++"Discard progress" = "Haladás elvetése";
+ "Download for offline" = "Letöltés";
+ "Downloaded" = "Letöltve";
+ "Downloads" = "Letöltések";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/it.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/it.lproj/NativeStrings.strings
+index 37a1407f..5fcbbc54 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/it.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/it.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Consenti la ricerca della posizione sui controlli delle notifiche multimediali";
+ "Always" = "Sempre";
++"Are you sure you want to reset your progress?" = "Sei sicuro/sicura di voler ripristinare i tuoi progressi?";
+ "Ask" = "Richiedi una conferma";
+ "Author" = "Autore";
+ "Author, first name" = "Autore (Per Nome)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Chiudi player";
+ "Collections" = "Raccolte";
+ "Complete" = "Completo";
++"Confirm" = "Conferma";
+ "Contents" = "Indice";
+ "Continue listening" = "Continua l'ascolto";
+ "Dark" = "Scuro";
+@@ -26,6 +28,7 @@
+ "Delete" = "Elimina";
+ "Description" = "Descrizione";
+ "Details" = "Dettagli";
++"Discard progress" = "Elimina i progressi";
+ "Download for offline" = "Scarica";
+ "Downloaded" = "Scaricati";
+ "Downloads" = "Scaricamenti";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/ko.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/ko.lproj/NativeStrings.strings
+index c2ce0bab..69fd9429 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/ko.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/ko.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "미디어 알림 컨트롤에서 위치 탐색 허용";
+ "Always" = "항상";
++"Are you sure you want to reset your progress?" = "진행 상황을 재설정하시겠습니까?";
+ "Ask" = "확인을 요청하세요";
+ "Author" = "작가";
+ "Author, first name" = "작가 (이름 성)";
+@@ -24,6 +25,7 @@
+ "Delete" = "삭제";
+ "Description" = "설명";
+ "Details" = "세부사항";
++"Discard progress" = "진행 상황 삭제";
+ "Download for offline" = "다운로드";
+ "Downloaded" = "다운로드됨";
+ "Downloads" = "다운로드";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/lt.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/lt.lproj/NativeStrings.strings
+index 5e7cb6fc..298300ec 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/lt.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/lt.lproj/NativeStrings.strings
+@@ -1,5 +1,6 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Always" = "Visada";
++"Are you sure you want to reset your progress?" = "Ar tikrai norite ištrinti savo progresą?";
+ "Ask" = "Prašyti patvirtinimo";
+ "Author" = "Autorius";
+ "Author, first name" = "Autorius (Vardas Pavardė)";
+@@ -12,12 +13,14 @@
+ "Close playback" = "Uždaryti grotuvą";
+ "Collections" = "Kolekcijos";
+ "Complete" = "Baigta";
++"Confirm" = "Patvirtinti";
+ "Contents" = "Turinys";
+ "Continue listening" = "Klausytis toliau";
+ "Dark" = "Tamsi";
+ "Delete" = "Ištrinti";
+ "Description" = "Aprašymas";
+ "Details" = "Detalės";
++"Discard progress" = "Ištrinti progresą";
+ "Download for offline" = "Atsisiųsti";
+ "Downloaded" = "Atsisiųsta";
+ "Downloads" = "Atsisiuntimai";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/nb.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/nb.lproj/NativeStrings.strings
+index 31d7963d..84b19805 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/nb.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/nb.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Tillat posisjonsblafring i mediamerknadskontroller";
+ "Always" = "Alltid";
++"Are you sure you want to reset your progress?" = "Er du sikker på at du vil tilbakestille fremdriften din?";
+ "Ask" = "Spør om bekreftelse";
+ "Author" = "Forfatter";
+ "Author, first name" = "Forfatter (Fornavn Etternavn)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Lukk spiller";
+ "Collections" = "Samlinger";
+ "Complete" = "Fullfør";
++"Confirm" = "Bekreft";
+ "Contents" = "Innholdsfortegnelse";
+ "Continue listening" = "Fortsett lytting";
+ "Dark" = "Mørk";
+@@ -26,6 +28,7 @@
+ "Delete" = "Slett";
+ "Description" = "Beskrivelse";
+ "Details" = "Detaljer";
++"Discard progress" = "Forkast framdrift";
+ "Download for offline" = "Last ned";
+ "Downloaded" = "Nedlastet";
+ "Downloads" = "Nedlastinger";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/nl.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/nl.lproj/NativeStrings.strings
+index acb30be3..9b5fb310 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/nl.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/nl.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Positie zoeken toestaan via media notificatie";
+ "Always" = "Altijd";
++"Are you sure you want to reset your progress?" = "Weet u zeker dat u uw voortgang wilt resetten?";
+ "Ask" = "Vraag voor bevestiging";
+ "Author" = "Auteur";
+ "Author, first name" = "Auteur (Voornaam Achternaam)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Sluit speler";
+ "Collections" = "Collecties";
+ "Complete" = "Compleet";
++"Confirm" = "Bevestigen";
+ "Contents" = "Inhoudsopgave";
+ "Continue listening" = "Verder Luisteren";
+ "Dark" = "Donker";
+@@ -26,6 +28,7 @@
+ "Delete" = "Verwijder";
+ "Description" = "Beschrijving";
+ "Details" = "Details";
++"Discard progress" = "Voortgang negeren";
+ "Download for offline" = "Download";
+ "Downloaded" = "Gedownload";
+ "Downloads" = "Downloads";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/pl.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/pl.lproj/NativeStrings.strings
+index e2725c69..5401cc0f 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/pl.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/pl.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Zezwól na wyszukiwanie pozycji na ekranie blokady";
+ "Always" = "Zawsze";
++"Are you sure you want to reset your progress?" = "Na pewno chcesz zresetować postęp?";
+ "Ask" = "Pytaj o potwierdzenie";
+ "Author" = "Autor";
+ "Author, first name" = "Autor (Rosnąco)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Zamknij odtwarzacz";
+ "Collections" = "Kolekcje";
+ "Complete" = "Ukończone";
++"Confirm" = "Potwierdzić";
+ "Contents" = "Spis treści";
+ "Continue listening" = "Kontynuuj słuchanie";
+ "Dark" = "Ciemny";
+@@ -26,6 +28,7 @@
+ "Delete" = "Usuń";
+ "Description" = "Opis";
+ "Details" = "Szczegóły";
++"Discard progress" = "Zresetuj postęp";
+ "Download for offline" = "Pobierz";
+ "Downloaded" = "Pobrane";
+ "Downloads" = "Pobrane";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/pt-BR.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/pt-BR.lproj/NativeStrings.strings
+index f758fa39..9fd08d1a 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/pt-BR.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/pt-BR.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Permitir busca de posição nos controles de notificação de mídia";
+ "Always" = "Sempre";
++"Are you sure you want to reset your progress?" = "Tem certeza de que deseja resetar o seu progresso?";
+ "Ask" = "Pedir confirmação";
+ "Author" = "Autor";
+ "Author, first name" = "Autor (Nome Sobrenome)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Fechar Reprodutor";
+ "Collections" = "Coleções";
+ "Complete" = "Concluído";
++"Confirm" = "Confirmar";
+ "Contents" = "Sumário";
+ "Continue listening" = "Continuar Escutando";
+ "Dark" = "Escuro";
+@@ -26,6 +28,7 @@
+ "Delete" = "Apagar";
+ "Description" = "Descrição";
+ "Details" = "Detalhes";
++"Discard progress" = "Descartar Progresso";
+ "Download for offline" = "Download";
+ "Downloaded" = "Download realizado";
+ "Downloads" = "Downloads";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/ru.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/ru.lproj/NativeStrings.strings
+index 6781ad3b..11f95989 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/ru.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/ru.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Разрешить перемотку элементами управления мультимедиа";
+ "Always" = "Всегда";
++"Are you sure you want to reset your progress?" = "Вы уверены, что хотите сбросить свой прогресс?";
+ "Ask" = "Запросить подтверждение";
+ "Author" = "Автор";
+ "Author, first name" = "Автор (Имя Фамилия)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Закрыть проигрыватель";
+ "Collections" = "Коллекции";
+ "Complete" = "Завершить";
++"Confirm" = "Подтвердить";
+ "Contents" = "Содержание";
+ "Continue listening" = "Продолжить слушать";
+ "Dark" = "Темная";
+@@ -26,6 +28,7 @@
+ "Delete" = "Удалить";
+ "Description" = "Описание";
+ "Details" = "Подробности";
++"Discard progress" = "Отбросить прогресс";
+ "Download for offline" = "Скачать";
+ "Downloaded" = "Загружено";
+ "Downloads" = "Загрузки";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/sk.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/sk.lproj/NativeStrings.strings
+index c11f2352..31ae6b15 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/sk.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/sk.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Povoliť zmenu pozície prehrávania v mediálnych notifikáciách";
+ "Always" = "Vždy";
++"Are you sure you want to reset your progress?" = "Ste si istý, že chcete resetovať váš aktuálny stav počúvania?";
+ "Ask" = "Požiadať o potvrdenie";
+ "Author" = "Autor";
+ "Author, first name" = "Autor (Meno Priezvisko)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Zavrieť prehrávač";
+ "Collections" = "Kolekcie";
+ "Complete" = "Hotovo";
++"Confirm" = "Potvrď";
+ "Contents" = "Obsah";
+ "Continue listening" = "Pokračovať v počúvaní";
+ "Dark" = "Tmavá";
+@@ -26,6 +28,7 @@
+ "Delete" = "Zmazať";
+ "Description" = "Popis";
+ "Details" = "Podrobnosti";
++"Discard progress" = "Odstrániť aktuálny stav počúvania";
+ "Download for offline" = "Stiahnuť";
+ "Downloaded" = "Stiahnuté";
+ "Downloads" = "Stiahnuté súbory";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/sl.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/sl.lproj/NativeStrings.strings
+index ca7765a1..f5218578 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/sl.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/sl.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Dovoli premikanje položaja v kontrolnikih za obvestila o medijih";
+ "Always" = "Vedno";
++"Are you sure you want to reset your progress?" = "Ali ste prepričani, da želite ponastaviti svoj napredek?";
+ "Ask" = "Prosi za potrditev";
+ "Author" = "Avtor";
+ "Author, first name" = "Avtor (ime priimek)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Zapri predvajalnik";
+ "Collections" = "Zbirke";
+ "Complete" = "Končano";
++"Confirm" = "Potrdi";
+ "Contents" = "Kazalo";
+ "Continue listening" = "Nadaljuj poslušanje";
+ "Dark" = "Temna";
+@@ -26,6 +28,7 @@
+ "Delete" = "Izbriši";
+ "Description" = "Opis";
+ "Details" = "Podrobnosti";
++"Discard progress" = "Zavrzi napredek";
+ "Download for offline" = "Prenos";
+ "Downloaded" = "Preneseno";
+ "Downloads" = "Prenosi";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/sv.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/sv.lproj/NativeStrings.strings
+index d453e948..13d1ed49 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/sv.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/sv.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Tillåt spolning med mediekontrollerna i aviseringen";
+ "Always" = "Alltid";
++"Are you sure you want to reset your progress?" = "Är du säker på att du vill återställa din uppspelningsposition?";
+ "Ask" = "Begär bekräftelse";
+ "Author" = "Författare";
+ "Author, first name" = "Författare (förnamn efternamn)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Stäng spelaren";
+ "Collections" = "Samlingar";
+ "Complete" = "Slutförd";
++"Confirm" = "Bekräfta";
+ "Contents" = "Innehållsförteckning";
+ "Continue listening" = "Fortsätt att lyssna";
+ "Dark" = "Mörkt";
+@@ -26,6 +28,7 @@
+ "Delete" = "Ta bort";
+ "Description" = "Beskrivning";
+ "Details" = "Detaljer";
++"Discard progress" = "Återställ uppspelningspositionen";
+ "Download for offline" = "Hämta";
+ "Downloaded" = "Hämtad";
+ "Downloads" = "Hämtningar";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/tr.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/tr.lproj/NativeStrings.strings
+index bacaa1a9..c7104222 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/tr.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/tr.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Medya bildirim kontrollerinde ileri/geri sarmaya izin ver";
+ "Always" = "Her zaman";
++"Are you sure you want to reset your progress?" = "İlerlemenizi sıfırlamak istediğinizden emin misiniz?";
+ "Ask" = "Onay iste";
+ "Author" = "Yazar";
+ "Author, first name" = "Yazar (Ad Soyad)";
+@@ -24,6 +25,7 @@
+ "Delete" = "Sil";
+ "Description" = "Açıklama";
+ "Details" = "Detaylar";
++"Discard progress" = "İlerlemeyi Sıfırla";
+ "Download for offline" = "İndir";
+ "Downloaded" = "İndirildi";
+ "Downloads" = "İndirilenler";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/uk.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/uk.lproj/NativeStrings.strings
+index 768aa6b7..b721897a 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/uk.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/uk.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Увімкнути перемотування в меню управління медіа";
+ "Always" = "Завжди";
++"Are you sure you want to reset your progress?" = "Ви дійсно бажаєте скинути ваш прогрес?";
+ "Ask" = "Щоразу запитувати";
+ "Author" = "Автор";
+ "Author, first name" = "Автор (за ім'ям)";
+@@ -17,6 +18,7 @@
+ "Close playback" = "Закрити програвач";
+ "Collections" = "Добірки";
+ "Complete" = "Завершити";
++"Confirm" = "Підтвердити";
+ "Contents" = "Зміст";
+ "Continue listening" = "Слухати далі";
+ "Dark" = "Темна";
+@@ -26,6 +28,7 @@
+ "Delete" = "Видалити";
+ "Description" = "Опис";
+ "Details" = "Подробиці";
++"Discard progress" = "Скинути прогрес";
+ "Download for offline" = "Скачати";
+ "Downloaded" = "Завантажено";
+ "Downloads" = "Завантаження";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/vi.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/vi.lproj/NativeStrings.strings
+index 7a0d1c53..f4e1964f 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/vi.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/vi.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "Cho phép tìm kiếm vị trí trên các điều khiển phương tiện thông báo";
+ "Always" = "Luôn luôn";
++"Are you sure you want to reset your progress?" = "Bạn có chắc chắn muốn đặt lại tiến trình của mình không?";
+ "Ask" = "Yêu cầu xác nhận";
+ "Author" = "Tác Giả";
+ "Author, first name" = "Tác Giả (Tên Đầu Tiên, Họ)";
+@@ -23,6 +24,7 @@
+ "Delete" = "Xóa";
+ "Description" = "Mô Tả";
+ "Details" = "Chi Tiết";
++"Discard progress" = "Hủy Bỏ Tiến Độ";
+ "Download for offline" = "Tải Xuống";
+ "Downloaded" = "Đã Tải Xuống";
+ "Downloads" = "Tải Xuống";
+diff --git a/apple/Localization/Sources/NativeLocalization/Resources/zh-Hans.lproj/NativeStrings.strings b/apple/Localization/Sources/NativeLocalization/Resources/zh-Hans.lproj/NativeStrings.strings
+index fceb0a5c..010fa4d7 100644
+--- a/apple/Localization/Sources/NativeLocalization/Resources/zh-Hans.lproj/NativeStrings.strings
++++ b/apple/Localization/Sources/NativeLocalization/Resources/zh-Hans.lproj/NativeStrings.strings
+@@ -1,6 +1,7 @@
+ /* Generated by apple/Localization/generate.py. */
+ "Allow seeking from system media controls" = "允许在媒体通知控件上拖动进度";
+ "Always" = "总是";
++"Are you sure you want to reset your progress?" = "你确定要重置进度吗？";
+ "Ask" = "要求确认";
+ "Author" = "作者";
+ "Author, first name" = "作者（名 姓）";
+@@ -17,6 +18,7 @@
+ "Close playback" = "关闭播放器";
+ "Collections" = "收藏";
+ "Complete" = "已完成";
++"Confirm" = "确认";
+ "Contents" = "目录";
+ "Continue listening" = "继续收听";
+ "Dark" = "黑暗";
+@@ -26,6 +28,7 @@
+ "Delete" = "删除";
+ "Description" = "描述";
+ "Details" = "详情";
++"Discard progress" = "放弃进度";
+ "Download for offline" = "下载";
+ "Downloaded" = "已下载";
+ "Downloads" = "下载";
+diff --git a/apple/Localization/legacy-equivalents.json b/apple/Localization/legacy-equivalents.json
+index 9eaa1e94..46253ba4 100644
+--- a/apple/Localization/legacy-equivalents.json
++++ b/apple/Localization/legacy-equivalents.json
+@@ -1,6 +1,7 @@
+ {
+   "Allow seeking from system media controls": "LabelAllowSeekingOnMediaControls",
+   "Always": "LabelAlways",
++  "Are you sure you want to reset your progress?": "MessageConfirmDiscardProgress",
+   "Ask": "LabelAskConfirmation",
+   "Author": "LabelAuthor",
+   "Author, first name": "LabelAuthorFirstLast",
+@@ -17,6 +18,7 @@
+   "Close playback": "LabelClosePlayer",
+   "Collections": "ButtonCollections",
+   "Complete": "LabelComplete",
++  "Confirm": "HeaderConfirm",
+   "Contents": "HeaderTableOfContents",
+   "Continue listening": "LabelContinueListening",
+   "Dark": "LabelThemeDark",
+@@ -26,6 +28,7 @@
+   "Delete": "ButtonDelete",
+   "Description": "LabelDescription",
+   "Details": "HeaderDetails",
++  "Discard progress": "MessageDiscardProgress",
+   "Download for offline": "LabelDownload",
+   "Downloaded": "LabelDownloaded",
+   "Downloads": "HeaderDownloads",

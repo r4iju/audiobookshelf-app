@@ -17,6 +17,24 @@ extension NativeMigrationAdoption {
         }
     }
 
+    /// Readies a progress reset for the media: carried-over listening is delivered first, since a
+    /// later `local-all` would recreate the deleted progress, and carried-over positions are retired
+    /// unsent. Throws while any of that listening is still owed to the server.
+    func prepareProgressReset(account: AccountIdentity, itemID: String, episodeID: String?) async throws {
+        _ = await sync()
+        guard try await api.currentAccount() == account else { throw CancellationError() }
+        try updateLedger { ledger in
+            for (key, record) in ledger.progress where !record.resolved && identity(record.account) == account
+                && record.progress.libraryItemID == itemID && record.progress.episodeID == episodeID {
+                ledger.progress[key]?.resolved = true; ledger.progress[key]?.lastError = nil
+            }
+        }
+        let owed = try AdoptionLedger.load(ledgerURL).sessions.values.contains {
+            !$0.acknowledged && $0.unconfirmed == nil && identity($0.account) == account && $0.session.libraryItemId == itemID && $0.session.episodeId == episodeID
+        }
+        if owed { throw SyncFailure.rejected("Carried-over listening for this title is still waiting to be sent, so its progress was kept. Try again when the server is reachable.") }
+    }
+
     /// Overlapping calls share one run, so nothing is sent twice by concurrent callers.
     func sync() async -> AdoptionSyncReport {
         if let syncTask { return await syncTask.value }

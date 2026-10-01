@@ -66,6 +66,19 @@ import Combine
                               revision: changed || correctedFraction ? UUID().uuidString : old!.revision, pending: fileID == nil && (changed || correctedFraction || old?.pending == true),
                               rotation: rotation, serverLocation: old?.serverLocation, issuedLocation: old?.issuedLocation, issuedRevision: old?.issuedRevision))
     }
+    // The server's progress row holds the ebook location too. An empty location dated now opens at the
+    // start and outranks pending pages and older snapshots; supplementary documents keep their own.
+    func discardProgress(account: AccountIdentity, itemID: String) throws {
+        let now = Date().timeIntervalSince1970 * 1000
+        var next = positions
+        for format in ["epub", "pdf"] {
+            let old = position(account: account, itemID: itemID, format: format)
+            let reset = Position(account: account, itemID: itemID, format: format, location: "", fraction: 0, updatedAt: now, revision: UUID().uuidString, pending: false, rotation: old?.rotation ?? 0)
+            if let index = next.firstIndex(where: { $0.account == account && $0.itemID == itemID && $0.format == format && $0.fileID == nil }) { next[index] = reset }
+            else { next.append(reset) }
+        }
+        try save(next)
+    }
     func adopt(_ remote: MediaProgress, account: AccountIdentity, itemID: String, format: String) throws {
         guard writable else { return }
         guard let location = remote.ebookLocation else { return }

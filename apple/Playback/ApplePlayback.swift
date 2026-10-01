@@ -85,7 +85,8 @@ import UIKit
     private let api: APIClient
     private let listening: ListeningSync
     private var readingPublication: Task<Void, Error>?
-    var canPublishReading: Bool { session == nil && !preparing && !closing }
+    var canPublishReading: Bool { session == nil && !preparing && !closing && progressReset == nil }
+    @Published private var progressReset: Task<CurrentUser, Error>?
     private var listeningID: String?
     private let player = AVPlayer()
     @Published private(set) var trackIndex = 0
@@ -187,6 +188,7 @@ import UIKit
         defer { if preparationID == preparation { preparing = false } }
         do {
             if let readingPublication { _ = try? await readingPublication.value }
+            if let progressReset { _ = try? await progressReset.value }
             guard preparationID == preparation else { return }
             try await closeCurrentSession()
             let requestGeneration = generation
@@ -259,6 +261,7 @@ import UIKit
         defer { if preparationID == preparation { preparing = false } }
         do {
             if let readingPublication { _ = try? await readingPublication.value }
+            if let progressReset { _ = try? await progressReset.value }
             guard preparationID == preparation else { return }
             guard try await api.currentAccount() == audio.account else { throw APIError.signInRequired }
             try await suspendForConnectionChange(preservingIntent: initialIntent)
@@ -609,6 +612,48 @@ import UIKit
         return user
     }
 
+    /// Discards the account's progress for the media on this device and the server, as the baseline
+    /// Discard progress action does, and returns the refreshed user. `prepare` runs after this
+    /// device's listening is published and before the server row is deleted; `discardLocal` runs
+    /// once it is gone. Playback and reading publication wait for the reset.
+    func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?,
+                       prepare: @escaping @MainActor () async throws -> Void = {},
+                       discardLocal: @escaping @MainActor () throws -> Void = {}) async throws -> CurrentUser {
+        guard progressReset == nil, !preparing, !closing, !seeking else { throw ProgressResetFailure.busy }
+        let authorization = api.authorizationRevision
+        func owned() async throws {
+            guard api.authorizationRevision == authorization, try await api.currentAccount() == account else { throw CancellationError() }
+        }
+        let reset = Task { @MainActor () throws -> CurrentUser in
+            try await owned()
+            if self.itemID == itemID, self.episodeID == episodeID { try await stop() }
+            if let readingPublication { _ = try? await readingPublication.value }
+            // A 2.30 local session sync recreates deleted progress, so unsent listening is published
+            // before the delete; if it cannot be, nothing is deleted.
+            try await listening.flush()
+            try await owned()
+            try await prepare()
+            try await owned()
+            guard try !listening.hasLocalListening(account: account, itemID: itemID, episodeID: episodeID, newerThan: nil) else { throw ProgressResetFailure.busy }
+            _ = try await api.resetProgress(itemID: itemID, episodeID: episodeID, authorization: authorization)
+            try listening.forgetPosition(account: account, itemID: itemID, episodeID: episodeID)
+            try discardLocal()
+            try await owned()
+            let user = try await api.me()
+            try await owned()
+            try listening.rememberRemoteProgress(user, account: account)
+            return user
+        }
+        progressReset = reset
+        defer { progressReset = nil }
+        return try await reset.value
+    }
+
+    private enum ProgressResetFailure: LocalizedError {
+        case busy
+        var errorDescription: String? { "Progress can be discarded once playback and listening sync finish. Try again." }
+    }
+
     func prepareProgressEdit(itemID: String, episodeID: String?) async throws {
         if self.itemID == itemID, self.episodeID == episodeID { try await stop() }
         try await listening.flush()
@@ -889,3 +934,15 @@ import UIKit
         }
     }
 }
+
+#if os(iOS)
+extension ApplePlayback {
+    /// The mobile reset: carried-over legacy listening and positions and, for a book, primary
+    /// reading positions cannot bring the progress back either.
+    func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?, reading: ReadingStore, adoption: NativeMigrationAdoption) async throws -> CurrentUser {
+        try await resetProgress(account: account, itemID: itemID, episodeID: episodeID,
+                                prepare: { try await adoption.prepareProgressReset(account: account, itemID: itemID, episodeID: episodeID) },
+                                discardLocal: { if episodeID == nil { try reading.discardProgress(account: account, itemID: itemID) } })
+    }
+}
+#endif

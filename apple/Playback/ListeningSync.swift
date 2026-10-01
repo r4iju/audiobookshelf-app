@@ -61,6 +61,12 @@ import Foundation
         return journal.cachedPosition(account: account, itemID: itemID, episodeID: episodeID, newerThan: remoteUpdatedAt.nextUp) != nil
     }
 
+    /// Records that the server holds no progress for the media as of now, so older snapshots
+    /// cannot bring back a reset position.
+    func forgetPosition(account: AccountIdentity, itemID: String, episodeID: String?) throws {
+        try loaded().rememberRemotePosition(account: account, itemID: itemID, episodeID: episodeID, time: 0, updatedAt: Date().timeIntervalSince1970 * 1_000)
+    }
+
     func record(id: String, position: Double, listened: Double) throws {
         try loaded().record(id: id, position: position, listened: listened)
     }
