@@ -33,6 +33,7 @@ export const keys = {
   all: (connectionId: string) => [connectionId] as const,
   libraries: (connectionId: string) => [connectionId, "libraries"] as const,
   me: (connectionId: string) => [connectionId, "me"] as const,
+  heldDeliveries: (connectionId: string) => [connectionId, "held-deliveries"] as const,
   listeningStats: (connectionId: string) => [connectionId, "stats", "listening"] as const,
   yearStats: (connectionId: string, year: number) => [connectionId, "stats", "year", year] as const,
   serverYearStats: (connectionId: string, year: number) =>

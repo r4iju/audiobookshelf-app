@@ -6,15 +6,18 @@ import {
   beginChange,
   block,
   claimDelete,
+  confirmRestart,
   deliveryChange,
   disregard,
   finishDelete,
   finishSending,
+  heldByUnfinishedDeletes,
   isSending,
   keep,
   type ProgressChange,
   inFlight as recordedDeliveries,
   releaseUnreadableBlocks,
+  requestRestart,
   type Target,
   thisPage,
 } from "./coordination";
@@ -244,3 +247,25 @@ export async function flushReports(client: AbsClient, onUnauthorized: () => void
     });
   return inFlight;
 }
+
+/** Whether a delete that may still be running on the server holds back this account's deliveries. */
+export function heldDeliveries(client: AbsClient) {
+  return heldByUnfinishedDeletes(client.connection.id, holdIds(client));
+}
+
+/** Records what a restart of the account's server is to end, before the user restarts it (see coordination.ts). */
+export function requestServerRestart(client: AbsClient) {
+  return requestRestart(client.connection.id, serverOrigin(client), holdIds(client), thisPage);
+}
+
+/** Retires what the restart asked for ended, once the user confirms the server restarted, and sends what waited. */
+export async function confirmServerRestarted(client: AbsClient) {
+  await confirmRestart(client.connection.id, serverOrigin(client));
+}
+
+const holdIds = (client: AbsClient) =>
+  outboxFor(client.connection.id)
+    .holds()
+    .map((hold) => hold.id);
+/** The server whose restart ends the requests this account sent, as named to the user. */
+export const serverOrigin = (client: AbsClient) => new URL(client.connection.serverUrl).origin;

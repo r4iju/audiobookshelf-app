@@ -1,5 +1,13 @@
 // English strings for UI this client adds beyond the legacy string table. Keep keys in the legacy naming scheme.
 export const webStrings = {
+  WebHeldDeliveries:
+    "Progress from this browser is held back. A request that deletes progress may still be running on the server at {0}, and progress sent now could be deleted with it. Only restarting that server ends it.",
+  WebHeldRestartRequested:
+    "Progress is still held back. Restart the Audiobookshelf server at {0} now, then confirm here. This browser cannot tell whether the server restarted: if it did not, a delete still running there can remove progress sent after you confirm. Confirming covers only requests this browser had sent before you chose to restart; anything sent since stays held.",
+  WebHeldRestartUnreadable:
+    'Progress from this browser is held back, and its record of the server restart it asked for cannot be read, so it cannot tell which requests a restart would end. Choose "Restart the server" again, then restart the Audiobookshelf server at {0} when asked.',
+  WebRestartTheServer: "Restart the server",
+  WebServerRestarted: "I restarted the server",
   WebAppName: "Audiobookshelf",
   WebSkipToContent: "Skip to content",
   WebServerAddressHelp:

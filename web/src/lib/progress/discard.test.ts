@@ -8,12 +8,15 @@ import { discardProgress } from "./discard";
 import { createListeningReport, createOutbox, type ListeningReport } from "./outbox";
 import {
   changeProgress,
+  confirmServerRestarted,
   discardAnyway,
   finishDiscard,
   flushReports,
+  heldDeliveries,
   issueChange,
   keepProgress,
   outboxFor,
+  requestServerRestart,
 } from "./sync";
 
 function memoryStorage() {
@@ -30,7 +33,7 @@ function memoryStorage() {
   };
 }
 
-const report = (id: string, itemId: string) =>
+const report = (id: string, itemId: string, { currentTime = 40, localNow = 50_000 } = {}) =>
   createListeningReport(
     {
       id,
@@ -44,7 +47,7 @@ const report = (id: string, itemId: string) =>
       startTime: 0,
       startedAt: 1_000,
     },
-    { currentTime: 40, timeListening: 40, localNow: 50_000, serverOffset: 0 },
+    { currentTime, timeListening: currentTime, localNow, serverOffset: 0 },
   );
 
 /** A server whose listening delivery answers only when the test says so, and which logs what reached it. */
@@ -213,6 +216,22 @@ function otherTab(
       return sessions.map((session) => ({ id: session.id, success: true }));
     });
   return { delivering, answer, sent: () => sent };
+}
+
+/** What this origin's coordination database holds under `prefix`. */
+async function coordinationRecords(prefix: string) {
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open("abs-web-coordination", 1);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  const records = await new Promise<{ key: string }[]>((resolve, reject) => {
+    const all = db.transaction("entries").objectStore("entries").getAll();
+    all.onsuccess = () => resolve(all.result);
+    all.onerror = () => reject(all.error);
+  });
+  db.close();
+  return records.filter((record) => record.key.startsWith(prefix));
 }
 
 /** Writes records into this origin's coordination database as an earlier version of the client left them. */
@@ -869,5 +888,166 @@ describe("discardProgress", () => {
 
     // The first place was already on its way, which discarding anyway accepts.
     expect(server.log).toEqual(["DELETE /api/me/progress/p-x", "PATCH /api/me/progress/book-x"]);
+  });
+});
+
+describe("a delete that may still be running on the server, with no discard left to finish it", () => {
+  const poisoned = { key: "block:conn-a:gone", phase: "deleting" };
+  const readablePoisoned = { ...poisoned, libraryItemId: "book-q", episodeId: null };
+  const failedSend = (key: string, itemId: string) => ({
+    key,
+    connectionId: "conn-a",
+    page: "page-gone",
+    failed: true,
+    items: [{ id: `sent-${itemId}`, libraryItemId: itemId, episodeId: null }],
+  });
+  const discardOf = (client: AbsClient, itemId: string) =>
+    discardProgress(client, { progressId: `p-${itemId}`, itemId, episodeId: null });
+
+  it("holds listening until the user confirms a restart they were asked for, then sends it, leaving what came later", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok", "ok"]);
+    usePlayerStore.getState().attach(server.client);
+    await storedCoordination([poisoned, failedSend("sending:conn-a:failed-z", "book-z")]);
+    outboxFor("conn-a").record(report("new-y", "book-y"));
+    await flushReports(server.client, () => {});
+    expect({ log: [...server.log], held: await heldDeliveries(server.client) }).toEqual({
+      log: [],
+      held: { held: 1, restart: null },
+    });
+
+    await requestServerRestart(server.client);
+    await storedCoordination([failedSend("sending:conn-a:failed-w", "book-w")]);
+    expect(await heldDeliveries(server.client)).toEqual({
+      held: 1,
+      restart: { serverOrigin: "https://abs.example" },
+    });
+    await confirmServerRestarted(server.client);
+    await flushReports(server.client, () => {});
+
+    const held = await heldDeliveries(server.client);
+    const later = await discardOf(server.client, "book-w");
+    const earlier = await discardOf(server.client, "book-z");
+
+    expect({ log: server.log, held, later, earlier }).toEqual({
+      log: ["listening book-y@40", "DELETE /api/me/progress/p-book-z"],
+      held: { held: 0, restart: null },
+      later: "unconfirmed",
+      earlier: "done",
+    });
+  });
+
+  it("keeps holding a request that failed again, unchanged, after the restart was asked for", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    usePlayerStore.getState().attach(server.client);
+    outboxFor("conn-a").record(report("old-z", "book-z"));
+    const first = otherTab(server.log, { fails: true });
+    const failing = first.delivering();
+    first.answer();
+    await failing;
+    await storedCoordination([readablePoisoned]);
+
+    await requestServerRestart(server.client);
+    const again = otherTab(server.log, { fails: true });
+    const failingAgain = again.delivering();
+    again.answer();
+    await failingAgain;
+    await confirmServerRestarted(server.client);
+
+    // Sent again after the request, it may have reached the restarted server.
+    expect(await discardOf(server.client, "book-z")).toBe("unconfirmed");
+  });
+
+  it("goes on sending the listening of another tab whose request it retired", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", []);
+    usePlayerStore.getState().attach(server.client);
+    outboxFor("conn-a").record(report("old-z", "book-z"));
+    const tab = otherTab(server.log);
+    const delivering = tab.delivering();
+    await vi.waitFor(() => expect(tab.sent()).toBe(true));
+    await storedCoordination([readablePoisoned]);
+
+    await requestServerRestart(server.client);
+    await confirmServerRestarted(server.client);
+    tab.answer();
+    await delivering;
+    outboxFor("conn-a").record(report("old-z", "book-z", { currentTime: 50, localNow: 60_000 }));
+    await flushReports(server.client, () => {});
+
+    expect(server.log.some((line) => line.includes("book-z@50"))).toBe(true);
+  });
+
+  it("explains a restart request it cannot read, and lets the user ask again, keeping the unreadable one", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", []);
+    usePlayerStore.getState().attach(server.client);
+    const unreadable = { key: "restart:conn-a", serverOrigin: 5 };
+    await storedCoordination([poisoned, unreadable]);
+    outboxFor("conn-a").record(report("new-y", "book-y"));
+
+    const before = await heldDeliveries(server.client);
+    await requestServerRestart(server.client);
+    const asked = await heldDeliveries(server.client);
+    await confirmServerRestarted(server.client);
+    await flushReports(server.client, () => {});
+    const kept = (await coordinationRecords("restarted:conn-a:")).map(({ key, ...record }) => record);
+
+    expect({ before, asked, log: server.log }).toEqual({
+      before: { held: 1, restart: "unreadable" },
+      asked: { held: 1, restart: { serverOrigin: "https://abs.example" } },
+      log: ["listening book-y@40"],
+    });
+    expect(kept).toContainEqual(expect.objectContaining({ unreadable: { ...unreadable } }));
+  });
+
+  it("keeps holding a record that changed after the restart was asked for", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    await storedCoordination([poisoned]);
+    outboxFor("conn-a").record(report("new-y", "book-y"));
+
+    await requestServerRestart(server.client);
+    await storedCoordination([{ ...poisoned, phase: "removing" }]);
+    await confirmServerRestarted(server.client);
+    await flushReports(server.client, () => {});
+
+    expect({ log: server.log, held: (await heldDeliveries(server.client)).held }).toEqual({
+      log: [],
+      held: 1,
+    });
+  });
+
+  it("releases nothing for a restart confirmed for another server than the one asked about", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    await storedCoordination([poisoned]);
+    outboxFor("conn-a").record(report("new-y", "book-y"));
+    const moved = {
+      ...server.client,
+      connection: { ...server.client.connection, serverUrl: "https://other.example" },
+    } as unknown as AbsClient;
+
+    await requestServerRestart(server.client);
+    await expect(confirmServerRestarted(moved)).rejects.toThrow();
+    await flushReports(server.client, () => {});
+
+    expect(server.log).toEqual([]);
+  });
+
+  it("releases nothing as time passes, or for a restart confirmed without being asked for first", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    await storedCoordination([poisoned]);
+    outboxFor("conn-a").record(report("new-y", "book-y"));
+
+    await expect(confirmServerRestarted(server.client)).rejects.toThrow();
+    const later = Date.now() + 30 * 24 * 60 * 60_000;
+    const clock = vi.spyOn(Date, "now").mockReturnValue(later);
+    await flushReports(server.client, () => {});
+    clock.mockRestore();
+
+    expect(server.log).toEqual([]);
   });
 });

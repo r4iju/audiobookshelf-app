@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { expect, type Page, test } from "@playwright/test";
 import { clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
 
@@ -99,4 +100,52 @@ test("speed and bookmarks are kept", async ({ page }) => {
 
   await page.reload();
   await expect(player(page).getByLabel("Playback Speed", { exact: true })).toHaveValue("1.5");
+});
+
+test("listening held by a delete that may still be running is sent once a restart the user was asked for is confirmed", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const { api, id, account } = await fresh();
+  await signIn(page, account);
+  // A record left by a discard whose delete may still be running, which no discard of this browser is finishing.
+  await page.evaluate(async () => {
+    const { activeId } = JSON.parse(localStorage.getItem("abs-web:v1:connections") ?? "{}");
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("abs-web-coordination", 1);
+      request.onupgradeneeded = () => request.result.createObjectStore("entries", { keyPath: "key" });
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction("entries", "readwrite");
+      transaction.objectStore("entries").put({ key: `block:${activeId}:gone`, phase: "deleting" });
+      transaction.oncomplete = () => resolve();
+      transaction.onabort = () => reject(transaction.error);
+    });
+    db.close();
+  });
+  await page.goto(`/item/${id}`);
+  await page.getByRole("button", { name: /^Play/ }).click();
+  await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(4);
+  await player(page).getByRole("button", { name: "Pause", exact: true }).click();
+  await expect(page.getByText(/waiting to sync/)).toBeVisible({ timeout: 20_000 });
+
+  const notice = page.getByRole("alert").filter({ hasText: "held back" });
+  await expect(notice).toContainText(qa.origin);
+  expect((await api.call(`/api/me/progress/${id}`)).status).toBe(404);
+  await notice.getByRole("button", { name: "Restart the server" }).click();
+  await expect(notice).toContainText(`Restart the Audiobookshelf server at ${qa.origin} now`);
+  await expect(notice).toContainText(
+    "if it did not, a delete still running there can remove progress sent after",
+  );
+
+  execFileSync("docker", ["restart", "abs-web-qa"]);
+  execFileSync("node", ["qa/server.mjs", "up"], { stdio: "ignore" });
+  await notice.getByRole("button", { name: "I restarted the server" }).click();
+
+  await expect(notice).toHaveCount(0);
+  await expect
+    .poll(async () => (await api.call(`/api/me/progress/${id}`)).body?.currentTime ?? 0, { timeout: 30_000 })
+    .toBeGreaterThan(4);
 });

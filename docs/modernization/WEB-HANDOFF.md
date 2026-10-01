@@ -35,7 +35,12 @@ shared modernization documents. Issues #55 to #65.
 | `cc26ec24` | A discard's delete is claimed in IndexedDB, so no tab can keep it once it is issued; listening goes out one session version at a time, and reader places and finished changes are recorded like listening |
 | `56e92c87` | A reader place that waited for a discard which then deleted is dropped |
 | `df362fbd` | Reader places are recorded when the page turns, not when their turn to be sent comes; stored coordination records are checked, and those an earlier version left are read as it meant them |
-| (this commit) | Records the full local run on `df362fbd` |
+| `2baac784` | Records the full local run on `df362fbd` |
+| `4f4bb7cd` | The QA fixtures (OpenID provider, podcast feed, SMTP sink) run as containers in the QA server's own network, adopted from the fixture-network branch |
+| `96cbb5f7` | Formatting of `qa/server.mjs` |
+| `a6961e2b` | Removing an episode leaves its page even when the server's update arrives first |
+| `843a928c` | Only blocks whose delete was never issued are cleaned up when their book cannot be read; removing an episode leaves its page only if that page is still showing for the same account |
+| (this commit) | Restart recovery: a delete that may still be running, with no discard left to finish it, is released only by a server restart the user asked for and then confirmed, retiring only the records recorded at the request |
 
 ## Checks
 
@@ -213,9 +218,9 @@ server, or a physical device. The production container `audiobookshelf` (port 13
   - IndexedDB keeps one small record per playback session ever sent, and one per discard; nothing prunes them.
   - For a discard left by the version before `cc26ec24`, the item page still offers Keep progress, which leaves it
     unconfirmed.
-  - A block whose book cannot be read, whose delete may have been issued, and that no hold is finishing stops all
-    listening for that account in this browser. Nothing in the app clears it; clearing the site's data does, along
-    with any unsent listening.
+  - A block whose delete may have been issued and that no hold is finishing (one whose book cannot be read holds
+    back all of the account's listening) is released only by the restart recovery below. Until then that listening
+    waits on this device.
   - A reader place made before a discard and still waiting its turn in a tab that then closes stays recorded, so
     discards of that book are unconfirmed until the user chooses.
   - A browser that refuses IndexedDB delivers no listening and saves no reader place; each attempt fails as an
@@ -225,6 +230,36 @@ server, or a physical device. The production container `audiobookshelf` (port 13
   fails the discard before anything is sent, so the server's progress is unchanged. A refusal part-way through
   step 2 can leave this device partly reset (the unsent listening dropped but the saved player place not yet
   written); discarding again once storage accepts writes finishes it.
+
+  **Restart recovery.** 2.30.0 offers no way to learn that a request it is still handling has finished, but a
+  restart of the server ends them all. Where a delete may still be running and no discard is left to finish it, the
+  shell shows "Progress from this browser is held back", naming the server's origin, with **Restart the server**.
+  Recovery has two steps, as in the native apps:
+
+  1. **Restart the server** records, in IndexedDB and before the owner restarts anything, exactly the records the
+     restart is to end, with their stored values: those deletes, and every request recorded as sent except this
+     page's own still waiting for an answer. The record is bound to the account (whose id names the server) and to
+     the server's origin, and a second request does not replace it. The notice then says to restart the server at
+     that origin and confirm, and that the browser cannot tell whether it restarted: if it did not, a delete still
+     running there can remove progress sent after confirming.
+  2. **I restarted the server** retires, in one transaction, only the recorded records whose values are still
+     exactly as recorded, and only for the same account and origin; otherwise nothing is retired. Records written or
+     changed after the request stay held, since they may have reached the restarted server. Each failure of a request
+     is recorded with the attempt it came from, so the same request failing again after the request is a changed
+     record and stays held. The request is kept as a `restarted:` record of the values it retired. The queue and
+     session records are untouched, so the held listening is then sent as it was recorded. Listening another tab was
+     sending under a retired record is sent again, unchanged, as after a failure, since that tab's answer no longer
+     finds its record.
+
+  A restart request that cannot be read releases nothing. The notice says so, and **Restart the server** sets it
+  aside (kept, as a `restarted:` record) and records a new one, so only a restart after that new request counts.
+
+  Nothing is released by time passing, and the moment of confirming is not taken as the restart. The confirmation
+  is the owner's word that the server restarted: 2.30.0 exposes no boot identity the browser could compare. A request
+  that failed after the restart request, for a request that was itself covered, is a changed record and stays held,
+  so that case needs a second restart. A proxy that holds or retries a request across the restart would defeat it:
+  nginx, for one, can retry an idempotent request such as `DELETE` on another upstream server. No proxy's behaviour
+  across a restart was tested.
 
 ## Ports
 

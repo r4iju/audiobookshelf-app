@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useEffect } from "react";
+import { HeldDeliveries } from "@/components/app/held-deliveries";
 import { AudioEngine } from "@/components/player/audio-engine";
 import { PlayerDock } from "@/components/player/player-dock";
 import { ButtonLink } from "@/components/ui/button";
@@ -326,6 +327,7 @@ function Shell({ children }: { children: ReactNode }) {
                   {t("WebReauthRequired")}
                 </Alert>
               ) : null}
+              <HeldDeliveries />
               {online ? null : (
                 <Alert tone="info">
                   <span className="inline-flex items-center gap-2">
