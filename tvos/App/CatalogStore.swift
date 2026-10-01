@@ -7,6 +7,11 @@ struct SearchResult: Identifiable, Hashable {
     var route: Route { episodeID.map { .episode(item, episodeID: $0) } ?? .item(item) }
 }
 
+struct SearchFound {
+    var titles: [SearchResult] = []
+    var related: [Route] = []
+}
+
 struct HomeShelf: Identifiable {
     let id: String
     let shelfID: String
@@ -103,11 +108,19 @@ struct HomeShelf: Identifiable {
         progress[itemID + ":" + (episodeID ?? "book")]
     }
 
-    func search(_ text: String) async throws -> [SearchResult] {
+    func search(_ text: String) async throws -> SearchFound {
         let responses = try await Self.eachLibrary(libraries) { library in
-            [try await self.api.search(libraryID: library.id, query: text, limit: 25)]
+            [(libraryID: library.id, response: try await self.api.search(libraryID: library.id, query: text, limit: 25))]
         }
-        return Self.merge(responses)
+        return SearchFound(titles: Self.merge(responses.map(\.response)), related: Self.related(responses))
+    }
+
+    /// Authors, then series. Both belong to the library that found them, whose catalog their pages query.
+    nonisolated static func related(_ responses: [(libraryID: String, response: SearchResponse)]) -> [Route] {
+        let authors = responses.flatMap { found in (found.response.authors ?? []).map { Route.author(RelatedLink(id: $0.id, name: $0.name, libraryID: found.libraryID)) } }
+        let series = responses.flatMap { found in (found.response.series ?? []).map { Route.series(RelatedLink(id: $0.series.id, name: $0.series.name, libraryID: found.libraryID)) } }
+        var seen = Set<String>()
+        return (authors + series).filter { seen.insert($0.relatedIdentifier ?? "").inserted }
     }
 
     /// A podcast and each of its matching episodes are separate results; only exact repeats across libraries are dropped.

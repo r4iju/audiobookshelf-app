@@ -40,6 +40,7 @@ struct CatalogShelf: View {
     @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
+    @EnvironmentObject private var realtime: NativeRealtime
     @StateObject private var catalog: CatalogStore
     @AppStorage("previewListLayout") private var listLayout = false
     @State private var filterOptions = false
@@ -143,6 +144,7 @@ struct CatalogShelf: View {
                     } label: { Image(systemName: "person.crop.circle") }.accessibilityIdentifier("account")
                 }
             }.onAppear { Task { if case .loading = catalog.state { await catalog.reload() } else { await catalog.refreshProgressIfNeeded() } } }
+            .onReceive(realtime.events) { event in catalog.receive(event) }
             .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
             .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
             .background(NavigationLink(destination: NativeSettings(), isActive: $settingsPresented) { EmptyView() }.hidden())
@@ -193,6 +195,13 @@ struct BookCard: View {
     let item: LibraryItem
     let catalog: CatalogStore
     let listLayout: Bool
+    /// `LibraryItem` equality compares ids only, so metadata edited elsewhere is held separately for SwiftUI to redraw it.
+    private let title: String
+    private let author: String
+    init(item: LibraryItem, catalog: CatalogStore, listLayout: Bool) {
+        self.item = item; self.catalog = catalog; self.listLayout = listLayout
+        title = item.title; author = item.author
+    }
     var body: some View {
         Group {
             if listLayout {
@@ -203,8 +212,8 @@ struct BookCard: View {
     }
     private var labels: some View {
         VStack(alignment: .leading, spacing: 5) {
-            metadata(item.title, font: .subheadline.weight(.semibold), color: .primary)
-            metadata(item.author.isEmpty ? l10n("Unknown author") : item.author, font: .caption, color: .secondary)
+            metadata(title, font: .subheadline.weight(.semibold), color: .primary)
+            metadata(author.isEmpty ? l10n("Unknown author") : author, font: .caption, color: .secondary)
             if let duration = item.media.duration { Text(ShelfTime.describe(duration)).font(.caption).foregroundColor(.secondary) }
         }
     }
@@ -225,12 +234,19 @@ struct ContinueCard: View {
     let item: LibraryItem
     let catalog: CatalogStore
     let progress: MediaProgress?
+    /// Held separately for the same reason as in `BookCard`.
+    private let title: String
+    private let author: String
+    init(item: LibraryItem, catalog: CatalogStore, progress: MediaProgress?) {
+        self.item = item; self.catalog = catalog; self.progress = progress
+        title = item.title; author = item.author
+    }
     var body: some View {
         HStack(spacing: 14) {
             BookArtwork(item: item, catalog: catalog).frame(width: 64)
             VStack(alignment: .leading, spacing: 6) {
-                Text(item.title).font(.subheadline.weight(.semibold)).foregroundColor(.primary).lineLimit(2)
-                Text(item.author).font(.caption).foregroundColor(.secondary).lineLimit(1)
+                Text(title).font(.subheadline.weight(.semibold)).foregroundColor(.primary).lineLimit(2)
+                Text(author).font(.caption).foregroundColor(.secondary).lineLimit(1)
                 ProgressView(value: progress?.fraction ?? 0).accentColor(ShelfStyle.accent)
                 Text(l10n("{0}% listened", Int((progress?.fraction ?? 0) * 100))).font(.caption).foregroundColor(.secondary)
             }.frame(width: sizeCategory.isAccessibilityCategory ? 260 : 175, alignment: .leading)

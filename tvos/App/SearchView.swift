@@ -3,7 +3,7 @@ import SwiftUI
 struct SearchView: View {
     @EnvironmentObject private var catalog: CatalogStore
     @State private var query = ""
-    @State private var results: [SearchResult] = []
+    @State private var found = SearchFound()
     @State private var searching = false
     @State private var error: String?
 
@@ -13,13 +13,26 @@ struct SearchView: View {
                 VStack(alignment: .leading, spacing: 40) {
                     if let error {
                         StatusMessage(text: error, identifier: "search-error", retryIdentifier: "retry-search") { Task { await search() } }
-                    } else if searching && results.isEmpty {
+                    } else if searching && found.titles.isEmpty && found.related.isEmpty {
                         ProgressView("Searching…").frame(maxWidth: .infinity)
-                    } else if !query.isEmpty && results.isEmpty {
-                        Text("No titles or episodes match “\(query)”.").font(.title3).foregroundStyle(.secondary)
+                    } else if !query.isEmpty && found.titles.isEmpty && found.related.isEmpty {
+                        Text("No titles, episodes, authors or series match “\(query)”.").font(.title3).foregroundStyle(.secondary)
+                    }
+                    if !found.related.isEmpty {
+                        ScrollView(.horizontal) {
+                            LazyHStack(spacing: 30) {
+                                ForEach(found.related, id: \.self) { route in
+                                    NavigationLink(value: route) { RelatedLabel(route: route) }
+                                        .accessibilityIdentifier("search." + (route.relatedIdentifier ?? ""))
+                                }
+                            }
+                            .padding(.vertical, 20)
+                        }
+                        .scrollClipDisabled()
+                        .focusSection()
                     }
                     LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
-                        ForEach(results) { result in
+                        ForEach(found.titles) { result in
                             NavigationLink(value: result.route) { ItemTile(item: result.item, episodeID: result.episodeID) }
                                 .buttonStyle(.card)
                                 .accessibilityIdentifier("search." + result.item.id + (result.episodeID.map { "." + $0 } ?? ""))
@@ -41,13 +54,13 @@ struct SearchView: View {
     private func search() async {
         let text = query.trimmingCharacters(in: .whitespacesAndNewlines)
         error = nil
-        guard !text.isEmpty else { results = []; return }
+        guard !text.isEmpty else { found = SearchFound(); return }
         searching = true
         defer { searching = false }
         do {
-            let found = try await catalog.search(text)
+            let results = try await catalog.search(text)
             guard text == query.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
-            results = found
+            found = results
         } catch is CancellationError {
         } catch {
             catalog.noteAuthentication(error)

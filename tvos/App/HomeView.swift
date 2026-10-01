@@ -6,6 +6,8 @@ extension View {
             switch route {
             case .item(let item): ItemDetailView(item: item)
             case .episode(let item, let episodeID): EpisodeDetailView(item: item, episodeID: episodeID)
+            case .author(let author): AuthorView(author: author)
+            case .series(let series): SeriesView(series: series)
             }
         }
     }

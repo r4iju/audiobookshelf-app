@@ -1,5 +1,6 @@
 #!/bin/bash
-# Remote-driven tvOS journeys against owned synthetic fixtures on 20765 (HTTP) and 20767 (HTTPS).
+# Remote-driven tvOS journeys against owned synthetic fixtures on 20765 (HTTP) and 20767 (HTTPS): verification/fixture.py
+# extended with the 2.30 author and series endpoints by tvos/scripts/related_fixture.py.
 # Extra arguments pass to xcodebuild, for example -only-testing:TVJourneyTests/CatalogJourney.
 set -euo pipefail
 tvos_root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -29,9 +30,9 @@ openssl req -newkey rsa:2048 -nodes -keyout "$fixture_dir/key.pem" -out "$fixtur
 printf 'subjectAltName=IP:127.0.0.1\nextendedKeyUsage=serverAuth\n' > "$fixture_dir/server.ext"
 openssl x509 -req -in "$fixture_dir/server.csr" -CA "$fixture_dir/ca.pem" -CAkey "$fixture_dir/ca.key" -CAcreateserial \
     -days 2 -extfile "$fixture_dir/server.ext" -out "$fixture_dir/cert.pem" >> "$fixture_dir/tls.log" 2>&1
-(cd "$repo_root" && exec python3 -m verification.fixture --port 20765) > "$fixture_dir/http.log" 2>&1 &
+(cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port 20765) > "$fixture_dir/http.log" 2>&1 &
 fixture_pids+=("$!")
-(cd "$repo_root" && exec python3 -m verification.fixture --port 20767 --tls-cert "$fixture_dir/cert.pem" --tls-key "$fixture_dir/key.pem") > "$fixture_dir/https.log" 2>&1 &
+(cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port 20767 --tls-cert "$fixture_dir/cert.pem" --tls-key "$fixture_dir/key.pem") > "$fixture_dir/https.log" 2>&1 &
 fixture_pids+=("$!")
 python3 - <<'PY'
 import socket, time

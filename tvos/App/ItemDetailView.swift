@@ -117,6 +117,7 @@ struct ItemDetailView: View {
                             }
                             if detail.item != nil { PlaybackActions(detail: detail, item: loaded).focusSection() }
                         }
+                        if detail.item != nil { RelatedLinks(item: loaded) }
                         if detail.loading && detail.item == nil { ProgressView("Loading details…") }
                         if let error = detail.error, detail.item == nil {
                             Text(error).foregroundStyle(.orange).accessibilityIdentifier("detail-error")

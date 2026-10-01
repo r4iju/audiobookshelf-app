@@ -64,9 +64,13 @@ struct LibrarySearch: View {
                             }
                         }
                         if !(results.authors ?? []).isEmpty { Text(l10n("Authors")).font(.headline) }
-                        ForEach(results.authors ?? []) { author in related(author.name, group: "authors", value: author.id) }
+                        ForEach(results.authors ?? []) { author in
+                            relatedRow(author.name, identifier: "search-author-" + author.id, destination: RelatedAuthorView(catalog: search.catalog, authorID: author.id, name: author.name))
+                        }
                         if !(results.series ?? []).isEmpty { Text(l10n("Series")).font(.headline) }
-                        ForEach(results.series ?? []) { series in related(series.series.name, group: "series", value: series.id) }
+                        ForEach(results.series ?? []) { series in
+                            relatedRow(series.series.name, identifier: "search-series-" + series.id, destination: RelatedSeriesView(catalog: search.catalog, seriesID: series.id, name: series.series.name))
+                        }
                         if !(results.narrators ?? []).isEmpty { Text(l10n("Narrators")).font(.headline) }
                         ForEach(results.narrators ?? []) { narrator in related(narrator.name, group: "narrators", value: narrator.name) }
                         if !(results.tags ?? []).isEmpty { Text(l10n("Tags")).font(.headline) }
@@ -88,8 +92,11 @@ struct LibrarySearch: View {
     }
     private func submit() { pending?.cancel(); pending = Task { await search.search() } }
     private func related(_ name: String, group: String, value: String) -> some View {
-        NavigationLink(destination: CatalogShelf(api: search.catalog.api, library: search.catalog.library, filter: group + "." + Data(value.utf8).base64EncodedString())) {
+        relatedRow(name, identifier: "search-\(group)-\(value)", destination: CatalogShelf(api: search.catalog.api, library: search.catalog.library, filter: group + "." + Data(value.utf8).base64EncodedString()))
+    }
+    private func relatedRow<Destination: View>(_ name: String, identifier: String, destination: Destination) -> some View {
+        NavigationLink(destination: destination) {
             HStack { Text(name); Spacer(); Image(systemName: "chevron.right") }.padding(18).background(appearance.card).cornerRadius(16)
-        }.buttonStyle(PlainButtonStyle())
+        }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier(identifier)
     }
 }

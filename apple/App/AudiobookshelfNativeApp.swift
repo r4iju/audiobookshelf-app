@@ -4,6 +4,7 @@ import SwiftUI
     @AppStorage("previewTheme") private var theme = "system"
     @Environment(\.scenePhase) private var scenePhase
     @UIApplicationDelegateAdaptor(NativeDownloadAppDelegate.self) private var appDelegate
+    @StateObject private var realtime: NativeRealtime
     @StateObject private var serverQueue: NativePodcastQueue
     @StateObject private var reading: ReadingStore
     @StateObject private var downloads: NativeDownloads
@@ -59,10 +60,12 @@ import SwiftUI
         }
         #endif
         let api = APIClient(store: vault)
-        _serverQueue = StateObject(wrappedValue: NativePodcastQueue(api: api))
         let downloads = NativeDownloads(api: api)
         _downloads = StateObject(wrappedValue: downloads)
         let playback = ApplePlayback(api: api)
+        let realtimeStream = NativeRealtime(api: api, localSession: { [weak playback] in playback?.session?.id })
+        _realtime = StateObject(wrappedValue: realtimeStream)
+        _serverQueue = StateObject(wrappedValue: NativePodcastQueue(api: api, realtime: realtimeStream))
         let reading = ReadingStore(player: playback)
         _reading = StateObject(wrappedValue: reading)
         let adoption = NativeMigrationAdoption(downloads: downloads, reading: reading, api: api)
@@ -73,12 +76,25 @@ import SwiftUI
 
     var body: some Scene {
         WindowGroup {
-            PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player).environmentObject(downloads).environmentObject(reading).environmentObject(serverQueue)
+            PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player).environmentObject(downloads).environmentObject(reading).environmentObject(serverQueue).environmentObject(realtime)
                 .accentColor(ShelfStyle.accent)
-                .onAppear { Task { await connection.restore(); serverQueue.connect(); downloads.refresh(); reading.sync(api: connection.api); await restoreImportedData() } }
-                .onChange(of: scenePhase) { phase in if phase == .active { serverQueue.connect(); serverQueue.retrySavingResults(); Task { await migration.sync() } } }
+                .onAppear { Task { await connection.restore(); realtime.connect(); downloads.refresh(); reading.sync(api: connection.api); await restoreImportedData() } }
+                .onChange(of: scenePhase) { phase in if phase == .active { realtime.connect(); serverQueue.retrySavingResults(); Task { await migration.sync() } } }
                 .onChange(of: player.canPublishReading) { available in if available { reading.sync(api: connection.api) } }
-                .onChange(of: connection.activeAccount) { _ in serverQueue.connect(); reading.sync(api: connection.api); Task { await migration.sync() } }
+                .onChange(of: connection.activeAccount) { _ in reading.sync(api: connection.api); Task { await migration.sync() } }
+                .onChange(of: connection.signInRevision) { _ in realtime.connect() }
+                .onReceive(realtime.events) { event in
+                    Task {
+                        guard event.isCurrent(on: connection.api) else { return }
+                        switch event.change {
+                        case .progress(let itemID, let episodeID, let sessionID):
+                            await player.followRemoteProgress(account: event.account, itemID: itemID, episodeID: episodeID, sessionID: sessionID)
+                        case .authenticated(resumed: true), .user:
+                            await player.refreshPausedProgress(account: event.account)
+                        default: break
+                        }
+                    }
+                }
                 .sheet(isPresented: $downloads.presented) { DownloadsView().environmentObject(downloads).environmentObject(player).environmentObject(reading) }
                 .environmentObject(migration)
                 .nativeLocalization()

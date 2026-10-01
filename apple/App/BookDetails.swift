@@ -10,6 +10,7 @@ struct BookDetails: View {
     @EnvironmentObject private var localDownloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
     @Environment(\.nativeStrings) private var l10n
+    @EnvironmentObject private var realtime: NativeRealtime
     let item: LibraryItem
     let catalog: CatalogStore
     let progress: MediaProgress?
@@ -82,6 +83,7 @@ struct BookDetails: View {
                     Button(l10n("Download for offline")) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: episode) } }
                     if let error = localDownloads.error { Text(error).foregroundColor(.red) }
                 }
+                if episode == nil { ItemServerActionsSection(itemID: book.id, catalog: catalog) }
                 if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
                     VStack(alignment: .leading, spacing: 10) {
                         ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
@@ -130,6 +132,7 @@ struct BookDetails: View {
             }
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
+            .onReceive(realtime.events) { event in receive(event) }
     }
 
     @ViewBuilder private var header: some View {
@@ -154,6 +157,7 @@ struct BookDetails: View {
             if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
                 Text(l10n("Narrated by {0}", narrators.joined(separator: ", "))).font(.footnote).foregroundColor(.secondary)
             }
+            if episode == nil, book.mediaType == "book" { RelatedBookLinks(item: book, catalog: catalog) }
         }.multilineTextAlignment(alignment == .center ? .center : .leading)
             .frame(maxWidth: .infinity, alignment: alignment == .center ? .center : .leading)
     }
@@ -299,8 +303,19 @@ struct BookDetails: View {
         }
     }
 
-    private func load(monitorDownloads: Bool = false) {
-        guard !progressBusy else { return }
+    private func receive(_ event: NativeRealtime.Event) {
+        switch event.change {
+        case .authenticated(resumed: true): load(monitorDownloads: true, for: event)
+        case .user: load(for: event)
+        case .progress(let itemID, _, _) where itemID == book.id: load(for: event)
+        case .itemsUpdated(let items) where items.contains(where: { $0.id == book.id }): load(for: event)
+        default: break
+        }
+    }
+
+    /// `event` is the realtime change that asked for this load; nothing is fetched or shown unless the catalog owns it.
+    private func load(monitorDownloads: Bool = false, for event: NativeRealtime.Event? = nil) {
+        guard !progressBusy, event.map(catalog.owns) != false else { return }
         request?.cancel()
         let revision = UUID()
         detailRevision = revision
@@ -310,7 +325,7 @@ struct BookDetails: View {
                 async let detail = catalog.api.item(id: item.id)
                 async let account = catalog.api.me()
                 let (value, user) = try await (detail, account)
-                guard !Task.isCancelled, detailRevision == revision, try await catalog.api.currentAccount() == owner else { return }
+                guard !Task.isCancelled, detailRevision == revision, try await catalog.api.currentAccount() == owner, event.map(catalog.owns) != false else { return }
                 expanded = value
                 mediaProgress = user.mediaProgress
                 canManagePodcasts = user.canManagePodcasts
@@ -321,7 +336,7 @@ struct BookDetails: View {
                 error = nil
                 if monitorDownloads, book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() }
             } catch {
-                guard !Task.isCancelled, detailRevision == revision else { return }
+                guard !Task.isCancelled, detailRevision == revision, event.map(catalog.owns) != false else { return }
                 self.error = ConnectionStore.recovery(for: error)
             }
         }

@@ -194,14 +194,57 @@ import Foundation
         let response: LibrariesResponse = try await get("api/libraries")
         return response.libraries
     }
-    public func items(libraryID: String, page: Int, filter: String? = nil, sort: String = "media.metadata.title", descending: Bool = false) async throws -> ItemsResponse {
-        try await get("api/libraries/\(libraryID)/items", query: [
+    /// With `authorization`, only for that sign-in, like `coverData(itemID:authorization:)`.
+    public func items(libraryID: String, page: Int, filter: String? = nil, sort: String = "media.metadata.title", descending: Bool = false, authorization: UUID? = nil) async throws -> ItemsResponse {
+        try await get("api/libraries/\(libraryID)/items", pinned: authorization, query: [
             URLQueryItem(name: "limit", value: "60"), URLQueryItem(name: "page", value: String(page)),
             URLQueryItem(name: "sort", value: sort), URLQueryItem(name: "desc", value: descending ? "1" : "0"), URLQueryItem(name: "minified", value: "1")
         ] + (filter.map { [URLQueryItem(name: "filter", value: $0)] } ?? []))
     }
     public func search(libraryID: String, query: String, limit: Int) async throws -> SearchResponse {
         try await get("api/libraries/\(libraryID)/search", query: [URLQueryItem(name: "q", value: query), URLQueryItem(name: "limit", value: String(limit))])
+    }
+    /// A library filter such as `authors.<base64 id>` or `series.<base64 id>`, as the server's filter decoder expects.
+    public static func relatedFilter(_ group: String, _ value: String) -> String { group + "." + Data(value.utf8).base64EncodedString() }
+    public func author(id: String, authorization: UUID? = nil) async throws -> AuthorDetail { try await get("api/authors/\(id)", pinned: authorization) }
+    /// A series with progress over its books in `libraryID`. The server's global `api/series/:id` is deprecated
+    /// because a series is not specific to one library.
+    public func series(libraryID: String, id: String, authorization: UUID? = nil) async throws -> SeriesDetail {
+        try await get("api/libraries/\(libraryID)/series/\(id)", pinned: authorization, query: [URLQueryItem(name: "include", value: "progress")])
+    }
+    /// The series in a library that contain at least one book by the author, sorted by name.
+    public func authorSeries(libraryID: String, authorID: String, page: Int, limit: Int = 20, authorization: UUID? = nil) async throws -> SeriesPage {
+        try await get("api/libraries/\(libraryID)/series", pinned: authorization, query: [
+            URLQueryItem(name: "filter", value: Self.relatedFilter("authors", authorID)), URLQueryItem(name: "sort", value: "name"),
+            URLQueryItem(name: "desc", value: "0"), URLQueryItem(name: "limit", value: String(limit)),
+            URLQueryItem(name: "page", value: String(page)), URLQueryItem(name: "minified", value: "1")
+        ])
+    }
+    /// Only for the sign-in identified by `authorization`, like `coverData(itemID:authorization:)`.
+    public func authorImageData(authorID: String, authorization: UUID) async throws -> Data {
+        try await request("api/authors/\(authorID)/image", query: [URLQueryItem(name: "width", value: "400")], pinned: authorization)
+    }
+    /// The signed-in user and the e-reader devices the server lets them use, from the same payload as sign-in.
+    public func sessionAuthorization(authorization: UUID) async throws -> SessionAuthorization {
+        try JSONDecoder().decode(SessionAuthorization.self, from: await request("api/authorize", method: "POST", pinned: authorization))
+    }
+    /// The expanded item with its open RSS feed, if any.
+    public func itemActions(id: String, authorization: UUID) async throws -> ItemActionsDetail {
+        try await get("api/items/\(id)", pinned: authorization, query: [URLQueryItem(name: "expanded", value: "1"), URLQueryItem(name: "include", value: "rssfeed")])
+    }
+    public func openFeed(itemID: String, serverAddress: String, slug: String, preventIndexing: Bool, ownerName: String, ownerEmail: String, authorization: UUID) async throws -> RSSFeed {
+        struct Opened: Decodable { let feed: RSSFeed }
+        let data = try await request("api/feeds/item/\(itemID)/open", method: "POST", body: [
+            "serverAddress": serverAddress, "slug": slug,
+            "metadataDetails": ["preventIndexing": preventIndexing, "ownerName": ownerName, "ownerEmail": ownerEmail]
+        ], pinned: authorization)
+        return try JSONDecoder().decode(Opened.self, from: data).feed
+    }
+    public func closeFeed(id: String, authorization: UUID) async throws {
+        _ = try await request("api/feeds/\(id)/close", method: "POST", pinned: authorization)
+    }
+    public func sendEbookToDevice(itemID: String, deviceName: String, authorization: UUID) async throws {
+        _ = try await request("api/emails/send-ebook-to-device", method: "POST", body: ["libraryItemId": itemID, "deviceName": deviceName], pinned: authorization)
     }
     public func filters(libraryID: String) async throws -> LibraryFilters { try await get("api/libraries/\(libraryID)/filterdata") }
     public func item(id: String) async throws -> LibraryItem { try await get("api/items/\(id)", query: [URLQueryItem(name: "expanded", value: "1")]) }
@@ -293,8 +336,8 @@ import Foundation
         return expiry < Date().timeIntervalSince1970 + 60
     }
 
-    private func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
-        try JSONDecoder().decode(T.self, from: await request(path, query: query))
+    private func get<T: Decodable>(_ path: String, pinned: UUID? = nil, query: [URLQueryItem] = []) async throws -> T {
+        try JSONDecoder().decode(T.self, from: await request(path, query: query, pinned: pinned))
     }
 
     private func request(_ path: String, method: String = "GET", query: [URLQueryItem] = [], body: [String: Any]? = nil, bodyData: Data? = nil, retry: Bool = true, pinned: UUID? = nil) async throws -> Data {

@@ -14,6 +14,8 @@ import Combine
     @Published var savedConnectionsPresented = false
     @Published private(set) var savedConnections: [KeychainCredentials.Summary] = []
     @Published private(set) var activeAccount: AccountIdentity?
+    /// `api.authorizationRevision` of the opened account; changes on a new sign-in even when the account is the same.
+    @Published private(set) var signInRevision: UUID?
     @Published var managementError: String?
     let api: APIClient
     private let vault: KeychainCredentials
@@ -100,6 +102,7 @@ import Combine
             let account = try await api.currentAccount()
             guard request == generation else { return }
             activeAccount = account
+            signInRevision = api.authorizationRevision
             let libraries = try await api.libraries()
             guard request == generation else { return }
             if let id = try vault.activeConnection()?.libraryID, let library = libraries.first(where: { $0.id == id }) {
@@ -159,6 +162,7 @@ import Combine
                 try await playback.suspendForConnectionChange()
                 try api.signOut()
                 activeAccount = nil
+                signInRevision = nil
                 generation = UUID()
                 defaults.removeObject(forKey: "previewLibrary")
                 refreshSavedConnections()

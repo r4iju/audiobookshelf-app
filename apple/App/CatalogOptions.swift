@@ -1,35 +1,5 @@
 import SwiftUI
 
-enum CatalogSort: String, CaseIterable {
-    case title = "media.metadata.title", author = "media.metadata.authorName", authorLast = "media.metadata.authorNameLF"
-    case year = "media.metadata.publishedYear", added = "addedAt", size, duration = "media.duration"
-    case fileCreated = "birthtimeMs", fileModified = "mtimeMs", progress, started = "progress.createdAt", finished = "progress.finishedAt", random
-    case podcastAuthor = "media.metadata.author", episodes = "media.numTracks"
-    static func available(for mediaType: String) -> [CatalogSort] {
-        if mediaType == "podcast" { return [.title, .podcastAuthor, .added, .size, .episodes, .fileCreated, .fileModified, .random] }
-        return allCases.filter { $0 != .podcastAuthor && $0 != .episodes }
-    }
-    var name: String {
-        switch self {
-        case .title: return "Title"
-        case .author: return "Author, first name"
-        case .authorLast: return "Author, last name"
-        case .year: return "Published year"
-        case .added: return "Date added"
-        case .size: return "File size"
-        case .duration: return "Duration"
-        case .fileCreated: return "File created"
-        case .fileModified: return "File modified"
-        case .progress: return "Listening progress"
-        case .started: return "Date started"
-        case .finished: return "Date finished"
-        case .random: return "Random"
-        case .podcastAuthor: return "Author"
-        case .episodes: return "Number of episodes"
-        }
-    }
-}
-
 struct CatalogFilterOptions: View {
     @ObservedObject var catalog: CatalogStore
     @Binding var presented: Bool

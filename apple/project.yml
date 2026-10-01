@@ -78,6 +78,9 @@ targets:
         excludes: ["*.md"]
       - App/NativeDownloads.swift
       - App/ReadingStore.swift
+      - App/CatalogStore.swift
+      - App/NativeRealtime.swift
+      - Localization/Sources/NativeLocalization
       - Playback
       - ../tvos/Core/Sources/TVCore
       - Migration/Sources/LegacyMigration
