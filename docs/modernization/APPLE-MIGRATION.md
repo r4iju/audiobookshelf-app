@@ -86,8 +86,16 @@ the default schema, so they cannot collide with any other Realm schema in either
 - `committedOutcome()` and `fileURL(for: MigratedFile)` are the read side for the app.
 
 The legacy installation is never modified: the Realm is read from a copy, files are linked or
-copied, Keychain items and UserDefaults are read only. The legacy app's data remains available
-for rollback until the user removes it.
+copied, Keychain items and UserDefaults are read only. The Realm work copy holds access tokens;
+it is deleted after reading, and copies left by an interrupted read are deleted by the next read.
+
+Rollback. Route 2 keeps both apps installed, so the legacy app stays usable unchanged. Route 1
+replaces the legacy binary, but its Realm, Documents files, UserDefaults and Keychain items are
+left as they were, so reinstalling the legacy build restores it with its pre-upgrade data.
+Listening and downloads made in the native app after the upgrade are not visible to the restored
+legacy app (except through the server). Story-60 ("current app remains available") is therefore
+met by route 2 only; route 1 must not ship to the audience until the rollback reinstall is proven
+(gate 8).
 
 Hard links share storage with the legacy file. Neither app modifies downloaded media in place, so
 this is safe, but deleting a download in the native app must remove only the native link.
@@ -179,17 +187,29 @@ in UserDefaults), so it runs once per outcome.
 | --- | --- |
 | `MigratedAccount` + adopted secret | `KeychainCredentials` `Document.connections` (`Connection(id:credentials:libraryID:)`, `Credentials(server, accessToken, refreshToken, userID, username)`); active account from `wasActive`. The sink implements `MigrationSecretSink` over `KeychainCredentials`, so secrets stay in Keychain. `lastLibraryId` preference seeds `libraryID`. |
 | `reauthenticationRequired` | Show the account in the sign-in list with its server prefilled; attach migrated data when `AccountIdentity(server, userID)` matches after sign-in. |
-| `MigratedDownload` | `NativeDownloads.Entry` (`account`, `media`, `tracks`, `chapters`, `ebook`, `finished`, `state: .ready`). Move or link `fileURL(for:)` into `NativeDownloads.directory` with the native names `audio-<index>.<ext>` and `ebook.<format>`, then write the manifest. Entries with `complete == false` stay visible with their issue. |
-| `MigratedProgress` (audio) | `ListeningSync` remembered position (`rememberRemotePosition`) per account and item/episode, compared by `lastUpdate`. |
+| `MigratedDownload` (book) | One `NativeDownloads.Entry`: `id` and `generation` new UUIDs, `account`, `media` (`ListeningMedia(itemID: libraryItemID, episodeID: nil, title, author, mediaType, duration: sum of finite track durations, startTime: progress currentTime)`), `tracks`, `chapters`, `ebook`, `serverPosition`/`serverUpdatedAt` from the matching `MigratedProgress` (else 0), `finished` = indices of adopted parts. Move or link `fileURL(for:)` into `NativeDownloads.directory` with the native names `audio-<index>.<ext>` and `ebook.<format>`, then write the manifest. The native manifest rejects the whole file when a `.ready` entry has unfinished parts or a non-finite duration, so use `state: .ready` only when `complete`, else `.failed` with the issue's message in `error`. Items with no `libraryItemID` stay out of the manifest and in the issue list. |
+| `MigratedDownload` (podcast) | One `Entry` per `MigratedEpisode` with an adopted track (`ListeningMedia.episodeID` = episode id), since an entry holds one `ListeningMedia`. |
+| `MigratedDownload.cover` | No native field yet. The adopted cover stays at `fileURL(for:)` until `Entry` gains cover storage; the native app otherwise loads the server cover. |
+| `MigratedProgress` (audio, finished flags, reading) | Upload, not a journal entry: `ListeningJournal.rememberRemotePosition` records a server position and uploads nothing. For each account, compare with the server's `mediaProgress` by `lastUpdate`, as the legacy `syncLocalSessionsWithServer` did; where the local value is newer, `PATCH /api/me/progress/<item>[/<episode>]` with `currentTime`, `duration`, `progress`, `isFinished`, `finishedAt`, `ebookLocation`, `ebookProgress` (the legacy `updateMediaProgress` route). The native app has no such path today; the coordinator adds it. Until uploaded, keep the outcome as the source. |
 | `MigratedProgress.reading` | `ReadingStore.Position(account, itemID, format, fileID, location, fraction, updatedAt, revision, pending: true, rotation: 0)`. PDF uses the page string; EPUB keeps the CFI; MOBI/AZW3/CBZ/CBR keep the raw value for their deferred readers. |
 | `webStorage["ebookLocations-<id>"]` | EPUB location cache for the native EPUB reader when it exists; otherwise keep in the outcome. |
-| `MigratedSession` | Listening journal entries for upload. `sessionTotal` goes through `/api/session/local-all`; `sinceLastSync` is reported as the unsynced delta. |
+| `MigratedSession` | Upload through the native `api/session/local-all` path (`APIClient.swift`), as the legacy app did on reconnect for every pending row. `sessionTotal` rows match what the server expects. For `sinceLastSync` rows (streamed, `localLibraryItemId == nil`) the server already holds the session id; whether `local-all` adds or replaces their `timeListening` is unverified (gate 9), and the alternative is the legacy streamed route `POST /api/session/<id>/sync` with `timeListened` = the stored value. Sessions with no account are not sent. |
 | `LegacyDeviceSettings` | `previewSkipForward` (`jumpForwardTime`), `previewSkipBackward` (`jumpBackwardsTime`), `previewHaptic` (`hapticFeedback` lowercased), `previewResumeRewind` (`!disableAutoRewind`), `previewMediaSeeking` (`allowSeekingOnMediaControls`), `previewSleepFade` (`!disableSleepTimerFadeOut`), `previewDownloadCellular` (`downloadUsingCellular != "NEVER"`) |
 | `LegacyPlayerSettings` | `previewPlaybackSpeed` (`playbackRate`) |
-| Preferences `theme`, `bookshelfListView`, `lastLibraryId` | `previewTheme`, `previewListLayout` (Bool, from the `"true"`/`"false"` string), `previewLibrary` |
+| Preferences `theme`, `bookshelfListView`, `lastLibraryId` | `previewTheme`, `previewListLayout` (Bool, `"1"` is true; the legacy app stores `'1'`/`'0'`), `previewLibrary` |
 | `webStorage["ereaderSettings"]` | `previewEPUBPreferences` (font scale, theme, spacing where equivalent) |
 | `webStorage["absDeviceId"]` | `nativeDeviceID`, so the server sees the same device |
-| `issues` | A "Migration needs attention" list in Settings, grouped by account, with each `message`. |
+| `issues` | A "Migration needs attention" list in Settings, grouped by account with an "Other" group for issues with no account (`unscopedData`, `accountMismatch`, `unreadableConnection`), each showing its `message`. |
+
+Kept in the outcome without a native target yet (the coordinator decides when a native setting
+exists): `languageCode` and `lang`, `lockOrientation`, `streamingUsingCellular`, `chapterTrack`,
+`enableAltView`, and the `userSettings`/`serverSettings` preference blobs.
+
+Not read from the legacy Realm: item metadata beyond title and author (subtitle, narrators,
+series, description, genres, tags), podcast `autoDownloadEpisodes`, episode number, season, type
+and description, and session `chapters`/`mediaMetadata`. These are server data; the native app
+fetches them by `libraryItemID` once signed in. Offline before that, a migrated item shows title
+and author only. Media duration is the sum of track durations.
 
 ## Legacy export adapter (route 2), integration patch
 
@@ -212,15 +232,25 @@ archive. Patch for the legacy owner:
 
 ## Verification evidence (this machine, synthetic data only)
 
-Tests were written first and failed before implementation:
+Tests were written first and failed before implementation. The first round was observed locally
+(tests and code were committed together):
 
 - Core: 16 tests with 18 failures against neutral stubs, then 17 of 17 passing.
 - Realm adapter: 5 tests, 5 failures against neutral stubs, then 5 of 5 passing.
 
+The review round is committed red first, then fixed, so it can be checked from history:
+
+- Core: 3 new tests failing (non-finite legacy numbers aborted the commit; progress and sessions
+  without an account raised no issue; a file shared by two accounts was adopted into only one
+  account's scope), then 20 of 20 passing.
+- Realm adapter: 1 new test failing (a credential-bearing work copy left by an interrupted read
+  survived), then 6 of 6 passing.
+
 Covered failure and recovery cases: interruption after N file transfers then resume, interruption
 between outcome and journal commit, repeated runs, corrupt journal, tampered staged file, corrupt
 and incomplete archives, unsupported schema, unreadable database, different source after commit,
-copy fallback without space, path traversal, missing and truncated files, account mismatch,
+copy fallback without space, path traversal, NaN and infinite legacy numbers, shared files across
+accounts, stale credential copies, missing and truncated files, account mismatch,
 unscoped items, interrupted downloads, invalid reader locations, credential absence from every
 file written by the migration.
 
@@ -245,3 +275,7 @@ credential was read.
 6. iOS 14 runtime on a device or simulator (builds here target the iOS 14 minimum but run on the
    Xcode 27 toolchain).
 7. Free-space and hard-link behaviour on a real device volume with a large library.
+8. Route 1 rollback: reinstall the legacy build over the upgraded app on a device and confirm it
+   opens with its pre-upgrade accounts, downloads and progress.
+9. Server handling of streamed (`sinceLastSync`) sessions posted through `local-all` when the
+   server already holds the session id, against the supported server versions.

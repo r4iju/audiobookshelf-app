@@ -49,10 +49,7 @@ public struct LegacySource {
 
     /// Content identity of the snapshot, used to recognise a retry of the same migration.
     public var fingerprint: String {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys]
-        let data = Data(kind.rawValue.utf8) + ((try? encoder.encode(snapshot)) ?? Data())
-        return SHA256.hash(data: data).hex
+        get throws { SHA256.hash(data: Data(kind.rawValue.utf8) + (try MigrationJSON.encoder.encode(snapshot))).hex }
     }
 }
 

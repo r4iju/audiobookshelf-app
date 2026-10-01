@@ -64,7 +64,7 @@ public final class LegacyMigrator {
 
     public func migrate(_ source: LegacySource, secrets: MigrationSecretSink? = nil) throws -> MigrationOutcome {
         try requireSupportedSchema(source)
-        let fingerprint = source.fingerprint
+        let fingerprint = try source.fingerprint
         var journal = try loadJournal(for: fingerprint)
         if journal.committed, let outcome = try? readOutcome() {
             return outcome
@@ -79,7 +79,7 @@ public final class LegacyMigrator {
 
         var adopted: [String: MigratedFile] = [:]
         var pendingTransfer: [(PlannedFile, String)] = []
-        for planned in plan.files.values.sorted(by: { $0.legacyPath < $1.legacyPath }) {
+        for planned in plan.files.values.sorted(by: { $0.key < $1.key }) {
             let digest = try Self.sha256(of: planned.source)
             if let recorded = source.recordedDigests[planned.legacyPath], recorded != digest {
                 plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath,
@@ -88,7 +88,7 @@ public final class LegacyMigrator {
             }
             let destination = filesURL.appendingPathComponent(planned.destination)
             if FileManager.default.fileExists(atPath: destination.path), (try? Self.sha256(of: destination)) == digest {
-                adopted[planned.legacyPath] = planned.migrated(sha256: digest)
+                adopted[planned.key] = planned.migrated(sha256: digest)
             } else {
                 pendingTransfer.append((planned, digest))
             }
@@ -102,7 +102,7 @@ public final class LegacyMigrator {
                 try fileSystem.link(planned.source, to: staged)
             } catch {
                 if !copyBudgetChecked {
-                    let required = pendingTransfer.filter { adopted[$0.0.legacyPath] == nil }.reduce(Int64(0)) { $0 + $1.0.size }
+                    let required = pendingTransfer.filter { adopted[$0.0.key] == nil }.reduce(Int64(0)) { $0 + $1.0.size }
                     let available = try fileSystem.availableCapacity(at: root)
                     guard required <= available else { throw LegacyMigrationError.insufficientSpace(required: required, available: available) }
                     copyBudgetChecked = true
@@ -120,7 +120,7 @@ public final class LegacyMigrator {
                 try FileManager.default.removeItem(at: destination)
             }
             try FileManager.default.moveItem(at: staged, to: destination)
-            adopted[planned.legacyPath] = planned.migrated(sha256: digest)
+            adopted[planned.key] = planned.migrated(sha256: digest)
             journal.adopted[planned.destination] = digest
             try writeJournal(journal)
         }
@@ -148,9 +148,7 @@ public final class LegacyMigrator {
         }
 
         let outcome = plan.outcome(kind: source.kind, fingerprint: fingerprint, accounts: accounts, adopted: adopted)
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys]
-        try fileSystem.writeAtomically(try encoder.encode(outcome), to: outcomeURL)
+        try fileSystem.writeAtomically(try MigrationJSON.encoder.encode(outcome), to: outcomeURL)
         journal.committed = true
         try writeJournal(journal)
         try? FileManager.default.removeItem(at: stagingURL)
@@ -175,11 +173,11 @@ public final class LegacyMigrator {
 
     private func readJournal() throws -> Journal? {
         guard FileManager.default.fileExists(atPath: journalURL.path) else { return nil }
-        return try JSONDecoder().decode(Journal.self, from: Data(contentsOf: journalURL))
+        return try MigrationJSON.decoder.decode(Journal.self, from: Data(contentsOf: journalURL))
     }
 
     private func readOutcome() throws -> MigrationOutcome {
-        let outcome = try JSONDecoder().decode(MigrationOutcome.self, from: Data(contentsOf: outcomeURL))
+        let outcome = try MigrationJSON.decoder.decode(MigrationOutcome.self, from: Data(contentsOf: outcomeURL))
         guard outcome.formatVersion == MigrationOutcome.formatVersion else { throw CocoaError(.fileReadCorruptFile) }
         return outcome
     }
@@ -206,9 +204,7 @@ public final class LegacyMigrator {
     }
 
     private func writeJournal(_ journal: Journal) throws {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys]
-        try fileSystem.writeAtomically(try encoder.encode(journal), to: journalURL)
+        try fileSystem.writeAtomically(try MigrationJSON.encoder.encode(journal), to: journalURL)
     }
 
     static func sha256(of url: URL) throws -> String {

@@ -151,10 +151,10 @@ public struct MigratedProgress: Codable, Equatable {
 }
 
 public struct MigratedSession: Codable, Equatable {
-    /// How `timeListening` must be reported. Legacy downloaded-media sessions are uploaded whole
-    /// through `/api/session/local-all` (the server derives the delta from the session it already
-    /// holds); streamed sessions reset `timeListening` after each acknowledged sync, so the stored
-    /// value is listening the server has not counted yet.
+    /// What the stored `timeListening` counts. Downloaded-media sessions hold the session total and
+    /// were posted whole (`/api/session/local`, or `/api/session/local-all` on reconnect). Streamed
+    /// sessions reset it after each acknowledged `/api/session/<id>/sync`, so it holds listening
+    /// since that sync; the legacy app also sent these through `local-all` on reconnect.
     public enum ListeningSemantics: String, Codable {
         case sessionTotal
         case sinceLastSync

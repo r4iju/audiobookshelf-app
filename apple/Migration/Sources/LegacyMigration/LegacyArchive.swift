@@ -37,9 +37,7 @@ public enum LegacyArchive {
             digests[planned.legacyPath] = try LegacyMigrator.sha256(of: target)
         }
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys]
-        let manifest = try encoder.encode(Manifest(formatVersion: formatVersion, snapshot: exported, digests: digests))
+        let manifest = try MigrationJSON.encoder.encode(Manifest(formatVersion: formatVersion, snapshot: exported, digests: digests))
         try manifest.write(to: partial.appendingPathComponent(manifestName), options: .atomic)
         try FileManager.default.moveItem(at: partial, to: destination)
         return destination
@@ -50,7 +48,7 @@ public enum LegacyArchive {
         guard FileManager.default.fileExists(atPath: manifestURL.path) else { throw LegacyMigrationError.archiveIncomplete }
         let manifest: Manifest
         do {
-            manifest = try JSONDecoder().decode(Manifest.self, from: Data(contentsOf: manifestURL))
+            manifest = try MigrationJSON.decoder.decode(Manifest.self, from: Data(contentsOf: manifestURL))
         } catch {
             throw LegacyMigrationError.archiveUnreadable("The export description could not be read.")
         }

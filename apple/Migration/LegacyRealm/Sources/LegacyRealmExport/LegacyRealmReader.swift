@@ -11,13 +11,22 @@ public struct LegacyRealmContents {
 public enum LegacyRealmReader {
     /// Reads the legacy database through a private copy, so the original file, its lock and
     /// management files are never opened. The copy holds credentials and is removed before
-    /// returning, whether or not reading succeeds.
+    /// returning, whether or not reading succeeds. `workDirectory` belongs to the reader: copies left
+    /// by a read the system interrupted are removed first.
     public static func read(realmAt url: URL, workDirectory: URL) throws -> LegacyRealmContents {
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw LegacyMigrationError.legacyDatabaseUnreadable("The old app's database is not present.")
         }
+        for stale in (try? FileManager.default.contentsOfDirectory(at: workDirectory, includingPropertiesForKeys: nil)) ?? [] {
+            try FileManager.default.removeItem(at: stale)
+        }
         let work = workDirectory.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
+        #if os(iOS)
+        let attributes: [FileAttributeKey: Any] = [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication]
+        #else
+        let attributes: [FileAttributeKey: Any] = [:]
+        #endif
+        try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true, attributes: attributes)
         defer {
             try? FileManager.default.removeItem(at: work)
             if (try? FileManager.default.contentsOfDirectory(atPath: workDirectory.path))?.isEmpty == true {
