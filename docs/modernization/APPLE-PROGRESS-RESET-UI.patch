@@ -1,5 +1,5 @@
 diff --git a/apple/App/BookDetails.swift b/apple/App/BookDetails.swift
-index adac576f..4d17af48 100644
+index adac576f..c0b941a7 100644
 --- a/apple/App/BookDetails.swift
 +++ b/apple/App/BookDetails.swift
 @@ -9,6 +9,7 @@ struct BookDetails: View {
@@ -47,7 +47,7 @@ index adac576f..4d17af48 100644
 +            defer { progressBusy = false }
 +            do {
 +                let account = try await catalog.api.currentAccount()
-+                let user = try await migration.resetProgress(account: account, itemID: book.id, episodeID: episode?.id, reading: readingStore)
++                let user = try await migration.resetProgress(account: account, itemID: book.id, episodeID: episode?.id)
 +                guard !Task.isCancelled else { return }
 +                progressDiscarded = true
 +                mediaProgress = user.mediaProgress
@@ -84,17 +84,18 @@ index 8f812164..6df876a7 100644
          guard needsProgressRefresh, case .content(var current) = state, !current.loadingMore else { return }
          let request = generation
 diff --git a/apple/App/NativeMigrationImport.swift b/apple/App/NativeMigrationImport.swift
-index a7b05e82..35497eb4 100644
+index a7b05e82..28589512 100644
 --- a/apple/App/NativeMigrationImport.swift
 +++ b/apple/App/NativeMigrationImport.swift
-@@ -19,6 +19,11 @@ import UniformTypeIdentifiers
+@@ -19,6 +19,12 @@ import UniformTypeIdentifiers
          self.adopter = adopter
          self.player = player
      }
 +    /// Discards the user's progress for the media so that carried-over legacy listening and
-+    /// positions cannot bring it back.
-+    func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?, reading: ReadingStore) async throws -> CurrentUser {
-+        try await player.resetProgress(account: account, itemID: itemID, episodeID: episodeID, reading: reading, adoption: adopter)
++    /// positions cannot bring it back. A reset that throws after it was saved stays on hold and is
++    /// finished by the next attempt, start or listening restore.
++    func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?) async throws -> CurrentUser {
++        try await player.resetProgress(account: account, itemID: itemID, episodeID: episodeID, adoption: adopter)
 +    }
      private var selectedURL: URL?
      private var selectedFingerprint: String?

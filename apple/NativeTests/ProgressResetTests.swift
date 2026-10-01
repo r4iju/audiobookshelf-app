@@ -121,10 +121,120 @@ import XCTest
     }
 
     private func reset(_ item: String, episode: String? = nil) async throws -> CurrentUser {
-        try await harness.player.resetProgress(account: alice, itemID: item, episodeID: episode, reading: harness.reading, adoption: harness.adoption)
+        try await harness.player.resetProgress(account: alice, itemID: item, episodeID: episode, adoption: harness.adoption)
     }
 
     private func deletes() -> [String] { harness.stub.requests.filter { $0.method == "DELETE" }.map(\.path) }
+
+    /// Upserts the row as 2.30's progress PATCH does: a row recreated after a delete gets a new ID.
+    private func acceptProgressPatches(_ item: String) {
+        let server = server
+        harness.stub.route("PATCH", api + "/me/progress/" + item) { request in
+            let id = server[item, nil]?.id ?? "mp-new-" + UUID().uuidString
+            server[item, nil] = Row(id: id, time: request.json?["currentTime"] as? Double ?? server[item, nil]?.time ?? 0,
+                                    updatedAt: Date().timeIntervalSince1970 * 1_000, ebookLocation: request.json?["ebookLocation"] as? String)
+            return .status(200)
+        }
+    }
+
+    /// Answers the book's delete with `status`, after applying it when `applied`.
+    private func answerDeletes(_ status: Int, applied: Bool) {
+        let server = server, id = server.id(book, nil)
+        harness.stub.route("DELETE", api + "/me/progress/" + id) { _ in
+            if applied { server.remove(id: id) }
+            return .status(status)
+        }
+    }
+
+    private func patches(_ item: String) -> Int { harness.stub.requests("PATCH", api + "/me/progress/" + item).count }
+
+    private func readPendingPage() throws {
+        server[book, nil] = Row(id: server.id(book, nil), time: 12, updatedAt: old, ebookLocation: "epubcfi(/6/4)")
+        acceptProgressPatches(book)
+        try harness.reading.update(account: alice, itemID: book, format: "epub", location: "epubcfi(/6/8)", fraction: 0.6, rotation: 0)
+    }
+
+    private func expectUnfinishedReset() async {
+        do { _ = try await reset(book); XCTFail("The reset reported success before it finished") } catch {}
+    }
+
+    /// Publishes pending reading and waits for it to settle.
+    private func publishReading() async throws {
+        harness.reading.sync(api: harness.api)
+        try await Task.sleep(nanoseconds: 300_000_000)
+    }
+
+    /// Plays the download whose snapshot still holds the deleted position, and returns where it opened.
+    private func startStaleDownload() async throws -> Double? {
+        await harness.player.startOffline(try audio(book, serverPosition: 12, serverUpdatedAt: old))
+        harness.player.pause()
+        return harness.player.session == nil ? nil : harness.player.currentTime
+    }
+
+    private func assertResetFinished(file: StaticString = #filePath, line: UInt = #line) async throws {
+        let primary = harness.reading.position(account: alice, itemID: book, format: "epub")
+        XCTAssertEqual(primary?.location, "", "The old page survived", file: file, line: line)
+        XCTAssertEqual(primary?.pending, false, file: file, line: line)
+        // Reading publishes only while no audio is open.
+        try await publishReading()
+        XCTAssertNil(server[book, nil]?.ebookLocation.flatMap { $0.isEmpty ? nil : $0 }, "An old page restored the reset", file: file, line: line)
+        let opened = try await startStaleDownload()
+        XCTAssertEqual(try XCTUnwrap(opened, harness.player.error ?? "The download did not open", file: file, line: line), 0, accuracy: 0.05, file: file, line: line)
+        try await settleListening()
+        XCTAssertEqual(server[book, nil]?.time ?? 0, 0, accuracy: 0.05, "Old listening restored the reset", file: file, line: line)
+    }
+
+    func testARefusedLocalCleanupKeepsTheResetPendingUntilItFinishes() async throws {
+        try readPendingPage()
+        try harness.reading.update(account: alice, itemID: other, format: "pdf", location: "3", fraction: 0.3, rotation: 0)
+        acceptProgressPatches(other)
+        // The reading document can no longer be replaced.
+        try? FileManager.default.removeItem(at: harness.readingFile)
+        try FileManager.default.createDirectory(at: harness.readingFile.appendingPathComponent("refused"), withIntermediateDirectories: true)
+        await expectUnfinishedReset()
+        XCTAssertNil(server[book, nil], "Precondition: the server row was deleted")
+
+        // Until this device's copies are discarded, none of them is published or played.
+        try await publishReading()
+        XCTAssertEqual(patches(book), 0, "The old page recreated the deleted progress")
+        let opened = try await startStaleDownload()
+        XCTAssertNil(opened, "Playback opened before the reset finished")
+        XCTAssertNil(server[book, nil])
+
+        try FileManager.default.removeItem(at: harness.readingFile)
+        await harness.player.restoreListening()
+        try await assertResetFinished()
+        XCTAssertEqual(patches(book), 0)
+        XCTAssertEqual(server[other, nil]?.ebookLocation, "3", "Unrelated reading was not published")
+    }
+
+    func testADeleteAppliedWithoutAnAnswerFinishesAfterRelaunch() async throws {
+        try readPendingPage()
+        answerDeletes(500, applied: true)
+        await expectUnfinishedReset()
+        XCTAssertNil(server[book, nil], "Precondition: the server applied the delete")
+
+        harness.openStores()
+        try await publishReading()
+        XCTAssertEqual(patches(book), 0, "After a relaunch the old page recreated the deleted progress")
+        answerDeletes(200, applied: true)
+        await harness.player.restoreListening()
+        try await assertResetFinished()
+        XCTAssertEqual(patches(book), 0)
+    }
+
+    func testARejectedDeleteKeepsThisDevicesProgressUntilTheServerAcceptsIt() async throws {
+        try readPendingPage()
+        answerDeletes(500, applied: false)
+        await expectUnfinishedReset()
+        XCTAssertEqual(server[book, nil]?.time, 12, "Precondition: the server kept the progress")
+        XCTAssertEqual(harness.reading.position(account: alice, itemID: book, format: "epub")?.location, "epubcfi(/6/8)", "This device's reading was discarded though the server kept the progress")
+
+        answerDeletes(200, applied: true)
+        await harness.player.restoreListening()
+        XCTAssertNil(server[book, nil], "The confirmed reset was never finished")
+        try await assertResetFinished()
+    }
 
     func testResettingABookDeletesItsServerRowAndReturnsTheUserWithoutIt() async throws {
         server[book, nil] = Row(id: server.id(book, nil), time: 12, updatedAt: old)
@@ -249,6 +359,30 @@ import XCTest
         let deleted = try XCTUnwrap(index("DELETE", api + "/me/progress/" + server.id(book, nil)))
         XCTAssertFalse(harness.stub.requests.enumerated().contains { $0.offset > deleted && $0.element.method == "PATCH" }, "The carried-over position was sent after the reset")
         XCTAssertNil(server[book, nil])
+    }
+
+    func testACarriedOverPositionWaitsForAnUnfinishedResetAndIsRetiredByIt() async throws {
+        harness.addProgress(book, account: AdoptionHarness.alice, position: 300, duration: 900, lastUpdate: AdoptionHarness.legacyUpdate)
+        _ = try await harness.adoption.apply(outcome: try harness.migrate(), migrator: harness.migrator)
+        server[book, nil] = Row(id: server.id(book, nil), time: 12, updatedAt: AdoptionHarness.legacyUpdate - 5_000)
+        let server = server, book = book
+        server.acceptListening = false
+        harness.stub.route("PATCH", api + "/me/progress/" + book) { request in
+            guard server.acceptListening else { return .status(500) }
+            server[book, nil] = Row(id: "mp-new-" + UUID().uuidString, time: request.json?["currentTime"] as? Double ?? 0, updatedAt: request.json?["lastUpdate"] as? Double ?? 0)
+            return .status(200)
+        }
+        answerDeletes(500, applied: true)
+        await expectUnfinishedReset()
+        server.acceptListening = true
+
+        harness.openStores()
+        _ = await harness.adoption.sync()
+        XCTAssertNil(server[book, nil], "After a relaunch the carried-over position recreated the deleted progress")
+        answerDeletes(200, applied: true)
+        await harness.player.restoreListening()
+        _ = await harness.adoption.sync()
+        XCTAssertNil(server[book, nil], "The finished reset left the carried-over position to be sent")
     }
 
     func testCarriedOverLegacyListeningIsDeliveredBeforeTheDeleteAndCannotRestoreIt() async throws {

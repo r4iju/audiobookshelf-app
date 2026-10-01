@@ -87,6 +87,7 @@ import UIKit
     private var readingPublication: Task<Void, Error>?
     var canPublishReading: Bool { session == nil && !preparing && !closing && progressReset == nil }
     @Published private var progressReset: Task<CurrentUser, Error>?
+    private var resetCleanups: [String: @MainActor (ProgressResetIntent) throws -> Void] = [:]
     private var listeningID: String?
     private let player = AVPlayer()
     @Published private(set) var trackIndex = 0
@@ -119,11 +120,11 @@ import UIKit
         #endif
     }
 
-    init(api: APIClient) {
+    init(api: APIClient, progressResets: URL? = nil) {
         self.api = api
         let savedSpeed = UserDefaults.standard.float(forKey: "previewPlaybackSpeed")
         speed = savedSpeed >= 0.5 && savedSpeed <= 10 ? savedSpeed : 1
-        listening = ListeningSync(api: api)
+        listening = ListeningSync(api: api, resets: progressResets)
         #if os(iOS)
         audioObservers.append(NotificationCenter.default.addObserver(forName: AppleNetworkPolicy.changed, object: nil, queue: .main) { [weak self] note in
             guard note.object as? String == AppleNetworkPolicy.streamingKey else { return }
@@ -189,6 +190,8 @@ import UIKit
         do {
             if let readingPublication { _ = try? await readingPublication.value }
             if let progressReset { _ = try? await progressReset.value }
+            guard preparationID == preparation else { return }
+            try await finishProgressReset(account: try await api.currentAccount(), itemID: item.id, episodeID: episode?.id)
             guard preparationID == preparation else { return }
             try await closeCurrentSession()
             let requestGeneration = generation
@@ -264,6 +267,8 @@ import UIKit
             if let progressReset { _ = try? await progressReset.value }
             guard preparationID == preparation else { return }
             guard try await api.currentAccount() == audio.account else { throw APIError.signInRequired }
+            try await finishProgressReset(account: audio.account, itemID: audio.media.libraryItemID, episodeID: audio.media.episodeID)
+            guard preparationID == preparation else { return }
             try await suspendForConnectionChange(preservingIntent: initialIntent)
             preparationID = preparation; preparing = true
             let request = generation
@@ -563,6 +568,7 @@ import UIKit
     func restoreListening() async {
         do { try await listening.flush(); clearProgressFailure() }
         catch { failed(error, prefix: "Saved listening is waiting to sync: ", origin: .progress) }
+        await resumeProgressResets()
     }
 
     // Legacy servers timestamp audio and reading together. Publish reading only after
@@ -614,11 +620,12 @@ import UIKit
 
     /// Discards the account's progress for the media on this device and the server, as the baseline
     /// Discard progress action does, and returns the refreshed user. `prepare` runs after this
-    /// device's listening is published and before the server row is deleted; `discardLocal` runs
-    /// once it is gone. Playback and reading publication wait for the reset.
+    /// device's listening is published and before anything is changed. The reset is saved before
+    /// the server row is deleted; from then until the registered cleanups have discarded this
+    /// device's copies, the media cannot be played or its reading published. A reset that fails
+    /// after that point throws and is finished by the next attempt, start or `restoreListening`.
     func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?,
-                       prepare: @escaping @MainActor () async throws -> Void = {},
-                       discardLocal: @escaping @MainActor () throws -> Void = {}) async throws -> CurrentUser {
+                       prepare: @escaping @MainActor () async throws -> Void = {}) async throws -> CurrentUser {
         guard progressReset == nil, !preparing, !closing, !seeking else { throw ProgressResetFailure.busy }
         let authorization = api.authorizationRevision
         func owned() async throws {
@@ -628,16 +635,25 @@ import UIKit
             try await owned()
             if self.itemID == itemID, self.episodeID == episodeID { try await stop() }
             if let readingPublication { _ = try? await readingPublication.value }
-            // A 2.30 local session sync recreates deleted progress, so unsent listening is published
-            // before the delete; if it cannot be, nothing is deleted.
-            try await listening.flush()
-            try await owned()
-            try await prepare()
-            try await owned()
-            guard try !listening.hasLocalListening(account: account, itemID: itemID, episodeID: episodeID, newerThan: nil) else { throw ProgressResetFailure.busy }
-            _ = try await api.resetProgress(itemID: itemID, episodeID: episodeID, authorization: authorization)
-            try listening.forgetPosition(account: account, itemID: itemID, episodeID: episodeID)
-            try discardLocal()
+            let intent: ProgressResetIntent
+            if let pending = try listening.pendingResets().first(where: { $0.covers(account: account, itemID: itemID, episodeID: episodeID) }) {
+                // A reset left unfinished is finished, not confirmed again.
+                intent = pending
+            } else {
+                // A 2.30 local session sync recreates deleted progress, so unsent listening is
+                // published before the delete; if it cannot be, nothing is deleted.
+                try await listening.flush()
+                try await owned()
+                try await prepare()
+                try await owned()
+                guard try !listening.hasLocalListening(account: account, itemID: itemID, episodeID: episodeID, newerThan: nil) else { throw ProgressResetFailure.busy }
+                let rowID = try await api.progressRowID(itemID: itemID, episodeID: episodeID, authorization: authorization)
+                try await owned()
+                let confirmed = ProgressResetIntent(account: account, itemID: itemID, episodeID: episodeID, rowID: rowID, requestedAt: Date().timeIntervalSince1970 * 1_000)
+                try listening.beginReset(confirmed)
+                intent = confirmed
+            }
+            try await finish(intent, authorization: authorization)
             try await owned()
             let user = try await api.me()
             try await owned()
@@ -649,9 +665,59 @@ import UIKit
         return try await reset.value
     }
 
+    /// Registers how another store discards its copies of reset progress. Cleanups run, in no
+    /// particular order, whenever a reset finishes, and must tolerate running again.
+    func registerProgressResetCleanup(_ name: String, _ cleanup: @escaping @MainActor (ProgressResetIntent) throws -> Void) {
+        resetCleanups[name] = cleanup
+    }
+
+    /// Whether a confirmed reset of the media has not finished, so its copies must not be published.
+    /// Unreadable resets count as pending.
+    func progressResetPending(account: AccountIdentity, itemID: String, episodeID: String?) -> Bool {
+        guard let resets = try? listening.pendingResets() else { return true }
+        return resets.contains { $0.covers(account: account, itemID: itemID, episodeID: episodeID) }
+    }
+
+    /// Finishes the signed-in account's resets that a failure or relaunch left unfinished.
+    func resumeProgressResets() async {
+        if let progressReset { _ = try? await progressReset.value }
+        let authorization = api.authorizationRevision
+        guard let account = try? await api.currentAccount(), api.authorizationRevision == authorization else { return }
+        do {
+            for intent in try listening.pendingResets() where intent.account == account {
+                try await finish(intent, authorization: authorization)
+            }
+        } catch { failed(error, origin: .progress) }
+    }
+
+    /// Finishes an unfinished reset of the media before it plays; throws while it cannot.
+    private func finishProgressReset(account: AccountIdentity, itemID: String, episodeID: String?) async throws {
+        guard let intent = try listening.pendingResets().first(where: { $0.covers(account: account, itemID: itemID, episodeID: episodeID) }) else { return }
+        try await finish(intent, authorization: api.authorizationRevision)
+    }
+
+    // Deleting the row again is harmless, and cleanups keep copies dated after the confirmation, so
+    // a reset can be finished any number of times.
+    private func finish(_ intent: ProgressResetIntent, authorization: UUID) async throws {
+        do {
+            guard api.authorizationRevision == authorization, try await api.currentAccount() == intent.account else { throw CancellationError() }
+            if let rowID = intent.rowID { try await api.deleteProgress(rowID: rowID, authorization: authorization) }
+            try listening.forgetPosition(account: intent.account, itemID: intent.itemID, episodeID: intent.episodeID, at: intent.requestedAt)
+            for cleanup in resetCleanups.values { try cleanup(intent) }
+            try listening.finishReset(intent)
+        } catch is CancellationError { throw CancellationError() }
+        catch { throw ProgressResetFailure.unfinished(error) }
+    }
+
     private enum ProgressResetFailure: LocalizedError {
         case busy
-        var errorDescription: String? { "Progress can be discarded once playback and listening sync finish. Try again." }
+        case unfinished(Error)
+        var errorDescription: String? {
+            switch self {
+            case .busy: return "Progress can be discarded once playback and listening sync finish. Try again."
+            case .unfinished(let error): return "Discarding progress has not finished, so this title stays on hold until it does. Try again. " + error.localizedDescription
+            }
+        }
     }
 
     func prepareProgressEdit(itemID: String, episodeID: String?) async throws {
@@ -937,12 +1003,11 @@ import UIKit
 
 #if os(iOS)
 extension ApplePlayback {
-    /// The mobile reset: carried-over legacy listening and positions and, for a book, primary
-    /// reading positions cannot bring the progress back either.
-    func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?, reading: ReadingStore, adoption: NativeMigrationAdoption) async throws -> CurrentUser {
+    /// The mobile reset: carried-over legacy listening is delivered first. Reading positions and
+    /// carried-over positions are discarded by the cleanups their stores register.
+    func resetProgress(account: AccountIdentity, itemID: String, episodeID: String?, adoption: NativeMigrationAdoption) async throws -> CurrentUser {
         try await resetProgress(account: account, itemID: itemID, episodeID: episodeID,
-                                prepare: { try await adoption.prepareProgressReset(account: account, itemID: itemID, episodeID: episodeID) },
-                                discardLocal: { if episodeID == nil { try reading.discardProgress(account: account, itemID: itemID) } })
+                                prepare: { try await adoption.prepareProgressReset(account: account, itemID: itemID, episodeID: episodeID) })
     }
 }
 #endif

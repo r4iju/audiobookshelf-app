@@ -300,16 +300,18 @@ import Foundation
         guard !ebook.ino.isEmpty, !ebook.ino.contains("/"), !ebook.ino.contains("..") else { throw APIError.unsafeMediaURL }
         return try await request("api/items/\(itemID)/file/\(ebook.ino)")
     }
-    /// Deletes the signed-in user's progress for the media, only for the sign-in identified by
-    /// `authorization`. Server 2.30 deletes by progress row ID, so the row is looked up first. Returns
-    /// whether the server held progress.
-    public func resetProgress(itemID: String, episodeID: String?, authorization: UUID) async throws -> Bool {
+    /// The ID of the signed-in user's progress row for the media, or nil when there is none, only
+    /// for the sign-in identified by `authorization`. Server 2.30 deletes progress by this ID.
+    public func progressRowID(itemID: String, episodeID: String?, authorization: UUID) async throws -> String? {
         struct Row: Decodable { let id: String }
-        let row: Row
-        do { row = try JSONDecoder().decode(Row.self, from: await request("api/me/progress/\(itemID)" + (episodeID.map { "/\($0)" } ?? ""), pinned: authorization)) }
-        catch APIError.http(404) { return false }
-        _ = try await request("api/me/progress/\(row.id)", method: "DELETE", pinned: authorization)
-        return true
+        do { return try JSONDecoder().decode(Row.self, from: await request("api/me/progress/\(itemID)" + (episodeID.map { "/\($0)" } ?? ""), pinned: authorization)).id }
+        catch APIError.http(404) { return nil }
+    }
+
+    /// Deletes a progress row, only for the sign-in identified by `authorization`. Server 2.30
+    /// answers success for a row that is already gone.
+    public func deleteProgress(rowID: String, authorization: UUID) async throws {
+        _ = try await request("api/me/progress/\(rowID)", method: "DELETE", pinned: authorization)
     }
 
     public func saveReading(account: AccountIdentity, itemID: String, location: String, progress: Double) async throws {

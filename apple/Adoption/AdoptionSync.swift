@@ -18,21 +18,25 @@ extension NativeMigrationAdoption {
     }
 
     /// Readies a progress reset for the media: carried-over listening is delivered first, since a
-    /// later `local-all` would recreate the deleted progress, and carried-over positions are retired
-    /// unsent. Throws while any of that listening is still owed to the server.
+    /// later `local-all` would recreate the deleted progress. Throws while any of it is still owed
+    /// to the server. Carried-over positions are retired by `retireProgress` once the reset is saved.
     func prepareProgressReset(account: AccountIdentity, itemID: String, episodeID: String?) async throws {
         _ = await sync()
         guard try await api.currentAccount() == account else { throw CancellationError() }
-        try updateLedger { ledger in
-            for (key, record) in ledger.progress where !record.resolved && identity(record.account) == account
-                && record.progress.libraryItemID == itemID && record.progress.episodeID == episodeID {
-                ledger.progress[key]?.resolved = true; ledger.progress[key]?.lastError = nil
-            }
-        }
         let owed = try AdoptionLedger.load(ledgerURL).sessions.values.contains {
             !$0.acknowledged && $0.unconfirmed == nil && identity($0.account) == account && $0.session.libraryItemId == itemID && $0.session.episodeId == episodeID
         }
         if owed { throw SyncFailure.rejected("Carried-over listening for this title is still waiting to be sent, so its progress was kept. Try again when the server is reachable.") }
+    }
+
+    /// Retires the reset media's carried-over positions unsent; a reset's cleanup.
+    func retireProgress(_ reset: ProgressResetIntent) throws {
+        try updateLedger { ledger in
+            for (key, record) in ledger.progress where !record.resolved && identity(record.account) == reset.account
+                && record.progress.libraryItemID == reset.itemID && record.progress.episodeID == reset.episodeID {
+                ledger.progress[key]?.resolved = true; ledger.progress[key]?.lastError = nil
+            }
+        }
     }
 
     /// Overlapping calls share one run, so nothing is sent twice by concurrent callers.
@@ -365,6 +369,8 @@ extension NativeMigrationAdoption {
     /// progress right before each change; true when sent.
     private func sendProgress(_ key: String, identity: AccountIdentity) async throws -> Bool {
         guard let record = try AdoptionLedger.load(ledgerURL).progress[key], !record.resolved, let item = record.progress.libraryItemID else { return false }
+        // An unfinished reset retires this position when it finishes.
+        guard !reading.player.progressResetPending(account: identity, itemID: item, episodeID: record.progress.episodeID) else { return false }
         let local = record.progress
         guard Self.plausibleTime(local.lastUpdate) != nil else { throw SyncFailure.rejected("The position has no usable time and is kept on this device.") }
         let path = Self.progressPath(item, episode: local.episodeID)
