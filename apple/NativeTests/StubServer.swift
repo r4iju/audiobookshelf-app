@@ -25,6 +25,8 @@ final class StubServer {
         /// The client gave up waiting (URLSession's request timeout) while the server may still
         /// be handling the request.
         case timedOut
+        /// This response once the semaphore is signalled, without holding up other requests meanwhile.
+        indirect case held(DispatchSemaphore, Response)
     }
 
     private let lock = NSLock()
@@ -84,7 +86,13 @@ final class StubProtocol: URLProtocol {
 
     override func startLoading() {
         guard let server = Self.server else { client?.urlProtocol(self, didFailWithError: URLError(.cannotConnectToHost)); return }
-        switch server.handle(request) {
+        deliver(server.handle(request))
+    }
+
+    private func deliver(_ response: StubServer.Response) {
+        switch response {
+        case .held(let gate, let response):
+            DispatchQueue.global().async { gate.wait(); self.deliver(response) }
         case .lost:
             client?.urlProtocol(self, didFailWithError: URLError(.networkConnectionLost))
         case .failure(let error):

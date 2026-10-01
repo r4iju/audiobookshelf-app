@@ -37,7 +37,7 @@ struct BookDetails: View {
     }
     @State private var progressConfirmation: ProgressConfirmation?
     /// Whether the server may still apply an earlier save of this title, so newer ones wait.
-    @State private var writesWaiting = false
+    @StateObject private var writesWaiting = WaitingWrites()
     /// Whether confirming the restart goes on to discard the progress.
     @State private var restartThenDiscard = true
     @State private var progressDiscarded = false
@@ -76,7 +76,7 @@ struct BookDetails: View {
 
                     }
                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
-                    if writesWaiting {
+                    if writesWaiting.waiting {
                         VStack(alignment: .leading, spacing: 12) {
                             Text(l10n("An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.")).font(.callout).foregroundColor(ShelfStyle.secondaryText)
                             Button(l10n("Restart the server")) { askForRestart(thenDiscard: false) }.disabled(progressBusy).accessibilityIdentifier("restart-server")
@@ -152,7 +152,7 @@ struct BookDetails: View {
             }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
         }.background(appearance.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
             .onAppear { load(monitorDownloads: true) }
-            .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel() }
+            .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel(); writesWaiting.stop() }
             .sheet(isPresented: $showingFeed) {
                 FeedEpisodes(api: catalog.api, item: book, presented: $showingFeed) { change in
                     switch change {
@@ -284,10 +284,8 @@ struct BookDetails: View {
         }
     }
 
-    /// For the signed-in account and this title only.
     private func refreshWaitingWrites() async {
-        guard let account = try? await catalog.api.currentAccount() else { writesWaiting = false; return }
-        writesWaiting = player.publications.unresolved(account: account, itemID: book.id, episodeID: episode?.id)
+        await writesWaiting.refresh(api: catalog.api, ledger: player.publications, owner: catalog.owner, itemID: book.id, episodeID: episode?.id)
     }
 
     // After a discard the progress this view was opened with is stale.
