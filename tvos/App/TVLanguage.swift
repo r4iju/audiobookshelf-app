@@ -64,7 +64,7 @@ struct LanguageView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 Text(l10n("Language")).font(.title2.bold())
-                Text(l10n("Apple TV screens show these translations where the earlier app had an equivalent. Other text, and system screens, stay in English or follow the Apple TV language."))
+                Text(l10n("Some text appears in English when a translation is unavailable. System screens follow your Apple TV language."))
                     .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("language-note")
                 row(l10n("System default"), detail: NativeLanguage.resolve(saved: nil, preferred: Locale.preferredLanguages).name,

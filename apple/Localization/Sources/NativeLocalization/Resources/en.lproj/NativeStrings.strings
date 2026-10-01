@@ -30,7 +30,6 @@
 "An earlier import is already saved. Choose its original export to retry or repair it." = "An earlier import is already saved. Choose its original export to retry or repair it.";
 "Appearance" = "Appearance";
 "Apple TV" = "Apple TV";
-"Apple TV screens show these translations where the earlier app had an equivalent. Other text, and system screens, stay in English or follow the Apple TV language." = "Apple TV screens show these translations where the earlier app had an equivalent. Other text, and system screens, stay in English or follow the Apple TV language.";
 "Are you sure you want to reset your progress?" = "Are you sure you want to reset your progress?";
 "Ascending order" = "Ascending order";
 "Ask" = "Ask";
@@ -443,6 +442,7 @@
 "Some additions include" = "Some additions include";
 "Some books finished this year" = "Some books finished this year";
 "Some imported files need repair. Choose the original export again. Your saved data is retained." = "Some imported files need repair. Choose the original export again. Your saved data is retained.";
+"Some text appears in English when a translation is unavailable. System screens follow your Apple TV language." = "Some text appears in English when a translation is unavailable. System screens follow your Apple TV language.";
 "Sort episodes" = "Sort episodes";
 "Sort library" = "Sort library";
 "Sort: {0}" = "Sort: {0}";
