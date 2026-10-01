@@ -103,7 +103,7 @@ export function ConnectScreen({
       }
       if (form.get("intent") === "openid") {
         const redirectUri = `${location.origin}${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/oauth`;
-        const { url, pending: openId } = await startOpenId(previous.serverUrl, redirectUri);
+        const { url, pending: openId } = await startOpenId(previous.serverUrl, redirectUri, next);
         savePendingOpenId(openId);
         location.assign(url);
         return previous;

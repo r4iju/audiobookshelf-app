@@ -25,6 +25,12 @@ export default defineConfig({
   webServer: [
     // The QA server downloads podcast feeds and episodes from here (qa/feed.mjs).
     { command: "node qa/feed.mjs", url: "http://127.0.0.1:19885/feed.xml", reuseExistingServer: true },
+    // The identity provider for OpenID sign-in (qa/oidc.mjs), used by the deployment journeys.
+    {
+      command: "node qa/oidc.mjs",
+      url: "http://127.0.0.1:19884/.well-known/openid-configuration",
+      reuseExistingServer: true,
+    },
     ...(process.env.ABS_WEB_URL
       ? []
       : [

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { randomId } from "@/lib/random-id";
 import { readStored, writeStored } from "@/lib/storage/local";
 
 const KEY = "abs-web:v1:device-id";
@@ -9,7 +10,7 @@ export const clientVersion = process.env.NEXT_PUBLIC_CLIENT_VERSION ?? "0.1.0";
 export function deviceInfo() {
   let id = readStored(KEY, z.string());
   if (!id) {
-    id = crypto.randomUUID();
+    id = randomId();
     writeStored(KEY, id);
   }
   return {

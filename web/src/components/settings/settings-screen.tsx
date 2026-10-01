@@ -232,10 +232,13 @@ function DiagnosticsSection() {
         </p>
         <Button
           onClick={() =>
-            void navigator.clipboard.writeText(report).then(
-              () => setCopied("yes"),
-              () => setCopied("failed"),
-            )
+            // The clipboard is missing altogether on plain-HTTP origins, which reads as a failed copy.
+            void Promise.resolve()
+              .then(() => navigator.clipboard.writeText(report))
+              .then(
+                () => setCopied("yes"),
+                () => setCopied("failed"),
+              )
           }
         >
           {copied === "yes" ? (

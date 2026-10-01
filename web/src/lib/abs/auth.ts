@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { type AuthState, type Connection, connectionId, normalizeServerAddress } from "./connection";
 import { type LoginResponse, loginResponseSchema, type ServerStatus, statusSchema } from "./schemas";
+import { sha256 } from "./sha256";
 
 type Fetcher = typeof fetch;
 
@@ -112,6 +113,7 @@ export const pendingOpenIdSchema = z.object({
   state: z.string(),
   verifier: z.string(),
   redirectUri: z.string(),
+  returnTo: z.string().default("/"),
 });
 export type PendingOpenId = z.infer<typeof pendingOpenIdSchema>;
 
@@ -125,11 +127,13 @@ function base64Url(bytes: Uint8Array) {
 export async function startOpenId(
   serverUrl: string,
   redirectUri: string,
+  returnTo: string,
 ): Promise<{ url: string; pending: PendingOpenId }> {
   const verifier = base64Url(crypto.getRandomValues(new Uint8Array(32)));
   const state = base64Url(crypto.getRandomValues(new Uint8Array(16)));
+  const bytes = new TextEncoder().encode(verifier);
   const challenge = base64Url(
-    new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier))),
+    crypto.subtle ? new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)) : sha256(bytes),
   );
   const query = new URLSearchParams({
     code_challenge: challenge,
@@ -139,18 +143,24 @@ export async function startOpenId(
     response_type: "code",
     state,
   });
-  return { url: `${serverUrl}/auth/openid?${query}`, pending: { serverUrl, state, verifier, redirectUri } };
+  return {
+    url: `${serverUrl}/auth/openid?${query}`,
+    pending: { serverUrl, state, verifier, redirectUri, returnTo },
+  };
 }
 
 export async function completeOpenId(
   pending: PendingOpenId,
   params: URLSearchParams,
   fetcher: Fetcher = fetch,
-): Promise<LoginResult | { ok: false; reason: "state-mismatch" | "provider-error"; detail?: string }> {
+): Promise<
+  LoginResult | { ok: false; reason: "state-mismatch" | "provider-error" | "rejected"; detail?: string }
+> {
+  if (params.get("state") !== pending.state) return { ok: false, reason: "state-mismatch" };
   const error = params.get("error");
   if (error) return { ok: false, reason: "provider-error", detail: error };
   const code = params.get("code");
-  if (!code || params.get("state") !== pending.state) return { ok: false, reason: "state-mismatch" };
+  if (!code) return { ok: false, reason: "state-mismatch" };
   const query = new URLSearchParams({ state: pending.state, code, code_verifier: pending.verifier });
   let response: Response;
   try {
@@ -160,6 +170,9 @@ export async function completeOpenId(
   } catch {
     return { ok: false, reason: "unreachable" };
   }
+  // The server reports a failed exchange by sending the browser to its own login page with the error.
+  const refused = response.redirected ? new URL(response.url).searchParams.get("error") : null;
+  if (refused) return { ok: false, reason: "rejected", detail: refused };
   return readLogin(response, pending.serverUrl);
 }
 

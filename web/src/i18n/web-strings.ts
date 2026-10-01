@@ -26,6 +26,15 @@ export const webStrings = {
   WebOpenIdUnavailable: "OpenID sign-in needs this client to be served from the same origin as the server.",
   WebOpenIdFailed: "OpenID sign-in did not complete: {0}",
   WebOpenIdCompleting: "Completing sign-in…",
+  WebOpenIdNotStarted: "no sign-in was started in this tab, or it has expired",
+  WebOpenIdStateMismatch: "the reply does not belong to the sign-in started here",
+  WebOpenIdRefused: "the identity provider refused ({0})",
+  WebOpenIdRejected: "the server did not accept the sign-in",
+  WebOpenIdRateLimited: "too many sign-in attempts; wait a few minutes and try again",
+  WebOpenIdServerRefused: "the server refused it ({0})",
+  WebOpenIdUnreachable: "the server could not be reached",
+  WebOpenIdServerError: "the server could not finish the sign-in ({0})",
+  WebTryAgain: "Try again",
   WebOffline:
     "Offline. Your account and unsent listening progress are kept and will sync when the server is reachable again.",
   WebReauthRequired:

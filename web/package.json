@@ -17,7 +17,9 @@
     "format": "biome format --write .",
     "test": "vitest run",
     "e2e": "playwright test",
-    "qa:server": "node qa/server.mjs"
+    "qa:server": "node qa/server.mjs",
+    "qa:oidc": "node qa/oidc.mjs",
+    "qa:deploy": "node qa/deploy.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "5.104.0",

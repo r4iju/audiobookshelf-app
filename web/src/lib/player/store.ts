@@ -4,6 +4,7 @@ import { type AbsClient, AbsError } from "@/lib/abs/client";
 import { chapterSchema } from "@/lib/abs/schemas";
 import { createListeningReport, type ListeningReport, type ReportIdentity } from "@/lib/progress/outbox";
 import { outboxFor } from "@/lib/progress/sync";
+import { randomId } from "@/lib/random-id";
 import { useSettingsStore } from "@/lib/settings/store";
 import { readStored, removeStored, writeStored } from "@/lib/storage/local";
 import { closePlayback, openPlayback } from "./api";
@@ -209,7 +210,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
         },
         listening: {
           identity: {
-            id: crypto.randomUUID(),
+            id: randomId(),
             libraryItemId: media.itemId,
             episodeId: media.episodeId,
             libraryId: media.libraryId,

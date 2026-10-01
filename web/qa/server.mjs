@@ -15,7 +15,7 @@ const image =
 export const QA_PORT = Number(process.env.ABS_QA_PORT ?? 19880);
 const origin = `http://127.0.0.1:${QA_PORT}`;
 const devOrigins = ["http://127.0.0.1:19881", "http://localhost:19881"];
-const env = {
+export const env = {
   ...process.env,
   DOCKER_HOST: process.env.DOCKER_HOST ?? `unix://${process.env.HOME}/.colima/default/docker.sock`,
 };
@@ -27,7 +27,7 @@ export const accounts = {
   limited: { username: "qa-limited", password: "qa-limited-pass" },
 };
 
-const docker = (...args) => execFileSync("docker", args, { env, encoding: "utf8" }).trim();
+export const docker = (...args) => execFileSync("docker", args, { env, encoding: "utf8" }).trim();
 
 async function call(path, { token, method = "GET", body } = {}) {
   const response = await fetch(origin + path, {
