@@ -183,6 +183,21 @@ final class CatalogServer: URLProtocol {
         XCTAssertEqual(content?.loadingMore, false)
     }
 
+    func testProgressDuringTheFirstLoadIsNotLostToTheOlderLoad() async throws {
+        CatalogServer.hold("page=0"); CatalogServer.hold("personalized")
+        let loading = Task { await store.reload() }
+        try await until { CatalogServer.isHeld("page=0") && CatalogServer.isHeld("personalized") }
+        CatalogServer.listen("user-a", to: "book-5")
+        store.receive(event(.progress(itemID: "book-5", episodeID: nil, sessionID: "web")))
+        try await Task.sleep(nanoseconds: 300_000_000)
+        CatalogServer.release("personalized"); CatalogServer.release("page=0")
+        await loading.value
+        try await until { self.content?.continuing.map(\.id) == ["book-0", "book-5"] }
+        XCTAssertEqual(content?.user.mediaProgress.map(\.libraryItemId), ["book-0", "book-5"], "The first load was read before the progress, so it must not be what stays")
+        XCTAssertEqual(content?.items.count, 60)
+        XCTAssertEqual(content?.loadingMore, false)
+    }
+
     func testAnInitDuringTheFirstLoadThatFailsShowsTheFailure() async throws {
         CatalogServer.hold("page=0")
         let loading = Task { await store.reload() }

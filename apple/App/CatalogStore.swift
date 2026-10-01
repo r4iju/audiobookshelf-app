@@ -213,9 +213,12 @@ enum CatalogSort: String, CaseIterable {
     }
 
     /// Reloading items supersedes page loading; a progress-only refresh leaves loaded and loading pages alone. A progress
-    /// filter's membership follows progress, so `receive` reloads its items instead.
-    private func refreshNow(items reloadItems: Bool, for event: NativeRealtime.Event) async {
+    /// filter's membership follows progress, so `receive` reloads its items instead. During the first load there is no
+    /// content to refresh, and that load may have read the server before the change, so it is superseded by a reload.
+    private func refreshNow(items: Bool, for event: NativeRealtime.Event) async {
         guard owns(event) else { return }
+        let reloadItems: Bool
+        if case .loading = state { reloadItems = true } else { reloadItems = items }
         if reloadItems { generation = UUID() }
         let pages = generation
         defer {

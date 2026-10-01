@@ -69,7 +69,7 @@ The item page ignored `rss_feed_open` and `rss_feed_closed`, and only a resumed 
 - `ItemServerActions.feedChanged(_:)` applies a feed change for the current sign-in. A load that started before a change does not undo it. `ItemServerActionsSection` subscribes through `catalog.owns(event)` and reloads on `init`.
 - Catalog, book details, group list and details, and the root's `refreshPausedProgress` call now run on every `init`. The paused-player call site keeps its `event.isCurrent(on:)` guard, and `followPausedProgress` still skips unacknowledged listening.
 - A catalog whose first load is superseded by an `init` refresh that fails now shows the failure instead of loading forever.
-- `verify-realtime.sh` serves `apple/scripts/item_actions_fixture.py` on 26769. Its listen backlog is raised, because an `init` refresh bursts about seven requests and item reads loop back into the same server. With the default backlog of five, the Node proxy returned 503 to part of the burst. A failing iPad run traced to this, and a 40-request burst reproduced it before the change and not after.
+- `verify-realtime.sh` serves `apple/scripts/item_actions_fixture.py` on 26769. That Python backend's listen backlog is raised to 128 (`server.socket.listen(128)` in `apple/scripts/item_actions_fixture.py`, committed in `9223f97c`). The change is in the Python backend, not in `native-fixture.mjs`. An `init` refresh bursts about seven requests, and item reads loop back into the same server. With the default backlog of five, the backend refused part of the burst, and the Node proxy turned each refused connection into a 503. A failing iPad run traced to an `item-action-error` showing HTTP 503. A 40-request burst through the proxy reproduced 503s before the change and none after; that burst check was an uncommitted `/tmp` script. No production behaviour was changed for it.
 
 Evidence, simulators `Audiobookshelf Realtime Sync QA` (iPhone 17) and `Audiobookshelf Realtime Sync iPad QA` (iPad Pro 11-inch M5), iOS 27, logs in `/tmp/realtime-sync-qa/`:
 
@@ -87,3 +87,19 @@ Evidence, simulators `Audiobookshelf Realtime Sync QA` (iPhone 17) and `Audioboo
 - Not run: `verification/realtime` Node tests need the root `socket.io-client`, which is not installed in this worktree. They do not load `native-fixture.mjs`.
 
 Remaining gates: a live-server feed opened and closed by another client (needs owner approval); physical iPhone/iPad realtime with a second client, Wi-Fi loss and suspension; and TV adoption of `itemFeed`.
+
+## Review corrections to `9223f97c`
+
+- **Own feed mutations against remote feed events.** `openFeed` and `closeFeed` applied their HTTP result whenever the sign-in was still current. A delayed open could restore a feed another client had closed since, and a delayed close could clear a replacement another client had opened. Each mutation now captures the feed-change count before its request and applies its result only if no realtime feed change arrived meanwhile. Activity and error still complete through `perform`, and the admin check, disabled state and sign-in (account ABA) guards are unchanged.
+- **Progress during the first catalog load.** A `.progress` or `.user` refresh of an unfiltered catalog fetched only user and shelves. If those finished while the first load was still in flight, there was no content to update, so the refresh returned, and the slower first load then published its older user and shelves. This happens when a library opens after the socket has already authenticated, so the `init` resync can't repair it. Any refresh that runs while the catalog is still `.loading` is now a full reload that supersedes the first load. It goes through the same one-at-a-time queue, sign-in and account checks, and in-flight item-change merge as other reloads. A failure shows `.failed` rather than loading forever, and nothing re-triggers it, so it can't loop.
+
+RED first: `testAnOpenAnsweredAfterAnotherClientClosedTheFeedKeepsItClosed` and `testACloseAnsweredAfterAnotherClientOpenedAReplacementKeepsTheReplacement` (Core) failed on the feed only. Activity and error already completed. `testProgressDuringTheFirstLoadIsNotLostToTheOlderLoad` (NativeTests) kept the first load's `["book-0"]` instead of `["book-0", "book-5"]`.
+
+Green after the corrections, same simulators, logs in `/tmp/realtime-sync-qa/`:
+
+- `swift test` in `tvos/Core`: all pass (`core-mutation-green.log`).
+- NativeTests: 52/52 on iPhone (`native-mutation-green-iphone.log`) and on iPad (`native-fix2-ipad.log`).
+- RealtimeJourney 9/9 plus PausedRealtimeJourney 2/2: 11/11 on iPhone and on iPad (`journeys-fix2-*.log`).
+- iOS 14 source typecheck: 0 errors (`ios14-typecheck-fix2.log`).
+- `ItemServerActionsJourney` was not rerun: its runner uses port 27765, which is outside this worker's 26765/26769. The Core tests above cover the open and close paths.
+

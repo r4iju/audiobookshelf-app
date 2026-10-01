@@ -66,7 +66,7 @@ public enum ItemServerActionError: Error, Equatable {
     private var hasAudio = false
     private var hasEbook = false
     private var isBook = false
-    /// Counts feed changes from realtime events, so a load that started before one does not undo it.
+    /// Counts feed changes from realtime events, so a load, open or close that started before one does not undo it.
     private var feedChanges = 0
 
     public init(api: APIClient, itemID: String) {
@@ -141,17 +141,19 @@ public enum ItemServerActionError: Error, Equatable {
         guard activity == nil, showsFeed, canManageFeed, feed == nil, signIn.isCurrent else { return }
         guard !slug.isEmpty, slug == Self.sanitizedSlug(slug) else { error = ItemServerActionError.invalidSlug; return }
         await perform(.opening) { authorization in
+            let changes = self.feedChanges
             let opened = try await self.api.openFeed(itemID: self.itemID, serverAddress: self.serverAddress, slug: slug, preventIndexing: preventIndexing,
                                                      ownerName: ownerName, ownerEmail: ownerEmail, authorization: authorization)
-            return { self.feed = opened }
+            return { if self.feedChanges == changes { self.feed = opened } }
         }
     }
 
     public func closeFeed() async {
         guard activity == nil, canManageFeed, let feed, signIn.isCurrent else { return }
         await perform(.closing) { authorization in
+            let changes = self.feedChanges
             try await self.api.closeFeed(id: feed.id, authorization: authorization)
-            return { self.feed = nil }
+            return { if self.feedChanges == changes { self.feed = nil } }
         }
     }
 

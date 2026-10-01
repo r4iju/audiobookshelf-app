@@ -313,6 +313,38 @@ import XCTest
         XCTAssertNil(actions.feed, "The item was read before the feed closed, so its open feed is stale")
     }
 
+    func testAnOpenAnsweredAfterAnotherClientClosedTheFeedKeepsItClosed() async throws {
+        var actions: ItemServerActions!
+        serve { entry in
+            guard entry.path == "/abs/api/feeds/item/book-1/open" else { return nil }
+            DispatchQueue.main.sync { MainActor.assumeIsolated { actions.feedChanged(nil) } }
+            return (200, #"{"feed":\#(Self.openFeed)}"#)
+        }
+        actions = ItemServerActions(api: api, itemID: "book-1")
+        await actions.load()
+        await actions.openFeed(slug: "saga-feed", preventIndexing: true, ownerName: "", ownerEmail: "")
+        XCTAssertNil(actions.feed, "Another client closed the feed after this open reached the server")
+        XCTAssertNil(actions.activity)
+        XCTAssertNil(actions.error)
+        XCTAssertTrue(actions.showsFeed, "An admin can open it again")
+    }
+
+    func testACloseAnsweredAfterAnotherClientOpenedAReplacementKeepsTheReplacement() async throws {
+        var actions: ItemServerActions!
+        let replacement = Self.openFeed.replacingOccurrences(of: "saga-feed", with: "replacement-feed")
+        serve(feed: Self.openFeed) { entry in
+            guard entry.path == "/abs/api/feeds/saga-feed/close" else { return nil }
+            DispatchQueue.main.sync { MainActor.assumeIsolated { actions.feedChanged(try! JSONDecoder().decode(RSSFeed.self, from: Data(replacement.utf8))) } }
+            return (200, "OK")
+        }
+        actions = ItemServerActions(api: api, itemID: "book-1")
+        await actions.load()
+        await actions.closeFeed()
+        XCTAssertEqual(actions.feed?.id, "replacement-feed", "Another client opened a new feed after this close reached the server")
+        XCTAssertNil(actions.activity)
+        XCTAssertNil(actions.error)
+    }
+
     func testAFeedChangeAfterASignInChangeIsIgnored() async throws {
         serve(feed: Self.openFeed)
         let actions = ItemServerActions(api: api, itemID: "book-1")
