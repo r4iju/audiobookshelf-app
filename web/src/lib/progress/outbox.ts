@@ -110,6 +110,9 @@ export function createOutbox(connectionId: string, storage: OutboxStorage) {
     record(report: ListeningReport) {
       save([...load().filter((entry) => entry.id !== report.id), report]);
     },
+    forget(libraryItemId: string, episodeId: string | null) {
+      save(load().filter((entry) => entry.libraryItemId !== libraryItemId || entry.episodeId !== episodeId));
+    },
     async flush(send: (sessions: ListeningReport[]) => Promise<DeliveryResult[]>): Promise<FlushResult> {
       const sending = load();
       if (sending.length === 0) return { kind: "idle" };

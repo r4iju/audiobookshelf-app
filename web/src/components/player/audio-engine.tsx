@@ -81,7 +81,11 @@ export function AudioEngine() {
   // External system: play and pause the audio element to match the requested status.
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !source) return;
+    if (!audio) return;
+    if (!source) {
+      audio.pause();
+      return;
+    }
     if (status === "playing" && audio.paused) {
       audio.play().catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "NotAllowedError")

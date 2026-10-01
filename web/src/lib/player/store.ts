@@ -86,6 +86,8 @@ interface PlayerStore {
   seek: (time: number) => void;
   jump: (seconds: number) => void;
   stop: () => Promise<void>;
+  /** After its progress is discarded: drops this device's unsent listening and goes back to the start. */
+  startOver: (media: Pick<PlayerMedia, "itemId" | "episodeId">) => Promise<void>;
   setSleep: (sleep: Sleep) => void;
   /** Records listening so far, for example before the page is hidden or closed. */
   checkpoint: () => void;
@@ -335,6 +337,20 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
       set({ player: { phase: "idle" }, listening: null, sleep: { kind: "off" } });
       persist();
     },
+    startOver: async ({ itemId, episodeId }) => {
+      const { player, client, connectionId } = get();
+      if (connectionId) outboxFor(connectionId).forget(itemId, episodeId ?? null);
+      if (player.phase !== "active" || player.media.itemId !== itemId || player.media.episodeId !== episodeId)
+        return;
+      // Closed without a final report, so the server is not told the old position again.
+      if (player.source && client) await closePlayback(client, player.source.serverSessionId);
+      set({
+        player: { ...player, source: null, status: "paused", currentTime: 0, seekTo: { time: 0 } },
+        listening: null,
+        pausedAt: null,
+      });
+      persist();
+    },
     setSleep: (sleep) => set({ sleep }),
     checkpoint: () => {
       const { player } = get();
@@ -343,7 +359,8 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
     },
     onTime: (time) => {
       const { player, sleep } = get();
-      if (player.phase !== "active") return;
+      // Without a source the element still holds the previous file, whose time no longer applies.
+      if (player.phase !== "active" || !player.source) return;
       tick(player.status === "playing");
       set({ player: { ...player, currentTime: time } });
       if (sleep.kind === "chapter-end" && time >= sleep.at - 0.3) {

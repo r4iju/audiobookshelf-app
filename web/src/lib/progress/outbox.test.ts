@@ -103,4 +103,18 @@ describe("progress outbox", () => {
     outbox.record({ ...report(10, 1_000), id: "s3" });
     expect(sizes).toEqual([1]);
   });
+
+  it("forgets unsent listening for one book or episode whose progress was discarded", () => {
+    const storage = memoryStorage();
+    const outbox = createOutbox("conn-a", storage);
+    outbox.record(report(10, 1_000));
+    outbox.record({ ...report(10, 1_000), id: "s2", libraryItemId: "li2" });
+    outbox.record({ ...report(10, 1_000), id: "s3", episodeId: "ep1" });
+    outbox.forget("li1", null);
+    expect(
+      createOutbox("conn-a", storage)
+        .pending()
+        .map((entry) => entry.id),
+    ).toEqual(["s2", "s3"]);
+  });
 });

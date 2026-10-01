@@ -68,3 +68,36 @@ test("finishing and discarding progress reach the server", async ({ page }) => {
   await expect.poll(async () => (await api.call(`/api/me/progress/${id}`)).status).toBe(404);
   await expect(page.getByRole("progressbar", { name: "Your Progress" })).toHaveCount(0);
 });
+
+test("discarding the progress of the book in the player starts it over on this device too", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await itemIdByTitle("Salt and Signal");
+  await clearProgress(api, id);
+  await api.call(`/api/me/progress/${id}`, {
+    method: "PATCH",
+    body: { currentTime: 40, duration: 60, progress: 0.66 },
+  });
+  const server = async () => (await api.call(`/api/me/progress/${id}`)).body;
+
+  await signIn(page);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("button", { name: /^Play/ }).click();
+  const player = page.getByRole("region", { name: "Player" });
+  const position = () => player.getByRole("slider", { name: "Seek" }).inputValue().then(Number);
+  await expect.poll(position, { timeout: 15_000 }).toBeGreaterThan(41);
+  await player.getByRole("button", { name: "Pause", exact: true }).click();
+  await expect.poll(async () => (await server())?.currentTime).toBeGreaterThan(41);
+
+  await page.getByRole("button", { name: "Discard progress" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Discard progress" }).click();
+  await expect.poll(async () => (await api.call(`/api/me/progress/${id}`)).status).toBe(404);
+  await expect.poll(position).toBe(0);
+
+  await page.reload();
+  await expect.poll(position).toBe(0);
+  await player.getByRole("button", { name: "Play", exact: true }).click();
+  await expect.poll(position, { timeout: 15_000 }).toBeGreaterThan(1);
+  await player.getByRole("button", { name: "Pause", exact: true }).click();
+  await expect.poll(async () => (await server())?.currentTime).toBeGreaterThan(1);
+  expect((await server()).currentTime).toBeLessThan(20);
+});

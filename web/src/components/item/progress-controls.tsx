@@ -59,7 +59,11 @@ export function ProgressControls({
         busy={discard.isPending}
         onClose={() => setConfirming(false)}
         onConfirm={() => {
-          if (progress) discard.mutate(progress.id, { onSettled: () => setConfirming(false) });
+          if (progress)
+            discard.mutate(
+              { progressId: progress.id, itemId, episodeId: episodeId ?? null },
+              { onSettled: () => setConfirming(false) },
+            );
         }}
       />
     </div>
