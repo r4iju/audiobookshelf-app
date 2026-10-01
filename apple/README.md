@@ -37,6 +37,12 @@ The UI journeys exercise the actual signed app against the synthetic server: boo
 
 Run the same journeys on a dedicated iPad simulator with `ABS_QA_SIMULATOR='Audiobookshelf Native iPad QA' ./apple/scripts/verify-ui.sh`. Create that simulator using an available iPad device type and the same iOS runtime.
 
+## Collections and playlists
+
+The catalog account menu opens book collections and personal book/podcast playlists. Details retain member order and selected episode identity; group playback starts the first playable unfinished member and pauses a currently playing member. Completed account-owned audio downloads are used without streaming. A reachable server refreshes progress before selection; transient connection failure can use the retained snapshot. Newer durable local progress takes precedence over an older remote completion.
+
+The native editor supports metadata, membership and ordering with server permissions and explicit deletion. Failed saves retain the draft and explain possible partial membership changes; retries compare fresh server membership. Six simulator journeys passed on iPhone and iPad, observing real WAV playback and persisted server state. Strict local packaging passed and the preview was installed on both physical devices. Broader permission/failure/editing and live-device acceptance remain open under #13. See `docs/modernization/APPLE-GROUPS.md` for evidence boundaries.
+
 ## Playback
 
 The app and TV target share `Playback/ApplePlayback.swift`. One app-owned AVPlayer session survives catalog navigation and player dismissal. The mini-player and full-screen player provide play/pause, whole-book scrubbing, saved skip intervals, elapsed time and preparation/error status. Authenticated media URLs are validated against the connected server. File-relative positions are translated to complete-book positions, and natural track endings load the next file.

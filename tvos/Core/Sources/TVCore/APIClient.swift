@@ -59,6 +59,54 @@ import Foundation
         _ = try await request(path, method: "PATCH", body: ["isFinished": finished])
     }
 
+    public func audioGroups(libraryID: String, kind: AudioGroupKind) async throws -> AudioGroupPage {
+        try await get("api/libraries/\(libraryID)/\(kind.rawValue)")
+    }
+    public func audioGroup(id: String, kind: AudioGroupKind) async throws -> AudioGroup {
+        try await get("api/\(kind.rawValue)/\(id)")
+    }
+    public func saveAudioGroup(id: String?, libraryID: String, kind: AudioGroupKind, name: String, description: String, members: [AudioGroupMember], account: AccountIdentity) async throws -> AudioGroup {
+        guard try await currentAccount() == account else { throw APIError.signInRequired }
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              Set(members.map(\.id)).count == members.count,
+              !(members.isEmpty && (id == nil || kind == .playlist)) else { throw APIError.http(400) }
+        let key = kind == .collection ? "books" : "items"
+        func payload(_ members: [AudioGroupMember]) -> Any {
+            if kind == .collection { return members.map(\.libraryItemId) }
+            return members.map { member -> [String: String] in
+                var value = ["libraryItemId": member.libraryItemId]
+                if let episodeID = member.episodeId { value["episodeId"] = episodeID }
+                return value
+            }
+        }
+        if let id {
+            let original = try await audioGroup(id: id, kind: kind)
+            guard original.libraryId == libraryID, try await currentAccount() == account else { throw APIError.signInRequired }
+            let desired = Set(members.map(\.id)), existing = Set(original.members.map(\.id))
+            let added = members.filter { !existing.contains($0.id) }
+            let removed = original.members.filter { !desired.contains($0.id) }
+            if !added.isEmpty {
+                _ = try await request("api/\(kind.rawValue)/\(id)/batch/add", method: "POST", body: [key: payload(added)])
+            }
+            guard try await currentAccount() == account else { throw APIError.signInRequired }
+            if !removed.isEmpty {
+                _ = try await request("api/\(kind.rawValue)/\(id)/batch/remove", method: "POST", body: [key: payload(removed)])
+            }
+            guard try await currentAccount() == account else { throw APIError.signInRequired }
+            let data = try await request("api/\(kind.rawValue)/\(id)", method: "PATCH", body: ["name": name, "description": description, key: payload(members)])
+            guard try await currentAccount() == account else { throw APIError.signInRequired }
+            return try JSONDecoder().decode(AudioGroup.self, from: data)
+        }
+        let data = try await request("api/\(kind.rawValue)", method: "POST", body: ["libraryId": libraryID, "name": name, "description": description, key: payload(members)])
+        guard try await currentAccount() == account else { throw APIError.signInRequired }
+        return try JSONDecoder().decode(AudioGroup.self, from: data)
+    }
+    public func deleteAudioGroup(id: String, kind: AudioGroupKind, account: AccountIdentity) async throws {
+        guard try await currentAccount() == account else { throw APIError.signInRequired }
+        _ = try await request("api/\(kind.rawValue)/\(id)", method: "DELETE")
+        guard try await currentAccount() == account else { throw APIError.signInRequired }
+    }
+
     public func podcastFeed(url: String) async throws -> PodcastFeed {
         let data = try await request("api/podcasts/feed", method: "POST", body: ["rssFeed": url])
         return try JSONDecoder().decode(PodcastFeedResponse.self, from: data).podcast

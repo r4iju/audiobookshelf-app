@@ -202,6 +202,20 @@ import UIKit
         }
     }
 
+    func hasFinishedOffline(_ audio: OfflineAudio, serverFinished: Bool) throws -> Bool {
+        try listening.hasFinished(audio, serverFinished: serverFinished)
+    }
+
+    func resumeOffline(_ audio: OfflineAudio) async throws {
+        guard try await api.currentAccount() == audio.account else { throw APIError.signInRequired }
+        guard offlineID == audio.id, session != nil else { await startOffline(audio); return }
+        let position = try listening.position(for: audio)
+        if abs(position - currentTime) > 0.1 {
+            pausedAt = nil
+            try await seek(to: position, autoplay: true)
+        } else { resume() }
+    }
+
     func startOffline(_ audio: OfflineAudio) async {
         guard !preparing, !seeking, !closing else { return }
         let preparation = UUID()

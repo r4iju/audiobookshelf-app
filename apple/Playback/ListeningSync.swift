@@ -41,6 +41,13 @@ import Foundation
         try loaded().cachedPosition(account: audio.account, itemID: audio.media.libraryItemID, episodeID: audio.media.episodeID, newerThan: audio.serverUpdatedAt) ?? audio.serverPosition
     }
 
+    func hasFinished(_ audio: OfflineAudio, serverFinished: Bool) throws -> Bool {
+        if let newer = try loaded().cachedPosition(account: audio.account, itemID: audio.media.libraryItemID, episodeID: audio.media.episodeID, newerThan: audio.serverUpdatedAt.nextUp) {
+            return newer >= audio.media.duration
+        }
+        return serverFinished || audio.serverPosition >= audio.media.duration
+    }
+
     func record(id: String, position: Double, listened: Double) throws {
         try loaded().record(id: id, position: position, listened: listened)
     }

@@ -73,6 +73,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             'permissions': {'download': True, 'update': True, 'delete': False, 'upload': False},
             'mediaProgress': [], 'bookmarks': [], 'settings': {}}
     podcast = {'id': 'podcast', 'mediaType': 'podcast', 'media': {'metadata': {'title': 'Evening Stories', 'author': 'QA Studio'}, 'episodes': [{'id': 'episode', 'title': 'A Quiet Evening', 'duration': 20, 'publishedAt': 1000}, {'id': 'episode-morning', 'title': 'The Morning After', 'duration': 20, 'publishedAt': 2000}]}}
+    for episode in podcast['media']['episodes']:
+        episode['audioTrack'] = {'contentUrl': '/api/items/podcast/file/' + episode['id'], 'duration': 20, 'startOffset': 0, 'mimeType': 'audio/wav', 'metadata': {'filename': episode['id'] + '.wav', 'ext': '.wav'}}
+        episode['audioFile'] = {'duration': 20, 'metadata': {'filename': episode['id'] + '.wav'}}
     sessions = {}
     created_podcasts = []
     pending_feed_downloads = []
@@ -89,6 +92,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     login_outcomes = []
     requests = []
     configuration = {'mode': 'baseline', 'failed': False}
+    collections = [{'id': 'collection-evening', 'libraryId': 'books', 'name': 'Evening shelf', 'description': 'An established listening order.', 'books': [items[2], items[1]]}]
+    playlists = [{'id': 'playlist-evening', 'libraryId': 'books', 'userId': user['id'], 'name': 'Evening queue', 'description': 'Personal listening.', 'items': [{'libraryItemId': item['id'], 'libraryItem': item} for item in [items[1], items[2]]]}]
+    playlists.append({'id': 'playlist-podcasts', 'libraryId': 'podcasts', 'userId': user['id'], 'name': 'Morning episodes', 'items': [{'libraryItemId': 'podcast', 'libraryItem': podcast, 'episodeId': 'episode-morning', 'episode': {**podcast['media']['episodes'][1], 'description': '<p>The episode selected from this playlist.</p>', 'audioFile': {'duration': 20}}}]})
     prefix = '/' + prefix.strip('/') if prefix.strip('/') else ''
 
     class Handler(BaseHTTPRequestHandler):
@@ -137,6 +143,61 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
         def progress(self):
             return progress_by_user[self.account['id']]
 
+        def mutate_group(self, path, data):
+            match = re.fullmatch(r'/api/(collections|playlists)(?:/([^/]+)(?:/batch/(add|remove))?)?', path or '')
+            if not match:
+                return False
+            kind, identity, action = match.groups()
+            entries = collections if kind == 'collections' else playlists
+            entry = next((entry for entry in entries if entry['id'] == identity), None)
+            if configuration['mode'] == 'group-forbidden' or kind == 'collections' and not self.account['permissions']['update']:
+                self.respond(403, {}); return True
+            if identity and entry is None:
+                self.respond(404, {}); return True
+            if entry and kind == 'playlists' and entry['userId'] != self.account['id']:
+                self.respond(403, {}); return True
+            if self.command == 'DELETE':
+                if kind == 'collections' and not self.account['permissions']['delete']:
+                    self.respond(403, {}); return True
+                entries.remove(entry); self.respond(200, {}); return True
+            key = 'books' if kind == 'collections' else 'items'
+            supplied = data.get(key, [])
+            references = [{'libraryItemId': value} for value in supplied] if kind == 'collections' else supplied
+            for reference in references:
+                if not any(item['id'] == reference.get('libraryItemId') for item in items):
+                    self.respond(400, {}); return True
+            def expanded(reference):
+                item = next(item for item in items if item['id'] == reference['libraryItemId'])
+                return item if kind == 'collections' else {'libraryItemId': item['id'], 'libraryItem': item}
+            def member_id(member):
+                return member['id'] if kind == 'collections' else member['libraryItemId']
+            if identity is None:
+                if not data.get('name') or not data.get('libraryId') or not references:
+                    self.respond(400, {}); return True
+                entry = {'id': kind[:-1] + '-created-' + str(len(entries)), 'libraryId': data['libraryId'], 'name': data['name'], 'description': data.get('description'), key: [expanded(value) for value in references]}
+                if kind == 'playlists': entry['userId'] = self.account['id']
+                entries.append(entry)
+            elif action == 'add':
+                for reference in references:
+                    if not any(member_id(member) == reference['libraryItemId'] for member in entry[key]):
+                        entry[key].append(expanded(reference))
+            elif action == 'remove':
+                removed = {reference['libraryItemId'] for reference in references}
+                entry[key] = [member for member in entry[key] if member_id(member) not in removed]
+                if kind == 'playlists' and not entry[key]: entries.remove(entry)
+            else:
+                if configuration['mode'] == 'group-partial-failure' and not configuration['failed']:
+                    configuration['failed'] = True; self.respond(503, {}); return True
+                for field in ['name', 'description']:
+                    if field in data: entry[field] = data[field]
+                if references:
+                    ordered = [reference['libraryItemId'] for reference in references]
+                    if set(ordered) != {member_id(member) for member in entry[key]}:
+                        self.respond(400, {}); return True
+                    entry[key].sort(key=lambda member: ordered.index(member_id(member)))
+            self.respond(200, entry)
+            return True
+
         def do_GET(self):
             path, query = self.route()
             if path == '/status':
@@ -176,13 +237,28 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     return self.respond(401, {})
                 return self.respond(200, {'user': {**user, 'accessToken': 'expired', 'refreshToken': 'refresh'}})
             if path == '/__fixture__/observations':
-                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None]})
+                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None], 'collections': collections, 'playlists': playlists})
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
                 return self.respond(503, {})
             if path == '/api/libraries':
                 return self.respond(200, {'libraries': [{'id': 'books', 'name': 'Audiobooks', 'mediaType': 'book'}, {'id': 'podcasts', 'name': 'Podcasts', 'mediaType': 'podcast', 'folders': [{'id': 'podcast-folder', 'fullPath': '/fixtures/podcasts'}]}]})
+            if path == '/api/libraries/books/collections':
+                return self.respond(200, {'results': collections, 'total': len(collections)})
+            playlist_library = re.fullmatch(r'/api/libraries/(books|podcasts)/playlists', path or '')
+            if playlist_library:
+                visible = [entry for entry in playlists if entry['userId'] == self.account['id'] and entry['libraryId'] == playlist_library[1]]
+                return self.respond(200, {'results': visible, 'total': len(visible)})
+            group = re.fullmatch(r'/api/(collections|playlists)/([^/]+)', path or '')
+            if group:
+                entries = collections if group[1] == 'collections' else playlists
+                entry = next((entry for entry in entries if entry['id'] == group[2]), None)
+                if entry is None:
+                    return self.respond(404, {})
+                if group[1] == 'playlists' and entry['userId'] != self.account['id']:
+                    return self.respond(403, {})
+                return self.respond(200, entry)
             if path == '/api/libraries/podcasts/items':
                 if created_podcasts:
                     time.sleep(2)
@@ -236,6 +312,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if path == '/api/search/podcast':
                 return self.respond(200, [{'id': 42, 'title': 'New Voices Discovery', 'artistName': 'Fixture Studio', 'feedUrl': 'http://127.0.0.1:19765/feed.xml', 'genres': ['Stories']}])
             downloaded_file = re.fullmatch(r'/api/items/book-[0-9]+/file/([01]|pdf|epub)/download', path or '')
+            if re.fullmatch(r'/api/items/podcast/file/(episode|episode-morning)/download', path or ''):
+                return self.respond(200, audio(20), 'audio/wav')
             if path in ('/api/items/book-0/file/notes', '/api/items/book-0/file/notes/download'):
                 return self.respond(200, pdf(pages=2, title='Listening notes'), 'application/pdf')
             if path == '/api/items/book-0/file/epub' or downloaded_file and downloaded_file[1] == 'epub':
@@ -302,7 +380,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(400, {})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
                 if mode in ('pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
@@ -349,11 +427,15 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                                 del progress_by_user[account['id']][key]
                         account['bookmarks'] = []
                         if mode == 'baseline':
+                            progress_by_user[account['id']].pop(('book-2', None), None)
                             for entry in progress_by_user[account['id']].values():
                                 entry.pop('ebookLocation', None); entry.pop('ebookProgress', None)
                         position = 6 if account['username'] == 'qa' else 2
                         progress_by_user[account['id']][('book-0', None)].update(currentTime=position, duration=20, progress=position / 20, isFinished=False, lastUpdate=0)
                         account['mediaProgress'] = list(progress_by_user[account['id']].values())
+                if mode == 'group-remote-finish':
+                    progress[('book-2', None)] = {'libraryItemId': 'book-2', 'episodeId': None, 'currentTime': 20, 'duration': 20, 'progress': 1, 'isFinished': True, 'lastUpdate': time.time() * 1000}
+                    user['mediaProgress'] = list(progress.values())
                 if mode == 'pdf-remote':
                     progress[('book-0', None)].update(ebookLocation='4', ebookProgress=0.75, lastUpdate=time.time() * 1000)
                     user['mediaProgress'] = list(progress.values())
@@ -383,6 +465,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(401, {})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
                 return self.respond(503, {})
+            if self.mutate_group(path, data):
+                return
             if path == '/api/podcasts/feed':
                 if self.account['type'] not in ('root', 'admin'):
                     return self.respond(403, {})
@@ -525,6 +609,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if not self.authorized():
                 return self.respond(401, {})
             bookmark = re.fullmatch(r'/api/me/item/book-0/bookmark/([0-9]+(?:\.[0-9]+)?)', path or '')
+            if self.mutate_group(path, {}):
+                return
             if bookmark:
                 position = float(bookmark.group(1))
                 existing = next((entry for entry in self.account['bookmarks'] if entry['libraryItemId'] == 'book-0' and entry['time'] == position), None)

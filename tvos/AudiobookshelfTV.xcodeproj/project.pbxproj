@@ -18,6 +18,7 @@
 		B5588A53439584F39D4D3E82 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53716A31D8B3AF4CD758EAD6 /* Models.swift */; };
 		C1988305324EAB80A6B728B7 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F070DD59862F0CD60084A1 /* LibraryStore.swift */; };
 		D0D5A748BF180431003D11AB /* KeychainCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081251E538B89B11DDF39642 /* KeychainCredentials.swift */; };
+		D93FFC82AAEBCA9267D073B3 /* AudioGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9472E7E35E51A76197DDA4 /* AudioGroups.swift */; };
 		E23322425B5AEF0FFEE7C971 /* PodcastFeedEpisode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AFE981F5A76A43B2FBD9CD /* PodcastFeedEpisode.swift */; };
 		E8F9CBE05B9C920FB22A7C05 /* ListeningJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DF06F6BBACFE7D396671B39 /* ListeningJournal.swift */; };
 /* End PBXBuildFile section */
@@ -32,6 +33,7 @@
 		3FBB1C5D529D5EFE2F534838 /* AudiobookshelfTVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiobookshelfTVApp.swift; sourceTree = "<group>"; };
 		53716A31D8B3AF4CD758EAD6 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		5DF06F6BBACFE7D396671B39 /* ListeningJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningJournal.swift; sourceTree = "<group>"; };
+		7B9472E7E35E51A76197DDA4 /* AudioGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioGroups.swift; sourceTree = "<group>"; };
 		80DFEB1C064A24D44B3F15CE /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		A47F28A332699633DD119766 /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		ABA1E0404BA6403B2756A289 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				80DFEB1C064A24D44B3F15CE /* APIClient.swift */,
+				7B9472E7E35E51A76197DDA4 /* AudioGroups.swift */,
 				5DF06F6BBACFE7D396671B39 /* ListeningJournal.swift */,
 				53716A31D8B3AF4CD758EAD6 /* Models.swift */,
 				0E5A7FADE8DB257513CBE566 /* OfflineAudio.swift */,
@@ -200,6 +203,7 @@
 			files = (
 				4755673A3393723E50F062C9 /* APIClient.swift in Sources */,
 				2C071B2547A4F364174A485E /* ApplePlayback.swift in Sources */,
+				D93FFC82AAEBCA9267D073B3 /* AudioGroups.swift in Sources */,
 				11044CCCBB76A34268BC6521 /* AudiobookshelfTVApp.swift in Sources */,
 				D0D5A748BF180431003D11AB /* KeychainCredentials.swift in Sources */,
 				C1988305324EAB80A6B728B7 /* LibraryStore.swift in Sources */,

@@ -313,10 +313,13 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         guard FileManager.default.fileExists(atPath: file.path) else { throw ListeningJournal.Failure.invalidData }
         return file
     }
-    func audio(_ entry: Entry) throws -> OfflineAudio {
+    func audio(_ entry: Entry, progress: MediaProgress? = nil) throws -> OfflineAudio {
         guard entry.account == account, entry.state == .ready else { throw APIError.signInRequired }
         let files = entry.tracks.indices.map { localFile(entry, $0) }
         guard files.allSatisfy({ FileManager.default.fileExists(atPath: $0.path) }) else { throw ListeningJournal.Failure.invalidData }
-        return OfflineAudio(id: entry.id, account: entry.account, media: entry.media, files: files, tracks: entry.tracks, chapters: entry.chapters, serverPosition: entry.serverPosition, serverUpdatedAt: entry.serverUpdatedAt)
+        let latest = progress.flatMap { value in
+            value.libraryItemId == entry.media.libraryItemID && value.episodeId == entry.media.episodeID && (value.lastUpdate ?? 0) >= entry.serverUpdatedAt ? value : nil
+        }
+        return OfflineAudio(id: entry.id, account: entry.account, media: entry.media, files: files, tracks: entry.tracks, chapters: entry.chapters, serverPosition: latest?.currentTime ?? entry.serverPosition, serverUpdatedAt: latest?.lastUpdate ?? entry.serverUpdatedAt)
     }
 }

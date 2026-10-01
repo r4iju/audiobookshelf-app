@@ -102,6 +102,8 @@ public struct ItemsResponse: Decodable {
 }
 public struct LibraryItem: Decodable, Identifiable, Hashable {
     public let id: String
+    public let isMissing: Bool?
+    public let isInvalid: Bool?
     public let mediaType: String
     public let media: Media
     public let recentEpisode: Episode?
