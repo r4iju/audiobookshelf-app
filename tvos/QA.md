@@ -77,3 +77,7 @@ See [HANDOFF.md](HANDOFF.md) for the hardware storage caveat that affects check 
 ## Current integrated TV install
 
 On October 2, root generated the TV project in the clean final-integration checkout at `829259be`, built its signed Release app locally, verified its signature with `codesign --verify --deep --strict`, and installed it on Living Room TV (tvOS 18.6) without launching it. Evidence: `/tmp/abs-apple-final-tv-device.log`. This build includes the reviewed related-author/series loaders and views, and the shared paused-progress hooks. The hooks are not a TV realtime feature without a TV event caller. Shared Core passed 48/48 in the combined checkout. The physical acceptance list above remains open.
+
+### Combined Apple integration regression
+
+The root integration at `315183c1` passes the full local suite: 20 remote-driven TV journeys and 12 app unit tests, `/tmp/abs-root-final-tv-ui.log`. This includes catalog, author/series, playback, podcasts, media recovery and durable listening recovery. Tests use the owned synthetic HTTP/HTTPS fixtures on 20765/20767; no owner library was mutated. Physical remote/device acceptance remains open.

@@ -8,12 +8,12 @@ This does not include results from work still running at reconciliation: the pro
 
 1. **Interruptions and route changes (story-34).** These are implemented according to `apple/README.md`, but neither iPhone/iPad nor TV has a test or recorded observation.
 2. **TV diagnostics, accessibility and localization (story-52, 53, 54).** Nothing is recorded for the TV. Implement them where applicable, or record why they don't apply.
-3. **Migration, in-place route (story-58).** Not built yet:
+3. **Migration, alternative in-place route (story-58).** The delivered preview uses the separate-identity Files export/import route. These in-place checks apply only if that alternative identity is adopted:
    - a compatible-identity build (legacy bundle ID, team and Keychain group)
    - reading a Realm written by an actual legacy 0.14.2-beta build
-   - reader settings from WebView localStorage
-   Owner/private data has not been tested on either route.
-4. **Collections and playlists (story-22).** Still missing:
+   - direct reading of the old WebView store during an in-place upgrade
+   PR76 already exercises reader-generated WebView settings/cache, Settings export, Files save and archive import in the actual legacy app with synthetic data. Owner-device migration and rollback remain unproven.
+4. **Collections and playlists (story-22).** Implemented, with remaining acceptance coverage:
    - permission denial
    - partial membership failure and retry
    - unavailable or deleted members
@@ -27,13 +27,13 @@ This does not include results from work still running at reconciliation: the pro
    - device restart
    - insufficient storage
    - actual cellular transitions
-7. **Localization (story-54).** Each language is 18–27% translated. Playback and network alerts stay English.
+7. **Localization (story-54).** Non-English coverage at `315183c1` is 15–21%. Playback controls have semantic mappings, with English fallback for unmapped text. Cellular consent constructs UIKit text directly in `AppleNetworkPolicy.swift`; it still needs the shared localization lookup.
 8. **Accessibility (story-53).** Untested:
    - VoiceOver walkthroughs
    - contrast
    - a reduced-motion check
 9. **Realtime (`upstream-realtime`).**
-   - iPad has not been rerun on the corrected wiring.
+   - iPad realtime journeys have not been rerun on the corrected wiring.
    - Behaviour with queued unsent progress during a reconnection is unproven.
    - The item page does not follow `rss_feed_open`/`rss_feed_closed` events.
    - Server 2.30 has no replay, so changes made before the first `init` or while suspended are missed.
@@ -72,3 +72,7 @@ This does not include results from work still running at reconciliation: the pro
 - Remaining EPUB acceptance, including hardware volume navigation, and the MOBI, AZW3, CBZ and CBR readers are deferred until after Phase 2 (#65, `scopeAmendments`).
 - Migration must keep their files and locations.
 - Auto-sleep window, shake reset, chime and the local folder workflow are Android-only in the baseline.
+
+## Final integration checks recorded afterward
+
+At `315183c1`, the full remote-driven TV suite passes 20/20 journeys and 12/12 app unit tests (`/tmp/abs-root-final-tv-ui.log`). The signed iPhone/iPad Release build passes and is installed on both devices without launching (`/tmp/abs-root-items-device-build.log`, `/tmp/abs-root-items-phone-install.log`, `/tmp/abs-root-items-pad-install.log`). Independent composition review found no blocking issue. These results do not close hardware interaction or live-server acceptance.

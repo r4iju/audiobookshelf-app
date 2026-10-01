@@ -22,6 +22,7 @@
 		4755673A3393723E50F062C9 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DFEB1C064A24D44B3F15CE /* APIClient.swift */; };
 		4F1C481495CEBE8D7A3EB5C2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11495E1C66F7E695A1F3872 /* RootView.swift */; };
 		611F21B8CA412F2735C761F4 /* RecoveryJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19DDF6F0EA4566595251D33 /* RecoveryJourney.swift */; };
+		65B454B5420A07F920A3F927 /* ItemServerActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3415E0FDD33594D8AAB1FD /* ItemServerActions.swift */; };
 		6DCB18F2B7D05D1F8ED23239 /* RealtimeChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 380936A0F1F2B853D4DE948D /* RealtimeChange.swift */; };
 		6F031BD9071178AE81D6B1A8 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CADF70A698F318EFF42CF0B /* HomeView.swift */; };
 		6FB70223C819A7434F27747E /* ServerEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715D7E78790E973158A68378 /* ServerEvents.swift */; };
@@ -101,6 +102,7 @@
 		C850184BDFFE0D3242B9874A /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		CE22E9CB2F259AC21DBE966D /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		D11495E1C66F7E695A1F3872 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		DE3415E0FDD33594D8AAB1FD /* ItemServerActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemServerActions.swift; sourceTree = "<group>"; };
 		DFED0402AB7D61A322B0535F /* TVAppTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TVAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E658F1503F524B5E48D2954E /* FormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatTests.swift; sourceTree = "<group>"; };
 		E7C9CC8D7EA65AD9D300C352 /* TVPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVPlayer.swift; sourceTree = "<group>"; };
@@ -194,6 +196,7 @@
 				80DFEB1C064A24D44B3F15CE /* APIClient.swift */,
 				7B9472E7E35E51A76197DDA4 /* AudioGroups.swift */,
 				1D1EA6D3BFEC5636C2C61191 /* AuthorSeries.swift */,
+				DE3415E0FDD33594D8AAB1FD /* ItemServerActions.swift */,
 				5DF06F6BBACFE7D396671B39 /* ListeningJournal.swift */,
 				B9DCF54C11B37504BA508579 /* ListeningStats.swift */,
 				53716A31D8B3AF4CD758EAD6 /* Models.swift */,
@@ -383,6 +386,7 @@
 				DBC4E3E6EA8696B3A669B37F /* Components.swift in Sources */,
 				6F031BD9071178AE81D6B1A8 /* HomeView.swift in Sources */,
 				470B841E12FA752EAB3C4D81 /* ItemDetailView.swift in Sources */,
+				65B454B5420A07F920A3F927 /* ItemServerActions.swift in Sources */,
 				D0D5A748BF180431003D11AB /* KeychainCredentials.swift in Sources */,
 				A1BD679FCDAD002CB258C6F9 /* LibraryBrowser.swift in Sources */,
 				917E944D857BC42FA92CAEE3 /* LibraryView.swift in Sources */,
