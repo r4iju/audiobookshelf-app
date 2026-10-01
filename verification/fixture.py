@@ -96,7 +96,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     realtime_authentications = []
     # Access tokens are renewed by `/__fixture__/expire-access` and accounts signed out server-side by
     # `/__fixture__/revoke`, so clients can be checked mid-session. Configuring any mode restores both.
-    tokens = {'renewals': 0, 'revoked': set()}
+    tokens = {'renewals': 0, 'revoked': set(), 'refresh_delay': 0}
     revocations = []
 
     def access_token(username):
@@ -146,6 +146,12 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             self.observed_request = observed
             requests.append(observed)
             return path, parse_qs(parsed.query)
+
+        def send_response(self, code, message=None):
+            # Each observed request keeps the status it was answered with, so clients can be checked against rejections.
+            if getattr(self, 'observed_request', None) is not None:
+                self.observed_request.setdefault('status', code)
+            super().send_response(code, message)
 
         def authorized(self):
             header = self.headers.get('Authorization') or ''
@@ -487,10 +493,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.remote_change(data)
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art', 'long-audio'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
-                tokens.update(renewals=0, revoked=set())
+                tokens.update(renewals=0, revoked=set(), refresh_delay=0)
                 revocations.clear()
                 remote_events.clear()
                 for (account_id, key), original in remote_originals['progress'].items():
@@ -528,9 +534,11 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     items[0]['libraryFiles'] = [{'ino': 'notes', 'fileType': 'ebook', 'isSupplementary': True, 'metadata': {'filename': 'Listening notes.pdf', 'ext': '.pdf'}}]
                 elif mode != 'offline-library':
                     items[0].pop('libraryFiles', None)
+                # `long-audio` is the baseline book lengthened to two minutes, for checks that must end before the book does.
+                book_duration = 120 if mode == 'long-audio' else 60 if mode == 'pdf-audio' else 20
                 if mode != 'offline-library':
-                    tracks[1] = audio(52 if mode == 'pdf-audio' else 12)
-                    items[0]['media']['tracks'][1]['duration'] = 52 if mode == 'pdf-audio' else 12
+                    tracks[1] = audio(book_duration - 8)
+                    items[0]['media']['tracks'][1]['duration'] = book_duration - 8
                 user['type'] = 'admin' if mode in ('podcast-admin', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure') else 'user'
                 created_podcasts.clear()
                 pending_feed_downloads.clear()
@@ -545,8 +553,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if mode == 'large-cover-art' and (directory := os.environ.get('ABS_QA_COVER_DIRECTORY')):
                     for item, display in zip(items, json.loads((Path(directory) / 'display.json').read_text())):
                         item['media']['metadata'].update(title=display['title'], authorName=display['author'])
-                items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else 60 if mode == 'pdf-audio' else 20
-                if mode in ('baseline', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress'):
+                items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else book_duration
+                if mode in ('baseline', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'long-audio'):
                     reports.clear()
                     local_sessions.clear()
                     for account in users.values():
@@ -559,7 +567,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                             for entry in progress_by_user[account['id']].values():
                                 entry.pop('ebookLocation', None); entry.pop('ebookProgress', None)
                         position = 6 if account['username'] == 'qa' else 2
-                        progress_by_user[account['id']][('book-0', None)].update(currentTime=position, duration=20, progress=position / 20, isFinished=False, lastUpdate=0)
+                        progress_by_user[account['id']][('book-0', None)].update(currentTime=position, duration=book_duration, progress=position / book_duration, isFinished=False, lastUpdate=0)
                         account['mediaProgress'] = list(progress_by_user[account['id']].values())
                 if mode == 'group-remote-finish':
                     progress[('book-2', None)] = {'libraryItemId': 'book-2', 'episodeId': None, 'currentTime': 20, 'duration': 20, 'progress': 1, 'isFinished': True, 'lastUpdate': time.time() * 1000}
@@ -576,6 +584,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {})
             if path == '/__fixture__/expire-access':
                 tokens['renewals'] += 1
+                # `refreshDelay` holds the renewal back, so a client can act while it waits.
+                tokens['refresh_delay'] = float(data.get('refreshDelay', 0))
                 return self.respond(200, {})
             if path == '/__fixture__/revoke':
                 if data.get('username') not in users:
@@ -593,6 +603,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'user': {**users[data['username']], **({'token': access_token(data['username'])} if auth_mode == 'legacy' else {'token': 'expired' + suffix, 'accessToken': 'expired' + suffix, 'refreshToken': 'refresh' + suffix})},
                     'serverSettings': {'version': '2.30.0-fixture', 'language': 'en-us'}, 'userDefaultLibraryId': 'books', 'ereaderDevices': []})
             if path == '/auth/refresh':
+                if tokens['refresh_delay']:
+                    time.sleep(tokens['refresh_delay'])
                 token = self.headers.get('x-refresh-token')
                 username = {'refresh': 'qa', 'refresh-other': 'qa-other'}.get(token)
                 if username is None or username in tokens['revoked']:
@@ -709,10 +721,11 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     'displayTitle': title, 'displayAuthor': 'QA Studio', 'audioTracks': [
                         {'contentUrl': '/audio/0', 'startOffset': 0, 'duration': 8, 'mimeType': 'audio/wav'},
                         {'contentUrl': '/audio/1', 'startOffset': 8, 'duration': 12, 'mimeType': 'audio/wav'}], 'chapters': chapters}
-                if configuration['mode'] == 'pdf-audio':
-                    result['duration'] = 60
-                    result['audioTracks'][1]['duration'] = 52
-                    result['chapters'] = [chapters[0], {**chapters[1], 'end': 60}]
+                if configuration['mode'] in ('pdf-audio', 'long-audio'):
+                    duration = 120 if configuration['mode'] == 'long-audio' else 60
+                    result['duration'] = duration
+                    result['audioTracks'][1]['duration'] = duration - 8
+                    result['chapters'] = [chapters[0], {**chapters[1], 'end': duration}]
                 sessions[session_id] = result
                 if configuration['mode'] == 'no-audio':
                     result['audioTracks'] = []

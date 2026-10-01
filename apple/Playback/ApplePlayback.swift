@@ -104,6 +104,8 @@ import UIKit
     /// The access token the current streamed item sends, and the item whose failure is being checked against it.
     private var mediaToken: String?
     private var recoveringMedia: AVPlayerItem?
+    /// Where the reload after a renewal starts: the failure's position, or a position requested while it waited.
+    private var recoveryTarget: Double?
     private var controlStatus: NSKeyValueObservation?
     private var syncTask: Task<Void, Never>?
     private var lastTick = Date()
@@ -355,7 +357,14 @@ import UIKit
         guard !closing, let session, session.position(at: time) != nil else { return }
         playbackIntent = UUID()
         wantsPlayback = autoplay && !needsSignIn
-        pendingSeek = SeekRequest(time: min(max(time.isFinite ? time : 0, 0), session.duration), generation: generation)
+        let target = min(max(time.isFinite ? time : 0, 0), session.duration)
+        // The failed item cannot seek, so the latest request waits for the reload that follows its renewal.
+        if let recoveringMedia, player.currentItem === recoveringMedia {
+            recoveryTarget = target
+            currentTime = target
+            return
+        }
+        pendingSeek = SeekRequest(time: target, generation: generation)
         if let seekLoop { return try await seekLoop.value }
         tick(player.currentTime())
         let loop = Task { @MainActor in
@@ -458,24 +467,26 @@ import UIKit
 
     /// The asset sends the token it was created with, so a server that stopped accepting that token fails the
     /// stream. An authenticated request then renews the token, as for any other request, and the item is
-    /// reloaded once at the same position; a revoked login reaches `failed` as `signInRequired` instead.
+    /// reloaded once at the same position, or at a later requested one; a revoked login reaches `failed` as
+    /// `signInRequired` instead.
     private func mediaFailed(_ item: AVPlayerItem) {
         guard player.currentItem === item, recoveringMedia !== item else { return }
         guard offlineFiles == nil, let token = mediaToken, let session else { return playbackFailed() }
         recoveringMedia = item
+        recoveryTarget = currentTime
         let requestGeneration = generation
-        let position = currentTime
         player.pause()
         playing = false
         // A seek waiting on the failed item never finishes; cancelled, it ends quietly and the reload below follows.
         item.cancelPendingSeeks()
         Task { @MainActor in
-            defer { if recoveringMedia === item { recoveringMedia = nil } }
+            defer { if recoveringMedia === item { recoveringMedia = nil; recoveryTarget = nil } }
             @MainActor func current() -> Bool { requestGeneration == generation && self.session?.id == session.id && player.currentItem === item }
             do {
                 _ = try await api.me()
-                guard current() else { return }
+                guard current(), let position = recoveryTarget else { return }
                 recoveringMedia = nil
+                recoveryTarget = nil
                 guard api.credentials?.accessToken != token else { return playbackFailed() }
                 player.replaceCurrentItem(with: nil)
                 try await seek(to: position, autoplay: wantsPlayback)
@@ -512,7 +523,8 @@ import UIKit
         let now = Date()
         let elapsed = now.timeIntervalSince(lastTick)
         lastTick = now
-        guard let session, !seeking, !closing, player.currentItem != nil else { return }
+        // A failed item's time is not the position while its renewal decides where the reload starts.
+        guard let session, !seeking, !closing, player.currentItem != nil, recoveringMedia == nil else { return }
         let time = player.currentTime()
         if time.seconds.isFinite {
             let position = min(session.duration, session.audioTracks[trackIndex].startOffset + max(time.seconds, 0))

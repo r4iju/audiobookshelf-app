@@ -89,6 +89,34 @@ import XCTest
         XCTAssertGreaterThan(delivered["currentTime"] as? Double ?? 0, 9.5)
     }
 
+    /// Story 12 with a slow renewal: a seek the listener makes while the rejected file waits for its renewed
+    /// token is the latest request, so the reloaded file must start there, not where the failure happened.
+    func testSeekDuringDelayedRenewalIsWhereTheReloadedFileStarts() async throws {
+        try await startStreaming()
+        try await control("expire-access", ["refreshDelay": 3])
+        let renewalsBefore = try await observations().requests.filter { $0 == "/auth/refresh" }.count
+        try await eventually(12, "the next file's renewal waiting") { player.trackIndex == 1 && !player.playing }
+        let renewalDeadline = Date().addingTimeInterval(5)
+        while try await observations().requests.filter({ $0 == "/auth/refresh" }).count == renewalsBefore {
+            guard Date() < renewalDeadline else { return XCTFail("The rejected file never asked for a renewal") }
+            try await Task.sleep(nanoseconds: 50_000_000)
+        }
+        XCTAssertNil(player.error)
+        // Not awaited: the listener's seek returns whenever the player finishes it, and the test only checks where audio plays.
+        Task { try? await player.seek(to: 14, autoplay: true) }
+
+        try await eventually(10, "audio playing again after the renewal") { player.playing && player.currentTime > 14.2 }
+        XCTAssertLessThan(player.currentTime, 17, "Reloaded somewhere other than the latest seek")
+        XCTAssertEqual(player.trackIndex, 1)
+        XCTAssertNil(player.error)
+        XCTAssertEqual(credentials.value?.accessToken, "fresh-r1")
+        player.pause()
+        await player.restoreListening()
+        let reports = try await observations().reports
+        let delivered = try XCTUnwrap(reports.last)
+        XCTAssertGreaterThan(delivered["currentTime"] as? Double ?? 0, 14, "The latest seek was lost from the saved listening")
+    }
+
     /// Story 14: the server signs the account out while audio streams. Audio must stop rather than play on
     /// unnoticed, the player must ask to sign in, and the listening must survive another account signing in
     /// until the same account signs in again.

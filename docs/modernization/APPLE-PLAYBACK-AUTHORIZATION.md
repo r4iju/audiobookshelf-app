@@ -7,9 +7,11 @@ This covers stories 12, 14 and 34 on the shared Apple player (`apple/Playback/Ap
 - **Token renewal while streaming (story 12).** Streams carry a bearer token fixed when each file loads. If the server stops accepting that token, the next file fails with HTTP 401. The player now:
   - pauses;
   - asks the server who is signed in, which renews the login through the client's single shared refresh;
-  - reloads the file with the new token at the same position.
+  - reloads the file with the new token at the same position, or at the latest position the listener asked for while the renewal waited.
   
   The renewed token is saved, and listening continues under the same account. The renewal is attempted only once per failed file. If the token did not change, the old "Audio could not be played" error is kept.
+
+  While a renewal waits, the failed file is not treated as the position: a seek records its target and shows it, and the reload starts there. Pausing during the wait reloads without playing.
 - **Revocation (story 14).** If the server no longer accepts the login, including its refresh, the player:
   - stops audio, whether streamed or downloaded;
   - sets `needsSignIn`;
@@ -30,30 +32,55 @@ Run them with `apple/scripts/verify-playback-authorization.sh`. The script:
 - restores the regenerated pbxproj when it exits.
 
 New fixture controls:
-- `POST /__fixture__/expire-access` makes the server reject the current access tokens. Refresh then issues `fresh-rN`.
+- `POST /__fixture__/expire-access` makes the server reject the current access tokens. Refresh then issues `fresh-rN`. With `{"refreshDelay": seconds}`, each refresh is held back that long.
 - `POST /__fixture__/revoke {"username"}` rejects that account's access token and refresh until it signs in again.
+- `configure {"mode": "long-audio"}` lengthens the synthetic book to 120 s (files of 8 s and 112 s). Only the revocation journey uses it; every other mode keeps the 20 s book.
+- Every observed request now records the status it was answered with.
 
-Both are reset by `configure`, and revocations are listed in the observations.
+`configure` resets all of them, and revocations are listed in the observations.
 
 | Check | Before the fix (base `000ea3c8`) | After |
 | --- | --- | --- |
 | `verification.test_fixture` `MidSessionTokenJourney` (3) | 3 errors, no such controls (`/tmp/abs-playback-final-fixture-red.log`) | 8/8 OK (`/tmp/abs-playback-final-fixture-green.log`) |
+| `MidSessionTokenJourney` long-audio and request status (2) | 1 error (mode rejected), 1 failure (no status) (`/tmp/abs-playback-final-longaudio-fixture-red.log`) | 10/10 OK (`/tmp/abs-playback-final-longaudio-fixture-green.log`) |
+| `MidSessionTokenJourney` refresh delay (1) | Failed: refresh answered at once (`/tmp/abs-playback-final-refresh-delay-fixture-red.log`) | 11/11 OK (`/tmp/abs-playback-final-refresh-delay-fixture-green.log`) |
 | `PlaybackAuthorizationTests.testExpiredAccessDuringStreamingRenewsOnceAndPlaybackContinuesIntoTheNextFile` | Failed: stuck at 8.0 s with "Audio could not be played" | Passed |
 | `PlaybackAuthorizationTests.testRevocationDuringDownloadedPlaybackStopsAudioAtTheNextSync` | Failed: audio kept playing, and `resume()` restarted it | Passed |
 | `PlaybackAuthorizationTests.testRevocationDuringStreamingStopsAudioAsksToSignInAndKeepsListeningForThatAccount` | Passed at base, see below | Passed |
-| `PlaybackAuthorizationJourney.testRevokedLoginStopsPlaybackAndSigningInAgainDeliversItsListening` (app UI) | Failed: "No way to sign in again" (`/tmp/abs-playback-final-journey-red.log`) | Passed (`/tmp/abs-playback-final-journey-green3.log`), stopped at 8 s of 20 |
+| `PlaybackAuthorizationTests.testSeekDuringDelayedRenewalIsWhereTheReloadedFileStarts`, on `84a9047e` | Failed: stalled seeking at 8.0 s, latest seek to 14 s lost (`/tmp/abs-playback-final-latest-seek-red.log`) | Passed |
+| `PlaybackAuthorizationJourney.testRevokedLoginStopsPlaybackAndSigningInAgainDeliversItsListening` (app UI), first version | Failed: "No way to sign in again" (`/tmp/abs-playback-final-journey-red.log`) | Replaced, see below |
+| The same journey on the 120 s book. RED applies `evidence/playback-final/revocation-handling-removed.patch` to the final source. | Failed: prompt shown but still "Playing", book position 24 s to 27 s in 3 s (`/tmp/abs-playback-final-journey-long-red.log`) | Passed on the final source: "Paused" at 23 s of 120 (`/tmp/abs-playback-final-journey-long-green.log`) |
 
-Logs after the fix:
-- the three unit tests, three iterations each, 9/9 (`/tmp/abs-playback-final-auth-fix-iter.log`);
-- the full NativeTests suite, 67/67 (`/tmp/abs-playback-final-nativetests-full-2.log`).
+Logs after the fixes:
+- the four unit tests, three iterations each, 12/12 on the final source (`/tmp/abs-playback-final-latest-seek-green.log`);
+- the full NativeTests suite, 68/68 (`/tmp/abs-playback-final-nativetests-full-3.log`).
 
 The first fixed version renewed the token, but in the full suite it stalled. A seek started by the file change was still waiting on the failed item, and the reload joined it. Cancelling that item's pending seeks fixed it. The failed full run is in `/tmp/abs-playback-final-diag1.log`.
 
-The journey's timing depends on the UI:
-- In one run, the revocation landed after the 8 s file boundary because the UI steps took 3.5 s. The last file was already buffered, so audio stopped only at the end-of-book sync, at 20 s (`/tmp/abs-playback-final-journey-green2.log`).
-- The journey therefore asserts only that audio is paused and stays paused. The unit tests pin the stop to the next server contact.
-- Screenshots, kept local and showing synthetic data only: `/tmp/abs-playback-final-evidence/revoked-login-while-listening.png` and `sign-in-again.png`.
-- While sign-in is open, the mini player stays visible, and its play button does nothing until a sign-in.
+Independent review of `84a9047e` then found that a seek made while the renewal waited went to the failed item. The reload joined that stuck seek, so playback stalled at the failure position and the requested one was lost. The fixture shows the renewal succeeding and `/audio/1` never being requested again (`/tmp/abs-playback-final-latest-seek-red-requests.txt`). That red run was stopped by its process ID after both assertion failures were printed, because the stuck seek also held the runner.
+
+### Revocation journey
+
+The first journey revoked during a 20 s book. In one run, the UI steps took 3.5 s, so the revocation landed after the last file was buffered and the book ended at 20 s before a sync (`/tmp/abs-playback-final-journey-green2.log`). Paused at the end of a book proves nothing, so the journey now:
+- configures `long-audio`, a 120 s book;
+- checks the full player says "Playing" and its elapsed time advances before revoking;
+- reads the elapsed time right after the revocation;
+- expects the "Sign in again" button and "Paused" within the server-contact contract: the 15 s sync interval plus 3 s for the one-second tick, the rejected request's round trip and whole-second display;
+- asserts the stop is at most that far past the revocation, and more than 60 s before the book ends;
+- asserts the fixture answered a request after the revocation with 401;
+- asserts that 3 s of waiting and the play control both leave audio paused at the same second;
+- opens sign-in and checks the server address and username are the revoked account's, with the recovery message;
+- signs in, then asserts no audio file is requested, nothing plays, and the held listening is delivered for `qa` within 2 s of the stopped position.
+
+In the passing run, the requests after the revocation were a realtime socket (401), the periodic `local-all` sync (401) and `/auth/refresh` (401). Audio was "Paused" at 23 s, in the 112 s file, after which sign-in requested nothing from `/audio/` (`/tmp/abs-playback-final-journey-long-green-observations.json`; its reports were cleared by the journey's teardown `configure`). The passing assertion ties the delivered `local-all` report for `qa` to within 2 s of the stop.
+
+Notes on how the evidence was produced:
+- The first version of the long journey read `playback-elapsed`, which is the chapter's time, so its comparison with the delivered book position failed although audio had stopped correctly. It now reads `total-elapsed`. The RED and GREEN results above both use this final journey.
+- An earlier RED, with the first long journey on `84a9047e`, failed the same way and is superseded.
+- One RED attempt did not reach the simulator, because the host briefly refused loopback connections (`Errno 49`) in the fixture pre-check (`/tmp/abs-playback-final-journey-long-red-host-errno49.log`). It was rerun once that cleared.
+- The xcodebuild runs that hung after their tests finished were stopped by their own process ID; the test results had already been printed.
+
+Screenshots, kept local and showing synthetic data only: `/tmp/abs-playback-final-evidence/revoked-login-while-listening.png` and `sign-in-again.png`. While sign-in is open, the mini player stays visible, and its play button does nothing until a sign-in.
 
 The streaming revocation test passed at base only by accident, and its log is `/tmp/abs-playback-final-auth-red.saved.log`. At base:
 1. the next file failed with a generic error;
@@ -95,8 +122,13 @@ The renewal test asserts:
 ## Limits
 
 - **Simulated system events.** The probe posts the notifications itself. It does not show whether real calls, Siri, alarms, CarPlay or Bluetooth produce those notifications on hardware. `mediaServicesWereReset` is not handled. Physical interruption, headset and Bluetooth checks remain open.
-- **When revocation is noticed.** Revocation is detected only at the next server contact: the periodic sync (every 15 s), a file load, or a pause. Fully buffered streaming audio, or downloaded audio, can play until then. The journey revokes while the first file plays, so the next file load stops it.
+- **When revocation is noticed.** Revocation is detected only at the next server contact: the periodic sync (every 15 s), a file load, or a pause. Fully buffered streaming audio, or downloaded audio, can play until then, up to about 15 s.
 - **After signing in again.** The connection change closes the player, so the listener reopens the book. Its listening is delivered, and the server position follows from it.
 - **Fixture tokens.** They are opaque strings. Renewal is triggered by the server rejecting a token before the client expects expiry. The client's own JWT `exp` pre-check is unchanged and is covered elsewhere.
 - **TV.** It shares the player change and builds (`/tmp/abs-playback-final-tv-build-2.log`, BUILD SUCCEEDED with the final player). The TV UI journeys were not rerun, and `tvos/QA.md` check 9 (login expiry) remains open.
-- **Pre-existing failure.** `verification/test_upgrade_gate.py` already fails at the base commit (`/tmp/abs-playback-final-upgrade-gate-base.log`). It is unrelated to this change.
+- **Compatibility gate, still failing.** `verification/test_upgrade_gate.py` fails at the base commit and here, so final combined readiness is not met (`/tmp/abs-playback-final-upgrade-gate-base.log`). The exact reason, from a detached checkout of `000ea3c8` (`/tmp/abs-playback-final-upgrade-gate-diagnosis.log`):
+  - both Swift `client-journey` runs pass, legacy and modern auth, TVCore, all seven workflows;
+  - `node verification/realtime/journey.mjs baseline` exits 1 with `ERR_MODULE_NOT_FOUND: Cannot find package 'socket.io-client' imported from plugins/server.js`, because these worktrees have no `node_modules`;
+  - `verification/compatibility.py` catches the resulting parse error, prints its generic "could not complete" report on stdout and exits 2, so the test shows an empty stderr.
+
+  No packages were installed here. Root will address it when integrating the final source.

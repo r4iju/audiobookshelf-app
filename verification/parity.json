@@ -448,7 +448,7 @@
       "replacementEvidence": {
         "apple-mobile": [
           "Contract only: production TVCore follows 401 + x-refresh-token and persists refreshed credentials in the aligned candidate gate (SERVER-COMPATIBILITY.md, verification/test_upgrade_gate.py). SavedConnectionsJourney.testLegacyAccountRefreshRetainsSelectedLibraryWithoutDuplicatingConnection.",
-          "Simulator, synthetic fixture: PlaybackAuthorizationTests.testExpiredAccessDuringStreamingRenewsOnceAndPlaybackContinuesIntoTheNextFile. The server rejects the access token mid-stream (fixture expire-access); the production player renews through one shared refresh, saves the token and continues into the next file under the same account (APPLE-PLAYBACK-AUTHORIZATION.md). No live-server or hardware run."
+          "Simulator, synthetic fixture: PlaybackAuthorizationTests.testExpiredAccessDuringStreamingRenewsOnceAndPlaybackContinuesIntoTheNextFile. The server rejects the access token mid-stream (fixture expire-access); the production player renews through one shared refresh, saves the token and continues into the next file under the same account; a seek made while a delayed renewal waits is where the reloaded file starts (testSeekDuringDelayedRenewalIsWhereTheReloadedFileStarts, APPLE-PLAYBACK-AUTHORIZATION.md). No live-server or hardware run."
         ],
         "android": [],
         "browser": [],
@@ -520,7 +520,7 @@
       "replacementEvidence": {
         "apple-mobile": [
           "Partial: TVCoreTests.testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop; imported archive accounts arrive as reauthenticationRequired (APPLE-MIGRATION.md); pending listening stays with its account (SavedConnectionsJourney).",
-          "Simulator, synthetic fixture: PlaybackAuthorizationTests revocation tests (streamed and downloaded) and PlaybackAuthorizationJourney.testRevokedLoginStopsPlaybackAndSigningInAgainDeliversItsListening. The fixture revokes the account mid-session; audio stops, cannot be resumed, the app asks to sign in again for that server and username, another account does not send the held listening, and signing in again delivers it (APPLE-PLAYBACK-AUTHORIZATION.md). Revocation is noticed at the next server contact. No live-server or hardware run."
+          "Simulator, synthetic fixture: PlaybackAuthorizationTests revocation tests (streamed and downloaded) and PlaybackAuthorizationJourney.testRevokedLoginStopsPlaybackAndSigningInAgainDeliversItsListening on a 120 s synthetic book (fixture long-audio). The fixture revokes the account while audio decodes; the journey fails with the player's revocation handling removed and passes with it, stopping at the first rejected server contact within the 15 s sync interval; audio stops, cannot be resumed, the app asks to sign in again for that server and username, another account does not send the held listening, and signing in again delivers it (APPLE-PLAYBACK-AUTHORIZATION.md). Revocation is noticed at the next server contact. No live-server or hardware run."
         ],
         "android": [],
         "browser": [],
