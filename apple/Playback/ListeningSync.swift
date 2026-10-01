@@ -22,6 +22,8 @@ struct ProgressResetIntent: Codable, Equatable {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("NativeListening/listening.json")
     }
+    /// Where `publications` is kept unless the resets are kept elsewhere.
+    static var publicationsFile: URL { file.deletingLastPathComponent().appendingPathComponent("publications.json") }
     private let api: APIClient
     private let journal: ListeningJournal?
     private let loadingFailure: Error?
@@ -32,10 +34,13 @@ struct ProgressResetIntent: Codable, Equatable {
     private var request: Transfer?
     private let resetsFile: URL
     private var resets: Result<[ProgressResetIntent], Error>
+    /// Every progress write this app sends, listening, reading and carried-over data alike.
+    let publications: PublicationLedger
 
     init(api: APIClient, resets: URL? = nil) {
         self.api = api
         resetsFile = resets ?? Self.file.deletingLastPathComponent().appendingPathComponent("progress-resets.json")
+        publications = PublicationLedger(file: resetsFile.deletingLastPathComponent().appendingPathComponent("publications.json"))
         do {
             self.resets = .success(FileManager.default.fileExists(atPath: resetsFile.path)
                 ? try JSONDecoder().decode([ProgressResetIntent].self, from: Data(contentsOf: resetsFile)) : [])
@@ -124,9 +129,17 @@ struct ProgressResetIntent: Codable, Equatable {
         let journal = try loaded()
         let account = try await api.currentAccount()
         let transfer = Task { @MainActor in
-            while let next = journal.pending(account: account).first {
+            // Listening of media whose earlier sync the server may still apply stays on this device.
+            var waiting: Set<String> = []
+            while let next = journal.pending(account: account).first(where: { !waiting.contains($0.id) }) {
                 try Task.checkCancellation()
-                try await api.syncListening(next)
+                do {
+                    try await api.syncListening(next, issuing: publications.issuing(account: account, itemID: next.media.libraryItemID, episodeID: next.media.episodeID))
+                } catch PublicationLedger.Failure.waiting {
+                    waiting.insert(next.id)
+                    continue
+                }
+                // Acknowledges only the revision sent, never later listening.
                 try journal.acknowledge(next)
             }
             let user = try await api.me()

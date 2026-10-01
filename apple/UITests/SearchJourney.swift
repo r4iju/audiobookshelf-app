@@ -6,7 +6,7 @@ import XCTest
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
         app.buttons["account"].tap()
-        app.buttons["Change library"].tap()
+        accountMenu(app).buttons["Change library"].tap()
         app.buttons["library-podcasts"].tap()
         XCTAssertTrue(app.buttons["Search library"].waitForExistence(timeout: 5))
         app.buttons["Search library"].tap()

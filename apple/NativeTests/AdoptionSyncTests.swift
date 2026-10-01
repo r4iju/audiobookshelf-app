@@ -442,8 +442,15 @@ import XCTest
 
         XCTAssertEqual(server["li-failed"]?.time, 50, "the full update is sent again after it failed")
         XCTAssertEqual(server["li-failed"]?.finished, false)
-        XCTAssertEqual(server["li-lost"]?.time, 50, "a lost reopen response does not drop the position")
         XCTAssertEqual(server["li-elsewhere"]?.time, 700, "listening elsewhere after the reopen stays newer")
-        XCTAssertEqual(second.progressPending, 0)
+        // The lost reopen's handler may still run after anything sent later, so the position waits
+        // on this device until a restart asked for after it is confirmed.
+        XCTAssertEqual(server["li-lost"]?.time, 0)
+        XCTAssertEqual(second.progressPending, 1)
+        try h.player.requestServerRestart(account: AdoptionHarness.identity(AdoptionHarness.alice))
+        try h.player.confirmServerRestarted(account: AdoptionHarness.identity(AdoptionHarness.alice))
+        let afterRestart = await h.adoption.sync()
+        XCTAssertEqual(server["li-lost"]?.time, 50, "a lost reopen response does not drop the position")
+        XCTAssertEqual(afterRestart.progressPending, 0)
     }
 }

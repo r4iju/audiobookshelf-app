@@ -133,6 +133,14 @@ import Combine
 
     func cancelConnection() async { await restore() }
 
+    /// Opens sign-in for this server and username after the server stopped accepting the login. Playback stays
+    /// paused until a sign-in closes it, and its unsent listening stays with this account until that account signs in.
+    func reauthenticate() {
+        generation = UUID()
+        savedConnectionsPresented = false
+        screen = .connection(Self.recovery(for: APIError.signInRequired))
+    }
+
     func switchConnection(_ id: String) async {
         let request = UUID()
         let previousScreen = screen

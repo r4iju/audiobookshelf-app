@@ -28,6 +28,7 @@
 "Already on server" = "Already on server";
 "Always" = "Always";
 "An earlier import is already saved. Choose its original export to retry or repair it." = "An earlier import is already saved. Choose its original export to retry or repair it.";
+"An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed." = "An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.";
 "Appearance" = "Appearance";
 "Apple TV" = "Apple TV";
 "Are you sure you want to reset your progress?" = "Are you sure you want to reset your progress?";
@@ -333,6 +334,7 @@
 "Previous page" = "Previous page";
 "Previous year" = "Previous year";
 "Progress" = "Progress";
+"Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart." = "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart.";
 "Published year" = "Published year";
 "Queued" = "Queued";
 "Queueing on your server…" = "Queueing on your server…";
@@ -360,6 +362,9 @@
 "Report" = "Report";
 "Reset timer" = "Reset timer";
 "Restart playback" = "Restart playback";
+"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.";
+"Restart the server" = "Restart the server";
+"Restart the server now" = "Restart the server now";
 "Restarting…" = "Restarting…";
 "Resume" = "Resume";
 "Resume listening" = "Resume listening";
@@ -404,6 +409,7 @@
 "Server address" = "Server address";
 "Server download requests could not be restored. The original data is retained. {0}" = "Server download requests could not be restored. The original data is retained. {0}";
 "Server folder" = "Server folder";
+"Server restarted" = "Server restarted";
 "Server totals with covers of books added this year." = "Server totals with covers of books added this year.";
 "Server totals with top authors and genres." = "Server totals with top authors and genres.";
 "Server totals with top authors and narrators." = "Server totals with top authors and narrators.";
@@ -486,6 +492,7 @@
 "The server could not find this item, feed or device." = "The server could not find this item, feed or device.";
 "The server download result could not be saved: {0}" = "The server download result could not be saved: {0}";
 "The server no longer accepts this login. Listening saved on this TV is kept and sent after you sign in." = "The server no longer accepts this login. Listening saved on this TV is kept and sent after you sign in.";
+"The server no longer accepts this login. Listening saved on this device is kept and sent after you sign in." = "The server no longer accepts this login. Listening saved on this device is kept and sent after you sign in.";
 "The server no longer accepts this login. Sign in again to continue." = "The server no longer accepts this login. Sign in again to continue.";
 "The server refused the request. A feed slug may already be in use, or the server could not send the ebook." = "The server refused the request. A feed slug may already be in use, or the server could not send the ebook.";
 "The server returned HTTP {0}. Please try again." = "The server returned HTTP {0}. Please try again.";

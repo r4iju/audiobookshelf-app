@@ -145,7 +145,9 @@ extension NativeMigrationAdoption {
     // MARK: Transport
 
     /// One authenticated request as `identity`. A 401 lets the API client refresh the token once.
-    private func send(_ method: String, _ path: String, query: [URLQueryItem] = [], body: Any? = nil, as identity: AccountIdentity, retry: Bool = true) async throws -> (Int, Data) {
+    /// A write to the progress of `writing` is recorded in `PublicationLedger` before it is sent.
+    private func send(_ method: String, _ path: String, query: [URLQueryItem] = [], body: Any? = nil, as identity: AccountIdentity,
+                      writing media: (itemID: String, episodeID: String?)? = nil, retry: Bool = true) async throws -> (Int, Data) {
         guard try await api.currentAccount() == identity else { throw SyncFailure.accountChanged }
         let token = try await api.validToken()
         guard try await api.currentAccount() == identity else { throw SyncFailure.accountChanged }
@@ -159,12 +161,21 @@ extension NativeMigrationAdoption {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-        let (data, response) = try await session.data(for: request)
+        let publications = reading.player.publications
+        let write = media.map { PublicationLedger.Write(id: UUID(), account: identity, itemID: $0.itemID, episodeID: $0.episodeID, method: method,
+                                                        path: request.url?.path ?? path, body: request.httpBody, issuedAt: Date().timeIntervalSince1970 * 1_000) }
+        if let write { try publications.issue(write) }
+        let data: Data, response: URLResponse
+        do { (data, response) = try await session.data(for: request) } catch {
+            if let write, PublicationLedger.settled(by: error) { try? publications.resolve(write.id) }
+            throw error
+        }
         guard let status = (response as? HTTPURLResponse)?.statusCode else { throw SyncFailure.http(0) }
+        if let write, PublicationLedger.settled(byStatus: status) { try? publications.resolve(write.id) }
         if status == 401 {
             guard retry else { throw APIError.signInRequired }
             _ = try await api.me()
-            return try await send(method, path, query: query, body: body, as: identity, retry: false)
+            return try await send(method, path, query: query, body: body, as: identity, writing: media, retry: false)
         }
         return (status, data)
     }
@@ -205,7 +216,7 @@ extension NativeMigrationAdoption {
     private func sendLocal(_ session: LegacySession, total: Double, identity: AccountIdentity) async throws {
         let body: [String: Any] = ["sessions": [try payload(session, account: identity, total: total)],
                                    "deviceInfo": ["deviceId": deviceID, "clientName": "Audiobookshelf Native", "manufacturer": "Apple", "model": "iPhone / iPad"]]
-        let (status, data) = try await send("POST", "api/session/local-all", body: body, as: identity)
+        let (status, data) = try await send("POST", "api/session/local-all", body: body, as: identity, writing: session.libraryItemId.map { ($0, session.episodeId) })
         guard status == 200 else { throw SyncFailure.http(status) }
         let results = json(data)["results"] as? [[String: Any]] ?? []
         guard let result = results.first(where: { $0["id"] as? String == session.id }) else { throw SyncFailure.rejected("The server did not confirm this session.") }
@@ -269,7 +280,7 @@ extension NativeMigrationAdoption {
 
     /// Errors after which the request certainly did not reach the server.
     private static func notSent(_ error: Error) -> Bool {
-        if error is SyncFailure || error is APIError { return true }
+        if error is SyncFailure || error is APIError || error is PublicationLedger.Failure { return true }
         guard let error = error as? URLError else { return false }
         return [.notConnectedToInternet, .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed, .badURL, .unsupportedURL, .secureConnectionFailed].contains(error.code)
     }
@@ -321,7 +332,8 @@ extension NativeMigrationAdoption {
             try updateLedger { $0.sessions[key]?.syncAttempted = true }
             let synced: Int
             do {
-                (synced, _) = try await send("POST", "api/session/\(session.id)/sync", body: ["currentTime": position, "timeListened": delta, "duration": session.duration], as: identity)
+                (synced, _) = try await send("POST", "api/session/\(session.id)/sync", body: ["currentTime": position, "timeListened": delta, "duration": session.duration], as: identity,
+                                             writing: session.libraryItemId.map { ($0, session.episodeId) })
             } catch {
                 if Self.notSent(error) { try updateLedger { $0.sessions[key]?.syncAttempted = nil }; throw error }
                 return .unconfirmed(session, "The server did not answer while this listening was being added, so it may already have it. It is not sent again.")
@@ -386,14 +398,14 @@ extension NativeMigrationAdoption {
             // (`MediaProgress.applyProgressUpdate`). Stamped just before the legacy row, the
             // reset never looks newer than it, so a retry after a failure still sends it, while
             // listening anywhere after the reset is newer and wins.
-            let (status, _) = try await send("PATCH", path, body: ["isFinished": false, "lastUpdate": local.lastUpdate - 1], as: identity)
+            let (status, _) = try await send("PATCH", path, body: ["isFinished": false, "lastUpdate": local.lastUpdate - 1], as: identity, writing: (item, local.episodeID))
             guard (200...299).contains(status) else { throw SyncFailure.http(status) }
             if try superseded(try await remoteProgress(item, episode: local.episodeID, identity: identity)) { return false }
         }
         var body: [String: Any] = ["currentTime": local.currentTime, "duration": local.duration, "progress": local.progress, "isFinished": local.isFinished,
                                    "lastUpdate": local.lastUpdate, "startedAt": local.startedAt]
         if let finished = local.finishedAt { body["finishedAt"] = finished }
-        let (status, _) = try await send("PATCH", path, body: body, as: identity)
+        let (status, _) = try await send("PATCH", path, body: body, as: identity, writing: (item, local.episodeID))
         guard (200...299).contains(status) else { throw SyncFailure.http(status) }
         try updateLedger {
             guard $0.progress[key]?.progress == local else { return }

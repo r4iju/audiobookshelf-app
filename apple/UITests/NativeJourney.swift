@@ -6,6 +6,11 @@ import XCTest
         super.tearDown()
     }
 
+    /// The open account menu. The iPad library sidebar repeats "Change library", so the menu is the collection outside it.
+    func accountMenu(_ app: XCUIApplication) -> XCUIElementQuery {
+        app.collectionViews.matching(NSPredicate(format: "label != %@", "Sidebar"))
+    }
+
     func capture(_ name: String) {
         let evidence = XCTAttachment(screenshot: XCUIApplication().screenshot())
         evidence.name = name
@@ -38,6 +43,29 @@ import XCTest
         XCTAssertTrue(app.staticTexts["Audiobooks"].firstMatch.waitForExistence(timeout: 10))
         XCTAssertFalse(app.secureTextFields["password"].exists)
     }
+
+    func openPlayerSettings(_ app: XCUIApplication) {
+        let open = app.buttons["Playback settings"]
+        for _ in 0..<3 where !(open.exists && open.isHittable) { app.swipeUp() }
+        open.tap()
+    }
+
+    /// Opens Playback settings, applies the switches in order and closes the panel.
+    func playerSettings(_ app: XCUIApplication, _ switches: [(String, Bool)]) {
+        openPlayerSettings(app)
+        for (identifier, on) in switches {
+            let toggle = app.switches[identifier]
+            XCTAssertTrue(toggle.waitForExistence(timeout: 3), "\(identifier) is missing from Playback settings")
+            if (toggle.value as? String == "1") != on { toggle.switches.firstMatch.tap() }
+            XCTAssertEqual(toggle.value as? String, on ? "1" : "0", identifier)
+        }
+        app.buttons["panel-done"].tap()
+        app.swipeDown(); app.swipeDown()
+    }
+
+    /// The whole-book position. iOS starts with the chapter track on, where playback-elapsed is the time within the
+    /// chapter and the total track beside it shows the book. Both are divided by the playback speed unless that is turned off.
+    func bookElapsed(_ app: XCUIApplication) -> XCUIElement { app.staticTexts["total-elapsed"] }
 
     struct ObservedRequest: Decodable {
         let method: String?

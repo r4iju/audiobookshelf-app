@@ -201,7 +201,7 @@ import XCTest
         app.terminate(); app.launchArguments = []; app.launch()
         XCTAssertTrue(app.buttons["Show covers"].waitForExistence(timeout: 10), "The chosen list presentation must survive relaunch")
         guard app.buttons["Show covers"].exists else { return }
-        app.buttons["account"].tap(); app.buttons["Change library"].tap()
+        app.buttons["account"].tap(); accountMenu(app).buttons["Change library"].tap()
         app.buttons["library-podcasts"].tap()
         XCTAssertTrue(app.buttons["Show covers"].waitForExistence(timeout: 10), "The device display preference must also apply to another library")
         app.buttons["Show covers"].tap()

@@ -83,7 +83,7 @@ import UIKit
     private var networkEpoch = UUID()
     #endif
     private let api: APIClient
-    private let listening: ListeningSync
+    let listening: ListeningSync
     private var readingPublication: Task<Void, Error>?
     var canPublishReading: Bool { session == nil && !preparing && !closing && progressReset == nil }
     @Published private var progressReset: Task<CurrentUser, Error>?
@@ -101,6 +101,11 @@ import UIKit
     private var endObserver: NSObjectProtocol?
     private var failureObserver: NSObjectProtocol?
     private var itemStatus: NSKeyValueObservation?
+    /// The access token the current streamed item sends, and the item whose failure is being checked against it.
+    private var mediaToken: String?
+    private var recoveringMedia: AVPlayerItem?
+    /// Where the reload after a renewal starts: the failure's position, or a position requested while it waited.
+    private var recoveryTarget: Double?
     private var controlStatus: NSKeyValueObservation?
     private var syncTask: Task<Void, Never>?
     private var lastTick = Date()
@@ -296,6 +301,7 @@ import UIKit
 
     func toggle() { if wantsPlayback { pause() } else { resume() } }
     func resume() {
+        guard !needsSignIn else { return }
         playbackIntent = UUID()
         let pausedDuration = pausedAt.map { Date().timeIntervalSince($0) } ?? 0
         let rewind: Double = !rewindAfterPause || pausedDuration < 10 ? 0 : pausedDuration < 60 ? 3 : pausedDuration < 300 ? 10 : pausedDuration < 1800 ? 20 : 30
@@ -350,8 +356,15 @@ import UIKit
     func seek(to time: Double, autoplay: Bool) async throws {
         guard !closing, let session, session.position(at: time) != nil else { return }
         playbackIntent = UUID()
-        wantsPlayback = autoplay
-        pendingSeek = SeekRequest(time: min(max(time.isFinite ? time : 0, 0), session.duration), generation: generation)
+        wantsPlayback = autoplay && !needsSignIn
+        let target = min(max(time.isFinite ? time : 0, 0), session.duration)
+        // The failed item cannot seek, so the latest request waits for the reload that follows its renewal.
+        if let recoveringMedia, player.currentItem === recoveringMedia {
+            recoveryTarget = target
+            currentTime = target
+            return
+        }
+        pendingSeek = SeekRequest(time: target, generation: generation)
         if let seekLoop { return try await seekLoop.value }
         tick(player.currentTime())
         let loop = Task { @MainActor in
@@ -372,7 +385,7 @@ import UIKit
                 let finished = await player.seek(to: CMTime(seconds: position.localTime, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
                 guard !closing, request.generation == generation else { throw CancellationError() }
                 if pendingSeek != nil { continue }
-                guard finished else { throw PlaybackFailure.seekFailed }
+                guard finished else { throw recoveringMedia == nil ? PlaybackFailure.seekFailed : CancellationError() }
                 if let listeningID { try listening.record(id: listeningID, position: request.time, listened: 0) }
                 currentTime = request.time
                 if let end = sleepChapterEnd, currentTime >= end { endSleepTimer() }
@@ -401,14 +414,16 @@ import UIKit
         let requestNetworkEpoch = networkEpoch
         #endif
         let asset: AVURLAsset
+        var token: String?
         if let offlineFiles {
             guard offlineFiles.indices.contains(index), offlineFiles[index].isFileURL else { throw APIError.noAudio }
             asset = AVURLAsset(url: offlineFiles[index])
         } else {
-            let token = try await api.validToken()
+            let bearer = try await api.validToken()
+            token = bearer
             guard requestGeneration == generation, self.session?.id == session.id else { throw CancellationError() }
             let url = try api.mediaURL(session.audioTracks[index].contentUrl)
-            var options: [String: Any] = ["AVURLAssetHTTPHeaderFieldsKey": ["Authorization": "Bearer \(token)"]]
+            var options: [String: Any] = ["AVURLAssetHTTPHeaderFieldsKey": ["Authorization": "Bearer \(bearer)"]]
             #if os(iOS)
             if streamCellularConsent == nil {
                 let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.streamingKey)
@@ -426,6 +441,7 @@ import UIKit
         #endif
         let item = AVPlayerItem(asset: asset)
         trackIndex = index
+        mediaToken = token
         itemStatus = nil
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         if let failureObserver { NotificationCenter.default.removeObserver(failureObserver) }
@@ -437,20 +453,49 @@ import UIKit
         }
         failureObserver = NotificationCenter.default.addObserver(forName: .AVPlayerItemFailedToPlayToEndTime, object: item, queue: .main) { [weak self] _ in
             Task { @MainActor in
-                guard self?.player.currentItem === item else { return }
-                self?.playbackFailed()
+                self?.mediaFailed(item)
             }
         }
         itemStatus = item.observe(\.status, options: [.new]) { [weak self] item, _ in
             if item.status == .failed {
-                Task { @MainActor in
-                    guard self?.player.currentItem === item else { return }
-                    self?.playbackFailed()
-                }
+                Task { @MainActor in self?.mediaFailed(item) }
             }
         }
         player.replaceCurrentItem(with: item)
         installSleepBoundary()
+    }
+
+    /// The asset sends the token it was created with, so a server that stopped accepting that token fails the
+    /// stream. An authenticated request then renews the token, as for any other request, and the item is
+    /// reloaded once at the same position, or at a later requested one; a revoked login reaches `failed` as
+    /// `signInRequired` instead.
+    private func mediaFailed(_ item: AVPlayerItem) {
+        guard player.currentItem === item, recoveringMedia !== item else { return }
+        guard offlineFiles == nil, let token = mediaToken, let session else { return playbackFailed() }
+        recoveringMedia = item
+        recoveryTarget = currentTime
+        let requestGeneration = generation
+        player.pause()
+        playing = false
+        // A seek waiting on the failed item never finishes; cancelled, it ends quietly and the reload below follows.
+        item.cancelPendingSeeks()
+        Task { @MainActor in
+            defer { if recoveringMedia === item { recoveringMedia = nil; recoveryTarget = nil } }
+            @MainActor func current() -> Bool { requestGeneration == generation && self.session?.id == session.id && player.currentItem === item }
+            do {
+                _ = try await api.me()
+                guard current(), let position = recoveryTarget else { return }
+                recoveringMedia = nil
+                recoveryTarget = nil
+                guard api.credentials?.accessToken != token else { return playbackFailed() }
+                player.replaceCurrentItem(with: nil)
+                try await seek(to: position, autoplay: wantsPlayback)
+            } catch is CancellationError {
+            } catch {
+                guard current() else { return }
+                if error as? APIError == .signInRequired { failed(error) } else { playbackFailed() }
+            }
+        }
     }
 
     private func playbackFailed() {
@@ -478,7 +523,8 @@ import UIKit
         let now = Date()
         let elapsed = now.timeIntervalSince(lastTick)
         lastTick = now
-        guard let session, !seeking, !closing, player.currentItem != nil else { return }
+        // A failed item's time is not the position while its renewal decides where the reload starts.
+        guard let session, !seeking, !closing, player.currentItem != nil, recoveringMedia == nil else { return }
         let time = player.currentTime()
         if time.seconds.isFinite {
             let position = min(session.duration, session.audioTracks[trackIndex].startOffset + max(time.seconds, 0))
@@ -579,7 +625,8 @@ import UIKit
             try await listening.flush()
             guard try await api.currentAccount() == account else { throw CancellationError() }
             try beforePublication()
-            try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction)
+            try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction,
+                                      issuing: listening.publications.issuing(account: account, itemID: itemID, episodeID: nil))
         }
         readingPublication = publication
         defer { readingPublication = nil }
@@ -593,7 +640,11 @@ import UIKit
 
     private func failed(_ failure: Error, prefix: String = "", origin: FailureOrigin = .playback) {
         if failure is CancellationError { return }
-        if failure as? APIError == .signInRequired { needsSignIn = true }
+        if failure as? APIError == .signInRequired {
+            needsSignIn = true
+            // Audio, downloaded or streamed, stops with the login and waits for signing in again.
+            if wantsPlayback || playing { pause() }
+        }
         error = prefix + failure.localizedDescription
         failureOrigin = origin
     }
@@ -611,7 +662,8 @@ import UIKit
         try await prepareProgressEdit(itemID: itemID, episodeID: episodeID)
         try Task.checkCancellation()
         guard try await api.currentAccount() == owner else { throw CancellationError() }
-        try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished)
+        try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished,
+                                  issuing: listening.publications.issuing(account: owner, itemID: itemID, episodeID: episodeID))
         let user = try await api.me()
         guard try await api.currentAccount() == owner else { throw CancellationError() }
         try listening.rememberRemoteProgress(user, account: owner)
@@ -640,15 +692,27 @@ import UIKit
                 // A reset left unfinished is finished, not confirmed again.
                 intent = pending
             } else {
+                // A write the server may still apply would recreate the row after the delete, and
+                // holds back every other write for the media, so only a restart lets this go on.
+                @MainActor func unresolved() -> Bool { listening.publications.unresolved(account: account, itemID: itemID, episodeID: episodeID) }
+                guard !unresolved() else { throw UnresolvedProgressWrites() }
                 // A 2.30 local session sync recreates deleted progress, so unsent listening is
                 // published before the delete; if it cannot be, nothing is deleted.
-                try await listening.flush()
-                try await owned()
-                try await prepare()
-                try await owned()
+                do {
+                    try await listening.flush()
+                    try await owned()
+                    try await prepare()
+                    try await owned()
+                } catch where !(error is CancellationError) {
+                    // Publishing may have left a write unanswered, or been held back by one.
+                    if unresolved() { throw UnresolvedProgressWrites() }
+                    throw error
+                }
+                guard !unresolved() else { throw UnresolvedProgressWrites() }
                 guard try !listening.hasLocalListening(account: account, itemID: itemID, episodeID: episodeID, newerThan: nil) else { throw ProgressResetFailure.busy }
                 let rowID = try await api.progressRowID(itemID: itemID, episodeID: episodeID, authorization: authorization)
                 try await owned()
+                guard !unresolved() else { throw UnresolvedProgressWrites() }
                 let confirmed = ProgressResetIntent(account: account, itemID: itemID, episodeID: episodeID, rowID: rowID, requestedAt: Date().timeIntervalSince1970 * 1_000)
                 try listening.beginReset(confirmed)
                 intent = confirmed
@@ -676,6 +740,21 @@ import UIKit
     func progressResetPending(account: AccountIdentity, itemID: String, episodeID: String?) -> Bool {
         guard let resets = try? listening.pendingResets() else { return true }
         return resets.contains { $0.covers(account: account, itemID: itemID, episodeID: episodeID) }
+    }
+
+    /// The progress writes this app sends; see `PublicationLedger`.
+    var publications: PublicationLedger { listening.publications }
+
+    /// Records that the owner is asked to restart the account's server now; see
+    /// `PublicationLedger.requestRestart`.
+    func requestServerRestart(account: AccountIdentity) throws {
+        try listening.publications.requestRestart(server: account.server)
+    }
+
+    /// Records the owner's confirmation that the account's server restarted after the last
+    /// `requestServerRestart`, which resolves the writes unresolved at that request.
+    func confirmServerRestarted(account: AccountIdentity) throws {
+        try listening.publications.confirmRestart(server: account.server)
     }
 
     /// Finishes the signed-in account's resets that a failure or relaunch left unfinished.
@@ -707,6 +786,15 @@ import UIKit
             try listening.finishReset(intent)
         } catch is CancellationError { throw CancellationError() }
         catch { throw ProgressResetFailure.unfinished(error) }
+    }
+
+    /// Thrown by `resetProgress` while the server may still apply an earlier write for the media.
+    /// Nothing was changed. Server 2.30 cannot confirm when such a write has finished; restarting
+    /// it ends the write, and `requestServerRestart` and `confirmServerRestarted` record that.
+    struct UnresolvedProgressWrites: LocalizedError {
+        var errorDescription: String? {
+            "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Ask for a restart here, restart the Audiobookshelf server, confirm it, then discard again."
+        }
     }
 
     private enum ProgressResetFailure: LocalizedError {

@@ -1,0 +1,30 @@
+diff --git a/apple/Playback/ApplePlayback.swift b/apple/Playback/ApplePlayback.swift
+index c279972c..b6b6d291 100644
+--- a/apple/Playback/ApplePlayback.swift
++++ b/apple/Playback/ApplePlayback.swift
+@@ -301,7 +301,6 @@ import UIKit
+ 
+     func toggle() { if wantsPlayback { pause() } else { resume() } }
+     func resume() {
+-        guard !needsSignIn else { return }
+         playbackIntent = UUID()
+         let pausedDuration = pausedAt.map { Date().timeIntervalSince($0) } ?? 0
+         let rewind: Double = !rewindAfterPause || pausedDuration < 10 ? 0 : pausedDuration < 60 ? 3 : pausedDuration < 300 ? 10 : pausedDuration < 1800 ? 20 : 30
+@@ -356,7 +355,7 @@ import UIKit
+     func seek(to time: Double, autoplay: Bool) async throws {
+         guard !closing, let session, session.position(at: time) != nil else { return }
+         playbackIntent = UUID()
+-        wantsPlayback = autoplay && !needsSignIn
++        wantsPlayback = autoplay
+         let target = min(max(time.isFinite ? time : 0, 0), session.duration)
+         // The failed item cannot seek, so the latest request waits for the reload that follows its renewal.
+         if let recoveringMedia, player.currentItem === recoveringMedia {
+@@ -641,8 +640,6 @@ import UIKit
+         if failure is CancellationError { return }
+         if failure as? APIError == .signInRequired {
+             needsSignIn = true
+-            // Audio, downloaded or streamed, stops with the login and waits for signing in again.
+-            if wantsPlayback || playing { pause() }
+         }
+         error = prefix + failure.localizedDescription
+         failureOrigin = origin

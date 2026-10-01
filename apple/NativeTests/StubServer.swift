@@ -22,6 +22,9 @@ final class StubServer {
         case lost
         /// The loading system failed the request with this error.
         case failure(Error)
+        /// The client gave up waiting (URLSession's request timeout) while the server may still
+        /// be handling the request.
+        case timedOut
     }
 
     private let lock = NSLock()
@@ -86,6 +89,8 @@ final class StubProtocol: URLProtocol {
             client?.urlProtocol(self, didFailWithError: URLError(.networkConnectionLost))
         case .failure(let error):
             client?.urlProtocol(self, didFailWithError: error)
+        case .timedOut:
+            client?.urlProtocol(self, didFailWithError: URLError(.timedOut))
         case .status(let code):
             respond(code, Data())
         case .json(let code, let value):

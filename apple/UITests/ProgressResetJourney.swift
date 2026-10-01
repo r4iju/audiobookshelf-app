@@ -95,7 +95,7 @@ import XCTest
         try await ResetFixture.configure(fail: nil)
         connectSelectAndRestore(serverURL: Self.fixture, verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap(); app.buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
+        app.buttons["account"].tap(); accountMenu(app).buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
         XCTAssertTrue(app.buttons["book-podcast"].waitForExistence(timeout: 10))
         app.buttons["book-podcast"].tap()
         let evening = app.buttons["episode-episode"]

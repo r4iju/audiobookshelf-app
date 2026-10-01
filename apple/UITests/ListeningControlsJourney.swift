@@ -24,11 +24,11 @@ import XCTest
 
     func testResumeRewindsAfterAPauseAndCanBeDisabledPersistently() async throws {
         let app = try await openPlayer()
-        let before = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        let before = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         try await Task.sleep(nanoseconds: 11_000_000_000)
         app.buttons["resume-playback"].tap()
         app.buttons["pause-playback"].tap()
-        let rewound = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        let rewound = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         XCTAssertLessThan(rewound, before)
         app.buttons["Playback settings"].tap()
         let rewind = app.switches["Rewind after a pause"]
@@ -110,14 +110,15 @@ import XCTest
         chapters.tap()
         app.buttons["chapter-1"].tap()
         XCTAssertTrue(app.staticTexts["File 2 of 2"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["playback-elapsed"].label, "8 sec")
+        XCTAssertEqual(bookElapsed(app).label, "8 sec")
         XCTAssertEqual(app.staticTexts["chapter-elapsed"].label, "0 sec of 12 sec")
         app.buttons["Playback speed"].tap()
         app.buttons["speed-2"].tap()
         app.buttons["resume-playback"].tap()
         try await Task.sleep(nanoseconds: 2_000_000_000)
         app.buttons["pause-playback"].tap()
-        let seconds = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        playerSettings(app, [("scale-elapsed-setting", false)])
+        let seconds = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         XCTAssertGreaterThanOrEqual(seconds, 12)
         app.terminate()
         app.launchArguments = []
@@ -140,10 +141,10 @@ import XCTest
         app.navigationBars["Settings"].buttons["Done"].tap()
         let forward = app.buttons["Forward 5 seconds"]
         XCTAssertTrue(forward.waitForExistence(timeout: 5))
-        let before = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        let before = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         forward.tap()
         XCTAssertTrue(app.staticTexts["File 2 of 2"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["playback-elapsed"].label, "\(before + 5) sec")
+        XCTAssertEqual(bookElapsed(app).label, "\(before + 5) sec")
         app.terminate()
         app.launchArguments = []
         app.launch()

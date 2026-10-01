@@ -10,6 +10,11 @@ These come from the 2.30 source; nothing was invented.
 - `DELETE /api/me/progress/:id` takes that row ID, removes it (`removeById`), answers 200 even for an unknown ID and emits `user_updated`.
 - `POST /api/session/local-all` (`syncLocalSession`) updates progress unless the row's `updatedAt` is later than the session's, and creates a row when none exists. Listening that is still unsent at the delete will therefore bring the deleted progress back.
 - The row holds the ebook location too, so a book reset also clears where reading resumes.
+- There is no request barrier, idempotency key or restart marker. A handler keeps running after its client gave up: a `local-all` (`syncLocalSession`), a progress PATCH (`MeController.createUpdateMediaProgress`) or a session `/sync` that reaches its progress lookup after the delete creates a new row (`User.createUpdateMediaProgressFromPayload`). A replay of the same payload being accepted, a fresh `GET`, or time passing proves nothing about the original handler. Only an answer to that exact request does. `/status`, `/ping` and `/healthcheck` carry no start time.
+- A late `local-all` handler also undoes what was sent after it:
+  - It replaces a stored session's `currentTime`, `timeListening` and `updatedAt` unconditionally (`syncLocalSession`), so a later cumulative revision of the same session loses listening.
+  - Its progress check reads `req.user`'s progress as loaded at request start (`getUserByIdOrOldId` with `mediaProgress`, unless the LRU `userCache` hands out a shared instance). `applyProgressUpdate` then sets the row with no time comparison, so it can rewind a newer position.
+  - A progress PATCH likewise sets whatever it carries.
 
 ## Operation
 
@@ -20,7 +25,13 @@ These come from the 2.30 source; nothing was invented.
 1. Refuses while another reset, a preparation, closing or seeking is in progress.
 2. Checks the account and `authorizationRevision` before and after every await, so an A to B to A sign-in change cancels it.
 3. Stops the media if it is open, and waits for any reading publication.
-4. Flushes the listening journal and runs `prepare`. If listening for this media is still unacknowledged, nothing has changed and the call throws.
+4. Throws `ApplePlayback.UnresolvedProgressWrites` with nothing changed while a progress write for the media may still be applied by the server (see "Writes the server may still apply"). It checks this:
+   - before publishing anything, because such a write holds back every other write for the media;
+   - when the flush or `prepare` fails;
+   - after both;
+   - again right before the intent is saved.
+
+   Otherwise it flushes the listening journal and runs `prepare`. If listening for this media is still unacknowledged, nothing has changed and the call throws.
 5. Looks up the row and saves a `ProgressResetIntent`, with the account, media, row ID and confirmation time, to `NativeListening/progress-resets.json`. If this write fails, nothing has changed and the call throws.
 6. Finishes the intent:
    1. deletes the row;
@@ -52,6 +63,36 @@ Files changed outside `ApplePlayback.swift`:
 - `AdoptionSync.swift` and `NativeMigrationAdoption.swift`: prepare, retire and the send gate.
 - `AdoptionHarness.swift`: a per-test intent file.
 
+## Writes the server may still apply
+
+`PublicationLedger` (`apple/Playback/PublicationLedger.swift`, `NativeListening/publications.json`) is the one record for every progress write this app sends: listening `local-all`, primary reading PATCH, mark finished, and carried-over `local-all`, `/sync` and PATCH. Supplementary documents publish nothing and are not involved.
+
+- **Before transmission:** each transmission (account, media, method, path and exact body, no headers or token) is saved as its own write, including a resend after a 401. `APIClient` calls an `issuing` hook right before it hands each transmission to `URLSession`, and reports that transmission's outcome to what the hook returned. Adoption saves each one in its own `send`. If it cannot be saved, nothing is sent.
+- **Send gate:** while a write for the account's media is unresolved, `issue` lets through only a write that repeats it exactly: same method, path and JSON body. Whichever handler runs last then leaves the same. Anything else throws `PublicationLedger.Failure.waiting` before sending and stays on this device:
+  - a later cumulative revision of the session;
+  - new listening;
+  - a different page;
+  - mark finished;
+  - carried-over sessions and positions for the media.
+
+  The listening flush skips a waiting session and goes on with other titles. Adoption keeps waiting sessions and positions pending, never `unconfirmed`. The journal acknowledges only the revision sent, so newly earned listening stays as one cumulative session and is sent once.
+- **Resolved** only when the request itself was answered by the server, or certainly never left the device (no connection, host not found, TLS refused, no sign-in, cancelled before sending). A 408, 502, 503 or 504 is a gateway answering and counts as unknown, like a timeout, lost connection or cancellation in flight.
+- **Never resolved** by a replay being accepted, a later `GET`, a heartbeat or elapsed time. Each replay is its own write. The listening journal acknowledges only the revision a request carried, and reading clears its pending page only when the revision sent is still current, so a replay never acknowledges a newer payload.
+- **Reset gate:** after the flush and `prepare`, `resetProgress` throws `UnresolvedProgressWrites` while any unresolved write covers the account's media. Nothing is deleted, the intent is not saved, and local positions and history stay. Other titles are unaffected.
+- **Relaunch:** writes are on disk; one saved but never answered (the app stopped mid-request) stays unresolved.
+- **Unreadable record:** the file is renamed to `publications-unreadable-<ms>.json`, kept for recovery, and a new record marks every earlier write to every server unknown. Every write waits and all resets refuse until a restart is confirmed. If it cannot even be read from disk or replaced, nothing is sent and every reset refuses.
+- **Resolution:** server 2.30 offers no way to learn that a held handler finished. A server restart ends them all, so recovery has two steps:
+  1. `ApplePlayback.requestServerRestart(account:)` records the server's unresolved write IDs before the owner is told to restart.
+  2. `confirmServerRestarted(account:)` then resolves only those IDs, and the unreadable-record marker set before the request. It throws when no restart was requested.
+
+  A write issued after the request may have reached the restarted server and stays unresolved. The moment of confirmation is never taken as the restart time.
+
+  `BookDetails` offers two ways in, and both request the restart before showing "Restart the server now", then confirm with "Server restarted":
+  - the reset refusal's "Try again";
+  - a notice on any title with an unresolved write, with "Restart the server". After confirming, it sends what waited. A gateway that queues a request across the restart and forwards it afterwards would defeat this, which common proxies do not do for POST or PATCH by default.
+
+Carried-over adoption follows the same rule. Its replay paths (the downloaded-session `local-all` resend, the closed-row resend of the issued total) record each attempt. `prepareProgressReset` still skips sessions marked `unconfirmed`, because they are never sent again; whether a write of theirs may still be running is the ledger's question, so the reset still refuses while one is.
+
 ## Root handoff
 
 `APPLE-PROGRESS-RESET-UI.patch` (next to this file) is the root-owned UI. It needs this branch's core change. It applies cleanly to 6ac3f2ee, and with `git apply -3` to the current `origin/fork/native-tv` and to `fork/apple-final-integration` at 713c93f8. On the integration branch, leave out the generated string tables and `COVERAGE.md` (`--exclude='apple/Localization/COVERAGE.md' --exclude='apple/Localization/Sources/*'`), then run `python3 apple/Localization/generate.py`. The patch:
@@ -69,13 +110,75 @@ Root also owns realtime: the server's `user_updated` after the delete reaches ot
 - A pending intent waits for its account. Signed in as someone else, it stays on disk and holds back only that account's media.
 - An unreadable intent file counts as pending for every media: playback refuses, and reading and carried-over positions wait, rather than risking a recreated row.
 - Pages read after the confirmation while the reset is pending are kept and published once it finishes. No test distinguishes this rule; see the mutation results.
+- A write can stay unresolved for good until the owner confirms a server restart. Until then, all later progress for that media (listening, pages, finished, carried-over) waits on this device. A single timeout therefore holds a title's progress back until a restart, which is the cost of not inventing a server guarantee. Exact replays still go out.
+- tvOS has no restart action. A TV title with an unresolved write keeps its later progress on the device indefinitely, and the existing progress recovery does not explain why. Root owns any TV UI for this.
+- Requests sent by builds before the ledger left no record, so they cannot hold back a reset.
+- tvOS keeps the same rule with the ledger in Application Support, next to the intents, which the system may purge. TV has no reset, so the ledger only gates resets on the device that sent the writes, and a ledger write that fails stops TV listening from being sent until it succeeds, shown through the existing progress recovery.
 - Simulator and fixture evidence only. No live server, physical device or cross-device acceptance is claimed, and the reset was never run against the owner's server.
 
 ## Verification
 
 `apple/NativeTests/ProgressResetTests.swift` drives the production player, journal, reading store and adoption against the in-process stub. The stub models 2.30 rows, lookup, delete, `local-all`, and a PATCH that recreates a deleted row with a new ID. A relaunch is `AdoptionHarness.openStores()`, which builds new stores from disk. No port is bound.
 
-### Correction for the failure-order review (this commit)
+### Correction for the cumulative-history and restart-cutoff reviews
+
+- **Stub additions:**
+  - session rows that `local-all` replaces by ID, recording any lowered total;
+  - a progress step run against the row as loaded at request start;
+  - holds filtered by item;
+  - `restart()`, which ends held handlers unapplied.
+
+  Tests drive the production `ListeningSync` directly, and `ApplePlayback.listening` is internal for this.
+- **RED** (`bccdcbeb`, with an unrecorded `requestServerRestart` seam; `/tmp/pubsafe-red2-committed.log`): 20 tests, 9 failures, all in the three new tests:
+  - `testASyncThatGotNoAnswerCannotReplaceLaterListeningOfItsSession`: the held first sync replaced the session's accepted 90 s with 30 s.
+  - `testCarriedOverListeningThatGotNoAnswerCannotRewindLaterListening`: the held carried-over send rewound a later position from 12 s to 150 s.
+  - `testARestartConfirmationDoesNotSettleWritesSentAfterTheRestart`: a retry issued after the restart but before the confirmation was resolved by it, and recreated the row after the reset.
+- **Fix** `5179aeec`: the send gate, per-transmission outcomes, and two-phase restart. `testAReopenedPositionSurvivesAFailedUpdateAndALostResponseButNotNewerListening` now expects the position after a lost un-finish PATCH to wait until a confirmed restart, instead of following the possibly running PATCH.
+- **`b1ad57ab`:**
+  - the waiting notice;
+  - `ListeningSync.publicationsFile` removed by `--reset-preview-account` (debug simulator only);
+  - tests that fail against the mutants that stop the flush at a waiting title, or send through an unreadable record.
+- **RED** `97574ac2` (`/tmp/pubsafe-red3-committed.log`): with later listening held back, or carried-over listening gated, the reset threw a generic busy or "still waiting" error that `BookDetails` offers no restart for.
+- **Fix** `11ba8750`: the reset ordering in step 4.
+- **`439c94e6`:**
+  - a test where the reset's own sync gets no answer, which fails against rethrowing the timeout;
+  - the teardown sends held-back listening, because `ListeningSync.file` is shared by all tests and runs. An aborted mutant run had left a session that failed later tests.
+- **GREEN:** `NativeTests` 75/75 (`/tmp/pubsafe-full5.log`).
+- **Mutations that failed a test** (the reset class, 20 to 25 tests):
+  - no send gate;
+  - no exact repeat allowed;
+  - confirmation resolving every write;
+  - any outcome resolving;
+  - transport errors reported as answers;
+  - no restart mark;
+  - sends through an unreadable record;
+  - a flush stopping at a waiting title;
+  - no intent-time recheck;
+  - no conversion of a failed publish.
+- **Survivors:**
+  - The first and post-publish reset checks each cover for the other.
+  - Adoption treating a waiting `/sync` as sent (`notSent`) has no test.
+  - A behavioral RED for 401 resends is not possible against 2.30: auth middleware answers a 401 before any handler runs, so the first transmission is always settled. Each transmission now has its own record.
+- **Builds:**
+  - the app;
+  - TV;
+  - `tvos/Core` 63/63;
+  - the iOS 14 typecheck;
+  - `generate.py --check`.
+
+### Correction for the publication-ordering review
+
+- **Stub:** a held write is answered with a client timeout (`URLError.timedOut`) while its handler keeps running on its own thread, waiting before its progress lookup until the test releases it. It then applies as 2.30 does: it updates the row, or creates one under a new ID. No 25-second wait. The handler is never killed early.
+- **RED** (`971ccaa9`, run against `a1c92b03`'s sources plus a no-op `confirmServerRestarted` so the tests compile): 17 tests, 9 failures, all in the three new tests; the 14 existing ones passed (`/tmp/pubsafe-red-committed.log`):
+  - `testListeningWhoseFirstSyncGotNoAnswerKeepsTheResetRefusedAfterItsReplayIsAccepted`: the reset ran after the replay was accepted, and the released first `local-all` recreated the row under a new ID. After a relaunch, the reset ran again; with the record unreadable, it ran again.
+  - `testAPrimaryPDFPageWhosePublicationGotNoAnswerKeepsTheResetRefusedAfterItsReplayIsAccepted`: the reset ran, and the released first PATCH recreated the row at page 7.
+  - `testCarriedOverListeningWhoseFirstSendGotNoAnswerKeepsTheResetRefusedAfterItsReplayIsAccepted`: the reset ran after the carried-over replay was accepted, and the released first send recreated the row at 400 s.
+- **GREEN:** the 17 reset tests pass, and the full `NativeTests` passes 67/67 (`/tmp/pubsafe-full-final.log`).
+- **Mutations** that each failed a test: no reset gate; a timeout counted as answered; an accepted replay resolving the media's earlier writes; no marker for an unreadable record; a restart confirmation that resolves nothing; adoption writes not recorded; reading published outside the ledger; a ledger kept only in memory.
+- **Survivors:** a gateway status counted as answered, and `URLError.cancelled` counted as never sent. No test drives either. Mark finished goes through the ledger, and the "Has the server restarted?" alert in `BookDetails` was added; neither has a test.
+- **Builds:** the `AudiobookshelfNative` app builds; the TV app builds for the tvOS simulator; `tvos/Core` passes 63/63; and every app-target source typechecks for `arm64-apple-ios14.0-simulator`. `generate.py --check` passes after the new strings. No server, device or owner data was used.
+
+### Correction for the failure-order review
 
 - **RED:** three regressions were written first and run against e3536adf's sources. The only change was an unused `progressResets:` init parameter so the harness compiles. 13 tests ran with 14 failures, all in the three new tests (`/tmp/playerfollow/durable-red-final.log`):
   - `testARefusedLocalCleanupKeepsTheResetPendingUntilItFinishes`: the reading document cannot be written after the delete. The stale download opened, and after writes were allowed the old page survived.
