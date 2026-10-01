@@ -14,7 +14,6 @@
 "Automatic" = "تلقائي";
 "Automatically download new episodes" = "تنزيل الحلقات تلقائيًا";
 "Backward interval" = "وقت القفز للخلف";
-"Black" = "أسود";
 "Bookmarks" = "علاماتك المرجعية";
 "Cancel" = "إلغاء";
 "Cancel timer" = "إلغاء المؤقت";
@@ -27,13 +26,14 @@
 "Complete" = "مكتمل";
 "Confirm" = "تأكيد";
 "Connect" = "اتصل";
+"Connecting" = "جاري محاولة الاتصال بالخادم...";
+"Connecting…" = "جاري محاولة الاتصال بالخادم...";
 "Contents" = "جدول المحتويات";
 "Continue Listening" = "استمرار الاستماع";
 "Continue Series" = "استمرار المسلسلات";
 "Continue listening" = "استمرار الاستماع";
 "Custom owner email" = "البريد الالكتروني المخصص للمالك";
 "Custom owner name" = "الاسم المخصص للمالك";
-"Dark" = "غامق";
 "Date added" = "أضيفت على";
 "Date finished" = "المرحلة: تم الانتهاء";
 "Date started" = "المرحلة: تم البدء";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "ردود الفعل اللمسية";
 "Has ebook" = "يحتوي كتاب إلكتروني";
 "Has supplementary ebook" = "يحتوي كتاب إلكتروني تكميلي";
-"Heavy" = "ثقيل";
 "Home" = "الرئيسية";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "تحذير: تتطلب معظم تطبيقات البث الصوتي أن يكون عنوان URL الخاص بتغذية RSS يستخدم HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "تحذير: حلقة واحدة أو أكثر من حلقاتك ليس لها تاريخ نشر. بعض تطبيقات البودكاست تتطلب هذا.";
@@ -78,8 +77,8 @@
 "Loading" = "جاري التحميل...";
 "Lock player" = "قفل المشغل";
 "Mark as finished" = "وضع علامة \"تم الإنتهاء\"";
+"Mark book finished?" = "هل أنت متأكد أنك تريد وضع علامة \"مكتمل\" على هذا العنصر؟";
 "Mark finished" = "وضع علامة \"تم الإنتهاء\"";
-"Medium" = "متوسط";
 "Minutes listened in the last 7 days" = "الدقائق المسموعة (آخر 7 أيام)";
 "Mirrored" = "معكوس";
 "Name" = "الاسم";
@@ -96,6 +95,7 @@
 "No playlists yet." = "ليس لديك أي قوائم تشغيل";
 "No podcasts found" = "لم يتم العثور على أي بودكاست";
 "No series" = "لا توجد سلاسل";
+"Not connected" = "خادم Audiobookshelf غير متصل";
 "Not finished" = "لم يتم الانتهاء";
 "Not started" = "لم يتم البدء";
 "Number of episodes" = "# من الحلقات";
@@ -133,6 +133,7 @@
 "Server folder" = "المجلد";
 "Settings" = "إعدادات";
 "Show server address" = "إظهار عنوان الخادم";
+"Sign out" = "فصل";
 "Single page" = "صفحة واحدة";
 "Sleep" = "مؤقت النوم";
 "Sleep timer" = "مؤقت النوم";
@@ -154,7 +155,14 @@
 "Yes" = "نعم";
 "Your libraries" = "المكتبات";
 "Your listening" = "إحصائياتك";
+"hapticStrength::Heavy" = "ثقيل";
+"hapticStrength::Light" = "فاتح";
+"hapticStrength::Medium" = "متوسط";
+"hapticStrength::Off" = "ايقاف";
 "minutes" = "دقائق";
 "minutes listening" = "دقائق الاستماع";
+"theme::Black" = "أسود";
+"theme::Dark" = "غامق";
+"theme::Light" = "فاتح";
 "{0} episodes" = "{0} حلقات";
 "{0} remaining" = "{0} متبقية";

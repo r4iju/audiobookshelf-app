@@ -14,7 +14,6 @@
 "Automatic" = "Automatisch";
 "Automatically download new episodes" = "Afleveringen automatisch downloaden";
 "Backward interval" = "Terug in tijd springen";
-"Black" = "Zwart";
 "Bookmarks" = "Je boekwijzers";
 "Cancel" = "Annuleren";
 "Cancel timer" = "Timer annuleren";
@@ -27,13 +26,14 @@
 "Complete" = "Compleet";
 "Confirm" = "Bevestigen";
 "Connect" = "Verbinden";
+"Connecting" = "Serverconnectie proberen...";
+"Connecting…" = "Serverconnectie proberen...";
 "Contents" = "Inhoudsopgave";
 "Continue Listening" = "Verder Luisteren";
 "Continue Series" = "Doorgaan met Serie";
 "Continue listening" = "Verder Luisteren";
 "Custom owner email" = "Aangepast e-mailadres eigenaar";
 "Custom owner name" = "Aangepaste naam eigenaar";
-"Dark" = "Donker";
 "Date added" = "Toegevoegd op";
 "Date finished" = "Voortgang: Voltooid";
 "Date started" = "Voortgang: Gestart";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Haptische feedback";
 "Has ebook" = "Heeft Ebook";
 "Has supplementary ebook" = "Heeft aanvullend Ebook";
-"Heavy" = "Zwaar";
 "Home" = "Thuis";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Waarschuwing: De meeste podcast-apps zullen eisen dat de RSS-feed URL HTTPS gebruikt";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Waarschuwing: 1 of meer van je afleveringen hebben geen Pub Datum. Sommige podcast-apps vereisen dit.";
@@ -78,8 +77,8 @@
 "Loading" = "Aan het laden...";
 "Lock player" = "Speler vergrendelen";
 "Mark as finished" = "Markeer als Voltooid";
+"Mark book finished?" = "Weet u zeker dat u dit item als voltooid wilt markeren?";
 "Mark finished" = "Markeer als Voltooid";
-"Medium" = "Medium";
 "Minutes listened in the last 7 days" = "Minuten geluisterd (laatste 7 dagen)";
 "Mirrored" = "Gespiegeld";
 "Name" = "Naam";
@@ -96,6 +95,7 @@
 "No playlists yet." = "Je hebt geen afspeellijsten";
 "No podcasts found" = "Geen podcasts gevonden";
 "No series" = "Geen series";
+"Not connected" = "Audiobookshelf server niet geconnecteerd";
 "Not finished" = "Niet Voltooid";
 "Not started" = "Niet Gestart";
 "Number of episodes" = "# Afleveringen";
@@ -133,6 +133,7 @@
 "Server folder" = "Map";
 "Settings" = "Instellingen";
 "Show server address" = "Ontmasker server adres";
+"Sign out" = "Verbreek verbinding";
 "Single page" = "Enkele pagina";
 "Sleep" = "Slaaptimer";
 "Sleep timer" = "Slaaptimer";
@@ -154,7 +155,14 @@
 "Yes" = "Ja";
 "Your libraries" = "Bibliotheken";
 "Your listening" = "Je statistieken";
+"hapticStrength::Heavy" = "Zwaar";
+"hapticStrength::Light" = "Licht";
+"hapticStrength::Medium" = "Medium";
+"hapticStrength::Off" = "Uit";
 "minutes" = "minuten";
 "minutes listening" = "Minuten luisterend";
+"theme::Black" = "Zwart";
+"theme::Dark" = "Donker";
+"theme::Light" = "Licht";
 "{0} episodes" = "{0} afleveringen";
 "{0} remaining" = "{0} te gaan";

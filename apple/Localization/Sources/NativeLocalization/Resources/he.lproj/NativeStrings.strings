@@ -14,7 +14,6 @@
 "Automatic" = "אוטומטי";
 "Automatically download new episodes" = "הורד פרקים באופן אוטומטי";
 "Backward interval" = "הרץ לאחור";
-"Black" = "שחור";
 "Bookmarks" = "הסימניות שלך";
 "Cancel" = "ביטול";
 "Cancel timer" = "בטל טיימר";
@@ -26,13 +25,14 @@
 "Collections" = "אוספים";
 "Complete" = "הושלם";
 "Connect" = "התחבר";
+"Connecting" = "מנסה להתחבר לשרת...";
+"Connecting…" = "מנסה להתחבר לשרת...";
 "Contents" = "תוכן עניינים";
 "Continue Listening" = "המשך האזנה";
 "Continue Series" = "המשך סדרה";
 "Continue listening" = "המשך האזנה";
 "Custom owner email" = "אימייל בעלים מותאם אישית";
 "Custom owner name" = "שם בעלים מותאם אישית";
-"Dark" = "כהה";
 "Date added" = "נוסף ב-";
 "Date finished" = "התקדמות: הושלם";
 "Date started" = "התקדמות: הותחל";
@@ -61,7 +61,6 @@
 "Haptic feedback" = "משוב מגע";
 "Has ebook" = "קיים ספר אלקטרוני";
 "Has supplementary ebook" = "קיים ספר אלקטרוני משלים";
-"Heavy" = "כבד";
 "Home" = "בית";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "אזהרה: רוב אפליקציות הפודקאסטים ידרשו שכתובת האתר של ערוץ ה-RSS תשתמש ב-HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "אזהרה: פרק אחד או יותר לא מכילים תאריך פרסום. חלק מיישומי הפודקאסט דורשים זאת.";
@@ -76,8 +75,8 @@
 "Loading" = "טוען...";
 "Lock player" = "נעילת נגן";
 "Mark as finished" = "סמן כהושלם";
+"Mark book finished?" = "אתה בטוח שאתה רוצה לסמן את הפריט הזה כהושלם?";
 "Mark finished" = "סמן כהושלם";
-"Medium" = "בינוני";
 "Minutes listened in the last 7 days" = "דקות האזנה (7 ימים אחרונים)";
 "Mirrored" = "מראה";
 "Name" = "שם";
@@ -94,6 +93,7 @@
 "No playlists yet." = "אין לך רשימות השמעה";
 "No podcasts found" = "לא נמצאו פודקאסטים";
 "No series" = "אין סדרות";
+"Not connected" = "לא מחובר לשרת Audiobookshelf";
 "Not finished" = "לא הושלם";
 "Not started" = "לא התחיל";
 "Number of episodes" = "# פרקים";
@@ -128,6 +128,7 @@
 "Server folder" = "תיקייה";
 "Settings" = "הגדרות";
 "Show server address" = "גלה כתובת שרת";
+"Sign out" = "התנתק";
 "Single page" = "עמוד יחיד";
 "Sleep" = "טיימר שינה";
 "Sleep timer" = "טיימר שינה";
@@ -149,7 +150,14 @@
 "Yes" = "כן";
 "Your libraries" = "ספריות";
 "Your listening" = "הסטטיסטיקות שלך";
+"hapticStrength::Heavy" = "כבד";
+"hapticStrength::Light" = "בהיר";
+"hapticStrength::Medium" = "בינוני";
+"hapticStrength::Off" = "כיבוי";
 "minutes" = "דקות";
 "minutes listening" = "דקות האזנה";
+"theme::Black" = "שחור";
+"theme::Dark" = "כהה";
+"theme::Light" = "בהיר";
 "{0} episodes" = "{0} פרקים";
 "{0} remaining" = "{0} נותרו";

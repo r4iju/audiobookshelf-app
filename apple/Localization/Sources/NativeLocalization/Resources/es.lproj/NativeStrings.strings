@@ -14,7 +14,6 @@
 "Automatic" = "Automático";
 "Automatically download new episodes" = "Auto‐Descargar episodios";
 "Backward interval" = "Volver en el tiempo";
-"Black" = "Negro";
 "Bookmarks" = "Sus marcadores";
 "Cancel" = "Cancelar";
 "Cancel timer" = "Cancelar temporizador";
@@ -27,13 +26,14 @@
 "Complete" = "Completo";
 "Confirm" = "Confirmar";
 "Connect" = "Conectar";
+"Connecting" = "Intentando conectar con el servidor...";
+"Connecting…" = "Intentando conectar con el servidor...";
 "Contents" = "Sumario";
 "Continue Listening" = "Seguir Escuchando";
 "Continue Series" = "Continuar series";
 "Continue listening" = "Seguir Escuchando";
 "Custom owner email" = "Correo-e de propietario personalizado";
 "Custom owner name" = "Nombre de propietario personalizado";
-"Dark" = "Oscuro";
 "Date added" = "Añadido en";
 "Date finished" = "Progreso: Finalizado";
 "Date started" = "Progreso: Iniciado";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Comentario háptico";
 "Has ebook" = "Tiene libro-e";
 "Has supplementary ebook" = "Tiene un libro-e suplementario";
-"Heavy" = "Denso";
 "Home" = "Inicio";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Atención: la mayoría de las aplicaciones de pódcast requieren que el URL del suministro RSS use HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Advertencia: 1 o más de sus episodios no tienen fecha de publicación. Algunas aplicaciones de podcast lo requieren.";
@@ -78,8 +77,8 @@
 "Loading" = "Cargando...";
 "Lock player" = "Bloquear reproductor";
 "Mark as finished" = "Marcar como terminado";
+"Mark book finished?" = "¿Confirma que quiere marcar este elemento como terminado?";
 "Mark finished" = "Marcar como terminado";
-"Medium" = "Medio";
 "Minutes listened in the last 7 days" = "Minutos escuchando (últimos 7 días)";
 "Mirrored" = "Espejado";
 "Name" = "Nombre";
@@ -96,6 +95,7 @@
 "No playlists yet." = "No tiene ninguna lista de reproducción";
 "No podcasts found" = "No se encontró ningún pódcast";
 "No series" = "Ninguna serie";
+"Not connected" = "Servidor de Audiobookshelf no conectado";
 "Not finished" = "No finalizado";
 "Not started" = "Sin iniciar";
 "Number of episodes" = "Nº de episodios";
@@ -133,6 +133,7 @@
 "Server folder" = "Carpeta";
 "Settings" = "Ajustes";
 "Show server address" = "Desenmascarar dirección de servidor";
+"Sign out" = "Desconectar";
 "Single page" = "Página única";
 "Sleep" = "Temporizador de dormida";
 "Sleep timer" = "Temporizador de dormida";
@@ -154,7 +155,14 @@
 "Yes" = "Sí";
 "Your libraries" = "Bibliotecas";
 "Your listening" = "Sus estadísticas";
+"hapticStrength::Heavy" = "Denso";
+"hapticStrength::Light" = "Claro";
+"hapticStrength::Medium" = "Medio";
+"hapticStrength::Off" = "Apagado";
 "minutes" = "minutos";
 "minutes listening" = "Minutos escuchando";
+"theme::Black" = "Negro";
+"theme::Dark" = "Oscuro";
+"theme::Light" = "Claro";
 "{0} episodes" = "{0} episodios";
 "{0} remaining" = "{0} restante";

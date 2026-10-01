@@ -14,7 +14,6 @@
 "Automatic" = "Automatické";
 "Automatically download new episodes" = "Automaticky stahovat epizody";
 "Backward interval" = "Délka skoku zpět v čase";
-"Black" = "Černé";
 "Bookmarks" = "Vaše záložky";
 "Cancel" = "Zrušit";
 "Cancel timer" = "Zrušit časovač";
@@ -27,13 +26,14 @@
 "Complete" = "Dokončeno";
 "Confirm" = "Potvrzení";
 "Connect" = "Připojit";
+"Connecting" = "Pokouším se o připojit k serveru...";
+"Connecting…" = "Pokouším se o připojit k serveru...";
 "Contents" = "Obsah";
 "Continue Listening" = "Pokračovat v poslechu";
 "Continue Series" = "Pokračovat v sériích";
 "Continue listening" = "Pokračovat v poslechu";
 "Custom owner email" = "Vlastní e-mail vlastníka";
 "Custom owner name" = "Vlastní jméno vlastníka";
-"Dark" = "Tmavé";
 "Date added" = "Přidáno v";
 "Date finished" = "Pokrok: dokončeno";
 "Date started" = "Pokrok: začato";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Haptická odezva";
 "Has ebook" = "Má e-knihu";
 "Has supplementary ebook" = "Obsahuje doplňkovou e-knihu";
-"Heavy" = "Silná";
 "Home" = "Domů";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Upozornění: Většina aplikací pro podcasty bude vyžadovat, aby adresa URL kanálu RSS používala protokol HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Upozornění: 1 nebo více epizod nemá datum vydání. Některé podcastové aplikace to vyžadují.";
@@ -78,8 +77,8 @@
 "Loading" = "Načítá se...";
 "Lock player" = "Zamknout přehrávač";
 "Mark as finished" = "Označit jako dokončené";
+"Mark book finished?" = "Opravdu chcete tuto položku označit jako dokončenou?";
 "Mark finished" = "Označit jako dokončené";
-"Medium" = "Střední";
 "Minutes listened in the last 7 days" = "Poslech za posledních 7 dní (min)";
 "Mirrored" = "Zrcadleno";
 "Name" = "Jméno";
@@ -96,6 +95,7 @@
 "No playlists yet." = "Nemáte žádné seznamy skladeb";
 "No podcasts found" = "Nebyly nalezeny žádné podcasty";
 "No series" = "Žádné série";
+"Not connected" = "Server Audiobookshelf není připojen";
 "Not finished" = "Nedokončeno";
 "Not started" = "Nezahájeno";
 "Number of episodes" = "Počet epizod";
@@ -133,6 +133,7 @@
 "Server folder" = "Složka";
 "Settings" = "Nastavení";
 "Show server address" = "Odkrýt adresu serveru";
+"Sign out" = "Odpojit";
 "Single page" = "Jedna stránka";
 "Sleep" = "Spánek po";
 "Sleep timer" = "Spánek po";
@@ -154,7 +155,14 @@
 "Yes" = "Ano";
 "Your libraries" = "Knihovny";
 "Your listening" = "Vaše statistiky";
+"hapticStrength::Heavy" = "Silná";
+"hapticStrength::Light" = "Slabá";
+"hapticStrength::Medium" = "Střední";
+"hapticStrength::Off" = "Vypnutá";
 "minutes" = "minut";
 "minutes listening" = "Minuty poslechu";
+"theme::Black" = "Černé";
+"theme::Dark" = "Tmavé";
+"theme::Light" = "Světlé";
 "{0} episodes" = "{0} epizod";
 "{0} remaining" = "{0} zbývá";

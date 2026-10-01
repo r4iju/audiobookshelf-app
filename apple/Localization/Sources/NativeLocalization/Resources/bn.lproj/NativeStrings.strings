@@ -14,7 +14,6 @@
 "Automatic" = "স্বয়ংক্রিয়";
 "Automatically download new episodes" = "স্বয়ংক্রিয় ডাউনলোড পর্ব";
 "Backward interval" = "পিছনের সময়ে ঝাঁপ";
-"Black" = "কালো";
 "Bookmarks" = "আপনার বুকমার্কস";
 "Cancel" = "বাতিল করুন";
 "Cancel timer" = "টাইমার বাতিল করুন";
@@ -27,13 +26,14 @@
 "Complete" = "সম্পূর্ণ";
 "Confirm" = "নিশ্চিত করুন";
 "Connect" = "সংযোগ করুন";
+"Connecting" = "সার্ভার সংযোগের চেষ্টা করা হচ্ছে..।";
+"Connecting…" = "সার্ভার সংযোগের চেষ্টা করা হচ্ছে..।";
 "Contents" = "বিষয়বস্তুর সারণী";
 "Continue Listening" = "শোনা চালিয়ে যান";
 "Continue Series" = "সিরিজ চালিয়ে যান";
 "Continue listening" = "শোনা চালিয়ে যান";
 "Custom owner email" = "কাস্টম মালিকের ইমেইল";
 "Custom owner name" = "কাস্টম মালিকের নাম";
-"Dark" = "অন্ধকার";
 "Date added" = "এতে যোগ করা হয়েছে";
 "Date finished" = "অগ্রগতি: সম্পন্ন";
 "Date started" = "অগ্রগতি: শুরু হয়েছে";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "হ্যাপটিক প্রতিক্রিয়া";
 "Has ebook" = "ই-বই আছে";
 "Has supplementary ebook" = "পরিপূরক ই-বই আছে";
-"Heavy" = "ভারী";
 "Home" = "নীড়";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "সতর্কতা: বেশিরভাগ পডকাস্ট অ্যাপের জন্য প্রয়োজন হবে RSS ফিড URL যেটি HTTPS ব্যবহার করছে";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "সতর্কতা: আপনার 1 বা তার বেশি পর্বের একটি পাব তারিখ নেই। কিছু পডকাস্ট অ্যাপের এটি প্রয়োজন।";
@@ -78,8 +77,8 @@
 "Loading" = "লোড হচ্ছে.।";
 "Lock player" = "প্লেয়ার লক করুন";
 "Mark as finished" = "সমাপ্ত হিসাবে চিহ্নিত করুন";
+"Mark book finished?" = "আপনি কি এই আইটেমটিকে সমাপ্ত হিসাবে চিহ্নিত করার বিষয়ে নিশ্চিত?";
 "Mark finished" = "সমাপ্ত হিসাবে চিহ্নিত করুন";
-"Medium" = "মাঝারি";
 "Minutes listened in the last 7 days" = "মিনিট শ্রবণ (গত ৭ দিন)";
 "Mirrored" = "মিরর করা হয়েছে";
 "Name" = "নাম";
@@ -96,6 +95,7 @@
 "No playlists yet." = "আপনার কোনো প্লেলিস্ট নেই";
 "No podcasts found" = "কোন পডকাস্ট পাওয়া যায়নি";
 "No series" = "কোনো সিরিজ নেই";
+"Not connected" = "অডিওবুকশেল্ফ সার্ভার সংযুক্ত করা যায়নি";
 "Not finished" = "সমাপ্ত হয়নি";
 "Not started" = "শুরু হয়নি";
 "Number of episodes" = "পর্বের সংখ্যা";
@@ -133,6 +133,7 @@
 "Server folder" = "ফোল্ডার";
 "Settings" = "সেটিংস";
 "Show server address" = "সার্ভারের ঠিকানা প্রকাশ করুন";
+"Sign out" = "সংযোগ বিচ্ছিন্ন করুন";
 "Single page" = "একক পৃষ্ঠা";
 "Sleep" = "স্লিপ টাইমার";
 "Sleep timer" = "স্লিপ টাইমার";
@@ -154,7 +155,14 @@
 "Yes" = "হ্যাঁ";
 "Your libraries" = "লাইব্রেরি";
 "Your listening" = "আপনার পরিসংখ্যান";
+"hapticStrength::Heavy" = "ভারী";
+"hapticStrength::Light" = "আলো";
+"hapticStrength::Medium" = "মাঝারি";
+"hapticStrength::Off" = "বন্ধ";
 "minutes" = "মিনিট";
 "minutes listening" = "মিনিট শুনছেন";
+"theme::Black" = "কালো";
+"theme::Dark" = "অন্ধকার";
+"theme::Light" = "আলো";
 "{0} episodes" = "{0}টি পর্ব";
 "{0} remaining" = "{0}টি অবশিষ্ট";

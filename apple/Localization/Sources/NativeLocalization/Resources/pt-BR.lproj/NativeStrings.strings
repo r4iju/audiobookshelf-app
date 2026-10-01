@@ -14,7 +14,6 @@
 "Automatic" = "Automático";
 "Automatically download new episodes" = "Download Automático de Episódios";
 "Backward interval" = "Retroceder tempo";
-"Black" = "Preto";
 "Bookmarks" = "Seus Marcadores";
 "Cancel" = "Cancelar";
 "Cancel timer" = "Cancelar Timer";
@@ -27,13 +26,14 @@
 "Complete" = "Concluído";
 "Confirm" = "Confirmar";
 "Connect" = "Conectar";
+"Connecting" = "Tentando conexão ao ...";
+"Connecting…" = "Tentando conexão ao ...";
 "Contents" = "Sumário";
 "Continue Listening" = "Continuar Escutando";
 "Continue Series" = "Continuar Série";
 "Continue listening" = "Continuar Escutando";
 "Custom owner email" = "E-mail do dono personalizado";
 "Custom owner name" = "Nome do dono personalizado";
-"Dark" = "Escuro";
 "Date added" = "Acrescentado Em";
 "Date finished" = "Progresso: Terminado";
 "Date started" = "Progresso: Iniciado";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Feedback tátil";
 "Has ebook" = "Tem ebook";
 "Has supplementary ebook" = "Tem ebook complementar";
-"Heavy" = "Pesado";
 "Home" = "Principal";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Atenção: A maioria dos aplicativos de podcasts requer que a URL do feed RSS use HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Atenção: Um ou mais dos seus episódios não tem uma data de publicação. Alguns aplicativos de podcasts requerem isto.";
@@ -78,8 +77,8 @@
 "Loading" = "Carregando...";
 "Lock player" = "Travar Reprodutor";
 "Mark as finished" = "Marcar como Concluído";
+"Mark book finished?" = "Tem certeza de que deseja marcar esse item como concluído?";
 "Mark finished" = "Marcar como Concluído";
-"Medium" = "Média";
 "Minutes listened in the last 7 days" = "Minutos Escutados (últimos 7 dias)";
 "Mirrored" = "Espelhado";
 "Name" = "Nome";
@@ -96,6 +95,7 @@
 "No playlists yet." = "Você não tem listas de reprodução";
 "No podcasts found" = "Nenhum podcast encontrado";
 "No series" = "Sem séries";
+"Not connected" = "Servidor Audiobookshelf não conectado";
 "Not finished" = "Não concluído";
 "Not started" = "Não Iniciado";
 "Number of episodes" = "# de Episódios";
@@ -133,6 +133,7 @@
 "Server folder" = "Pasta";
 "Settings" = "Configurações";
 "Show server address" = "Revelar endereço do servidor";
+"Sign out" = "Desconectar";
 "Single page" = "Uma página";
 "Sleep" = "Timer";
 "Sleep timer" = "Timer";
@@ -154,7 +155,14 @@
 "Yes" = "Sim";
 "Your libraries" = "Bibliotecas";
 "Your listening" = "Suas Estatísticas";
+"hapticStrength::Heavy" = "Pesado";
+"hapticStrength::Light" = "Leve";
+"hapticStrength::Medium" = "Média";
+"hapticStrength::Off" = "Desligado";
 "minutes" = "minutos";
 "minutes listening" = "Minutos Escutando";
+"theme::Black" = "Preto";
+"theme::Dark" = "Escuro";
+"theme::Light" = "Claro";
 "{0} episodes" = "{0} episódios";
 "{0} remaining" = "{0} restantes";

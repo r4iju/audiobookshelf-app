@@ -14,7 +14,6 @@
 "Automatic" = "Automàtic";
 "Automatically download new episodes" = "Baixa episodis automàticament";
 "Backward interval" = "Saltar enrere";
-"Black" = "Negre";
 "Bookmarks" = "Els vostres marcadors";
 "Cancel" = "Cancel·la";
 "Cancel timer" = "Cancel·la el temporitzador";
@@ -31,7 +30,6 @@
 "Continue Listening" = "Continuar escoltant";
 "Continue Series" = "Continuar sèries";
 "Continue listening" = "Continuar escoltant";
-"Dark" = "Fosc";
 "Date added" = "Afegit a";
 "Date finished" = "Progrés: Finalitzat";
 "Date started" = "Progrés: Començat";
@@ -61,7 +59,6 @@
 "Haptic feedback" = "Resposta hàptica";
 "Has ebook" = "Té llibre electrònic";
 "Has supplementary ebook" = "Té llibre electrònic suplementari";
-"Heavy" = "Pesat";
 "Home" = "Inici";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Avís: la majoria d'aplicacions de pòdcast requereixen que l'URL del canal RSS utilitzi HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Avís: un o més dels vostres episodis no tenen data de publicació. Algunes aplicacions de pòdcast ho requereixen.";
@@ -77,7 +74,6 @@
 "Lock player" = "Bloca el reproductor";
 "Mark as finished" = "Marcar com acabat";
 "Mark finished" = "Marcar com acabat";
-"Medium" = "Mitjà";
 "Minutes listened in the last 7 days" = "Minuts escoltant (últims 7 dies)";
 "Mirrored" = "Emmirallat";
 "Name" = "Nom";
@@ -128,6 +124,7 @@
 "Server folder" = "Carpeta";
 "Settings" = "Paràmetres";
 "Show server address" = "Desemmascara l'adreça del servidor";
+"Sign out" = "Desconnectar";
 "Single page" = "Pàgina única";
 "Sleep" = "Temporitzador de desconnexió";
 "Sleep timer" = "Temporitzador de desconnexió";
@@ -145,6 +142,13 @@
 "Yes" = "Sí";
 "Your libraries" = "Biblioteques";
 "Your listening" = "Les vostres estadístiques";
+"hapticStrength::Heavy" = "Pesat";
+"hapticStrength::Light" = "Clar";
+"hapticStrength::Medium" = "Mitjà";
+"hapticStrength::Off" = "Apagat";
 "minutes" = "Minuts";
+"theme::Black" = "Negre";
+"theme::Dark" = "Fosc";
+"theme::Light" = "Clar";
 "{0} episodes" = "{0} episodis";
 "{0} remaining" = "{0} restant";

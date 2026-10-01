@@ -27,7 +27,6 @@
 "Continue listening" = "Klausytis toliau";
 "Custom owner email" = "Pasirinktinis savininko el. paštas";
 "Custom owner name" = "Pasirinktinis savininko vardas";
-"Dark" = "Tamsi";
 "Delete" = "Ištrinti";
 "Description" = "Aprašymas";
 "Details" = "Detalės";
@@ -72,6 +71,7 @@
 "No listening sessions yet." = "Klausymo sesijų nėra";
 "No playlists yet." = "Neturite grojaraščių";
 "No podcasts found" = "Tinklalaidžių nerasta";
+"Not connected" = "Audiobookshelf serveris neprijungtas";
 "Not finished" = "Nebaigta";
 "Not started" = "Nepasileista";
 "Open RSS feed" = "Atidaryti RSS srautą";
@@ -98,6 +98,7 @@
 "Server folder" = "Aplankas";
 "Settings" = "Nustatymai";
 "Show server address" = "Rodyti serverio adresą";
+"Sign out" = "Atsijungti";
 "Sleep" = "Miego laikmatis";
 "Sleep timer" = "Miego laikmatis";
 "Speed" = "Grojimo greitis";
@@ -115,4 +116,6 @@
 "Your listening" = "Jūsų statistika";
 "minutes" = "minutės";
 "minutes listening" = "Klausyta minučių";
+"theme::Dark" = "Tamsi";
+"theme::Light" = "Šviesi";
 "{0} remaining" = "{0} likę";

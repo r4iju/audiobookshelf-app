@@ -25,13 +25,14 @@
 "Collections" = "Bộ Sưu Tập";
 "Complete" = "Hoàn Thành";
 "Connect" = "Kết Nối";
+"Connecting" = "Đang cố kết nối tới máy chủ...";
+"Connecting…" = "Đang cố kết nối tới máy chủ...";
 "Contents" = "Mục Lục";
 "Continue Listening" = "Tiếp Tục Nghe";
 "Continue Series" = "Tiếp Tục Chuỗi";
 "Continue listening" = "Tiếp Tục Nghe";
 "Custom owner email" = "Email Chủ Sở Hữu Tùy Chỉnh";
 "Custom owner name" = "Tên Chủ Sở Hữu Tùy Chỉnh";
-"Dark" = "Tối";
 "Date added" = "Đã Thêm Vào";
 "Delete" = "Xóa";
 "Description" = "Mô Tả";
@@ -55,7 +56,6 @@
 "Haptic feedback" = "Phản Hồi Haptic";
 "Has ebook" = "Có ebook";
 "Has supplementary ebook" = "Có ebook bổ sung";
-"Heavy" = "Nặng";
 "Home" = "Trang Chủ";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Lưu ý: Hầu hết các ứng dụng podcast sẽ yêu cầu URL feed RSS sử dụng HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Lưu ý: 1 hoặc nhiều tập phim của bạn không có Ngày Xuất Bản. Một số ứng dụng podcast yêu cầu điều này.";
@@ -69,8 +69,8 @@
 "Loading" = "Đang tải...";
 "Lock player" = "Khóa Trình Phát";
 "Mark as finished" = "Đánh dấu là Hoàn Thành";
+"Mark book finished?" = "Bạn có chắc chắn muốn đánh dấu mục này là đã hoàn thành không?";
 "Mark finished" = "Đánh dấu là Hoàn Thành";
-"Medium" = "Trung Bình";
 "Minutes listened in the last 7 days" = "Phút Nghe (7 ngày gần đây)";
 "Name" = "Tên";
 "Narrator" = "Người Đọc";
@@ -84,6 +84,7 @@
 "No listening sessions yet." = "Không có Phiên Nghe";
 "No playlists yet." = "Bạn không có danh sách phát nào";
 "No podcasts found" = "Không tìm thấy podcast";
+"Not connected" = "Máy chủ Audiobookshelf không kết nối";
 "Not finished" = "Chưa Hoàn Thành";
 "Not started" = "Chưa Bắt Đầu";
 "Number of episodes" = "Số lượng tập";
@@ -116,6 +117,7 @@
 "Server folder" = "Thư Mục";
 "Settings" = "Cài Đặt";
 "Show server address" = "Hiện địa chỉ máy chủ";
+"Sign out" = "Ngắt Kết Nối";
 "Single page" = "Một Trang";
 "Sleep" = "Bộ Đếm Thời Gian Ngủ";
 "Sleep timer" = "Bộ Đếm Thời Gian Ngủ";
@@ -136,7 +138,13 @@
 "Yes" = "Có";
 "Your libraries" = "Thư Viện";
 "Your listening" = "Thống Kê Của Bạn";
+"hapticStrength::Heavy" = "Nặng";
+"hapticStrength::Light" = "Nhẹ";
+"hapticStrength::Medium" = "Trung Bình";
+"hapticStrength::Off" = "Tắt";
 "minutes" = "phút";
 "minutes listening" = "Phút Đã Nghe";
+"theme::Dark" = "Tối";
+"theme::Light" = "Sáng";
 "{0} episodes" = "{0} tập";
 "{0} remaining" = "{0} còn lại";

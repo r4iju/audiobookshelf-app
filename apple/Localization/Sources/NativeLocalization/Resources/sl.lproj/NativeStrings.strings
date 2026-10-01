@@ -14,7 +14,6 @@
 "Automatic" = "Auto";
 "Automatically download new episodes" = "Samodejni prenos epizod";
 "Backward interval" = "Skoči čas nazaj";
-"Black" = "Črna";
 "Bookmarks" = "Tvoji zaznamki";
 "Cancel" = "Prekliči";
 "Cancel timer" = "Prekliči časovnik";
@@ -27,13 +26,14 @@
 "Complete" = "Končano";
 "Confirm" = "Potrdi";
 "Connect" = "Poveži";
+"Connecting" = "Poskus povezave s strežnikom...";
+"Connecting…" = "Poskus povezave s strežnikom...";
 "Contents" = "Kazalo";
 "Continue Listening" = "Nadaljuj poslušanje";
 "Continue Series" = "Nadaljuj s serijo";
 "Continue listening" = "Nadaljuj poslušanje";
 "Custom owner email" = "E-pošta lastnika po meri";
 "Custom owner name" = "Ime lastnika po meri";
-"Dark" = "Temna";
 "Date added" = "Dodano ob";
 "Date finished" = "Napredek: Končano";
 "Date started" = "Napredek: Začelo se je";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Haptična povratna informacija";
 "Has ebook" = "Ima e-knjigo";
 "Has supplementary ebook" = "Ima dodatno e-knjigo";
-"Heavy" = "Težka";
 "Home" = "Domov";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Opozorilo: večina aplikacij za podcaste bo zahtevala, da URL vira RSS uporablja HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Opozorilo: 1 ali več vaših epizod nima datuma objave. Nekatere aplikacije za podcaste to zahtevajo.";
@@ -78,8 +77,8 @@
 "Loading" = "Nalagam...";
 "Lock player" = "Zakleni predvajalnik";
 "Mark as finished" = "Označi kot dokončano";
+"Mark book finished?" = "Ali ste prepričani, da želite označiti ta element kot dokončan?";
 "Mark finished" = "Označi kot dokončano";
-"Medium" = "Srednje";
 "Minutes listened in the last 7 days" = "Minut poslušanja (zadnjih 7 dni)";
 "Mirrored" = "Zrcalno";
 "Name" = "Naziv";
@@ -96,6 +95,7 @@
 "No playlists yet." = "Nimate seznamov predvajanja";
 "No podcasts found" = "Ni podcastov";
 "No series" = "Ni serij";
+"Not connected" = "Strežnik Audiobookshelf ni povezan";
 "Not finished" = "Ni dokončano";
 "Not started" = "Ni zagnano";
 "Number of episodes" = "# epizod";
@@ -133,6 +133,7 @@
 "Server folder" = "Mapa";
 "Settings" = "Nastavitve";
 "Show server address" = "Odkrij naslov strežnika";
+"Sign out" = "Prekini povezavo";
 "Single page" = "Ena stran";
 "Sleep" = "Časovnik za spanje";
 "Sleep timer" = "Časovnik za spanje";
@@ -154,7 +155,14 @@
 "Yes" = "Da";
 "Your libraries" = "Knjižnice";
 "Your listening" = "Tvoja statistika";
+"hapticStrength::Heavy" = "Težka";
+"hapticStrength::Light" = "Svetlo";
+"hapticStrength::Medium" = "Srednje";
+"hapticStrength::Off" = "Izključeno";
 "minutes" = "minute";
 "minutes listening" = "Minut poslušanja";
+"theme::Black" = "Črna";
+"theme::Dark" = "Temna";
+"theme::Light" = "Svetla";
 "{0} episodes" = "{0} epizod";
 "{0} remaining" = "Še {0}";

@@ -1,6 +1,6 @@
 {
-  "NativeAppearance.name": ["System", "Light", "Dark", "Black"],
-  "NativeHaptic.name": ["Off", "Light", "Medium", "Heavy"],
+  "NativeAppearance.name": ["theme::System", "theme::Light", "theme::Dark", "theme::Black"],
+  "NativeHaptic.name": ["hapticStrength::Off", "hapticStrength::Light", "hapticStrength::Medium", "hapticStrength::Heavy"],
   "AppleNetworkPolicy.title": ["Ask", "Always", "Never"],
   "AudioGroupKind.title": ["Collections", "Playlists"],
   "NativeDownloads.Entry.State": ["Queued", "Ready", "Failed", "Cancelled"],

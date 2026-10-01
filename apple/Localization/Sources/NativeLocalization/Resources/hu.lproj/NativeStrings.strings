@@ -14,7 +14,6 @@
 "Automatic" = "Automatikus";
 "Automatically download new episodes" = "Epizódok automatikus letöltése";
 "Backward interval" = "Visszaugrás ideje";
-"Black" = "Fekete";
 "Bookmarks" = "Könyvjelzőid";
 "Cancel" = "Mégsem";
 "Cancel timer" = "Időzítő megszakítása";
@@ -27,13 +26,14 @@
 "Complete" = "Kész";
 "Confirm" = "Megerősítés";
 "Connect" = "Csatlakozás";
+"Connecting" = "Szerverkapcsolat kísérlete...";
+"Connecting…" = "Szerverkapcsolat kísérlete...";
 "Contents" = "Tartalomjegyzék";
 "Continue Listening" = "Hallgatás folytatása";
 "Continue Series" = "Sorozat folytatása";
 "Continue listening" = "Hallgatás folytatása";
 "Custom owner email" = "Egyéni tulajdonos e-mail";
 "Custom owner name" = "Egyéni tulajdonos neve";
-"Dark" = "Sötét";
 "Date added" = "Hozzáadva ekkor";
 "Date finished" = "Folyamat: Befejezve";
 "Date started" = "Folyamat: Elindult";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Tapintás visszajelzés";
 "Has ebook" = "Van e-könyv";
 "Has supplementary ebook" = "Van kiegészítő e-könyve";
-"Heavy" = "Nehéz";
 "Home" = "Kezdőlap";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Figyelmeztetés: A legtöbb podcast alkalmazás megköveteli, hogy az RSS hírcsatorna URL-je HTTPS-t használjon";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Figyelmeztetés: Egy vagy több epizódnak nincs közzétételi dátuma. Néhány podcast alkalmazás ezt megköveteli.";
@@ -78,8 +77,8 @@
 "Loading" = "Betöltés...";
 "Lock player" = "Lejátszó zárolása";
 "Mark as finished" = "Befejezettnek jelölés";
+"Mark book finished?" = "Biztosan befejezettnek jelöli ezt az elemet?";
 "Mark finished" = "Befejezettnek jelölés";
-"Medium" = "Közepes";
 "Minutes listened in the last 7 days" = "Hallgatási grafikon percben (az elmúlt 7 napból)";
 "Mirrored" = "Tükrözve";
 "Name" = "Név";
@@ -96,6 +95,7 @@
 "No playlists yet." = "Nincsenek lejátszási listái";
 "No podcasts found" = "Nem találhatók podcastok";
 "No series" = "Nincsenek sorozatok";
+"Not connected" = "Az Audiobookshelf szerver nem csatlakozik";
 "Not finished" = "Nem befejezett";
 "Not started" = "Nem kezdődött el";
 "Number of episodes" = "Epizódok száma";
@@ -133,6 +133,7 @@
 "Server folder" = "Mappa";
 "Settings" = "Beállítások";
 "Show server address" = "Kiszolgáló címének maszkolásának törlése";
+"Sign out" = "Kapcsolat bontása";
 "Single page" = "Egyoldalas";
 "Sleep" = "Alvásidőzítő";
 "Sleep timer" = "Alvásidőzítő";
@@ -154,7 +155,14 @@
 "Yes" = "Igen";
 "Your libraries" = "Könyvtárak";
 "Your listening" = "Saját statisztikák";
+"hapticStrength::Heavy" = "Nehéz";
+"hapticStrength::Light" = "Könnyű";
+"hapticStrength::Medium" = "Közepes";
+"hapticStrength::Off" = "Kikapcsolva";
 "minutes" = "perc";
 "minutes listening" = "Hallgatás percekben";
+"theme::Black" = "Fekete";
+"theme::Dark" = "Sötét";
+"theme::Light" = "Világos";
 "{0} episodes" = "{0} epizód";
 "{0} remaining" = "{0} maradt";

@@ -14,7 +14,6 @@
 "Automatic" = "Аўто";
 "Automatically download new episodes" = "Аўтаматычна спампоўваць выпускі";
 "Backward interval" = "Час пераходу назад";
-"Black" = "Чорная";
 "Bookmarks" = "Вашы закладкі";
 "Cancel" = "Скасаваць";
 "Cancel timer" = "Скасаваць таймер";
@@ -27,13 +26,14 @@
 "Complete" = "Завяршыць";
 "Confirm" = "Пацвердзіць";
 "Connect" = "Падлучыцца";
+"Connecting" = "Спроба злучэння з серверам...";
+"Connecting…" = "Спроба злучэння з серверам...";
 "Contents" = "Змест";
 "Continue Listening" = "Працяг праслухоўвання";
 "Continue Series" = "Працягнуць серыі";
 "Continue listening" = "Працяг праслухоўвання";
 "Custom owner email" = "Карыстальніцкая электронная пошта ўладальніка";
 "Custom owner name" = "Карыстальніцкае імя ўладальніка";
-"Dark" = "Цёмная";
 "Date added" = "Дата дабаўлення";
 "Date finished" = "Прагрэс: завершана";
 "Date started" = "Прагрэс: пачата";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Тактыльная зваротная сувязь";
 "Has ebook" = "Мае электронную кнігу";
 "Has supplementary ebook" = "Мае дадатковую электронную кнігу";
-"Heavy" = "Моцная";
 "Home" = "Галоўная";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Папярэджанне: большасць праграм для падкастаў патрабуюць, каб URL RSS-стужкі выкарыстоўваў HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Папярэджанне: адзін ці больш выпускаў не маюць даты публікацыі. Некаторыя праграмы для падкастаў патрабуюць гэтага.";
@@ -78,8 +77,8 @@
 "Loading" = "Загрузка...";
 "Lock player" = "Заблакіраваць прайгравальнік";
 "Mark as finished" = "Пазначыць як завершаную";
+"Mark book finished?" = "Вы ўпэўнены, што хочаце пазначыць гэты элемент як завершаны?";
 "Mark finished" = "Пазначыць як завершаную";
-"Medium" = "Сярэдняя";
 "Minutes listened in the last 7 days" = "Хвілін праслухоўвання (апошнія 7 дзён)";
 "Mirrored" = "Люстраваны";
 "Name" = "Назва";
@@ -96,6 +95,7 @@
 "No playlists yet." = "У вас няма плэй-лістоў";
 "No podcasts found" = "Падкасты не знойдзены";
 "No series" = "Няма серый";
+"Not connected" = "Сервер Audiobookshelf не падлучаны";
 "Not finished" = "Незавершана";
 "Not started" = "Не пачата";
 "Number of episodes" = "Колькасць выпускаў";
@@ -133,6 +133,7 @@
 "Server folder" = "Папка";
 "Settings" = "Налады";
 "Show server address" = "Паказаць адрас сервера";
+"Sign out" = "Адлучыцца";
 "Single page" = "Аднабаковы";
 "Sleep" = "Таймер сну";
 "Sleep timer" = "Таймер сну";
@@ -154,7 +155,14 @@
 "Yes" = "Так";
 "Your libraries" = "Бібліятэкі";
 "Your listening" = "Ваша статыстыка";
+"hapticStrength::Heavy" = "Моцная";
+"hapticStrength::Light" = "Лёгкая";
+"hapticStrength::Medium" = "Сярэдняя";
+"hapticStrength::Off" = "Выключына";
 "minutes" = "хвілін";
 "minutes listening" = "Хвілін праслухоўвання";
+"theme::Black" = "Чорная";
+"theme::Dark" = "Цёмная";
+"theme::Light" = "Светлая";
 "{0} episodes" = "{0} выпускаў";
 "{0} remaining" = "Засталося {0}";

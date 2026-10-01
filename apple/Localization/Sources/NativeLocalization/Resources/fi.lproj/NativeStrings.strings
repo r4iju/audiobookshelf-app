@@ -14,7 +14,6 @@
 "Automatic" = "Automaattinen";
 "Automatically download new episodes" = "Lataa jaksot automaattisesti";
 "Backward interval" = "Hyppää taaksepäin ajassa";
-"Black" = "Musta";
 "Bookmarks" = "Kirjanmerkkisi";
 "Cancel" = "Peruuta";
 "Cancel timer" = "Peruuta ajastin";
@@ -27,13 +26,14 @@
 "Complete" = "Valmis";
 "Confirm" = "Vahvista";
 "Connect" = "Yhdistä";
+"Connecting" = "Yritetään palvelinyhteyttä...";
+"Connecting…" = "Yritetään palvelinyhteyttä...";
 "Contents" = "Sisällysluettelo";
 "Continue Listening" = "Jatka kuuntelua";
 "Continue Series" = "Jatka sarjoja";
 "Continue listening" = "Jatka kuuntelua";
 "Custom owner email" = "Mukautettu omistajan sähköposti";
 "Custom owner name" = "Mukautettu omistajan nimi";
-"Dark" = "Tumma";
 "Date added" = "Lisätty listalle";
 "Date finished" = "Edistyminen: Valmis";
 "Date started" = "Edistyminen: Aloitettu";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Tuntopalaute";
 "Has ebook" = "Sillä on s-kirja";
 "Has supplementary ebook" = "Sillä on täydentävän s-kirjan";
-"Heavy" = "Raskas";
 "Home" = "Koti";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Varoitus: Useimmat podcast-sovellukset edellyttävät, että RSS-syötteen URL-osoite käyttää HTTPS:a";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Varoitus: yhdellä tai useammalla jaksollasi ei ole julkaisupäivämäärää. Jotkut podcast-sovellukset vaativat tämän.";
@@ -78,8 +77,8 @@
 "Loading" = "Ladataan...";
 "Lock player" = "Lukitse soitin";
 "Mark as finished" = "Merkitse valmiiksi";
+"Mark book finished?" = "Haluatko varmasti merkitä tämän kohteen valmiiksi?";
 "Mark finished" = "Merkitse valmiiksi";
-"Medium" = "Keskitaso";
 "Minutes listened in the last 7 days" = "Kuunteluminuutit (viim. 7 pv)";
 "Mirrored" = "Peilattu";
 "Name" = "Nimi";
@@ -96,6 +95,7 @@
 "No playlists yet." = "Sinulla ei ole soittolistoja";
 "No podcasts found" = "Podcasteja ei löytynyt";
 "No series" = "Ei sarjoja";
+"Not connected" = "Audiobookshelf palvelinta ei ole yhdistetty";
 "Not finished" = "Ei valmis";
 "Not started" = "Ei aloitettu";
 "Number of episodes" = "# jaksoja";
@@ -133,6 +133,7 @@
 "Server folder" = "Kansio";
 "Settings" = "Asetukset";
 "Show server address" = "Näytä palvelimen osoite";
+"Sign out" = "Katkaise yhteys";
 "Single page" = "Yksi sivu";
 "Sleep" = "Uniajastin";
 "Sleep timer" = "Uniajastin";
@@ -154,7 +155,14 @@
 "Yes" = "Kyllä";
 "Your libraries" = "Kirjastot";
 "Your listening" = "Tilastosi";
+"hapticStrength::Heavy" = "Raskas";
+"hapticStrength::Light" = "Vaalea";
+"hapticStrength::Medium" = "Keskitaso";
+"hapticStrength::Off" = "Pois päältä";
 "minutes" = "minuuttia";
 "minutes listening" = "Minuuttia kuunneltu";
+"theme::Black" = "Musta";
+"theme::Dark" = "Tumma";
+"theme::Light" = "Kirkas";
 "{0} episodes" = "{0} jaksoa";
 "{0} remaining" = "{0} jäljellä";

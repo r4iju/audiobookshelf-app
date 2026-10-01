@@ -50,7 +50,6 @@
 "Back {0} seconds" = "Back {0} seconds";
 "Backward interval" = "Backward interval";
 "Banner" = "Banner";
-"Black" = "Black";
 "Book progress" = "Book progress";
 "Book {0}" = "Book {0}";
 "Bookmarks" = "Bookmarks";
@@ -109,7 +108,6 @@
 "Custom owner email" = "Custom owner email";
 "Custom owner name" = "Custom owner name";
 "Custom speed: {0}×" = "Custom speed: {0}×";
-"Dark" = "Dark";
 "Date added" = "Date added";
 "Date finished" = "Date finished";
 "Date started" = "Date started";
@@ -182,7 +180,6 @@
 "Haptic feedback" = "Haptic feedback";
 "Has ebook" = "Has ebook";
 "Has supplementary ebook" = "Has supplementary ebook";
-"Heavy" = "Heavy";
 "Highlights" = "Highlights";
 "Home" = "Home";
 "Idle" = "Idle";
@@ -202,7 +199,6 @@
 "Language" = "Language";
 "Languages" = "Languages";
 "Library" = "Library";
-"Light" = "Light";
 "Line spacing" = "Line spacing";
 "Line spacing {0}%" = "Line spacing {0}%";
 "Listen Again" = "Listen Again";
@@ -226,7 +222,6 @@
 "Mark finished" = "Mark finished";
 "Mark unfinished" = "Mark unfinished";
 "Media" = "Media";
-"Medium" = "Medium";
 "Minutes listened in the last 7 days" = "Minutes listened in the last 7 days";
 "Mirrored" = "Mirrored";
 "Missing files and unclear account ownership will be retained for recovery." = "Missing files and unclear account ownership will be retained for recovery.";
@@ -588,6 +583,10 @@
 "books added" = "books added";
 "books finished" = "books finished";
 "books listened to" = "books listened to";
+"hapticStrength::Heavy" = "Heavy";
+"hapticStrength::Light" = "Light";
+"hapticStrength::Medium" = "Medium";
+"hapticStrength::Off" = "Off";
 "hour" = "hour";
 "hour listening" = "hour listening";
 "hours" = "hours";
@@ -599,6 +598,10 @@
 "session" = "session";
 "sessions" = "sessions";
 "supplementary PDF" = "supplementary PDF";
+"theme::Black" = "Black";
+"theme::Dark" = "Dark";
+"theme::Light" = "Light";
+"theme::System" = "System";
 "this download" = "this download";
 "this listening session" = "this listening session";
 "{0} accounts" = "{0} accounts";

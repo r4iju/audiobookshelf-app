@@ -14,7 +14,6 @@
 "Automatic" = "Авто";
 "Automatically download new episodes" = "Автозавантаження епізодів";
 "Backward interval" = "Час відмотування назад";
-"Black" = "Чорний";
 "Bookmarks" = "Ваші закладки";
 "Cancel" = "Скасувати";
 "Cancel timer" = "Скасувати таймер";
@@ -27,13 +26,14 @@
 "Complete" = "Завершити";
 "Confirm" = "Підтвердити";
 "Connect" = "Підключитися";
+"Connecting" = "Спроба підключення до сервера...";
+"Connecting…" = "Спроба підключення до сервера...";
 "Contents" = "Зміст";
 "Continue Listening" = "Слухати далі";
 "Continue Series" = "Продовжити серії";
 "Continue listening" = "Слухати далі";
 "Custom owner email" = "Користувацька електронна адреса власника";
 "Custom owner name" = "Користувацьке ім'я власника";
-"Dark" = "Темна";
 "Date added" = "Дата додавання";
 "Date finished" = "Прогрес: Завершено";
 "Date started" = "Прогрес: Розпочато";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Вібровідгук";
 "Has ebook" = "Має електронну книгу";
 "Has supplementary ebook" = "Має додаткову електронну книгу";
-"Heavy" = "Сильно";
 "Home" = "Головна";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Попередження: більшість додатків подкастів вимагають використання HTTPS для RSS-каналу";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Попередження: один або більше ваших епізодів не мають дати публікації. Деякі додатки подкастів цього вимагають.";
@@ -78,8 +77,8 @@
 "Loading" = "Завантаження...";
 "Lock player" = "Заблокувати програвач";
 "Mark as finished" = "Позначити як завершене";
+"Mark book finished?" = "Ви дійсно бажаєте позначити цей елемент завершеним?";
 "Mark finished" = "Позначити як завершене";
-"Medium" = "Середньо";
 "Minutes listened in the last 7 days" = "Хвилин прослухано (останні 7 днів)";
 "Mirrored" = "Віддзеркалено";
 "Name" = "Назва";
@@ -96,6 +95,7 @@
 "No playlists yet." = "У вас немає списків відтворення";
 "No podcasts found" = "Подкастів не знайдено";
 "No series" = "Серії відсутні";
+"Not connected" = "Сервер Audiobookshelf не підключений";
 "Not finished" = "Незавершені";
 "Not started" = "Непочаті";
 "Number of episodes" = "Кількість серій";
@@ -133,6 +133,7 @@
 "Server folder" = "Тека";
 "Settings" = "Налаштування";
 "Show server address" = "Розкрити адресу сервера";
+"Sign out" = "Відключитися";
 "Single page" = "Одна";
 "Sleep" = "Таймер вимкнення";
 "Sleep timer" = "Таймер вимкнення";
@@ -154,7 +155,14 @@
 "Yes" = "Так";
 "Your libraries" = "Бібліотеки";
 "Your listening" = "Ваша статистика";
+"hapticStrength::Heavy" = "Сильно";
+"hapticStrength::Light" = "Легко";
+"hapticStrength::Medium" = "Середньо";
+"hapticStrength::Off" = "Вимкнути";
 "minutes" = "хвилин";
 "minutes listening" = "Хвилин прослухано";
+"theme::Black" = "Чорний";
+"theme::Dark" = "Темна";
+"theme::Light" = "Світла";
 "{0} episodes" = "{0} епізодів";
 "{0} remaining" = "Лишилося: {0}";

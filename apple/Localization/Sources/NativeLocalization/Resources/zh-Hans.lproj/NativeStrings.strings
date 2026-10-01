@@ -14,7 +14,6 @@
 "Automatic" = "自动";
 "Automatically download new episodes" = "自动下载剧集";
 "Backward interval" = "快退时间";
-"Black" = "黑色";
 "Bookmarks" = "你的书签";
 "Cancel" = "取消";
 "Cancel timer" = "取消计时器";
@@ -27,13 +26,14 @@
 "Complete" = "已完成";
 "Confirm" = "确认";
 "Connect" = "连接";
+"Connecting" = "正在尝试连接服务器…";
+"Connecting…" = "正在尝试连接服务器…";
 "Contents" = "目录";
 "Continue Listening" = "继续收听";
 "Continue Series" = "在追系列";
 "Continue listening" = "继续收听";
 "Custom owner email" = "自定义所有者电子邮件";
 "Custom owner name" = "自定义所有者名称";
-"Dark" = "黑暗";
 "Date added" = "添加于";
 "Date finished" = "进度：已完成";
 "Date started" = "进度：已开始";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "触觉反馈";
 "Has ebook" = "有电子书";
 "Has supplementary ebook" = "有补充电子书";
-"Heavy" = "重";
 "Home" = "首页";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "警告：大多数播客应用程序都需要 RSS 源 URL 使用 HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "警告：你的一集或多集没有发布日期。一些播客应用程序要求这样做。";
@@ -78,8 +77,8 @@
 "Loading" = "正在加载…";
 "Lock player" = "锁定播放器";
 "Mark as finished" = "标记为已完成";
+"Mark book finished?" = "你确定要将此项目标记为已完成吗？";
 "Mark finished" = "标记为已完成";
-"Medium" = "中等";
 "Minutes listened in the last 7 days" = "收听分钟数（最近7天）";
 "Mirrored" = "镜像";
 "Name" = "名称";
@@ -96,6 +95,7 @@
 "No playlists yet." = "你没有播放列表";
 "No podcasts found" = "未找到播客";
 "No series" = "没有系列";
+"Not connected" = "Audiobookshelf 服务器未连接";
 "Not finished" = "未听完";
 "Not started" = "未开始";
 "Number of episodes" = "集数";
@@ -133,6 +133,7 @@
 "Server folder" = "文件夹";
 "Settings" = "设置";
 "Show server address" = "显示服务器地址";
+"Sign out" = "断开连接";
 "Single page" = "单页";
 "Sleep" = "睡眠定时";
 "Sleep timer" = "睡眠定时";
@@ -154,7 +155,14 @@
 "Yes" = "确定";
 "Your libraries" = "媒体库";
 "Your listening" = "你的统计数据";
+"hapticStrength::Heavy" = "重";
+"hapticStrength::Light" = "轻";
+"hapticStrength::Medium" = "中等";
+"hapticStrength::Off" = "关闭";
 "minutes" = "分钟";
 "minutes listening" = "收听分钟数";
+"theme::Black" = "黑色";
+"theme::Dark" = "黑暗";
+"theme::Light" = "明亮";
 "{0} episodes" = "{0} 个剧集";
 "{0} remaining" = "剩余 {0}";

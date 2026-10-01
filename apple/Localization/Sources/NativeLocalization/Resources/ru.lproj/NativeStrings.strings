@@ -14,7 +14,6 @@
 "Automatic" = "Авто";
 "Automatically download new episodes" = "Скачивать выпуски автоматически";
 "Backward interval" = "Перемотка назад";
-"Black" = "Черный";
 "Bookmarks" = "Ваши закладки";
 "Cancel" = "Отмена";
 "Cancel timer" = "Отмена таймера";
@@ -27,13 +26,14 @@
 "Complete" = "Завершить";
 "Confirm" = "Подтвердить";
 "Connect" = "Подключение";
+"Connecting" = "Попытка подключения к серверу...";
+"Connecting…" = "Попытка подключения к серверу...";
 "Contents" = "Содержание";
 "Continue Listening" = "Продолжить слушать";
 "Continue Series" = "Продолжить серии";
 "Continue listening" = "Продолжить слушать";
 "Custom owner email" = "Пользовательский Email владельца";
 "Custom owner name" = "Пользовательское Имя владельца";
-"Dark" = "Темная";
 "Date added" = "Дата добавления";
 "Date finished" = "Прогресс: Закончена";
 "Date started" = "Прогресс: Начата";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Тактильная отдача";
 "Has ebook" = "Есть электронная книга";
 "Has supplementary ebook" = "Есть дополнительная e-книга";
-"Heavy" = "Тяжелый";
 "Home" = "Домой";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Предупреждение: Большинству приложений подкастов потребуется, чтобы URL-адрес RSS-ленты использовал HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Предупреждение: 1 или более выпусков не имеют даты публикации. Некоторые приложения для подкастов требуют этого.";
@@ -78,8 +77,8 @@
 "Loading" = "Загрузка...";
 "Lock player" = "Блокировка проигрывателя";
 "Mark as finished" = "Отметить, как завершенную";
+"Mark book finished?" = "Вы уверены, что хотите пометить этот элемент как завершенный?";
 "Mark finished" = "Отметить, как завершенную";
-"Medium" = "Средний";
 "Minutes listened in the last 7 days" = "Минут прослушивания (последние 7 дней)";
 "Mirrored" = "Зеркало";
 "Name" = "Имя";
@@ -96,6 +95,7 @@
 "No playlists yet." = "У вас нет плейлистов";
 "No podcasts found" = "Подкасты не найдены";
 "No series" = "Нет серии";
+"Not connected" = "Сервер Audiobookshelf не подключен";
 "Not finished" = "Не завершено";
 "Not started" = "Не запущено";
 "Number of episodes" = "# из выпусков";
@@ -133,6 +133,7 @@
 "Server folder" = "Папка";
 "Settings" = "Настройки";
 "Show server address" = "Не скрывать адрес сервера";
+"Sign out" = "Отключиться";
 "Single page" = "Одна страница";
 "Sleep" = "Таймер сна";
 "Sleep timer" = "Таймер сна";
@@ -154,7 +155,14 @@
 "Yes" = "Да";
 "Your libraries" = "Библиотеки";
 "Your listening" = "Ваша статистика";
+"hapticStrength::Heavy" = "Тяжелый";
+"hapticStrength::Light" = "Подсветка";
+"hapticStrength::Medium" = "Средний";
+"hapticStrength::Off" = "Выключить";
 "minutes" = "минут";
 "minutes listening" = "Минут прослушано";
+"theme::Black" = "Черный";
+"theme::Dark" = "Темная";
+"theme::Light" = "Светлая";
 "{0} episodes" = "{0} выпусков";
 "{0} remaining" = "{0} осталось";

@@ -14,7 +14,6 @@
 "Automatic" = "Otomatik";
 "Automatically download new episodes" = "Bölümleri Otomatik İndir";
 "Backward interval" = "Geri sarma süresi";
-"Black" = "Siyah";
 "Bookmarks" = "Yer İmlerin";
 "Cancel" = "İptal";
 "Cancel timer" = "Zamanlayıcıyı İptal Et";
@@ -26,13 +25,14 @@
 "Collections" = "Koleksiyonlar";
 "Complete" = "Tamamlandı";
 "Connect" = "Bağlan";
+"Connecting" = "Sunucuya bağlanmaya çalışılıyor...";
+"Connecting…" = "Sunucuya bağlanmaya çalışılıyor...";
 "Contents" = "İçindekiler";
 "Continue Listening" = "Dinlemeye Devam Et";
 "Continue Series" = "Seriye Devam Et";
 "Continue listening" = "Dinlemeye Devam Et";
 "Custom owner email" = "Özel Sahip E-postası";
 "Custom owner name" = "Özel Sahip Adı";
-"Dark" = "Koyu";
 "Date added" = "Eklenme Zamanı";
 "Delete" = "Sil";
 "Description" = "Açıklama";
@@ -60,7 +60,6 @@
 "Haptic feedback" = "Dokunsal geribildirim";
 "Has ebook" = "E-kitabı var";
 "Has supplementary ebook" = "Ek e-kitabı var";
-"Heavy" = "Çok Kalın";
 "Home" = "Ana Sayfa";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Uyarı: Çoğu podcast uygulaması, RSS akış URL'sinin HTTPS kullanmasını gerektirir";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Uyarı: Bölümlerinizden bir veya daha fazlasının Yayın Tarihi yok. Bazı podcast uygulamaları bunu zorunlu kılar.";
@@ -74,8 +73,8 @@
 "Loading" = "Yükleniyor...";
 "Lock player" = "Oynatıcıyı Kilitle";
 "Mark as finished" = "Bitirildi Olarak İşaretle";
+"Mark book finished?" = "Bu öğeyi bitirildi olarak işaretlemek istediğinizden emin misiniz?";
 "Mark finished" = "Bitirildi Olarak İşaretle";
-"Medium" = "Orta";
 "Minutes listened in the last 7 days" = "Dinlenen Dakika (son 7 gün)";
 "Mirrored" = "Aynalanmış";
 "Name" = "İsim";
@@ -92,6 +91,7 @@
 "No playlists yet." = "Hiç oynatma listeniz yok";
 "No podcasts found" = "Podcast bulunamadı";
 "No series" = "Seri yok";
+"Not connected" = "Audiobookshelf sunucusuna bağlı değil";
 "Not finished" = "Bitirilmedi";
 "Not started" = "Başlanmadı";
 "Number of episodes" = "Bölüm Sayısı";
@@ -127,6 +127,7 @@
 "Server folder" = "Klasör";
 "Settings" = "Ayarlar";
 "Show server address" = "Sunucu adresini göster";
+"Sign out" = "Bağlantıyı Kes";
 "Single page" = "Tek sayfa";
 "Sleep" = "Uyku Zamanlayıcısı";
 "Sleep timer" = "Uyku Zamanlayıcısı";
@@ -148,7 +149,14 @@
 "Yes" = "Evet";
 "Your libraries" = "Kütüphaneler";
 "Your listening" = "İstatistiklerin";
+"hapticStrength::Heavy" = "Çok Kalın";
+"hapticStrength::Light" = "İnce";
+"hapticStrength::Medium" = "Orta";
+"hapticStrength::Off" = "Kapalı";
 "minutes" = "dakika";
 "minutes listening" = "Dinlenen Dakika";
+"theme::Black" = "Siyah";
+"theme::Dark" = "Koyu";
+"theme::Light" = "Açık";
 "{0} episodes" = "{0} bölüm";
 "{0} remaining" = "{0} kaldı";

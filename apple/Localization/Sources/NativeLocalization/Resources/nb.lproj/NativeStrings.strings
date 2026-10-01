@@ -14,7 +14,6 @@
 "Automatic" = "Automatisk";
 "Automatically download new episodes" = "Last ned episoder automatisk";
 "Backward interval" = "Tilbakespolingstid";
-"Black" = "Svart";
 "Bookmarks" = "Dine bokmerker";
 "Cancel" = "Avbryt";
 "Cancel timer" = "Avbryt tidsur";
@@ -27,13 +26,14 @@
 "Complete" = "Fullfør";
 "Confirm" = "Bekreft";
 "Connect" = "Koble til";
+"Connecting" = "Kobler til tjener …";
+"Connecting…" = "Kobler til tjener …";
 "Contents" = "Innholdsfortegnelse";
 "Continue Listening" = "Fortsett lytting";
 "Continue Series" = "Fortsett serier";
 "Continue listening" = "Fortsett lytting";
 "Custom owner email" = "Tilpasset eier e-post";
 "Custom owner name" = "Tilpasset eier Navn";
-"Dark" = "Mørk";
 "Date added" = "Lagt Til";
 "Date finished" = "Fremdrift: Fullført";
 "Date started" = "Fremdrift: Startet";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Taktil respons";
 "Has ebook" = "Har e-bok";
 "Has supplementary ebook" = "Har supplerende e-bok";
-"Heavy" = "Tung";
 "Home" = "Hjem";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Advarsel! De fleste podcast applikasjoner trenger RSS feed URL som bruker HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Advarsel! 1 eller flere av episodene har ikke publikasjonsdato. Noen podcast applikasjoner trenger dette.";
@@ -78,8 +77,8 @@
 "Loading" = "Laster...";
 "Lock player" = "Lås avspiller";
 "Mark as finished" = "Marker som Fullført";
+"Mark book finished?" = "Er du sikker på at du vil merke element som fullført?";
 "Mark finished" = "Marker som Fullført";
-"Medium" = "Middels";
 "Minutes listened in the last 7 days" = "Minutter lyttet (siste 7 dagene)";
 "Mirrored" = "Speilet";
 "Name" = "Navn";
@@ -96,6 +95,7 @@
 "No playlists yet." = "Du har ingen spillelister";
 "No podcasts found" = "Ingen podcaster funnet";
 "No series" = "Ingen serier";
+"Not connected" = "Ikke tilkoblet Audiobookshelf-tjener";
 "Not finished" = "Ikke fullført";
 "Not started" = "Ikke startet";
 "Number of episodes" = "# episoder";
@@ -133,6 +133,7 @@
 "Server folder" = "Mappe";
 "Settings" = "Innstillinger";
 "Show server address" = "Vis tjeneradresse";
+"Sign out" = "Koble fra";
 "Single page" = "Enkeltside";
 "Sleep" = "Sove-timer";
 "Sleep timer" = "Sove-timer";
@@ -154,7 +155,14 @@
 "Yes" = "Ja";
 "Your libraries" = "Biblioteker";
 "Your listening" = "Din statistikk";
+"hapticStrength::Heavy" = "Tung";
+"hapticStrength::Light" = "Lett";
+"hapticStrength::Medium" = "Middels";
+"hapticStrength::Off" = "Av";
 "minutes" = "minuter";
 "minutes listening" = "Minutter lyttet";
+"theme::Black" = "Svart";
+"theme::Dark" = "Mørk";
+"theme::Light" = "Lys";
 "{0} episodes" = "{0} episoder";
 "{0} remaining" = "{0} gjennstående";

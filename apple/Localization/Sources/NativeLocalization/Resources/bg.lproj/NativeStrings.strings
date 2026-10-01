@@ -14,7 +14,6 @@
 "Automatic" = "Авто";
 "Automatically download new episodes" = "Автоматично изтегляне на епизоди";
 "Backward interval" = "Време за превъртане назад";
-"Black" = "Черен";
 "Bookmarks" = "Твойте отметки";
 "Cancel" = "Отказ";
 "Cancel timer" = "Отмени Таймер";
@@ -27,13 +26,14 @@
 "Complete" = "Приключено";
 "Confirm" = "Потвърди";
 "Connect" = "Свържи се";
+"Connecting" = "Свързване със сървъра...";
+"Connecting…" = "Свързване със сървъра...";
 "Contents" = "Съдържание";
 "Continue Listening" = "Продължи слушане";
 "Continue Series" = "Продължи серии";
 "Continue listening" = "Продължи слушане";
 "Custom owner email" = "Персонализиран имейл на собственика";
 "Custom owner name" = "Персонализирано име на собственика";
-"Dark" = "Тъмна";
 "Date added" = "Добавено в";
 "Date finished" = "Прогрес: Приключено";
 "Date started" = "Прогрес: Започнато";
@@ -63,7 +63,6 @@
 "Haptic feedback" = "Обратна връзка чрез вибриране";
 "Has ebook" = "Има е-книга";
 "Has supplementary ebook" = "Има допълнителна е-книга";
-"Heavy" = "Тежка";
 "Home" = "Начало";
 "Important: most podcast apps require the RSS feed URL to use HTTPS." = "Предупреждение: Повечето приложения за подкасти изискват URL адресът на RSS емисията да използва HTTPS";
 "Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this." = "Предупреждение: Един или повече от вашите епизоди нямат дата на публикуване. Някои приложения за подкасти изискват това.";
@@ -78,8 +77,8 @@
 "Loading" = "Зарежда...";
 "Lock player" = "Заключване на плейъра";
 "Mark as finished" = "Маркирай като завършено";
+"Mark book finished?" = "Сигурни ли сте, че искате да маркирате този елемент като завършен?";
 "Mark finished" = "Маркирай като завършено";
-"Medium" = "Средно";
 "Minutes listened in the last 7 days" = "Изслушани минути (последните 7 дни)";
 "Mirrored" = "Дублирано";
 "Name" = "Име";
@@ -96,6 +95,7 @@
 "No playlists yet." = "Нямате създадени плейлисти";
 "No podcasts found" = "Няма намерени подкасти";
 "No series" = "Няма серии";
+"Not connected" = "Audiobookshelf сървър не е включен";
 "Not finished" = "Не е приключено";
 "Not started" = "Не е започнато";
 "Number of episodes" = "Брой епизоди";
@@ -133,6 +133,7 @@
 "Server folder" = "Папка";
 "Settings" = "Настройки";
 "Show server address" = "Демаскирай адреса на съвърът";
+"Sign out" = "Прекъснете връзката";
 "Single page" = "Единична страница";
 "Sleep" = "Таймер за изключване";
 "Sleep timer" = "Таймер за изключване";
@@ -154,7 +155,14 @@
 "Yes" = "Да";
 "Your libraries" = "Библиотеки";
 "Your listening" = "Вашата статистика";
+"hapticStrength::Heavy" = "Тежка";
+"hapticStrength::Light" = "Светло";
+"hapticStrength::Medium" = "Средно";
+"hapticStrength::Off" = "Изключено";
 "minutes" = "минути";
 "minutes listening" = "Общо слушани минути";
+"theme::Black" = "Черен";
+"theme::Dark" = "Тъмна";
+"theme::Light" = "Светла";
 "{0} episodes" = "{0} епизоди";
 "{0} remaining" = "{0} оставащи";
