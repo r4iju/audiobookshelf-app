@@ -16,12 +16,21 @@ final class NativeStringsTests: XCTestCase {
         XCTAssertEqual(strings("ar")("Haptic feedback"), "ردود الفعل اللمسية")
     }
 
+    /// Native texts whose legacy screen showed the same thing under other English wording, such as the reader settings
+    /// sheet, the podcast form, the bookmarks panel and the server download queue, keep the legacy translation.
+    func testNativeWordingOfALegacyLabelShowsTheLegacyTranslation() {
+        XCTAssertEqual(strings("de")("Reading settings"), "E-Reader Einstellungen")
+        XCTAssertEqual(strings("de")("Show server address"), "Server Adresse anzeigen")
+        XCTAssertEqual(strings("ar")("No playlists yet."), "ليس لديك أي قوائم تشغيل")
+        XCTAssertEqual(strings("fr")("Waiting for {0} episode(s) from your server", 3), "3 épisode(s) mis en file pour téléchargement")
+    }
+
     func testEnglishKeepsTheNativeWording() {
         XCTAssertEqual(strings("en-us")("Continue listening"), "Continue listening")
     }
 
     func testTextWithoutALegacyEquivalentFallsBackToEnglish() {
-        XCTAssertEqual(strings("de")("Network preferences"), "Network preferences")
+        XCTAssertEqual(strings("de")("Diagnostics"), "Diagnostics")
     }
 
     /// Renderers outside the app, such as the year export, receive an immutable copy of only the translated texts, so
