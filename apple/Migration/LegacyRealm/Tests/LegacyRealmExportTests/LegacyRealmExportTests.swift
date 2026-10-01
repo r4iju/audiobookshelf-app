@@ -545,6 +545,77 @@ final class LegacyRealmExportTests: XCTestCase {
         XCTAssertEqual(LegacyExportJob.message(for: CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: "/private/\(Self.accessToken)"])),
                        LegacyExportJob.Message.failed, "unexpected errors are described generically, never with their paths")
     }
+
+    private typealias SaveOutcome = Result<Bool, LegacyExportSessionError>
+
+    private func copyRealm(_ url: URL) throws {
+        try FileManager.default.copyItem(at: realmURL, to: url)
+    }
+
+    func testASaveDialogThatCannotBeShownRejectsTheSaveAndTheNextSaveStillOpens() throws {
+        try seedLegacyRealm()
+        let session = LegacyExportSession(job: job())
+        let result = try session.export(webStorage: [:], copyRealm: copyRealm, progress: nil)
+        var outcomes: [SaveOutcome] = []
+
+        session.save(presentingWith: { _, done in done(.failure(.saveUnavailable)) }) { outcomes.append($0) }
+
+        XCTAssertEqual(outcomes, [.failure(.saveUnavailable)], "a dialog that was never shown rejects the call instead of leaving it pending")
+        var presented: [URL] = []
+        session.save(presentingWith: { url, done in
+            presented.append(url)
+            done(.success(true))
+        }) { outcomes.append($0) }
+        XCTAssertEqual(presented, [result.url], "a failed presentation leaves nothing behind that blocks the next save")
+        XCTAssertEqual(outcomes.last, .success(true))
+    }
+
+    func testThePackageCannotBeReplacedOrRemovedWhileItsSaveDialogIsOpen() throws {
+        try seedLegacyRealm()
+        let session = LegacyExportSession(job: job())
+        let result = try session.export(webStorage: [:], copyRealm: copyRealm, progress: nil)
+        var finish: LegacyExportSession.SaveCompletion?
+        var outcomes: [SaveOutcome] = []
+        session.save(presentingWith: { _, done in finish = done }) { outcomes.append($0) }
+
+        XCTAssertThrowsError(try session.discard()) { XCTAssertEqual($0 as? LegacyExportSessionError, .busy) }
+        XCTAssertThrowsError(try session.export(webStorage: [:], copyRealm: copyRealm, progress: nil)) {
+            XCTAssertEqual($0 as? LegacyExportSessionError, .busy)
+        }
+        XCTAssertNoThrow(try LegacyArchive.open(result.url), "the package the dialog is saving stays whole")
+        var second: [SaveOutcome] = []
+        session.save(presentingWith: { _, _ in XCTFail("a second dialog must not open") }) { second.append($0) }
+        XCTAssertEqual(second, [.failure(.busy)])
+        XCTAssertEqual(outcomes, [])
+
+        finish?(.success(false))
+        finish?(.success(true))
+
+        XCTAssertEqual(outcomes, [.success(false)], "the save resolves exactly once")
+        XCTAssertNoThrow(try session.discard())
+        XCTAssertFalse(FileManager.default.fileExists(atPath: result.url.path))
+    }
+
+    func testNothingIsSavedOrDiscardedBeforeOrDuringAnExport() throws {
+        try seedLegacyRealm()
+        let session = LegacyExportSession(job: job())
+        var outcomes: [SaveOutcome] = []
+        session.save(presentingWith: { _, _ in XCTFail("nothing to show yet") }) { outcomes.append($0) }
+        XCTAssertEqual(outcomes, [.failure(.nothingToSave)])
+        var discardError: Error?
+
+        _ = try session.export(webStorage: [:], copyRealm: { url in
+            session.save(presentingWith: { _, _ in XCTFail("the package is still being written") }) { outcomes.append($0) }
+            do { try session.discard() } catch { discardError = error }
+            try self.copyRealm(url)
+        }, progress: nil)
+
+        XCTAssertEqual(outcomes, [.failure(.nothingToSave), .failure(.busy)])
+        XCTAssertEqual(discardError as? LegacyExportSessionError, .busy)
+        let messages = [LegacyExportSessionError.busy, .nothingToSave, .saveUnavailable].map { LegacyExportJob.message(for: $0) }
+        XCTAssertEqual(Set(messages).count, 3, "each refusal is explained in its own words")
+        XCTAssertFalse(messages.contains(LegacyExportJob.Message.failed))
+    }
 }
 
 private struct FakeRefreshTokens: LegacyRefreshTokenReading {
