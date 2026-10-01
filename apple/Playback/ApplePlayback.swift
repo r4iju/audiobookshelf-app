@@ -42,6 +42,7 @@ import UIKit
     private var pausedAt: Date?
     private var interruptedGeneration: UUID?
     private var playbackIntent = UUID()
+    var playbackIntentID: UUID { playbackIntent }
     private var audioObservers: [NSObjectProtocol] = []
     private var nowPlayingArtwork: MPMediaItemArtwork?
     @Published var rewindAfterPause = UserDefaults.standard.object(forKey: "previewResumeRewind") as? Bool ?? true {
