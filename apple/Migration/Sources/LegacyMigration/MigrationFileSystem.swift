@@ -7,6 +7,8 @@ public protocol MigrationFileSystem {
     func copy(_ source: URL, to destination: URL) throws
     func availableCapacity(at directory: URL) throws -> Int64
     func writeAtomically(_ data: Data, to url: URL) throws
+    /// Reads the next chunk of the file at `url` through `handle`; empty at its end.
+    func read(_ handle: FileHandle, upToCount count: Int, of url: URL) throws -> Data
 }
 
 public struct LocalMigrationFileSystem: MigrationFileSystem {
@@ -32,5 +34,9 @@ public struct LocalMigrationFileSystem: MigrationFileSystem {
         #else
         try data.write(to: url, options: .atomic)
         #endif
+    }
+
+    public func read(_ handle: FileHandle, upToCount count: Int, of url: URL) throws -> Data {
+        handle.readData(ofLength: count)
     }
 }

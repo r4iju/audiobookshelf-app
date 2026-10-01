@@ -225,7 +225,7 @@ final class FaultInjectingFileSystem: MigrationFileSystem {
     }
 
     func read(_ handle: FileHandle, upToCount count: Int, of url: URL) throws -> Data {
-        let chunk = handle.readData(ofLength: count)
+        let chunk = try real.read(handle, upToCount: count, of: url)
         if let hook = afterFirstRead, hook.name == url.lastPathComponent {
             afterFirstRead = nil
             try hook.action(url)

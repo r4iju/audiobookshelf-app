@@ -59,7 +59,7 @@ There is no automatic cross-sandbox import.
 apple/Migration/
   Package.swift                     LegacyMigration (Foundation + CryptoKit only), iOS 14, macOS 12
   Sources/LegacyMigration/          snapshot, plan, migrator, archive, outcome
-  Tests/LegacyMigrationTests/       36 tests, synthetic Documents tree and fault-injecting file system
+  Tests/LegacyMigrationTests/       37 tests, synthetic Documents tree and fault-injecting file system
   LegacyRealm/Package.swift         LegacyRealmExport (RealmSwift 10.54.6 exact)
   LegacyRealm/Sources/...           schema-21 mirror classes, Realm reader, installation source,
                                     archive exporter, read-only legacy Keychain reader
@@ -104,7 +104,9 @@ the default schema, so they cannot collide with any other Realm schema in either
   stamp (device, inode, size, modification and change time, kept in `verified.json`) is unchanged
   since its content was last confirmed: writing content moves the change time, which cannot be
   set back, and replacing a file changes its inode, so a same-size change is always rehashed and
-  caught. The first check after a migration hashes everything; later launches only stat. It
+  caught. A hash only counts when the file's stamp is the same before and after reading and the
+  path still names that file afterwards, so a write landing behind the read position during
+  hashing is reported, never recorded as verified. The first check after a migration hashes everything; later launches only stat. It
   returns nil when nothing was committed and throws `committedMigrationDamaged` when the record
   no longer holds; the app then runs `migrate` with the source to repair. `migrate` itself always
   rehashes. If the source is gone (an archive the user deleted),
@@ -361,6 +363,13 @@ bytes passed both checks and was returned by `migrate`. Then core 36 of 36 and R
 7 passing, with the legacy tree, the symbolic link targets and the original fingerprint unchanged
 through a failed repair. The iOS 14 device and simulator typecheck of the core was repeated with
 no errors or warnings.
+
+Sixth round (final re-review of `497e3cc0`), committed red first at `ffb979a4`: 1 new core test
+with 3 assertion failures. Through a read seam on `MigrationFileSystem`, it writes to an adopted
+file right after its first chunk was hashed; the old code handed out the changed file, and the
+seam was never reached because hashing read the file directly. Then core 37 of 37 and Realm
+adapter 7 of 7 passing, the legacy tree and fingerprint unchanged, and the iOS 14 device and
+simulator typecheck with no errors or warnings.
 
 ## Remaining physical gates (open)
 

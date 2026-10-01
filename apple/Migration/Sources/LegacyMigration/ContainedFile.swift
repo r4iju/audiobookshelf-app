@@ -47,21 +47,33 @@ enum ContainedFile {
         return FileStamp(info)
     }
 
-    /// SHA-256 of a regular file, refusing a symbolic link. The stamp is taken before reading, so a
-    /// change made while reading leaves a later stamp than the one returned.
-    static func digest(of url: URL) throws -> (sha256: String, stamp: FileStamp) {
+    /// SHA-256 of a regular file, refusing a symbolic link. The file's stamp is taken before and
+    /// after reading and must agree, so content written while it was read, even behind the read
+    /// position, never yields a digest.
+    static func digest(of url: URL, reading fileSystem: MigrationFileSystem) throws -> (sha256: String, stamp: FileStamp) {
         let descriptor = open(url.path, O_RDONLY | O_NOFOLLOW)
         guard descriptor >= 0 else { throw CocoaError(.fileReadNoSuchFile, userInfo: [NSURLErrorKey: url]) }
         let handle = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
-        var info = stat()
-        guard fstat(descriptor, &info) == 0, info.st_mode & S_IFMT == S_IFREG else { throw CocoaError(.fileReadCorruptFile, userInfo: [NSURLErrorKey: url]) }
+        var before = stat()
+        guard fstat(descriptor, &before) == 0, before.st_mode & S_IFMT == S_IFREG else { throw CocoaError(.fileReadCorruptFile, userInfo: [NSURLErrorKey: url]) }
         var hasher = SHA256()
         while true {
-            let chunk = handle.readData(ofLength: 1 << 20)
+            let chunk = try fileSystem.read(handle, upToCount: 1 << 20, of: url)
             if chunk.isEmpty { break }
             hasher.update(data: chunk)
         }
-        return (hasher.finalize().hex, FileStamp(info))
+        var after = stat()
+        guard fstat(descriptor, &after) == 0, FileStamp(after) == FileStamp(before) else { throw CocoaError(.fileReadCorruptFile, userInfo: [NSURLErrorKey: url]) }
+        return (hasher.finalize().hex, FileStamp(after))
+    }
+
+    /// Digest of the contained regular file at `base/path`, when its content held still while it
+    /// was read and the path still names that same file afterwards.
+    static func stableDigest(_ path: String, under base: URL, reading fileSystem: MigrationFileSystem) -> (url: URL, sha256: String, stamp: FileStamp)? {
+        guard let url = url(path, under: base), let (sha256, stamp) = try? digest(of: url, reading: fileSystem),
+              self.url(path, under: base) == url, self.stamp(of: url) == stamp
+        else { return nil }
+        return (url, sha256, stamp)
     }
 
     /// Clears the way to `base/path`: the first component below `base` that is not a real directory

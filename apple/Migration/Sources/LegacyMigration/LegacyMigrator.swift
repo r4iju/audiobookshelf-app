@@ -106,7 +106,7 @@ public final class LegacyMigrator {
         var adopted: [String: MigratedFile] = [:]
         var pendingTransfer: [(PlannedFile, String)] = []
         for planned in plan.files.values.sorted(by: { $0.key < $1.key }) {
-            let digest = try ContainedFile.digest(of: planned.source).sha256
+            let digest = try ContainedFile.digest(of: planned.source, reading: fileSystem).sha256
             let destination = "Files/\(planned.destination)"
             if let recorded = source.recordedDigests[planned.legacyPath], recorded != digest {
                 plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath, MigrationPlan.damagedInExportMessage)
@@ -118,7 +118,7 @@ public final class LegacyMigrator {
                             "This downloaded file changed after it was migrated, in both apps. It is no longer used; download it again.")
                 continue
             }
-            if let existing = ContainedFile.url(destination, under: root), (try? ContainedFile.digest(of: existing).sha256) == digest {
+            if ContainedFile.stableDigest(destination, under: root, reading: fileSystem)?.sha256 == digest {
                 adopted[planned.key] = planned.migrated(sha256: digest)
             } else {
                 pendingTransfer.append((planned, digest))
@@ -139,7 +139,7 @@ public final class LegacyMigrator {
                 }
                 try fileSystem.copy(planned.source, to: staged)
             }
-            guard try ContainedFile.digest(of: staged).sha256 == digest else {
+            guard try ContainedFile.digest(of: staged, reading: fileSystem).sha256 == digest else {
                 try? FileManager.default.removeItem(at: staged)
                 plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath,
                             "This downloaded file changed while it was being moved. The original is unchanged; run the migration again.")
@@ -219,17 +219,17 @@ public final class LegacyMigrator {
     /// directories only, with its committed size and digest. `verified` holds stamps of files
     /// whose content was confirmed; with `trustingStamps`, an unchanged stamp stands for a rehash.
     private func intactURL(of file: MigratedFile, verified: inout [String: VerifiedFile], trustingStamps: Bool) -> URL? {
-        guard let url = ContainedFile.url("Files/\(file.path)", under: root) else { return nil }
+        let path = "Files/\(file.path)"
         if trustingStamps, let known = verified[file.path], known.sha256 == file.sha256, known.stamp.size == Int64(file.size),
-           ContainedFile.stamp(of: url) == known.stamp {
+           let url = ContainedFile.url(path, under: root), ContainedFile.stamp(of: url) == known.stamp {
             return url
         }
-        guard let (digest, stamp) = try? ContainedFile.digest(of: url), digest == file.sha256, stamp.size == Int64(file.size) else {
+        guard let read = ContainedFile.stableDigest(path, under: root, reading: fileSystem), read.sha256 == file.sha256, read.stamp.size == Int64(file.size) else {
             verified[file.path] = nil
             return nil
         }
-        verified[file.path] = VerifiedFile(sha256: digest, stamp: stamp)
-        return url
+        verified[file.path] = VerifiedFile(sha256: read.sha256, stamp: read.stamp)
+        return read.url
     }
 
     private func requireSupportedSchema(_ source: LegacySource) throws {
