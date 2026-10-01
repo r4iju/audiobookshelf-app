@@ -94,6 +94,16 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     login_outcomes = []
     requests = []
     realtime_authentications = []
+    # Access tokens are renewed by `/__fixture__/expire-access` and accounts signed out server-side by
+    # `/__fixture__/revoke`, so clients can be checked mid-session. Configuring any mode restores both.
+    tokens = {'renewals': 0, 'revoked': set()}
+    revocations = []
+
+    def access_token(username):
+        return ('fresh' if tokens['renewals'] == 0 else f"fresh-r{tokens['renewals']}") + ('-other' if username == 'qa-other' else '')
+
+    def token_owner(token):
+        return next((name for name in users if token == access_token(name) and name not in tokens['revoked']), None)
     remote_events = []
     remote_originals = {'progress': {}, 'playlists': {}}
     configuration = {'mode': 'baseline', 'failed': False}
@@ -138,11 +148,12 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             return path, parse_qs(parsed.query)
 
         def authorized(self):
-            return self.headers.get('Authorization') in ('Bearer fresh', 'Bearer fresh-other')
+            header = self.headers.get('Authorization') or ''
+            return header.startswith('Bearer ') and token_owner(header[len('Bearer '):]) is not None
 
         @property
         def account(self):
-            return other_user if self.headers.get('Authorization') == 'Bearer fresh-other' else user
+            return users[token_owner((self.headers.get('Authorization') or '')[len('Bearer '):]) or 'qa']
 
         @property
         def progress(self):
@@ -296,7 +307,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     return self.respond(401, {})
                 return self.respond(200, {'user': {**user, 'accessToken': 'expired', 'refreshToken': 'refresh'}})
             if path == '/__fixture__/observations':
-                return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None], 'collections': collections, 'playlists': playlists, 'realtimeAuthentications': realtime_authentications})
+                return self.respond(200, {'revocations': revocations, 'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None], 'collections': collections, 'playlists': playlists, 'realtimeAuthentications': realtime_authentications})
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
@@ -466,10 +477,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     download['readyAt'] = time.monotonic()
                 return self.respond(200, {})
             if path == '/__fixture__/realtime-auth':
-                token = data.get('token')
-                if token not in ('fresh', 'fresh-other'):
+                owner = token_owner(data.get('token'))
+                if owner is None:
                     return self.respond(401, {})
-                identity = other_user['id'] if token == 'fresh-other' else user['id']
+                identity = users[owner]['id']
                 realtime_authentications.append(identity)
                 return self.respond(200, {'userId': identity})
             if path == '/__fixture__/remote-change':
@@ -479,6 +490,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
+                tokens.update(renewals=0, revoked=set())
+                revocations.clear()
                 remote_events.clear()
                 for (account_id, key), original in remote_originals['progress'].items():
                     if original is None: progress_by_user[account_id].pop(key, None)
@@ -561,21 +574,31 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     progress[('book-0', None)].update(currentTime=19, duration=20, progress=0.95, isFinished=False, lastUpdate=time.time() * 1000)
                     user['mediaProgress'] = list(progress.values())
                 return self.respond(200, {})
+            if path == '/__fixture__/expire-access':
+                tokens['renewals'] += 1
+                return self.respond(200, {})
+            if path == '/__fixture__/revoke':
+                if data.get('username') not in users:
+                    return self.respond(400, {})
+                tokens['revoked'].add(data['username'])
+                revocations.append(users[data['username']]['id'])
+                return self.respond(200, {})
             if path == '/login':
                 accepted = data.get('username') in users and data.get('password') == 'qa'
                 login_outcomes.append({'accepted': accepted, 'usernameMatches': data.get('username') in users, 'passwordMatches': data.get('password') == 'qa'})
                 if not accepted:
                     return self.respond(401, {})
                 suffix = '-other' if data['username'] == 'qa-other' else ''
-                return self.respond(200, {'user': {**users[data['username']], **({'token': 'fresh' + suffix} if auth_mode == 'legacy' else {'token': 'expired' + suffix, 'accessToken': 'expired' + suffix, 'refreshToken': 'refresh' + suffix})},
+                tokens['revoked'].discard(data['username'])
+                return self.respond(200, {'user': {**users[data['username']], **({'token': access_token(data['username'])} if auth_mode == 'legacy' else {'token': 'expired' + suffix, 'accessToken': 'expired' + suffix, 'refreshToken': 'refresh' + suffix})},
                     'serverSettings': {'version': '2.30.0-fixture', 'language': 'en-us'}, 'userDefaultLibraryId': 'books', 'ereaderDevices': []})
             if path == '/auth/refresh':
                 token = self.headers.get('x-refresh-token')
-                if token not in ('refresh', 'refresh-other'):
+                username = {'refresh': 'qa', 'refresh-other': 'qa-other'}.get(token)
+                if username is None or username in tokens['revoked']:
                     return self.respond(401, {})
-                suffix = '-other' if token == 'refresh-other' else ''
-                account = other_user if suffix else user
-                return self.respond(200, {'user': {**account, 'token': 'fresh' + suffix, 'accessToken': 'fresh' + suffix, 'refreshToken': 'refresh' + suffix}})
+                suffix = '-other' if username == 'qa-other' else ''
+                return self.respond(200, {'user': {**users[username], 'token': access_token(username), 'accessToken': access_token(username), 'refreshToken': 'refresh' + suffix}})
             if not self.authorized():
                 return self.respond(401, {})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):

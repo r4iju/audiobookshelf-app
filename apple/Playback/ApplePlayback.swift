@@ -101,6 +101,9 @@ import UIKit
     private var endObserver: NSObjectProtocol?
     private var failureObserver: NSObjectProtocol?
     private var itemStatus: NSKeyValueObservation?
+    /// The access token the current streamed item sends, and the item whose failure is being checked against it.
+    private var mediaToken: String?
+    private var recoveringMedia: AVPlayerItem?
     private var controlStatus: NSKeyValueObservation?
     private var syncTask: Task<Void, Never>?
     private var lastTick = Date()
@@ -296,6 +299,7 @@ import UIKit
 
     func toggle() { if wantsPlayback { pause() } else { resume() } }
     func resume() {
+        guard !needsSignIn else { return }
         playbackIntent = UUID()
         let pausedDuration = pausedAt.map { Date().timeIntervalSince($0) } ?? 0
         let rewind: Double = !rewindAfterPause || pausedDuration < 10 ? 0 : pausedDuration < 60 ? 3 : pausedDuration < 300 ? 10 : pausedDuration < 1800 ? 20 : 30
@@ -350,7 +354,7 @@ import UIKit
     func seek(to time: Double, autoplay: Bool) async throws {
         guard !closing, let session, session.position(at: time) != nil else { return }
         playbackIntent = UUID()
-        wantsPlayback = autoplay
+        wantsPlayback = autoplay && !needsSignIn
         pendingSeek = SeekRequest(time: min(max(time.isFinite ? time : 0, 0), session.duration), generation: generation)
         if let seekLoop { return try await seekLoop.value }
         tick(player.currentTime())
@@ -372,7 +376,7 @@ import UIKit
                 let finished = await player.seek(to: CMTime(seconds: position.localTime, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
                 guard !closing, request.generation == generation else { throw CancellationError() }
                 if pendingSeek != nil { continue }
-                guard finished else { throw PlaybackFailure.seekFailed }
+                guard finished else { throw recoveringMedia == nil ? PlaybackFailure.seekFailed : CancellationError() }
                 if let listeningID { try listening.record(id: listeningID, position: request.time, listened: 0) }
                 currentTime = request.time
                 if let end = sleepChapterEnd, currentTime >= end { endSleepTimer() }
@@ -401,14 +405,16 @@ import UIKit
         let requestNetworkEpoch = networkEpoch
         #endif
         let asset: AVURLAsset
+        var token: String?
         if let offlineFiles {
             guard offlineFiles.indices.contains(index), offlineFiles[index].isFileURL else { throw APIError.noAudio }
             asset = AVURLAsset(url: offlineFiles[index])
         } else {
-            let token = try await api.validToken()
+            let bearer = try await api.validToken()
+            token = bearer
             guard requestGeneration == generation, self.session?.id == session.id else { throw CancellationError() }
             let url = try api.mediaURL(session.audioTracks[index].contentUrl)
-            var options: [String: Any] = ["AVURLAssetHTTPHeaderFieldsKey": ["Authorization": "Bearer \(token)"]]
+            var options: [String: Any] = ["AVURLAssetHTTPHeaderFieldsKey": ["Authorization": "Bearer \(bearer)"]]
             #if os(iOS)
             if streamCellularConsent == nil {
                 let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.streamingKey)
@@ -426,6 +432,7 @@ import UIKit
         #endif
         let item = AVPlayerItem(asset: asset)
         trackIndex = index
+        mediaToken = token
         itemStatus = nil
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         if let failureObserver { NotificationCenter.default.removeObserver(failureObserver) }
@@ -437,20 +444,47 @@ import UIKit
         }
         failureObserver = NotificationCenter.default.addObserver(forName: .AVPlayerItemFailedToPlayToEndTime, object: item, queue: .main) { [weak self] _ in
             Task { @MainActor in
-                guard self?.player.currentItem === item else { return }
-                self?.playbackFailed()
+                self?.mediaFailed(item)
             }
         }
         itemStatus = item.observe(\.status, options: [.new]) { [weak self] item, _ in
             if item.status == .failed {
-                Task { @MainActor in
-                    guard self?.player.currentItem === item else { return }
-                    self?.playbackFailed()
-                }
+                Task { @MainActor in self?.mediaFailed(item) }
             }
         }
         player.replaceCurrentItem(with: item)
         installSleepBoundary()
+    }
+
+    /// The asset sends the token it was created with, so a server that stopped accepting that token fails the
+    /// stream. An authenticated request then renews the token, as for any other request, and the item is
+    /// reloaded once at the same position; a revoked login reaches `failed` as `signInRequired` instead.
+    private func mediaFailed(_ item: AVPlayerItem) {
+        guard player.currentItem === item, recoveringMedia !== item else { return }
+        guard offlineFiles == nil, let token = mediaToken, let session else { return playbackFailed() }
+        recoveringMedia = item
+        let requestGeneration = generation
+        let position = currentTime
+        player.pause()
+        playing = false
+        // A seek waiting on the failed item never finishes; cancelled, it ends quietly and the reload below follows.
+        item.cancelPendingSeeks()
+        Task { @MainActor in
+            defer { if recoveringMedia === item { recoveringMedia = nil } }
+            @MainActor func current() -> Bool { requestGeneration == generation && self.session?.id == session.id && player.currentItem === item }
+            do {
+                _ = try await api.me()
+                guard current() else { return }
+                recoveringMedia = nil
+                guard api.credentials?.accessToken != token else { return playbackFailed() }
+                player.replaceCurrentItem(with: nil)
+                try await seek(to: position, autoplay: wantsPlayback)
+            } catch is CancellationError {
+            } catch {
+                guard current() else { return }
+                if error as? APIError == .signInRequired { failed(error) } else { playbackFailed() }
+            }
+        }
     }
 
     private func playbackFailed() {
@@ -594,7 +628,11 @@ import UIKit
 
     private func failed(_ failure: Error, prefix: String = "", origin: FailureOrigin = .playback) {
         if failure is CancellationError { return }
-        if failure as? APIError == .signInRequired { needsSignIn = true }
+        if failure as? APIError == .signInRequired {
+            needsSignIn = true
+            // Audio, downloaded or streamed, stops with the login and waits for signing in again.
+            if wantsPlayback || playing { pause() }
+        }
         error = prefix + failure.localizedDescription
         failureOrigin = origin
     }

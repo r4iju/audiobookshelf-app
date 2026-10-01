@@ -4,13 +4,23 @@ import UIKit
 struct PlaybackContainer<Content: View>: View {
     @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var player: ApplePlayback
+    @EnvironmentObject private var connection: ConnectionStore
     @Environment(\.nativeStrings) private var l10n
     @State private var expanded = false
+    @State private var signInPrompt = false
     let content: Content
     var body: some View {
         content.padding(.bottom, player.session == nil && !player.preparing ? 0 : 86)
             .overlay(miniPlayer, alignment: .bottom)
             .fullScreenCover(isPresented: $expanded) { NowListening().environmentObject(player).nativeLocalization() }
+            // The full player offers the same choice next to its error.
+            .onChange(of: player.needsSignIn) { needed in signInPrompt = needed && !expanded }
+            .alert(isPresented: $signInPrompt) {
+                Alert(title: Text(l10n("Sign in again")),
+                      message: Text(l10n("The server no longer accepts this login. Listening saved on this device is kept and sent after you sign in.")),
+                      primaryButton: .default(Text(l10n("Sign in"))) { connection.reauthenticate() },
+                      secondaryButton: .cancel(Text(l10n("Not now"))))
+            }
             .recordsDiagnostics()
             .nativeLocalization()
     }
@@ -113,6 +123,12 @@ struct NowListening: View {
                     if player.sleepChapterEnd != nil { Text(l10n("Sleep at chapter end")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
                     Button { panel = .settings } label: { Label(l10n("Playback settings"), systemImage: "slider.horizontal.3") }.font(.footnote)
                     if let error = player.error { Text(error).font(.callout).foregroundColor(.red).accessibilityIdentifier("playback-error") }
+                    if player.needsSignIn {
+                        Button(l10n("Sign in again")) {
+                            presentation.wrappedValue.dismiss()
+                            connection.reauthenticate()
+                        }.font(.callout.bold()).accessibilityIdentifier("sign-in-again")
+                    }
                     Button(l10n("Close playback")) {
                         Task {
                             do { try await player.stop(); presentation.wrappedValue.dismiss() }

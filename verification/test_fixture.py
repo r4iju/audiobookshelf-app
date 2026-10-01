@@ -107,5 +107,55 @@ class LocalReferenceJourney(FixtureJourneyBase):
         self.assertEqual(error.exception.headers['Content-Range'], 'bytes */256044')
 
 
+class MidSessionTokenJourney(FixtureJourneyBase):
+    def rejected(self, path, data=None, token=None, headers=None):
+        with self.assertRaises(HTTPError) as error:
+            self.request(path, data, token, headers)
+        self.addCleanup(error.exception.close)
+        return error.exception.code
+
+    def media_status(self, token):
+        try:
+            with urlopen(Request(self.address + '/audio/1', headers={'Authorization': 'Bearer ' + token, 'Range': 'bytes=0-1'}), timeout=3) as response:
+                return response.status
+        except HTTPError as error:
+            error.close()
+            return error.code
+
+    def test_expired_access_is_rejected_until_the_session_refreshes_to_a_new_token(self):
+        refresh = self.request('/login', {'username': 'qa', 'password': 'qa'})['user']['refreshToken']
+        first = self.request('/auth/refresh', {}, headers={'x-refresh-token': refresh})['user']['accessToken']
+        self.assertEqual(self.media_status(first), 206)
+        self.request('/__fixture__/expire-access', {})
+        self.assertEqual(self.media_status(first), 401)
+        self.assertEqual(self.rejected('/api/me', token=first), 401)
+        renewed = self.request('/auth/refresh', {}, headers={'x-refresh-token': refresh})['user']
+        self.assertNotEqual(renewed['accessToken'], first)
+        self.assertEqual(renewed['username'], 'qa')
+        self.assertEqual(self.media_status(renewed['accessToken']), 206)
+        self.assertEqual(self.request('/api/me', token=renewed['accessToken'])['username'], 'qa')
+
+    def test_revoked_account_cannot_refresh_or_stream_until_it_signs_in_again(self):
+        refresh = self.request('/login', {'username': 'qa', 'password': 'qa'})['user']['refreshToken']
+        access = self.request('/auth/refresh', {}, headers={'x-refresh-token': refresh})['user']['accessToken']
+        other_refresh = self.request('/login', {'username': 'qa-other', 'password': 'qa'})['user']['refreshToken']
+        other = self.request('/auth/refresh', {}, headers={'x-refresh-token': other_refresh})['user']['accessToken']
+        self.request('/__fixture__/revoke', {'username': 'qa'})
+        self.assertEqual(self.media_status(access), 401)
+        self.assertEqual(self.rejected('/auth/refresh', {}, headers={'x-refresh-token': refresh}), 401)
+        self.assertEqual(self.media_status(other), 206, 'Revoking one account must not sign out another')
+        again = self.request('/login', {'username': 'qa', 'password': 'qa'})['user']['refreshToken']
+        renewed = self.request('/auth/refresh', {}, headers={'x-refresh-token': again})['user']['accessToken']
+        self.assertEqual(self.media_status(renewed), 206)
+        self.assertEqual(self.request('/__fixture__/observations')['revocations'], ['00000000-0000-4000-8000-000000000001'])
+
+    def test_configuring_a_mode_restores_the_original_tokens(self):
+        self.request('/__fixture__/expire-access', {})
+        self.request('/__fixture__/revoke', {'username': 'qa'})
+        self.request('/__fixture__/configure', {'mode': 'baseline'})
+        self.assertEqual(self.media_status('fresh'), 206)
+        self.assertEqual(self.request('/auth/refresh', {}, headers={'x-refresh-token': 'refresh'})['user']['accessToken'], 'fresh')
+
+
 if __name__ == '__main__':
     unittest.main()

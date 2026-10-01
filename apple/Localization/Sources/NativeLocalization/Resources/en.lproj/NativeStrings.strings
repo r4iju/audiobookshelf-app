@@ -492,6 +492,7 @@
 "The server could not find this item, feed or device." = "The server could not find this item, feed or device.";
 "The server download result could not be saved: {0}" = "The server download result could not be saved: {0}";
 "The server no longer accepts this login. Listening saved on this TV is kept and sent after you sign in." = "The server no longer accepts this login. Listening saved on this TV is kept and sent after you sign in.";
+"The server no longer accepts this login. Listening saved on this device is kept and sent after you sign in." = "The server no longer accepts this login. Listening saved on this device is kept and sent after you sign in.";
 "The server no longer accepts this login. Sign in again to continue." = "The server no longer accepts this login. Sign in again to continue.";
 "The server refused the request. A feed slug may already be in use, or the server could not send the ebook." = "The server refused the request. A feed slug may already be in use, or the server could not send the ebook.";
 "The server returned HTTP {0}. Please try again." = "The server returned HTTP {0}. Please try again.";

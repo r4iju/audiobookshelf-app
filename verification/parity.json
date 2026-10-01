@@ -447,12 +447,14 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "Contract only: production TVCore follows 401 + x-refresh-token and persists refreshed credentials in the aligned candidate gate (SERVER-COMPATIBILITY.md, verification/test_upgrade_gate.py). SavedConnectionsJourney.testLegacyAccountRefreshRetainsSelectedLibraryWithoutDuplicatingConnection. Renewal during active playback has no journey."
+          "Contract only: production TVCore follows 401 + x-refresh-token and persists refreshed credentials in the aligned candidate gate (SERVER-COMPATIBILITY.md, verification/test_upgrade_gate.py). SavedConnectionsJourney.testLegacyAccountRefreshRetainsSelectedLibraryWithoutDuplicatingConnection.",
+          "Simulator, synthetic fixture: PlaybackAuthorizationTests.testExpiredAccessDuringStreamingRenewsOnceAndPlaybackContinuesIntoTheNextFile. The server rejects the access token mid-stream (fixture expire-access); the production player renews through one shared refresh, saves the token and continues into the next file under the same account (APPLE-PLAYBACK-AUTHORIZATION.md). No live-server or hardware run."
         ],
         "android": [],
         "browser": [],
         "tv": [
-          "Contract only: TVCore refresh-token candidate in the compatibility gate (SERVER-COMPATIBILITY.md). Login expiry on the TV has no automated test (tvos/QA.md check 9 open)."
+          "Contract only: TVCore refresh-token candidate in the compatibility gate (SERVER-COMPATIBILITY.md). Login expiry on the TV has no automated test (tvos/QA.md check 9 open).",
+          "Shared player change only (APPLE-PLAYBACK-AUTHORIZATION.md); the TV builds but no TV journey renews during playback, and tvos/QA.md check 9 stays open."
         ]
       },
       "gates": {
@@ -517,12 +519,14 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "Partial: TVCoreTests.testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop; imported archive accounts arrive as reauthenticationRequired (APPLE-MIGRATION.md); pending listening stays with its account (SavedConnectionsJourney). No journey revokes a token server-side."
+          "Partial: TVCoreTests.testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop; imported archive accounts arrive as reauthenticationRequired (APPLE-MIGRATION.md); pending listening stays with its account (SavedConnectionsJourney).",
+          "Simulator, synthetic fixture: PlaybackAuthorizationTests revocation tests (streamed and downloaded) and PlaybackAuthorizationJourney.testRevokedLoginStopsPlaybackAndSigningInAgainDeliversItsListening. The fixture revokes the account mid-session; audio stops, cannot be resumed, the app asks to sign in again for that server and username, another account does not send the held listening, and signing in again delivers it (APPLE-PLAYBACK-AUTHORIZATION.md). Revocation is noticed at the next server contact. No live-server or hardware run."
         ],
         "android": [],
         "browser": [],
         "tv": [
-          "Contract only: TVCoreTests.testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop. The fixture cannot revoke a token; tvos/QA.md check 9 open."
+          "Contract only: TVCoreTests.testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop. tvos/QA.md check 9 open.",
+          "Shared player change only: a revoked login stops audio and blocks resuming until RootView's existing sign-in prompt completes. No TV journey; tvos/QA.md check 9 stays open."
         ]
       },
       "gates": {
@@ -1236,10 +1240,14 @@
         "then": "Resume follows platform policy, never surprises the user, and position is retained"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Local observation only: docs/modernization/evidence/playback-final/InterruptionRouteProbe.swift posts interruption and route notifications to the production handlers while synthetic audio decodes on a simulator; 9/9 behave as documented (APPLE-PLAYBACK-AUTHORIZATION.md). Real calls, Bluetooth and headsets on hardware are unproven."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Shared handlers observed on iOS simulator only (APPLE-PLAYBACK-AUTHORIZATION.md); nothing run on a TV."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
