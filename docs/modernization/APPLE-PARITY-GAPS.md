@@ -1,94 +1,35 @@
 # Apple parity gaps before cutover
 
-Reconciled on October 2, 2026, against `937f7936` (PR #80 merged on `fork/native-tv`), the unmerged worker branches named
-below, the Apple docs in this directory, `tvos/QA.md` and the local logs they cite. Per-row evidence is in
-`verification/parity.json`.
+Reconciled October 2, 2026 against merged `a77d7114` (PR #82) and root publication/authorization integration `da6460ef`. Evidence is local and synthetic unless expressly stated otherwise. These checks do not establish owner-device, live-server, iOS 14 runtime, or whole-platform acceptance.
 
-Nearly all evidence comes from simulators, unit tests, or signed local builds and installs against synthetic fixtures.
-No row has hardware, iOS 14 runtime, live-server or owner acceptance. No row is claimed complete, and the Apple apps are
-not claimed to be at full parity.
+## Integrated evidence
 
-## Integrated so far
-
-| PR | Merge | What is verified | What it does not close |
+| Work | Source / merge | Verified | Remaining limits |
 | --- | --- | --- | --- |
-| #76 | `e875498d` | Legacy export through Files for the separate-identity preview: the actual legacy app, with synthetic data, writes reader-generated WebView settings and cache, exports Settings, saves to Files, and the native app imports the archive | Owner-device migration, rollback, and the in-place route (gap 3) |
-| #79 | `000ea3c8` | Durable progress reset at `56990f46`: final iPhone and iPad reset suites 4/4. The signed Release build was verified and installed on the owner's paired iPhone and iPad without launching (`APPLE-PROGRESS-RESET.md`) | Interactive device acceptance. The publication-ordering blocker found afterward (gap 1) |
-| #80 | `937f7936` | TV diagnostics, accessibility and localization, source `8444b02d` (integrated as `1652c305`): the complete TV suite passes 38/38 (13 app unit tests, 25 remote-driven journeys), and a signed local tvOS Release build passes strict verification without a new provisioning call (`APPLE-TV-READINESS.md`) | TV hardware use: not installed, VoiceOver and readability from the sofa not checked |
+| Legacy export/import | PR #76, `e875498d` | Actual legacy app exports reader-generated WebView settings/cache and native imports synthetic archive through Files | Owner migration, rollback and optional in-place identity route |
+| Durable reset | PR #79, `000ea3c8` | Final phone and tablet reset suites 4/4, signed Release installed without launching | Subsequent publication gate changes require combined UI rerun |
+| TV readiness | PR #80, `937f7936` | 13 unit tests and 25 remote journeys; signed local TV Release verified | Hardware acceptance; latest TV recovery integration pending |
+| Realtime | PR #81, `39609d08` | Root Core 72, Native 66, phone realtime9 plus paused2; worker tablet 11. Every init resyncs visible screens; item feed changes and delayed action responses are guarded | Final combined tablet suite; server has no event replay |
+| Contrast, permissions and downloads | PR #82, `a77d7114` | Root Native 70, Core 72, UI 5, fixture 10; full owned storage volume, listed-size audio validation, completed audio preserved on PDF failure | Whole-device exhaustion, force-quit background behavior and physical transitions |
+| Publication gate | Root `8bce55b2`, from worker `8b544ef4` | Independent review clear. Per-transmission issued records retain unanswered writes, newer same-title writes wait durably, two-step restart retires only the requested snapshot. Other titles continue | TV remote recovery under implementation; final mobile recovery journey |
+| Playback authorization | Root `1f03c796`, from reviewed `2e70f1d` | Latest seek/pause intent survives renewal; revoked login blocks resumed audio. Combined native suite below includes all four decoded authorization cases | Root long-book UI journey passes; TV authorization acceptance remains |
 
-Earlier, at `315183c1`, the TV suite passed 20/20 journeys and 12/12 app unit tests, and the signed iPhone/iPad Release
-build was installed on both devices without launching. That TV result is superseded by the 38/38 at PR #80.
+Root combined source `8bce55b2`: all 85 NativeTests pass, zero skipped, with the full-volume and real-audio synthetic fixtures active (`/tmp/abs-root-publication-auth-native-all.log`; `apple/build-remaining-qa/results/storage-Audiobookshelf-Root-Related-QA-20261002-065758.xcresult`). Core 72 and fixture 12 pass. Earlier invocation skipped five fixture-dependent tests and is superseded by this run. Later `ad502e5d` and `f08e3e1c` correct whole-book time assertions and the iPad account-menu selector; `da6460ef` keeps the new recovery notice on the adaptive contrast palette.
 
-## In progress, not integrated
+Root long-book revocation UI journey also passes 1/1 at `da6460ef`, result `apple/build-remaining-qa/derived/Logs/Test/Test-AudiobookshelfNative-2026.10.02_06-59-20-+0900.xcresult`, log `/tmp/abs-root-publication-auth-ui.log`. iOS14 source typecheck passes all 69 actual target sources (`/tmp/abs-root-publication-auth-minimum.log`).
 
-These are worker states seen locally on October 2. None is merged, and none closes its gap until it is reviewed and
-integrated, and its suite passes on the integration commit.
+Root reset journeys pass 4/4 at `da6460ef`, result `apple/build-reset/Root-Publication-Reset-20261002-070046.xcresult`, log `/tmp/abs-root-publication-auth-reset-ui.log`. The baseline/modern-auth compatibility invocation and `verification.test_upgrade_gate` both pass after supplying the matching local dependency tree through a read-only symlink. This resolves the worker checkout’s missing `socket.io-client` dependency; it is not live-server certification.
 
-| Work | Branch and SHA | State |
-| --- | --- | --- |
-| Publication safety (progress writes against reset) | `fork/apple-native-publication-safety` at `99780f35` (RED `971ccaa9`) | Under independent review, **not complete**. New concern: after an unresolved original write, `ListeningSync.flush` retries with the same cumulative session ID, and later listening can be sent meanwhile. So an older original could still land a smaller `timeListening` or `currentTime` after a newer cumulative write was accepted. Server 2.30 replaces rather than linearizes. Review also found that restart confirmation clears attempts issued after the actual restart; both blockers remain under correction. The issuing hook is invoked again on a recursive 401 resend |
-| Realtime feeds, pre-`init` changes, overlapping item-action loads | `fork/apple-realtime-sync` at `837cafc1` | Independent review cleared. NativeTests 52/52; RealtimeJourney 9/9 plus PausedRealtimeJourney 2/2: 11/11 on iPhone and 11/11 on iPad (`APPLE-REALTIME.md` on that branch, `/tmp/realtime-sync-qa/`) |
-| Root realtime integration | `fork/apple-final-realtime-integration` at `87215563` (over `937f7936`) | Core 72/72 (`/tmp/abs-root-realtime-final-core.log`). NativeTests 66/66 and iPhone realtime plus paused-player journeys 11/11 also pass (`/tmp/abs-root-realtime-final-native-unit.log`, `/tmp/abs-root-realtime-final-ui.log`). Socket contracts 2/2, item-actions fixtures 4/4, and iOS 14 source typecheck pass. This is an incremental integration, not the final combined mobile suite |
-| Token renewal, revocation, interruption and route probe | `fork/apple-playback-final-qa` at `84a9047e` | Under correction. Review blocker: `mediaFailed` captures the position before awaiting `api.me`, so a same-track seek during a delayed renewal can be lost and the older position restored. The revocation journey's 20-second book can pause at its natural end, so its pass does not prove revocation. A long synthetic audio mode, a RED with handling removed, and a GREEN are being added |
-| Full iPhone and iPad suites | `fork/apple-final-mobile-qa` and `fork/apple-final-mobile-ipad-qa` at `56990f46` | The full journey suites are running on both devices, with corrections to tests whose elapsed-time assumptions were wrong. Uncommitted test edits are in both worktrees. **No final combined-suite pass is claimed** |
-| Collections, downloads and contrast | `fork/apple-remaining-local-qa` at `8286f63c` | Source review cleared `b405a805`; the storage classification correction is `553fd012` (RED `63ed02cf`). NativeTests 68/68 on the worker. Listed-size validation rejects truncated transfers without Content-Length, and collections follow actual update/delete permissions. iPhone and iPad contrast audits and collection-denial journeys pass; the new admin-permission journey passes on iPhone. Completed audio remains playable when a PDF fails. Evidence and remaining local gaps are recorded in `APPLE-REMAINING-QA.md`; this is not final combined-suite acceptance |
+## Remaining local gates
 
-## Open gaps, in priority order
-
-1. **Publication ordering (blocks whole-platform replacement).** A replay acknowledgment cannot prove that a timed-out
-   original server write has finished on server 2.30. An original listening sync or primary-reading PATCH can then
-   complete after a progress reset and recreate discarded progress. Ordinary cumulative listening history must also never
-   regress or duplicate. Earlier passing reset tests cover their documented failure paths, not this case. Correction:
-   `99780f35`, under review (above).
-2. **Token renewal during playback (story-12) and server-side revocation (story-14).** At `937f7936`, only contract tests
-   and the existing rows in `parity.json` cover these. `84a9047e` adds fixture expire and revoke modes, renewal and
-   revocation handling, and journeys, but it has the open latest-seek blocker and the weak revocation proof (above).
-3. **Migration, in-place alternative (story-58).** The delivered preview uses the separate-identity route: export from the
-   legacy app through Files, then import (PR #76). These checks apply only if the in-place alternative identity is
-   adopted instead:
-   - a compatible-identity build (legacy bundle ID, team and Keychain group);
-   - reading a Realm written by an actual legacy 0.14.2-beta build;
-   - reading the old WebView store directly during an upgrade.
-
-   Owner-device migration and rollback remain unproven on either route.
-4. **Combined iPhone and iPad rerun.** Most journeys passed on the slice that introduced them. The full suites must pass
-   once on the final integration commit, which includes the publication-safety, playback-authorization, realtime and
-   remaining-QA work. The runs at `56990f46` predate those. Presentation journeys have not been confirmed on iPad in a
-   combined run.
-5. **Realtime (`upstream-realtime`).** At `937f7936`:
-   - the item page ignores `rss_feed_open` and `rss_feed_closed`;
-   - changes made before the first `init` stay hidden until the next one, because server 2.30 keeps no replay.
-
-   `837cafc1` addresses both by resyncing visible screens on every `init` and following item feeds. It is cleared, but
-   its integration at `87215563` passes the 11 iPhone realtime and paused-player journeys. Queued unsent listening through a reconnection is guarded only
-   against the synthetic fixture on simulators. Changes missed while suspended are recovered only by that resync.
-6. **Interruptions and route changes (story-34).** No recorded observation at `937f7936`. The probe in `84a9047e` posts
-   interruption and route notifications to the production handlers while synthetic audio decodes on a simulator, and
-   passes 9/9. It lands with gap 2's branch. Real calls, Siri, alarms, CarPlay and Bluetooth on hardware remain
-   unobserved.
-7. **Collections and playlists (story-22).**
-   - The refused-edit case is fixed on the remaining-QA branch, not integrated.
-   - Still open: partial membership failure and retry, unavailable or deleted members, collection editing, and podcast
-     playlist membership editing.
-   - `CollectionJourney.testCreateReorderRemoveAndDeletePlaylistThroughRelaunch` failed in 3 of 4 runs on the
-     pre-correction realtime wiring, with no cause found. It needs a clean result in the combined rerun.
-8. **Downloads (story-42, 43).**
-   - Out-of-space handling is fixed on the remaining-QA branch, not integrated.
-   - A later PDF failure making downloaded audio unplayable offline has a RED only.
-   - Still untested: background transfer interruption, device restart, and actual cellular transitions.
-9. **Accessibility (story-53).**
-   - Mobile text contrast is fixed on the remaining-QA branch, not integrated.
-   - Not checked: VoiceOver walkthroughs and reduced motion on iPhone and iPad.
-   - On TV, the audit passes on six screens in the simulator. Hardware VoiceOver, contrast and readability checks are
-     open (`APPLE-TV-READINESS.md`).
-10. **Localization (story-54).**
-    - Non-English mobile coverage at `315183c1` was 15–21%. Untranslated text falls back to English.
-    - Cellular consent uses the shared lookup and generated English templates.
-    - The TV uses only legacy translations, and its Language screen says the rest stays English. On TV, the author and
-      series pages, `ApplePlayback` messages and TVCore error descriptions remain English.
-    - No new translations are claimed.
-11. **iOS 14 runtime.** Only typechecking has been done, because Xcode 27 needs a build-only iOS 15 override. The app must
-    run on an older runtime or SDK before the supported audience is confirmed.
+1. **Final combined phone and tablet suites.** Initial broad runs predate the integrated source. Whole-book time assertions and iPad duplicate menu selection are corrected without relaxing their numeric thresholds. Account-switch restoration is still intermittent in the phone slice; the iPad timer interaction is still under diagnosis. No final full-suite pass is claimed.
+2. **TV unanswered-save recovery.** Shared gating is integrated, but the TV needs a remote-operable request-before-restart / confirm-after-restart flow. This is in a separate worktree, including meaningful RED/GREEN and remote journeys.
+3. **Combined reset/recovery and authorization UI.** Unit safety passes; run the journeys on the final source, including preservation of held listening and no automatic playback after sign-in.
+4. **Collections and playlists.** Permission-denial journeys pass. Worker probes cover partial membership retry, unavailable members, editing through relaunch and podcast playlist membership. The formerly intermittent collection relaunch journey must pass the final suite on corrected realtime wiring.
+5. **Localization.** Existing native coverage is approximately 15–21% for non-English languages, with explicit English fallback. A fresh mapping audit is in progress. No full translation claim is made. TV author/series pages and shared playback/error text retain documented English gaps.
+6. **Accessibility.** Targeted contrast audits pass, including tablet worker evidence. Full VoiceOver walkthroughs, reduced-motion checks and unaudited screens remain unverified.
+7. **iOS14 runtime.** Source typechecks alone do not establish runtime support. Current Xcode requires the documented iOS15 build override; an older runtime/SDK remains necessary for actual iOS14 acceptance.
+8. **Interruption and route behavior.** The production-handler simulator probe passed 9/9 while decoding audio. Real calls, Siri, alarms, CarPlay/Bluetooth and media-services-reset recovery remain unverified.
 
 ## Physical, live-server and owner gates (none performed)
 

@@ -132,3 +132,7 @@ The renewal test asserts:
   - `verification/compatibility.py` catches the resulting parse error, prints its generic "could not complete" report on stdout and exits 2, so the test shows an empty stderr.
 
   No packages were installed here. Root will address it when integrating the final source.
+
+## Root integration evidence
+
+The root integration `da6460ef` combines this correction with publication safety, realtime and polish. All 85 NativeTests pass with zero skips with synthetic audio and full-volume storage active (`/tmp/abs-root-publication-auth-native-all.log`). Core72, fixture12, the long-book UI journey1/1, and reset journeys4/4 pass. iOS14 source typecheck passes69 target files. The local compatibility invocation and `verification.test_upgrade_gate` pass with the matching local dependency tree supplied by a read-only symlink (`/tmp/abs-root-publication-auth-compatibility.log`, `/tmp/abs-root-publication-auth-upgrade.log`); the earlier dependency-only failure remains recorded above and is superseded locally. Full combined phone/tablet and TV journeys and physical acceptance remain open.
