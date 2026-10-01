@@ -29,6 +29,7 @@ import com.audiobookshelf.core.Chapter
 import com.audiobookshelf.core.DeviceInfo
 import com.audiobookshelf.core.ListeningJournal
 import com.audiobookshelf.core.ListeningMedia
+import com.audiobookshelf.core.SleepTimer
 import com.audiobookshelf.core.Timeline
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -66,6 +67,9 @@ data class PlayerState(
     val finished: Boolean = false,
     /** Failure after media was opened; retry reopens at the same position. */
     val error: String? = null,
+    /** Seconds left on the sleep timer, or null when none is running. */
+    val sleepRemaining: Double? = null,
+    val sleepEndOfChapter: Boolean = false,
     /** Failure opening an item, keyed by `itemId/episodeId` so the item screen can explain it. */
     val openError: Pair<String, String>? = null,
 )
@@ -129,6 +133,9 @@ class PlaybackEngine(
 
     val player: ExoPlayer by lazy { buildPlayer() }
 
+    private val sleep = SleepController(context, settings, onShakeRestart = { if (!player.playWhenReady) resume() })
+        .also { controller -> controller.bind { Triple(globalPosition(), loaded?.now?.chapters.orEmpty(), player.playbackParameters.speed) } }
+
     // region Commands
     fun play(source: PlaySource) {
         val current = loaded
@@ -165,8 +172,24 @@ class PlaybackEngine(
             }
         }
         pausedAt = 0
+        val sleptThrough = sleep.takeAutoRewind()
+        if (sleptThrough > 0) seekInternal((globalPosition() - sleptThrough).coerceAtLeast(0.0))
         if (player.playbackState == Player.STATE_IDLE) player.prepare()
         player.play()
+        sleep.maybeStartAuto(globalPosition(), current.now.chapters, player.playbackParameters.speed)
+    }
+
+    fun startSleep(mode: SleepTimer.Mode) {
+        sleep.start(mode, globalPosition(), loaded?.now?.chapters.orEmpty(), player.playbackParameters.speed)
+        tick()
+    }
+
+    fun adjustSleep(seconds: Double) { sleep.adjust(seconds); tick() }
+
+    fun cancelSleep() {
+        sleep.cancel()
+        player.volume = 1f
+        mutable.value = mutable.value.copy(sleepRemaining = null, sleepEndOfChapter = false)
     }
 
     fun pause() {
@@ -236,6 +259,8 @@ class PlaybackEngine(
     /** Stops playback, publishes listening, and closes the server stream session. */
     fun close() {
         generation++
+        sleep.cancel()
+        player.volume = 1f
         stopCurrent(closeStream = true)
         mutable.value = PlayerState(speed = mutable.value.speed)
     }
@@ -326,6 +351,7 @@ class PlaybackEngine(
         player.prepare()
         player.play()
         pausedAt = 0
+        sleep.maybeStartAuto(start, current.now.chapters, settings.current.playbackRate)
         mutable.value = mutable.value.copy(now = current.now, loading = false, error = null, openError = null, position = start, speed = settings.current.playbackRate, finished = false)
         startTicker()
     }
@@ -365,7 +391,11 @@ class PlaybackEngine(
         val now = SystemClock.elapsedRealtime()
         if (player.isPlaying) current.unrecordedListening += (now - current.lastTick) / 1000.0
         current.lastTick = now
-        mutable.value = mutable.value.copy(position = globalPosition())
+        val position = globalPosition()
+        val slept = sleep.tick(player.isPlaying, position, player.playbackParameters.speed)
+        if (slept.remaining != null || slept.expired) player.volume = slept.volume
+        if (slept.expired) pause()
+        mutable.value = mutable.value.copy(position = position, sleepRemaining = slept.remaining, sleepEndOfChapter = sleep.mode == SleepTimer.Mode.EndOfChapter)
         if (now - current.lastRecord >= RECORD_INTERVAL_MS) persist(current, force = false)
         if (player.isPlaying && now - current.lastPublish >= PUBLISH_INTERVAL_MS) {
             current.lastPublish = now

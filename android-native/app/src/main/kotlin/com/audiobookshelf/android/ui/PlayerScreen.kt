@@ -25,6 +25,8 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.outlined.Bedtime
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Button
@@ -78,6 +80,9 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
     val state by engine.state.collectAsState()
     val now = state.now
     var speedSheet by remember { mutableStateOf(false) }
+    var tool by remember { mutableStateOf<String?>(null) }
+    val graph = LocalContext.current.graph
+    val client = graph.accounts.activeClient
 
     Surface(Modifier.fillMaxSize().testTag("player-screen")) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
@@ -121,7 +126,20 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                 }
                 item { Controls(state, engine::previousChapter, { engine.jump(false) }, engine::toggle, { engine.jump(true) }, engine::nextChapter, hasChapters = now.chapters.isNotEmpty()) }
                 item {
-                    TextButton(onClick = { speedSheet = true }, modifier = Modifier.testTag("player-speed")) { Text("Speed ${formatSpeed(state.speed)}") }
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(onClick = { speedSheet = true }, modifier = Modifier.testTag("player-speed")) { Text("Speed ${formatSpeed(state.speed)}") }
+                        val remaining = state.sleepRemaining
+                        TextButton(onClick = { tool = "sleep" }, modifier = Modifier.testTag("player-sleep")) {
+                            Icon(Icons.Outlined.Bedtime, if (remaining != null) "Sleep timer" else null, Modifier.size(18.dp))
+                            if (remaining == null) Text("Sleep", Modifier.padding(start = 6.dp))
+                        }
+                        if (remaining != null) Text(formatClock(remaining), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.semantics { stateDescription = "Sleep timer" }.testTag("sleep-remaining"))
+                        if (client != null) TextButton(onClick = { tool = "bookmarks" }, modifier = Modifier.testTag("player-bookmarks")) {
+                            Icon(Icons.Outlined.BookmarkBorder, null, Modifier.size(18.dp))
+                            Text("Bookmarks", Modifier.padding(start = 6.dp))
+                        }
+                    }
                 }
                 if (now.chapters.isNotEmpty()) {
                     item { Text("Chapters", style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth().semantics { heading() }) }
@@ -129,6 +147,10 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                 }
             }
         }
+    }
+    when (tool) {
+        "sleep" -> SleepSheet(engine, state) { tool = null }
+        "bookmarks" -> if (now != null && client != null) BookmarksSheet(client, now.itemId, state.position, engine::seekTo, graph.accounts::handle) { tool = null }
     }
     if (speedSheet) {
         ModalBottomSheet(onDismissRequest = { speedSheet = false }) {
