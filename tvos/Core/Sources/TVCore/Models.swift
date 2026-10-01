@@ -169,9 +169,46 @@ public struct CurrentUser: Decodable {
     public let username: String
     public let mediaProgress: [MediaProgress]
     public let permissions: UserPermissions
+    public let bookmarks: [Bookmark]?
+}
+
+public struct Bookmark: Decodable, Identifiable {
+    public let libraryItemId: String
+    public let time: Double
+    public let title: String
+    public var id: String { libraryItemId + ":" + String(time) }
+}
+
+public struct SearchResponse: Decodable {
+    public struct Item: Decodable { public let libraryItem: LibraryItem }
+    public struct AuthorMatch: Decodable, Identifiable { public let id: String; public let name: String }
+    public struct NamedMatch: Decodable, Identifiable { public let name: String; public var id: String { name } }
+    public struct SeriesMatch: Decodable, Identifiable {
+        public let series: AuthorMatch
+        public let books: [LibraryItem]
+        public var id: String { series.id }
+    }
+    public let book: [Item]?
+    public let podcast: [Item]?
+    public let authors: [AuthorMatch]?
+    public let series: [SeriesMatch]?
+    public let narrators: [NamedMatch]?
+    public let tags: [NamedMatch]?
+    public var items: [LibraryItem] { (book ?? []).map(\.libraryItem) + (podcast ?? []).map(\.libraryItem) }
+    public var isEmpty: Bool { items.isEmpty && (authors ?? []).isEmpty && (series ?? []).isEmpty && (narrators ?? []).isEmpty && (tags ?? []).isEmpty }
+}
+
+public struct LibraryFilters: Decodable {
+    public let authors: [SearchResponse.AuthorMatch]?
+    public let series: [SearchResponse.AuthorMatch]?
+    public let genres: [String]?
+    public let tags: [String]?
+    public let narrators: [String]?
+    public let languages: [String]?
 }
 
 public struct UserPermissions: Decodable {
+    public let accessExplicitContent: Bool?
     public let download: Bool?
     public let update: Bool?
     public let delete: Bool?

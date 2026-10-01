@@ -37,8 +37,9 @@ struct CatalogShelf: View {
     @EnvironmentObject private var connection: ConnectionStore
     @StateObject private var catalog: CatalogStore
     @State private var listLayout = false
-    init(api: APIClient, library: Library) {
-        _catalog = StateObject(wrappedValue: CatalogStore(api: api, library: library))
+    @State private var filterOptions = false
+    init(api: APIClient, library: Library, filter: String? = nil) {
+        _catalog = StateObject(wrappedValue: CatalogStore(api: api, library: library, filter: filter))
     }
     var body: some View {
         ScrollView {
@@ -75,7 +76,7 @@ struct CatalogShelf: View {
                             .accessibilityLabel(listLayout ? "Show covers" : "Show list")
                     }
                     if content.items.isEmpty {
-                        Text("This library is empty. Add titles on your server, then refresh.").foregroundColor(.secondary)
+                        Text(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.").foregroundColor(.secondary)
                     }
                     LazyVGrid(columns: listLayout ? [GridItem(.flexible())] : [GridItem(.adaptive(minimum: 140, maximum: 210), spacing: 20)], spacing: 26) {
                         ForEach(content.items) { item in
@@ -98,6 +99,22 @@ struct CatalogShelf: View {
         }.accessibilityIdentifier("catalog").background(ShelfStyle.background)
             .navigationTitle(catalog.library.name)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    NavigationLink(destination: LibrarySearch(catalog: catalog)) { Image(systemName: "magnifyingglass").font(.title2) }.accessibilityLabel("Search library")
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        Menu {
+                            Button("Title A–Z") { Task { await catalog.changeSort(.title, descending: false) } }
+                            Button("Title Z–A") { Task { await catalog.changeSort(.title, descending: true) } }
+                            Button("Newest first") { Task { await catalog.changeSort(.added, descending: true) } }
+                            Divider()
+                            ForEach(CatalogSort.available(for: catalog.library.mediaType), id: \.self) { sort in Button(sort.name) { Task { await catalog.changeSort(sort, descending: catalog.descending) } } }
+                            Button(catalog.descending ? "Ascending order" : "Descending order") { Task { await catalog.changeSort(catalog.sort, descending: !catalog.descending) } }
+                        } label: { Image(systemName: "arrow.up.arrow.down") }.accessibilityLabel("Sort library")
+                        Button { filterOptions = true } label: { Image(systemName: catalog.filter == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill") }.accessibilityLabel("Filter library")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button("Refresh") { Task { await catalog.reload() } }
@@ -107,6 +124,7 @@ struct CatalogShelf: View {
                     } label: { Image(systemName: "person.crop.circle").font(.title2) }.accessibilityIdentifier("account")
                 }
             }.onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
+            .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
     }
 
     private func progress(_ item: LibraryItem, _ content: CatalogStore.Catalog) -> MediaProgress? {

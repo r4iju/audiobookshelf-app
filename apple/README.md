@@ -37,11 +37,21 @@ Run the same journeys on a dedicated iPad simulator with `ABS_QA_SIMULATOR='Audi
 
 ## Playback
 
-The app and TV target share `Playback/ApplePlayback.swift`. One app-owned AVPlayer session survives catalog navigation and player dismissal. The mini-player and full-screen player provide play/pause, whole-book scrubbing, 30-second skips, elapsed time and preparation/error status. Authenticated media URLs are validated against the connected server. File-relative positions are translated to complete-book positions, and natural track endings load the next file.
+The app and TV target share `Playback/ApplePlayback.swift`. One app-owned AVPlayer session survives catalog navigation and player dismissal. The mini-player and full-screen player provide play/pause, whole-book scrubbing, saved skip intervals, elapsed time and preparation/error status. Authenticated media URLs are validated against the connected server. File-relative positions are translated to complete-book positions, and natural track endings load the next file.
 
 Pending seeks are serialized with the newest requested position retained. Play intent is separate from AVPlayer's observed playback state, so pausing during session or file preparation prevents autoplay. Failed media preparation stays visible; failed session close retains its progress rather than silently signing out.
 
 Production UI journeys use real synthetic WAV media and server request/progress observations. They cover file transitions while navigating, missing media, a replacement seek during slow file preparation, and pausing during a delayed session request. The missing-play action, dropped-seek race, preparation-pause gap and missing-media error were observed failing before their implementations or fixes.
+
+## Listening controls and discovery
+
+The full-screen player uses server artwork, separate chapter and whole-book positions, chapter selection, the baseline 0.5–10× speed range, saved forward/backward intervals, and bookmarks stored by the server. Bookmark failures retain the draft and offer retry; selecting a bookmark keeps the current play/pause intent. Saved intervals also update the system skip controls. Speed and interval preferences persist on this device.
+
+Duration sleep timers count time while audio plays and pause during buffering or paused playback. Timer ownership stays with the shared player after its screen is dismissed. End-of-chapter boundaries are installed on the current file, and seeking past a boundary stops audio and clears the timer. Users can reset/cancel timers and enable the final-minute fade. Broader advanced preferences and interruption/route acceptance remain unfinished work under #9/#11.
+
+Native search calls the existing server endpoint, with book/podcast results and author, series, narrator and tag links. Result expansion requests a larger supported search limit. Catalog ordering uses the baseline server sort fields, and filters use server-provided metadata and its Base64 filter contract. Filtered catalog pages retain their filter and order and suppress unrelated Continue Listening entries. The explicit-content filter follows the account permission.
+
+Signed simulator journeys verify chapter/file seeking, actual faster playback and restored speed, saved skip intervals, server bookmark create/edit/jump/delete through relaunch, actual timed audio stopping after leaving the player, a title beyond the first catalog page, and descending order plus genre filtering. Each newly introduced journey first failed through the production UI. These observations use the local 2.30.0 synthetic contract; physical and live-library acceptance remains outstanding.
 
 ## Durable listening
 

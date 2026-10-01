@@ -18,13 +18,17 @@ import SwiftUI
     @Published private(set) var state: State = .loading
     let api: APIClient
     let library: Library
+    @Published private(set) var filter: String?
+    @Published private(set) var sort: CatalogSort = .title
+    @Published private(set) var descending = false
     private var page = 0
     private var generation = UUID()
     private let covers = NSCache<NSString, UIImage>()
 
-    init(api: APIClient, library: Library) {
+    init(api: APIClient, library: Library, filter: String? = nil) {
         self.api = api
         self.library = library
+        self.filter = filter
         covers.countLimit = 150
     }
 
@@ -33,13 +37,13 @@ import SwiftUI
         generation = request
         state = .loading
         do {
-            async let response = api.items(libraryID: library.id, page: 0)
+            async let response = api.items(libraryID: library.id, page: 0, filter: filter, sort: sort.rawValue, descending: descending)
             async let user = api.me()
             async let personalized = api.personalized(libraryID: library.id)
             let (items, account, shelves) = try await (response, user, personalized)
             guard generation == request else { return }
             page = 0
-            state = .content(Catalog(items: items.results, total: items.total, user: account, continuing: shelves.filter { $0.id == "continue-listening" }.flatMap(\.entities)))
+            state = .content(Catalog(items: items.results, total: items.total, user: account, continuing: filter == nil ? shelves.filter { $0.id == "continue-listening" }.flatMap(\.entities) : []))
         } catch {
             guard generation == request else { return }
             state = .failed(ConnectionStore.recovery(for: error))
@@ -53,7 +57,7 @@ import SwiftUI
         catalog.pageError = nil
         state = .content(catalog)
         do {
-            let response = try await api.items(libraryID: library.id, page: page + 1)
+            let response = try await api.items(libraryID: library.id, page: page + 1, filter: filter, sort: sort.rawValue, descending: descending)
             guard generation == request else { return }
             let existing = Set(catalog.items.map(\.id))
             let newItems = response.results.filter { !existing.contains($0.id) }
@@ -77,4 +81,10 @@ import SwiftUI
         covers.setObject(image, forKey: item.id as NSString)
         return image
     }
+
+    func changeSort(_ field: CatalogSort, descending: Bool) async {
+        sort = field; self.descending = descending
+        await reload()
+    }
+    func changeFilter(_ value: String?) async { filter = value; await reload() }
 }

@@ -54,6 +54,14 @@ import Foundation
 
     public func me() async throws -> CurrentUser { try await get("api/me") }
 
+    public func saveBookmark(itemID: String, time: Double, title: String, editing: Bool) async throws {
+        _ = try await request("api/me/item/\(itemID)/bookmark", method: editing ? "PATCH" : "POST", body: ["time": time, "title": title])
+    }
+
+    public func deleteBookmark(itemID: String, time: Double) async throws {
+        _ = try await request("api/me/item/\(itemID)/bookmark/\(Int(time))", method: "DELETE")
+    }
+
     public func currentAccount() async throws -> AccountIdentity {
         guard let original = credentials else { throw APIError.signInRequired }
         if let id = original.userID { return try AccountIdentity(server: original.server, userID: id) }
@@ -85,12 +93,16 @@ import Foundation
         let response: LibrariesResponse = try await get("api/libraries")
         return response.libraries
     }
-    public func items(libraryID: String, page: Int) async throws -> ItemsResponse {
+    public func items(libraryID: String, page: Int, filter: String? = nil, sort: String = "media.metadata.title", descending: Bool = false) async throws -> ItemsResponse {
         try await get("api/libraries/\(libraryID)/items", query: [
             URLQueryItem(name: "limit", value: "60"), URLQueryItem(name: "page", value: String(page)),
-            URLQueryItem(name: "sort", value: "media.metadata.title"), URLQueryItem(name: "minified", value: "1")
-        ])
+            URLQueryItem(name: "sort", value: sort), URLQueryItem(name: "desc", value: descending ? "1" : "0"), URLQueryItem(name: "minified", value: "1")
+        ] + (filter.map { [URLQueryItem(name: "filter", value: $0)] } ?? []))
     }
+    public func search(libraryID: String, query: String, limit: Int) async throws -> SearchResponse {
+        try await get("api/libraries/\(libraryID)/search", query: [URLQueryItem(name: "q", value: query), URLQueryItem(name: "limit", value: String(limit))])
+    }
+    public func filters(libraryID: String) async throws -> LibraryFilters { try await get("api/libraries/\(libraryID)/filterdata") }
     public func item(id: String) async throws -> LibraryItem { try await get("api/items/\(id)", query: [URLQueryItem(name: "expanded", value: "1")]) }
 
     public func play(itemID: String, episodeID: String? = nil, deviceID: String) async throws -> PlaybackSession {

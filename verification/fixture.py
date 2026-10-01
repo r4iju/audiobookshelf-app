@@ -32,7 +32,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     chapters = [{'id': 0, 'title': 'Opening', 'start': 0, 'end': 8}, {'id': 1, 'title': 'Next chapter', 'start': 8, 'end': 20}]
     items = [{'id': f'book-{i}', 'mediaType': 'book', 'media': {
         'metadata': {'title': f'Stories for Tomorrow {i + 1:02}', 'authorName': 'Audiobookshelf QA', 'authors': [{'id': 'author', 'name': 'Audiobookshelf QA'}],
-                     'narrators': ['QA Narrator'], 'genres': ['Fiction'], 'description': '<p>Synthetic two-file audio. No live library data.</p>'},
+                     'narrators': ['QA Narrator'], 'genres': ['Fiction' if i % 2 == 0 else 'Mystery'], 'description': '<p>Synthetic two-file audio. No live library data.</p>'},
         'duration': 20, 'numTracks': 2, 'chapters': chapters}} for i in range(61)]
     user = {'id': '00000000-0000-4000-8000-000000000001', 'username': 'qa', 'type': 'user',
             'permissions': {'download': True, 'update': True, 'delete': False, 'upload': False},
@@ -155,7 +155,22 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if not configuration['failed'] and (mode == 'catalog-error' or mode == 'page-error' and page == 1):
                     configuration['failed'] = True
                     return self.respond(503, {'error': 'Synthetic temporary failure'})
-                return self.respond(200, {'items' if scenario == 'library-schema-change' else 'results': items[page * limit:(page + 1) * limit], 'total': len(items), 'limit': limit, 'page': page})
+                filtered = list(items)
+                selected_filter = query.get('filter', [''])[0]
+                if selected_filter.startswith('genres.'):
+                    genre = base64.b64decode(selected_filter.split('.', 1)[1]).decode()
+                    filtered = [entry for entry in filtered if genre in entry['media']['metadata']['genres']]
+                if query.get('desc') == ['1']:
+                    filtered.reverse()
+                return self.respond(200, {'items' if scenario == 'library-schema-change' else 'results': filtered[page * limit:(page + 1) * limit], 'total': len(filtered), 'limit': limit, 'page': page})
+            if path == '/api/libraries/books/filterdata':
+                return self.respond(200, {'genres': ['Fiction', 'Mystery'], 'authors': [{'id': 'author', 'name': 'Audiobookshelf QA'}], 'series': [], 'tags': [], 'narrators': ['QA Narrator'], 'languages': []})
+            if path == '/api/libraries/books/search':
+                query_text = query.get('q', [''])[0].lower()
+                limit = min(500, max(1, int(query.get('limit', ['12'])[0])))
+                matches = [entry for entry in items if query_text in entry['media']['metadata']['title'].lower()]
+                authors = [{'id': 'author', 'name': 'Audiobookshelf QA'}] if query_text in 'audiobookshelf qa' else []
+                return self.respond(200, {'book': [{'libraryItem': entry} for entry in matches[:limit]], 'authors': authors, 'series': [], 'narrators': [], 'tags': []})
             if path == '/api/libraries/books/personalized':
                 if configuration['mode'] == 'empty':
                     return self.respond(200, [])
@@ -228,6 +243,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     reports.clear()
                     local_sessions.clear()
                     for account in users.values():
+                        account['bookmarks'] = []
                         position = 6 if account['username'] == 'qa' else 2
                         progress_by_user[account['id']][('book-0', None)].update(currentTime=position, duration=20, progress=position / 20, isFinished=False, lastUpdate=0)
                         account['mediaProgress'] = list(progress_by_user[account['id']].values())
@@ -273,6 +289,19 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     configuration['failed'] = True
                     return self.respond(503, {})
                 return self.respond(200, {'results': results})
+            if path == '/api/me/item/book-0/bookmark':
+                title, position = data.get('title'), data.get('time')
+                if not isinstance(title, str) or not title or not isinstance(position, (int, float)):
+                    return self.respond(400, {})
+                existing = next((bookmark for bookmark in self.account['bookmarks'] if bookmark['libraryItemId'] == 'book-0' and bookmark['time'] == position), None)
+                if self.command == 'PATCH' and existing is None:
+                    return self.respond(404, {})
+                if existing is not None:
+                    existing['title'] = title
+                    return self.respond(200, existing)
+                bookmark = {'libraryItemId': 'book-0', 'time': position, 'title': title, 'createdAt': int(time.time() * 1000)}
+                self.account['bookmarks'].append(bookmark)
+                return self.respond(200, bookmark)
             play = re.fullmatch(r'/api/items/(book-[0-9]+|podcast)/play(?:/(episode))?', path or '')
             if play:
                 delay_response = configuration['mode'] == 'slow-session'
@@ -318,6 +347,23 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 reports.append({'path': path, 'userId': self.account['id'], **data})
                 return self.respond(200, {})
             self.respond(404, {})
+
+        def do_PATCH(self):
+            self.do_POST()
+
+        def do_DELETE(self):
+            path, _ = self.route()
+            if not self.authorized():
+                return self.respond(401, {})
+            bookmark = re.fullmatch(r'/api/me/item/book-0/bookmark/([0-9]+)', path or '')
+            if bookmark:
+                position = int(bookmark.group(1))
+                existing = next((entry for entry in self.account['bookmarks'] if entry['libraryItemId'] == 'book-0' and entry['time'] == position), None)
+                if existing is None:
+                    return self.respond(404, {})
+                self.account['bookmarks'].remove(existing)
+                return self.respond(200, {})
+            return self.respond(404, {})
 
     return ThreadingHTTPServer((bind, port), Handler), prefix
 

@@ -273,9 +273,9 @@ struct NowPlayingView: View {
                         }.font(.callout.monospacedDigit()).foregroundStyle(.secondary)
                     }
                     HStack(spacing: 25) {
-                        Button { Task { await player.skip(-30) } } label: { Image(systemName: "gobackward.30") }
+                        Button { Task { await player.skip(-Double(player.backwardInterval)) } } label: { VStack { Image(systemName: "gobackward"); Text("\(player.backwardInterval)").font(.caption) } }
                         Button { player.toggle() } label: { Label(player.playing ? "Pause" : "Play", systemImage: player.playing ? "pause.fill" : "play.fill") }
-                        Button { Task { await player.skip(30) } } label: { Image(systemName: "goforward.30") }
+                        Button { Task { await player.skip(Double(player.forwardInterval)) } } label: { VStack { Image(systemName: "goforward"); Text("\(player.forwardInterval)").font(.caption) } }
                     }.disabled(player.seeking || player.preparing)
                     HStack(spacing: 25) {
                         Button("Speed · \(player.speed, specifier: "%.2g")×") {

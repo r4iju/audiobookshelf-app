@@ -13,6 +13,10 @@ import SwiftUI
             UserDefaults.standard.removeObject(forKey: "previewLibrary")
             UserDefaults.standard.removeObject(forKey: "previewServer")
             UserDefaults.standard.removeObject(forKey: "previewUsername")
+            UserDefaults.standard.removeObject(forKey: "previewPlaybackSpeed")
+            UserDefaults.standard.removeObject(forKey: "previewSleepFade")
+            UserDefaults.standard.removeObject(forKey: "previewSkipForward")
+            UserDefaults.standard.removeObject(forKey: "previewSkipBackward")
         }
         if CommandLine.arguments.contains("--seed-legacy-preview-account") {
             try? vault.seedLegacyPreviewAccount()

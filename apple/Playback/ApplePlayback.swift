@@ -14,9 +14,30 @@ import SwiftUI
     private var failureOrigin = FailureOrigin.playback
     @Published private(set) var needsSignIn = false
     @Published var speed: Float = 1
+    @Published var forwardInterval = UserDefaults.standard.object(forKey: "previewSkipForward") as? Int ?? 10 {
+        didSet { UserDefaults.standard.set(forwardInterval, forKey: "previewSkipForward"); updateSkipCommands() }
+    }
+    @Published var backwardInterval = UserDefaults.standard.object(forKey: "previewSkipBackward") as? Int ?? 10 {
+        didSet { UserDefaults.standard.set(backwardInterval, forKey: "previewSkipBackward"); updateSkipCommands() }
+    }
     @Published private(set) var title = ""
     @Published private(set) var author = ""
     @Published private(set) var itemID: String?
+    @Published private(set) var bookmarks: [Bookmark] = []
+    @Published private(set) var bookmarkBusy = false
+    @Published private(set) var bookmarkError: String?
+    @Published private(set) var sleepRemaining: Double?
+    @Published private(set) var sleepChapterEnd: Double?
+    private var sleepTask: Task<Void, Never>?
+    private var sleepBoundary: Any?
+    private var sleepLength: Double?
+    private var sleepTick = Date()
+    @Published var fadeSleepTimer = UserDefaults.standard.object(forKey: "previewSleepFade") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(fadeSleepTimer, forKey: "previewSleepFade") }
+    }
+    var currentChapter: Chapter? {
+        session?.chapters?.last { $0.start <= currentTime && currentTime < $0.end }
+    }
     private let api: APIClient
     private let listening: ListeningSync
     private var listeningID: String?
@@ -53,6 +74,8 @@ import SwiftUI
 
     init(api: APIClient) {
         self.api = api
+        let savedSpeed = UserDefaults.standard.float(forKey: "previewPlaybackSpeed")
+        speed = savedSpeed >= 0.5 && savedSpeed <= 10 ? savedSpeed : 1
         listening = ListeningSync(api: api)
         timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 600), queue: .main) { [weak self] time in
             Task { @MainActor in self?.tick(time) }
@@ -70,13 +93,12 @@ import SwiftUI
         commandTargets.append((commands.pauseCommand, commands.pauseCommand.addTarget { [weak self] _ in
             Task { @MainActor in self?.pause() }; return .success
         }))
-        commands.skipForwardCommand.preferredIntervals = [30]
-        commands.skipBackwardCommand.preferredIntervals = [30]
+        updateSkipCommands()
         commandTargets.append((commands.skipForwardCommand, commands.skipForwardCommand.addTarget { [weak self] _ in
-            Task { @MainActor in await self?.skip(30) }; return .success
+            Task { @MainActor in guard let self else { return }; await self.skip(Double(self.forwardInterval)) }; return .success
         }))
         commandTargets.append((commands.skipBackwardCommand, commands.skipBackwardCommand.addTarget { [weak self] _ in
-            Task { @MainActor in await self?.skip(-30) }; return .success
+            Task { @MainActor in guard let self else { return }; await self.skip(-Double(self.backwardInterval)) }; return .success
         }))
     }
 
@@ -148,9 +170,16 @@ import SwiftUI
     }
     func changeSpeed() {
         tick(player.currentTime())
+        speed = speed.isFinite ? min(max(speed, 0.5), 10) : 1
+        UserDefaults.standard.set(speed, forKey: "previewPlaybackSpeed")
         measuredSpeed = speed
         if playing { player.rate = speed }
         updateNowPlaying()
+    }
+    private func updateSkipCommands() {
+        let commands = MPRemoteCommandCenter.shared()
+        commands.skipForwardCommand.preferredIntervals = [NSNumber(value: forwardInterval)]
+        commands.skipBackwardCommand.preferredIntervals = [NSNumber(value: backwardInterval)]
     }
     func skip(_ amount: Double) async {
         do { try await seek(to: currentTime + amount, autoplay: wantsPlayback) }
@@ -183,6 +212,7 @@ import SwiftUI
                 guard finished else { throw PlaybackFailure.seekFailed }
                 if let listeningID { try listening.record(id: listeningID, position: request.time, listened: 0) }
                 currentTime = request.time
+                if let end = sleepChapterEnd, currentTime >= end { endSleepTimer() }
                 lastTick = Date()
                 measuredPlayback = false
                 measuredSpeed = speed
@@ -234,6 +264,7 @@ import SwiftUI
             }
         }
         player.replaceCurrentItem(with: item)
+        installSleepBoundary()
     }
 
     private func playbackFailed() {
@@ -243,6 +274,7 @@ import SwiftUI
     private func trackEnded() async {
         guard let session, !closing, !seeking else { return }
         tick(player.currentTime())
+        if let end = sleepChapterEnd, currentTime >= end - 0.05 { endSleepTimer(); return }
         if trackIndex + 1 < session.audioTracks.count {
             guard wantsPlayback else { return }
             do { try await seek(to: session.audioTracks[trackIndex + 1].startOffset, autoplay: wantsPlayback) }
@@ -320,12 +352,14 @@ import SwiftUI
 
     func stop() async throws {
         wantsPlayback = false
+        cancelSleepTimer()
         try await closeCurrentSession()
     }
 
     func suspendForConnectionChange() async throws {
         guard !closing else { throw CancellationError() }
         wantsPlayback = false
+        cancelSleepTimer()
         tick(player.currentTime())
         closing = true
         defer { closing = false }
@@ -345,12 +379,14 @@ import SwiftUI
         if let session { try api.releaseStream(sessionID: session.id) }
         player.replaceCurrentItem(with: nil)
         session = nil; itemID = nil; currentTime = 0; listeningID = nil
+        bookmarks = []; bookmarkError = nil
         error = nil
         needsSignIn = false
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
     private func closeCurrentSession() async throws {
+        cancelSleepTimer()
         tick(player.currentTime())
         closing = true
         defer { closing = false }
@@ -395,5 +431,102 @@ import SwiftUI
             MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
             MPNowPlayingInfoPropertyPlaybackRate: playing ? speed : 0
         ]
+    }
+
+    func loadBookmarks() async {
+        guard let id = itemID else { return }
+        let request = generation
+        do {
+            let user = try await api.me()
+            guard generation == request else { return }
+            bookmarks = (user.bookmarks ?? []).filter { $0.libraryItemId == id }.sorted { $0.time < $1.time }
+            bookmarkError = nil
+        } catch { if generation == request { bookmarkError = error.localizedDescription } }
+    }
+
+    func saveBookmark(title: String, editing: Bookmark?) async {
+        guard !bookmarkBusy, let id = itemID else { return }
+        let request = generation
+        bookmarkBusy = true
+        defer { bookmarkBusy = false }
+        do {
+            try await api.saveBookmark(itemID: id, time: editing?.time ?? floor(currentTime), title: title, editing: editing != nil)
+            guard generation == request else { return }
+            await loadBookmarks()
+        } catch { if generation == request { bookmarkError = error.localizedDescription } }
+    }
+
+    func deleteBookmark(_ bookmark: Bookmark) async {
+        guard !bookmarkBusy, itemID == bookmark.libraryItemId else { return }
+        let request = generation
+        bookmarkBusy = true
+        defer { bookmarkBusy = false }
+        do {
+            try await api.deleteBookmark(itemID: bookmark.libraryItemId, time: bookmark.time)
+            guard generation == request else { return }
+            await loadBookmarks()
+        } catch { if generation == request { bookmarkError = error.localizedDescription } }
+    }
+
+    func setSleepTimer(seconds: Double) {
+        guard seconds.isFinite, seconds > 0 else { return }
+        cancelSleepTimer()
+        sleepLength = seconds
+        sleepRemaining = seconds
+        sleepTick = Date()
+        sleepTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 250_000_000)
+                guard !Task.isCancelled, let self, let remaining = self.sleepRemaining else { return }
+                let now = Date()
+                let elapsed = now.timeIntervalSince(self.sleepTick)
+                self.sleepTick = now
+                guard self.player.timeControlStatus == .playing else { continue }
+                let updated = max(0, remaining - max(elapsed, 0))
+                self.sleepRemaining = updated
+                if self.fadeSleepTimer { self.player.volume = Float(min(updated / 60, 1)) }
+                if updated <= 0 { self.endSleepTimer(); return }
+            }
+        }
+    }
+
+    func setChapterSleepTimer() {
+        guard let chapter = currentChapter else { return }
+        cancelSleepTimer()
+        sleepChapterEnd = chapter.end
+        installSleepBoundary()
+    }
+
+    func resetSleepTimer() {
+        if let seconds = sleepLength { setSleepTimer(seconds: seconds) }
+        else if sleepChapterEnd != nil { setChapterSleepTimer() }
+    }
+
+    func cancelSleepTimer() {
+        sleepTask?.cancel(); sleepTask = nil
+        if let sleepBoundary { player.removeTimeObserver(sleepBoundary) }
+        sleepBoundary = nil
+        sleepRemaining = nil; sleepChapterEnd = nil; sleepLength = nil
+        player.volume = 1
+    }
+
+    private func installSleepBoundary() {
+        if let sleepBoundary { player.removeTimeObserver(sleepBoundary) }
+        sleepBoundary = nil
+        guard let end = sleepChapterEnd, let session, let item = player.currentItem else { return }
+        let track = session.audioTracks[trackIndex]
+        guard end >= track.startOffset, end <= track.startOffset + track.duration else { return }
+        let time = CMTime(seconds: end - track.startOffset, preferredTimescale: 600)
+        sleepBoundary = player.addBoundaryTimeObserver(forTimes: [NSValue(time: time)], queue: .main) { [weak self] in
+            Task { @MainActor in
+                guard let self, self.player.currentItem === item, self.sleepChapterEnd == end else { return }
+                self.endSleepTimer()
+            }
+        }
+    }
+
+    private func endSleepTimer() {
+        pause()
+        cancelSleepTimer()
     }
 }
