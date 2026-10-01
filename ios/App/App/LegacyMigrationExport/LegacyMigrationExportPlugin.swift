@@ -25,8 +25,9 @@ public class LegacyMigrationExportPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumen
     // Main thread only.
     private var activeSave: (picker: UIDocumentPickerViewController, done: LegacyExportSession.SaveCompletion)?
 
+    // Created with the plugin, before any call, so every queue shares this one session.
     // Temporary storage: not backed up, and the package is only kept until the user saves it.
-    private lazy var session: LegacyExportSession = {
+    private let session: LegacyExportSession = {
         let temporary = FileManager.default.temporaryDirectory
         return LegacyExportSession(job: LegacyExportJob(
             documents: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0],
