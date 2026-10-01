@@ -3,6 +3,27 @@ import XCTest
 
 final class ListeningJournalTests: XCTestCase {
     @MainActor
+    func testOfflineResumeRetainsAcknowledgedPositionButRespectsANewerRemoteSnapshot() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let file = directory.appendingPathComponent("listening.json")
+        let account = try AccountIdentity(server: "https://Books.Example:443/abs/", userID: "reader")
+        let equivalent = try AccountIdentity(server: "https://books.example/abs", userID: "reader")
+        let other = try AccountIdentity(server: "https://books.example/abs", userID: "another-reader")
+        let journal = try ListeningJournal(file: file)
+        let id = try journal.begin(account: account, media: Self.media(), deviceID: "device", at: Date(timeIntervalSince1970: 1000))
+        try journal.record(id: id, position: 12, listened: 6, at: Date(timeIntervalSince1970: 1006))
+        try journal.finish(id: id)
+        try journal.acknowledge(XCTUnwrap(journal.pending(account: account).first))
+        let reopened = try ListeningJournal(file: file)
+        XCTAssertTrue(reopened.pending(account: equivalent).isEmpty)
+        XCTAssertEqual(reopened.cachedPosition(account: equivalent, itemID: "book", episodeID: nil, newerThan: 1_005_000), 12)
+        XCTAssertNil(reopened.cachedPosition(account: equivalent, itemID: "book", episodeID: nil, newerThan: 1_007_000))
+        XCTAssertNil(reopened.cachedPosition(account: other, itemID: "book", episodeID: nil, newerThan: 0))
+        XCTAssertNil(reopened.cachedPosition(account: equivalent, itemID: "book", episodeID: "episode", newerThan: 0))
+    }
+
+    @MainActor
     func testRecoveredSessionsKeepUnsentListeningAndRemoveAcknowledgedHistory() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }

@@ -32,6 +32,15 @@ import Foundation
         return try loaded().begin(account: account, media: media, deviceID: deviceID)
     }
 
+    func beginOffline(_ audio: OfflineAudio, position: Double, deviceID: String) throws -> String {
+        let media = ListeningMedia(itemID: audio.media.libraryItemID, episodeID: audio.media.episodeID, title: audio.media.title, author: audio.media.author, mediaType: audio.media.mediaType, duration: audio.media.duration, startTime: position)
+        return try loaded().begin(account: audio.account, media: media, deviceID: deviceID)
+    }
+
+    func position(for audio: OfflineAudio) throws -> Double {
+        try loaded().cachedPosition(account: audio.account, itemID: audio.media.libraryItemID, episodeID: audio.media.episodeID, newerThan: audio.serverUpdatedAt) ?? audio.serverPosition
+    }
+
     func record(id: String, position: Double, listened: Double) throws {
         try loaded().record(id: id, position: position, listened: listened)
     }
@@ -48,6 +57,12 @@ import Foundation
                 try Task.checkCancellation()
                 try await api.syncListening(next)
                 try journal.acknowledge(next)
+            }
+            let user = try await api.me()
+            guard try await api.currentAccount() == account else { throw CancellationError() }
+            for progress in user.mediaProgress {
+                guard let position = progress.currentTime, let updated = progress.lastUpdate else { continue }
+                try journal.rememberRemotePosition(account: account, itemID: progress.libraryItemId, episodeID: progress.episodeId, time: position, updatedAt: updated)
             }
         }
         let id = UUID()

@@ -3,6 +3,7 @@ import CryptoKit
 import UIKit
 
 struct BookDetails: View {
+    @EnvironmentObject private var localDownloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
     let item: LibraryItem
     let catalog: CatalogStore
@@ -60,6 +61,10 @@ struct BookDetails: View {
                     if progressBusy { ProgressView("Saving your progress…") }
                 }
                 if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
+                if book.mediaType == "book" || episode != nil {
+                    Button("Download for offline") { Task { await localDownloads.enqueue(item: book, episode: episode) } }
+                    if let error = localDownloads.error { Text(error).foregroundColor(.red) }
+                }
                 if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
                     VStack(alignment: .leading, spacing: 10) {
                         ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
@@ -140,6 +145,7 @@ struct BookDetails: View {
             case "complete": return progress?.isFinished == true
             case "incomplete": return progress?.isFinished != true
             case "inProgress": return progress != nil && progress?.isFinished != true
+            case "downloaded": return localDownloads.visible.contains { $0.media.libraryItemID == book.id && $0.media.episodeID == episode.id && $0.state == .ready }
             default: return true
             }
         }.sorted { left, right in
@@ -173,6 +179,7 @@ struct BookDetails: View {
                     Button("Incomplete") { episodeFilter = "incomplete" }
                     Button("In progress") { episodeFilter = "inProgress" }
                     Button("Complete") { episodeFilter = "complete" }
+                    Button("Downloaded") { episodeFilter = "downloaded" }
                 } label: { Image(systemName: "line.3.horizontal.decrease.circle") }.accessibilityLabel("Filter episodes")
             }
             if canManagePodcasts, book.media.metadata.feedUrl?.isEmpty == false {

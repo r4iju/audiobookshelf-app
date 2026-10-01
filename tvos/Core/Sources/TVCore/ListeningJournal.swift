@@ -25,6 +25,11 @@ public struct ListeningMedia: Codable, Sendable {
     public let duration: Double
     public let startTime: Double
 
+    public init(itemID: String, episodeID: String?, title: String, author: String, mediaType: String, duration: Double, startTime: Double) {
+        self.libraryItemID = itemID; self.episodeID = episodeID; self.title = title; self.author = author
+        self.mediaType = mediaType; self.duration = duration; self.startTime = startTime
+    }
+
     public init(item: LibraryItem, episode: Episode? = nil, session: PlaybackSession) {
         libraryItemID = item.id
         episodeID = episode?.id
@@ -62,6 +67,14 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
     private struct Document: Codable {
         let version: Int
         var records: [ListeningRecord]
+        var positions: [Position]?
+    }
+    private struct Position: Codable {
+        let account: AccountIdentity
+        let itemID: String
+        let episodeID: String?
+        let time: Double
+        let updatedAt: Double
     }
     public enum Failure: LocalizedError {
         case invalidData
@@ -69,6 +82,7 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
     }
     private let file: URL
     private var records: [ListeningRecord]
+    private var positions: [Position]
 
     public init(file: URL) throws {
         self.file = file
@@ -76,7 +90,10 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
             let saved = try JSONDecoder().decode(Document.self, from: Data(contentsOf: file))
             guard saved.version == 1 else { throw Failure.invalidData }
             records = saved.records
-        } else { records = [] }
+            positions = saved.positions ?? []
+            guard positions.allSatisfy({ $0.time.isFinite && $0.time >= 0 && $0.updatedAt.isFinite }) else { throw Failure.invalidData }
+            for record in records { remember(record, in: &positions) }
+        } else { records = []; positions = [] }
     }
 
     public func begin(account: AccountIdentity, media: ListeningMedia, deviceID: String, at date: Date = Date()) throws -> String {
@@ -85,7 +102,9 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
         let time = date.timeIntervalSince1970 * 1000
         let record = ListeningRecord(id: id, account: account, media: media, deviceID: deviceID, startedAt: time, updatedAt: time,
                                      currentTime: min(max(media.startTime, 0), media.duration), timeListening: 0, revision: 1, acknowledged: 0, closed: false)
-        try commit(records + [record])
+        var nextPositions = positions
+        remember(record, in: &nextPositions)
+        try commit(records + [record], positions: nextPositions)
         return id
     }
 
@@ -98,7 +117,9 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
         next[index].updatedAt = date.timeIntervalSince1970 * 1000
         guard next[index].timeListening.isFinite, next[index].revision < .max else { throw Failure.invalidData }
         next[index].revision += 1
-        try commit(next)
+        var nextPositions = positions
+        remember(next[index], in: &nextPositions)
+        try commit(next, positions: nextPositions)
     }
 
     public func finish(id: String) throws {
@@ -112,6 +133,18 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
     public func pending(account: AccountIdentity) -> [ListeningRecord] {
         records.filter { $0.account == account && $0.revision > $0.acknowledged }
             .sorted { $0.updatedAt == $1.updatedAt ? $0.id < $1.id : $0.updatedAt < $1.updatedAt }
+    }
+
+    public func cachedPosition(account: AccountIdentity, itemID: String, episodeID: String?, newerThan: Double) -> Double? {
+        positions.first { $0.account == account && $0.itemID == itemID && $0.episodeID == episodeID && $0.updatedAt >= newerThan }?.time
+    }
+
+    public func rememberRemotePosition(account: AccountIdentity, itemID: String, episodeID: String?, time: Double, updatedAt: Double) throws {
+        guard time.isFinite, time >= 0, updatedAt.isFinite else { throw Failure.invalidData }
+        var next = positions
+        let position = Position(account: account, itemID: itemID, episodeID: episodeID, time: time, updatedAt: updatedAt)
+        remember(position, in: &next)
+        try commit(records, positions: next)
     }
 
     public func acknowledge(_ sent: ListeningRecord) throws {
@@ -131,14 +164,24 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
         try commit(next)
     }
 
-    private func commit(_ next: [ListeningRecord]) throws {
+    private func remember(_ record: ListeningRecord, in positions: inout [Position]) {
+        remember(Position(account: record.account, itemID: record.media.libraryItemID, episodeID: record.media.episodeID, time: record.currentTime, updatedAt: record.updatedAt), in: &positions)
+    }
+    private func remember(_ position: Position, in positions: inout [Position]) {
+        if let index = positions.firstIndex(where: { $0.account == position.account && $0.itemID == position.itemID && $0.episodeID == position.episodeID }) {
+            if positions[index].updatedAt <= position.updatedAt { positions[index] = position }
+        } else { positions.append(position) }
+    }
+    private func commit(_ next: [ListeningRecord], positions nextPositions: [Position]? = nil) throws {
         try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
-        let data = try JSONEncoder().encode(Document(version: 1, records: next))
+        let savedPositions = nextPositions ?? positions
+        let data = try JSONEncoder().encode(Document(version: 1, records: next, positions: savedPositions))
         var options: Data.WritingOptions = .atomic
         #if os(iOS) || os(tvOS)
         options.insert(.completeFileProtectionUntilFirstUserAuthentication)
         #endif
         try data.write(to: file, options: options)
         records = next
+        positions = savedPositions
     }
 }

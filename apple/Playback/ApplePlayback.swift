@@ -61,6 +61,8 @@ import UIKit
     var currentChapter: Chapter? {
         session?.chapters?.last { $0.start <= currentTime && currentTime < $0.end }
     }
+    @Published private(set) var offlineID: String?
+    private var offlineFiles: [URL]?
     private let api: APIClient
     private let listening: ListeningSync
     private var listeningID: String?
@@ -196,6 +198,40 @@ import UIKit
         }
     }
 
+    func startOffline(_ audio: OfflineAudio) async {
+        guard !preparing, !seeking, !closing else { return }
+        let preparation = UUID()
+        preparationID = preparation; preparing = true; wantsPlayback = true; error = nil
+        playbackIntent = UUID()
+        let initialIntent = playbackIntent
+        defer { if preparationID == preparation { preparing = false } }
+        do {
+            guard try await api.currentAccount() == audio.account else { throw APIError.signInRequired }
+            try await suspendForConnectionChange(preservingIntent: initialIntent)
+            preparationID = preparation; preparing = true
+            let request = generation
+            try await Self.activateAudioSession()
+            guard request == generation else { return }
+            let position = min(max(try listening.position(for: audio), 0), audio.media.duration)
+            let tracks = zip(audio.tracks, audio.files).map { track, file in
+                AudioTrack(contentUrl: file.absoluteString, metadata: nil, startOffset: track.startOffset, duration: track.duration)
+            }
+            session = PlaybackSession(id: "offline-" + UUID().uuidString, currentTime: position, duration: audio.media.duration, audioTracks: tracks, chapters: audio.chapters, displayTitle: audio.media.title, displayAuthor: audio.media.author)
+            offlineID = audio.id; offlineFiles = audio.files
+            itemID = audio.media.libraryItemID; episodeID = audio.media.episodeID
+            title = audio.media.title; author = audio.media.author; currentTime = position
+            bookmarkSupported = false; nowPlayingArtwork = nil
+            let deviceID = UserDefaults.standard.string(forKey: Self.deviceKey) ?? UUID().uuidString
+            UserDefaults.standard.set(deviceID, forKey: Self.deviceKey)
+            listeningID = try listening.beginOffline(audio, position: position, deviceID: deviceID)
+            lastTick = Date(); lastSync = Date()
+            try await seek(to: position, autoplay: wantsPlayback)
+        } catch {
+            guard preparationID == preparation else { return }
+            wantsPlayback = false; failed(error)
+        }
+    }
+
     func toggle() { if wantsPlayback { pause() } else { resume() } }
     func resume() {
         playbackIntent = UUID()
@@ -291,10 +327,16 @@ import UIKit
     private func loadTrack(_ index: Int) async throws {
         guard let session else { return }
         let requestGeneration = generation
-        let token = try await api.validToken()
-        guard requestGeneration == generation, self.session?.id == session.id else { throw CancellationError() }
-        let url = try api.mediaURL(session.audioTracks[index].contentUrl)
-        let asset = AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": ["Authorization": "Bearer \(token)"]])
+        let asset: AVURLAsset
+        if let offlineFiles {
+            guard offlineFiles.indices.contains(index), offlineFiles[index].isFileURL else { throw APIError.noAudio }
+            asset = AVURLAsset(url: offlineFiles[index])
+        } else {
+            let token = try await api.validToken()
+            guard requestGeneration == generation, self.session?.id == session.id else { throw CancellationError() }
+            let url = try api.mediaURL(session.audioTracks[index].contentUrl)
+            asset = AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": ["Authorization": "Bearer \(token)"]])
+        }
         let item = AVPlayerItem(asset: asset)
         trackIndex = index
         itemStatus = nil
@@ -420,10 +462,10 @@ import UIKit
         try await listening.flush()
     }
 
-    func suspendForConnectionChange() async throws {
+    func suspendForConnectionChange(preservingIntent: UUID? = nil) async throws {
         guard !closing else { throw CancellationError() }
-        wantsPlayback = false
-        playbackIntent = UUID()
+        if preservingIntent == nil { wantsPlayback = false }
+        playbackIntent = preservingIntent ?? UUID()
         interruptedGeneration = nil
         pausedAt = nil
         cancelSleepTimer()
@@ -443,8 +485,9 @@ import UIKit
         await listening.cancelTransfers()
         if let syncTask { await syncTask.value }
         if let listeningID { try listening.finish(id: listeningID) }
-        if let session { try api.releaseStream(sessionID: session.id) }
+        if let session, offlineID == nil { try api.releaseStream(sessionID: session.id) }
         player.replaceCurrentItem(with: nil)
+        offlineID = nil; offlineFiles = nil
         session = nil; itemID = nil; episodeID = nil; currentTime = 0; listeningID = nil
         bookmarks = []; bookmarkError = nil
         error = nil
@@ -467,14 +510,25 @@ import UIKit
         if let seekLoop { _ = try? await seekLoop.value }
         player.pause()
         playing = false
+        let local = offlineID != nil
+        if local {
+            syncTask?.cancel()
+            await listening.cancelTransfers()
+        }
         if let syncTask { await syncTask.value }
         if let session {
-            try await listening.flush()
-            try await api.closeStream(sessionID: session.id)
-            if let listeningID { try listening.finish(id: listeningID) }
+            if local {
+                if let listeningID { try listening.finish(id: listeningID) }
+                Task { await restoreListening() }
+            } else {
+                try await listening.flush()
+                try await api.closeStream(sessionID: session.id)
+                if let listeningID { try listening.finish(id: listeningID) }
+            }
         }
         generation = UUID()
         player.replaceCurrentItem(with: nil)
+        offlineID = nil; offlineFiles = nil
         session = nil; itemID = nil; episodeID = nil; currentTime = 0; listeningID = nil
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }

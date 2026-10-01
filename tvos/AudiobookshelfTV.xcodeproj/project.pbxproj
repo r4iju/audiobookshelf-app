@@ -10,6 +10,7 @@
 		0C84F384FC684222CDBF2BA0 /* ListeningSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33667F6BF3D8B66E8321CE4D /* ListeningSync.swift */; };
 		11044CCCBB76A34268BC6521 /* AudiobookshelfTVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBB1C5D529D5EFE2F534838 /* AudiobookshelfTVApp.swift */; };
 		2C071B2547A4F364174A485E /* ApplePlayback.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B87CDF1812945F950522F9 /* ApplePlayback.swift */; };
+		36078078332730C389B72106 /* OfflineAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5A7FADE8DB257513CBE566 /* OfflineAudio.swift */; };
 		4755673A3393723E50F062C9 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DFEB1C064A24D44B3F15CE /* APIClient.swift */; };
 		53F8DE640C8C937078305286 /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47F28A332699633DD119766 /* Views.swift */; };
 		A4DD27B94E49EECC148A38A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABA1E0404BA6403B2756A289 /* Assets.xcassets */; };
@@ -24,6 +25,7 @@
 /* Begin PBXFileReference section */
 		05AFE981F5A76A43B2FBD9CD /* PodcastFeedEpisode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastFeedEpisode.swift; sourceTree = "<group>"; };
 		081251E538B89B11DDF39642 /* KeychainCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainCredentials.swift; sourceTree = "<group>"; };
+		0E5A7FADE8DB257513CBE566 /* OfflineAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineAudio.swift; sourceTree = "<group>"; };
 		2E4FC5B9BCD2A7CE35D1E116 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		33667F6BF3D8B66E8321CE4D /* ListeningSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningSync.swift; sourceTree = "<group>"; };
 		344FE9E115B6DD1B1751B0BC /* AudiobookshelfTV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AudiobookshelfTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +96,7 @@
 				80DFEB1C064A24D44B3F15CE /* APIClient.swift */,
 				5DF06F6BBACFE7D396671B39 /* ListeningJournal.swift */,
 				53716A31D8B3AF4CD758EAD6 /* Models.swift */,
+				0E5A7FADE8DB257513CBE566 /* OfflineAudio.swift */,
 				05AFE981F5A76A43B2FBD9CD /* PodcastFeedEpisode.swift */,
 			);
 			path = TVCore;
@@ -203,6 +206,7 @@
 				E8F9CBE05B9C920FB22A7C05 /* ListeningJournal.swift in Sources */,
 				0C84F384FC684222CDBF2BA0 /* ListeningSync.swift in Sources */,
 				B5588A53439584F39D4D3E82 /* Models.swift in Sources */,
+				36078078332730C389B72106 /* OfflineAudio.swift in Sources */,
 				E23322425B5AEF0FFEE7C971 /* PodcastFeedEpisode.swift in Sources */,
 				A68A56DCE1EC148EE9C11C3D /* TVPlayer.swift in Sources */,
 				53F8DE640C8C937078305286 /* Views.swift in Sources */,

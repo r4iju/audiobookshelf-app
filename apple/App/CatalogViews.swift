@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ConnectedLibrary: View {
+    @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     @Environment(\.horizontalSizeClass) private var sizeClass
     let library: Library
@@ -20,6 +21,7 @@ struct ConnectedLibrary: View {
 }
 
 struct LibrarySidebar: View {
+    @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     let selected: Library
     var body: some View {
@@ -34,6 +36,7 @@ struct LibrarySidebar: View {
 }
 
 struct CatalogShelf: View {
+    @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     @StateObject private var catalog: CatalogStore
     @State private var listLayout = false
@@ -121,6 +124,7 @@ struct CatalogShelf: View {
                         if catalog.library.mediaType == "podcast", case .content(let content) = catalog.state, content.user.canManagePodcasts {
                             Button("Add podcast") { addingPodcast = true }
                         }
+                        Button("Downloads") { downloads.presented = true }
                         Button("Refresh") { Task { await catalog.reload() } }
                         Button("Change library") { Task { await connection.openLibrariesForSelection() } }
                         Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }

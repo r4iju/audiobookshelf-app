@@ -115,6 +115,7 @@ public struct Media: Decodable {
     public let duration: Double?
     public let episodes: [Episode]?
     public let chapters: [Chapter]?
+    public let tracks: [AudioTrack]?
 }
 public struct Metadata: Decodable {
     public let title: String
@@ -135,6 +136,8 @@ public struct Episode: Decodable, Identifiable {
     public let publishedAt: Double?
     public let season: String?
     public let episode: String?
+    public let chapters: [Chapter]?
+    public let audioTrack: AudioTrack?
     public let audioFile: File?
     public let enclosure: Enclosure?
     public struct Enclosure: Decodable { public let url: String? }
@@ -144,14 +147,17 @@ public struct Episode: Decodable, Identifiable {
         public struct FileMetadata: Decodable { public let filename: String? }
     }
 }
-public struct Chapter: Decodable, Identifiable {
+public struct Chapter: Codable, Identifiable {
     public let id: Int
     public let title: String
     public let start: Double
     public let end: Double
 }
-public struct AudioTrack: Decodable, Sendable {
+public struct AudioTrack: Codable, Sendable {
     public let contentUrl: String
+    public var mimeType: String? = nil
+    public let metadata: TrackMetadata?
+    public struct TrackMetadata: Codable, Sendable { public let filename: String?; public let ext: String? }
     public let startOffset: Double
     public let duration: Double
 }
@@ -289,6 +295,7 @@ public struct MediaProgress: Decodable, Identifiable {
     public let duration: Double?
     public let progress: Double?
     public let isFinished: Bool?
+    public let lastUpdate: Double?
     public var id: String { libraryItemId + ":" + (episodeId ?? "book") }
     public var fraction: Double { min(max(progress ?? 0, 0), 1) }
 }

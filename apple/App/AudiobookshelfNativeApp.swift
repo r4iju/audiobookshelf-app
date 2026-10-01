@@ -1,6 +1,8 @@
 import SwiftUI
 
 @main struct AudiobookshelfNativeApp: App {
+    @UIApplicationDelegateAdaptor(NativeDownloadAppDelegate.self) private var appDelegate
+    @StateObject private var downloads: NativeDownloads
     @StateObject private var connection: ConnectionStore
     @StateObject private var player: ApplePlayback
 
@@ -10,6 +12,7 @@ import SwiftUI
         if CommandLine.arguments.contains("--reset-preview-account") {
             try? vault.resetPreviewAccounts()
             try? FileManager.default.removeItem(at: ListeningSync.file)
+            try? FileManager.default.removeItem(at: NativeDownloads.directory)
             UserDefaults.standard.removeObject(forKey: "previewLibrary")
             UserDefaults.standard.removeObject(forKey: "previewServer")
             UserDefaults.standard.removeObject(forKey: "previewUsername")
@@ -31,6 +34,7 @@ import SwiftUI
         }
         #endif
         let api = APIClient(store: vault)
+        _downloads = StateObject(wrappedValue: NativeDownloads(api: api))
         let playback = ApplePlayback(api: api)
         _player = StateObject(wrappedValue: playback)
         _connection = StateObject(wrappedValue: ConnectionStore(api: api, playback: playback, vault: vault))
@@ -38,9 +42,10 @@ import SwiftUI
 
     var body: some Scene {
         WindowGroup {
-            PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player)
+            PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player).environmentObject(downloads)
                 .accentColor(ShelfStyle.accent)
-                .onAppear { Task { await connection.restore() } }
+                .onAppear { Task { await connection.restore(); downloads.refresh() } }
+                .sheet(isPresented: $downloads.presented) { DownloadsView().environmentObject(downloads).environmentObject(player) }
         }
     }
 }

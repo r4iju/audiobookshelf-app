@@ -33,7 +33,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     items = [{'id': f'book-{i}', 'mediaType': 'book', 'media': {
         'metadata': {'title': f'Stories for Tomorrow {i + 1:02}', 'authorName': 'Audiobookshelf QA', 'authors': [{'id': 'author', 'name': 'Audiobookshelf QA'}],
                      'narrators': ['QA Narrator'], 'genres': ['Fiction' if i % 2 == 0 else 'Mystery'], 'description': '<p>Synthetic two-file audio. No live library data.</p>'},
-        'duration': 20, 'numTracks': 2, 'chapters': chapters}} for i in range(61)]
+        'duration': 20, 'numTracks': 2, 'chapters': chapters, 'tracks': [{'contentUrl': f'/api/items/book-{i}/file/{j}', 'startOffset': 0 if j == 0 else 8, 'duration': 8 if j == 0 else 12, 'mimeType': 'audio/wav'} for j in range(2)]}} for i in range(61)]
     user = {'id': '00000000-0000-4000-8000-000000000001', 'username': 'qa', 'type': 'user',
             'permissions': {'download': True, 'update': True, 'delete': False, 'upload': False},
             'mediaProgress': [], 'bookmarks': [], 'settings': {}}
@@ -143,6 +143,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values())})
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
+            if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
+                return self.respond(503, {})
             if path == '/api/libraries':
                 return self.respond(200, {'libraries': [{'id': 'books', 'name': 'Audiobooks', 'mediaType': 'book'}, {'id': 'podcasts', 'name': 'Podcasts', 'mediaType': 'podcast', 'folders': [{'id': 'podcast-folder', 'fullPath': '/fixtures/podcasts'}]}]})
             if path == '/api/libraries/podcasts/items':
@@ -197,6 +199,11 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'downloads': []})
             if path == '/api/search/podcast':
                 return self.respond(200, [{'id': 42, 'title': 'New Voices Discovery', 'artistName': 'Fixture Studio', 'feedUrl': 'http://127.0.0.1:19765/feed.xml', 'genres': ['Stories']}])
+            downloaded_file = re.fullmatch(r'/api/items/book-[0-9]+/file/([01])/download', path or '')
+            if downloaded_file:
+                if configuration['mode'] == 'download-error-page':
+                    return self.respond(200, {'error': 'Synthetic proxy error page'})
+                return self.respond(200, tracks[int(downloaded_file[1])], 'audio/wav')
             if path and path.startswith('/api/items/book-') and not path.endswith('/cover'):
                 try:
                     return self.respond(200, items[int(path.rsplit('-', 1)[1])])
@@ -252,7 +259,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(400, {})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False)
                 user['type'] = 'admin' if mode == 'podcast-admin' else 'user'
@@ -273,6 +280,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                         position = 6 if account['username'] == 'qa' else 2
                         progress_by_user[account['id']][('book-0', None)].update(currentTime=position, duration=20, progress=position / 20, isFinished=False, lastUpdate=0)
                         account['mediaProgress'] = list(progress_by_user[account['id']].values())
+                if mode == 'remote-rewind':
+                    progress[('book-0', None)].update(currentTime=2, duration=20, progress=0.1, isFinished=False, lastUpdate=time.time() * 1000)
+                    user['mediaProgress'] = list(progress.values())
                 if mode == 'newer-remote':
                     progress[('book-0', None)].update(currentTime=19, duration=20, progress=0.95, isFinished=False, lastUpdate=time.time() * 1000)
                     user['mediaProgress'] = list(progress.values())
@@ -294,6 +304,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'user': {**account, 'token': 'fresh' + suffix, 'accessToken': 'fresh' + suffix, 'refreshToken': 'refresh' + suffix}})
             if not self.authorized():
                 return self.respond(401, {})
+            if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
+                return self.respond(503, {})
             if path == '/api/podcasts/feed':
                 if self.account['type'] not in ('root', 'admin'):
                     return self.respond(403, {})

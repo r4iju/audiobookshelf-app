@@ -7,13 +7,14 @@ enum ShelfStyle {
 }
 
 struct ConnectionRoot: View {
+    @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     var body: some View {
         Group {
             switch connection.screen {
             case .connection(let error): ConnectionForm(error: error)
             case .loading:
-                VStack(spacing: 18) { ProgressView(); Text("Opening your library…").font(.headline) }
+                VStack(spacing: 18) { ProgressView(); Text("Opening your library…").font(.headline); Button("Open downloads") { downloads.presented = true } }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .libraries(let libraries): LibraryChooser(libraries: libraries)
             case .shelf(let library): ConnectedLibrary(library: library)
@@ -32,6 +33,7 @@ struct ConnectionRoot: View {
 }
 
 struct ConnectionForm: View {
+    @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     let error: String?
     @State private var password = ""
@@ -72,6 +74,7 @@ struct ConnectionForm: View {
                         HStack { Text("Connect to your library").fontWeight(.semibold); Spacer(); Image(systemName: "arrow.right") }
                             .padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
                     }.disabled(connection.server.isEmpty || connection.username.isEmpty).accessibilityIdentifier("connect")
+                    if !downloads.visible.isEmpty { Button("Open downloads") { downloads.presented = true } }
                     Button("Sign in with OpenID") {
                         password = ""
                         Task { await connection.connectWithOpenID() }
@@ -83,7 +86,8 @@ struct ConnectionForm: View {
                     Button("Cancel") { Task { await connection.cancelConnection() } }
                 }
                 if !connection.savedConnections.isEmpty {
-                    Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+                    Button("Downloads") { downloads.presented = true }
+                        Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
                 }
             }.frame(maxWidth: 480).padding(24).frame(maxWidth: .infinity)
         }.accessibilityIdentifier("connection-screen")
@@ -98,6 +102,7 @@ struct ConnectionForm: View {
 }
 
 struct LibraryChooser: View {
+    @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     let libraries: [Library]
     var body: some View {
@@ -124,6 +129,7 @@ struct LibraryChooser: View {
             }.navigationTitle("Your libraries")
                 .toolbar { ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
+                        Button("Downloads") { downloads.presented = true }
                         Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
                         Button("Sign out") { connection.signOut() }
                     } label: { Image(systemName: "person.crop.circle") }.accessibilityIdentifier("account")
@@ -133,6 +139,7 @@ struct LibraryChooser: View {
 }
 
 struct SavedConnectionsView: View {
+    @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     var body: some View {
         NavigationView {
