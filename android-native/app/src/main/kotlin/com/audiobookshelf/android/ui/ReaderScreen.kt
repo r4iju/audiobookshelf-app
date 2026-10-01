@@ -146,7 +146,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
             if (graph.reading.entry(account, route.itemId, fileKey)?.page == shown) return@collect
             try {
                 graph.reading.record(account, route.itemId, fileKey, primary = !route.supplementary, page = shown, pages = current.pageCount)
-                if (!route.supplementary) scope.launch { graph.readingSync.publish(account) }
+                if (!route.supplementary) graph.readingSync.publishAll()
             } catch (failure: Exception) {
                 saveError = failure.message ?: "This page could not be saved on this device."
             }
@@ -160,7 +160,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
         fun resolve(keepLocal: Boolean) {
             try {
                 graph.reading.resolveConflict(account, route.itemId, fileKey, keepLocal)
-                if (keepLocal) scope.launch { graph.readingSync.publish(account) } else if (conflict != null) page = conflict.coerceIn(1, document.pageCount)
+                if (keepLocal) graph.readingSync.publishAll() else if (conflict != null) page = conflict.coerceIn(1, document.pageCount)
             } catch (failure: Exception) {
                 saveError = failure.message ?: "Your choice could not be saved on this device."
             }

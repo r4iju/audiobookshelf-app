@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() {
         graph.serverEvents
         graph.downloads.resumeInterrupted()
         graph.readingSync
+        graph.startResets()
         if (savedInstanceState == null) route(intent)
         // Applied before the first frame so a locked orientation never flashes the other way at launch.
         applyOrientation(graph.settings.current.lockOrientation)

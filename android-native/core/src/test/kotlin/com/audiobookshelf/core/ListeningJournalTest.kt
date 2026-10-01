@@ -68,4 +68,21 @@ class ListeningJournalTest {
         assertThrows(ListeningJournal.Unreadable::class.java) { ListeningJournal(file) }
         assertArrayEquals(damaged, file.readBytes())
     }
+
+    @Test
+    fun aResetOutranksServerSnapshotsTakenBeforeIt() {
+        val file = folder.root.resolve("journal.json")
+        val journal = ListeningJournal(file)
+        val id = journal.begin(qa, book, "device", now = 1_000)
+        journal.record(id, position = 9.5, listened = 3.5, now = 2_000)
+        journal.resetPosition(qa, "book-0", null, at = 5_000.0)
+
+        val reopened = ListeningJournal(file)
+        reopened.adoptRemotePosition(qa, "book-0", null, time = 9.5, updatedAt = 3_000.0)
+        assertEquals(0.0, reopened.cachedPosition(qa, "book-0", null, newerThan = Double.NEGATIVE_INFINITY)!!, 0.0)
+        assertEquals(0.0, reopened.cachedPosition(qa, "book-0", null, newerThan = 4_000.0)!!, 0.0)
+
+        reopened.adoptRemotePosition(qa, "book-0", null, time = 2.0, updatedAt = 6_000.0)
+        assertEquals(2.0, reopened.cachedPosition(qa, "book-0", null, newerThan = Double.NEGATIVE_INFINITY)!!, 0.0)
+    }
 }

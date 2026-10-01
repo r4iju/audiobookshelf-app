@@ -26,8 +26,13 @@ class ProgressResetJourney {
     }
 
     private fun ComposeTestRule.discard() {
+        scrollTo("item-detail", "discard-progress")
         tap("discard-progress")
         tap("confirm-discard-progress")
+    }
+
+    private fun ComposeTestRule.waitForDiscard() = eventually(30_000) {
+        !isShown("discard-progress") && !isShown("confirm-discard-progress") && !isShown("discard-pending")
     }
 
     @Test
@@ -76,6 +81,56 @@ class ProgressResetJourney {
                     .any { it.getString("libraryItemId") == "book-0" && it.optDouble("currentTime") >= start + 3 }
             }
             assertNull("Discarded progress must stay discarded", Fixture.serverProgress("book-0"))
+        }
+    }
+
+    @Test
+    fun aPageSentJustBeforeTheDiscardDoesNotBringProgressBack() {
+        Fixture.resetAppData()
+        Fixture.configure("pdf-delayed")
+        ActivityScenario.launch(MainActivity::class.java).use {
+            compose.signIn()
+            compose.tap("item-book-0")
+            compose.tap("read-ebook")
+            compose.tap("pdf-next")
+            // The server holds this page write for a few seconds before saving it.
+            eventually { Fixture.requests().any { it.optString("ebookLocation") == "2" } }
+            compose.tap("reader-close")
+            compose.discard()
+            compose.waitForDiscard()
+            Thread.sleep(5_000)
+            assertNull("A page written before the discard must not outlive it", Fixture.serverProgress("book-0"))
+        }
+    }
+
+    @Test
+    fun playingWhileProgressIsBeingDiscardedDoesNotResumeTheOldPosition() {
+        Fixture.resetAppData()
+        Fixture.configure("baseline")
+        Fixture.post("${Fixture.server}/__android__/slow-discard", """{"seconds":5}""")
+        ActivityScenario.launch(MainActivity::class.java).use {
+            compose.signIn()
+            compose.tap("item-book-0")
+            compose.discard()
+            compose.tap("play")
+            val played = runCatching { compose.waitForTag("player-playing", 6_000) }.isSuccess
+            compose.waitForDiscard()
+            if (played) {
+                Thread.sleep(2_000)
+                compose.tap("player-close")
+                eventually(60_000) {
+                    Fixture.observations().getJSONArray("localSessions").objects().any { it.getString("libraryItemId") == "book-0" }
+                }
+            }
+            val recreated = Fixture.serverProgress("book-0")?.optDouble("currentTime")
+            assertTrue("Listening from before the discard came back at $recreated s", recreated == null || recreated < 5)
+
+            // Once discarded, the title plays from the beginning.
+            compose.tap("play")
+            compose.waitForTag("player-playing", 15_000)
+            compose.tap("play-pause")
+            compose.waitForTag("player-paused")
+            assertTrue(compose.shownSeconds() <= 2)
         }
     }
 }

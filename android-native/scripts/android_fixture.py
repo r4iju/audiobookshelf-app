@@ -24,13 +24,17 @@ def android_server(port, prefix, bind='127.0.0.1'):
     # Listening sync can be refused on its own, whatever the shared mode, so reading and listening
     # ordering is observable with a document present. Any reconfiguration accepts listening again.
     refusal = {'listening': False}
-    # The shared fixture reconfigures progress entries it assumes exist; discarding progress removes
-    # one, so the entries as they were at start are kept and missing ones are restored on reconfiguring.
-    def progress_of(token):
+    discard_delay = {'seconds': 0}
+    # The shared fixture reconfigures progress entries it assumes exist, and keeps progress and
+    # bookmarks one journey class added for the next. Reconfiguring restores the titles that had
+    # progress at startup, drops progress added since and clears bookmarks, so classes pass alone and
+    # in one run alike. Entries that exist are left for the mode to set, so modes can be layered.
+    def probe_for(token):
         probe = base.__new__(base)
         probe.headers = {'Authorization': token} if token else {}
-        return probe.progress
-    accounts = [progress_of(None), progress_of('Bearer fresh-other')]
+        return probe
+    probes = [probe_for(None), probe_for('Bearer fresh-other')]
+    accounts = [probe.progress for probe in probes]
     originals = [copy.deepcopy(entries) for entries in accounts]
     # Server 2.30 item actions the shared fixture does not model. Nothing is sent anywhere: feeds and
     # e-reader deliveries are only recorded for journeys to observe.
@@ -169,6 +173,10 @@ def android_server(port, prefix, bind='127.0.0.1'):
                     return self.respond(404, {})
                 del actions['feeds'][item_id]
                 return self.respond(200, {})
+            if path == '/__android__/slow-discard':
+                discard_delay['seconds'] = float(self.body().get('seconds', 0))
+                self.route()
+                return self.respond(200, discard_delay)
             if path == '/__android__/refuse-listening':
                 data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
                 refusal['listening'] = bool(data.get('refuse'))
@@ -179,9 +187,14 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 self.rfile = io.BytesIO(body)
                 reset_actions(json.loads(body or b'{}').get('mode', ''))
                 refusal['listening'] = False
-                for entries, original in zip(accounts, originals):
+                discard_delay['seconds'] = 0
+                for probe, entries, original in zip(probes, accounts, originals):
+                    for key in [key for key in entries if key not in original]:
+                        del entries[key]
                     for key, entry in original.items():
                         entries.setdefault(key, copy.deepcopy(entry))
+                    probe.account['bookmarks'] = []
+                    probe.account['mediaProgress'] = list(entries.values())
             if path == '/api/session/local-all' and refusal['listening']:
                 self.rfile.read(int(self.headers.get('Content-Length', 0)))
                 self.route()
@@ -195,7 +208,8 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 if not self.authorized():
                     return self.respond(401, {})
                 self.identify_progress()
-                key = next((key for key, entry in self.progress.items() if entry['id'] == discard[1]), None)
+                time.sleep(discard_delay['seconds'])
+                key = next((key for key, entry in self.progress.items() if entry.get('id') == discard[1]), None)
                 if key is None:
                     return self.respond(404, {})
                 del self.progress[key]

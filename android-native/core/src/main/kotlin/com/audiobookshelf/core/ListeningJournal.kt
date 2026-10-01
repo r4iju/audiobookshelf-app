@@ -156,10 +156,21 @@ class ListeningJournal(private val file: File) {
         commit(records, remember(positions, Position(account, itemId, episodeId, time, updatedAt)))
     }
 
-    /** Forgets where this device last was in a title whose progress was discarded. */
+    /** Remembers a server position unless this device knows a newer one for the title. */
     @Synchronized
-    fun forgetPosition(account: AccountIdentity, itemId: String, episodeId: String?) {
-        commit(records, positions.filterNot { it.account == account && it.itemId == itemId && it.episodeId == episodeId })
+    fun adoptRemotePosition(account: AccountIdentity, itemId: String, episodeId: String?, time: Double, updatedAt: Double) {
+        val known = positions.firstOrNull { it.account == account && it.itemId == itemId && it.episodeId == episodeId }?.updatedAt
+        if (known == null || updatedAt > known) rememberRemotePosition(account, itemId, episodeId, time, updatedAt)
+    }
+
+    /**
+     * Returns the title to its beginning as of [at], when its progress was discarded. The dated
+     * position outranks every server snapshot taken before then, so none can bring the old one back.
+     */
+    @Synchronized
+    fun resetPosition(account: AccountIdentity, itemId: String, episodeId: String?, at: Double) {
+        require(at.isFinite())
+        commit(records, remember(positions, Position(account, itemId, episodeId, 0.0, at)))
     }
 
     private fun ListeningRecord.position() = Position(account, media.libraryItemId, media.episodeId, currentTime, updatedAt)

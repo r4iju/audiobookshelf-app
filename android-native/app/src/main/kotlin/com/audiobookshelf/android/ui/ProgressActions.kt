@@ -9,6 +9,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +36,14 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
     var error by remember { mutableStateOf<String?>(null) }
     var confirming by remember { mutableStateOf(false) }
     val finished = progress?.isFinished == true
+    val resets by graph.resets.requested.collectAsState()
+    val discarding = resets.any { it.matches(active.client.account, itemId, episodeId) }
+    var wasDiscarding by remember { mutableStateOf(false) }
+    // A discard completed in the background removes the progress shown here too.
+    LaunchedEffect(discarding) {
+        if (wasDiscarding && !discarding) catalog.forgetProgress(itemId, episodeId)
+        wasDiscarding = discarding
+    }
 
     fun run(action: suspend () -> Unit) {
         saving = true; error = null
@@ -52,10 +62,13 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
                     catalog.applyProgress(saved ?: MediaProgress(libraryItemId = itemId, episodeId = episodeId, isFinished = !finished, progress = if (finished) 0.0 else 1.0))
                 }
             },
-            enabled = !saving,
+            enabled = !saving && !discarding,
             modifier = Modifier.fillMaxWidth().testTag(if (finished) "$tagPrefix-unfinish" else "$tagPrefix-finish"),
         ) { Text(if (finished) "Mark unfinished" else "Mark finished") }
-        if (progress != null) {
+        if (discarding) {
+            Text("Discarding progress. This finishes once your server can be reached and this title's listening is sent.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("discard-pending"))
+        } else if (progress != null) {
             TextButton(onClick = { confirming = true }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("discard-progress")) { Text("Discard progress") }
         }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -68,8 +81,7 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
             TextButton(onClick = {
                 confirming = false
                 run {
-                    graph.discardProgress(active.client, itemId, episodeId, progress?.id)
-                    catalog.forgetProgress(itemId, episodeId)
+                    if (graph.discardProgress(active.client, itemId, episodeId)) catalog.forgetProgress(itemId, episodeId)
                 }
             }, modifier = Modifier.testTag("confirm-discard-progress")) { Text("Discard") }
         },

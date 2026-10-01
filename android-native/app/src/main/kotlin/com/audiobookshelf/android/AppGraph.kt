@@ -14,6 +14,8 @@ import com.audiobookshelf.android.playback.ProgressSync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import com.audiobookshelf.core.ApiClient
@@ -51,9 +53,10 @@ class AppGraph private constructor(val context: Context) {
         }
     }
     /** Creating the engine closes listening left open by a previous process and publishes it. */
-    val playback by lazy {
+    val playback: PlaybackEngine by lazy {
         journal.finishRecoveredSessions()
-        PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io, diagnostics::record).also { progressSync.publishAll() }
+        PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io, diagnostics::record,
+            resetPending = { account, itemId, episodeId -> resets.pending(account, itemId, episodeId) }).also { progressSync.publishAll() }
     }
 
     val downloads by lazy {
@@ -79,23 +82,77 @@ class AppGraph private constructor(val context: Context) {
         }
     }
 
+    val resets: com.audiobookshelf.core.ProgressResets by lazy {
+        com.audiobookshelf.core.ProgressResets(File(context.filesDir, "progress-resets.json"), remoteFor = { account ->
+            accounts.clientFor(account)?.let { client ->
+                object : com.audiobookshelf.core.ProgressRemote {
+                    override suspend fun progress(itemId: String, episodeId: String?) = client.progress(itemId, episodeId)
+                    override suspend fun remove(progressId: String) = client.removeProgress(progressId)
+                }
+            }
+        }, exclusive = { reset, block -> playback.excludingTitle(reset.account, reset.itemId, reset.episodeId, block) },
+            cleanup = { reset, at ->
+                journal.resetPosition(reset.account, reset.itemId, reset.episodeId, at)
+                if (reset.episodeId == null) reading.forget(reset.account, reset.itemId)
+            })
+    }
+
+    private var resetRetry: kotlinx.coroutines.Job? = null
+    private var resetBackoffMs = 1_000L
+
+    private var resetsStarted = false
+
+    /** Completes discarded progress left from before, and again whenever a network or the account returns. */
+    fun startResets() {
+        if (resetsStarted) return
+        resetsStarted = true
+        context.getSystemService(ConnectivityManager::class.java)?.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) { scope.launch { completeResets() } }
+        })
+        scope.launch {
+            accounts.session.map { (it as? com.audiobookshelf.android.data.SessionState.Active)?.client?.account }.distinctUntilChanged().collect { completeResets() }
+        }
+    }
+
+    /** Resumes discarded progress that is not yet complete, for every signed-in account that asked for it. */
+    fun completeResets() {
+        scope.launch {
+            var failed = false
+            for (account in resets.pendingAccounts()) {
+                if (accounts.clientFor(account) == null) continue
+                val done = try {
+                    kotlinx.coroutines.withContext(Dispatchers.IO) { resets.complete(account) }
+                } catch (failure: Exception) {
+                    accounts.handle(failure)
+                    diagnostics.record(com.audiobookshelf.android.data.Diagnostics.Area.SYNC, "Discarding progress did not finish yet; it is retried", failure)
+                    false
+                }
+                failed = failed || !done
+            }
+            if (!failed) { resetBackoffMs = 1_000L; return@launch }
+            if (resetRetry?.isActive == true) return@launch
+            val wait = resetBackoffMs
+            resetBackoffMs = (resetBackoffMs * 2).coerceAtMost(60_000L)
+            resetRetry = scope.launch { kotlinx.coroutines.delay(wait); resetRetry = null; completeResets() }
+        }
+    }
+
     /**
-     * Discards a title's progress on the server and on this device, as the existing app does. Its
-     * listening is sent first, so none of it can recreate the progress afterwards; while that listening
-     * cannot be sent nothing is discarded.
+     * Discards a title's progress on the server and on this device, as the existing app does. The
+     * request is saved first and completed in the background when it cannot finish now; the title's
+     * listening is sent before anything is deleted, so none of it can recreate the progress afterwards.
      */
-    suspend fun discardProgress(client: ApiClient, itemId: String, episodeId: String?, progressId: String?) {
+    suspend fun discardProgress(client: ApiClient, itemId: String, episodeId: String?): Boolean {
         val account = client.account
-        if (!playback.settleListening(account, itemId, episodeId)) {
-            throw java.io.IOException("Listening for this title is not on the server yet, so its progress was kept. Try again when connected.")
+        kotlinx.coroutines.withContext(io) { resets.request(account, itemId, episodeId) }
+        val done = try {
+            kotlinx.coroutines.withContext(Dispatchers.IO) { resets.complete(account) }
+        } catch (failure: Exception) {
+            accounts.handle(failure)
+            false
         }
-        // Progress written by this device carries no server id until the server is asked for it.
-        val id = progressId ?: client.progress(itemId, episodeId)?.id
-        if (id != null) client.removeProgress(id)
-        kotlinx.coroutines.withContext(io) {
-            journal.forgetPosition(account, itemId, episodeId)
-            if (episodeId == null) reading.forget(account, itemId)
-        }
+        if (!done) completeResets()
+        return done
     }
 
     val podcastRequests by lazy { com.audiobookshelf.android.podcast.PodcastRequests(File(context.filesDir, "podcast-requests.json")) }

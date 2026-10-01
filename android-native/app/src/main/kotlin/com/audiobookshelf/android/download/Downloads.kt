@@ -156,8 +156,7 @@ class Downloads(
         for (record in downloaded) {
             val remote = progress.firstOrNull { it.libraryItemId == record.itemId && it.episodeId == record.episodeId } ?: continue
             val updated = remote.lastUpdate ?: continue
-            val known = journal.cachedUpdatedAt(account, record.itemId, record.episodeId)
-            if (record.audio.isNotEmpty() && (known == null || updated > known)) runCatching { journal.rememberRemotePosition(account, record.itemId, record.episodeId, remote.currentTime, updated) }
+            if (record.audio.isNotEmpty()) runCatching { journal.adoptRemotePosition(account, record.itemId, record.episodeId, remote.currentTime, updated) }
         }
     }
 

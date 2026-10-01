@@ -45,6 +45,7 @@ import com.audiobookshelf.core.Timeline
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -125,6 +126,8 @@ class PlaybackEngine(
     private val device: () -> DeviceInfo,
     private val io: CoroutineDispatcher,
     private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
+    /** True while the title's progress is being discarded; it does not start until that is complete. */
+    private val resetPending: (AccountIdentity, String, String?) -> Boolean = { _, _, _ -> false },
 ) {
     private class Loaded(
         val source: PlaySource,
@@ -163,6 +166,7 @@ class PlaybackEngine(
     private var queue: List<PlaySource> = emptyList()
     /** Account of the most recent open request, which may still be in flight. */
     private var opening: AccountIdentity? = null
+    private var openingTitle: Triple<AccountIdentity, String, String?>? = null
     private val main = android.os.Handler(android.os.Looper.getMainLooper())
 
     /** The player only accepts its own thread; screens may call after a network result resumes elsewhere. */
@@ -195,13 +199,17 @@ class PlaybackEngine(
         }
         val request = ++generation
         opening = source.account
+        openingTitle = Triple(source.account, source.itemId, source.episodeId)
         stopCurrent(closeStream = true)
         mutable.value = mutable.value.copy(now = null, loading = true, error = null, openError = null, finished = false, position = 0.0)
         startService()
         scope.launch {
             try {
-                // A reading write already under way finishes first; none starts once this open is loading.
-                readingPublication.withLock { }
+                // A reading write or progress reset already under way finishes first; neither starts once
+                // this open is loading.
+                readingPublication.withLock {
+                    if (resetPending(source.account, source.itemId, source.episodeId)) throw ResetPending()
+                }
                 if (request != generation) return@launch
                 open(source, request, transcode = false, at = null)
             } catch (failure: Exception) {
@@ -481,13 +489,26 @@ class PlaybackEngine(
      */
     suspend fun settleListening(account: AccountIdentity, itemId: String, episodeId: String?): Boolean {
         withContext(Dispatchers.Main) {
-            if (loaded?.source?.let { it.account == account && it.itemId == itemId && it.episodeId == episodeId } == true) close()
+            val title = Triple(account, itemId, episodeId)
+            val playing = loaded?.source?.let { Triple(it.account, it.itemId, it.episodeId) == title } == true
+            if (playing || (mutable.value.loading && openingTitle == title)) close()
         }
         val ofTitle = { recordId: String -> journal.open(recordId)?.let { it.account == account && it.media.libraryItemId == itemId && it.media.episodeId == episodeId } == true }
         // A closed title's listening is written and finished in the background before it can be sent.
         val written = withTimeoutOrNull(SETTLE_TIMEOUT_MS) { while (writer.holds(ofTitle)) delay(100) } != null
         return written && sync.publish(account)
     }
+
+    /**
+     * Runs [block] once the title's listening is on the server, with no reading write under way and no
+     * title starting until it returns. False, running nothing, while that listening is not yet sent.
+     */
+    suspend fun excludingTitle(account: AccountIdentity, itemId: String, episodeId: String?, block: suspend () -> Unit): Boolean =
+        readingPublication.withLock {
+            if (!settleListening(account, itemId, episodeId)) return@withLock false
+            withContext(NonCancellable) { block() }
+            true
+        }
 
     private fun listeningBusy() = loaded != null || mutable.value.loading || writer.busy
 
@@ -502,9 +523,13 @@ class PlaybackEngine(
         if (listeningBusy()) return@withLock false
         if (!sync.publish(account)) throw java.io.IOException("Listening for this account is not on the server yet")
         if (listeningBusy()) return@withLock false
-        publication()
+        // A write already sent cannot be withdrawn, so the gate stays closed until it completes even
+        // when the caller is cancelled; otherwise a reset could delete progress that this write recreates.
+        withContext(NonCancellable) { publication() }
         true
     }
+
+    class ResetPending : java.io.IOException("Progress for this title is still being discarded. It plays from the beginning once that is done.")
 
     private suspend fun closeStream(client: ApiClient, sessionId: String) {
         runCatching { client.closeSession(sessionId) }.onFailure { Log.i(TAG, "Stream session close deferred: ${it.javaClass.simpleName}") }

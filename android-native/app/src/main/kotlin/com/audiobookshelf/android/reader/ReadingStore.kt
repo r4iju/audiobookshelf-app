@@ -223,9 +223,13 @@ class ReadingSync(
     suspend fun publish(account: AccountIdentity) = lock.withLock {
         val remote = remoteFor(account) ?: return@withLock
         while (true) {
-            val next = store.publishable(account).firstOrNull() ?: break
+            if (store.publishable(account).isEmpty()) break
             try {
+                // The page is chosen inside the gate: a progress reset that held it may have forgotten the page meanwhile.
+                var chosen: ReadingStore.Entry? = null
                 val allowed = listeningGate(account) {
+                    val next = store.publishable(account).firstOrNull() ?: return@listeningGate
+                    chosen = next
                     when (store.preflight(next, remote.progress(next.itemId))) {
                         ReadingStore.Preflight.CONFLICT -> Unit
                         ReadingStore.Preflight.ALREADY_THERE -> store.acknowledge(next, null)
@@ -238,6 +242,7 @@ class ReadingSync(
                 }
                 // Listening is open or unsent; publication resumes when it ends.
                 if (!allowed) break
+                val next = chosen ?: break
                 backoffMs = FIRST_RETRY_MS
                 // A page that is still publishable unchanged would only be asked about again; wait for a retry.
                 if (store.publishable(account).any { it.itemId == next.itemId && it.fileId == next.fileId && it.revision == next.revision }) { scheduleRetry(); break }
