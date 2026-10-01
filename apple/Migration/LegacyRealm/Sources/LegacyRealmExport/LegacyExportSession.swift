@@ -14,9 +14,10 @@ public protocol LegacyExportPackaging: AnyObject {
 
 extension LegacyExportJob: LegacyExportPackaging {}
 
-/// The export and save lifecycle of the legacy app's export action. While a save dialog holds the
-/// package, nothing may replace or remove it, and every save resolves exactly once, so a dialog
-/// that never appeared cannot block later saves. Safe to call from any thread.
+/// The export and save lifecycle of the legacy app's export action. One operation at a time owns
+/// the package: while it is written, saved or removed, nothing else may replace, save or remove it.
+/// Every save resolves exactly once, so a dialog that never appeared cannot block later saves.
+/// Safe to call from any thread.
 public final class LegacyExportSession {
     public typealias SaveCompletion = (Result<Bool, LegacyExportSessionError>) -> Void
     /// Shows the save dialog for the package and reports, once, how it ended; a dialog that cannot
@@ -28,6 +29,7 @@ public final class LegacyExportSession {
         case exporting
         case ready(LegacyExportResult)
         case saving(LegacyExportResult, UUID)
+        case discarding
     }
 
     private let job: LegacyExportPackaging
@@ -41,7 +43,7 @@ public final class LegacyExportSession {
     public func export(webStorage: [String: String], copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)?) throws -> LegacyExportResult {
         try transition { state in
             switch state {
-            case .exporting, .saving: throw LegacyExportSessionError.busy
+            case .exporting, .saving, .discarding: throw LegacyExportSessionError.busy
             case .idle, .ready: state = .exporting
             }
         }
@@ -62,7 +64,7 @@ public final class LegacyExportSession {
             url = try transition { state -> URL in
                 switch state {
                 case .idle: throw LegacyExportSessionError.nothingToSave
-                case .exporting, .saving: throw LegacyExportSessionError.busy
+                case .exporting, .saving, .discarding: throw LegacyExportSessionError.busy
                 case let .ready(result):
                     state = .saving(result, token)
                     return result.url
@@ -84,10 +86,12 @@ public final class LegacyExportSession {
     public func discard() throws {
         try transition { state in
             switch state {
-            case .exporting, .saving: throw LegacyExportSessionError.busy
-            case .idle, .ready: state = .idle
+            case .exporting, .saving, .discarding: throw LegacyExportSessionError.busy
+            case .idle, .ready: state = .discarding
             }
         }
+        // Whatever remains after a failed removal is not offered again.
+        defer { transition { $0 = .idle } }
         try job.discard()
     }
 
