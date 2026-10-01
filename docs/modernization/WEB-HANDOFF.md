@@ -40,7 +40,9 @@ shared modernization documents. Issues #55 to #65.
 | `96cbb5f7` | Formatting of `qa/server.mjs` |
 | `a6961e2b` | Removing an episode leaves its page even when the server's update arrives first |
 | `843a928c` | Only blocks whose delete was never issued are cleaned up when their book cannot be read; removing an episode leaves its page only if that page is still showing for the same account |
-| (this commit) | Restart recovery: a delete that may still be running, with no discard left to finish it, is released only by a server restart the user asked for and then confirmed, retiring only the records recorded at the request |
+| `d272afbf` | Restart recovery: a delete that may still be running, with no discard left to finish it, is released only by a server restart the user asked for and then confirmed, retiring only the records recorded at the request |
+| `296259de` | A restart request is used only if it is the account's own; a retired delete ends as a confirmed one; a request sent again after a renewed sign-in is a new attempt |
+| (this commit) | Records the full local run on `296259de` |
 
 ## Checks
 
@@ -50,20 +52,30 @@ Run from `web/` on the Studio, against the isolated QA server only:
 npm run lint && npm run typecheck && npm test && npx playwright test
 ```
 
-Last full run, on `df362fbd` (Studio, Chromium; the commit after it changes only this file), log
-`web/qa/.runtime/final-check-10.log`. The chain was
+Last full run, on `296259de` (Studio, Chromium; the commit after it changes only this file), log
+`web/qa/.runtime/final-check-16.log`. The chain was `node qa/fixture-network.mjs 60`, then
 `npm run lint && npm run typecheck && npm test && npm run build && npm run qa:deploy -- up && npx playwright test`:
 
+- Fixture network check: **failed**. Of 3,424 connections from inside the QA server's network, 3 took just over a
+  second: OpenID 1 of 1,144 (max 1,026 ms), mail 2 of 1,142 (max 1,069 ms), feed 0 of 1,138 (max 786 ms). None
+  errored or timed out. The Studio's load average was 353 to 483 at the time. Run again alone straight after
+  (`final-check-16-fixnet-rerun.log`, load 259 to 367), it passed: 3,550 connections, none failed, max 33 ms. The
+  one-second threshold is what the check is for, so this run does not show the fixture network free of stalls
+  under that load;
 - Biome clean (1 info: the `recommended` field in `biome.json` is deprecated);
 - `tsc` clean;
-- vitest: 98 passed in 17 files;
+- vitest: 114 passed in 17 files;
 - production build and deployment image built;
-- Playwright: 61 passed in 3.5 minutes, including the 7 deployment journeys against the image built from that
-  commit and the e-reader journey.
+- Playwright: 63 passed, none skipped or failed, in 4.7 minutes. That includes the restart recovery journey, which
+  restarts the QA server container `abs-web-qa` (not the owner's server), and the 7 deployment journeys against the
+  image built from that commit, the OpenID journeys and the e-reader journey. The checks that a restart request
+  must be the account's own are unit tests; no journey covers them.
 
-The run before it, on `56e92c87`, had 54 passed and 7 failed: six with `ERR_ADDRESS_INVALID` or `EADDRNOTAVAIL`
-connecting to the loopback QA ports, and one click timeout in the settings journey. The fixture networking behind
-those and the stalls below is being diagnosed separately; nothing in it was changed here.
+Superseded runs: on `843a928c` (`final-check-14.log`) everything passed (101 unit tests, 62 journeys, no fixture
+stalls); the run on `d272afbf` (`final-check-15.log`) was stopped part-way when review found the problems fixed in
+`296259de`, and is not evidence for either commit. On `df362fbd` (`final-check-10.log`) 98 unit tests and 61 journeys
+passed. On `56e92c87`, 54 passed and 7 failed with loopback connection errors and one click timeout, before the
+fixtures moved into the QA server's network (`4f4bb7cd`).
 
 Intermittent failures seen in full runs on `df948480`, `f4e8d15f` and `5710199f`, none reproduced on retry:
 
