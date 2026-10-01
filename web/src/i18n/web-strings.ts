@@ -137,7 +137,7 @@ export const webStrings = {
   WebEbookSent: "Ebook sent to {0}",
   WebDiscardPending: "Discarding progress. It finishes when the server can be reached.",
   WebDiscardUnconfirmed:
-    "Discarding progress. Listening for this that another tab sent is not confirmed by the server, and could bring the old position back after the discard. It finishes by itself once confirmed.",
+    "Discarding progress. Listening or a reading place for this, sent by another tab or failed on the way, is not confirmed by the server and could bring the old place back after the discard. It finishes by itself if that tab hears back. Otherwise, keep the progress, or discard anyway and accept that the old place may return.",
   WebKeepProgress: "Keep progress",
   WebDiscardAnyway: "Discard anyway",
   WebEbookSendFailed: "Failed to send ebook to device: {0}",

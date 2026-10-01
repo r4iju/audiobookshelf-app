@@ -25,7 +25,8 @@ export function useProgressSync() {
       soon = setTimeout(flush, 1_000);
     });
     flush();
-    const timer = setInterval(() => (outbox.pending().length || outbox.hasHolds()) && flush(), RETRY_MS);
+    // Always, as versions of listening that failed are sent again from IndexedDB rather than from the queue.
+    const timer = setInterval(flush, RETRY_MS);
     window.addEventListener("online", flush);
     return () => {
       stop();

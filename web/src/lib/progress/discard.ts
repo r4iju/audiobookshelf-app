@@ -20,6 +20,9 @@ export async function discardProgress(
   // for the book from now on, and this device lets go of the old position, before finishDiscard deletes.
   const connectionId = client.connection.id;
   const outbox = outboxFor(connectionId);
+  const forgotten = outbox
+    .pending()
+    .filter((entry) => entry.libraryItemId === itemId && entry.episodeId === episodeId);
   const hold = outbox.hold(itemId, episodeId, progressId);
   try {
     await usePlayerStore.getState().startOver({ connectionId, itemId, episodeId });
@@ -30,12 +33,16 @@ export async function discardProgress(
   }
   let result: DiscardResult;
   try {
-    result = await finishDiscard(client, { id: hold.id, libraryItemId: itemId, episodeId, progressId }, {});
+    result = await finishDiscard(
+      client,
+      { id: hold.id, libraryItemId: itemId, episodeId, progressId },
+      { forgotten },
+    );
   } catch (error) {
     hold.abandon();
     throw error;
   }
-  if (result === "done") {
+  if (result !== "unconfirmed") {
     hold.settle();
   } else {
     // Any tab finishes it once the listening is answered.

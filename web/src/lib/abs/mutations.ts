@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { type DiscardTarget, discardProgress } from "@/lib/progress/discard";
-import { discardAnyway, keepProgress } from "@/lib/progress/sync";
+import { changeProgress, discardAnyway, keepProgress } from "@/lib/progress/sync";
 import { useAbs } from "@/lib/session/store";
 import type { AbsClient } from "./client";
 import { feedSchema } from "./feeds";
@@ -62,9 +62,11 @@ export function useSetFinished() {
       episodeId?: string | null;
       finished: boolean;
     }) =>
-      client.command("PATCH", `/api/me/progress/${itemId}${episodeId ? `/${episodeId}` : ""}`, {
-        isFinished: finished,
-      }),
+      changeProgress(
+        client,
+        { libraryItemId: itemId, episodeId: episodeId ?? null },
+        { isFinished: finished },
+      ),
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
   });
 }
@@ -79,7 +81,9 @@ export function useDiscardProgress() {
 }
 
 /** Settles a discard left unconfirmed (see discardProgress) the way the user chose. */
-function useDiscardChoice(choose: typeof keepProgress) {
+function useDiscardChoice(
+  choose: (client: AbsClient, itemId: string, episodeId: string | null) => Promise<unknown>,
+) {
   const { client, connection } = useAbs();
   const queryClient = useQueryClient();
   return useMutation({
@@ -89,7 +93,7 @@ function useDiscardChoice(choose: typeof keepProgress) {
   });
 }
 
-/** Gives up the discard: nothing is deleted. */
+/** Gives up the discard, so nothing is deleted, unless its delete was issued meanwhile; then it is shown as pending. */
 export const useKeepProgress = () => useDiscardChoice(keepProgress);
 
 /** Deletes anyway, accepting that the unconfirmed listening may bring the old place back. */
@@ -264,7 +268,8 @@ export function useSaveEbookPlace(itemId: string) {
   return useMutation({
     // One at a time, so a quick run of page turns cannot land on the server out of order.
     scope: { id: `ebook-place-${itemId}` },
-    mutationFn: (place: EbookPlace) => client.command("PATCH", `/api/me/progress/${itemId}`, place),
+    mutationFn: (place: EbookPlace) =>
+      changeProgress(client, { libraryItemId: itemId, episodeId: null }, place),
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.itemProgress(connection.id, itemId) }),
   });
 }

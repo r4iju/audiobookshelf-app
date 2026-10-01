@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type AbsClient, AbsError } from "@/lib/abs/client";
 import { usePlayerStore } from "@/lib/player/store";
-import { beginSending, finishSending } from "./coordination";
+import { beginPublishing, finishSending } from "./coordination";
 import { discardProgress } from "./discard";
 import { createListeningReport, createOutbox, type ListeningReport } from "./outbox";
-import { discardAnyway, finishDiscard, flushReports, keepProgress, outboxFor } from "./sync";
+import { changeProgress, discardAnyway, finishDiscard, flushReports, keepProgress, outboxFor } from "./sync";
 
 function memoryStorage() {
   const data = new Map<string, string>();
@@ -143,6 +143,7 @@ function scriptedDeleteServer(connectionId: string, script: ("hang" | "refuse" |
       return { results: body.sessions.map((session) => ({ id: session.id, success: true })) };
     }),
     command: vi.fn(async (method: string, path: string) => {
+      if (method === "PATCH") log.push(`${method} ${path}`);
       if (method !== "DELETE") return;
       const answer = script[deletes++] ?? "ok";
       if (answer === "refuse") throw new AbsError("network", "Network error");
@@ -182,7 +183,7 @@ function otherTab(
   const outbox = createOutbox("conn-a", storage, undefined, {
     begin: async (connectionId, candidates) => {
       await registering;
-      return beginSending(connectionId, candidates, page);
+      return beginPublishing(connectionId, candidates, page);
     },
     finish: finishSending,
   });
@@ -479,7 +480,8 @@ describe("discardProgress", () => {
     await finishDiscard(server.client, hold, {});
     await flushReports(server.client, () => {});
 
-    expect(server.log).toEqual(["listening book-x@40"]);
+    // The failed request's version, sent again unchanged, and the held listening.
+    expect(server.log).toEqual(["listening book-x@40,book-x@40"]);
     expect(outboxFor("conn-a").discardState("book-x", null)).toBeNull();
   });
 
@@ -541,7 +543,7 @@ describe("discardProgress", () => {
     expect(server.log).toEqual(["DELETE /api/me/progress/p-x"]);
   });
 
-  it("waits for another tab's request though the same listening reached the server another way", async () => {
+  it("waits for another tab's request, sending no copy of it meanwhile", async () => {
     vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
     const server = scriptedDeleteServer("conn-a", ["ok"]);
     usePlayerStore.getState().attach(server.client);
@@ -549,7 +551,6 @@ describe("discardProgress", () => {
     const tab = otherTab(server.log);
     const delivering = tab.delivering();
     await vi.waitFor(() => expect(tab.sent()).toBe(true));
-    // This tab sends the same queued report itself, and the server applies it.
     await flushReports(server.client, () => {});
 
     const result = await discardProgress(server.client, {
@@ -557,11 +558,107 @@ describe("discardProgress", () => {
       itemId: "book-x",
       episodeId: null,
     });
-    expect({ result, log: [...server.log] }).toEqual({ result: "unconfirmed", log: ["listening book-x@40"] });
+    expect({ result, log: [...server.log] }).toEqual({ result: "unconfirmed", log: [] });
     tab.answer();
     await delivering;
     await flushReports(server.client, () => {});
 
-    expect(server.log).toEqual(["listening book-x@40", "listening book-x@40", "DELETE /api/me/progress/p-x"]);
+    expect(server.log).toEqual(["listening book-x@40", "DELETE /api/me/progress/p-x"]);
+  });
+
+  it("lets no tab keep the progress once its delete is on its way, holding new listening until the delete is answered", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["hang"]);
+    usePlayerStore.getState().attach(server.client);
+    const discarding = discardProgress(server.client, {
+      progressId: "p-x",
+      itemId: "book-x",
+      episodeId: null,
+    });
+    await vi.waitFor(() => expect(server.deletes()).toBe(1));
+    outboxFor("conn-a").record(report("new-x", "book-x"));
+
+    // Another tab still offering Keep, or recovering the discard on its own, chooses to keep.
+    const kept = await keepProgress(server.client, "book-x", null);
+    await flushReports(server.client, () => {});
+    expect({ kept, log: [...server.log], state: outboxFor("conn-a").discardState("book-x", null) }).toEqual({
+      kept: false,
+      log: [],
+      state: "pending",
+    });
+    server.thaw();
+    await discarding;
+    await flushReports(server.client, () => {});
+
+    expect(server.log).toEqual(["DELETE /api/me/progress/p-x", "listening book-x@40"]);
+  });
+
+  it("leaves a discard unconfirmed, deleting nothing, when a reading place for the book failed without an answer", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    usePlayerStore.getState().attach(server.client);
+    const reader = {
+      ...server.client,
+      command: vi.fn(async () => {
+        throw new AbsError("network", "Network error");
+      }),
+    } as unknown as AbsClient;
+    await expect(
+      changeProgress(
+        reader,
+        { libraryItemId: "book-x", episodeId: null },
+        { ebookLocation: "epubcfi(/6/8)" },
+      ),
+    ).rejects.toThrow();
+
+    const result = await discardProgress(server.client, {
+      progressId: "p-x",
+      itemId: "book-x",
+      episodeId: null,
+    });
+
+    expect({ result, log: server.log }).toEqual({ result: "unconfirmed", log: [] });
+  });
+
+  it("saves a reading place given during a discard only once the delete is answered", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["hang"]);
+    usePlayerStore.getState().attach(server.client);
+    const discarding = discardProgress(server.client, {
+      progressId: "p-x",
+      itemId: "book-x",
+      episodeId: null,
+    });
+    await vi.waitFor(() => expect(server.deletes()).toBe(1));
+
+    const saving = changeProgress(
+      server.client,
+      { libraryItemId: "book-x", episodeId: null },
+      { ebookLocation: "epubcfi(/6/8)" },
+    );
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    server.thaw();
+    await Promise.all([discarding, saving]);
+
+    expect(server.log).toEqual(["DELETE /api/me/progress/p-x", "PATCH /api/me/progress/book-x"]);
+  });
+
+  it("sends nothing a discard forgot, after its delete, from a tab whose view of the queue still has it", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    usePlayerStore.getState().attach(server.client);
+    outboxFor("conn-a").record(report("old-x", "book-x"));
+    const before = localStorage.getItem("abs-web:v1:outbox:conn-a");
+    const behind = {
+      ...sharedStorage,
+      read: (key: string) => (key === "abs-web:v1:outbox:conn-a" ? before : sharedStorage.read(key)),
+    };
+
+    await discardProgress(server.client, { progressId: "p-x", itemId: "book-x", episodeId: null });
+    const tab = otherTab(server.log, { storage: behind });
+    tab.answer();
+    await tab.delivering();
+
+    expect(server.log).toEqual(["DELETE /api/me/progress/p-x"]);
   });
 });

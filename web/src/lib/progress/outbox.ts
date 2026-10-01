@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { randomId } from "@/lib/random-id";
-import { beginSending, finishSending, thisPage } from "./coordination";
+import { type Begun, beginPublishing, finishSending, thisPage } from "./coordination";
 
 // Listening progress is reported as "local sessions": one record per listening session with cumulative totals and a
-// client-chosen id. Re-sending the same record is harmless, so anything not confirmed is simply sent again later,
-// after a reload, an outage or a new sign-in. The server only applies progress whose updatedAt is not older than
-// what it already has, so reports are dated in server time.
+// client-chosen id. What is not confirmed is sent again later, after a reload, an outage or a new sign-in, in the
+// versions coordination.ts allows. The server only applies progress whose updatedAt is not older than what it
+// already has, so reports are dated in server time.
 
 export const listeningReportSchema = z.object({
   id: z.string(),
@@ -91,15 +91,12 @@ const noOwners: HoldOwners = { claim: () => () => {}, live: async () => null };
 
 /** Records what is being sent, across tabs, so a discard can account for it (see coordination.ts). */
 export interface Deliveries {
-  begin: (
-    connectionId: string,
-    candidates: ListeningReport[],
-  ) => Promise<{ sendingKey: string; sending: ListeningReport[] }>;
+  begin: (connectionId: string, candidates: () => ListeningReport[]) => Promise<Begun>;
   finish: (sendingKey: string, outcome: "answered" | "failed") => Promise<void>;
 }
 
 const pageDeliveries: Deliveries = {
-  begin: (connectionId, candidates) => beginSending(connectionId, candidates, thisPage),
+  begin: (connectionId, candidates) => beginPublishing(connectionId, candidates, thisPage),
   finish: finishSending,
 };
 
@@ -258,25 +255,19 @@ export function createOutbox(
       storage.remove(`${holdPrefix}${holdId}`);
       notify();
     },
-    hasHolds: () => readHolds().length > 0,
     async flush(send: (sessions: ListeningReport[]) => Promise<DeliveryResult[]>): Promise<FlushResult> {
-      const unheld = load().filter((entry) => !isHeld(entry.libraryItemId, entry.episodeId));
-      if (unheld.length === 0) return { kind: "idle" };
-      let begun: Awaited<ReturnType<Deliveries["begin"]>>;
+      let begun: Begun;
       try {
-        begun = await deliveries.begin(connectionId, unheld);
+        begun = await deliveries.begin(connectionId, () =>
+          load().filter((entry) => !isHeld(entry.libraryItemId, entry.episodeId)),
+        );
       } catch (error) {
         // Unrecorded, a delivery could not be waited for by a discard in another tab.
         return { kind: "failed", error };
       }
-      const { sendingKey, sending: recorded } = begun;
-      // Exactly what was recorded is sent, so the record says what may still reach the server. A discard may have let
-      // go of a report while this tab was recording, and finished since, so a report no longer queued or now held is
-      // left out.
-      const queued = new Set(load().map((entry) => entry.id));
-      const sending = recorded.filter(
-        (report) => queued.has(report.id) && !isHeld(report.libraryItemId, report.episodeId),
-      );
+      // Exactly what was recorded is sent, so the record says what may still reach the server.
+      const { sendingKey, issued, again } = begun;
+      const sending = [...issued, ...again];
       // A record the browser fails to update stays as it was: still being sent, which only keeps discards waiting.
       const finish = (outcome: "answered" | "failed") =>
         deliveries.finish(sendingKey, outcome).catch(() => {});
@@ -286,7 +277,7 @@ export function createOutbox(
       }
       let results: DeliveryResult[];
       try {
-        results = await send(sending);
+        results = await send(sending.map((publication) => publication.report));
       } catch (error) {
         await finish("failed");
         return { kind: "failed", error };
@@ -294,11 +285,19 @@ export function createOutbox(
       await finish("answered");
       // A rejected report (for example an item deleted on the server) will never succeed; keeping it would only
       // block reports behind it.
-      const settled = new Map(sending.map((report) => [report.id, report.updatedAt]));
       const answered = new Set(results.map((result) => result.id));
-      save(load().filter((entry) => !(answered.has(entry.id) && settled.get(entry.id) === entry.updatedAt)));
+      const delivered = new Set(
+        sending
+          .filter((publication) => answered.has(publication.report.id))
+          .map((publication) => `${publication.stream}@${publication.updatedAt}`),
+      );
+      const queue = load();
+      const left = queue.filter((entry) => !delivered.has(`${entry.id}@${entry.updatedAt}`));
+      if (left.length !== queue.length) save(left);
       return { kind: "sent", delivered: results.filter((result) => result.success).length };
     },
+    /** Tells listeners that another tab changed this outbox. */
+    changed: notify,
     subscribe(listener: () => void) {
       listeners.add(listener);
       return () => {

@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { beginPublishing, finishSending } from "./coordination";
 import { createListeningReport, createOutbox, type ListeningReport, type OutboxStorage } from "./outbox";
 
 function memoryStorage(): OutboxStorage & { data: Map<string, string> } {
@@ -33,6 +34,9 @@ function interleaving(shared: OutboxStorage) {
   };
   return { storage, arm: (step: () => void) => (meanwhile = step) };
 }
+
+/** A recorded report sent as it is, as the first version of its session. */
+const asPublished = (report: ListeningReport) => ({ stream: report.id, updatedAt: report.updatedAt, report });
 
 const base = {
   id: "s1",
@@ -135,9 +139,9 @@ describe("progress outbox", () => {
     let recorded: ListeningReport[] = [];
     const outbox = createOutbox("conn-a", storage, undefined, {
       begin: async (_connectionId, candidates) => {
-        recorded = structuredClone(candidates);
+        recorded = structuredClone(candidates());
         createOutbox("conn-a", storage).record(report(30, 3_000));
-        return { sendingKey: "k", sending: candidates };
+        return { sendingKey: "k", issued: recorded.map(asPublished), again: [] };
       },
       finish: async () => {},
     });
@@ -153,7 +157,11 @@ describe("progress outbox", () => {
 
   it("keeps what the server answered though the browser then fails to note that it was answered", async () => {
     const outbox = createOutbox("conn-a", memoryStorage(), undefined, {
-      begin: async (_connectionId, candidates) => ({ sendingKey: "k", sending: candidates }),
+      begin: async (_connectionId, candidates) => ({
+        sendingKey: "k",
+        issued: candidates().map(asPublished),
+        again: [],
+      }),
       finish: async () => {
         throw new Error("IndexedDB refused");
       },
@@ -197,6 +205,106 @@ describe("progress outbox", () => {
         .pending()
         .map((entry) => entry.id),
     ).toEqual(["s2", "s3"]);
+  });
+
+  describe("a session's cumulative listening", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    const answer = async (sessions: ListeningReport[]) =>
+      sessions.map((session) => ({ id: session.id, success: true }));
+    /** Another tab, on the same browser storage, whose request the server answers only when the test says so. */
+    const otherTab = (storage: OutboxStorage) => {
+      const outbox = createOutbox("conn-a", storage, undefined, {
+        begin: (connectionId, candidates) => beginPublishing(connectionId, candidates, "page-other"),
+        finish: finishSending,
+      });
+      let release = () => {};
+      const released = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const sent: ListeningReport[] = [];
+      const flushing = outbox.flush(async (sessions) => {
+        sent.push(...sessions);
+        await released;
+        return answer(sessions);
+      });
+      return { sent, release, flushing };
+    };
+
+    it("goes on under another session after a request fails without an answer, so that one landing late lowers nothing", async () => {
+      const outbox = createOutbox("conn-a", memoryStorage());
+      outbox.record(report(10, 1_000));
+      let failed: ListeningReport[] = [];
+      await outbox.flush(async (sessions) => {
+        failed = structuredClone(sessions);
+        throw new Error("offline");
+      });
+      outbox.record(report(30, 3_000));
+
+      const sent: ListeningReport[] = [];
+      await outbox.flush(async (sessions) => {
+        sent.push(...sessions);
+        return answer(sessions);
+      });
+
+      // The failed version is only ever sent again as it was. What came after it is a session of its own.
+      const [rest] = sent.filter((session) => session.id !== "s1");
+      expect(sent.filter((session) => session.id === "s1")).toEqual(failed);
+      expect(rest).toEqual({
+        ...report(30, 3_000),
+        id: rest?.id,
+        timeListening: 20,
+        startTime: 10,
+        startedAt: 1_000,
+      });
+      expect(outbox.pending()).toEqual([]);
+    });
+
+    it("sends no newer version of a session while another tab's request for it is unanswered", async () => {
+      const storage = memoryStorage();
+      const outbox = createOutbox("conn-a", storage);
+      outbox.record(report(10, 1_000));
+      const tab = otherTab(storage);
+      await vi.waitFor(() => expect(tab.sent).toHaveLength(1));
+      outbox.record(report(30, 3_000));
+
+      const sent: ListeningReport[] = [];
+      const send = async (sessions: ListeningReport[]) => {
+        sent.push(...sessions);
+        return answer(sessions);
+      };
+      await outbox.flush(send);
+      expect(sent).toEqual([]);
+      tab.release();
+      await tab.flushing;
+      await outbox.flush(send);
+
+      expect(sent).toEqual([report(30, 3_000)]);
+    });
+
+    it("goes on under another session when another tab's request for it stays unanswered", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      const storage = memoryStorage();
+      const outbox = createOutbox("conn-a", storage);
+      outbox.record(report(10, 1_000));
+      const tab = otherTab(storage);
+      await vi.waitFor(() => expect(tab.sent).toHaveLength(1));
+      outbox.record(report(30, 3_000));
+      // That tab was closed, or its request is stuck.
+      vi.advanceTimersByTime(10 * 60_000);
+
+      const sent: ListeningReport[] = [];
+      await outbox.flush(async (sessions) => {
+        sent.push(...sessions);
+        return answer(sessions);
+      });
+
+      const [rest] = sent.filter((session) => session.id !== "s1");
+      expect(sent.filter((session) => session.id === "s1")).toEqual(tab.sent);
+      expect(rest).toMatchObject({ timeListening: 20, startTime: 10, currentTime: 30 });
+    });
   });
 
   describe("holds taken by two tabs at the same moment", () => {
