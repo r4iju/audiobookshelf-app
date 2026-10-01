@@ -214,7 +214,8 @@ import XCTest
     private func expectHaptic(_ action: String, _ strength: String, in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
         let probe = app.staticTexts["haptic-observation"]
         let observed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label BEGINSWITH %@", action + ":" + strength), object: probe)
-        XCTAssertEqual(XCTWaiter().wait(for: [observed], timeout: 3), .completed, "\(action) gave \(probe.exists ? probe.label : "no probe")", file: file, line: line)
+        // Each probe query can take seconds on a loaded simulator, and the waiter polls between queries.
+        XCTAssertEqual(XCTWaiter().wait(for: [observed], timeout: 10), .completed, "\(action) gave \(probe.exists ? probe.label : "no probe")", file: file, line: line)
     }
 
     func testChosenHapticStrengthCoversBaselineActions() async throws {
