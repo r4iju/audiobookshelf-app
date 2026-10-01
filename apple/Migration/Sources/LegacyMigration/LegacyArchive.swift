@@ -30,7 +30,7 @@ public enum LegacyArchive {
         // from Documents would refuse to read.
         let plan = MigrationPlan(source: LegacySource(kind: .inPlace, snapshot: exported, filesRoot: documents))
         var digests: [String: String] = [:]
-        for planned in plan.files.values {
+        for planned in plan.files.values where digests[planned.legacyPath] == nil {
             let target = files.appendingPathComponent(planned.legacyPath)
             try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: planned.source, to: target)

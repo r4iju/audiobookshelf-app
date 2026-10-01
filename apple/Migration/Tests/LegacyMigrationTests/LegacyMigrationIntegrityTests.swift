@@ -136,6 +136,26 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
         XCTAssertTrue(try local(repaired, "local_li-pdf").complete)
     }
 
+    func testAnInterruptedRepairStillHoldsFilesToTheirCommittedDigests() throws {
+        let fileSystem = FaultInjectingFileSystem()
+        let migrator = LegacyMigrator(root: fixture.migrationRoot(), fileSystem: fileSystem)
+        let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+        let epub = try XCTUnwrap(try local(first, "local_li-epub").ebook?.file)
+        let handle = try FileHandle(forWritingTo: migrator.fileURL(for: epub))
+        handle.write(Data("XX".utf8))
+        try handle.close()
+        try FileManager.default.removeItem(at: migrator.fileURL(for: try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)))
+
+        fileSystem.failAfterTransfers = fileSystem.transfers.count
+        XCTAssertThrowsError(try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink()))
+        fileSystem.failAfterTransfers = nil
+        let repaired = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+
+        XCTAssertNil(try local(repaired, "local_li-epub").ebook?.file, "a file changed after commit must not be re-adopted after an interrupted repair")
+        XCTAssertTrue(repaired.issues.contains { $0.code == .fileCorrupt && $0.legacyPath == "li-epub/book.epub" })
+        XCTAssertEqual(try contents(migrator, try local(repaired, "local_li-audio").tracks.first?.file), "audio-track-one")
+    }
+
     func testAnOutcomeThatDisagreesWithItsJournalIsDamagedAndRepaired() throws {
         let root = fixture.migrationRoot()
         let migrator = LegacyMigrator(root: root)

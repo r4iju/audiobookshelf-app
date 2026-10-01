@@ -44,9 +44,22 @@ public final class LegacyMigrator {
         filesURL.appendingPathComponent(file.path)
     }
 
+    /// The committed outcome, checked cheaply (record agreement, file presence and size) so it can
+    /// run at every launch. Nil when nothing was committed. Throws `committedMigrationDamaged`
+    /// when the record no longer holds; `migrate` with the legacy source repairs it.
     public func committedOutcome() throws -> MigrationOutcome? {
-        guard let journal = try? readJournal(), journal.committed else { return nil }
-        return try? readOutcome()
+        let outcomeExists = FileManager.default.fileExists(atPath: outcomeURL.path)
+        guard let journal = try? readJournal() else {
+            if outcomeExists { throw LegacyMigrationError.committedMigrationDamaged }
+            return nil
+        }
+        guard journal.committed else { return nil }
+        guard let outcome = try? readOutcome(), outcome.sourceFingerprint == journal.sourceFingerprint,
+              Self.adoptedFiles(of: outcome).allSatisfy({ file in
+                  (try? FileManager.default.attributesOfItem(atPath: fileURL(for: file).path)[.size] as? NSNumber)?.intValue == file.size
+              })
+        else { throw LegacyMigrationError.committedMigrationDamaged }
+        return outcome
     }
 
     public func preflight(_ source: LegacySource) throws -> MigrationPreflight {
@@ -69,9 +82,13 @@ public final class LegacyMigrator {
         try requireSupportedSchema(source)
         let fingerprint = try source.fingerprint
         var journal = try loadJournal(for: fingerprint)
-        if journal.committed, let outcome = try? readOutcome() {
-            return outcome
-        }
+        // An outcome for this source stays on disk until the next commit replaces it, so a repair
+        // (even one interrupted and resumed) holds each file to the digest it was committed with;
+        // a source changed since then is reported rather than adopted.
+        let previous = (try? readOutcome()).flatMap { $0.sourceFingerprint == fingerprint ? $0 : nil }
+        if journal.committed, let previous = previous, verifies(previous) { return previous }
+        var recordedDigests: [String: String] = [:]
+        for file in previous.map(Self.adoptedFiles) ?? [] { recordedDigests[file.path] = file.sha256 }
         journal.committed = false
         try writeJournal(journal)
 
@@ -84,12 +101,17 @@ public final class LegacyMigrator {
         var pendingTransfer: [(PlannedFile, String)] = []
         for planned in plan.files.values.sorted(by: { $0.key < $1.key }) {
             let digest = try Self.sha256(of: planned.source)
+            let destination = filesURL.appendingPathComponent(planned.destination)
             if let recorded = source.recordedDigests[planned.legacyPath], recorded != digest {
-                plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath,
-                            "This downloaded file was damaged in the export. The original in the old app is unchanged; export again or download it again.")
+                plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath, MigrationPlan.damagedInExportMessage)
                 continue
             }
-            let destination = filesURL.appendingPathComponent(planned.destination)
+            if let committed = recordedDigests[planned.destination], committed != digest {
+                try? FileManager.default.removeItem(at: destination)
+                plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath,
+                            "This downloaded file changed after it was migrated, in both apps. It is no longer used; download it again.")
+                continue
+            }
             if FileManager.default.fileExists(atPath: destination.path), (try? Self.sha256(of: destination)) == digest {
                 adopted[planned.key] = planned.migrated(sha256: digest)
             } else {
@@ -135,7 +157,7 @@ public final class LegacyMigrator {
                 accounts[index].credentials = .adopted
                 continue
             }
-            guard let sink = secrets, let secret = plan.secret(for: account, from: source), !secret.isEmpty else { continue }
+            guard let sink = secrets, let secret = plan.secret(for: account), !secret.isEmpty else { continue }
             do {
                 try sink.adopt(secret, for: account)
             } catch {
@@ -156,6 +178,15 @@ public final class LegacyMigrator {
         try writeJournal(journal)
         try? FileManager.default.removeItem(at: stagingURL)
         return outcome
+    }
+
+    private static func adoptedFiles(of outcome: MigrationOutcome) -> [MigratedFile] {
+        outcome.downloads.flatMap { $0.files.compactMap(\.file) } + outcome.interruptedDownloads.flatMap { $0.parts.compactMap(\.file) }
+    }
+
+    /// Full check of a committed outcome against the files it names.
+    private func verifies(_ outcome: MigrationOutcome) -> Bool {
+        Self.adoptedFiles(of: outcome).allSatisfy { file in (try? Self.sha256(of: fileURL(for: file))) == file.sha256 }
     }
 
     private func requireSupportedSchema(_ source: LegacySource) throws {
@@ -188,22 +219,39 @@ public final class LegacyMigrator {
     /// Returns the journal to continue from. An unreadable journal is moved aside (never deleted)
     /// and the migration restarts; adopted files are re-verified by content, so nothing is trusted
     /// from it. A committed migration of different legacy data is never overwritten.
+    ///
+    /// Without a readable journal, a readable `outcome.json` is the commit record: it is kept, and
+    /// only the same source may continue (as committed, with its adopted credentials). An outcome
+    /// left by an interrupted commit of a different, uncommitted source is moved aside.
     private func loadJournal(for fingerprint: String) throws -> Journal {
         let existing: Journal?
         do {
             existing = try readJournal()
         } catch {
-            let aside = root.appendingPathComponent("state.corrupt-\(Int(Date().timeIntervalSince1970))-\(UUID().uuidString.prefix(8)).json")
-            try FileManager.default.moveItem(at: journalURL, to: aside)
+            try moveAside(journalURL, as: "state")
             existing = nil
         }
-        guard let journal = existing else {
-            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        if let journal = existing {
+            if journal.sourceFingerprint == fingerprint { return journal }
+            if journal.committed { throw LegacyMigrationError.differentSourceAlreadyCommitted }
+            if FileManager.default.fileExists(atPath: outcomeURL.path) { try moveAside(outcomeURL, as: "outcome") }
             return Journal(sourceFingerprint: fingerprint)
         }
-        if journal.sourceFingerprint == fingerprint { return journal }
-        if journal.committed { throw LegacyMigrationError.differentSourceAlreadyCommitted }
+        if FileManager.default.fileExists(atPath: outcomeURL.path) {
+            if let outcome = try? readOutcome() {
+                guard outcome.sourceFingerprint == fingerprint else { throw LegacyMigrationError.differentSourceAlreadyCommitted }
+                return Journal(sourceFingerprint: fingerprint, credentialsAdopted: outcome.accounts.filter { $0.credentials == .adopted }.map(\.account), committed: true)
+            }
+            try moveAside(outcomeURL, as: "outcome")
+        }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         return Journal(sourceFingerprint: fingerprint)
+    }
+
+    /// Unreadable or superseded records are kept for diagnosis, never deleted.
+    private func moveAside(_ url: URL, as name: String) throws {
+        let aside = root.appendingPathComponent("\(name).corrupt-\(Int(Date().timeIntervalSince1970))-\(UUID().uuidString.prefix(8)).json")
+        try FileManager.default.moveItem(at: url, to: aside)
     }
 
     private func writeJournal(_ journal: Journal) throws {

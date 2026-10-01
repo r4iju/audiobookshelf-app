@@ -16,10 +16,15 @@ From a legacy Capacitor/Realm installation (Realm 10.54.6, schema 21):
 | `ServerConnectionConfig.token`, Keychain `AudiobookshelfRefreshTokens` / `refresh_token_<id>` | `LegacyAccountSecret`, handed only to `MigrationSecretSink.adopt`; never written to disk by the module |
 | `DeviceSettings`, `PlayerSettings`, Capacitor Preferences (`CapacitorStorage.*`, allowlisted) | `MigratedSettings` |
 | WebView `ereaderSettings`, `ebookLocations-<id>`, `absDeviceId` (allowlisted) | `MigratedSettings.webStorage` |
-| `LocalLibraryItem` files (audio, PDF, EPUB, MOBI, AZW3, CBZ, CBR, covers, podcast episodes) | Hard link or verified copy under `<root>/Files/<account scope>/<local item>/...`, `MigratedDownload` with tracks, chapters, ebook and episodes |
+| `LocalLibraryItem` and every one of its `LocalFile`s (audio, PDF, EPUB, MOBI, AZW3, CBZ, CBR, covers, podcast episodes, supplementary files) | Hard link or verified copy under `<root>/Files/<account digest>/<item digest>/<legacy path>`; `MigratedDownload` with tracks, chapters, ebook, episodes, a `files` record of every legacy file with its role (`track`, `episodeTrack`, `ebook`, `cover`, `supplementary`) and the unchanged credential-free `legacyItem` (full metadata, tags, `isInvalid`, episode details) |
 | `LocalMediaProgress` (audio position, finished state, `ebookLocation`, `ebookProgress`) | `MigratedProgress`, with `MigratedReadingLocation` (`page` for PDF/CBZ/CBR, `cfi` for EPUB, `opaque` for MOBI/AZW3; the raw legacy value is always kept) |
-| `PlaybackSession` rows (unsynced listening) | `MigratedSession` with `sessionTotal` (local playback) or `sinceLastSync` (streamed) semantics |
-| `DownloadItem` rows (interrupted downloads) | `downloadInterrupted` issue; finished parts already in `LocalLibraryItem` are adopted |
+| `PlaybackSession` rows (unsynced listening), with chapters, media metadata and cover path | `MigratedSession` with `sessionTotal` (local playback) or `sinceLastSync` (streamed) semantics |
+| `DownloadItem` rows (interrupted downloads) and their `DownloadItemPart`s | `MigratedInterruptedDownload` plus a `downloadInterrupted` issue; parts that finished and were moved into Documents are adopted, so they are not downloaded again |
+
+Not read, deliberately: `DownloadItemPart.uri` (the legacy downloader put the access token in
+its query string), `LogEntry` (diagnostics), the server caches `LibraryItem`, `User` and embedded
+`MediaProgress`, `DownloadItem.media` (a server copy of the item), and `LocalPodcastEpisode`
+(declared in the legacy schema but never written by the legacy app).
 
 No file is converted, re-encoded or deleted. Nothing needs to be downloaded again unless the legacy
 file itself is missing or damaged, and those cases are listed as issues.
@@ -54,11 +59,11 @@ There is no automatic cross-sandbox import.
 apple/Migration/
   Package.swift                     LegacyMigration (Foundation + CryptoKit only), iOS 14, macOS 12
   Sources/LegacyMigration/          snapshot, plan, migrator, archive, outcome
-  Tests/LegacyMigrationTests/       17 tests, synthetic Documents tree and fault-injecting file system
+  Tests/LegacyMigrationTests/       29 tests, synthetic Documents tree and fault-injecting file system
   LegacyRealm/Package.swift         LegacyRealmExport (RealmSwift 10.54.6 exact)
   LegacyRealm/Sources/...           schema-21 mirror classes, Realm reader, installation source,
                                     archive exporter, read-only legacy Keychain reader
-  LegacyRealm/Tests/...             5 tests against Realm files written with the mirror schema
+  LegacyRealm/Tests/...             7 tests against Realm files written with the mirror schema
   scripts/prepare-realm-core.sh     local prebuilt realm-core mirror (see Build)
 ```
 
@@ -76,8 +81,30 @@ the default schema, so they cannot collide with any other Realm schema in either
   `root/outcome.json` and then the committed journal. Staging is removed after commit.
 - Retrying after interruption resumes; files already staged with a matching hash are kept.
   Credentials are adopted once and recorded in the journal.
-- A committed migration returns the same outcome on every later call. A different legacy source
-  after commit throws `differentSourceAlreadyCommitted`.
+- A committed migration returns the same outcome on every later call after verifying every adopted
+  file by SHA-256. A deleted or replaced adopted file is repaired from the untouched source. A file
+  whose source no longer matches the digest it was committed with (for example changed in place
+  through a hard link) is reported `fileCorrupt` and dropped from the outcome instead of being
+  adopted again; this holds when the repair itself is interrupted and resumed.
+- A different legacy source after commit throws `differentSourceAlreadyCommitted`. This holds when
+  `state.json` is lost or unreadable: a readable `outcome.json` is then the commit record, only the
+  same source continues (credentials it recorded as adopted are not adopted again), and records
+  that cannot be read are moved aside, never deleted.
+- `committedOutcome()` is the cheap launch-time read: it checks that journal and outcome agree and
+  that every adopted file is present with its recorded size. It returns nil when nothing was
+  committed and throws `committedMigrationDamaged` when the record no longer holds; the app then
+  runs `migrate` with the source to repair. If the source is gone (an archive the user deleted),
+  ask for a new export: the same legacy data repairs, changed legacy data is refused, and starting
+  over means deleting `root` (an explicit user action; the legacy data is untouched).
+- Destinations are `<account digest>/<digest of the legacy item or download id>/<legacy path>`.
+  Legacy identifiers never become path components, legacy paths are rejected if absolute or if
+  they contain `.`, `..` or empty components, and no destination is assigned twice.
+- Ownership: every item, progress row, session and interrupted download must corroborate the
+  connection it was saved under. When the row's own recorded user or server differs from that
+  connection's, the row is quarantined (`account` nil, `accountMismatch`) and kept, never
+  attributed to the connection's current user. The legacy app updates a connection's address and
+  user in place under the same id, so data from before a server move is quarantined rather than
+  guessed.
 - A corrupt journal is moved aside (`state.corrupt-<timestamp>-<id>.json`) and the migration
   restarts from the untouched legacy source.
 - Copy fallback checks free space before copying (`insufficientSpace`).
@@ -98,7 +125,9 @@ met by route 2 only; route 1 must not ship to the audience until the rollback re
 (gate 8).
 
 Hard links share storage with the legacy file. Neither app modifies downloaded media in place, so
-this is safe, but deleting a download in the native app must remove only the native link.
+this is safe, but deleting a download in the native app must remove only the native link. Files
+under `<root>/Files` belong to the migrator: link or copy them into native storage, never move or
+modify them, or `committedOutcome()` reports the migration damaged.
 Legacy download folders are excluded from backup (`isExcludedFromBackup`); the coordinator should
 apply the same flag to `<root>/Files` so backup behaviour is unchanged.
 
@@ -187,8 +216,11 @@ in UserDefaults), so it runs once per outcome.
 | --- | --- |
 | `MigratedAccount` + adopted secret | `KeychainCredentials` `Document.connections` (`Connection(id:credentials:libraryID:)`, `Credentials(server, accessToken, refreshToken, userID, username)`); active account from `wasActive`. The sink implements `MigrationSecretSink` over `KeychainCredentials`, so secrets stay in Keychain. `lastLibraryId` preference seeds `libraryID`. |
 | `reauthenticationRequired` | Show the account in the sign-in list with its server prefilled; attach migrated data when `AccountIdentity(server, userID)` matches after sign-in. |
-| `MigratedDownload` (book) | One `NativeDownloads.Entry`: `id` and `generation` new UUIDs, `account`, `media` (`ListeningMedia(itemID: libraryItemID, episodeID: nil, title, author, mediaType, duration: sum of finite track durations, startTime: progress currentTime)`), `tracks`, `chapters`, `ebook`, `serverPosition`/`serverUpdatedAt` from the matching `MigratedProgress` (else 0), `finished` = indices of adopted parts. Move or link `fileURL(for:)` into `NativeDownloads.directory` with the native names `audio-<index>.<ext>` and `ebook.<format>`, then write the manifest. The native manifest rejects the whole file when a `.ready` entry has unfinished parts or a non-finite duration, so use `state: .ready` only when `complete`, else `.failed` with the issue's message in `error`. Items with no `libraryItemID` stay out of the manifest and in the issue list. |
+| `MigratedDownload` (book) | One `NativeDownloads.Entry`: `id` and `generation` new UUIDs, `account`, `media` (`ListeningMedia(itemID: libraryItemID, episodeID: nil, title, author, mediaType, duration: sum of finite track durations, startTime: progress currentTime)`), `tracks`, `chapters`, `ebook`, `serverPosition`/`serverUpdatedAt` from the matching `MigratedProgress` (else 0), `finished` = indices of adopted parts. Link or copy `fileURL(for:)` into `NativeDownloads.directory` with the native names `audio-<index>.<ext>` and `ebook.<format>`, then write the manifest. The native manifest rejects the whole file when a `.ready` entry has unfinished parts or a non-finite duration, so use `state: .ready` only when `complete`, else `.failed` with the issue's message in `error`. Items with no `libraryItemID` stay out of the manifest and in the issue list. |
 | `MigratedDownload` (podcast) | One `Entry` per `MigratedEpisode` with an adopted track (`ListeningMedia.episodeID` = episode id), since an entry holds one `ListeningMedia`. |
+| `MigratedDownload.files` (`supplementary`) | No native field yet. Keep them reachable through `fileURL(for:)` and list them on the item until native storage has a place for them. |
+| `MigratedInterruptedDownload` | Offer "Resume download" on the item. Adopted parts are linked or copied in under their native part names (`audio-<trackIndex>.<ext>`, `ebook.<format>`) with an `Entry` in `.failed` state whose `finished` lists them, so the native downloader fetches only the rest. |
+| `legacyItem.metadata`, `legacyItem.tags` | Offline display (subtitle, narrators, series, description) until the server copy is fetched. |
 | `MigratedDownload.cover` | No native field yet. The adopted cover stays at `fileURL(for:)` until `Entry` gains cover storage; the native app otherwise loads the server cover. |
 | `MigratedProgress` (audio, finished flags, reading) | Upload, not a journal entry: `ListeningJournal.rememberRemotePosition` records a server position and uploads nothing. For each account, compare with the server's `mediaProgress` by `lastUpdate`, as the legacy `syncLocalSessionsWithServer` did; where the local value is newer, `PATCH /api/me/progress/<item>[/<episode>]` with `currentTime`, `duration`, `progress`, `isFinished`, `finishedAt`, `ebookLocation`, `ebookProgress` (the legacy `updateMediaProgress` route). The native app has no such path today; the coordinator adds it. Until uploaded, keep the outcome as the source. |
 | `MigratedProgress.reading` | `ReadingStore.Position(account, itemID, format, fileID, location, fraction, updatedAt, revision, pending: true, rotation: 0)`. PDF uses the page string; EPUB keeps the CFI; MOBI/AZW3/CBZ/CBR keep the raw value for their deferred readers. |
@@ -205,11 +237,8 @@ Kept in the outcome without a native target yet (the coordinator decides when a 
 exists): `languageCode` and `lang`, `lockOrientation`, `streamingUsingCellular`, `chapterTrack`,
 `enableAltView`, and the `userSettings`/`serverSettings` preference blobs.
 
-Not read from the legacy Realm: item metadata beyond title and author (subtitle, narrators,
-series, description, genres, tags), podcast `autoDownloadEpisodes`, episode number, season, type
-and description, and session `chapters`/`mediaMetadata`. These are server data; the native app
-fetches them by `libraryItemID` once signed in. Offline before that, a migrated item shows title
-and author only. Media duration is the sum of track durations.
+Media duration for `ListeningMedia` is `legacyItem.mediaDuration` when finite, else the sum of
+finite track durations; the native manifest rejects non-finite durations.
 
 ## Legacy export adapter (route 2), integration patch
 
@@ -250,12 +279,36 @@ Covered failure and recovery cases: interruption after N file transfers then res
 between outcome and journal commit, repeated runs, corrupt journal, tampered staged file, corrupt
 and incomplete archives, unsupported schema, unreadable database, different source after commit,
 copy fallback without space, path traversal, NaN and infinite legacy numbers, shared files across
-accounts, stale credential copies, missing and truncated files, account mismatch,
+accounts, stale credential copies, hostile or colliding item identifiers, journal loss after
+commit, deleted, replaced and in-place-changed adopted files (including an interrupted repair),
+journal/outcome disagreement, owner conflicts on items, progress, sessions and interrupted
+downloads, supplementary files, finished parts of interrupted downloads, the tokenized part URL, missing and truncated files, account mismatch,
 unscoped items, interrupted downloads, invalid reader locations, credential absence from every
 file written by the migration.
 
 Fixtures use synthetic accounts and `SYNTHETIC-*` token markers; no real Realm, Keychain item or
 credential was read.
+
+Third round (coordinator review findings plus an independent audit of the preservation
+contract), committed red first at `7edf085e`:
+
+- Core: 8 new tests failing for their defects (an item id `a/b` and `a_b` overwrote each other and
+  `..` escaped the account directory; a lost or corrupt journal let another source replace the
+  committed outcome; deleted, replaced or changed adopted files stayed reported as migrated; a
+  journal/outcome fingerprint disagreement went unnoticed; rows recorded for another user or
+  server were scoped to the connection's current account; supplementary files vanished from the
+  outcome; finished parts of interrupted downloads were orphaned).
+- Realm adapter: 1 new test failing (full metadata, tags, `isInvalid`, episode details, session
+  chapters and metadata, download parts not read).
+- One more core test, written after the audit found that an interrupted repair lost the committed
+  digests and re-adopted a file changed in place, failed before its fix.
+- Then core 29 of 29 and Realm adapter 7 of 7 passing.
+
+iOS 14 source minimum: Xcode 27 refuses simulator builds below 15, so the core was typechecked
+directly with availability enforced (`xcrun --sdk iphoneos swiftc -typecheck -target
+arm64-apple-ios14.0 ...` and the `-simulator` variant): no errors or warnings. The Realm adapter
+was not typechecked for iOS 14 (it needs the RealmSwift module for that target); it uses no API
+newer than iOS 13 by inspection, which is not evidence.
 
 ## Remaining physical gates (open)
 

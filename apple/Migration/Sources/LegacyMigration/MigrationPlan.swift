@@ -25,29 +25,54 @@ struct PlannedFile {
 /// can be adopted, reader-location interpretation and the issues to show the user. Performs no
 /// writes, so it also backs the preflight.
 struct MigrationPlan {
+    private struct KnownConnection {
+        let connection: LegacyConnection
+        let account: MigrationAccount
+    }
+
+    /// Whose data a legacy row is. A row's own recorded server and user must corroborate the
+    /// connection it was saved under; a connection later re-pointed at another user must not
+    /// claim the earlier user's data.
+    private enum Ownership {
+        case owned(MigrationAccount)
+        case unscoped
+        case conflict
+    }
+
+    private struct FileReference {
+        let path: String
+        let id: String
+        let filename: String?
+        let mimeType: String?
+        let size: Int
+    }
+
     private let source: LegacySource
-    private let connections: [String: (LegacyConnection, MigrationAccount)]
+    private let connections: [String: KnownConnection]
     private(set) var accounts: [MigratedAccount] = []
     private(set) var files: [String: PlannedFile] = [:]
     private(set) var issues: [MigrationIssue] = []
-    private var unsafePaths: Set<String> = []
-    private var rejectedPaths: Set<String> = []
+    private var destinations: Set<String> = []
+    private var itemOwners: [String: MigrationAccount] = [:]
+    private var progressOwners: [String: MigrationAccount] = [:]
+    private var sessionOwners: [String: MigrationAccount] = [:]
+    private var downloadOwners: [String: MigrationAccount] = [:]
 
     init(source: LegacySource) {
         self.source = source
-        let snapshot = source.snapshot
-        var connections: [String: (LegacyConnection, MigrationAccount)] = [:]
+        var connections: [String: KnownConnection] = [:]
         var issues: [MigrationIssue] = []
-        for connection in snapshot.connections.sorted(by: { $0.index < $1.index }) {
+        for connection in source.snapshot.connections.sorted(by: { $0.index < $1.index }) {
             guard let account = MigrationAccount(address: connection.address, userID: connection.userId) else {
                 issues.append(MigrationIssue(code: .unreadableConnection, account: nil, libraryItemID: nil, legacyPath: nil,
                                              message: "The saved server \"\(connection.name)\" has an address or user that can no longer be used. Add the server again to sign in."))
                 continue
             }
-            connections[connection.id] = (connection, account)
+            connections[connection.id] = KnownConnection(connection: connection, account: account)
         }
         self.connections = connections
         self.issues = issues
+        resolveOwners()
         buildAccounts()
         planFiles()
         planInterruptedDownloads()
@@ -55,22 +80,70 @@ struct MigrationPlan {
 
     // MARK: Accounts
 
-    private func account(connectionID: String?, address: String?, userID: String?) -> MigrationAccount? {
-        if let id = connectionID, let known = connections[id] { return known.1 }
-        guard let address = address, let userID = userID else { return nil }
-        return MigrationAccount(address: address, userID: userID)
+    private func ownership(connectionID: String?, address: String?, userID: String?) -> Ownership {
+        let address = address.flatMap { $0.isEmpty ? nil : $0 }
+        let userID = userID.flatMap { $0.isEmpty ? nil : $0 }
+        if let id = connectionID, let known = connections[id] {
+            if let userID = userID, userID != known.account.userID { return .conflict }
+            if let address = address, MigrationAccount(address: address, userID: known.account.userID)?.server != known.account.server { return .conflict }
+            return .owned(known.account)
+        }
+        guard let address = address, let userID = userID, let account = MigrationAccount(address: address, userID: userID) else { return .unscoped }
+        return .owned(account)
     }
 
-    private func account(for item: LegacyLocalItem) -> MigrationAccount? {
-        account(connectionID: item.serverConnectionConfigId, address: item.serverAddress, userID: item.serverUserId)
+    /// Resolves one row's owner, reporting why when it has none.
+    private mutating func owner(connectionID: String?, address: String?, userID: String?, item: String?, unscoped: String, conflict: String) -> MigrationAccount? {
+        switch ownership(connectionID: connectionID, address: address, userID: userID) {
+        case .owned(let account):
+            return account
+        case .unscoped:
+            report(.unscopedData, account: nil, item: item, path: nil, unscoped)
+        case .conflict:
+            report(.accountMismatch, account: nil, item: item, path: nil, conflict)
+        }
+        return nil
+    }
+
+    private mutating func resolveOwners() {
+        let snapshot = source.snapshot
+        let titles = Dictionary(snapshot.localItems.map { ($0.id, $0.title) }, uniquingKeysWith: { first, _ in first })
+        for item in snapshot.localItems {
+            itemOwners[item.id] = owner(
+                connectionID: item.serverConnectionConfigId, address: item.serverAddress, userID: item.serverUserId, item: item.libraryItemId ?? item.id,
+                unscoped: "\"\(item.title)\" was downloaded without a recorded server account. Its files are kept on this device; sign in to the server it came from to link them again.",
+                conflict: "\"\(item.title)\" is recorded for a different server account than the one it was saved under. Its files are kept on this device but not attached to either account.")
+        }
+        for entry in snapshot.progress {
+            let title = titles[entry.localLibraryItemId] ?? entry.libraryItemId ?? entry.id
+            progressOwners[entry.id] = owner(
+                connectionID: entry.serverConnectionConfigId, address: entry.serverAddress, userID: entry.serverUserId, item: entry.libraryItemId ?? entry.localLibraryItemId,
+                unscoped: "The saved progress of \"\(title)\" has no recorded server account. It is kept on this device but cannot be sent to a server.",
+                conflict: "The saved progress of \"\(title)\" is recorded for a different server account than the one it was saved under. It is kept but not sent to either account.")
+        }
+        for session in snapshot.sessions {
+            let title = session.displayTitle ?? session.libraryItemId ?? "an item"
+            sessionOwners[session.id] = owner(
+                connectionID: session.serverConnectionConfigId, address: session.serverAddress, userID: session.userId, item: session.libraryItemId,
+                unscoped: "Unsent listening for \"\(title)\" has no recorded server account. It is kept on this device but cannot be sent to a server.",
+                conflict: "Unsent listening for \"\(title)\" belongs to a different user than its saved server. It is kept but not sent to either account.")
+        }
+        for download in snapshot.pendingDownloads {
+            let title = download.title ?? download.libraryItemId ?? "an item"
+            downloadOwners[download.id] = owner(
+                connectionID: download.serverConnectionConfigId, address: download.serverAddress, userID: download.serverUserId, item: download.libraryItemId,
+                unscoped: "The unfinished download of \"\(title)\" has no recorded server account. Its finished parts are kept on this device.",
+                conflict: "The unfinished download of \"\(title)\" is recorded for a different server account than the one it was saved under. Its finished parts are kept but not attached to either account.")
+        }
     }
 
     private mutating func buildAccounts() {
         let snapshot = source.snapshot
         var byAccount: [MigrationAccount: MigratedAccount] = [:]
-        for (connection, account) in connections.values.sorted(by: { $0.0.index < $1.0.index }) {
+        for known in connections.values.sorted(by: { $0.connection.index < $1.connection.index }) {
+            let connection = known.connection
             let active = connection.index == snapshot.activeConnectionIndex
-            if var existing = byAccount[account] {
+            if var existing = byAccount[known.account] {
                 existing.legacyConnectionIDs.append(connection.id)
                 if active {
                     existing.wasActive = true
@@ -78,27 +151,25 @@ struct MigrationPlan {
                     existing.username = connection.username
                     existing.serverVersion = connection.version
                 }
-                byAccount[account] = existing
+                byAccount[known.account] = existing
             } else {
-                byAccount[account] = MigratedAccount(account: account, name: connection.name, username: connection.username, serverVersion: connection.version,
-                                                     legacyConnectionIDs: [connection.id], wasActive: active, credentials: .reauthenticationRequired)
+                byAccount[known.account] = MigratedAccount(account: known.account, name: connection.name, username: connection.username, serverVersion: connection.version,
+                                                           legacyConnectionIDs: [connection.id], wasActive: active, credentials: .reauthenticationRequired)
             }
         }
-        let referenced = snapshot.localItems.map { account(for: $0) }
-            + snapshot.progress.map { account(connectionID: $0.serverConnectionConfigId, address: $0.serverAddress, userID: $0.serverUserId) }
-            + snapshot.sessions.map { account(connectionID: $0.serverConnectionConfigId, address: $0.serverAddress, userID: $0.userId) }
-            + snapshot.pendingDownloads.map { account(connectionID: $0.serverConnectionConfigId, address: $0.serverAddress, userID: $0.serverUserId) }
-        for case let account? in referenced where byAccount[account] == nil {
+        let referenced = Array(itemOwners.values) + Array(progressOwners.values) + Array(sessionOwners.values) + Array(downloadOwners.values)
+        for account in referenced where byAccount[account] == nil {
             byAccount[account] = MigratedAccount(account: account, name: account.server, username: "", serverVersion: "", legacyConnectionIDs: [], wasActive: false, credentials: .reauthenticationRequired)
         }
         accounts = byAccount.values.sorted { $0.account < $1.account }
     }
 
     /// The secret of the account's active connection if it has one, else of its first connection.
-    func secret(for account: MigratedAccount, from source: LegacySource) -> LegacyAccountSecret? {
+    func secret(for account: MigratedAccount) -> LegacyAccountSecret? {
         guard let secrets = source.secrets else { return nil }
-        let candidates = account.legacyConnectionIDs.compactMap { connections[$0]?.0 }
-            .sorted { ($0.index == source.snapshot.activeConnectionIndex ? 0 : 1, $0.index) < ($1.index == source.snapshot.activeConnectionIndex ? 0 : 1, $1.index) }
+        let active = source.snapshot.activeConnectionIndex
+        let candidates = account.legacyConnectionIDs.compactMap { connections[$0]?.connection }
+            .sorted { ($0.index == active ? 0 : 1, $0.index) < ($1.index == active ? 0 : 1, $1.index) }
         for connection in candidates {
             if let secret = try? secrets.secret(for: connection), !secret.isEmpty { return secret }
         }
@@ -113,66 +184,43 @@ struct MigrationPlan {
 
     static func directory(for account: MigrationAccount?) -> String {
         guard let account = account else { return "unscoped" }
-        return String(SHA256.hash(data: Data("\(account.server)\n\(account.userID)".utf8)).hex.prefix(24))
+        return digestName("\(account.server)\n\(account.userID)")
+    }
+
+    /// Legacy identifiers are arbitrary strings; only their digest becomes a path component.
+    private static func digestName(_ identity: String) -> String {
+        String(SHA256.hash(data: Data(identity.utf8)).hex.prefix(24))
+    }
+
+    private static func isContained(_ relativePath: String) -> Bool {
+        let components = relativePath.split(separator: "/", omittingEmptySubsequences: false)
+        return !relativePath.isEmpty && !relativePath.hasPrefix("/") && !components.contains { $0.isEmpty || $0 == "." || $0 == ".." }
     }
 
     /// Resolves a legacy relative path inside the source root, or nil when it would escape it.
     private func resolve(_ path: String) -> URL? {
-        let components = path.split(separator: "/", omittingEmptySubsequences: false)
-        guard !path.isEmpty, !path.hasPrefix("/"), !components.contains(where: { $0.isEmpty || $0 == "." || $0 == ".." }) else { return nil }
+        guard Self.isContained(path) else { return nil }
         let base = source.filesRoot.standardizedFileURL.resolvingSymlinksInPath()
         let url = base.appendingPathComponent(path).standardizedFileURL.resolvingSymlinksInPath()
         guard url.path.hasPrefix(base.path + "/") else { return nil }
         return url
     }
 
+    private static func coverReference(_ item: LegacyLocalItem) -> FileReference? {
+        guard let cover = item.coverPath, !item.files.contains(where: { $0.path == cover }) else { return nil }
+        return FileReference(path: cover, id: "cover", filename: (cover as NSString).lastPathComponent, mimeType: nil, size: 0)
+    }
+
     private mutating func planFiles() {
         for item in source.snapshot.localItems {
-            let account = account(for: item)
-            if account == nil {
-                report(.unscopedData, account: nil, item: item.libraryItemId ?? item.id, path: nil,
-                       "\"\(item.title)\" was downloaded without a recorded server account. Its files are kept on this device; sign in to the server it came from to link them again.")
-            }
-            let itemDirectory = item.id.replacingOccurrences(of: "/", with: "_")
-            var references = item.files.map { (path: $0.path, id: $0.id, filename: $0.filename, mime: $0.mimeType, size: $0.size) }
-            if let cover = item.coverPath { references.append((cover, "cover", (cover as NSString).lastPathComponent, nil, 0)) }
-            for reference in references where files[Self.fileKey(account, reference.path)] == nil {
-                guard let url = resolve(reference.path) else {
-                    report(.unsafePath, account: account, item: item.libraryItemId, path: reference.path,
-                           "A file reference of \"\(item.title)\" points outside the app's downloads and was not read.")
-                    unsafePaths.insert(reference.path)
-                    continue
-                }
-                guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
-                      attributes[.type] as? FileAttributeType == .typeRegular,
-                      let actualSize = (attributes[.size] as? NSNumber)?.int64Value else {
-                    report(.fileMissing, account: account, item: item.libraryItemId, path: reference.path,
-                           "A downloaded file of \"\(item.title)\" is no longer on this device. Download it again when you need it; the rest of the item is kept.")
-                    rejectedPaths.insert(reference.path)
-                    continue
-                }
-                if source.recordedDigests[reference.path] != nil, reference.size > 0, actualSize != Int64(reference.size) {
-                    report(.fileCorrupt, account: account, item: item.libraryItemId, path: reference.path,
-                           "This downloaded file was damaged in the export. The original in the old app is unchanged; export again or download it again.")
-                    rejectedPaths.insert(reference.path)
-                    continue
-                }
-                if reference.size > 0 && actualSize != Int64(reference.size) {
-                    report(.fileIncomplete, account: account, item: item.libraryItemId, path: reference.path,
-                           "A downloaded file of \"\(item.title)\" is incomplete (\(actualSize) of \(reference.size) bytes). The original is kept; download it again to play this part offline.")
-                    rejectedPaths.insert(reference.path)
-                    continue
-                }
-                let relative = reference.path.split(separator: "/").dropFirst().joined(separator: "/")
-                files[Self.fileKey(account, reference.path)] = PlannedFile(
-                    legacyPath: reference.path, source: url,
-                    destination: "\(Self.directory(for: account))/\(itemDirectory)/\(relative.isEmpty ? reference.path : relative)",
-                    legacyFileID: reference.id, filename: reference.filename, mimeType: reference.mime, size: actualSize,
-                    account: account, libraryItemID: item.libraryItemId
-                )
+            let owner = itemOwners[item.id]
+            let references = item.files.map { FileReference(path: $0.path, id: $0.id, filename: $0.filename, mimeType: $0.mimeType, size: $0.size) }
+                + [Self.coverReference(item)].compactMap { $0 }
+            for reference in references {
+                plan(reference, owner: owner, libraryItemID: item.libraryItemId, title: item.title, scope: "item\n\(item.id)")
             }
             for track in item.tracks + item.episodes.compactMap(\.track) where track.localFileId != nil && !item.files.contains(where: { $0.id == track.localFileId }) {
-                report(.fileMissing, account: account, item: item.libraryItemId, path: nil,
+                report(.fileMissing, account: owner, item: item.libraryItemId, path: nil,
                        "\"\(item.title)\" lists an audio part whose file record is missing. Download it again to play that part offline.")
             }
         }
@@ -180,11 +228,57 @@ struct MigrationPlan {
 
     private mutating func planInterruptedDownloads() {
         for download in source.snapshot.pendingDownloads {
-            let owner = account(connectionID: download.serverConnectionConfigId, address: download.serverAddress, userID: download.serverUserId)
+            let owner = downloadOwners[download.id]
+            let title = download.title ?? download.libraryItemId ?? "an item"
             report(.downloadInterrupted, account: owner, item: download.libraryItemId, path: nil,
-                   "The download of \"\(download.title ?? download.libraryItemId ?? "an item")\" was not finished before the upgrade (\(download.completedParts) of \(download.totalParts) parts). Start it again from the item.")
+                   "The download of \"\(title)\" was not finished before the upgrade (\(download.completedParts) of \(download.totalParts) parts). Start it again from the item; finished parts are kept.")
+            for part in download.parts where part.completed && part.moved {
+                guard let path = part.path else { continue }
+                plan(FileReference(path: path, id: part.id, filename: part.filename, mimeType: nil, size: part.size),
+                     owner: owner, libraryItemID: download.libraryItemId, title: title, scope: "download\n\(download.id)")
+            }
         }
     }
+
+    /// Decides whether one legacy file can be adopted and where. The destination is
+    /// `<account digest>/<owner digest>/<validated legacy path>`, so neither an identifier nor a
+    /// path can leave the account's directory or land on another file's destination.
+    private mutating func plan(_ reference: FileReference, owner: MigrationAccount?, libraryItemID: String?, title: String, scope: String) {
+        let key = Self.fileKey(owner, reference.path)
+        guard files[key] == nil else { return }
+        guard let url = resolve(reference.path) else {
+            report(.unsafePath, account: owner, item: libraryItemID, path: reference.path,
+                   "A file reference of \"\(title)\" points outside the app's downloads and was not read.")
+            return
+        }
+        guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
+              attributes[.type] as? FileAttributeType == .typeRegular,
+              let actualSize = (attributes[.size] as? NSNumber)?.int64Value else {
+            report(.fileMissing, account: owner, item: libraryItemID, path: reference.path,
+                   "A downloaded file of \"\(title)\" is no longer on this device. Download it again when you need it; the rest of the item is kept.")
+            return
+        }
+        if source.recordedDigests[reference.path] != nil, reference.size > 0, actualSize != Int64(reference.size) {
+            report(.fileCorrupt, account: owner, item: libraryItemID, path: reference.path, Self.damagedInExportMessage)
+            return
+        }
+        if reference.size > 0 && actualSize != Int64(reference.size) {
+            report(.fileIncomplete, account: owner, item: libraryItemID, path: reference.path,
+                   "A downloaded file of \"\(title)\" is incomplete (\(actualSize) of \(reference.size) bytes). The original is kept; download it again to play this part offline.")
+            return
+        }
+        let destination = "\(Self.directory(for: owner))/\(Self.digestName(scope))/\(reference.path)"
+        guard Self.isContained(destination), !destinations.contains(destination) else {
+            report(.unsafePath, account: owner, item: libraryItemID, path: reference.path,
+                   "A file of \"\(title)\" could not be given a place of its own and was not read. The original is unchanged.")
+            return
+        }
+        destinations.insert(destination)
+        files[key] = PlannedFile(legacyPath: reference.path, source: url, destination: destination, legacyFileID: reference.id,
+                                 filename: reference.filename, mimeType: reference.mimeType, size: actualSize, account: owner, libraryItemID: libraryItemID)
+    }
+
+    static let damagedInExportMessage = "This downloaded file was damaged in the export. The original in the old app is unchanged; export again or download it again."
 
     mutating func report(_ code: MigrationIssue.Code, account: MigrationAccount?, item: String?, path: String?, _ message: String) {
         let issue = MigrationIssue(code: code, account: account, libraryItemID: item, legacyPath: path, message: message)
@@ -195,43 +289,21 @@ struct MigrationPlan {
 
     mutating func outcome(kind: LegacySourceKind, fingerprint: String, accounts: [MigratedAccount], adopted: [String: MigratedFile]) -> MigrationOutcome {
         let snapshot = source.snapshot
-        var downloads: [MigratedDownload] = []
-        for item in snapshot.localItems {
-            let owner = account(for: item)
-            let filesByID = Dictionary(item.files.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-            var complete = true
-            func file(_ id: String?) -> MigratedFile? {
-                guard let id = id, let legacy = filesByID[id], let migrated = adopted[Self.fileKey(owner, legacy.path)] else {
-                    complete = false
-                    return nil
-                }
-                return migrated
+        let downloads = snapshot.localItems.map { download(for: $0, adopted: adopted) }
+        let interrupted = snapshot.pendingDownloads.map { download -> MigratedInterruptedDownload in
+            let owner = downloadOwners[download.id]
+            let parts = download.parts.map { part in
+                MigratedInterruptedDownload.Part(part: part, file: part.completed && part.moved ? part.path.flatMap { adopted[Self.fileKey(owner, $0)] } : nil)
             }
-            func track(_ track: LegacyTrack, position: Int) -> MigratedTrack {
-                MigratedTrack(index: track.index ?? position, file: file(track.localFileId), title: track.title, startOffset: track.startOffset, duration: track.duration, mimeType: track.mimeType)
-            }
-            let tracks = item.tracks.enumerated().map { track($0.element, position: $0.offset) }
-            let episodes = item.episodes.map { MigratedEpisode(id: $0.id, title: $0.title, duration: $0.duration, track: $0.track.map { track($0, position: 0) }, chapters: $0.chapters) }
-            let ebook = item.ebook.map { MigratedEbook(ino: $0.ino, format: $0.format.lowercased(), file: file($0.localFileId)) }
-            let referenced = Set(item.tracks.compactMap(\.localFileId) + item.episodes.compactMap { $0.track?.localFileId } + [item.ebook?.localFileId].compactMap { $0 })
-            for legacy in item.files where !referenced.contains(legacy.id) && adopted[Self.fileKey(owner, legacy.path)] == nil {
-                complete = false
-            }
-            let cover = item.coverPath.flatMap { adopted[Self.fileKey(owner, $0)] }
-            downloads.append(MigratedDownload(account: owner, legacyLocalItemID: item.id, libraryItemID: item.libraryItemId, mediaType: item.mediaType,
-                                              title: item.title, author: item.author, cover: cover, tracks: tracks, chapters: item.chapters,
-                                              ebook: ebook, episodes: episodes, files: [], legacyItem: item, complete: complete))
+            return MigratedInterruptedDownload(account: owner, legacyDownloadID: download.id, libraryItemID: download.libraryItemId, episodeID: download.episodeId,
+                                               title: download.title, mediaType: download.mediaType, parts: parts)
         }
 
         let itemsByID = Dictionary(snapshot.localItems.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         var progress: [MigratedProgress] = []
         for entry in snapshot.progress {
-            let owner = account(connectionID: entry.serverConnectionConfigId, address: entry.serverAddress, userID: entry.serverUserId)
+            let owner = progressOwners[entry.id]
             let reading = entry.ebookLocation.map { Self.readingLocation($0, format: itemsByID[entry.localLibraryItemId]?.ebook?.format, fraction: entry.ebookProgress) }
-            if owner == nil {
-                report(.unscopedData, account: nil, item: entry.libraryItemId ?? entry.localLibraryItemId, path: nil,
-                       "The saved progress of \"\(itemsByID[entry.localLibraryItemId]?.title ?? entry.libraryItemId ?? entry.id)\" has no recorded server account. It is kept on this device but cannot be sent to a server.")
-            }
             if reading?.kind == .invalid {
                 report(.invalidReadingLocation, account: owner, item: entry.libraryItemId, path: nil,
                        "The saved reading position of \"\(itemsByID[entry.localLibraryItemId]?.title ?? entry.libraryItemId ?? entry.id)\" could not be interpreted. It is kept unchanged; the book opens at the start until you read on.")
@@ -241,27 +313,62 @@ struct MigrationPlan {
                                              currentTime: entry.currentTime, isFinished: entry.isFinished, lastUpdate: entry.lastUpdate,
                                              startedAt: entry.startedAt, finishedAt: entry.finishedAt, reading: reading))
         }
-
-        var sessions: [MigratedSession] = []
-        for session in snapshot.sessions {
-            var owner = account(connectionID: session.serverConnectionConfigId, address: session.serverAddress, userID: session.userId)
-            if let id = session.serverConnectionConfigId, let connection = connections[id]?.0, let user = session.userId, user != connection.userId {
-                report(.accountMismatch, account: nil, item: session.libraryItemId, path: nil,
-                       "Unsent listening for \"\(session.displayTitle ?? session.libraryItemId ?? "an item")\" belongs to a different user than its saved server. It is kept but not sent to either account.")
-                owner = nil
-            } else if owner == nil {
-                report(.unscopedData, account: nil, item: session.libraryItemId, path: nil,
-                       "Unsent listening for \"\(session.displayTitle ?? session.libraryItemId ?? "an item")\" has no recorded server account. It is kept on this device but cannot be sent to a server.")
-            }
-            sessions.append(MigratedSession(account: owner, session: session, semantics: session.localLibraryItemId == nil ? .sinceLastSync : .sessionTotal))
+        let sessions = snapshot.sessions.map {
+            MigratedSession(account: sessionOwners[$0.id], session: $0, semantics: $0.localLibraryItemId == nil ? .sinceLastSync : .sessionTotal)
         }
 
         let settings = MigratedSettings(device: snapshot.deviceSettings, player: snapshot.playerSettings,
                                         preferences: LegacyStorageAllowlist.preferences(snapshot.preferences),
                                         webStorage: LegacyStorageAllowlist.webStorage(snapshot.webStorage))
         return MigrationOutcome(formatVersion: MigrationOutcome.formatVersion, sourceKind: kind, sourceFingerprint: fingerprint,
-                                legacySchemaVersion: snapshot.schemaVersion, accounts: accounts, settings: settings, downloads: downloads, interruptedDownloads: [],
-                                progress: progress, pendingSessions: sessions, issues: issues)
+                                legacySchemaVersion: snapshot.schemaVersion, accounts: accounts, settings: settings, downloads: downloads,
+                                interruptedDownloads: interrupted, progress: progress, pendingSessions: sessions, issues: issues)
+    }
+
+    private func download(for item: LegacyLocalItem, adopted: [String: MigratedFile]) -> MigratedDownload {
+        let owner = itemOwners[item.id]
+        func adoptedFile(_ path: String) -> MigratedFile? { adopted[Self.fileKey(owner, path)] }
+        let filesByID = Dictionary(item.files.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        var complete = true
+        func file(_ id: String?) -> MigratedFile? {
+            guard let id = id, let legacy = filesByID[id], let migrated = adoptedFile(legacy.path) else {
+                complete = false
+                return nil
+            }
+            return migrated
+        }
+        func track(_ track: LegacyTrack, position: Int) -> MigratedTrack {
+            MigratedTrack(index: track.index ?? position, file: file(track.localFileId), title: track.title, startOffset: track.startOffset, duration: track.duration, mimeType: track.mimeType)
+        }
+        let tracks = item.tracks.enumerated().map { track($0.element, position: $0.offset) }
+        let episodes = item.episodes.map { MigratedEpisode(id: $0.id, title: $0.title, duration: $0.duration, track: $0.track.map { track($0, position: 0) }, chapters: $0.chapters) }
+        let ebook = item.ebook.map { MigratedEbook(ino: $0.ino, format: $0.format.lowercased(), file: file($0.localFileId)) }
+
+        var records = item.files.map { legacy -> MigratedItemFile in
+            var record = MigratedItemFile(role: .supplementary, trackIndex: nil, episodeID: nil, legacyFileID: legacy.id, legacyPath: legacy.path,
+                                          filename: legacy.filename, mimeType: legacy.mimeType, recordedSize: legacy.size, file: adoptedFile(legacy.path))
+            if let position = item.tracks.firstIndex(where: { $0.localFileId == legacy.id }) {
+                record.role = .track
+                record.trackIndex = item.tracks[position].index ?? position
+            } else if let episode = item.episodes.first(where: { $0.track?.localFileId == legacy.id }) {
+                record.role = .episodeTrack
+                record.episodeID = episode.id
+            } else if item.ebook?.localFileId == legacy.id {
+                record.role = .ebook
+            } else if legacy.path == item.coverPath {
+                record.role = .cover
+            }
+            return record
+        }
+        if let cover = Self.coverReference(item) {
+            records.append(MigratedItemFile(role: .cover, trackIndex: nil, episodeID: nil, legacyFileID: cover.id, legacyPath: cover.path,
+                                            filename: cover.filename, mimeType: nil, recordedSize: 0, file: adoptedFile(cover.path)))
+        }
+        if records.contains(where: { $0.file == nil }) { complete = false }
+
+        return MigratedDownload(account: owner, legacyLocalItemID: item.id, libraryItemID: item.libraryItemId, mediaType: item.mediaType,
+                                title: item.title, author: item.author, cover: item.coverPath.flatMap(adoptedFile), tracks: tracks, chapters: item.chapters,
+                                ebook: ebook, episodes: episodes, files: records, legacyItem: item, complete: complete)
     }
 
     static func readingLocation(_ raw: String, format: String?, fraction: Double?) -> MigratedReadingLocation {
