@@ -194,11 +194,6 @@ struct MigrationPlan {
         String(SHA256.hash(data: Data(identity.utf8)).hex.prefix(24))
     }
 
-    private static func isContained(_ relativePath: String) -> Bool {
-        let components = relativePath.split(separator: "/", omittingEmptySubsequences: false)
-        return !relativePath.isEmpty && !relativePath.hasPrefix("/") && !components.contains { $0.isEmpty || $0 == "." || $0 == ".." }
-    }
-
     /// Where a legacy path is stored under an archive's `files`: its own digest directory, so
     /// paths differing only by case cannot collide on the volume the archive is written to.
     static func archivedPath(_ legacyPath: String) -> String {
@@ -208,7 +203,7 @@ struct MigrationPlan {
     /// Resolves a legacy relative path inside the source root, or nil when it would escape it.
     private func resolve(_ path: String) -> URL? {
         let stored = source.storedPaths[path] ?? path
-        guard Self.isContained(path), Self.isContained(stored) else { return nil }
+        guard ContainedFile.isRelative(path), ContainedFile.isRelative(stored) else { return nil }
         let base = source.filesRoot.standardizedFileURL.resolvingSymlinksInPath()
         let url = base.appendingPathComponent(stored).standardizedFileURL.resolvingSymlinksInPath()
         guard url.path.hasPrefix(base.path + "/") else { return nil }
@@ -277,7 +272,7 @@ struct MigrationPlan {
             return
         }
         let destination = "\(Self.directory(for: owner))/\(Self.digestName(scope))/\(Self.digestName(reference.path))/\((reference.path as NSString).lastPathComponent)"
-        guard Self.isContained(destination), !destinations.contains(destination.lowercased()) else {
+        guard ContainedFile.isRelative(destination), !destinations.contains(destination.lowercased()) else {
             report(.unsafePath, account: owner, item: libraryItemID, path: reference.path,
                    "A file of \"\(title)\" could not be given a place of its own and was not read. The original is unchanged.")
             return

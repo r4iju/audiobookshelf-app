@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 
 public enum LegacyMigrationError: Error, Equatable {
@@ -8,8 +7,9 @@ public enum LegacyMigrationError: Error, Equatable {
     case archiveIncomplete
     case archiveUnreadable(String)
     case legacyDatabaseUnreadable(String)
-    /// The committed migration no longer matches its record (adopted files missing or changed, or
-    /// journal and outcome disagree). Run `migrate` with the legacy source again to repair it.
+    /// The committed migration no longer matches its record (an adopted file missing, changed, not
+    /// a regular file inside `Files`, or journal and outcome disagree). Run `migrate` with the
+    /// legacy source again to repair it.
     case committedMigrationDamaged
 }
 
@@ -24,8 +24,9 @@ public struct MigrationPreflight: Equatable {
 /// Adopts a legacy installation into the native app's container.
 ///
 /// Layout under `root`: `state.json` (journal), `outcome.json` (written once everything is
-/// verified; its presence plus a committed journal is the commit point), `Files/` (adopted media)
-/// and `Staging/` (transient). The legacy source is only ever read.
+/// verified; its presence plus a committed journal is the commit point), `Files/` (adopted media),
+/// `verified.json` (stamps of files whose committed content was last confirmed; losing it only
+/// costs a rehash) and `Staging/` (transient). The legacy source is only ever read.
 public final class LegacyMigrator {
     public let root: URL
     private let fileSystem: MigrationFileSystem
@@ -37,16 +38,23 @@ public final class LegacyMigrator {
 
     private var journalURL: URL { root.appendingPathComponent("state.json") }
     private var outcomeURL: URL { root.appendingPathComponent("outcome.json") }
-    private var filesURL: URL { root.appendingPathComponent("Files") }
     private var stagingURL: URL { root.appendingPathComponent("Staging") }
+    private var verifiedURL: URL { root.appendingPathComponent("verified.json") }
 
-    public func fileURL(for file: MigratedFile) -> URL {
-        filesURL.appendingPathComponent(file.path)
+    /// Where an adopted file can be opened: a regular file inside `Files`, reached through no
+    /// symbolic link, holding its committed content. Throws `committedMigrationDamaged` otherwise.
+    public func fileURL(for file: MigratedFile) throws -> URL {
+        var verified = readVerified()
+        guard let url = intactURL(of: file, verified: &verified, trustingStamps: true) else { throw LegacyMigrationError.committedMigrationDamaged }
+        writeVerified(verified)
+        return url
     }
 
-    /// The committed outcome, checked cheaply (record agreement, file presence and size) so it can
-    /// run at every launch. Nil when nothing was committed. Throws `committedMigrationDamaged`
-    /// when the record no longer holds; `migrate` with the legacy source repairs it.
+    /// The committed outcome, with every adopted file checked as `fileURL(for:)` does. Content is
+    /// rehashed unless the file's stamp is unchanged since its content was last confirmed, so an
+    /// unchanged migration is cheap to check at every launch. Nil when nothing was committed.
+    /// Throws `committedMigrationDamaged` when the record no longer holds; `migrate` with the
+    /// legacy source repairs it.
     public func committedOutcome() throws -> MigrationOutcome? {
         let outcomeExists = FileManager.default.fileExists(atPath: outcomeURL.path)
         guard let journal = try? readJournal() else {
@@ -55,9 +63,7 @@ public final class LegacyMigrator {
         }
         guard journal.committed else { return nil }
         guard let outcome = try? readOutcome(), outcome.sourceFingerprint == journal.sourceFingerprint,
-              Self.adoptedFiles(of: outcome).allSatisfy({ file in
-                  (try? FileManager.default.attributesOfItem(atPath: fileURL(for: file).path)[.size] as? NSNumber)?.intValue == file.size
-              })
+              verifies(outcome, trustingStamps: true)
         else { throw LegacyMigrationError.committedMigrationDamaged }
         return outcome
     }
@@ -86,7 +92,7 @@ public final class LegacyMigrator {
         // (even one interrupted and resumed) holds each file to the digest it was committed with;
         // a source changed since then is reported rather than adopted.
         let previous = (try? readOutcome()).flatMap { $0.sourceFingerprint == fingerprint ? $0 : nil }
-        if journal.committed, let previous = previous, verifies(previous) { return previous }
+        if journal.committed, let previous = previous, verifies(previous, trustingStamps: false) { return previous }
         var recordedDigests: [String: String] = [:]
         for file in previous.map(Self.adoptedFiles) ?? [] { recordedDigests[file.path] = file.sha256 }
         // A repair keeps the journal committed, so a failed repair stays damaged-and-committed
@@ -96,24 +102,23 @@ public final class LegacyMigrator {
         var plan = MigrationPlan(source: source)
         try? FileManager.default.removeItem(at: stagingURL)
         try FileManager.default.createDirectory(at: stagingURL, withIntermediateDirectories: true)
-        try FileManager.default.createDirectory(at: filesURL, withIntermediateDirectories: true)
 
         var adopted: [String: MigratedFile] = [:]
         var pendingTransfer: [(PlannedFile, String)] = []
         for planned in plan.files.values.sorted(by: { $0.key < $1.key }) {
-            let digest = try Self.sha256(of: planned.source)
-            let destination = filesURL.appendingPathComponent(planned.destination)
+            let digest = try ContainedFile.digest(of: planned.source).sha256
+            let destination = "Files/\(planned.destination)"
             if let recorded = source.recordedDigests[planned.legacyPath], recorded != digest {
                 plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath, MigrationPlan.damagedInExportMessage)
                 continue
             }
             if let committed = recordedDigests[planned.destination], committed != digest {
-                try? FileManager.default.removeItem(at: destination)
+                try ContainedFile.clear(destination, under: root, creatingDirectories: false)
                 plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath,
                             "This downloaded file changed after it was migrated, in both apps. It is no longer used; download it again.")
                 continue
             }
-            if FileManager.default.fileExists(atPath: destination.path), (try? Self.sha256(of: destination)) == digest {
+            if let existing = ContainedFile.url(destination, under: root), (try? ContainedFile.digest(of: existing).sha256) == digest {
                 adopted[planned.key] = planned.migrated(sha256: digest)
             } else {
                 pendingTransfer.append((planned, digest))
@@ -122,7 +127,6 @@ public final class LegacyMigrator {
 
         var copyBudgetChecked = false
         for (planned, digest) in pendingTransfer {
-            let destination = filesURL.appendingPathComponent(planned.destination)
             let staged = stagingURL.appendingPathComponent(UUID().uuidString)
             do {
                 try fileSystem.link(planned.source, to: staged)
@@ -135,17 +139,15 @@ public final class LegacyMigrator {
                 }
                 try fileSystem.copy(planned.source, to: staged)
             }
-            guard try Self.sha256(of: staged) == digest else {
+            guard try ContainedFile.digest(of: staged).sha256 == digest else {
                 try? FileManager.default.removeItem(at: staged)
                 plan.report(.fileCorrupt, account: planned.account, item: planned.libraryItemID, path: planned.legacyPath,
                             "This downloaded file changed while it was being moved. The original is unchanged; run the migration again.")
                 continue
             }
-            try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
-            if FileManager.default.fileExists(atPath: destination.path) {
-                try FileManager.default.removeItem(at: destination)
-            }
-            try FileManager.default.moveItem(at: staged, to: destination)
+            let destination = "Files/\(planned.destination)"
+            try ContainedFile.clear(destination, under: root, creatingDirectories: true)
+            try FileManager.default.moveItem(at: staged, to: root.appendingPathComponent(destination))
             adopted[planned.key] = planned.migrated(sha256: digest)
             journal.adopted[planned.destination] = digest
             try writeJournal(journal)
@@ -175,8 +177,9 @@ public final class LegacyMigrator {
 
         // A file adopted earlier stays adopted when its legacy original can no longer be read, as
         // long as the adopted copy still has its committed content.
+        var verified = readVerified()
         for (key, file) in previous.map(Self.adoptedFilesByKey) ?? [:] where adopted[key] == nil && plan.files[key] == nil {
-            guard (try? Self.sha256(of: fileURL(for: file))) == file.sha256 else { continue }
+            guard intactURL(of: file, verified: &verified, trustingStamps: false) != nil else { continue }
             adopted[key] = file
             plan.retractUnavailable(key: key, legacyPath: file.legacyPath)
         }
@@ -185,6 +188,8 @@ public final class LegacyMigrator {
         try fileSystem.writeAtomically(try MigrationJSON.encoder.encode(outcome), to: outcomeURL)
         journal.committed = true
         try writeJournal(journal)
+        let committedPaths = Set(Self.adoptedFiles(of: outcome).map(\.path))
+        writeVerified(verified.filter { committedPaths.contains($0.key) })
         try? FileManager.default.removeItem(at: stagingURL)
         return outcome
     }
@@ -204,9 +209,27 @@ public final class LegacyMigrator {
         return files
     }
 
-    /// Full check of a committed outcome against the files it names.
-    private func verifies(_ outcome: MigrationOutcome) -> Bool {
-        Self.adoptedFiles(of: outcome).allSatisfy { file in (try? Self.sha256(of: fileURL(for: file))) == file.sha256 }
+    private func verifies(_ outcome: MigrationOutcome, trustingStamps: Bool) -> Bool {
+        var verified = readVerified()
+        defer { writeVerified(verified) }
+        return Self.adoptedFiles(of: outcome).allSatisfy { intactURL(of: $0, verified: &verified, trustingStamps: trustingStamps) != nil }
+    }
+
+    /// The adopted file's location when it is a regular file inside `Files`, reached through real
+    /// directories only, with its committed size and digest. `verified` holds stamps of files
+    /// whose content was confirmed; with `trustingStamps`, an unchanged stamp stands for a rehash.
+    private func intactURL(of file: MigratedFile, verified: inout [String: VerifiedFile], trustingStamps: Bool) -> URL? {
+        guard let url = ContainedFile.url("Files/\(file.path)", under: root) else { return nil }
+        if trustingStamps, let known = verified[file.path], known.sha256 == file.sha256, known.stamp.size == Int64(file.size),
+           ContainedFile.stamp(of: url) == known.stamp {
+            return url
+        }
+        guard let (digest, stamp) = try? ContainedFile.digest(of: url), digest == file.sha256, stamp.size == Int64(file.size) else {
+            verified[file.path] = nil
+            return nil
+        }
+        verified[file.path] = VerifiedFile(sha256: digest, stamp: stamp)
+        return url
     }
 
     private func requireSupportedSchema(_ source: LegacySource) throws {
@@ -223,6 +246,21 @@ public final class LegacyMigrator {
         var adopted: [String: String] = [:]
         var credentialsAdopted: [MigrationAccount] = []
         var committed = false
+    }
+
+    private struct VerifiedFile: Codable, Equatable {
+        var sha256: String
+        var stamp: FileStamp
+    }
+
+    private func readVerified() -> [String: VerifiedFile] {
+        (try? MigrationJSON.decoder.decode([String: VerifiedFile].self, from: Data(contentsOf: verifiedURL))) ?? [:]
+    }
+
+    /// Best effort: an unwritten record only means the next check rehashes.
+    private func writeVerified(_ verified: [String: VerifiedFile]) {
+        guard verified != readVerified() else { return }
+        try? fileSystem.writeAtomically(try MigrationJSON.encoder.encode(verified), to: verifiedURL)
     }
 
     private func readJournal() throws -> Journal? {
@@ -276,17 +314,5 @@ public final class LegacyMigrator {
 
     private func writeJournal(_ journal: Journal) throws {
         try fileSystem.writeAtomically(try MigrationJSON.encoder.encode(journal), to: journalURL)
-    }
-
-    static func sha256(of url: URL) throws -> String {
-        let handle = try FileHandle(forReadingFrom: url)
-        defer { try? handle.close() }
-        var hasher = SHA256()
-        while true {
-            let chunk = handle.readData(ofLength: 1 << 20)
-            if chunk.isEmpty { break }
-            hasher.update(data: chunk)
-        }
-        return hasher.finalize().hex
     }
 }

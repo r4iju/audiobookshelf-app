@@ -59,7 +59,7 @@ There is no automatic cross-sandbox import.
 apple/Migration/
   Package.swift                     LegacyMigration (Foundation + CryptoKit only), iOS 14, macOS 12
   Sources/LegacyMigration/          snapshot, plan, migrator, archive, outcome
-  Tests/LegacyMigrationTests/       32 tests, synthetic Documents tree and fault-injecting file system
+  Tests/LegacyMigrationTests/       36 tests, synthetic Documents tree and fault-injecting file system
   LegacyRealm/Package.swift         LegacyRealmExport (RealmSwift 10.54.6 exact)
   LegacyRealm/Sources/...           schema-21 mirror classes, Realm reader, installation source,
                                     archive exporter, read-only legacy Keychain reader
@@ -93,10 +93,21 @@ the default schema, so they cannot collide with any other Realm schema in either
   `state.json` is lost or unreadable: a readable `outcome.json` is then the commit record, only the
   same source continues (credentials it recorded as adopted are not adopted again), and records
   that cannot be read are moved aside, never deleted.
-- `committedOutcome()` is the cheap launch-time read: it checks that journal and outcome agree and
-  that every adopted file is present with its recorded size. It returns nil when nothing was
-  committed and throws `committedMigrationDamaged` when the record no longer holds; the app then
-  runs `migrate` with the source to repair. If the source is gone (an archive the user deleted),
+- Every committed file, whether read at launch, handed out or checked by a repair, must be a
+  regular file inside `<root>/Files` reached through real directories only: a committed path that
+  is absolute or holds `.`, `..` or empty components, a symbolic link at the file or at any
+  directory above it, or anything other than a regular file is damage, even when it leads to
+  matching bytes. A repair removes such a link (never what it points at) and adopts the file
+  again from the legacy source.
+- `committedOutcome()` is the launch-time read. It checks that journal and outcome agree and that
+  every adopted file has its committed size and SHA-256. Content is rehashed unless the file's
+  stamp (device, inode, size, modification and change time, kept in `verified.json`) is unchanged
+  since its content was last confirmed: writing content moves the change time, which cannot be
+  set back, and replacing a file changes its inode, so a same-size change is always rehashed and
+  caught. The first check after a migration hashes everything; later launches only stat. It
+  returns nil when nothing was committed and throws `committedMigrationDamaged` when the record
+  no longer holds; the app then runs `migrate` with the source to repair. `migrate` itself always
+  rehashes. If the source is gone (an archive the user deleted),
   ask for a new export: the same legacy data repairs, changed legacy data is refused, and starting
   over means deleting `root` (an explicit user action; the legacy data is untouched).
 - Destinations are `<account digest>/<digest of the legacy item or download id>/<digest of the
@@ -125,6 +136,10 @@ the default schema, so they cannot collide with any other Realm schema in either
 - Schema other than 21 throws `unsupportedLegacySchema` and touches nothing. An unreadable
   database throws `legacyDatabaseUnreadable`.
 - `committedOutcome()` and `fileURL(for: MigratedFile)` are the read side for the app.
+  `fileURL(for:)` applies the same check to the one file and throws `committedMigrationDamaged`
+  instead of returning a path to a missing, changed, linked or escaping file. Call it right before
+  each use rather than caching the URL; the check cannot stop a process that can already write
+  the app's container from swapping the file between the check and the open.
 
 The legacy installation is never modified: the Realm is read from a copy, files are linked or
 copied, Keychain items and UserDefaults are read only. The Realm work copy holds access tokens;
@@ -213,11 +228,16 @@ Suggested shape (coordinator-owned, not applied):
 let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
     .appendingPathComponent("LegacyMigration", isDirectory: true)
 let migrator = LegacyMigrator(root: root)
-if let outcome = try? migrator.committedOutcome() {
-    MigrationImport.apply(outcome, files: migrator)   // idempotent, see mapping below
-} else if let source = pendingSource() {              // archive picked by the user, or in-place
-    let outcome = try migrator.migrate(source, secrets: KeychainMigrationSink(vault))
-    MigrationImport.apply(outcome, files: migrator)
+do {
+    if let outcome = try migrator.committedOutcome() {
+        MigrationImport.apply(outcome, files: migrator)   // idempotent, see mapping below
+    } else if let source = pendingSource() {              // archive picked by the user, or in-place
+        let outcome = try migrator.migrate(source, secrets: KeychainMigrationSink(vault))
+        MigrationImport.apply(outcome, files: migrator)
+    }
+} catch LegacyMigrationError.committedMigrationDamaged {
+    // Expose no migrated file. Repair with `migrate(source)` when the source is available,
+    // otherwise ask the user for a new export.
 }
 ```
 
@@ -330,6 +350,17 @@ source was accepted; a repair dropped an intact adopted file whose legacy origin
 differing only by case shared a destination on a case-insensitive volume and broke archive
 export), then core 32 of 32 and Realm adapter 7 of 7 passing. The iOS 14 typecheck was repeated
 with no errors or warnings.
+
+Fifth round (a focused review of committed-file integrity), committed red first at `28abf51b`:
+4 new core tests with 13 assertion failures against the previous code. A same-size change with
+its modification date restored was reported valid at launch and handed out by `fileURL(for:)`; an
+adopted file replaced by a symbolic link to matching bytes was handed out and passed the repair's
+full check, so the repair never replaced it; a directory above adopted files replaced by a
+symbolic link passed both checks; an `outcome.json` path of `../../decoy.pdf` leading to matching
+bytes passed both checks and was returned by `migrate`. Then core 36 of 36 and Realm adapter 7 of
+7 passing, with the legacy tree, the symbolic link targets and the original fingerprint unchanged
+through a failed repair. The iOS 14 device and simulator typecheck of the core was repeated with
+no errors or warnings.
 
 ## Remaining physical gates (open)
 

@@ -38,7 +38,7 @@ public enum LegacyArchive {
             let target = files.appendingPathComponent(stored)
             try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: planned.source, to: target)
-            digests[planned.legacyPath] = try LegacyMigrator.sha256(of: target)
+            digests[planned.legacyPath] = try ContainedFile.digest(of: target).sha256
         }
 
         let manifest = try MigrationJSON.encoder.encode(Manifest(formatVersion: formatVersion, snapshot: exported, digests: digests, storedPaths: storedPaths))
