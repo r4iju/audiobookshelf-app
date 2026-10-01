@@ -1779,7 +1779,7 @@
       "replacementEvidence": {
         "apple-mobile": [
           "PreferencesJourney statistics, Year in review and Buddhist-locale calendar journeys on iPhone and iPad (APPLE-PREFERENCES.md); YearExport 28 tests on simulator (apple/Localization/HANDOFF.md); book finished/unfinished management (APPLE-BOOK-PROGRESS.md). Physical image sharing and live annual data not tested.",
-          "Durable confirmed book/episode reset: 14 reset tests within 64 native tests pass; 4 iPhone and 4 iPad production journeys pass, including cancel, from-zero playback, isolation and retry. Unified completion confirmation retains 3 existing journeys. docs/modernization/APPLE-PROGRESS-RESET.md. Hardware and owner-data acceptance remain open."
+          "Durable confirmed book/episode reset: 14 reset tests within 64 native tests pass; final four iPhone and four actual iPad simulator journeys pass, including cancel, from-zero playback, isolation, visible Try again and foreground recovery. Three existing completion-confirmation journeys also pass. Signed build installed on both owner devices without launching. PR79, docs/modernization/APPLE-PROGRESS-RESET-QA.md. Hardware and owner-data acceptance remain open."
         ],
         "android": [],
         "browser": []
@@ -1883,7 +1883,7 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "PresentationJourney language journeys: saved language through relaunch, device language, Arabic right-to-left mirroring (APPLE-PRESENTATION.md). All 30 legacy languages selectable but only 18-27% of native texts translated, the rest English (apple/Localization/COVERAGE.md); playback alerts stay English."
+          "PresentationJourney covers saved language through relaunch, device language and Arabic right-to-left layout (APPLE-PRESENTATION.md). All 30 legacy languages are selectable. Generated non-English coverage is 15–21% at 315183c1; semantic mappings cover supported playback controls, while unmapped text uses explicit English fallback. Cellular consent now uses the shared lookup with generated English templates. This is not full translation or hardware acceptance."
         ],
         "android": [],
         "browser": [],
@@ -1996,7 +1996,8 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "Synthetic data only: migration core and Realm adapter suites (core 39/39, Realm export 15/15) and adoption NativeTests (APPLE-MIGRATION.md, APPLE-MIGRATION-ADOPTION.md). Owner/private data NOT tested. The in-place route (legacy bundle identifier, team and Keychain group), a Realm written by an actual legacy build, and device rollback are not built or tested."
+          "Synthetic data only: migration core and Realm adapter suites (core 39/39, Realm export 15/15) and adoption NativeTests (APPLE-MIGRATION.md, APPLE-MIGRATION-ADOPTION.md). Owner/private data NOT tested. The in-place route (legacy bundle identifier, team and Keychain group), a Realm written by an actual legacy build, and device rollback are not built or tested.",
+          "PR76 verifies Settings export, Files save and archive import using synthetic data in actual legacy app builds on iOS26/27 (APPLE-MIGRATION.md and legacy export evidence). The delivered separate-identity preview uses Files export/import; compatible-identity in-place upgrade is an alternative, not completed evidence. No owner-data migration or physical rollback acceptance is claimed."
         ],
         "android": []
       },
