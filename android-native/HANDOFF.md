@@ -138,6 +138,7 @@ Server 2.30 neither orders requests for one session or title nor says whether an
   - `LatePublicationJourney` 3 of 3; unit tests pass.
   - Full suite: 71 of 79 in one run. The 8 failures came from a transient fixture outage: the proxy answered 503 to fixture control calls such as `/__fixture__/configure`, and sign-ins timed out.
   - Rerun on the final build: ItemActions, Pdf, ReadingListening and Settings 19 of 19; LatePublication, ProgressReset, ListeningDurability and Playback 15 of 15.
+- **Cause of the 8 failures in the 79-test run:** the Android fixture listened with the default backlog of 5 (the shared factory fix `23abaa51` is not in this branch's base). Bursts of the app's one-request HTTP/1.0 connections were reset, and the realtime proxy reported them as 503. The wrapper now listens with 128. A local burst of 300 concurrent connections gave 43 resets at backlog 5 and 0 at 128. The reruns above are not a substitute for a clean full run, which is still required before ready.
 - **Limits:**
   - An uncertain title stays uncertain until the user chooses. Server 2.30 offers no way to prove an earlier request has finished, and no backend change is assumed.
   - A late older page can still overwrite a newer page on the server. The next sync sees a server change it did not make and asks the reader, rather than overwriting silently.

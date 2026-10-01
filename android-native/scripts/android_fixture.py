@@ -25,6 +25,9 @@ from verification.fixture import make_server  # noqa: E402
 
 def android_server(port, prefix, bind='127.0.0.1'):
     server, prefix = make_server(port, prefix, 'baseline', 'modern', bind)
+    # The shared factory listens with the default backlog of five here; a burst of the app's
+    # one-request connections beyond it was reset, which the realtime proxy reports as HTTP 503.
+    server.socket.listen(128)
     base = server.RequestHandlerClass
     # Listening sync can be refused on its own, whatever the shared mode, so reading and listening
     # ordering is observable with a document present. Any reconfiguration accepts listening again.
