@@ -1,10 +1,20 @@
+import { MutationObserver, QueryClient } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type AbsClient, AbsError } from "@/lib/abs/client";
+import { ebookPlaceSaves } from "@/lib/abs/mutations";
 import { usePlayerStore } from "@/lib/player/store";
 import { beginPublishing, finishSending } from "./coordination";
 import { discardProgress } from "./discard";
 import { createListeningReport, createOutbox, type ListeningReport } from "./outbox";
-import { changeProgress, discardAnyway, finishDiscard, flushReports, keepProgress, outboxFor } from "./sync";
+import {
+  changeProgress,
+  discardAnyway,
+  finishDiscard,
+  flushReports,
+  issueChange,
+  keepProgress,
+  outboxFor,
+} from "./sync";
 
 function memoryStorage() {
   const data = new Map<string, string>();
@@ -203,6 +213,23 @@ function otherTab(
       return sessions.map((session) => ({ id: session.id, success: true }));
     });
   return { delivering, answer, sent: () => sent };
+}
+
+/** Writes records into this origin's coordination database as an earlier version of the client left them. */
+async function storedCoordination(records: object[]) {
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open("abs-web-coordination", 1);
+    request.onupgradeneeded = () => request.result.createObjectStore("entries", { keyPath: "key" });
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  await new Promise<void>((resolve, reject) => {
+    const transaction = db.transaction("entries", "readwrite");
+    for (const record of records) transaction.objectStore("entries").put(record);
+    transaction.oncomplete = () => resolve();
+    transaction.onabort = () => reject(transaction.error);
+  });
+  db.close();
 }
 
 beforeEach(() => {
@@ -642,6 +669,73 @@ describe("discardProgress", () => {
     expect(server.log).toEqual(["DELETE /api/me/progress/p-x"]);
   });
 
+  it("sends none of the reading places queued during a discard that then deletes", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["hang"]);
+    usePlayerStore.getState().attach(server.client);
+    const queryClient = new QueryClient();
+    const save = (place: string) =>
+      new MutationObserver(queryClient, ebookPlaceSaves(server.client, "book-x"))
+        .mutate(
+          issueChange(server.client, { libraryItemId: "book-x", episodeId: null }, { ebookLocation: place }),
+        )
+        .catch(() => {});
+    const discarding = discardProgress(server.client, {
+      progressId: "p-x",
+      itemId: "book-x",
+      episodeId: null,
+    });
+    await vi.waitFor(() => expect(server.deletes()).toBe(1));
+
+    const saved = [save("epubcfi(/6/8)"), save("epubcfi(/6/10)"), save("epubcfi(/6/12)")];
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    server.thaw();
+    await Promise.all([discarding, ...saved]);
+
+    expect(server.log).toEqual(["DELETE /api/me/progress/p-x"]);
+  });
+
+  it("sends reading places queued before a discard ahead of its delete", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    usePlayerStore.getState().attach(server.client);
+    let answer = () => {};
+    const answered = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    const reader = {
+      ...server.client,
+      command: vi.fn(async (method: "PATCH" | "DELETE", path: string, body: unknown) => {
+        if (method === "PATCH") await answered;
+        return server.client.command(method, path, body);
+      }),
+    } as unknown as AbsClient;
+    const queryClient = new QueryClient();
+    const save = (place: string) =>
+      new MutationObserver(queryClient, {
+        ...ebookPlaceSaves(reader, "book-x"),
+        // The reader refetches progress after each save, before the next one starts.
+        onSettled: () => new Promise((resolve) => setTimeout(resolve, 50)),
+      }).mutate(issueChange(reader, { libraryItemId: "book-x", episodeId: null }, { ebookLocation: place }));
+    const saved = [save("epubcfi(/6/8)"), save("epubcfi(/6/10)")];
+    await vi.waitFor(() => expect(reader.command).toHaveBeenCalled());
+
+    const discarding = discardProgress(server.client, {
+      progressId: "p-x",
+      itemId: "book-x",
+      episodeId: null,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    answer();
+    await Promise.all([discarding, ...saved]);
+
+    expect(server.log).toEqual([
+      "PATCH /api/me/progress/book-x",
+      "PATCH /api/me/progress/book-x",
+      "DELETE /api/me/progress/p-x",
+    ]);
+  });
+
   it("sends nothing a discard forgot, after its delete, from a tab whose view of the queue still has it", async () => {
     vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
     const server = scriptedDeleteServer("conn-a", ["ok"]);
@@ -659,5 +753,102 @@ describe("discardProgress", () => {
     await tab.delivering();
 
     expect(server.log).toEqual(["DELETE /api/me/progress/p-x"]);
+  });
+
+  describe("with coordination records an earlier version left", () => {
+    /** A discard left pending by that version, with the listening its other tab sent still unanswered. */
+    const pendingDiscard = async (block: object) => {
+      const hold = outboxFor("conn-a").hold("book-x", null, "p-x");
+      hold.abandon();
+      await storedCoordination([
+        { key: `block:conn-a:${hold.id}`, ...block },
+        {
+          key: "sending:conn-a:earlier",
+          page: "page-gone",
+          failed: false,
+          reports: [report("old-x", "book-x")],
+        },
+      ]);
+    };
+
+    it("still waits for the earlier version's unanswered listening before deleting", async () => {
+      vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+      const server = scriptedDeleteServer("conn-a", ["ok"]);
+      await pendingDiscard({ libraryItemId: "book-x", episodeId: null });
+
+      await flushReports(server.client, () => {});
+
+      expect(server.log).toEqual([]);
+      expect(outboxFor("conn-a").discardState("book-x", null)).toBe("unconfirmed");
+    });
+
+    it("deletes nothing for a discard whose stored phase it cannot read", async () => {
+      vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+      const server = scriptedDeleteServer("conn-a", ["ok"]);
+      await pendingDiscard({ libraryItemId: "book-x", episodeId: null, phase: "removing" });
+
+      await flushReports(server.client, () => {});
+
+      expect(server.log).toEqual([]);
+      expect(outboxFor("conn-a").discardState("book-x", null)).toBe("unconfirmed");
+    });
+
+    it("does not keep the progress of an earlier version's discard whose delete may be on its way", async () => {
+      vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+      const server = scriptedDeleteServer("conn-a", ["ok"]);
+      const hold = outboxFor("conn-a").hold("book-x", null, "p-x");
+      hold.abandon();
+      await storedCoordination([
+        { key: `block:conn-a:${hold.id}`, libraryItemId: "book-x", episodeId: null },
+      ]);
+
+      await keepProgress(server.client, "book-x", null);
+
+      expect(outboxFor("conn-a").discardState("book-x", null)).toBe("unconfirmed");
+    });
+
+    it("delivers listening past a block whose book cannot be read and that no discard is finishing", async () => {
+      vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+      const server = scriptedDeleteServer("conn-a", ["ok"]);
+      await storedCoordination([{ key: "block:conn-a:gone", phase: "blocked" }]);
+      outboxFor("conn-a").record(report("new-y", "book-y"));
+
+      await flushReports(server.client, () => {});
+
+      expect(server.log).toEqual(["listening book-y@40"]);
+    });
+  });
+
+  it("sends no reading place still waiting its turn once the user discards anyway", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    const server = scriptedDeleteServer("conn-a", ["ok"]);
+    usePlayerStore.getState().attach(server.client);
+    let answer = () => {};
+    const answered = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    const reader = {
+      ...server.client,
+      command: vi.fn(async (method: "PATCH" | "DELETE", path: string, body: unknown) => {
+        if (method === "PATCH") await answered;
+        return server.client.command(method, path, body);
+      }),
+    } as unknown as AbsClient;
+    const queryClient = new QueryClient();
+    const save = (place: string) =>
+      new MutationObserver(queryClient, ebookPlaceSaves(reader, "book-x")).mutate(
+        issueChange(reader, { libraryItemId: "book-x", episodeId: null }, { ebookLocation: place }),
+      );
+    const saved = [save("epubcfi(/6/8)"), save("epubcfi(/6/10)")];
+    await vi.waitFor(() => expect(reader.command).toHaveBeenCalled());
+    const hold = outboxFor("conn-a").hold("book-x", null, "p-x");
+
+    await discardAnyway(server.client, "book-x", null);
+    hold.settle();
+    answer();
+    await Promise.all(saved);
+
+    // The first place was already on its way, which discarding anyway accepts.
+    expect(server.log).toEqual(["DELETE /api/me/progress/p-x", "PATCH /api/me/progress/book-x"]);
   });
 });

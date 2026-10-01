@@ -1,5 +1,6 @@
+import { z } from "zod";
 import { randomId } from "@/lib/random-id";
-import type { ListeningReport } from "./outbox";
+import { type ListeningReport, listeningReportSchema } from "./outbox";
 
 // Discards and what is sent for a book coordinate across this origin's tabs through IndexedDB, which orders
 // read-write transactions on one store across every tab, with or without Web Locks (plain-HTTP origins have none).
@@ -25,15 +26,19 @@ export interface ProgressChange extends Sent {
   change: { isFinished: boolean } | { ebookLocation: string; ebookProgress?: number };
 }
 
-interface Sending {
-  key: string;
-  connectionId: string;
+const targetSchema = z.object({ libraryItemId: z.string(), episodeId: z.string().nullable() });
+const sentSchema = targetSchema.extend({ id: z.string() }).loose();
+const keySchema = z.object({ key: z.string() });
+
+const sendingSchema = z.object({
+  connectionId: z.string(),
   /** The page that sends it. */
-  page: string;
+  page: z.string(),
   /** Its request failed without an answer, so whether and when it reaches the server is unknown. */
-  failed: boolean;
-  items: Sent[];
-}
+  failed: z.boolean(),
+  items: z.array(sentSchema),
+});
+type Sending = Omit<z.infer<typeof sendingSchema>, "items"> & { key: string; items: Sent[] };
 
 /** Something for a blocked book that was being sent when the block was taken. */
 export interface InFlight {
@@ -44,17 +49,18 @@ export interface InFlight {
 }
 
 /**
- * Where a discard stands. Delivery for its book is blocked while it is `blocked` or `deleting`. Once its delete is
- * issued (`deleting`) it can no longer be kept, since whether the server has deleted is unknown until it answers.
+ * Where a discard stands. Delivery for its book is blocked while it is `blocked`, `deleting` or `unknown`. Once its
+ * delete is issued (`deleting`) it can no longer be kept, since whether the server has deleted is unknown until it
+ * answers. `unknown`: its stored phase cannot be read, so whether its delete was issued is unknown too.
  */
-export type DiscardPhase = "blocked" | "deleting" | "finished" | "kept";
+export type DiscardPhase = "blocked" | "deleting" | "unknown" | "finished" | "kept";
 
 interface Block extends Target {
   key: string;
   phase: "blocked" | "deleting";
 }
 
-interface Ended {
+interface Ended extends Partial<Target> {
   key: string;
   phase: "finished" | "kept";
 }
@@ -65,11 +71,9 @@ interface Ended {
 // frozen, only ever sent again exactly as it was, and the session goes on under a new id that carries just what came
 // after it.
 
-interface Totals {
-  timeListening: number;
-  currentTime: number;
-  updatedAt: number;
-}
+const totalsSchema = z.object({ timeListening: z.number(), currentTime: z.number(), updatedAt: z.number() });
+// Lazy: outbox.ts imports this module.
+const reportSchema = z.lazy(() => listeningReportSchema);
 
 /** A version of a session's listening as sent: `report` under the current publication id. */
 export interface Publication {
@@ -80,18 +84,84 @@ export interface Publication {
   report: ListeningReport;
 }
 
-interface Stream extends Target {
-  key: string;
-  id: string;
-  publication: string;
+const streamSchema = targetSchema.extend({
+  key: z.string(),
+  id: z.string(),
+  publication: z.string(),
   /** What the frozen publications carry; null before any froze. */
-  base: Totals | null;
+  base: totalsSchema.nullable(),
   /** No recorded report up to this is sent: it was issued, or a discard forgot it. */
-  issuedUpTo: number;
+  issuedUpTo: z.number(),
   /** The current publication's unanswered version. */
-  open: { report: ListeningReport; totals: Totals; page: string; at: number } | null;
-  frozen: Publication[];
+  open: z.object({ report: reportSchema, totals: totalsSchema, page: z.string(), at: z.number() }).nullable(),
+  frozen: z.array(z.object({ stream: z.string(), updatedAt: z.number(), report: reportSchema })),
+});
+type Stream = z.infer<typeof streamSchema>;
+
+// Records are read as stored by any version of this client, in any open tab, so each is checked. The version before
+// phases were stored kept blocks without a phase, which may be deleting, `finished:` records for discards that deleted, and
+// sendings as `reports`. A record that cannot be read counts against delivery and deleting as far as it may reach:
+// an unreadable block blocks every book, an unreadable sending is unconfirmed for every book, and an unreadable
+// session is not sent.
+
+const earlierSendingSchema = z.object({ page: z.string(), reports: z.array(sentSchema) });
+
+interface StoredBlock {
+  key: string;
+  /** Null when unreadable: then it blocks every book. */
+  target: Target | null;
+  phase: "blocked" | "deleting" | "unknown";
 }
+
+function readBlock(key: string, raw: unknown): StoredBlock {
+  const target = targetSchema.safeParse(raw);
+  const phase = z.object({ phase: z.enum(["blocked", "deleting"]).optional() }).safeParse(raw);
+  return {
+    key,
+    target: target.success
+      ? { libraryItemId: target.data.libraryItemId, episodeId: target.data.episodeId }
+      : null,
+    phase: phase.success ? (phase.data.phase ?? "unknown") : "unknown",
+  };
+}
+
+/** A discard that deleted is never taken for kept: only a record that says `kept` is. */
+const readEnded = (raw: unknown): Ended["phase"] =>
+  z.object({ phase: z.literal("kept") }).safeParse(raw).success ? "kept" : "finished";
+
+/** A sending as stored, its items null when unreadable. */
+type StoredSending = Omit<Sending, "items"> & { items: Sent[] | null };
+
+function readSending(key: string, connectionId: string, raw: unknown): StoredSending {
+  const current = sendingSchema.safeParse(raw);
+  if (current.success) return { key, ...current.data };
+  // The earlier version's sendings are unresolved: nothing tells whether their tab still waits for an answer.
+  const earlier = earlierSendingSchema.safeParse(raw);
+  if (earlier.success)
+    return { key, connectionId, page: earlier.data.page, failed: true, items: earlier.data.reports };
+  return { key, connectionId, page: "", failed: true, items: null };
+}
+
+/** What a sending carries for the target; for one that cannot be read, a stand-in. */
+const sentFor = (sending: StoredSending, target: Target): Sent[] =>
+  sending.items
+    ? sending.items.filter((item) => sameTarget(item, target))
+    : [{ id: "", libraryItemId: target.libraryItemId, episodeId: target.episodeId }];
+
+/** The readable sessions, by id, and the ids of those that cannot be read. */
+function readStreams(connectionId: string, raws: unknown[]) {
+  const streams = new Map<string, Stream>();
+  const unreadable = new Set<string>();
+  for (const raw of raws) {
+    const parsed = streamSchema.safeParse(raw);
+    if (parsed.success) streams.set(parsed.data.id, parsed.data);
+    else unreadable.add(storedKey(raw).slice(streamPrefix(connectionId).length));
+  }
+  return { streams, unreadable };
+}
+
+/** A stored record's key, which the store requires of every record. */
+const storedKey = (raw: unknown) => keySchema.parse(raw).key;
 
 /** Another page's request left unanswered this long is taken for lost, its tab closed or its request stuck. */
 const LOST_MS = 5 * 60_000;
@@ -143,12 +213,17 @@ function readAll<T extends unknown[]>(
 
 const prefixed = (prefix: string) => IDBKeyRange.bound(prefix, `${prefix}￿`);
 const blockPrefix = (connectionId: string) => `block:${connectionId}:`;
+const blockKey = (connectionId: string, holdId: string) => `${blockPrefix(connectionId)}${holdId}`;
 const endedPrefix = (connectionId: string) => `ended:${connectionId}:`;
 const endedKey = (connectionId: string, holdId: string) => `ended:${connectionId}:${holdId}`;
+const earlierFinishedKey = (connectionId: string, holdId: string) => `finished:${connectionId}:${holdId}`;
 const sendingPrefix = (connectionId: string) => `sending:${connectionId}:`;
 const streamPrefix = (connectionId: string) => `stream:${connectionId}:`;
 const sameTarget = (a: Target, b: Target) =>
   a.libraryItemId === b.libraryItemId && a.episodeId === b.episodeId;
+const blocks = (block: StoredBlock, target: Target) => !block.target || sameTarget(block.target, target);
+const holdOf = (connectionId: string, block: StoredBlock) =>
+  block.key.slice(blockPrefix(connectionId).length);
 const sameVersion = (a: ListeningReport, b: Sent) =>
   a.id === b.id && "updatedAt" in b && a.updatedAt === b.updatedAt;
 
@@ -231,11 +306,12 @@ export function beginPublishing(
   now = Date.now(),
 ) {
   return transact<Begun>((store, finish) => {
-    readAll<[Block[], Stream[]]>(
+    readAll<[unknown[], unknown[]]>(
       [store.getAll(prefixed(blockPrefix(connectionId))), store.getAll(prefixed(streamPrefix(connectionId)))],
-      (blocks, records) => {
-        const blocked = (target: Target) => blocks.some((block) => sameTarget(block, target));
-        const streams = new Map(records.map((stream) => [stream.id, stream]));
+      (blockRecords, streamRecords) => {
+        const stored = blockRecords.map((raw) => readBlock(storedKey(raw), raw));
+        const blocked = (target: Target) => stored.some((block) => blocks(block, target));
+        const { streams, unreadable } = readStreams(connectionId, streamRecords);
         const changed = new Set<Stream>();
         for (const stream of streams.values())
           if (stream.open && stream.open.page !== page && now - stream.open.at > LOST_MS) {
@@ -244,7 +320,7 @@ export function beginPublishing(
           }
         const issued: Publication[] = [];
         for (const report of candidates()) {
-          if (blocked(report)) continue;
+          if (blocked(report) || unreadable.has(report.id)) continue;
           const stream = streams.get(report.id) ?? newStream(connectionId, report);
           if (stream.open || report.updatedAt <= stream.issuedUpTo) continue;
           const version = nextVersion(stream, report);
@@ -282,25 +358,58 @@ export function beginPublishing(
 }
 
 /**
- * Records that this page sends `change` now, unless a discard blocks its book: then it gives the discards to wait for.
- * A change that waited for a discard which then deleted is dropped instead, since it may carry the old place.
+ * A change issued while discards blocked its book: the discards it waits for (`blockedBy`), and those of its book that
+ * had deleted before it was issued (`deleted`, by record key).
  */
-export function beginChange(connectionId: string, change: ProgressChange, page: string, waitedFor: string[]) {
-  return transact<{ sendingKey: string } | { blockedBy: string[] } | "dropped">((store, finish) => {
-    readAll<[Block[], Ended[]]>(
-      [store.getAll(prefixed(blockPrefix(connectionId))), store.getAll(prefixed(endedPrefix(connectionId)))],
-      (blocks, ended) => {
-        const blocking = blocks.filter((block) => sameTarget(block, change));
+export interface Waiting {
+  blockedBy: string[];
+  deleted: string[];
+}
+
+/**
+ * Records that this page sends `change`, when the user makes it (`waiting` null) and again while it waits. A change
+ * made during a discard waits for that discard, and is dropped if any discard of its book deletes after the change
+ * was made, since it may carry the old place. A discard that begins after the change was made does not hold it up
+ * before deleting: the change is recorded, and that discard waits for it.
+ */
+export function beginChange(
+  connectionId: string,
+  change: ProgressChange,
+  page: string,
+  waiting: Waiting | null,
+) {
+  return transact<{ sendingKey: string } | Waiting | "dropped">((store, finish) => {
+    readAll<[unknown[], unknown[], unknown[]]>(
+      [
+        store.getAll(prefixed(blockPrefix(connectionId))),
+        store.getAll(prefixed(endedPrefix(connectionId))),
+        store.getAll(prefixed(earlierFinishedKey(connectionId, ""))),
+      ],
+      (blockRecords, endedRecords, earlierFinished) => {
+        const deleted = [...endedRecords, ...earlierFinished]
+          .filter((raw) => {
+            if (readEnded(raw) !== "finished") return false;
+            // A record without its book, from an earlier version, may be this one's.
+            const target = targetSchema.safeParse(raw);
+            return !target.success || sameTarget(target.data, change);
+          })
+          .map(storedKey);
+        if (waiting && deleted.some((key) => !waiting.deleted.includes(key))) return finish("dropped");
+        const blocking = blockRecords
+          .map((raw) => readBlock(storedKey(raw), raw))
+          .filter(
+            (block) =>
+              blocks(block, change) &&
+              (!waiting ||
+                block.phase !== "blocked" ||
+                waiting.blockedBy.includes(holdOf(connectionId, block))),
+          )
+          .map((block) => holdOf(connectionId, block));
         if (blocking.length > 0)
           return finish({
-            blockedBy: blocking.map((block) => block.key.slice(blockPrefix(connectionId).length)),
+            blockedBy: [...new Set([...(waiting?.blockedBy ?? []), ...blocking])],
+            deleted: waiting?.deleted ?? deleted,
           });
-        const deleted = ended.some(
-          (each) =>
-            each.phase === "finished" &&
-            waitedFor.some((holdId) => each.key === endedKey(connectionId, holdId)),
-        );
-        if (deleted) return finish("dropped");
         const sendingKey = `${sendingPrefix(connectionId)}${randomId()}`;
         store.put({ key: sendingKey, connectionId, page, failed: false, items: [change] } satisfies Sending);
         finish({ sendingKey });
@@ -317,14 +426,17 @@ export async function finishSending(sendingKey: string, outcome: "answered" | "f
   await transact<void>((store, finish) => {
     const recorded = store.get(sendingKey);
     recorded.onsuccess = () => {
-      const sending = recorded.result as Sending | undefined;
+      if (recorded.result === undefined) return;
+      const parsed = sendingSchema.safeParse(recorded.result);
+      // Unreadable, it stays as stored: unconfirmed for every book.
+      if (!parsed.success) return;
+      const sending = parsed.data;
       store.delete(sendingKey);
-      if (!sending) return;
       const records = store.getAll(prefixed(streamPrefix(sending.connectionId)));
       records.onsuccess = () => {
-        const streams = records.result as Stream[];
+        const { streams } = readStreams(sending.connectionId, records.result);
         const sent = (report: ListeningReport) => sending.items.some((item) => sameVersion(report, item));
-        for (const stream of streams) {
+        for (const stream of streams.values()) {
           const before = JSON.stringify(stream);
           if (stream.open && sent(stream.open.report)) {
             if (outcome === "answered") stream.open = null;
@@ -348,6 +460,29 @@ export async function finishSending(sendingKey: string, outcome: "answered" | "f
   announce();
 }
 
+/** The records that say where a discard stands, to read with `readPhase`. */
+const discardRecords = (
+  store: IDBObjectStore,
+  connectionId: string,
+  holdId: string,
+): [IDBRequest<unknown>, IDBRequest<unknown>, IDBRequest<unknown>] => [
+  store.get(endedKey(connectionId, holdId)),
+  store.get(earlierFinishedKey(connectionId, holdId)),
+  store.get(blockKey(connectionId, holdId)),
+];
+
+/** Where a discard stands as stored, or null before it is blocked. */
+function readPhase(
+  blockKey: string,
+  ended: unknown,
+  earlierFinished: unknown,
+  block: unknown,
+): DiscardPhase | null {
+  if (ended !== undefined) return readEnded(ended);
+  if (earlierFinished !== undefined) return "finished";
+  return block === undefined ? null : readBlock(blockKey, block).phase;
+}
+
 /**
  * Blocks the target's delivery for a discard, unless that discard has ended, and gives where it stands. The reports
  * the discard forgot (`forgotten`) are never sent afterwards, though a tab that has not seen them go still has them.
@@ -358,25 +493,23 @@ export function block(
   target: Target,
   forgotten: ListeningReport[] = [],
 ) {
-  const key = `${blockPrefix(connectionId)}${holdId}`;
+  const key = blockKey(connectionId, holdId);
   return transact<DiscardPhase>((store, finish) => {
-    readAll<[Ended | undefined, Block | undefined, Stream[]]>(
-      [
-        store.get(endedKey(connectionId, holdId)),
-        store.get(key),
-        store.getAll(prefixed(streamPrefix(connectionId))),
-      ],
-      (ended, current, streams) => {
-        if (ended) return finish(ended.phase);
-        if (current) return finish(current.phase);
+    readAll<[unknown, unknown, unknown, unknown[]]>(
+      [...discardRecords(store, connectionId, holdId), store.getAll(prefixed(streamPrefix(connectionId)))],
+      (ended, earlierFinished, current, streamRecords) => {
+        const phase = readPhase(key, ended, earlierFinished, current);
+        if (phase) return finish(phase);
         store.put({
           key,
           libraryItemId: target.libraryItemId,
           episodeId: target.episodeId,
           phase: "blocked",
         } satisfies Block);
+        const { streams, unreadable } = readStreams(connectionId, streamRecords);
         for (const report of forgotten) {
-          const stream = streams.find((each) => each.id === report.id) ?? newStream(connectionId, report);
+          if (unreadable.has(report.id)) continue;
+          const stream = streams.get(report.id) ?? newStream(connectionId, report);
           store.put({ ...stream, issuedUpTo: Math.max(stream.issuedUpTo, report.updatedAt) });
         }
         finish("blocked");
@@ -385,15 +518,29 @@ export function block(
   });
 }
 
-/** Moves a blocked discard on to deleting, unless it has ended meanwhile, and gives where it stands. */
-export function claimDelete(connectionId: string, holdId: string) {
+/**
+ * Moves a blocked discard on to deleting, unless it has ended meanwhile or something for its book is being sent
+ * (then it stays `blocked`), and gives where it stands.
+ */
+export function claimDelete(connectionId: string, holdId: string, target: Target) {
+  const key = blockKey(connectionId, holdId);
   return transact<DiscardPhase>((store, finish) => {
-    readAll<[Ended | undefined, Block | undefined]>(
-      [store.get(endedKey(connectionId, holdId)), store.get(`${blockPrefix(connectionId)}${holdId}`)],
-      (ended, current) => {
-        if (ended) return finish(ended.phase);
-        if (!current) throw new Error("A discard is deleting without its block");
-        store.put({ ...current, phase: "deleting" } satisfies Block);
+    readAll<[unknown, unknown, unknown, unknown[]]>(
+      [...discardRecords(store, connectionId, holdId), store.getAll(prefixed(sendingPrefix(connectionId)))],
+      (ended, earlierFinished, current, sendings) => {
+        const phase = readPhase(key, ended, earlierFinished, current);
+        if (phase === "finished" || phase === "kept") return finish(phase);
+        if (!phase) throw new Error("A discard is deleting without its block");
+        if (
+          sendings.some((raw) => sentFor(readSending(storedKey(raw), connectionId, raw), target).length > 0)
+        )
+          return finish("blocked");
+        store.put({
+          key,
+          libraryItemId: target.libraryItemId,
+          episodeId: target.episodeId,
+          phase: "deleting",
+        } satisfies Block);
         finish("deleting");
       },
     );
@@ -406,35 +553,62 @@ export function claimDelete(connectionId: string, holdId: string) {
  */
 export async function finishDelete(connectionId: string, holdId: string, target: Target) {
   await transact<void>((store, finish) => {
-    const streams = store.getAll(prefixed(streamPrefix(connectionId)));
-    streams.onsuccess = () => {
-      for (const stream of streams.result as Stream[])
+    const records = store.getAll(prefixed(streamPrefix(connectionId)));
+    records.onsuccess = () => {
+      for (const stream of readStreams(connectionId, records.result).streams.values())
         if (sameTarget(stream, target)) store.put({ ...stream, frozen: [] });
-      store.delete(`${blockPrefix(connectionId)}${holdId}`);
-      store.put({ key: endedKey(connectionId, holdId), phase: "finished" } satisfies Ended);
+      store.delete(blockKey(connectionId, holdId));
+      store.put({
+        key: endedKey(connectionId, holdId),
+        phase: "finished",
+        libraryItemId: target.libraryItemId,
+        episodeId: target.episodeId,
+      } satisfies Ended);
     };
     finish(undefined);
   });
   announce();
 }
 
-/** Keeps the progress a discard was to delete, unless its delete has been issued, and gives where it stands. */
+/** Keeps the progress a discard was to delete, unless its delete may have been issued, and gives where it stands. */
 export async function keep(connectionId: string, holdId: string) {
-  const key = `${blockPrefix(connectionId)}${holdId}`;
+  const key = blockKey(connectionId, holdId);
   const phase = await transact<DiscardPhase>((store, finish) => {
-    readAll<[Ended | undefined, Block | undefined]>(
-      [store.get(endedKey(connectionId, holdId)), store.get(key)],
-      (ended, current) => {
-        if (ended) return finish(ended.phase);
-        if (current?.phase === "deleting") return finish("deleting");
-        store.delete(key);
-        store.put({ key: endedKey(connectionId, holdId), phase: "kept" } satisfies Ended);
-        finish("kept");
-      },
-    );
+    readAll<[unknown, unknown, unknown]>(discardRecords(store, connectionId, holdId), (...stored) => {
+      const current = readPhase(key, ...stored);
+      if (current !== "blocked" && current !== null) return finish(current);
+      store.delete(key);
+      store.put({ key: endedKey(connectionId, holdId), phase: "kept" } satisfies Ended);
+      finish("kept");
+    });
   });
   announce();
   return phase;
+}
+
+/** Whether a recorded sending still counts: a discard that went ahead anyway has stopped counting it. */
+export function isSending(sendingKey: string) {
+  return transact<boolean>((store, finish) => {
+    const stored = store.getKey(sendingKey);
+    stored.onsuccess = () => finish(stored.result !== undefined);
+  });
+}
+
+/**
+ * Removes blocks whose book cannot be read and that none of `holdIds` is finishing: nothing would ever end them, and
+ * they would hold back every book.
+ */
+export function releaseUnreadableBlocks(connectionId: string, holdIds: string[]) {
+  return transact<void>((store, finish) => {
+    const records = store.getAll(prefixed(blockPrefix(connectionId)));
+    records.onsuccess = () => {
+      for (const raw of records.result) {
+        const block = readBlock(storedKey(raw), raw);
+        if (!block.target && !holdIds.includes(holdOf(connectionId, block))) store.delete(block.key);
+      }
+    };
+    finish(undefined);
+  });
 }
 
 /** What is still recorded as being sent for the target. */
@@ -443,25 +617,29 @@ export function inFlight(connectionId: string, target: Target) {
     const entries = store.getAll(prefixed(sendingPrefix(connectionId)));
     entries.onsuccess = () =>
       finish(
-        (entries.result as Sending[]).flatMap((entry) =>
-          entry.items
-            .filter((item) => sameTarget(item, target))
-            .map((item) => ({ sendingKey: entry.key, page: entry.page, failed: entry.failed, item })),
-        ),
+        entries.result.flatMap((raw) => {
+          const entry = readSending(storedKey(raw), connectionId, raw);
+          return sentFor(entry, target).map((item) => ({
+            sendingKey: entry.key,
+            page: entry.page,
+            failed: entry.failed,
+            item,
+          }));
+        }),
       );
   });
 }
 
 /** Stops counting one recorded item against discards of its book, when the user chooses to discard anyway. */
-export async function disregard(entry: InFlight) {
+export async function disregard(connectionId: string, entry: InFlight) {
   await transact<void>((store, finish) => {
     const stored = store.get(entry.sendingKey);
     stored.onsuccess = () => {
-      const sending = stored.result as Sending | undefined;
-      if (!sending) return;
-      const items = sending.items.filter((item) => item.id !== entry.item.id);
+      if (stored.result === undefined) return;
+      const sending = readSending(entry.sendingKey, connectionId, stored.result);
+      const items = sending.items?.filter((item) => item.id !== entry.item.id) ?? [];
       if (items.length === 0) store.delete(entry.sendingKey);
-      else store.put({ ...sending, items });
+      else store.put({ ...sending, items } satisfies Sending);
     };
     finish(undefined);
   });

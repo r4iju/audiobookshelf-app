@@ -1,7 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { type DiscardTarget, discardProgress } from "@/lib/progress/discard";
-import { changeProgress, discardAnyway, keepProgress } from "@/lib/progress/sync";
+import {
+  changeProgress,
+  discardAnyway,
+  type IssuedChange,
+  issueChange,
+  keepProgress,
+  sendChange,
+} from "@/lib/progress/sync";
 import { useAbs } from "@/lib/session/store";
 import type { AbsClient } from "./client";
 import { feedSchema } from "./feeds";
@@ -263,14 +270,22 @@ export interface EbookPlace {
 export function useSaveEbookPlace(itemId: string) {
   const { client, connection } = useAbs();
   const queryClient = useQueryClient();
-  return useMutation({
-    // One at a time, so a quick run of page turns cannot land on the server out of order.
-    scope: { id: `ebook-place-${itemId}` },
-    mutationFn: (place: EbookPlace) =>
-      changeProgress(client, { libraryItemId: itemId, episodeId: null }, place),
+  const mutation = useMutation({
+    ...ebookPlaceSaves(client, itemId),
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.itemProgress(connection.id, itemId) }),
   });
+  return {
+    error: mutation.error,
+    save: (place: EbookPlace) =>
+      mutation.mutate(issueChange(client, { libraryItemId: itemId, episodeId: null }, place)),
+  };
 }
+
+/** How a book's reading places are sent: one at a time, so a quick run of page turns lands on the server in order. */
+export const ebookPlaceSaves = (client: AbsClient, itemId: string) => ({
+  scope: { id: `ebook-place-${itemId}` },
+  mutationFn: (issued: IssuedChange) => sendChange(client, issued),
+});
 
 function useItemMutation<Variables, Result>(
   itemId: string,

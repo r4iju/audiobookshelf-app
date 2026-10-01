@@ -10,9 +10,11 @@ import {
   disregard,
   finishDelete,
   finishSending,
+  isSending,
   keep,
   type ProgressChange,
   inFlight as recordedDeliveries,
+  releaseUnreadableBlocks,
   type Target,
   thisPage,
 } from "./coordination";
@@ -99,16 +101,20 @@ export async function finishDiscard(
   const connectionId = client.connection.id;
   const phase = await block(connectionId, hold.id, hold, forgotten);
   if (phase === "finished" || phase === "kept") return ended(phase);
-  if (phase === "blocked") {
-    if (force) for (const entry of await recordedDeliveries(connectionId, hold)) await disregard(entry);
+  // Whether an unknown phase's delete was issued is unknown, so only the user's choice deletes again.
+  if (phase === "unknown" && !force) return "unconfirmed";
+  if (phase !== "deleting") {
+    if (force)
+      for (const entry of await recordedDeliveries(connectionId, hold)) await disregard(connectionId, entry);
     for (;;) {
       const open = await recordedDeliveries(connectionId, hold);
-      if (open.length === 0) break;
       if (open.some((entry) => entry.failed || entry.page !== thisPage)) return "unconfirmed";
-      await deliveryChange(WAIT_MS);
+      if (open.length === 0) {
+        const claimed = await claimDelete(connectionId, hold.id, hold);
+        if (claimed === "finished" || claimed === "kept") return ended(claimed);
+        if (claimed === "deleting") break;
+      } else await deliveryChange(WAIT_MS);
     }
-    const claimed = await claimDelete(connectionId, hold.id);
-    if (claimed === "finished" || claimed === "kept") return ended(claimed);
     outboxFor(connectionId).markUnconfirmed(hold.id, false);
   }
   await client.command("DELETE", `/api/me/progress/${hold.progressId}`);
@@ -118,7 +124,7 @@ export async function finishDiscard(
 
 /**
  * Gives up this account's discard of the book or episode, so nothing is deleted and its held listening is sent. One
- * whose delete has been issued goes on, shown as pending.
+ * whose delete has been issued goes on, shown as pending; one whose delete may have been issued stays unconfirmed.
  */
 export async function keepProgress(client: AbsClient, itemId: string, episodeId: string | null) {
   const connectionId = client.connection.id;
@@ -126,7 +132,7 @@ export async function keepProgress(client: AbsClient, itemId: string, episodeId:
   for (const hold of outbox.holdsFor(itemId, episodeId)) {
     const phase = await keep(connectionId, hold.id);
     if (phase === "kept" || phase === "finished") outbox.settled(hold.id);
-    else outbox.markUnconfirmed(hold.id, false);
+    else outbox.markUnconfirmed(hold.id, phase === "unknown");
   }
 }
 
@@ -138,30 +144,54 @@ export async function discardAnyway(client: AbsClient, itemId: string, episodeId
   }
 }
 
+/** A change to progress as the user made it, to send with `sendChange`. */
+export interface IssuedChange {
+  target: Target;
+  item: ProgressChange;
+  begun: ReturnType<typeof beginChange>;
+}
+
 /**
- * Changes the account's progress on a book or episode (finished, reader place). It is recorded as being sent, like
- * listening, so a discard accounts for it. During a discard it waits, and is sent only if the discard is kept.
+ * Takes a change to the account's progress on a book or episode (finished, reader place) when the user makes it,
+ * recording it as being sent, like listening, so a discard accounts for it even while it waits its turn. One made
+ * during a discard waits for the discard instead.
  */
-export async function changeProgress(client: AbsClient, target: Target, change: ProgressChange["change"]) {
-  const connectionId = client.connection.id;
+export function issueChange(
+  client: AbsClient,
+  target: Target,
+  change: ProgressChange["change"],
+): IssuedChange {
   const item: ProgressChange = {
     id: randomId(),
     libraryItemId: target.libraryItemId,
     episodeId: target.episodeId,
     change,
   };
-  const waitedFor = new Set<string>();
-  let begun = await beginChange(connectionId, item, thisPage, []);
+  const begun = beginChange(client.connection.id, item, thisPage, null);
+  // Seen by sendChange; until then a failure would only be reported as unhandled.
+  begun.catch(() => {});
+  return { target, item, begun };
+}
+
+/** Sends a change to progress, once any discard it waits for allows, and only if that discard is kept. */
+export async function sendChange(client: AbsClient, issued: IssuedChange) {
+  const connectionId = client.connection.id;
+  const { target, item } = issued;
+  const recorded = await issued.begun;
+  let begun = recorded;
+  // A change issued during a discard may have waited its turn while that discard ended, so it looks again first.
   while (begun !== "dropped" && "blockedBy" in begun) {
-    for (const holdId of begun.blockedBy) waitedFor.add(holdId);
-    await deliveryChange(WAIT_MS);
-    begun = await beginChange(connectionId, item, thisPage, [...waitedFor]);
+    const next = await beginChange(connectionId, item, thisPage, begun);
+    if (next !== "dropped" && "blockedBy" in next) await deliveryChange(WAIT_MS);
+    begun = next;
   }
   if (begun === "dropped") return;
   const { sendingKey } = begun;
+  // Recorded when it was made, it may have waited its turn while the user discarded anyway.
+  if (begun === recorded && !(await isSending(sendingKey))) return;
   const episode = target.episodeId ? `/${target.episodeId}` : "";
   try {
-    await client.command("PATCH", `/api/me/progress/${target.libraryItemId}${episode}`, change);
+    await client.command("PATCH", `/api/me/progress/${target.libraryItemId}${episode}`, item.change);
   } catch (error) {
     await finishSending(sendingKey, "failed").catch(() => {});
     throw error;
@@ -169,11 +199,18 @@ export async function changeProgress(client: AbsClient, target: Target, change: 
   await finishSending(sendingKey, "answered").catch(() => {});
 }
 
+export const changeProgress = (client: AbsClient, target: Target, change: ProgressChange["change"]) =>
+  sendChange(client, issueChange(client, target, change));
+
 /** Sends queued listening reports; an unauthorized answer is surfaced so the shell can ask for a new sign-in. */
 export async function flushReports(client: AbsClient, onUnauthorized: () => void) {
   if (inFlight) return inFlight;
   const outbox = outboxFor(client.connection.id);
   inFlight = (async () => {
+    await releaseUnreadableBlocks(
+      client.connection.id,
+      outbox.holds().map((hold) => hold.id),
+    ).catch(() => {});
     for (const hold of await outbox.orphaned()) {
       try {
         if ((await finishDiscard(client, hold, {})) !== "unconfirmed") outbox.settled(hold.id);

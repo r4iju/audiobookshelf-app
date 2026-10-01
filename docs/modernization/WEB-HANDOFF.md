@@ -31,7 +31,10 @@ shared modernization documents. Issues #55 to #65.
 | `f4e8d15f` | Discard holds last as long as their tab, however slow the delete, and tabs taking or releasing holds at once keep each other's |
 | `c68e6c1e` | A discard is kept until the server confirms its delete: refused or abandoned deletes are sent again by any tab, playing it meanwhile starts from the beginning, and the item page shows it pending |
 | `5710199f` | A discard accounts for listening any tab already sent, on plain-HTTP origins too: tabs record exactly what they send in IndexedDB; a discard deletes once those requests are answered, and otherwise is left unconfirmed for the user to keep or discard anyway |
-| (this commit) | Records the full local run on `5710199f` |
+| `5a56386d` | Records the full local run on `5710199f` |
+| `cc26ec24` | A discard's delete is claimed in IndexedDB, so no tab can keep it once it is issued; listening goes out one session version at a time, and reader places and finished changes are recorded like listening |
+| `56e92c87` | A reader place that waited for a discard which then deleted is dropped |
+| (this commit) | Reader places are recorded when the page turns, not when their turn to be sent comes; stored coordination records are checked, and those an earlier version left are read as it meant them |
 
 ## Checks
 
@@ -150,9 +153,22 @@ server, or a physical device. The production container `audiobookshelf` (port 13
   in the same transaction, then sends exactly that. A delivery recorded before the block counts against the
   discard, and one recorded after it leaves the book out. A record ends only with the server's answer to that
   request. A request that failed without an answer stays recorded, since it may still reach the server, or still be
-  running there. Reader places and finished changes (`PATCH /api/me/progress`) are recorded the same way. One made
-  while the book is blocked waits: it is sent if the discard is kept, and dropped if the discard deletes, since it
-  may carry the old place. The next page turn saves the place again.
+  running there. Reader places and finished changes (`PATCH /api/me/progress`) are recorded the same way, at the
+  moment they are made: a reader sends its places one at a time, so a place can wait behind earlier ones, and a
+  discard waits for every place made before it began, which then reaches the server before the delete. One made
+  while the book is blocked waits instead: it is sent if the discard is kept, and dropped if any discard of the book
+  deletes after it was made, since it may carry the old place. The next page turn saves the place again. A discard
+  moves to deleting only in the same transaction that finds nothing for the book being sent.
+
+  The records are checked when read, whichever version of this client wrote them. The version before `cc26ec24`
+  stored blocks without a phase while its delete could already be on its way, discards that deleted as `finished:`
+  records, and what it sent as `reports`, which is read as failed without an answer. A block without a readable
+  phase leaves its discard unconfirmed: nothing is deleted by itself, and Keep progress is refused too, since its
+  delete may still land, so Discard anyway is the way out. A record whose book cannot be read blocks, or counts
+  against, every book; such a block that no hold of this device is finishing is removed, since nothing would ever
+  end it. A playback session record that cannot be read is not sent, until a discard of its book drops its
+  listening. Before a reader place recorded when it was made is sent, it checks that it still counts, so one still
+  waiting its turn when the user discards anyway is dropped.
 
   2.30.0 shows nothing that says a given request is done. `local-all` requests for one session run independently,
   and one that finds no progress row creates one, so neither a copy sent again nor the server holding that listening
@@ -190,6 +206,10 @@ server, or a physical device. The production container `audiobookshelf` (port 13
     the moment another records one can drop that one report; the next report of the same session (every 15 seconds
     while playing) carries the same totals and more.
   - IndexedDB keeps one small record per playback session ever sent, and one per discard; nothing prunes them.
+  - For a discard left by the version before `cc26ec24`, the item page still offers Keep progress, which leaves it
+    unconfirmed.
+  - A reader place made before a discard and still waiting its turn in a tab that then closes stays recorded, so
+    discards of that book are unconfirmed until the user chooses.
   - A browser that refuses IndexedDB delivers no listening and saves no reader place; each attempt fails as an
     outage would, and nothing is sent unrecorded.
 

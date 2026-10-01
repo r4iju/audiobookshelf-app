@@ -92,8 +92,8 @@ server allows the development server's origins. OpenID cannot work cross-origin;
 - `PATCH /api/me/progress/:itemId[/:episodeId]`
   - `isFinished`, and reader places (`ebookLocation`, `ebookProgress`).
   - 2.30.0 creates a progress row when none exists and applies any PATCH regardless of age. The client records each
-    one like listening, so a discard waits for it, and holds back one made during a discard (sent if the discard is
-    kept, dropped if it deletes).
+    one like listening when it is made, even while it waits behind earlier ones, so a discard waits for it, and holds
+    back one made during a discard (sent if the discard is kept, dropped if it deletes).
 - `DELETE /api/me/progress/:progressId`
   - Discard progress. Sent only after the session is closed and every `local-all` and progress `PATCH` for that
     book that any tab recorded as sent has been answered. Once sent, the discard can no longer be kept. The server creates progress afresh from a report that lands after the

@@ -229,6 +229,7 @@ export function createOutbox(
       };
     },
     isHeld,
+    holds: () => readHolds().map(asHold),
     holdsFor: (libraryItemId: string, episodeId: string | null) =>
       holdsFor(libraryItemId, episodeId).map(asHold),
     /** Where this account's discard of the book or episode stands, if one is under way. */

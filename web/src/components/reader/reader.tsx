@@ -72,7 +72,7 @@ function ReaderBody({
   const { t } = useI18n();
   const file = useEbookFile(ebook.path);
   const progress = useServerItemProgress(item.id);
-  const save = useSaveEbookPlace(item.id);
+  const places = useSaveEbookPlace(item.id);
 
   // The place is read fresh on every opening, so a book follows wherever another device left it.
   if (file.isPending || (ebook.keepsProgress && !progress.isFetchedAfterMount))
@@ -80,14 +80,14 @@ function ReaderBody({
   if (file.isError) return <Alert>{errorMessage(t, file.error)}</Alert>;
   return (
     <>
-      <InlineError error={progress.error ?? save.error} />
+      <InlineError error={progress.error ?? places.error} />
       <View
         key={ebook.path}
         file={file.data}
         cacheKey={ebook.path}
         start={ebook.keepsProgress ? (progress.data?.ebookLocation ?? null) : null}
         onPlace={(place) => {
-          if (ebook.keepsProgress) save.mutate(place);
+          if (ebook.keepsProgress) places.save(place);
         }}
       />
     </>
