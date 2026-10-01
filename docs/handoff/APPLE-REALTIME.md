@@ -122,3 +122,15 @@ Green after this correction, logs in `/tmp/realtime-sync-qa/`:
 - NativeTests: 52/52 on iPhone and on iPad (`native-fix3-*.log`).
 - RealtimeJourney 9/9 plus PausedRealtimeJourney 2/2: 11/11 on iPhone and on iPad (`journeys-fix3-*.log`).
 - iOS 14 source typecheck: 0 errors (`ios14-typecheck-fix3.log`).
+
+## Root integration over PR80
+
+Root integrated the three source corrections at `87215563`, over merged `937f7936`. Independent review cleared `837cafc1`. The owned local runner temporarily used ports 61765/61769, then its source port changes were reverted.
+
+- Core: 72/72 (`/tmp/abs-root-realtime-final-core.log`).
+- NativeTests: 66/66 (`/tmp/abs-root-realtime-final-native-unit.log`).
+- iPhone realtime and paused-player journeys: 11/11 (`/tmp/abs-root-realtime-final-ui.log`).
+- Socket contract tests: 2/2 (`/tmp/abs-root-realtime-final-fixture.log`); item-actions fixtures: 4/4 (`/tmp/abs-root-realtime-final-actions-fixture.log`).
+- iOS 14 source typecheck passes (`/tmp/abs-root-realtime-final-minimum.log`); no iOS 14 runtime acceptance is claimed.
+
+The worker separately passed 11/11 iPad journeys on `837cafc1`. The final combined mobile run, publication uncertainty correction, hardware and live-server acceptance remain open. No owner data was changed during these checks.
