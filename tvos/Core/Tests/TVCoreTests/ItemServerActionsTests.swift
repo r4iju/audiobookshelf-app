@@ -345,6 +345,122 @@ import XCTest
         XCTAssertNil(actions.error)
     }
 
+    /// Holds the answer to the next item read, computed when the request arrived, until `release()`, as a slow network
+    /// would. Other requests are answered at once by `MockURLProtocol.handler`.
+    private final class HeldItemRead: URLProtocol {
+        private static let lock = NSLock()
+        private static var armed = false
+        private static var held: (() -> Void)?
+        static func arm() { lock.lock(); armed = true; held = nil; lock.unlock() }
+        static var isHeld: Bool { lock.lock(); defer { lock.unlock() }; return held != nil }
+        static func release() { lock.lock(); let deliver = held; held = nil; lock.unlock(); deliver?() }
+
+        override class func canInit(with request: URLRequest) -> Bool { true }
+        override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+        override func stopLoading() {}
+        override func startLoading() {
+            guard let handler = MockURLProtocol.handler, let url = request.url else { return }
+            let (status, body) = handler(request)
+            let deliver = { [self] in
+                client?.urlProtocol(self, didReceive: HTTPURLResponse(url: url, statusCode: status, httpVersion: nil, headerFields: nil)!, cacheStoragePolicy: .notAllowed)
+                client?.urlProtocol(self, didLoad: Data(body.utf8))
+                client?.urlProtocolDidFinishLoading(self)
+            }
+            Self.lock.lock()
+            let hold = Self.armed && url.path == "/abs/api/items/book-1"
+            if hold { Self.armed = false; Self.held = deliver }
+            Self.lock.unlock()
+            if !hold { deliver() }
+        }
+    }
+
+    /// Actions whose requests go through `HeldItemRead`, for the same signed-in account.
+    private func actionsWithHeldReads() -> ItemServerActions {
+        let store = MemoryCredentials()
+        store.value = Credentials(server: "https://books.example/abs", accessToken: "token", refreshToken: nil, userID: "a", username: "a")
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [HeldItemRead.self]
+        api = APIClient(store: store, session: URLSession(configuration: configuration))
+        return ItemServerActions(api: api, itemID: "book-1")
+    }
+
+    private func waitUntil(_ condition: () -> Bool) async throws {
+        for _ in 0..<200 where !condition() { try await Task.sleep(nanoseconds: 10_000_000) }
+        XCTAssertTrue(condition())
+    }
+
+    private static func item(feed: String) -> (Int, String) {
+        (200, #"{"id":"book-1","libraryId":"books","mediaType":"book","media":{"metadata":{"title":"Stories"},\#(audio)},"rssFeed":\#(feed)}"#)
+    }
+
+    private static let userWithoutDevices = (200, #"{"user":{"id":"a","username":"a","type":"user"},"userDefaultLibraryId":"books","serverSettings":{},"ereaderDevices":[]}"#)
+
+    func testAnOlderLoadAnsweredAfterANewerOneDoesNotReplaceIt() async throws {
+        var current = (account: Self.userWithoutDevices, item: Self.item(feed: "null"))
+        serve(feed: Self.openFeed) { entry in
+            switch entry.path {
+            case "/abs/api/authorize": return current.account
+            case "/abs/api/items/book-1": return current.item
+            default: return nil
+            }
+        }
+        let actions = actionsWithHeldReads()
+        HeldItemRead.arm()
+        let older = Task { await actions.load() }
+        try await waitUntil { HeldItemRead.isHeld }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        current = (account: (200, #"{"user":{"id":"a","username":"a","type":"admin"},"userDefaultLibraryId":"books","serverSettings":{},"ereaderDevices":[{"name":"Kindle","email":"kindle@example.invalid","availabilityOption":"userOrUp","users":[]}]}"#), item: Self.item(feed: Self.openFeed))
+        await actions.load()
+        XCTAssertEqual(actions.feed?.id, "saga-feed")
+        HeldItemRead.release()
+        await older.value
+        XCTAssertEqual(actions.feed?.id, "saga-feed", "The older load read the item before the newer one")
+        XCTAssertTrue(actions.canManageFeed, "The older load's account must not replace the newer one's")
+        XCTAssertEqual(actions.devices.map(\.name), ["Kindle"])
+    }
+
+    func testAnOlderLoadFailingAfterANewerOneSucceededShowsNoError() async throws {
+        var item = (500, "")
+        serve { entry in entry.path == "/abs/api/items/book-1" ? item : nil }
+        let actions = actionsWithHeldReads()
+        HeldItemRead.arm()
+        let older = Task { await actions.load() }
+        try await waitUntil { HeldItemRead.isHeld }
+        item = Self.item(feed: Self.openFeed)
+        await actions.load()
+        HeldItemRead.release()
+        await older.value
+        XCTAssertNil(actions.error, "The newer load succeeded after the older one was sent")
+        XCTAssertTrue(actions.loaded)
+        XCTAssertEqual(actions.feed?.id, "saga-feed")
+    }
+
+    func testAnOwnOpenIsNotUndoneByALoadThatReadTheItemBeforeIt() async throws {
+        var devices = #"[{"name":"Kindle","email":"kindle@example.invalid","availabilityOption":"userOrUp","users":[]}]"#
+        serve { entry in
+            switch entry.path {
+            case "/abs/api/authorize": return (200, #"{"user":{"id":"a","username":"a","type":"admin"},"userDefaultLibraryId":"books","serverSettings":{},"ereaderDevices":\#(devices)}"#)
+            case "/abs/api/feeds/item/book-1/open": return (200, #"{"feed":\#(Self.openFeed)}"#)
+            default: return nil
+            }
+        }
+        let actions = actionsWithHeldReads()
+        await actions.load()
+        XCTAssertNil(actions.feed)
+        devices = #"[{"name":"Kindle","email":"kindle@example.invalid","availabilityOption":"userOrUp","users":[]},{"name":"Tablet","email":"tablet@example.invalid","availabilityOption":"userOrUp","users":[]}]"#
+        HeldItemRead.arm()
+        let older = Task { await actions.load() }
+        try await waitUntil { HeldItemRead.isHeld }
+        await actions.openFeed(slug: "saga-feed", preventIndexing: true, ownerName: "", ownerEmail: "")
+        XCTAssertEqual(actions.feed?.id, "saga-feed")
+        HeldItemRead.release()
+        await older.value
+        XCTAssertEqual(actions.feed?.id, "saga-feed", "The load read the item before this device opened its feed")
+        XCTAssertNil(actions.error)
+        XCTAssertNil(actions.activity)
+        XCTAssertEqual(actions.devices.map(\.name), ["Kindle", "Tablet"], "The load's other capabilities still apply")
+    }
+
     func testAFeedChangeAfterASignInChangeIsIgnored() async throws {
         serve(feed: Self.openFeed)
         let actions = ItemServerActions(api: api, itemID: "book-1")

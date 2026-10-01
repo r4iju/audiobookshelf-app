@@ -103,3 +103,22 @@ Green after the corrections, same simulators, logs in `/tmp/realtime-sync-qa/`:
 - iOS 14 source typecheck: 0 errors (`ios14-typecheck-fix2.log`).
 - `ItemServerActionsJourney` was not rerun: its runner uses port 27765, which is outside this worker's 26765/26769. The Core tests above cover the open and close paths.
 
+## Review correction to `99f0a5a7`: overlapping item action loads
+
+`ItemServerActionsSection` loads on appear and again on `init`. Without a feed event in between, both loads captured the same feed-change count. If the older one answered last, its feed, account capabilities and devices replaced the fresh ones, and its failure could replace a fresh success.
+
+- `load()` takes a load number at entry. A success or error is published only by the latest load, and the existing sign-in ownership check still applies.
+- This device's own successful open or close now counts as a feed change. A load that read the item before it still refreshes the other capabilities, but not the feed. Remote feed events and the open and close result guards are unchanged, and activity and error still complete through `perform`.
+
+RED first (Core, against `99f0a5a7`). The tests hold one item read and deliver it late, through a test URL protocol that answers when the request arrives. An earlier version of these tests blocked the mock's only loading thread, never produced the overlap and passed without exercising it, so it was replaced before any fix.
+- `testAnOlderLoadAnsweredAfterANewerOneDoesNotReplaceIt`: feed nil, admin rights lost and devices empty.
+- `testAnOlderLoadFailingAfterANewerOneSucceededShowsNoError`: `http(500)` replaced the newer success.
+- `testAnOwnOpenIsNotUndoneByALoadThatReadTheItemBeforeIt`: the stale load cleared the feed this device had just opened.
+
+
+Green after this correction, logs in `/tmp/realtime-sync-qa/`:
+
+- `swift test` in `tvos/Core`: all pass (`core-overlap-green.log`).
+- NativeTests: 52/52 on iPhone and on iPad (`native-fix3-*.log`).
+- RealtimeJourney 9/9 plus PausedRealtimeJourney 2/2: 11/11 on iPhone and on iPad (`journeys-fix3-*.log`).
+- iOS 14 source typecheck: 0 errors (`ios14-typecheck-fix3.log`).
