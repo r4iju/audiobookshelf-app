@@ -163,6 +163,17 @@ class ReadingStore(private val file: File) {
             else resolved.copy(page = current.conflictPage ?: current.page, updatedAt = updated, acknowledged = current.revision, unconfirmed = emptyList()))
     }
 
+    /** Forgets the item's reading progress after it was discarded; supplementary documents keep their page. */
+    @Synchronized
+    fun forget(account: AccountIdentity, itemId: String) {
+        check(writable) { "Saved reading positions could not be read, so they are not overwritten." }
+        val updated = entries.filterNot { it.account == account && it.itemId == itemId && it.primary }
+        if (updated.size == entries.size) return
+        writeAtomically(file, AbsJson.encodeToString(Document.serializer(), Document(entries = updated)).toByteArray())
+        entries = updated
+        revisions.value += 1
+    }
+
     private fun save(next: Entry) {
         check(writable) { "Saved reading positions could not be read, so they are not overwritten." }
         val updated = entries.filterNot { it.account == next.account && it.itemId == next.itemId && it.fileId == next.fileId } + next

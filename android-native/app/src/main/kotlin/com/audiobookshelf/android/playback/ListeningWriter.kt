@@ -37,6 +37,9 @@ class ListeningWriter(
     /** Records whose listening could not be written yet. */
     val failing: StateFlow<Set<String>> = failingState
 
+    /** True while a record matching [record] is open, unwritten or not yet finished. */
+    fun holds(record: (String) -> Boolean): Boolean = synchronized(pending) { pending.keys.any(record) }
+
     /** True while any record is open, unwritten or not yet finished. */
     val busy: Boolean get() = synchronized(pending) { pending.isNotEmpty() }
 

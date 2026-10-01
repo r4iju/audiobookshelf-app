@@ -1,10 +1,16 @@
 package com.audiobookshelf.android
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.lifecycleScope
+import com.audiobookshelf.android.data.Orientation
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import com.audiobookshelf.android.auth.OpenIdSignIn
 import com.audiobookshelf.android.ui.AppRoot
 
@@ -17,7 +23,18 @@ class MainActivity : ComponentActivity() {
         graph.downloads.resumeInterrupted()
         graph.readingSync
         if (savedInstanceState == null) route(intent)
+        // Applied before the first frame so a locked orientation never flashes the other way at launch.
+        applyOrientation(graph.settings.current.lockOrientation)
+        lifecycleScope.launch { graph.settings.settings.map { it.lockOrientation }.distinctUntilChanged().collect(::applyOrientation) }
         setContent { AppRoot() }
+    }
+
+    private fun applyOrientation(lock: Orientation) {
+        requestedOrientation = when (lock) {
+            Orientation.NONE -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            Orientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            Orientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        }
     }
 
     override fun onNewIntent(intent: Intent) {

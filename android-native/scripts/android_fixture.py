@@ -4,6 +4,7 @@ The shared fixture belongs to the cross-platform verification suite, so Android-
 here instead of edited into it.
 """
 import argparse
+import copy
 import io
 import json
 import re
@@ -23,6 +24,14 @@ def android_server(port, prefix, bind='127.0.0.1'):
     # Listening sync can be refused on its own, whatever the shared mode, so reading and listening
     # ordering is observable with a document present. Any reconfiguration accepts listening again.
     refusal = {'listening': False}
+    # The shared fixture reconfigures progress entries it assumes exist; discarding progress removes
+    # one, so the entries as they were at start are kept and missing ones are restored on reconfiguring.
+    def progress_of(token):
+        probe = base.__new__(base)
+        probe.headers = {'Authorization': token} if token else {}
+        return probe.progress
+    accounts = [progress_of(None), progress_of('Bearer fresh-other')]
+    originals = [copy.deepcopy(entries) for entries in accounts]
 
     class AndroidHandler(base):
         def own_path(self):
@@ -81,6 +90,9 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 return self.respond(200, refusal)
             if path == '/__fixture__/configure':
                 refusal['listening'] = False
+                for entries, original in zip(accounts, originals):
+                    for key, entry in original.items():
+                        entries.setdefault(key, copy.deepcopy(entry))
             if path == '/api/session/local-all' and refusal['listening']:
                 self.rfile.read(int(self.headers.get('Content-Length', 0)))
                 self.route()

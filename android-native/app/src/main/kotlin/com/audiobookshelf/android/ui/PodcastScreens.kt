@@ -211,7 +211,6 @@ private fun EpisodeRow(episode: Episode, progress: MediaProgress?, onOpen: () ->
 @Composable
 fun EpisodeScreen(item: LibraryItem, episodeId: String, active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues, onPlayer: () -> Unit) {
     val graph = LocalContext.current.graph
-    val scope = rememberCoroutineScope()
     val episode = item.media.episodes.firstOrNull { it.id == episodeId }
     if (episode == null) {
         Box(Modifier.padding(padding)) { MessageState("Episode not available", "It may have been removed from the server.", tag = "episode-missing") }
@@ -219,8 +218,6 @@ fun EpisodeScreen(item: LibraryItem, episodeId: String, active: SessionState.Act
     }
     val progress = catalog.progressFor(item.id, episode.id)
     val cover = active.client.coverUrl(item.id).toString()
-    var saving by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
     val description = remember(episode.description) { episode.description?.let { HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_COMPACT).toString().trim() }?.takeIf { it.isNotEmpty() } }
     Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).testTag("episode-detail"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -240,23 +237,7 @@ fun EpisodeScreen(item: LibraryItem, episodeId: String, active: SessionState.Act
         }
         PlayButton({ preferDownloaded(graph, active, item.id, episode.id, progress) ?: PlaySource.Stream(active.client, item.id, episode.id, cover, progress?.lastUpdate) }, item.id, episode.id, onOpened = onPlayer)
         DownloadButton(item, episode, active, catalog)
-        val finished = progress?.isFinished == true
-        OutlinedButton(
-            onClick = {
-                saving = true; error = null
-                scope.launch {
-                    try {
-                        val saved = active.client.setFinished(item.id, episode.id, !finished)
-                        catalog.applyProgress(saved ?: MediaProgress(libraryItemId = item.id, episodeId = episode.id, isFinished = !finished, progress = if (finished) 0.0 else 1.0))
-                    } catch (failure: Exception) {
-                        error = "Not saved: ${failure.message ?: "try again"}"; graph.accounts.handle(failure)
-                    } finally { saving = false }
-                }
-            },
-            enabled = !saving,
-            modifier = Modifier.fillMaxWidth().testTag(if (finished) "episode-unfinish" else "episode-finish"),
-        ) { Text(if (finished) "Mark unfinished" else "Mark finished") }
-        error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+        ProgressActions(item.id, episode.id, active, catalog, tagPrefix = "episode")
         AddToGroupButton(item.id, episode.id, active, catalog)
         description?.let { ExpandableText(it) }
     }

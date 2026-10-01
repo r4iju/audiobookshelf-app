@@ -35,6 +35,16 @@ object Fixture {
 
     fun requests(base: String = server): List<JSONObject> = observations(base).getJSONArray("requests").objects()
 
+    /** Makes the server refuse listening sync, whatever the configured mode, until reconfigured. */
+    fun refuseListening(refuse: Boolean, base: String = server) {
+        post("$base/__android__/refuse-listening", JSONObject().put("refuse", refuse).toString())
+    }
+
+    /** The signed-in account's server progress for one book, or null when it has none. */
+    fun serverProgress(itemId: String, base: String = server): JSONObject? =
+        JSONObject(get("$base/__android__/progress")).getJSONArray("progress").objects()
+            .firstOrNull { it.getString("libraryItemId") == itemId && it.isNull("episodeId") }
+
     fun post(url: String, body: String): String = call(url, "POST", body)
     fun get(url: String): String = call(url, "GET", null)
 

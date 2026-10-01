@@ -1,5 +1,8 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.data.CellularPolicy
+import androidx.compose.material3.AlertDialog
+import android.net.ConnectivityManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +22,17 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.FastRewind
 import androidx.compose.material.icons.filled.Forward10
+import androidx.compose.material.icons.filled.Forward30
+import androidx.compose.material.icons.filled.Forward5
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay10
+import androidx.compose.material.icons.filled.Replay30
+import androidx.compose.material.icons.filled.Replay5
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material.icons.outlined.Bedtime
@@ -194,18 +204,32 @@ private fun Timeline(state: PlayerState, chapter: Chapter?, onSeek: (Double) -> 
 
 @Composable
 private fun Controls(state: PlayerState, onPrevious: () -> Unit, onBack: () -> Unit, onToggle: () -> Unit, onForward: () -> Unit, onNext: () -> Unit, hasChapters: Boolean) {
+    val settings by LocalContext.current.graph.settings.settings.collectAsState()
+    val haptic = rememberHaptic()
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onPrevious, enabled = hasChapters, modifier = Modifier.testTag("previous-chapter")) { Icon(Icons.Filled.SkipPrevious, "Previous chapter") }
-        IconButton(onClick = onBack, modifier = Modifier.size(56.dp).testTag("jump-back")) { Icon(Icons.Filled.Replay10, "Jump back", Modifier.size(32.dp)) }
+        IconButton(onClick = { haptic(); onPrevious() }, enabled = hasChapters, modifier = Modifier.testTag("previous-chapter")) { Icon(Icons.Filled.SkipPrevious, "Previous chapter") }
+        IconButton(onClick = { haptic(); onBack() }, modifier = Modifier.size(56.dp).testTag("jump-back")) { Icon(jumpIcon(false, settings.jumpBackwardsTime), jumpDescription(false, settings.jumpBackwardsTime), Modifier.size(32.dp)) }
         Box(Modifier.testTag(if (state.playing) "player-playing" else "player-paused")) {
-            FilledIconButton(onClick = onToggle, modifier = Modifier.size(72.dp).testTag("play-pause"), colors = IconButtonDefaults.filledIconButtonColors()) {
+            FilledIconButton(onClick = { haptic(); onToggle() }, modifier = Modifier.size(72.dp).testTag("play-pause"), colors = IconButtonDefaults.filledIconButtonColors()) {
                 if (state.loading) CircularProgressIndicator(Modifier.size(28.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 3.dp)
                 else Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) "Pause" else "Play", Modifier.size(40.dp))
             }
         }
-        IconButton(onClick = onForward, modifier = Modifier.size(56.dp).testTag("jump-forward")) { Icon(Icons.Filled.Forward10, "Jump forward", Modifier.size(32.dp)) }
-        IconButton(onClick = onNext, enabled = hasChapters, modifier = Modifier.testTag("next-chapter")) { Icon(Icons.Filled.SkipNext, "Next chapter") }
+        IconButton(onClick = { haptic(); onForward() }, modifier = Modifier.size(56.dp).testTag("jump-forward")) { Icon(jumpIcon(true, settings.jumpForwardTime), jumpDescription(true, settings.jumpForwardTime), Modifier.size(32.dp)) }
+        IconButton(onClick = { haptic(); onNext() }, enabled = hasChapters, modifier = Modifier.testTag("next-chapter")) { Icon(Icons.Filled.SkipNext, "Next chapter") }
     }
+}
+
+private fun jumpIcon(forward: Boolean, seconds: Int): ImageVector = when (seconds) {
+    5 -> if (forward) Icons.Filled.Forward5 else Icons.Filled.Replay5
+    10 -> if (forward) Icons.Filled.Forward10 else Icons.Filled.Replay10
+    30 -> if (forward) Icons.Filled.Forward30 else Icons.Filled.Replay30
+    else -> if (forward) Icons.Filled.FastForward else Icons.Filled.FastRewind
+}
+
+fun jumpDescription(forward: Boolean, seconds: Int): String {
+    val amount = if (seconds < 60) "$seconds seconds" else (seconds / 60).let { if (it == 1) "1 minute" else "$it minutes" }
+    return "Jump ${if (forward) "forward" else "back"} $amount"
 }
 
 @Composable
@@ -228,6 +252,7 @@ private fun ChapterRow(index: Int, chapter: Chapter, current: Boolean, onClick: 
 fun MiniPlayer(onOpen: () -> Unit) {
     val engine = LocalContext.current.graph.playback
     val state by engine.state.collectAsState()
+    val jumpBack = LocalContext.current.graph.settings.settings.collectAsState().value.jumpBackwardsTime
     if (state.unsavedListening && (state.now == null || state.error == null)) Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
         Text("Some listening is not saved on this device yet. It is kept and saved as soon as storage allows.",
             style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).testTag("listening-unsaved"))
@@ -250,7 +275,7 @@ fun MiniPlayer(onOpen: () -> Unit) {
                             color = if (state.error != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
-                IconButton(onClick = { engine.jump(false) }, modifier = Modifier.testTag("mini-jump-back")) { Icon(Icons.Filled.Replay10, "Jump back") }
+                IconButton(onClick = { engine.jump(false) }, modifier = Modifier.testTag("mini-jump-back")) { Icon(jumpIcon(false, jumpBack), jumpDescription(false, jumpBack)) }
                 Box(Modifier.testTag(if (state.playing) "mini-playing" else "mini-paused")) {
                     IconButton(onClick = engine::toggle, modifier = Modifier.testTag("mini-play-pause")) {
                         Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) "Pause" else "Play")
@@ -269,9 +294,14 @@ fun formatSpeed(speed: Float): String = "%.2f".format(speed).trimEnd('0').let { 
  */
 @Composable
 fun PlayButton(source: () -> PlaySource, itemId: String, episodeId: String?, onOpened: () -> Unit, modifier: Modifier = Modifier) {
-    val engine = LocalContext.current.graph.playback
+    val context = LocalContext.current
+    val engine = context.graph.playback
     val state by engine.state.collectAsState()
+    val haptic = rememberHaptic()
     var waiting by remember(itemId, episodeId) { mutableStateOf(false) }
+    var askCellular by remember { mutableStateOf<PlaySource?>(null) }
+    var refused by remember(itemId, episodeId) { mutableStateOf(false) }
+    val start: (PlaySource) -> Unit = { waiting = true; refused = false; engine.play(it) }
     val key = itemKey(itemId, episodeId)
     val loadedHere = state.now?.let { it.itemId == itemId && it.episodeId == episodeId } == true
     LaunchedEffect(waiting, loadedHere, state.openError) {
@@ -281,7 +311,17 @@ fun PlayButton(source: () -> PlaySource, itemId: String, episodeId: String?, onO
     }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Button(
-            onClick = { waiting = true; engine.play(source()) },
+            onClick = {
+                haptic()
+                val chosen = source()
+                val metered = context.getSystemService(ConnectivityManager::class.java)?.isActiveNetworkMetered == true
+                if (chosen !is PlaySource.Stream || !metered) start(chosen)
+                else when (context.graph.settings.current.streamingUsingCellular) {
+                    CellularPolicy.ALWAYS -> start(chosen)
+                    CellularPolicy.ASK -> askCellular = chosen
+                    CellularPolicy.NEVER -> refused = true
+                }
+            },
             enabled = !waiting,
             modifier = Modifier.fillMaxWidth().testTag("play"),
         ) {
@@ -291,8 +331,19 @@ fun PlayButton(source: () -> PlaySource, itemId: String, episodeId: String?, onO
                 Text(if (loadedHere && state.playing) "Playing" else if (loadedHere) "Resume" else "Play", Modifier.padding(start = 6.dp))
             }
         }
+        if (refused) Text("Streaming on mobile data is turned off in Settings. Connect to Wi-Fi or download this title first.",
+            color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("play-cellular-refused"))
         state.openError?.takeIf { it.first == key && !waiting }?.let { (_, message) ->
             Text(message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("play-error"))
         }
+    }
+    askCellular?.let { pending ->
+        AlertDialog(
+            onDismissRequest = { askCellular = null },
+            title = { Text("Stream on mobile data?") },
+            text = { Text("You are on a metered connection. You can change this in Settings.") },
+            confirmButton = { TextButton(onClick = { askCellular = null; start(pending) }, modifier = Modifier.testTag("play-cellular-allow")) { Text("Stream") } },
+            dismissButton = { TextButton(onClick = { askCellular = null }) { Text("Not now") } },
+        )
     }
 }

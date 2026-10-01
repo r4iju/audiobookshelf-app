@@ -128,6 +128,11 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
         user = current.copy(mediaProgress = others + progress)
     }
 
+    fun forgetProgress(itemId: String, episodeId: String?) {
+        val current = user ?: return
+        user = current.copy(mediaProgress = current.mediaProgress.filterNot { it.libraryItemId == itemId && it.episodeId == episodeId })
+    }
+
     /** Reads progress made on other clients before choosing what to play. */
     suspend fun freshUser(): User = client.me().also { user = it }
 

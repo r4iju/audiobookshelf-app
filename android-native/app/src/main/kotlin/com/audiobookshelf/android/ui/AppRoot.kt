@@ -116,6 +116,7 @@ private fun SignedIn(active: SessionState.Active) {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 DownloadButton(item, null, active, catalog)
                                 AddToGroupButton(item.id, null, active, catalog)
+                                ProgressActions(item.id, null, active, catalog)
                             }
                         })
                     }
@@ -148,6 +149,9 @@ private fun SignedIn(active: SessionState.Active) {
                     val libraryId = catalog.library?.id
                     if (libraryId != null) FilteredScreen(model.filtered(active, libraryId, route), padding, { catalog.progressFor(it) }, open)
                 }
+                Route.Settings -> RouteScaffold("Settings", pop) { padding -> SettingsScreen(padding, onDiagnostics = { model.push(Route.Diagnostics) }) }
+                Route.Diagnostics -> RouteScaffold("Diagnostics", pop) { padding -> DiagnosticsScreen(active, padding) }
+                Route.Statistics -> RouteScaffold("Statistics", pop) { padding -> StatisticsScreen(active, catalog, padding) }
                 else -> RouteScaffold("", pop) { padding ->
                     Box(Modifier.padding(padding)) { MessageState("Not available yet", "This part of the preview is still being built.", tag = "unavailable") }
                 }
@@ -207,6 +211,7 @@ private fun LibraryMenu(catalog: com.audiobookshelf.android.data.CatalogModel, o
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             if (catalog.library?.isPodcast == false) DropdownMenuItem(text = { Text("Collections") }, onClick = { open = false; onRoute(Route.Groups(COLLECTIONS)) }, modifier = Modifier.testTag("menu-collections"))
             DropdownMenuItem(text = { Text("Playlists") }, onClick = { open = false; onRoute(Route.Groups(PLAYLISTS)) }, modifier = Modifier.testTag("menu-playlists"))
+            DropdownMenuItem(text = { Text("Statistics") }, onClick = { open = false; onRoute(Route.Statistics) }, modifier = Modifier.testTag("menu-statistics"))
         }
     }
 }

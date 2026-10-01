@@ -1,6 +1,8 @@
 package com.audiobookshelf.android.playback
 
 import android.content.Context
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.flow.SharedFlow
@@ -22,6 +24,10 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.extractor.DefaultExtractorsFactory
+import androidx.media3.extractor.Extractor
+import androidx.media3.extractor.ExtractorsFactory
+import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
 import com.audiobookshelf.android.data.AccountStore
 import com.audiobookshelf.android.data.SessionState
@@ -469,6 +475,20 @@ class PlaybackEngine(
         }
     }
 
+    /**
+     * Stops [itemId] if it is loaded and sends the account's listening, so nothing listened before a
+     * progress reset reaches the server after it. False when that listening is not on the server yet.
+     */
+    suspend fun settleListening(account: AccountIdentity, itemId: String, episodeId: String?): Boolean {
+        withContext(Dispatchers.Main) {
+            if (loaded?.source?.let { it.account == account && it.itemId == itemId && it.episodeId == episodeId } == true) close()
+        }
+        val ofTitle = { recordId: String -> journal.open(recordId)?.let { it.account == account && it.media.libraryItemId == itemId && it.media.episodeId == episodeId } == true }
+        // A closed title's listening is written and finished in the background before it can be sent.
+        val written = withTimeoutOrNull(SETTLE_TIMEOUT_MS) { while (writer.holds(ofTitle)) delay(100) } != null
+        return written && sync.publish(account)
+    }
+
     private fun listeningBusy() = loaded != null || mutable.value.loading || writer.busy
 
     /**
@@ -616,7 +636,15 @@ class PlaybackEngine(
     }
 
     private fun buildPlayer(): ExoPlayer {
-        val sources = DefaultMediaSourceFactory(mediaDataSource)
+        // Read per source, so a changed MP3 seeking preference applies to the next title opened.
+        val extractors = object : ExtractorsFactory {
+            private fun current() = DefaultExtractorsFactory()
+                .setConstantBitrateSeekingEnabled(true)
+                .setMp3ExtractorFlags(if (settings.current.enableMp3IndexSeeking) Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING else 0)
+            override fun createExtractors(): Array<Extractor> = current().createExtractors()
+            override fun createExtractors(uri: Uri, responseHeaders: Map<String, List<String>>): Array<Extractor> = current().createExtractors(uri, responseHeaders)
+        }
+        val sources = DefaultMediaSourceFactory(mediaDataSource, extractors)
             .setLoadErrorHandlingPolicy(DefaultLoadErrorHandlingPolicy(2))
         val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(20_000, 45_000, 5_000, 20_000).build()
         return ExoPlayer.Builder(context)
@@ -661,6 +689,7 @@ class PlaybackEngine(
     companion object {
         private const val TAG = "AbsPlayback"
         private const val RECORD_INTERVAL_MS = 5_000L
+        private const val SETTLE_TIMEOUT_MS = 10_000L
         private const val SAVE_ERROR = "Listening could not be saved on this device, so playback paused. Free some storage and try again."
         private const val PUBLISH_INTERVAL_MS = 15_000L
 

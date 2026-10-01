@@ -156,6 +156,12 @@ class ListeningJournal(private val file: File) {
         commit(records, remember(positions, Position(account, itemId, episodeId, time, updatedAt)))
     }
 
+    /** Forgets where this device last was in a title whose progress was discarded. */
+    @Synchronized
+    fun forgetPosition(account: AccountIdentity, itemId: String, episodeId: String?) {
+        commit(records, positions.filterNot { it.account == account && it.itemId == itemId && it.episodeId == episodeId })
+    }
+
     private fun ListeningRecord.position() = Position(account, media.libraryItemId, media.episodeId, currentTime, updatedAt)
 
     private fun remember(all: List<Position>, position: Position): List<Position> {

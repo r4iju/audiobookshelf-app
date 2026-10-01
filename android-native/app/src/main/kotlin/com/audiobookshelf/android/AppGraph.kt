@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import com.audiobookshelf.core.ApiClient
 import java.io.File
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -75,6 +76,25 @@ class AppGraph private constructor(val context: Context) {
             })
             scope.launch { playback.listeningEnded.collect { sync.publishAll() } }
             sync.publishAll()
+        }
+    }
+
+    /**
+     * Discards a title's progress on the server and on this device, as the existing app does. Its
+     * listening is sent first, so none of it can recreate the progress afterwards; while that listening
+     * cannot be sent nothing is discarded.
+     */
+    suspend fun discardProgress(client: ApiClient, itemId: String, episodeId: String?, progressId: String?) {
+        val account = client.account
+        if (!playback.settleListening(account, itemId, episodeId)) {
+            throw java.io.IOException("Listening for this title is not on the server yet, so its progress was kept. Try again when connected.")
+        }
+        // Progress written by this device carries no server id until the server is asked for it.
+        val id = progressId ?: client.progress(itemId, episodeId)?.id
+        if (id != null) client.removeProgress(id)
+        kotlinx.coroutines.withContext(io) {
+            journal.forgetPosition(account, itemId, episodeId)
+            if (episodeId == null) reading.forget(account, itemId)
         }
     }
 
