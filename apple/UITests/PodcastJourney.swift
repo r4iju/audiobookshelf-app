@@ -213,7 +213,7 @@ import XCTest
         let restored = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         XCTAssertGreaterThanOrEqual(restored, saved)
         app.buttons["Close playback"].tap()
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.navigationBars.buttons["BackButton"].tap()
         app.buttons["episode-episode"].tap()
         app.buttons["play-book"].tap()
         app.buttons["mini-player"].tap()
