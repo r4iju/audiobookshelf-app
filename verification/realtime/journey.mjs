@@ -2,7 +2,7 @@ import { once } from 'node:events'
 import socketPlugin from '../../plugins/server.js'
 import { startFixture } from './fixture.mjs'
 
-const scenario = process.argv[2] || 'baseline'
+export async function runJourney(scenario = 'baseline') {
 if (!['baseline', 'progress-event-change'].includes(scenario)) throw new Error('Unknown synthetic scenario')
 const fixture = await startFixture({ scenario })
 const changes = []
@@ -29,13 +29,19 @@ try {
   fixture.interrupt()
   await reinitialized
   if (fixture.authentications.length !== 2) throw new Error('Reconnect did not authenticate')
-  report = { client: 'legacy-ServerSocket', result: 'passed', workflows: ['realtime-authentication', 'realtime-progress', 'realtime-reconnection'] }
+  report = { client: 'legacy-ServerSocket', result: 'passed', observations: { authenticatedConnections: fixture.authentications.length, progressApplied: changes.some(value => value.name === 'user/updateUserMediaProgress' && value.data.currentTime === 9), disconnected: changes.some(value => value.name === 'setSocketConnected' && value.data === false) }, workflows: ['realtime-authentication', 'realtime-progress', 'realtime-reconnection'] }
 } catch {
   report = { client: 'legacy-ServerSocket', result: 'failed', workflow, reason: 'Candidate no longer satisfies the shipped realtime workflow.' }
-  process.exitCode = 1
 } finally {
   socket.logout()
   await fixture.close()
 }
 
-console.log(JSON.stringify(report))
+return report
+}
+
+if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+  const report = await runJourney(process.argv[2])
+  console.log(JSON.stringify(report))
+  process.exitCode = report.result === 'passed' ? 0 : 1
+}
