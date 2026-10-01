@@ -59,9 +59,28 @@ Evidence for 5068c1d3:
 - Unit tests: `./gradlew :core:test :app:testDebugUnitTest`, all pass.
 - The full journey suite passes in one run on `emulator-5584`: 55 of 55 across 14 classes.
 - The affected classes (ProgressReset, Pdf, Settings, PlayerTools) pass 20 of 20 in each of two further runs.
-- **Pending independent review:** the reset is not handed off as accepted until the reviewer clears 5068c1d3.
+- Superseded by the corrections below.
+
+## Review blockers at 5068c1d3, fixed in 13ca2ed5121f9c3b50d5fbb4b901882bc2ef66b2
+
+| Blocker | Fix | RED observed before the fix |
+| --- | --- | --- |
+| An unreadable reset file was set aside and treated as no resets, so playback and reading could resurrect what it was to delete | `ProgressResets` keeps an unreadable file in place and reports `unreadable`. Every title then counts as under reset: nothing plays, no page is published, no new reset is saved and the file is never overwritten. This holds across restarts because the state is derived from the file on each launch. Only an explicit confirmation in Diagnostics sets the file aside (kept as `progress-resets.json.unreadable-<time>`) and releases titles. | `ProgressResetsTest.unreadableResetsHoldEveryTitleAndAreNeitherDiscardedNorOverwritten`: "An unreadable reset may be for any title". `ProgressResetJourney.unreadableDiscardRequestsKeepTitlesFromPlayingAfterStartUntilResolved`: the title played. |
+| `ReadingSync` sent a stale primary page for a title whose reset cleanup had failed, and the retry then took its own PATCH for later progress and skipped the DELETE | `ReadingSync` takes a `held` predicate and skips titles with a pending (or unreadable) reset, both when looping and when choosing inside the gate. Other titles and supplementary PDFs still publish. A completed reset, or an explicit Diagnostics resolution, runs `publishAll` again. | `ProgressResetJourney.aPageLeftUnsentByAFailedResetIsNeverSentForIt` (production path: reading refused, page 2 turned, journal replacement blocked so only cleanup fails): the server kept `ebookLocation` 2 with `currentTime` 6 after the discard. |
+
+Evidence for 13ca2ed5121f9c3b50d5fbb4b901882bc2ef66b2:
+- Unit tests: `./gradlew :core:test :app:testDebugUnitTest`, all pass.
+- `ProgressResetJourney` passes 6 of 6 on `emulator-5584`.
+- The commit alone, in a clean temporary worktree, passes the unit tests and compiles the instrumentation tests.
+- Regression on the same build: `PdfJourney` and `ReadingListeningJourney` 11 of 11, `SettingsJourney` 4 of 4, `ListeningDurabilityJourney` 1 of 1, `PlaybackJourney` 5 of 5.
+- Two interruptions in those runs, neither a failure of the change:
+  - `SettingsJourney.a` hung once mid-run with the app idle on Settings. Run alone, it passed 4 of 4.
+  - One `PlaybackJourney` failure was caused by a folder picker I opened on the emulator during the run ("No compose hierarchies found"). Run alone, it passed 5 of 5.
+- **Pending independent re-review** of 13ca2ed5.
+- No timeouts were lengthened and no fixture or app data is cleared to make a test pass. The page journey restores the journal path in `finally` so cleanup can succeed afterwards.
 
 **Fixture wrapper changes:**
+- `/__android__/refuse-reading` answers page PATCHes with 503 and records them as not applied.
 - Reconfiguring drops progress added since startup, restores startup titles and clears bookmarks. This fixes the PlayerTools and Settings cross-class failures seen in full runs.
 - Entries that exist are left for the mode, so layered modes such as `pdf-remote` then `pdf-supplementary` still work.
 - `/__android__/slow-discard` holds DELETE.
