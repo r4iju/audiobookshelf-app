@@ -36,7 +36,7 @@ final class NativeStringsTests: XCTestCase {
     /// Renderers outside the app, such as the year export, receive an immutable copy of only the translated texts, so
     /// anything untranslated keeps their own English default and nothing reads app resources while drawing.
     func testCopyForAnotherRendererCarriesOnlyTranslatedText() {
-        XCTAssertEqual(strings("de").copy(["Settings", "Network preferences", "Not a native text"]), ["Settings": "Einstellungen"])
+        XCTAssertEqual(strings("de").copy(["Settings", "Diagnostics", "Not a native text"]), ["Settings": "Einstellungen"])
         XCTAssertEqual(strings("en-us").copy(["Settings"]), [:])
     }
 
