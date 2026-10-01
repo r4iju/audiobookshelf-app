@@ -62,7 +62,7 @@ Root reset journeys pass 4/4 at `da6460ef`, result `apple/build-reset/Root-Publi
   - the ten checks in `tvos/QA.md`;
   - the four readiness checks in `APPLE-TV-READINESS.md`.
 
-  The PR #80 build was not installed on the TV.
+  The final PR #84 signed build was installed on Living Room TV without launch on October 2, 2026 (`/tmp/abs-final-tv-install.log`, `/tmp/abs-final-tv-install.json`). This confirms installation only, not physical playback acceptance.
 
 ## Deferred, not gating Apple readiness
 
@@ -86,6 +86,8 @@ Root `8b107f40` passes 86/86 NativeTests with zero skipped, including real-audio
 
 At `f868f8c4`, the reviewed TV sign-in correction presents reauthentication fullscreen. Its new remote journey checks actual presentation bounds, password/Connect/Diagnostics focus, Back preserving paused playback and held listening, same-account sign-in, and no autoplay. The worker observed the geometry assertion fail before the correction. Root final combined TV verification passes all40 tests (13 app unit tests and27 remote journeys), zero failures. Result: `tvos/build/Root-Final-Integrated-20261002.xcresult`; log `/tmp/abs-root-final-integrated-tv.log`. The checked application source is `f868f8c4`, with subsequent docs-only `12e04625`. iPad diagnostics sharing now waits for the system share card’s Close control to be hittable and asserts dismissal before continuing (`920f57db`).
 
-The isolated iPad worker reports119/121 journeys passing across its recorded slices, with both outstanding failures tied to custom sleep timer first-tap handling. Those slices do not constitute a final combined-source full-suite pass. Account-switch restoration and mobile publication recovery presentation remain under active diagnosis/verification. Final-source signed device builds and installs have not occurred.
+The isolated iPad worker reports119/121 journeys passing across its recorded slices, with both outstanding failures tied to custom sleep timer first-tap handling. Those slices do not constitute a final combined-source full-suite pass. Account-switch restoration and mobile publication recovery presentation remain under active diagnosis/verification. Final-source mobile signed builds and installs have not occurred. The final TV build and install are recorded below.
 
 The final integrated TV run exits successfully with40/40 tests and zero failures on October2at07:57 (`/tmp/abs-root-final-integrated-tv.log`). Signed local Release from the same application source builds successfully and passes strict code signature verification (`/tmp/abs-root-final-integrated-tv-signed.log`, `/tmp/abs-root-final-integrated-tv-codesign.log`). This remains simulator acceptance and signed artifact verification, not physical playback acceptance.
+
+PR #84 merged as `d860071b` from head `ba6dfc05`, which has the same application source as the verified `f868f8c4`. The signed TV artifact was successfully installed without launch on Living Room TV (bundle `com.forkzed.audiobookshelf.tv`), retaining the existing app identity. The install log is `/tmp/abs-final-tv-install.log`. No owner library or server mutation was performed.
