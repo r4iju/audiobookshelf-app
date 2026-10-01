@@ -6,6 +6,11 @@ import XCTest
         super.tearDown()
     }
 
+    /// The open account menu. The iPad library sidebar repeats "Change library", so the menu is the collection outside it.
+    func accountMenu(_ app: XCUIApplication) -> XCUIElementQuery {
+        app.collectionViews.matching(NSPredicate(format: "label != %@", "Sidebar"))
+    }
+
     func capture(_ name: String) {
         let evidence = XCTAttachment(screenshot: XCUIApplication().screenshot())
         evidence.name = name
