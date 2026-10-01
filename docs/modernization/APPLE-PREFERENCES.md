@@ -28,6 +28,18 @@ A new three-launch production UI journey first failed because Settings was absen
 
 ![Native Light appearance settings](evidence/apple-settings-light-iphone.png)
 
+## Annual listening statistics
+
+Statistics now opens a native Year in review against the existing `/api/me/stats/year/:year` endpoint. It shows listening minutes, finished/listened books, session count, audiobook/podcast time, leading authors/genres/narrator, most listened month and the longest finished audiobook. Previous/next year navigation clears old results while loading; request-generation and canonical-account checks guard publication. A native share action offers a text summary. Image-card variants, permitted server-wide annual review and physical sharing acceptance remain outstanding.
+
+The field names and seconds-based totals were checked against the installed 2.30 server's query source, not against private production data. Protocol years and zero-based month indexes remain Gregorian even when the device uses another calendar; names retain the locale.
+
+A new production UI journey genuinely failed because Year in review was absent, then passed with synthetic annual totals and a different previous-year response. Review identified a device-calendar defect: a Buddhist-locale production launch genuinely requested the wrong year and failed its totals/route assertions before the Gregorian correction. Both that case and the existing statistics journey passed afterward. The latter now scrolls to its recent session after the added navigation row shifted it below the viewport. The prior eight-case phone selection passed seven cases and failed only that offscreen assertion. All three final affected iPad statistics/annual/calendar journeys passed.
+
+Minimum-iOS-14 source typing, the 15-case shared core suite and eight Python fixture/compatibility checks passed. The TV simulator target and strict local signed app/IPA packaging also passed after the shared API addition. The captured annual screen was visually inspected. Synthetic journeys do not establish complete annual parity or live/physical acceptance.
+
+![Native annual listening statistics, synthetic data](evidence/apple-year-review-iphone.png)
+
 ## Remaining work
 
-Full theme/modal/large-text acceptance, localization, remaining haptic action coverage and physical vibration, applicable network policy options, statistics year-in-review, history and permitted progress management, preference migration, full accessibility/localization acceptance, and live/device acceptance remain under their current Apple tickets. iOS orientation locking is absent from the baseline settings presentation; the source inventory's stored key must still be preserved during migration. This slice does not close #22.
+Full theme/modal/large-text acceptance, localization, remaining haptic action coverage and physical vibration, applicable network policy options, annual image/server-wide review, applicable diagnostics and permitted progress management, preference migration, full accessibility/localization acceptance, and live/device acceptance remain under their current Apple tickets. iOS orientation locking is absent from the baseline settings presentation; the source inventory's stored key must still be preserved during migration. This slice does not close #22.

@@ -33,3 +33,21 @@ public struct ListeningSessionSummary: Decodable, Identifiable, Sendable {
         public let authorName: String?
     }
 }
+
+public struct YearListeningStats: Decodable, Sendable {
+    public let totalListeningSessions: Int
+    public let totalListeningTime: Double
+    public let totalBookListeningTime: Double
+    public let totalPodcastListeningTime: Double
+    public let numBooksFinished: Int
+    public let numBooksListened: Int
+    public let topAuthors: [NamedTime]
+    public let topGenres: [GenreTime]
+    public let mostListenedNarrator: NamedTime?
+    public let mostListenedMonth: MonthTime?
+    public let longestAudiobookFinished: FinishedBook?
+    public struct NamedTime: Decodable, Sendable { public let name: String; public let time: Double }
+    public struct GenreTime: Decodable, Sendable { public let genre: String; public let time: Double }
+    public struct MonthTime: Decodable, Sendable { public let month: Int; public let time: Double }
+    public struct FinishedBook: Decodable, Sendable { public let title: String; public let duration: Double }
+}
