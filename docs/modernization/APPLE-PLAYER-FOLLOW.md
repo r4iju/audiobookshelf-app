@@ -44,3 +44,9 @@ xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme NativeTests -de
 The test file is new under `apple/NativeTests`. Regenerating with `xcodegen generate --spec apple/project.yml` adds it to the project. The project file was not changed in this commit.
 
 This is simulator and fixture evidence only. It does not establish physical cross-device acceptance or live-server behavior, and it makes no exactly-once claim.
+
+## Integrated event delivery
+
+Root applied the reviewed realtime consumer patch and forwards current-sign-in progress events, reconnects and user updates to the player hooks in `AudiobookshelfNativeApp`. The event ownership guard runs inside the queued Task, then the hook pins its own authorization and playback intent through the request.
+
+`PausedRealtimeJourney` passed both cases in the combined checkout: remote progress moves the paused player across files to total position 14 without starting audio; reconnection refreshes a missed total position 16. Evidence: `/tmp/abs-root-paused-realtime-green-total.log`, `apple/build-paused-realtime/Logs/Test/Test-AudiobookshelfNative-2026.10.02_03-55-10-+0900.xcresult`. The assertions use `total-elapsed`, because the main elapsed label is chapter-relative by default. The first post-wiring run wrongly asserted total time against the chapter label; its journal and screenshot showed the correct total position and no app workaround was made. Removing just the root event forwarding then failed the corrected remote-progress test (`/tmp/abs-root-paused-realtime-mutation.log`), and the production source was restored exactly. The combined NativeTests suite passed 50/50 (`/tmp/abs-apple-final-wired-stores.log`). Physical acceptance remains open.

@@ -2193,7 +2193,11 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "apple-mobile": [
+          "Simulator and fixture evidence only: apple/scripts/verify-realtime.sh runs NativeJourneyTests/RealtimeJourney (progress, item, playlist, reconnection and account-switch journeys against Socket.IO 4.7.4) and tvos/Core RealtimeChangeTests; docs/modernization/APPLE-REALTIME.md. Physical-device and live-server gates remain open."
+        ]
+      },
       "verification": {
         "given": "Server emits authenticated user/progress/playlist events",
         "when": "Connect, mutate relevant state on another client, disconnect/reconnect",

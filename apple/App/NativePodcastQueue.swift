@@ -19,23 +19,20 @@ import CryptoKit
     static var file: URL { FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("NativePodcastQueue/requests.json") }
     @Published private(set) var revision = 0
     @Published private var storageError: String?
-    @Published private var authenticationError: String?
-    var error: String? { storageError ?? authenticationError }
+    @Published private var rejectedAccount: AccountIdentity?
+    var error: String? { storageError ?? (rejectedAccount.map { $0 == account } == true ? ConnectionStore.recovery(for: APIError.signInRequired) : nil) }
     private struct Receipt { let owner: AccountIdentity; let itemID: String; let job: PodcastDownload }
     private var unsavedReceipts: [String: Receipt] = [:]
     var hasUnsavedResults: Bool { unsavedReceipts.values.contains { $0.owner == account } }
     private var records: [Record] = []
     private var writable = true
     private let api: APIClient
-    private var events: ServerEvents?
-    private var connectionTask: Task<Void, Never>?
-    private var connectedAccount: AccountIdentity?
-    private var generation = UUID()
+    private var subscriptions: Set<AnyCancellable> = []
     private var account: AccountIdentity? {
         guard let credentials = api.credentials, let user = credentials.userID else { return nil }
         return try? AccountIdentity(server: credentials.server, userID: user)
     }
-    init(api: APIClient) {
+    init(api: APIClient, realtime: NativeRealtime) {
         self.api = api
         do {
             try FileManager.default.createDirectory(at: Self.file.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -47,29 +44,21 @@ import CryptoKit
                 records = manifest.records
             }
         } catch { writable = false; storageError = NativeStrings.current("Server download requests could not be restored. The original data is retained. {0}", error.localizedDescription) }
+        realtime.events.sink { [weak self] event in self?.receive(event) }.store(in: &subscriptions)
+        realtime.signInRejected.sink { [weak self] owner in self?.rejectedAccount = owner }.store(in: &subscriptions)
     }
-    func connect() {
-        guard account != connectedAccount || connectionTask == nil else { return }
-        generation = UUID(); let request = generation
-        connectionTask?.cancel(); events?.stop(); events = nil; connectionTask = nil
-        connectedAccount = account; authenticationError = nil; revision += 1
-        guard let owner = account else { return }
-        let stream = ServerEvents(api: api); events = stream
-        connectionTask = Task {
-            await stream.listen(account: owner, onEvent: { event in
-                guard generation == request, account == owner else { return }
-                if event.name == "init" { authenticationError = nil; retrySavingResults(); revision += 1 }
-                else if event.name == "episode_download_finished", let job = try? JSONDecoder().decode(PodcastDownload.self, from: event.data), let itemID = job.libraryItemId {
-                    do {
-                        if job.failed { try receiveFailure(itemID: itemID, job: job) }
-                        revision += 1
-                    } catch { storageError = NativeStrings.current("The server download result could not be saved: {0}", error.localizedDescription) }
-                }
-            }, onFailure: { failure in
-                guard generation == request, account == owner else { return }
-                if failure as? APIError == .signInRequired { authenticationError = ConnectionStore.recovery(for: failure) }
-            })
-            if generation == request { events = nil; connectionTask = nil }
+    private func receive(_ event: NativeRealtime.Event) {
+        guard event.isCurrent(on: api) else { return }
+        switch event.change {
+        case .authenticated:
+            rejectedAccount = nil; retrySavingResults(); revision += 1
+        case .episodeDownloadFinished(let job):
+            guard let itemID = job.libraryItemId else { return }
+            do {
+                if job.failed { try receiveFailure(itemID: itemID, job: job) }
+                revision += 1
+            } catch { storageError = NativeStrings.current("The server download result could not be saved: {0}", error.localizedDescription) }
+        default: break
         }
     }
     func pending(itemID: String) -> Set<String> {

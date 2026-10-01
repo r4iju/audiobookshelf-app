@@ -9,13 +9,13 @@ import XCTest
         // A pause can still be saving its own listening. A later event must follow once that save has settled.
         for _ in 0..<8 {
             try await post("remote-change", ["change": "progress", "itemId": "book-0", "currentTime": 14])
-            if app.staticTexts["playback-elapsed"].label == "14 sec" { break }
+            if app.staticTexts["total-elapsed"].label == "14 sec" { break }
             try await Task.sleep(nanoseconds: 500_000_000)
         }
-        XCTAssertEqual(app.staticTexts["playback-elapsed"].label, "14 sec")
+        XCTAssertEqual(app.staticTexts["total-elapsed"].label, "14 sec")
         XCTAssertTrue(app.buttons["resume-playback"].exists)
         try await Task.sleep(nanoseconds: 1_000_000_000)
-        XCTAssertEqual(app.staticTexts["playback-elapsed"].label, "14 sec")
+        XCTAssertEqual(app.staticTexts["total-elapsed"].label, "14 sec")
         capture("paused-player-follows-remote-progress")
     }
 
@@ -24,7 +24,7 @@ import XCTest
         try await Task.sleep(nanoseconds: 2_000_000_000)
         try await post("remote-change", ["change": "silent-progress", "itemId": "book-0", "currentTime": 16])
         try await post("remote-change", ["change": "disconnect"])
-        let position = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "16 sec"), object: app.staticTexts["playback-elapsed"])
+        let position = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "16 sec"), object: app.staticTexts["total-elapsed"])
         await fulfillment(of: [position], timeout: 15)
         XCTAssertTrue(app.buttons["resume-playback"].exists)
         XCTAssertEqual(app.staticTexts["playback-status"].label, "Paused")

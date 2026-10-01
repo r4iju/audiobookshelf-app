@@ -37,8 +37,9 @@ import SwiftUI
             groups.removeAll { $0.id == id }; selected = nil; return true
         } catch { if generation == request { self.error = ConnectionStore.recovery(for: error) }; return false }
     }
-    func load(id: String? = nil) async {
-        guard !saving else { return }
+    /// `event` is the realtime change that asked for this load; nothing is fetched or shown unless the catalog owns it.
+    func load(id: String? = nil, for event: NativeRealtime.Event? = nil) async {
+        guard !saving, event.map(catalog.owns) != false else { return }
         let request = UUID(); generation = request; loading = true; error = nil
         defer { if generation == request { loading = false } }
         do {
@@ -49,15 +50,15 @@ import SwiftUI
             if let id {
                 let group = try await catalog.api.audioGroup(id: id, kind: kind)
                 let user = try await currentUser
-                guard generation == request, try await catalog.api.currentAccount() == account else { return }
+                guard generation == request, try await catalog.api.currentAccount() == account, event.map(catalog.owns) != false else { return }
                 selected = group; self.user = user
             } else {
                 let page = try await catalog.api.audioGroups(libraryID: catalog.library.id, kind: kind)
                 let user = try await currentUser
-                guard generation == request, try await catalog.api.currentAccount() == account else { return }
+                guard generation == request, try await catalog.api.currentAccount() == account, event.map(catalog.owns) != false else { return }
                 groups = page.results; self.user = user
             }
-        } catch { if generation == request { self.error = ConnectionStore.recovery(for: error) } }
+        } catch { if generation == request, event.map(catalog.owns) != false { self.error = ConnectionStore.recovery(for: error) } }
     }
     private func nextChoice(in group: AudioGroup, downloads: NativeDownloads, player: ApplePlayback) throws -> (member: AudioGroupMember, audio: OfflineAudio?)? {
         for member in group.members where member.playable {
@@ -115,6 +116,7 @@ private extension AudioGroupKind {
 }
 
 struct AudioGroupList: View {
+    @EnvironmentObject private var realtime: NativeRealtime
     @StateObject private var store: AudioGroupStore
     @State private var creating = false
     @Environment(\.nativeStrings) private var l10n
@@ -143,11 +145,19 @@ struct AudioGroupList: View {
             }
             .sheet(isPresented: $creating) { AudioGroupEditor(store: store, group: nil, presented: $creating) }
             .onAppear { Task { await store.load() } }
+            .onReceive(realtime.events) { event in
+                switch event.change {
+                case .authenticated(resumed: true): Task { await store.load(for: event) }
+                case .group(let kind, _, _) where kind == store.kind: Task { await store.load(for: event) }
+                default: break
+                }
+            }
     }
 }
 
 struct AudioGroupDetails: View {
     @EnvironmentObject private var player: ApplePlayback
+    @EnvironmentObject private var realtime: NativeRealtime
     @EnvironmentObject private var downloads: NativeDownloads
     @StateObject private var store: AudioGroupStore
     @Environment(\.presentationMode) private var presentation
@@ -194,6 +204,15 @@ struct AudioGroupDetails: View {
                 }, secondaryButton: .cancel(Text(l10n("Cancel"))))
             }
             .onAppear { Task { await store.load(id: initial.id) } }
+            .onReceive(realtime.events) { event in
+                guard store.catalog.owns(event) else { return }
+                switch event.change {
+                case .group(let kind, let id, true) where kind == store.kind && id == initial.id: presentation.wrappedValue.dismiss()
+                case .group(let kind, let id, false) where kind == store.kind && id == initial.id: Task { await store.load(id: initial.id, for: event) }
+                case .authenticated(resumed: true), .progress, .user: Task { await store.load(id: initial.id, for: event) }
+                default: break
+                }
+            }
     }
 }
 
