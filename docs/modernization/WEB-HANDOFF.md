@@ -114,7 +114,23 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 ## Remaining gates (not met by this branch)
 
 - **Real browsers.** Only Chromium was automated. Safari (macOS and iOS) and Firefox, including Media Session,
-  background audio and autoplay rules on phones, are unchecked.
+  background audio and autoplay rules on phones, are unchecked. Playwright's own Firefox and WebKit builds are not
+  installed on the Studio (only `chromium-1234`): a run with them stops at "Executable doesn't exist" for
+  `firefox-1538` and `webkit-2336` (`web/qa/.runtime/engines-unavailable.log`). Installing them downloads from
+  Playwright's CDN, which needs the user's authorization for that egress. The config is ready; from `web/`:
+
+  ```sh
+  npx playwright install firefox webkit
+  ABS_WEB_ENGINES=firefox,webkit npx playwright test --project=firefox --project=webkit \
+    e2e/playback.spec.ts e2e/readers.spec.ts e2e/session.spec.ts
+  npm run qa:deploy -- up && ABS_WEB_ENGINES=firefox,webkit npx playwright test --project=firefox \
+    --project=webkit e2e/deployment.spec.ts
+  ```
+
+  Without `ABS_WEB_ENGINES` only Chromium runs, as before. Some journeys state what Chromium does, such as the
+  deployment journey's two tabs without Web Locks on a plain-HTTP origin, and may need their own expectations per
+  engine. Playwright's WebKit is not Safari: it shares the engine, not Safari's media, autoplay or storage policies,
+  and whether its build runs on macOS 27 is unknown. Neither replaces checking Safari on a Mac and an iPhone by hand.
 - **The owner's server and network.** No deployment beside the owner's server, behind the owner's HTTPS proxy and
   host name. That deployment is the root coordinator's call, following DEPLOYMENT.md.
 - **A real identity provider.** Only the loopback provider was used. A real provider adds consent screens, its own
@@ -123,6 +139,25 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 - **Physical listening.** Audible output, Bluetooth and lock-screen controls, long sessions and sleep.
 - **Release acceptance** (#55 and the parent issue). Compatibility, preservation and the owner's acceptance remain
   required before this client replaces anything. The legacy interface stays served by the server at `/`.
+
+## The owner's deployment, as read
+
+Read-only, on 2026-10-02, without changing or restarting anything:
+
+- The owner's server runs 2.30.0 at exactly the digest the QA server pins (`sha256:6fbd7dc9...`), but its compose
+  file names it by the `latest` tag, so a pull and recreate would upgrade it without the checks in
+  SERVER-CONTRACT.md. Pinning that digest is the owner's call.
+- The LAN proxy in front of it is nginx with one route to the server: it passes `Host` (as `$host`, without a port,
+  which suits the default ports it serves), `X-Forwarded-Proto` and WebSocket upgrades, and does not buffer. It has
+  one upstream, so it has no other server to retry a request on; the restart recovery's proxy caveat is about
+  proxies that do. Serving this client means adding a `/web` route to the client's container there, as
+  `deploy/nginx.conf` does, and keeping `/` on the server.
+- The public route to the server admits only the apps' user agents and refuses browsers, by design. The browser
+  client is therefore LAN-only (or through the owner's VPN) unless the owner adds a browser route. A gate that signs
+  people in with a cookie in front of it would refuse the client's API requests, which send no cookies
+  (`credentials: "omit"`); that is from the code and was not tried.
+
+No owner hostnames, addresses or account details are recorded here, since this repository is public.
 
 ## Decisions and known differences
 
