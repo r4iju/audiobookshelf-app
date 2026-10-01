@@ -179,7 +179,9 @@ async function up({ fresh }) {
       `${container}-metadata:/metadata`,
       image,
     );
-  } else if (!docker("inspect", "--format", "{{json .HostConfig.ExtraHosts}}", container).includes(fixtureHost)) {
+  } else if (
+    !docker("inspect", "--format", "{{json .HostConfig.ExtraHosts}}", container).includes(fixtureHost)
+  ) {
     throw new Error(`${container} still reaches its fixtures through the host; recreate it with up --fresh`);
   } else if (!running.startsWith("Up")) {
     docker("start", container);
