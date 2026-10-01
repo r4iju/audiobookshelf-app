@@ -1,0 +1,4 @@
+.build/
+.swiftpm/
+Vendor/
+LegacyRealm/Package.resolved
