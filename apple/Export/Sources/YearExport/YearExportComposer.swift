@@ -4,41 +4,92 @@ import UIKit
 /// Share composer for one immutable snapshot. A new snapshot (another year or account)
 /// replaces the whole composer state rather than updating it in place.
 public struct YearExportComposer: View {
-    private let snapshot: YearExportSnapshot
-    public init(snapshot: YearExportSnapshot) { self.snapshot = snapshot }
-    public var body: some View { ComposerContent(snapshot: snapshot).id(snapshot.id) }
+    private let source: YearExportSource
+    public init(snapshot: YearExportSnapshot) { source = .listener(snapshot) }
+    /// The admin server year; pass only a snapshot built from an admin's own response.
+    public init(server: YearExportServerSnapshot) { source = .server(server) }
+    public var body: some View { ComposerContent(source: source).id(source.id) }
 }
 
 /// The composer wrapped for modal presentation.
 public struct YearExportSheet: View {
-    private let snapshot: YearExportSnapshot
+    private let source: YearExportSource
     private let onDone: () -> Void
     public init(snapshot: YearExportSnapshot, onDone: @escaping () -> Void) {
-        self.snapshot = snapshot
+        source = .listener(snapshot)
+        self.onDone = onDone
+    }
+    public init(server: YearExportServerSnapshot, onDone: @escaping () -> Void) {
+        source = .server(server)
         self.onDone = onDone
     }
     public var body: some View {
         NavigationView {
-            YearExportComposer(snapshot: snapshot)
-                .navigationTitle("Share \(String(snapshot.year))")
+            ComposerContent(source: source).id(source.id)
+                .navigationTitle(source.title)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done", action: onDone) } }
         }.navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
+/// One immutable snapshot, listener or server; every render reads only from it.
+enum YearExportSource: Sendable {
+    case listener(YearExportSnapshot)
+    case server(YearExportServerSnapshot)
+
+    var id: UUID {
+        switch self {
+        case .listener(let snapshot): return snapshot.id
+        case .server(let snapshot): return snapshot.id
+        }
+    }
+    var year: Int {
+        switch self {
+        case .listener(let snapshot): return snapshot.year
+        case .server(let snapshot): return snapshot.year
+        }
+    }
+    var availableLayouts: [YearExportLayout] {
+        switch self {
+        case .listener(let snapshot): return snapshot.availableLayouts
+        case .server(let snapshot): return snapshot.availableLayouts
+        }
+    }
+    var title: String {
+        switch self {
+        case .listener: return "Share \(String(year))"
+        case .server: return "Share Server \(String(year))"
+        }
+    }
+    var footnote: String {
+        switch self {
+        case .listener: return "The image is created on this device from your \(String(year)) statistics."
+        case .server: return "The image is created on this device from this server's \(String(year)) statistics."
+        }
+    }
+    func render(_ layout: YearExportLayout) -> YearExportArtifact {
+        switch self {
+        case .listener(let snapshot): return YearExportRenderer.render(snapshot, layout: layout)
+        case .server(let snapshot): return YearExportRenderer.render(snapshot, layout: layout)
+        }
+    }
+}
+
 @MainActor final class YearExportComposerModel: ObservableObject {
-    let snapshot: YearExportSnapshot
+    let source: YearExportSource
     @Published private(set) var layout: YearExportLayout
     @Published private(set) var preview: YearExportArtifact?
 
-    init(snapshot: YearExportSnapshot) {
-        self.snapshot = snapshot
-        layout = snapshot.availableLayouts[0]
+    convenience init(snapshot: YearExportSnapshot) { self.init(source: .listener(snapshot)) }
+
+    init(source: YearExportSource) {
+        self.source = source
+        layout = source.availableLayouts[0]
     }
 
     var designs: [YearExportDesign] {
-        YearExportDesign.allCases.filter { design in snapshot.availableLayouts.contains { $0.design == design } }
+        YearExportDesign.allCases.filter { design in source.availableLayouts.contains { $0.design == design } }
     }
 
     func select(design: YearExportDesign) {
@@ -51,15 +102,15 @@ public struct YearExportSheet: View {
     }
 
     func refreshPreview() async {
-        let snapshot = snapshot, layout = layout
-        let artifact = await Task.detached(priority: .userInitiated) { YearExportRenderer.render(snapshot, layout: layout) }.value
+        let source = source, layout = layout
+        let artifact = await Task.detached(priority: .userInitiated) { source.render(layout) }.value
         guard layout == self.layout else { return }
         preview = artifact
     }
 
     func artifactForSharing() -> YearExportArtifact {
         if let preview, preview.layout == layout { return preview }
-        return YearExportRenderer.render(snapshot, layout: layout)
+        return source.render(layout)
     }
 }
 
@@ -68,7 +119,7 @@ private struct ComposerContent: View {
     @State private var request: ShareRequest?
     @Environment(\.horizontalSizeClass) private var sizeClass
 
-    init(snapshot: YearExportSnapshot) { _model = StateObject(wrappedValue: YearExportComposerModel(snapshot: snapshot)) }
+    init(source: YearExportSource) { _model = StateObject(wrappedValue: YearExportComposerModel(source: source)) }
 
     var body: some View {
         ScrollView {
@@ -101,7 +152,7 @@ private struct ComposerContent: View {
                 }
                 .background(ActivityPresenter(request: $request))
                 .accessibilityHint("Opens the share sheet with this image and a text summary.")
-                Text("The image is created on this device from your \(String(model.snapshot.year)) statistics.")
+                Text(model.source.footnote)
                     .font(.footnote).foregroundColor(.secondary)
             }
             .padding()

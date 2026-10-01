@@ -1,27 +1,33 @@
 # Apple year-review image export
 
-A native composer that turns one `YearListeningStats` response and its Gregorian year into
-shareable images and a text summary, generated entirely on the device. It lives in
-`apple/Export` and has no API, account or navigation coupling. The root integrates it.
+A native composer that turns one immutable annual snapshot into shareable images and a text summary,
+generated entirely on the device. It lives in `apple/Export` and never calls the API itself: the app
+loads stats and cover bytes and hands it a snapshot. `apple/App/YearReviewView.swift` does that loading.
 
 ## Legacy source and parity
 
-The primary sources are the mobile canvases in `components/stats/`:
+The primary sources are the mobile canvases in `components/stats/` and the Audiobookshelf 2.30.0 server
+(`server/utils/queries/userStats.js`, `adminStats.js`, `StatsController.middleware`).
 
 | Legacy canvas | Native design | Notes |
 | --- | --- | --- |
 | `YearInReview.vue` variant 0 (stat boxes, top narrator/genre/author/month) | Highlights | Square and portrait. Portrait adds the longest finished book, which the endpoint already returns. |
-| `YearInReview.vue` variant 1 (finished-book covers) | Not offered | Needs `finishedBooksWithCovers` plus cover downloads. `YearListeningStats` does not decode them, and the composer must not fetch. |
+| `YearInReview.vue` variant 1 (finished-book covers) | Finished | Square and portrait. Up to 5 `finishedBooksWithCovers`, center-cropped squares, under "Some books finished this year". Offered only when at least one finished cover loaded. |
 | `YearInReview.vue` variant 2 (top authors and genres lists) | Top Lists | Square and portrait. Hidden when both lists are empty. |
 | `YearInReviewShort.vue` (books finished/listened banner) | Compact | 3:1 banner, like the 600×200 original. |
-| `YearInReviewServer.vue` (admin server totals from `/api/stats/year`) | Not offered | Different payload and admin permission. The root owns fetching and permissions, so the composer does not fabricate it. |
+| `YearInReview.vue` cover mosaic background | All listener designs | 5×5-style wall of finished then other covers, rotated -25° at 25% opacity under a scrim. Falls back to the gradient when no cover loaded. |
+| `YearInReviewServer.vue` variant 0 (additions with covers) | Additions | Admin and root only. Books added, authors added, sessions, collection size and duration with this year's growth, up to 5 `booksAddedWithCovers`. Without covers it shows the library book count instead. |
+| `YearInReviewServer.vue` variant 1 (top authors, top narrators) | People | Names only, as in the legacy canvas. Hidden when both lists are empty. |
+| `YearInReviewServer.vue` variant 2 (top authors, top genres) | Genres | Names only. Hidden when there are no genres, so it never duplicates People. |
 
-The legacy cover-art background mosaic is replaced by an artwork-free gradient for the same reason.
-File names keep the legacy `audiobookshelf_my_<year>.png` / `_short.png` scheme, plus `_top` and `_story` suffixes.
+The server canvases share the server cover mosaic background. Sizes use binary units like `$bytesPretty`;
+durations use days, hours and minutes like `$elapsedPrettyExtended`.
+File names keep the legacy `audiobookshelf_my_<year>.png` / `_short.png` and `audiobookshelf_server_<year>.png`
+schemes, plus `_finished`, `_top`, `_people`, `_genres` and `_story` suffixes.
 
 ## Contract
 
-- `YearExportSnapshot(stats:year:locale:)` copies the values once and fails for years outside `2000...9999`
+- `YearExportSnapshot(stats:year:artwork:locale:)` copies the values once and fails for years outside `2000...9999`
   (the same range `APIClient.yearListeningStats` accepts). Each snapshot has a fresh `id`.
 - `YearExportComposer(snapshot:)` keys all of its state to `snapshot.id`. Passing a different snapshot
   rebuilds the composer, so a preview or share item from another year or account cannot survive.
@@ -45,50 +51,59 @@ File names keep the legacy `audiobookshelf_my_<year>.png` / `_short.png` scheme,
   ellipsis, and large numbers shrink to fit and then truncate. Durations are formatted as `Double`, never
   converted to `Int`, so finite values beyond `Int.max` (for example `1e100` seconds) cannot trap.
 
+- Covers (`YearExportArtworkLoader.load`):
+  - Takes the stats' own ID lists: listener `finishedBooksWithCovers` (primary, at most 5) and `booksWithCovers`
+    (secondary, at most 25); server `booksAddedWithCovers` (secondary, at most 25). More IDs are never requested.
+  - Refuses IDs that are not one safe path segment (`[A-Za-z0-9._-]`, not `.` or `..`) before any request.
+  - `fetch` is the app's authenticated request. The app passes `APIClient.coverData(itemID:)`: the bearer token stays
+    in the `Authorization` header (with refresh) and is never put in a `?token=` query, a file, the image or the text.
+    `GET /api/items/:id/cover` requires a signed-in user; the IDs come from that same user's (or admin's) stats response.
+  - At most 4 requests at once. A failed, missing or undecodable cover is skipped; the rest keep server order.
+  - Decodes through ImageIO thumbnails capped at 512 px and 20 MB of input. Nothing is cached or written to disk.
+  - Cancellation stops queueing, cancels in-flight fetches and throws `CancellationError`.
+  - After loading it re-checks `currentAccount() == owner` and throws `YearExportArtworkError.accountChanged` otherwise.
+- Snapshots accept artwork only when its year and requested ID lists equal the stats they are built from.
+  Artwork from another year, account load or response is dropped, leaving the gradient designs.
+- `YearExportServerSnapshot(stats:year:artwork:locale:)` copies an admin `ServerYearStats` response. Totals are cleaned
+  (non-finite or negative become 0) and byte counts clamp before `Int64` overflow, so `1e300` renders safely.
+- `YearExportComposer(server:)` and `YearExportSheet(server:onDone:)` mirror the listener initialisers.
+
+## Model types for root wiring
+
+All in `tvos/Core` (TVCore) unless noted:
+
+- `YearListeningStats.finishedBooksWithCovers: [String]`, `.booksWithCovers: [String]` (default `[]` for older servers).
+- `ServerYearStats` (Decodable, Sendable): `numListeningSessions`, `numBooksAdded`, `numAuthorsAdded`, `numBooks`,
+  `totalBooksAddedSize`, `totalBooksAddedDuration`, `totalBooksSize`, `totalBooksDuration`, `totalListeningTime`
+  (null or missing totals decode as 0), `booksAddedWithCovers`, `topAuthors`, `topNarrators`, `topGenres`.
+- `APIClient.serverYearStats(_ year: Int)` calls `GET api/stats/year/<year>` and rejects years outside `2000...9999`
+  without a request. A non-admin gets `APIError.http(403)` from the server.
+- `CurrentUser.canViewServerYearStats` is true for `root` and `admin` only.
+- `YearExport` module: `YearExportArtwork`, `YearExportArtworkLoader`, `YearExportArtworkError`,
+  `YearExportSnapshot(stats:year:artwork:locale:)`, `YearExportServerSnapshot`, `YearExportComposer`, `YearExportSheet`.
+
 ## Root integration
+
+`apple/App/YearReviewView.swift` is wired in this branch:
+
+- The store builds a cover-less `YearExportSnapshot` as soon as account-checked stats arrive, then a stored, cancellable
+  task loads covers and replaces the snapshot only if the request revision and account still match.
+- For `canViewServerYearStats` accounts it then loads the server year. A 403, network error or account change leaves
+  the server share hidden. Server covers load the same way.
+- `load(year:)` and `invalidate()` cancel that task and clear both snapshots.
+- The share button (a menu with "Share My Year" and "Share Server Year" for admins) captures the snapshot when tapped and
+  presents one `.sheet(item:)`. Covers arriving later never change an open composer.
+
+Still for the root, which owns these files:
 
 1. Add `Export/Sources/YearExport` to the `AudiobookshelfNative` sources in `apple/project.yml` and regenerate.
    The sources use `#if canImport(TVCore)`, so they compile both inside the app target and in the standalone package.
-2. Build a snapshot in `YearReviewStore` at the same point the account-checked stats are accepted. Capture it
-   when the share button is tapped, and present `.sheet(item:)`:
-
-```diff
---- a/apple/App/YearReviewView.swift
-+++ b/apple/App/YearReviewView.swift
-@@ @MainActor private final class YearReviewStore: ObservableObject {
-     @Published private(set) var stats: YearListeningStats?
-+    @Published private(set) var export: YearExportSnapshot?
-@@ func load(year: Int) async {
--        self.year = year; stats = nil; error = nil; loading = true
-+        self.year = year; stats = nil; export = nil; error = nil; loading = true
-@@
-             stats = value
-+            export = YearExportSnapshot(stats: value, year: year)
-@@
--    func invalidate() { revision = UUID(); stats = nil; loading = false }
-+    func invalidate() { revision = UUID(); stats = nil; export = nil; loading = false }
-@@ struct YearReviewView: View {
--    @State private var share = false
-+    @State private var exporting: YearExportSnapshot?
-@@
--    private var shareText: String { ... }            // remove
-@@
--            .toolbar { ... Button { share = true } ... .disabled(store.stats == nil) }
--            .sheet(isPresented: $share) { YearReviewShare(text: shareText) }
-+            .toolbar { ... Button { exporting = store.export } ... .disabled(store.export == nil) }
-+            .sheet(item: $exporting) { YearExportSheet(snapshot: $0) { exporting = nil } }
-@@
--private struct YearReviewShare: UIViewControllerRepresentable { ... }   // remove
-```
-
-3. Add `NSPhotoLibraryAddUsageDescription` to the app's `info.properties` (for example "Save your year in review image
+2. Add `NSPhotoLibraryAddUsageDescription` to the app's `info.properties` (for example "Save your year in review image
    to Photos."). Neither the app nor the QA host declares it, and the QA share sheet offered no Save Image action.
    The root should confirm Save Image on a device after adding it.
 
-The scratch integration build of `AudiobookshelfNative` with this exact patch succeeded on Xcode 27
+A scratch copy with step 1 applied builds `AudiobookshelfNative` with the wired view on Xcode 27
 (`IPHONEOS_DEPLOYMENT_TARGET=15.0` build-only override; Xcode 27 rejects 14.0).
-
-A server-year mode needs a separate snapshot type fed by a root-owned, admin-gated fetch. It is not part of this component.
 
 ## Verification
 
@@ -109,5 +124,16 @@ A server-year mode needs a separate snapshot type fed by a root-owned, admin-gat
 - A throwaway XCUITest host outside the repository drove the composer on a dedicated "Audiobookshelf Year Export QA"
   simulator (iPhone 17, iOS 27) with synthetic data only. It covered switching style and format, presenting the share
   sheet (it showed `audiobookshelf_my_2025_short` as a PNG image) and the empty year hiding Top Lists. Screenshots stay local.
-- Not verified: an iOS 14 or 15 runtime (none is installed), the iPad popover on a device, saving to Photos, and physical devices.
+- Annual covers and server export, red first: `YearExportArtworkTests` (9 tests) against stubs failed 8 of 9, with an
+  "Index out of range" crash in the loader-order test; the identifier-leak guard passed trivially on the blank stub.
+  `AnnualStatsTests` in TVCore (4 tests) failed 4 of 4 before the decode, route and role gate existed. Now all 22 Export
+  tests and all 19 TVCore tests pass. They cover server order and unsafe, failed and undecodable covers, the 5 and 25
+  caps, cancellation (no artwork, no more than 4 started fetches), account change, rejecting artwork for another
+  year or other covers, covers actually drawn (pixel colour) in the mosaic and Finished designs, no cover ID in the PNG,
+  text or accessibility label, the server designs, file names, sizes and text, hiding unfillable server lists, and
+  `1e300` totals.
+- Synthetic-cover renders of every listener and server layout were inspected locally (`/tmp/yearexport-evidence/covers`,
+  not committed). That pass found and fixed a mosaic drawn at full opacity and a divider drawn in copy blend mode.
+- Not verified: a live server. Loading covers and the admin year from a real account is an owner-data operation and
+  needs root review first; nothing here contacted a server. Also not verified: an iOS 14 or 15 runtime (none is installed), the iPad popover on a device, saving to Photos, and physical devices.
   All physical acceptance and migration gates remain open.
