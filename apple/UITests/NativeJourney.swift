@@ -13,9 +13,9 @@ import XCTest
         add(evidence)
     }
 
-    func connectSelectAndRestore(serverURL: String, verifyRestoration: Bool = true) {
+    func connectSelectAndRestore(serverURL: String, verifyRestoration: Bool = true, arguments: [String] = []) {
         let app = XCUIApplication()
-        app.launchArguments = ["--reset-preview-account"]
+        app.launchArguments = ["--reset-preview-account"] + arguments
         app.launch()
         let server = app.textFields["server"]
         XCTAssertTrue(server.waitForExistence(timeout: 10))
@@ -43,6 +43,8 @@ import XCTest
         let method: String?
         let path: String
         let page: String?
+        let ebookLocation: String?
+        let applied: Bool?
     }
     struct ProgressObservation: Decodable {
         let path: String
@@ -59,6 +61,7 @@ import XCTest
     struct ReadingObservation: Decodable {
         let libraryItemId: String
         let ebookLocation: String
+        let ebookProgress: Double?
         let currentTime: Double?
     }
     struct LocalSessionObservation: Decodable {

@@ -47,14 +47,16 @@ import Combine
     }
     func update(account: AccountIdentity, itemID: String, format: String, location: String, fraction: Double, rotation: Int, fileID: String? = nil) throws {
         let old = position(account: account, itemID: itemID, format: format, fileID: fileID)
-        if old?.location == location && old?.rotation == rotation { return }
+        if old?.location == location && old?.rotation == rotation && old?.fraction == fraction { return }
         let changed = old?.location != location
+        let correctedFraction = old?.fraction != fraction
         try remember(Position(account: account, itemID: itemID, format: format, fileID: fileID, location: location, fraction: fraction,
                               updatedAt: changed ? Date().timeIntervalSince1970 * 1000 : old!.updatedAt,
-                              revision: changed ? UUID().uuidString : old!.revision, pending: fileID == nil && (changed || old?.pending == true),
+                              revision: changed || correctedFraction ? UUID().uuidString : old!.revision, pending: fileID == nil && (changed || correctedFraction || old?.pending == true),
                               rotation: rotation, serverLocation: old?.serverLocation, issuedLocation: old?.issuedLocation, issuedRevision: old?.issuedRevision))
     }
     func adopt(_ remote: MediaProgress, account: AccountIdentity, itemID: String, format: String) throws {
+        guard writable else { return }
         guard let location = remote.ebookLocation else { return }
         let old = position(account: account, itemID: itemID, format: format)
         let updated = remote.lastUpdate ?? 0
@@ -74,6 +76,7 @@ import Combine
         return !olderOwnPublication && location != position.serverLocation && (remote.lastUpdate ?? 0) > position.updatedAt
     }
     func reconcile(api: APIClient, account: AccountIdentity, itemID: String, format: String) async {
+        guard writable else { return }
         do {
             let user = try await api.me()
             guard try await api.currentAccount() == account else { throw CancellationError() }
@@ -84,6 +87,7 @@ import Combine
         } catch { if !(error is CancellationError) { self.error = "Reading is saved on this device and waiting to sync: " + error.localizedDescription } }
     }
     func sync(api: APIClient) {
+        guard writable else { return }
         guard transfer == nil else { syncRequested = true; return }
         transfer = Task {
             defer {

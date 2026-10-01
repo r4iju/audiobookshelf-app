@@ -51,8 +51,8 @@ private struct OfflineDetails: View {
                 Text(entry.media.title).font(.system(.largeTitle, design: .serif).bold())
                 Text(entry.media.author).foregroundColor(.secondary)
                 Label("Available offline", systemImage: "checkmark.circle.fill")
-                if let ebook = entry.ebook, ebook.format == "pdf" {
-                    Button("Read PDF") {
+                if let ebook = entry.ebook, ["pdf", "epub"].contains(ebook.format) {
+                    Button("Read " + ebook.format.uppercased()) {
                         do { reader = ReadingSource(account: entry.account, itemID: entry.media.libraryItemID, title: entry.media.title, ebook: ebook, file: try downloads.ebookURL(entry), progress: entry.readingProgress, fileID: entry.supplementaryID) }
                         catch { self.error = error.localizedDescription }
                     }.accessibilityIdentifier("read-downloaded-ebook")
@@ -68,6 +68,6 @@ private struct OfflineDetails: View {
                 Button("Remove download") { Task { await downloads.remove(entry, player: player); presentation.wrappedValue.dismiss() } }.foregroundColor(.red)
             }.padding(24).frame(maxWidth: 800, alignment: .leading).frame(maxWidth: .infinity)
         }.background(ShelfStyle.background).navigationTitle(entry.media.title).navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $reader) { source in PDFReader(source: source, api: downloads.api, store: readingStore) }
+            .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: downloads.api, store: readingStore) }
     }
 }

@@ -63,8 +63,8 @@ struct BookDetails: View {
                     if progressBusy { ProgressView("Saving your progress…") }
                 }
                 if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
-                if let ebook = book.media.ebookFile, ebook.format == "pdf", episode == nil {
-                    Button("Read PDF") {
+                if let ebook = book.media.ebookFile, ["pdf", "epub"].contains(ebook.format), episode == nil {
+                    Button("Read " + ebook.format.uppercased()) {
                         Task {
                             do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil) }
                             catch { self.error = error.localizedDescription }
@@ -72,7 +72,7 @@ struct BookDetails: View {
                     }
                 }
                 if episode == nil {
-                    ForEach(book.supplementaryEbooks.filter { $0.ebook?.format == "pdf" }) { file in
+                    ForEach(book.supplementaryEbooks.filter { ["pdf", "epub"].contains($0.ebook?.format ?? "") }) { file in
                         if let ebook = file.ebook {
                             VStack(alignment: .leading, spacing: 12) {
                                 Button("Read " + (file.metadata?.filename ?? "supplementary PDF")) {
@@ -130,7 +130,7 @@ struct BookDetails: View {
                     watchDownloads()
                 }
             }
-            .fullScreenCover(item: $reader) { source in PDFReader(source: source, api: catalog.api, store: readingStore) }
+            .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: catalog.api, store: readingStore) }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
     }
 

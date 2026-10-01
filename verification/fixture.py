@@ -12,6 +12,7 @@ import struct
 import ssl
 import time
 import wave
+import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
@@ -44,6 +45,20 @@ def pdf(pages=4, rotation=0, title='Stories for Tomorrow'):
     data += b''.join(f'{offset:010} 00000 n \n'.encode() for offset in offsets[1:])
     data += f'trailer\n<< /Size {len(offsets)} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n'.encode()
     return data
+
+
+def epub(long=False, styled=False):
+    data = io.BytesIO()
+    with zipfile.ZipFile(data, 'w') as archive:
+        archive.writestr('mimetype', 'application/epub+zip', compress_type=zipfile.ZIP_STORED)
+        archive.writestr('META-INF/container.xml', '<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/book.opf" media-type="application/oebps-package+xml"/></rootfiles></container>')
+        archive.writestr('OEBPS/book.opf', '<package version="3.0" unique-identifier="id" xmlns="http://www.idpf.org/2007/opf"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="id">urn:uuid:abs-fixture</dc:identifier><dc:title>Tomorrow in Two Chapters</dc:title><dc:language>en</dc:language></metadata><manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="first" href="first.xhtml" media-type="application/xhtml+xml"/><item id="second" href="second.xhtml" media-type="application/xhtml+xml"/><item id="css" href="style.css" media-type="text/css"/><item id="illustration" href="illustration.svg" media-type="image/svg+xml"/></manifest><spine><itemref idref="first"/><itemref idref="second"/></spine></package>')
+        archive.writestr('OEBPS/nav.xhtml', '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"><head><title>Contents</title></head><body><nav epub:type="toc"><ol><li><a href="first.xhtml">First chapter</a></li><li><a href="second.xhtml">Second chapter</a></li></ol></nav></body></html>')
+        archive.writestr('OEBPS/style.css', '.publisher-hidden { display: none !important; } img { width: 64px; height: 64px; }')
+        archive.writestr('OEBPS/illustration.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#ed803f"/></svg>')
+        for name, text in [('first' , 'First passage by the window.'), ('second', 'Second passage beneath the stars.')]:
+            archive.writestr('OEBPS/' + name + '.xhtml', '<html xmlns="http://www.w3.org/1999/xhtml"><head><title>' + name + '</title>' + ('<link rel="stylesheet" href="style.css"/>' if styled else '') + '</head><body>' + ('<p class="publisher-hidden">Publisher hidden text</p><img src="illustration.svg" alt="Illustration from the publisher"/>' if styled else '') + '<h1>' + text + '</h1>' + ('<p>A real packaged EPUB chapter for local reader acceptance.</p>' * (2000 if long else 1)) + '</body></html>')
+    return data.getvalue()
 
 
 def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='modern', bind='127.0.0.1'):
@@ -107,6 +122,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             observed = {'method': self.command, 'path': path}
             if path and re.fullmatch(r'/api/libraries/[^/]+/items', path):
                 observed['page'] = parse_qs(parsed.query).get('page', ['0'])[0]
+            self.observed_request = observed
             requests.append(observed)
             return path, parse_qs(parsed.query)
 
@@ -219,9 +235,11 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'downloads': []})
             if path == '/api/search/podcast':
                 return self.respond(200, [{'id': 42, 'title': 'New Voices Discovery', 'artistName': 'Fixture Studio', 'feedUrl': 'http://127.0.0.1:19765/feed.xml', 'genres': ['Stories']}])
-            downloaded_file = re.fullmatch(r'/api/items/book-[0-9]+/file/([01]|pdf)/download', path or '')
+            downloaded_file = re.fullmatch(r'/api/items/book-[0-9]+/file/([01]|pdf|epub)/download', path or '')
             if path in ('/api/items/book-0/file/notes', '/api/items/book-0/file/notes/download'):
                 return self.respond(200, pdf(pages=2, title='Listening notes'), 'application/pdf')
+            if path == '/api/items/book-0/file/epub' or downloaded_file and downloaded_file[1] == 'epub':
+                return self.respond(200, document, 'application/epub+zip')
             if path == '/api/items/book-0/file/pdf' or downloaded_file and downloaded_file[1] == 'pdf':
                 return self.respond(200, document, 'application/pdf')
             if downloaded_file:
@@ -284,9 +302,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(400, {})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage'):
                     return self.respond(400, {})
-                configuration.update(mode=mode, failed=False, reading_attempts=0)
+                configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
                 if mode in ('pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
                     document = b'not a PDF' if mode == 'pdf-invalid' else pdf(pages=120 if mode == 'pdf-long' else 4, rotation=90 if mode == 'pdf-rotated' else 0)
                     items[0]['media']['ebookFile'] = {'ino': 'pdf', 'ebookFormat': 'pdf', 'metadata': {'filename': 'stories.pdf', 'ext': '.pdf', 'size': len(document)}}
@@ -296,6 +314,16 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                                 entry.pop('ebookLocation', None); entry.pop('ebookProgress', None)
                             duration = 60 if mode == 'pdf-audio' else 20
                             progress_by_user[account['id']][('book-0', None)].update(currentTime=6, duration=duration, progress=6 / duration, isFinished=False, lastUpdate=0)
+                elif mode in ('epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage'):
+                    document = b'PKinvalid archive' if mode == 'epub-invalid' else epub(long=mode == 'epub-long', styled=mode == 'epub-styled')
+                    items[0]['media']['ebookFile'] = {'ino': 'epub', 'ebookFormat': 'epub', 'metadata': {'filename': 'stories.epub', 'ext': '.epub', 'size': len(document)}}
+                    for account in users.values():
+                        for entry in progress_by_user[account['id']].values():
+                            if mode == 'epub-zero-percentage':
+                                entry['ebookProgress'] = 0
+                            else:
+                                entry.pop('ebookLocation', None); entry.pop('ebookProgress', None)
+                            entry['lastUpdate'] = 0
                 elif mode != 'offline-library':
                     items[0]['media'].pop('ebookFile', None)
                 if mode == 'pdf-supplementary':
@@ -376,11 +404,15 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, value)
             reading = re.fullmatch(r'/api/me/progress/(book-[0-9]+)', path or '')
             if reading and self.command == 'PATCH' and isinstance(data.get('ebookLocation'), str):
+                self.observed_request['ebookLocation'] = data['ebookLocation']
                 configuration['reading_attempts'] = configuration.get('reading_attempts', 0) + 1
-                if configuration['mode'] == 'pdf-double-failure' and configuration['reading_attempts'] == 2:
+                if configuration['mode'] == 'pdf-double-failure' and data['ebookLocation'] == '3' and not configuration['reading_rejected']:
+                    configuration['reading_rejected'] = True
+                    self.observed_request['applied'] = False
                     return self.respond(503, {})
-                lost_reading_ack = configuration['mode'] in ('pdf-lost-ack', 'pdf-double-failure') and not configuration['failed']
-                if configuration['mode'] in ('pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure') and not configuration['failed']:
+                older_page = data['ebookLocation'] == '2'
+                lost_reading_ack = configuration['mode'] in ('pdf-lost-ack', 'pdf-double-failure') and older_page and not configuration['failed']
+                if configuration['mode'] in ('pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure') and older_page and not configuration['failed']:
                     configuration['failed'] = True
                     time.sleep(3)
                 key = (reading[1], None)

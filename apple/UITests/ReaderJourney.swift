@@ -1,6 +1,195 @@
 import XCTest
 
 @MainActor final class ReaderJourney: NativeJourney {
+    func testDownloadedEPUBRemainsReadableWithUnreadableProgressStorage() async throws {
+        try await downloadedReaderWithUnreadableStorage(mode: "epub-reader", content: "First passage by the window.")
+    }
+    func testDownloadedPDFRemainsReadableWithUnreadableProgressStorage() async throws {
+        try await downloadedReaderWithUnreadableStorage(mode: "pdf-reader", content: "Page 1 of 4")
+    }
+    private func downloadedReaderWithUnreadableStorage(mode: String, content: String) async throws {
+        try await FixtureControl.configure(mode)
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        app.buttons[mode == "epub-reader" ? "Read EPUB" : "Read PDF"].tap()
+        XCTAssertTrue(app.staticTexts[content].waitForExistence(timeout: 10))
+        for _ in 0..<30 {
+            if try await !fixtureObservations().readingProgress.isEmpty { break }
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        app.buttons["Close reader"].tap(); app.buttons["Download for offline"].tap()
+        app.navigationBars.buttons["BackButton"].tap(); app.buttons["account"].tap(); app.buttons["Downloads"].tap()
+        XCTAssertTrue(app.buttons["offline-book-0"].waitForExistence(timeout: 45))
+        try await FixtureControl.configure("offline-library")
+        let requestsBeforeRelaunch = try await fixtureRequests().filter { $0.method == "PATCH" && $0.path.contains("/progress/") }.count
+        app.terminate(); app.launchArguments = ["--unreadable-preview-reading"]; app.launch()
+        app.buttons["Open downloads"].tap(); app.buttons["offline-book-0"].tap(); app.buttons["read-downloaded-ebook"].tap()
+        XCTAssertTrue(app.staticTexts[content].waitForExistence(timeout: 10), "A damaged reading journal must not prevent opening a valid downloaded book")
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "could not be restored")).firstMatch.exists)
+        let requestsAfterRelaunch = try await fixtureRequests().filter { $0.method == "PATCH" && $0.path.contains("/progress/") }.count
+        XCTAssertEqual(requestsAfterRelaunch, requestsBeforeRelaunch)
+    }
+    func testUnreadableReadingStorageRemainsVisibleAcrossRelaunch() async throws {
+        try await FixtureControl.configure("epub-reader")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false, arguments: ["--unreadable-preview-reading"])
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["First passage by the window."].waitForExistence(timeout: 10))
+        let failure = app.staticTexts["reading-save-error"]
+        XCTAssertTrue(failure.waitForExistence(timeout: 3))
+        guard failure.exists else { return }
+        XCTAssertTrue(failure.label.contains("could not be restored"))
+        app.buttons["Next page"].tap()
+        let observations = try await fixtureObservations()
+        XCTAssertTrue(observations.readingProgress.isEmpty, "Unreadable progress storage must not publish unsaved reading")
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["reading-save-error"].waitForExistence(timeout: 10), "The original unreadable data must remain available for recovery")
+    }
+    func testEPUBVolumeNavigationPreferencesSurviveRelaunch() async throws {
+        try await FixtureControl.configure("epub-reader")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["First passage by the window."].waitForExistence(timeout: 10))
+        app.buttons["Reading settings"].tap()
+        let mode = app.buttons["reader-volume-mode"]
+        XCTAssertTrue(mode.waitForExistence(timeout: 3))
+        guard mode.exists else { return }
+        mode.tap(); app.buttons["Mirrored"].tap()
+        let listening = app.switches["Volume navigation while listening"]
+        listening.tap(); XCTAssertEqual(listening.value as? String, "1")
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["First passage by the window."].waitForExistence(timeout: 10))
+        app.buttons["Reading settings"].tap()
+        XCTAssertTrue(app.buttons["reader-volume-mode"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["reader-volume-mode"].label.contains("Mirrored"))
+        XCTAssertEqual(app.switches["Volume navigation while listening"].value as? String, "1")
+    }
+    func testRestoredEPUBPassagePublishesCorrectedPercentage() async throws {
+        try await FixtureControl.configure("epub-reader")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["First passage by the window."].waitForExistence(timeout: 10))
+        app.buttons["Contents"].tap(); app.buttons["Second chapter"].tap()
+        XCTAssertTrue(app.staticTexts["Second passage beneath the stars."].waitForExistence(timeout: 10))
+        for _ in 0..<30 {
+            if (try await fixtureObservations().readingProgress.first?.ebookProgress ?? 0) > 0 { break }
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        try await FixtureControl.configure("epub-zero-percentage")
+        app.terminate()
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["Second passage beneath the stars."].waitForExistence(timeout: 10))
+        var fraction = 0.0
+        for _ in 0..<30 {
+            fraction = try await fixtureObservations().readingProgress.first?.ebookProgress ?? 0
+            if fraction > 0 { break }
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        XCTAssertGreaterThan(fraction, 0, "Restoring the same CFI must correct its actual calculated reading percentage")
+    }
+    func testEPUBPublisherStylesImagesAndSwipeNavigation() async throws {
+        try await FixtureControl.configure("epub-styled")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["First passage by the window."].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Publisher hidden text"].exists, "Archived publisher CSS must apply to the rendered chapter")
+        XCTAssertTrue(app.images["Illustration from the publisher"].exists)
+        app.webViews["epub-document"].swipeLeft()
+        var location = ""
+        for _ in 0..<50 {
+            location = try await fixtureObservations().readingProgress.first?.ebookLocation ?? ""
+            if location.contains("[second]") { break }
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        XCTAssertTrue(location.contains("[second]"), "Swiping must advance the actual rendered and published passage")
+    }
+    func testEPUBReadingWhileListeningRetainsAwakePreference() async throws {
+        try await FixtureControl.configure("epub-reader")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap(); app.buttons["play-book"].tap()
+        XCTAssertTrue(app.buttons["mini-pause-playback"].waitForExistence(timeout: 10))
+        app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["First passage by the window."].waitForExistence(timeout: 10))
+        let advanced = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
+            guard let element = value as? XCUIElement, let seconds = Int(element.label) else { return false }
+            return seconds >= 10
+        }, object: app.staticTexts["reader-audio-elapsed"])
+        await fulfillment(of: [advanced], timeout: 10)
+        app.buttons["reader-pause-playback"].tap()
+        app.buttons["Reading settings"].tap()
+        let awake = app.switches["Keep screen awake"]
+        XCTAssertTrue(awake.waitForExistence(timeout: 3))
+        guard awake.exists else { return }
+        awake.tap(); XCTAssertEqual(awake.value as? String, "1")
+        app.navigationBars.buttons["Done"].tap()
+        app.buttons["Contents"].tap(); app.buttons["Second chapter"].tap()
+        XCTAssertTrue(app.staticTexts["Second passage beneath the stars."].waitForExistence(timeout: 10))
+        app.buttons["Close reader"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["Second passage beneath the stars."].waitForExistence(timeout: 10))
+        app.buttons["Reading settings"].tap()
+        XCTAssertEqual(app.switches["Keep screen awake"].value as? String, "1")
+    }
+    func testInvalidEPUBRecoveryOpensLongDocument() async throws {
+        try await FixtureControl.configure("epub-invalid")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.buttons["Try again"].waitForExistence(timeout: 10))
+        guard app.buttons["Try again"].exists else { print(app.debugDescription); return }
+        try await FixtureControl.configure("epub-long")
+        app.buttons["Try again"].tap()
+        XCTAssertTrue(app.staticTexts["First passage by the window."].waitForExistence(timeout: 15))
+        app.buttons["Contents"].tap(); app.buttons["Second chapter"].tap()
+        XCTAssertTrue(app.staticTexts["Second passage beneath the stars."].waitForExistence(timeout: 15))
+        try await Task.sleep(nanoseconds: 500_000_000)
+        let prior = try await fixtureObservations().readingProgress.first?.ebookLocation
+        app.buttons["Next page"].tap()
+        var current = prior
+        for _ in 0..<50 {
+            current = try await fixtureObservations().readingProgress.first?.ebookLocation
+            if current != prior { break }
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        XCTAssertNotEqual(current, prior, "Page navigation must advance actual long-document content")
+        capture("Native EPUB long document after page turn")
+    }
+    func testEPUBChapterLocationSurvivesDownloadedOfflineRelaunch() async throws {
+        try await FixtureControl.configure("epub-reader")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        let read = app.buttons["Read EPUB"]
+        XCTAssertTrue(read.waitForExistence(timeout: 3))
+        guard read.exists else { return }
+        read.tap()
+        let first = app.staticTexts["First passage by the window."].waitForExistence(timeout: 10)
+        XCTAssertTrue(first)
+        guard first else { print(app.debugDescription); return }
+        app.buttons["Contents"].tap(); app.buttons["Second chapter"].tap()
+        XCTAssertTrue(app.staticTexts["Second passage beneath the stars."].waitForExistence(timeout: 10))
+        var location: String?
+        for _ in 0..<30 {
+            location = try await fixtureObservations().readingProgress.first?.ebookLocation
+            if location?.hasPrefix("epubcfi(") == true { break }
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        XCTAssertTrue(location?.hasPrefix("epubcfi(") == true, "EPUB progress must identify the actual passage")
+        app.buttons["Close reader"].tap(); app.buttons["Download for offline"].tap()
+        app.navigationBars.buttons["BackButton"].tap(); app.buttons["account"].tap(); app.buttons["Downloads"].tap()
+        XCTAssertTrue(app.buttons["offline-book-0"].waitForExistence(timeout: 45))
+        try await FixtureControl.configure("offline-library")
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["Open downloads"].tap(); app.buttons["offline-book-0"].tap(); app.buttons["read-downloaded-ebook"].tap()
+        XCTAssertTrue(app.staticTexts["Second passage beneath the stars."].waitForExistence(timeout: 10))
+    }
     func testSupplementaryPDFDownloadsAndRetainsItsOwnPage() async throws {
         try await FixtureControl.configure("pdf-remote")
         try await FixtureControl.configure("pdf-supplementary")
@@ -39,10 +228,11 @@ import XCTest
         let app = XCUIApplication()
         app.buttons["book-book-0"].tap(); app.buttons["Read PDF"].tap()
         XCTAssertTrue(app.staticTexts["Page 1 of 4"].waitForExistence(timeout: 10))
+        let initialRequestCount = try await fixtureRequests().count
         app.buttons["Next page"].tap()
         var issued = false
         for _ in 0..<30 {
-            issued = try await fixtureRequests().contains { $0.method == "PATCH" && $0.path == "/api/me/progress/book-0" }
+            issued = try await fixtureRequests().dropFirst(initialRequestCount).contains { $0.method == "PATCH" && $0.path == "/api/me/progress/book-0" && $0.ebookLocation == "2" }
             if issued { break }
             try await Task.sleep(nanoseconds: 100_000_000)
         }
@@ -51,13 +241,13 @@ import XCTest
         app.buttons["Next page"].tap()
         XCTAssertTrue(app.staticTexts["Page 3 of 4"].exists)
         if mode == "pdf-double-failure" {
-            var attempts = 0
+            var rejected = false
             for _ in 0..<60 {
-                attempts = try await fixtureRequests().filter { $0.method == "PATCH" && $0.path == "/api/me/progress/book-0" }.count
-                if attempts >= 2 { break }
+                rejected = try await fixtureRequests().dropFirst(initialRequestCount).contains { $0.ebookLocation == "3" && $0.applied == false }
+                if rejected { break }
                 try await Task.sleep(nanoseconds: 100_000_000)
             }
-            XCTAssertEqual(attempts, 2)
+            XCTAssertTrue(rejected, "The newer page retry must be rejected before it reaches server progress")
             try await Task.sleep(nanoseconds: 500_000_000)
             app.buttons["Close reader"].tap(); app.buttons["Read PDF"].tap()
             XCTAssertTrue(app.staticTexts["Page 3 of 4"].waitForExistence(timeout: 10))

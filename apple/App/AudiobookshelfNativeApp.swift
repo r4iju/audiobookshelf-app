@@ -27,9 +27,14 @@ import SwiftUI
             UserDefaults.standard.removeObject(forKey: "previewEpisodeSort")
             UserDefaults.standard.removeObject(forKey: "previewEpisodeDescending")
             UserDefaults.standard.removeObject(forKey: "previewPDFContinuous")
+            UserDefaults.standard.removeObject(forKey: "previewEPUBPreferences")
             for key in UserDefaults.standard.dictionaryRepresentation().keys where key.hasPrefix("previewServerPodcastRequests.") {
                 UserDefaults.standard.removeObject(forKey: key)
             }
+        }
+        if CommandLine.arguments.contains("--unreadable-preview-reading") {
+            try? FileManager.default.createDirectory(at: ReadingStore.file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try? Data("damaged reading document".utf8).write(to: ReadingStore.file, options: .atomic)
         }
         if CommandLine.arguments.contains("--seed-legacy-preview-account") {
             try? vault.seedLegacyPreviewAccount()

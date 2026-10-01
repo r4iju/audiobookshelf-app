@@ -14,7 +14,11 @@ targets:
     type: application
     platform: iOS
     sources:
-      - App
+      - path: App
+        excludes: [ReaderAssets]
+      - path: App/ReaderAssets
+        type: folder
+        buildPhase: resources
       - Playback
       - ../tvos/Core/Sources/TVCore
     settings:
