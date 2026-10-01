@@ -32,6 +32,8 @@ class ProgressSync(
     private val io: CoroutineDispatcher,
     private val publications: PublicationLedger,
     private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
+    /** Whether listening left by the previous process has been saved; nothing is sent before. */
+    private val recovered: () -> Boolean = { true },
 ) {
     private val lock = Mutex()
     private var retry: Job? = null
@@ -65,6 +67,7 @@ class ProgressSync(
         val client = accounts.clientFor(account) ?: return@withLock false
         val pending = try {
             withContext(io) {
+                if (!recovered()) throw java.io.IOException("Listening from before the app closed could not be saved")
                 // Sessions sent without an answer stay as sent, also when freezing them failed before.
                 publications.attempts.value.flatMap { it.listening }.filter { it.account == account }.forEach(journal::freeze)
                 journal.pending(account)

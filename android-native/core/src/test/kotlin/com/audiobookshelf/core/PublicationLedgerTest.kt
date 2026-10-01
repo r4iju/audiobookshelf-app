@@ -85,4 +85,44 @@ class PublicationLedgerTest {
         assertFalse(ledger.uncertain(qa, "book-7", null))
         assertTrue(folder.root.resolve("publications.json.unreadable-5").exists())
     }
+
+    private val media = ListeningMedia("book-0", null, "Stories", "QA", "book", 20.0, 6.0)
+
+    /** A session sent without an answer whose freeze failed, followed by more listening once storage recovered. */
+    private fun unfrozenAfterLostAnswer(journalFile: java.io.File): Triple<ListeningJournal, PublicationLedger, ListeningRecord> = runBlocking {
+        val journal = ListeningJournal(journalFile)
+        val id = journal.begin(qa, media, "device", now = 1_000)
+        journal.record(id, 10.0, 4.0, now = 2_000)
+        val sent = journal.pending(qa).single()
+        val ledger = PublicationLedger(file)
+        runCatching { ledger.publish(qa, PublicationLedger.Kind.LISTENING, listOf(book0), listOf(sent)) { throw IOException("connection reset") } }
+        // Storage refused the freeze; it is retried from the ledger before the next send.
+        journalFile.delete(); journalFile.mkdir(); journalFile.resolve("blocked").writeText("")
+        assertThrows(IOException::class.java) { journal.freeze(sent) }
+        journalFile.resolve("blocked").delete(); journalFile.delete()
+        journal.record(id, 13.0, 3.0, now = 3_000)
+        Triple(journal, ledger, sent)
+    }
+
+    @Test
+    fun acceptingTheRiskKeepsTheUnansweredSessionAsSent() {
+        val journalFile = folder.root.resolve("journal.json")
+        val (journal, ledger, sent) = unfrozenAfterLostAnswer(journalFile)
+        ledger.accept(qa, "book-0", null, keep = journal::freeze)
+
+        val pending = journal.pending(qa)
+        // A late original carries the sent total; sending a larger one under the same session would let it shrink history.
+        assertEquals(sent.payload(), pending.single { it.id == sent.id }.payload())
+        assertEquals(3.0, pending.single { it.id != sent.id }.timeListening, 0.0)
+    }
+
+    @Test
+    fun theRiskIsNotAcceptedWhileTheSessionCannotBeKeptAsSent() {
+        val journalFile = folder.root.resolve("journal.json")
+        val (journal, ledger, sent) = unfrozenAfterLostAnswer(journalFile)
+        journalFile.delete(); journalFile.mkdir(); journalFile.resolve("blocked").writeText("")
+        assertThrows(IOException::class.java) { ledger.accept(qa, "book-0", null, keep = journal::freeze) }
+        assertTrue("Still uncertain, so the discard keeps waiting", PublicationLedger(file).uncertain(qa, "book-0", null))
+        assertEquals(listOf(sent), PublicationLedger(file).attempts.value.single().listening)
+    }
 }

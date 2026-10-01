@@ -69,14 +69,19 @@ class PublicationLedger(private val file: File) {
     fun uncertain(account: AccountIdentity, itemId: String, episodeId: String?): Boolean =
         unreadableState.value || state.value.any { it.holds(account, itemId, episodeId) }
 
-    /** The user's explicit choice to go ahead although the title's earlier writes may still land. */
+    /**
+     * The user's explicit choice to go ahead although the title's earlier writes may still land.
+     * Listening sent in those writes is first kept exactly as sent by [keep] (the journal's freeze),
+     * since these records are what keeps it so; if that fails nothing is accepted and it is thrown.
+     */
     @Synchronized
-    fun accept(account: AccountIdentity, itemId: String, episodeId: String?) {
+    fun accept(account: AccountIdentity, itemId: String, episodeId: String?, keep: (ListeningRecord) -> Unit = {}) {
         if (unreadableState.value) throw Unreadable()
         val title = Title(itemId, episodeId)
+        val affected = state.value.filter { it.account == account && title in it.titles }
+        affected.flatMap { it.listening }.forEach(keep)
         commit(state.value.mapNotNull { attempt ->
-            if (attempt.account != account || title !in attempt.titles) attempt
-            else attempt.copy(titles = attempt.titles - title).takeIf { it.titles.isNotEmpty() }
+            if (attempt !in affected) attempt else attempt.copy(titles = attempt.titles - title).takeIf { it.titles.isNotEmpty() }
         })
     }
 

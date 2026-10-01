@@ -24,7 +24,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 /** Process-wide dependencies, created lazily so tests can reset app data before first use. */
-class AppGraph private constructor(val context: Context) {
+class AppGraph internal constructor(val context: Context) {
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     val http: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
@@ -46,25 +46,27 @@ class AppGraph private constructor(val context: Context) {
     val io = kotlinx.coroutines.Dispatchers.IO.limitedParallelism(1)
     /** Progress writes that may still be applied by the server; see [com.audiobookshelf.core.PublicationLedger]. */
     val publications by lazy { com.audiobookshelf.core.PublicationLedger(File(context.filesDir, "publication-ledger.json")) }
-    val journal: ListeningJournal by lazy {
-        openJournal(File(context.filesDir, "listening-journal.json")).also { journal ->
-            // Listening that was out when the process ended is kept as it was sent.
-            publications.attempts.value.flatMap { it.listening }.forEach(journal::freeze)
+    val journal: ListeningJournal by lazy { openJournal(File(context.filesDir, "listening-journal.json")) }
+    /** Listening left by the previous process; nothing plays or publishes until it is saved. */
+    val listeningRecovery by lazy {
+        com.audiobookshelf.core.ListeningRecovery(journal, publications).also { recovery ->
+            if (!recovery.run()) diagnostics.record(com.audiobookshelf.android.data.Diagnostics.Area.SYNC, "Listening from before the app closed could not be saved", recovery.problem.value)
         }
     }
     val progressSync by lazy {
-        ProgressSync(scope, journal, accounts, io, publications, diagnostics::record).also { sync ->
+        ProgressSync(scope, journal, accounts, io, publications, diagnostics::record, recovered = { listeningRecovery.run() }).also { sync ->
             context.getSystemService(ConnectivityManager::class.java)?.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) = sync.publishAll()
             })
         }
     }
-    /** Creating the engine closes listening left open by a previous process and publishes it. */
+    /** Creating the engine publishes listening left by a previous process once [listeningRecovery] is saved. */
     val playback: PlaybackEngine by lazy {
-        journal.finishRecoveredSessions()
+        listeningRecovery
         PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io, diagnostics::record,
             resetPending = { account, itemId, episodeId ->
                 when {
+                    !listeningRecovery.run() -> "Listening from before the app closed could not be saved because storage is unavailable, so nothing plays until it can be. Free some space, then try again."
                     resets.unreadable.value -> "Saved progress discards could not be read, so nothing plays until they are resolved in Diagnostics."
                     resets.pending(account, itemId, episodeId) -> "Progress for this title is still being discarded. It plays from the beginning once that is done."
                     else -> null
@@ -173,7 +175,7 @@ class AppGraph private constructor(val context: Context) {
     suspend fun resolveUncertainDiscard(client: ApiClient, itemId: String, episodeId: String?, discard: Boolean): Boolean {
         val account = client.account
         if (!discard) return kotlinx.coroutines.withContext(io) { resets.withdraw(account, itemId, episodeId) }
-        kotlinx.coroutines.withContext(io) { publications.accept(account, itemId, episodeId) }
+        kotlinx.coroutines.withContext(io) { publications.accept(account, itemId, episodeId, keep = journal::freeze) }
         completeResets()
         return true
     }

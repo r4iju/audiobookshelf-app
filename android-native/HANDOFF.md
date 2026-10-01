@@ -142,7 +142,20 @@ Server 2.30 neither orders requests for one session or title nor says whether an
 - **Limits:**
   - An uncertain title stays uncertain until the user chooses. Server 2.30 offers no way to prove an earlier request has finished, and no backend change is assumed.
   - A late older page can still overwrite a newer page on the server. The next sync sees a server change it did not make and asks the reader, rather than overwriting silently.
-  - The listening snapshots in the ledger are kept until the user accepts the risk for their titles.## Evidence for 2b3227dc (emulator and fixture only)
+  - The listening snapshots in the ledger are kept until the user accepts the risk for their titles.
+
+## Review blockers at c301f067
+
+| Blocker | Fix | RED observed before the fix |
+| --- | --- | --- |
+| **Discard anyway** removed the ledger's listening snapshots before the journal had kept those sessions as sent. If an earlier freeze had failed and more listening was journaled, the session was later sent with a larger total under the original ID, and the delayed original could shrink it | `PublicationLedger.accept` takes the journal's freeze and applies it to every affected snapshot before changing the records. If a freeze fails, nothing is accepted, the title stays uncertain and the discard does not run | `PublicationLedgerTest.acceptingTheRiskKeepsTheUnansweredSessionAsSent`: the original session was sent with the larger total. `theRiskIsNotAcceptedWhileTheSessionCannotBeKeptAsSent`: accept went ahead with the journal unwritable |
+| Startup froze the ledger's snapshots inside the journal's initializer. A relaunch with an unanswered snapshot and unwritable storage threw while constructing playback and progress sync | `ListeningRecovery` (core) freezes the snapshots and closes records left open, and reports a failure instead of throwing. Until it is saved, playback is refused with a storage message and progress sync sends nothing and retries. Each play attempt, sync retry and the Diagnostics **Try again** button (`listening-storage`, `retry-listening-storage`) runs it again. The ledger and journal are left untouched while it fails | `ListeningRecoveryJourney`: constructing playback after relaunch threw `FileNotFoundException ... EACCES` |
+
+`ListeningRecoveryJourney` builds a fresh `AppGraph` over its own files directory (made read-only), so the relaunch is real for the graph without touching the app's own data. After storage recovers, the original session is pending only with its sent payload, and the 3 s listened later is in a new session.
+
+Evidence: unit tests pass. In one run on `emulator-5584`: ListeningRecovery 1, LatePublication 3, ProgressReset 6, ListeningDurability 1, Playback 5 and ReadingListening 1, 17 of 17. A clean full run is still required before ready.
+
+## Evidence for 2b3227dc (emulator and fixture only)
 
 - Unit tests: `./gradlew :core:test :app:testDebugUnitTest`, 24 tests, 0 failures.
 - Journeys on `emulator-5584` (API 36) against the local fixture on ports 28765/28766/28767/28769:

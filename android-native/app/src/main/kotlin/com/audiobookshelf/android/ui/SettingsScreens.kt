@@ -288,6 +288,7 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
     var resolving by remember { mutableStateOf(false) }
     var resolveError by remember { mutableStateOf<String?>(null) }
     val unreadableWrites by graph.publications.unreadable.collectAsState()
+    val unsavedRecovery by graph.listeningRecovery.problem.collectAsState()
     var settingAside by remember { mutableStateOf(false) }
     LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("diagnostics"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (unreadableResets) item {
@@ -297,6 +298,14 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
                     style = MaterialTheme.typography.bodyMedium)
                 TextButton(onClick = { resolving = true }, modifier = Modifier.testTag("resolve-unreadable-resets")) { Text("Set them aside") }
                 resolveError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            }
+        }
+        if (unsavedRecovery != null) item {
+            Column(Modifier.testTag("listening-storage"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Listening from before the app closed could not be saved", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+                Text("Storage on this device is unavailable or full. Nothing plays and no listening is sent until it is saved; it is kept until then.",
+                    style = MaterialTheme.typography.bodyMedium)
+                TextButton(onClick = { if (graph.listeningRecovery.run()) graph.progressSync.publishAll() }, modifier = Modifier.testTag("retry-listening-storage")) { Text("Try again") }
             }
         }
         if (unreadableWrites) item {
