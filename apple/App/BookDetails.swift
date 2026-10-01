@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 struct BookDetails: View {
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var serverQueue: NativePodcastQueue
     @EnvironmentObject private var readingStore: ReadingStore
@@ -16,10 +17,11 @@ struct BookDetails: View {
     @State private var error: String?
     @State private var request: Task<Void, Never>?
     @State private var playAttempted = false
-    @State private var episodeProgress: [MediaProgress] = []
+    @State private var mediaProgress: [MediaProgress] = []
     @AppStorage("previewEpisodeSort") private var episodeSort = "publishedAt"
     @AppStorage("previewEpisodeDescending") private var episodeDescending = true
     @State private var episodeFilter = "all"
+    @State private var confirmCompletion = false
     @State private var progressBusy = false
     @State private var progressRequest: Task<Void, Never>?
     @State private var canManagePodcasts = false
@@ -37,18 +39,7 @@ struct BookDetails: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
-                HStack(alignment: .top, spacing: 22) {
-                    BookArtwork(item: book, catalog: catalog).frame(width: 120)
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(episode?.title ?? book.title).font(.system(.title2, design: .serif).bold())
-                        if episode != nil { Text(book.title).font(.subheadline).foregroundColor(.secondary) }
-                        Text(book.author).font(.headline).foregroundColor(.secondary)
-                        if let duration = listeningDuration { Label(ShelfTime.describe(duration), systemImage: "headphones").font(.subheadline) }
-                        if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
-                            Text("Narrated by \(narrators.joined(separator: ", "))").font(.subheadline).foregroundColor(.secondary)
-                        }
-                    }
-                }
+                header
                 if book.mediaType != "podcast" || episode != nil {
                 Button { NativeHaptic.impact(); playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
                     HStack {
@@ -58,7 +49,7 @@ struct BookDetails: View {
                     }.padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
                 }.disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
                 }
-                if episode != nil {
+                if episode != nil || book.mediaType == "book" {
                     Button(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished", action: toggleFinished).disabled(progressBusy)
                     if progressBusy { ProgressView("Saving your progress…") }
                 }
@@ -133,14 +124,50 @@ struct BookDetails: View {
                 }
             }
             .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: catalog.api, store: readingStore) }
+            .alert(isPresented: $confirmCompletion) {
+                Alert(title: Text("Mark book finished?"), message: Text("Your saved progress will change when this book is marked finished."), primaryButton: .default(Text("Mark finished")) { applyFinished(true) }, secondaryButton: .cancel())
+            }
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in load(monitorDownloads: true) }
     }
 
+    @ViewBuilder private var header: some View {
+        if sizeClass == .regular {
+            HStack(alignment: .top, spacing: 28) {
+                BookArtwork(item: book, catalog: catalog).frame(width: 200)
+                metadata(alignment: .leading)
+            }
+        } else {
+            VStack(spacing: 20) {
+                BookArtwork(item: book, catalog: catalog).frame(width: 184)
+                metadata(alignment: .center)
+            }.frame(maxWidth: .infinity)
+        }
+    }
+    private func metadata(alignment: HorizontalAlignment) -> some View {
+        VStack(alignment: alignment, spacing: 8) {
+            Text(episode?.title ?? book.title).font(.title2.weight(.semibold)).fixedSize(horizontal: false, vertical: true)
+            if episode != nil { Text(book.title).font(.subheadline).foregroundColor(.secondary) }
+            Text(book.author).font(.subheadline).foregroundColor(.secondary)
+            if let duration = listeningDuration { Label(ShelfTime.describe(duration), systemImage: "headphones").font(.subheadline) }
+            if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
+                Text("Narrated by \(narrators.joined(separator: ", "))").font(.footnote).foregroundColor(.secondary)
+            }
+        }.multilineTextAlignment(alignment == .center ? .center : .leading)
+            .frame(maxWidth: .infinity, alignment: alignment == .center ? .center : .leading)
+    }
+
     private func toggleFinished() {
+        guard !progressBusy else { return }
         NativeHaptic.impact()
-        guard !progressBusy, let episode else { return }
         let finished = selectedProgress?.isFinished != true
+        let livePosition = player.itemID == book.id && player.episodeID == nil ? player.currentTime : 0
+        if episode == nil, finished, (selectedProgress?.currentTime ?? 0) > 0 || (selectedProgress?.ebookProgress ?? 0) > 0 || livePosition > 0 {
+            confirmCompletion = true
+        } else { applyFinished(finished) }
+    }
+    private func applyFinished(_ finished: Bool) {
+        guard !progressBusy else { return }
         request?.cancel()
         detailRevision = UUID()
         progressBusy = true
@@ -148,25 +175,23 @@ struct BookDetails: View {
         progressRequest = Task {
             defer { progressBusy = false }
             do {
-                try await player.prepareProgressEdit(itemID: book.id, episodeID: episode.id)
-                try Task.checkCancellation()
-                try await catalog.api.setFinished(itemID: book.id, episodeID: episode.id, finished: finished)
-                let user = try await catalog.api.me()
+                let user = try await player.setFinished(itemID: book.id, episodeID: episode?.id, finished: finished)
                 guard !Task.isCancelled else { return }
-                episodeProgress = user.mediaProgress
+                mediaProgress = user.mediaProgress
+                catalog.applyProgress(user)
             } catch { if !Task.isCancelled { self.error = ConnectionStore.recovery(for: error) } }
         }
     }
 
     private var selectedProgress: MediaProgress? {
-        episodeProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? progress
+        mediaProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode?.id } ?? progress
     }
     private var listeningDuration: Double? {
         if let episode { return episode.duration ?? episode.audioFile?.duration }
         return book.media.duration
     }
     private func progress(for episode: Episode) -> MediaProgress? {
-        episodeProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode.id }
+        mediaProgress.first { $0.libraryItemId == book.id && $0.episodeId == episode.id }
     }
     private var visibleEpisodes: [Episode] {
         (book.media.episodes ?? []).filter { episode in
@@ -286,7 +311,7 @@ struct BookDetails: View {
                 let (value, user) = try await (detail, account)
                 guard !Task.isCancelled, detailRevision == revision, try await catalog.api.currentAccount() == owner else { return }
                 expanded = value
-                episodeProgress = user.mediaProgress
+                mediaProgress = user.mediaProgress
                 canManagePodcasts = user.canManagePodcasts
                 if book.mediaType == "podcast", episode == nil {
                     try serverQueue.adoptLegacy(itemID: item.id)

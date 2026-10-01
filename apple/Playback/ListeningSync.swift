@@ -67,15 +67,20 @@ import Foundation
             }
             let user = try await api.me()
             guard try await api.currentAccount() == account else { throw CancellationError() }
-            for progress in user.mediaProgress {
-                guard let position = progress.currentTime, let updated = progress.lastUpdate else { continue }
-                try journal.rememberRemotePosition(account: account, itemID: progress.libraryItemId, episodeID: progress.episodeId, time: position, updatedAt: updated)
-            }
+            try rememberRemoteProgress(user, account: account)
         }
         let id = UUID()
         request = Transfer(id: id, task: transfer)
         defer { if request?.id == id { request = nil } }
         try await transfer.value
+    }
+
+    func rememberRemoteProgress(_ user: CurrentUser, account: AccountIdentity) throws {
+        let journal = try loaded()
+        for progress in user.mediaProgress {
+            guard let position = progress.currentTime, let updated = progress.lastUpdate else { continue }
+            try journal.rememberRemotePosition(account: account, itemID: progress.libraryItemId, episodeID: progress.episodeId, time: position, updatedAt: updated)
+        }
     }
 
     func cancelTransfers() async {

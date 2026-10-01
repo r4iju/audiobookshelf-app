@@ -59,13 +59,9 @@ struct CatalogShelf: View {
                 RecoveryCard(message: error) { Task { await catalog.reload() } }.padding(24)
             case .content(let content):
                 VStack(alignment: .leading, spacing: 30) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("A little more listening.").font(.system(.largeTitle, design: .serif).bold())
-                        Text("Find a familiar voice. Discover a new world.").foregroundColor(.secondary)
-                    }.padding(.top, 8)
                     if !content.continuing.isEmpty {
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Continue listening").font(.title2.bold())
+                            Text("Continue listening").font(.headline)
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
                                     ForEach(content.continuing) { item in
@@ -78,7 +74,7 @@ struct CatalogShelf: View {
                         }
                     }
                     HStack {
-                        Text("All \(catalog.library.mediaType == "podcast" ? "podcasts" : "books")").font(.title2.bold())
+                        Text("All \(catalog.library.mediaType == "podcast" ? "podcasts" : "books")").font(.title3.weight(.semibold))
                         Text("\(content.total)").font(.subheadline).foregroundColor(.secondary)
                         Spacer()
                         Button { listLayout.toggle() } label: { Image(systemName: listLayout ? "square.grid.2x2" : "list.bullet").padding(10) }
@@ -87,7 +83,7 @@ struct CatalogShelf: View {
                     if content.items.isEmpty {
                         Text(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.").foregroundColor(.secondary)
                     }
-                    LazyVGrid(columns: listLayout ? [GridItem(.flexible())] : [GridItem(.adaptive(minimum: 140, maximum: 210), spacing: 20)], spacing: 26) {
+                    LazyVGrid(columns: listLayout ? [GridItem(.flexible(), alignment: .top)] : [GridItem(.adaptive(minimum: 140, maximum: 210), spacing: 16, alignment: .top)], spacing: 22) {
                         ForEach(content.items) { item in
                             NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: progress(item, content))) {
                                 BookCard(item: item, catalog: catalog, listLayout: listLayout)
@@ -103,13 +99,13 @@ struct CatalogShelf: View {
                         ProgressView().frame(maxWidth: .infinity).padding(20)
 
                     }
-                }.padding(24).frame(maxWidth: 1400).frame(maxWidth: .infinity)
+                }.padding(20).frame(maxWidth: 1400).frame(maxWidth: .infinity)
             }
         }.accessibilityIdentifier("catalog").background(appearance.background)
             .navigationTitle(catalog.library.name)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    NavigationLink(destination: LibrarySearch(catalog: catalog)) { Image(systemName: "magnifyingglass").font(.title2) }.accessibilityLabel("Search library")
+                    NavigationLink(destination: LibrarySearch(catalog: catalog)) { Image(systemName: "magnifyingglass") }.accessibilityLabel("Search library")
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
@@ -120,7 +116,7 @@ struct CatalogShelf: View {
                             Divider()
                             ForEach(CatalogSort.available(for: catalog.library.mediaType), id: \.self) { sort in Button(sort.name) { Task { await catalog.changeSort(sort, descending: catalog.descending) } } }
                             Button(catalog.descending ? "Ascending order" : "Descending order") { Task { await catalog.changeSort(catalog.sort, descending: !catalog.descending) } }
-                        } label: { Image(systemName: "arrow.up.arrow.down") }.accessibilityLabel("Sort library")
+                        } label: { Image(systemName: "arrow.up.arrow.down").font(.body) }.accessibilityLabel("Sort library")
                         Button { filterOptions = true } label: { Image(systemName: catalog.filter == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill") }.accessibilityLabel("Filter library")
                     }
                 }
@@ -140,9 +136,9 @@ struct CatalogShelf: View {
                         Button("Change library") { Task { await connection.openLibrariesForSelection() } }
                         Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
                         Button("Sign out") { connection.signOut() }.accessibilityIdentifier("account-signout")
-                    } label: { Image(systemName: "person.crop.circle").font(.title2) }.accessibilityIdentifier("account")
+                    } label: { Image(systemName: "person.crop.circle") }.accessibilityIdentifier("account")
                 }
-            }.onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
+            }.onAppear { Task { if case .loading = catalog.state { await catalog.reload() } else { await catalog.refreshProgressIfNeeded() } } }
             .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
             .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
             .background(NavigationLink(destination: NativeSettings(), isActive: $settingsPresented) { EmptyView() }.hidden())
@@ -163,16 +159,18 @@ struct BookArtwork: View {
     @State private var image: UIImage?
     @State private var request: Task<Void, Never>?
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 16).fill(appearance.card)
-            if let image { Image(uiImage: image).resizable().scaledToFill() }
-            else {
-                VStack(spacing: 10) {
-                    Image(systemName: "book.closed.fill").font(.largeTitle)
-                    Text(item.title).font(.caption.bold()).multilineTextAlignment(.center).lineLimit(3)
-                }.foregroundColor(ShelfStyle.accent).padding(18)
-            }
-        }.aspectRatio(0.72, contentMode: .fit).clipped().cornerRadius(16)
+        RoundedRectangle(cornerRadius: 12).fill(image == nil ? appearance.card : .clear)
+            .aspectRatio(1, contentMode: .fit)
+            .overlay(Group {
+                if let image { Image(uiImage: image).resizable().scaledToFit().clipShape(RoundedRectangle(cornerRadius: 12)) }
+                else {
+                    VStack(spacing: 8) {
+                        Image(systemName: "book.closed.fill").font(.title2)
+                        Text(item.title).font(.caption.bold()).multilineTextAlignment(.center).lineLimit(3)
+                    }.foregroundColor(ShelfStyle.accent).padding(12)
+                }
+            })
+            .clipShape(RoundedRectangle(cornerRadius: 12))
             .accessibilityHidden(true)
             .onAppear { if image == nil { request = Task { image = await catalog.artwork(for: item) } } }
             .onDisappear { request?.cancel(); request = nil }
@@ -194,10 +192,18 @@ struct BookCard: View {
     }
     private var labels: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(item.title).font(.headline).foregroundColor(.primary).lineLimit(3)
-            Text(item.author.isEmpty ? "Unknown author" : item.author).font(.caption).foregroundColor(.secondary).lineLimit(2)
+            metadata(item.title, font: .subheadline.weight(.semibold), color: .primary)
+            metadata(item.author.isEmpty ? "Unknown author" : item.author, font: .caption, color: .secondary)
             if let duration = item.media.duration { Text(ShelfTime.describe(duration)).font(.caption).foregroundColor(.secondary) }
         }
+    }
+    private func metadata(_ value: String, font: Font, color: Color) -> some View {
+        ZStack(alignment: .topLeading) {
+            if !listLayout {
+                Text("Ag\nAg").hidden().accessibilityHidden(true)
+            }
+            Text(value).foregroundColor(color).lineLimit(2)
+        }.font(font).frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -207,15 +213,15 @@ struct ContinueCard: View {
     let catalog: CatalogStore
     let progress: MediaProgress?
     var body: some View {
-        HStack(spacing: 18) {
-            BookArtwork(item: item, catalog: catalog).frame(width: 74)
-            VStack(alignment: .leading, spacing: 10) {
-                Text(item.title).font(.headline).foregroundColor(.primary).lineLimit(2)
+        HStack(spacing: 14) {
+            BookArtwork(item: item, catalog: catalog).frame(width: 64)
+            VStack(alignment: .leading, spacing: 6) {
+                Text(item.title).font(.subheadline.weight(.semibold)).foregroundColor(.primary).lineLimit(2)
                 Text(item.author).font(.caption).foregroundColor(.secondary).lineLimit(1)
                 ProgressView(value: progress?.fraction ?? 0).accentColor(ShelfStyle.accent)
                 Text("\(Int((progress?.fraction ?? 0) * 100))% listened").font(.caption).foregroundColor(.secondary)
             }.frame(width: 175, alignment: .leading)
-        }.padding(18).background(appearance.card).cornerRadius(24)
+        }.padding(16).background(appearance.card).cornerRadius(18)
     }
 }
 

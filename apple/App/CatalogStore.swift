@@ -21,6 +21,7 @@ import SwiftUI
     @Published private(set) var filter: String?
     @Published private(set) var sort: CatalogSort = .title
     @Published private(set) var descending = false
+    private var needsProgressRefresh = false
     private var page = 0
     private var generation = UUID()
     private let covers = NSCache<NSString, UIImage>()
@@ -43,6 +44,7 @@ import SwiftUI
             let (items, account, shelves) = try await (response, user, personalized)
             guard generation == request else { return }
             page = 0
+            needsProgressRefresh = false
             state = .content(Catalog(items: items.results, total: items.total, user: account, continuing: filter == nil ? shelves.filter { $0.id == "continue-listening" }.flatMap(\.entities) : []))
         } catch {
             guard generation == request else { return }
@@ -51,6 +53,7 @@ import SwiftUI
     }
 
     func loadMore() async {
+        if needsProgressRefresh { await refreshProgressIfNeeded(); return }
         guard case .content(var catalog) = state, !catalog.loadingMore, catalog.hasMore else { return }
         let request = generation
         catalog.loadingMore = true
@@ -71,8 +74,42 @@ import SwiftUI
             guard generation == request else { return }
             catalog.pageError = ConnectionStore.recovery(for: error)
         }
+        if case .content(let latest) = state { catalog.user = latest.user; catalog.continuing = latest.continuing }
         catalog.loadingMore = false
         state = .content(catalog)
+    }
+
+    func applyProgress(_ user: CurrentUser) {
+        guard case .content(var content) = state, content.user.id == user.id else { return }
+        generation = UUID()
+        content.loadingMore = false
+        content.user = user
+        if filter?.hasPrefix("progress.") == true { needsProgressRefresh = true }
+        content.continuing.removeAll { item in
+            guard let progress = user.mediaProgress.first(where: { $0.libraryItemId == item.id && $0.episodeId == nil }) else { return false }
+            return progress.isFinished == true || (progress.currentTime ?? 0) <= 0
+        }
+        state = .content(content)
+    }
+
+    func refreshProgressIfNeeded() async {
+        guard needsProgressRefresh, case .content(var current) = state, !current.loadingMore else { return }
+        let request = generation
+        current.loadingMore = true; current.pageError = nil
+        state = .content(current)
+        do {
+            let response = try await api.items(libraryID: library.id, page: 0, filter: filter, sort: sort.rawValue, descending: descending)
+            guard generation == request, case .content(var content) = state else { return }
+            content.items = response.results; content.total = response.total
+            content.pageError = nil; content.loadingMore = false
+            page = 0; needsProgressRefresh = false
+            state = .content(content)
+        } catch {
+            guard generation == request, case .content(var content) = state else { return }
+            content.loadingMore = false
+            content.pageError = ConnectionStore.recovery(for: error)
+            state = .content(content)
+        }
     }
 
     func artwork(for item: LibraryItem) async -> UIImage? {

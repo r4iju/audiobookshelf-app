@@ -47,6 +47,7 @@
 		CE49EB3F1C6A1C10E099D2DC /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B6CC0E695DC31E590D3C2B /* APIClient.swift */; };
 		D9BA7FE22537DCE7E5F74F22 /* PlaybackViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AC840B99BF9E4C5E8634AC /* PlaybackViews.swift */; };
 		DE99C8824C14EF1CB284986E /* CatalogRecoveryJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440FCD5B29796AC12E0E0788 /* CatalogRecoveryJourney.swift */; };
+		DF0C729D247028757B0CCBDC /* ArtworkJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71993EA51724D91F41A6476 /* ArtworkJourney.swift */; };
 		E00EF93C2285FE0ED68DB1DD /* ServerEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D716B41B49708E6A00605567 /* ServerEvents.swift */; };
 		E5086F9B19216BD7283F0FD6 /* ConnectionJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CAC9658FF3F40EF409324C /* ConnectionJourney.swift */; };
 		E7868F696560654E9E242357 /* ListeningSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = E779620640E22D9796AD5963 /* ListeningSync.swift */; };
@@ -111,6 +112,7 @@
 		D1C2CFEF2D5FBC6F4EC51932 /* Preview.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Preview.entitlements; sourceTree = "<group>"; };
 		D1D2451CCE26A54E231EE326 /* ListeningStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningStats.swift; sourceTree = "<group>"; };
 		D716B41B49708E6A00605567 /* ServerEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerEvents.swift; sourceTree = "<group>"; };
+		D71993EA51724D91F41A6476 /* ArtworkJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkJourney.swift; sourceTree = "<group>"; };
 		DED963E2BB67CF0C2512E188 /* PodcastFeedEpisode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastFeedEpisode.swift; sourceTree = "<group>"; };
 		DFD50815ACE665566CE9977C /* ReaderAssets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ReaderAssets; path = App/ReaderAssets; sourceTree = SOURCE_ROOT; };
 		E779620640E22D9796AD5963 /* ListeningSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningSync.swift; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 		DC8496AE186C06413B82ACBD /* UITests */ = {
 			isa = PBXGroup;
 			children = (
+				D71993EA51724D91F41A6476 /* ArtworkJourney.swift */,
 				440FCD5B29796AC12E0E0788 /* CatalogRecoveryJourney.swift */,
 				FB67FA4E4F15B8C3895A29BF /* CollectionJourney.swift */,
 				E7CAC9658FF3F40EF409324C /* ConnectionJourney.swift */,
@@ -351,6 +354,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF0C729D247028757B0CCBDC /* ArtworkJourney.swift in Sources */,
 				DE99C8824C14EF1CB284986E /* CatalogRecoveryJourney.swift in Sources */,
 				11BBB0251CEA34B69409FEFE /* CollectionJourney.swift in Sources */,
 				E5086F9B19216BD7283F0FD6 /* ConnectionJourney.swift in Sources */,
