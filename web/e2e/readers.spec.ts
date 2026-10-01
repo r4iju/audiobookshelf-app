@@ -110,3 +110,82 @@ test("a document the server cannot deliver is reported, with a way back", async 
   await page.reload();
   await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
 });
+
+const book = (page: import("@playwright/test").Page) => page.locator("main iframe").first().contentFrame();
+
+test("an EPUB pages through, jumps by its contents, and resumes at the saved passage here and from other clients", async ({
+  page,
+}) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Paper Lanterns");
+  await resetProgress(api, id);
+
+  await signIn(page);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("link", { name: "Read" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Paper Lanterns" })).toBeVisible();
+  await page.getByRole("button", { name: "Next page" }).click();
+  await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeInViewport();
+  await page.keyboard.press("ArrowRight");
+  await expect(book(page).getByText("Chapter 1: Lantern 1")).not.toBeInViewport();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation ?? "").toMatch(/^epubcfi\(/);
+
+  await page.getByRole("button", { name: "Table of Contents" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Chapter 3: Lantern 3" }).click();
+  await expect(book(page).getByRole("heading", { name: "Chapter 3: Lantern 3" })).toBeInViewport();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookProgress ?? 0).toBeGreaterThan(0.2);
+  const chapterThree = (await serverProgress(api, id)).ebookLocation as string;
+
+  await page.reload();
+  await expect(book(page).getByRole("heading", { name: "Chapter 3: Lantern 3" })).toBeInViewport();
+
+  await page.getByRole("button", { name: "Table of Contents" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Chapter 5: Lantern 5" }).click();
+  await expect(book(page).getByRole("heading", { name: "Chapter 5: Lantern 5" })).toBeInViewport();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).not.toBe(chapterThree);
+
+  // Another client saved its place in chapter 3; opening the book again follows it.
+  await api.call(`/api/me/progress/${id}`, { method: "PATCH", body: { ebookLocation: chapterThree } });
+  await page.getByRole("link", { name: "Back" }).click();
+  await page.getByRole("link", { name: "Read" }).click();
+  await expect(book(page).getByRole("heading", { name: "Chapter 3: Lantern 3" })).toBeInViewport();
+});
+
+test("EPUB display settings apply to the text and are kept in this browser", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Paper Lanterns");
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(book(page).locator("body")).toBeAttached();
+
+  await page.getByRole("button", { name: "Reader settings" }).click();
+  const settings = page.getByRole("dialog", { name: "Reader settings" });
+  await settings.getByLabel("Theme").selectOption({ label: "Light" });
+  await settings.getByLabel("Font family").selectOption({ label: "Sans" });
+  await settings.getByLabel("Font scale").fill("150");
+  await settings.getByRole("button", { name: "Close" }).click();
+
+  const paragraph = book(page).locator("p").first();
+  await expect(paragraph).toHaveCSS("color", "rgb(0, 0, 0)");
+  await expect(book(page).locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(paragraph).toHaveCSS("font-family", /sans-serif/);
+
+  await page.reload();
+  await expect(book(page).locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await page.getByRole("button", { name: "Reader settings" }).click();
+  await expect(settings.getByLabel("Font scale")).toHaveValue("150");
+  await settings.getByLabel("Theme").selectOption({ label: "Dark" });
+  await settings.getByLabel("Font family").selectOption({ label: "Serif" });
+  await settings.getByLabel("Font scale").fill("100");
+});
+
+test("a damaged EPUB is reported as unreadable", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Paper Lanterns");
+  await signIn(page);
+  await page.route(`**/api/items/${id}/ebook**`, (route) =>
+    route.fulfill({ status: 200, contentType: "application/epub+zip", body: "PK this is not a zip" }),
+  );
+  await page.goto(`/read/${id}`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
+});

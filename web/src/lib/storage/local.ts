@@ -20,3 +20,7 @@ export function writeStored(key: string, value: unknown) {
 export function removeStored(key: string) {
   localStorage.removeItem(key);
 }
+
+export function storedKeys(prefix: string) {
+  return Object.keys(localStorage).filter((key) => key.startsWith(prefix));
+}

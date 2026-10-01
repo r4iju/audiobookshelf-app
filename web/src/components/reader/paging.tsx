@@ -1,12 +1,12 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { type PointerEvent, useEffect, useEffectEvent, useRef } from "react";
+import { type PointerEvent, type ReactNode, useEffect, useEffectEvent, useRef } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/i18n";
 
-interface Turns {
+export interface Turns {
   next: () => void;
   previous: () => void;
 }
@@ -15,15 +15,20 @@ const typing = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 
+/** Turns the page for an arrow or page key, and reports whether it did. */
+export function turnForKey(event: KeyboardEvent, turns: Turns) {
+  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || typing(event.target))
+    return false;
+  if (event.key === "ArrowRight" || event.key === "PageDown") turns.next();
+  else if (event.key === "ArrowLeft" || event.key === "PageUp") turns.previous();
+  else return false;
+  return true;
+}
+
 /** Arrow and page keys turn pages anywhere in the reader except while typing. */
 export function usePageKeys(turns: Turns) {
   const onKey = useEffectEvent((event: KeyboardEvent) => {
-    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || typing(event.target))
-      return;
-    if (event.key === "ArrowRight" || event.key === "PageDown") turns.next();
-    else if (event.key === "ArrowLeft" || event.key === "PageUp") turns.previous();
-    else return;
-    event.preventDefault();
+    if (turnForKey(event, turns)) event.preventDefault();
   });
 
   // External system: keys reach the window, not a focused element of the reader.
@@ -54,6 +59,43 @@ export function useSwipe(turns: Turns) {
   };
 }
 
+/** The bar under every reader: page turns at the ends, the format's own controls between them. */
+export function ReaderBar({
+  onPrevious,
+  onNext,
+  canGoBack = true,
+  canGoOn = true,
+  children,
+}: {
+  onPrevious: () => void;
+  onNext: () => void;
+  canGoBack?: boolean;
+  canGoOn?: boolean;
+  children: ReactNode;
+}) {
+  const { t } = useI18n();
+  return (
+    <nav
+      aria-label={t("WebReaderNavigation")}
+      className="flex items-center justify-between gap-2 border-t border-line px-2 py-2 sm:px-4"
+    >
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={t("WebPreviousPage")}
+        disabled={!canGoBack}
+        onClick={onPrevious}
+      >
+        <ChevronLeft aria-hidden className="size-5" />
+      </Button>
+      {children}
+      <Button variant="ghost" size="icon" aria-label={t("WebNextPage")} disabled={!canGoOn} onClick={onNext}>
+        <ChevronRight aria-hidden className="size-5" />
+      </Button>
+    </nav>
+  );
+}
+
 const pageInput = z.coerce.number().int();
 
 export function PageControls({
@@ -67,19 +109,12 @@ export function PageControls({
 }) {
   const { t } = useI18n();
   return (
-    <nav
-      aria-label={t("WebReaderNavigation")}
-      className="flex items-center justify-between gap-2 border-t border-line px-2 py-2 sm:px-4"
+    <ReaderBar
+      onPrevious={() => onGo(page - 1)}
+      onNext={() => onGo(page + 1)}
+      canGoBack={page > 1}
+      canGoOn={page < pages}
     >
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={t("WebPreviousPage")}
-        disabled={page <= 1}
-        onClick={() => onGo(page - 1)}
-      >
-        <ChevronLeft aria-hidden className="size-5" />
-      </Button>
       <form
         className="flex items-center gap-2 text-sm"
         action={(form) => {
@@ -105,15 +140,6 @@ export function PageControls({
           {t("WebReaderPage", page, pages)}
         </output>
       </form>
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={t("WebNextPage")}
-        disabled={page >= pages}
-        onClick={() => onGo(page + 1)}
-      >
-        <ChevronRight aria-hidden className="size-5" />
-      </Button>
-    </nav>
+    </ReaderBar>
   );
 }

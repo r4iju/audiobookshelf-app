@@ -234,7 +234,7 @@ export function useRemoveEpisode() {
 
 export interface EbookPlace {
   ebookLocation: string;
-  ebookProgress: number;
+  ebookProgress?: number;
 }
 
 export function useSaveEbookPlace(itemId: string) {

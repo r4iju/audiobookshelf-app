@@ -18,12 +18,14 @@ export interface ReaderViewProps {
   /** The saved location to open at, in the format's own notation. */
   start: string | null;
   onPlace: (place: EbookPlace) => void;
+  /** Names the document for what this browser keeps about it, such as an EPUB's generated locations. */
+  cacheKey: string;
 }
 
 // The document engines touch browser-only APIs as they load, so they are only ever loaded in the browser.
 const views: Record<EbookKind, React.ComponentType<ReaderViewProps> | null> = {
   pdf: dynamic(() => import("./pdf-view").then((module) => module.PdfView), { ssr: false }),
-  epub: null,
+  epub: dynamic(() => import("./epub-view").then((module) => module.EpubView), { ssr: false }),
   mobi: null,
   comic: null,
 };
@@ -72,14 +74,17 @@ function ReaderBody({
   const progress = useServerItemProgress(item.id);
   const save = useSaveEbookPlace(item.id);
 
-  if (file.isPending || (ebook.keepsProgress && progress.isPending))
+  // The place is read fresh on every opening, so a book follows wherever another device left it.
+  if (file.isPending || (ebook.keepsProgress && !progress.isFetchedAfterMount))
     return <Spinner label={t("WebLoading")} />;
   if (file.isError) return <Alert>{errorMessage(t, file.error)}</Alert>;
   return (
     <>
       <InlineError error={progress.error ?? save.error} />
       <View
+        key={ebook.path}
         file={file.data}
+        cacheKey={ebook.path}
         start={ebook.keepsProgress ? (progress.data?.ebookLocation ?? null) : null}
         onPlace={(place) => {
           if (ebook.keepsProgress) save.mutate(place);

@@ -12,12 +12,23 @@ export const sleepPresetsMinutes = [5, 10, 15, 30, 45, 60, 90] as const;
 
 const jump = z.number().refine((value) => (jumpTimes as readonly number[]).includes(value));
 
+/** Percentages for scale and spacing, hundredths of a pixel for boldness, as the legacy reader stores them. */
+export const readerLimits = {
+  fontScale: { min: 5, max: 300, step: 5 },
+  lineSpacing: { min: 100, max: 300, step: 5 },
+  textStroke: { min: 0, max: 300, step: 10 },
+} as const;
+export type ReaderNumber = keyof typeof readerLimits;
+
+export const readerNumber = (key: ReaderNumber) =>
+  z.number().int().min(readerLimits[key].min).max(readerLimits[key].max);
+
 export const readerSettingsSchema = z.object({
   theme: z.enum(["dark", "black", "light"]).catch("dark"),
   font: z.enum(["serif", "sans-serif"]).catch("serif"),
-  fontScale: z.number().min(5).max(300).catch(100),
-  lineSpacing: z.number().min(100).max(300).catch(115),
-  textStroke: z.number().min(0).max(300).catch(0),
+  fontScale: readerNumber("fontScale").catch(100),
+  lineSpacing: readerNumber("lineSpacing").catch(115),
+  textStroke: readerNumber("textStroke").catch(0),
   spread: z.enum(["auto", "none"]).catch("auto"),
 });
 export type ReaderSettings = z.infer<typeof readerSettingsSchema>;
