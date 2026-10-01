@@ -490,6 +490,61 @@ final class LegacyRealmExportTests: XCTestCase {
                                                           copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }),
                          "a retry after a failure succeeds")
     }
+
+    private func job(at date: Date = Date(timeIntervalSince1970: 1_790_000_000)) -> LegacyExportJob {
+        LegacyExportJob(documents: documents, exportsDirectory: directory.appendingPathComponent("Exports"),
+                        workDirectory: directory.appendingPathComponent("ExportWork"), defaults: defaults, now: { date })
+    }
+
+    func testAnExportJobWritesOneDatedMigrationPackageAndReplacesEarlierOnes() throws {
+        try seedLegacyRealm()
+        let before = try digest()
+        let exports = directory.appendingPathComponent("Exports")
+        try FileManager.default.createDirectory(at: exports.appendingPathComponent("Old.absmigration"), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: exports.appendingPathComponent("Torn.absmigration.partial"), withIntermediateDirectories: true)
+        var last: LegacyExportProgress?
+
+        let result = try job().run(webStorage: ["ereaderSettings": "{}", "absDeviceId": "device-1"],
+                                   copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }, progress: { last = $0 })
+
+        XCTAssertEqual(result.url.pathExtension, "absmigration")
+        XCTAssertTrue(result.url.lastPathComponent.hasPrefix("Audiobookshelf Export "))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: exports.path), [result.url.lastPathComponent],
+                       "earlier and torn exports are replaced, so only one package is offered")
+        guard case let .copyingFiles(files)? = last else { return XCTFail("no file progress") }
+        XCTAssertEqual(result.files, files.totalFiles)
+        XCTAssertEqual(result.bytes, files.totalBytes)
+        XCTAssertEqual(try LegacyArchive.open(result.url).snapshot.webStorage, ["ereaderSettings": "{}"])
+        XCTAssertEqual(try digest(), before)
+
+        try job().discard()
+        XCTAssertFalse(FileManager.default.fileExists(atPath: exports.path))
+        XCTAssertEqual(try digest(), before)
+    }
+
+    func testAnExportJobFailureLeavesNoPackageAndExplainsItWithoutDetails() throws {
+        try seedLegacyRealm()
+        let messages = [LegacyExportJob.Message.insufficientSpace, LegacyExportJob.Message.databaseUnreadable,
+                        LegacyExportJob.Message.unsupportedVersion, LegacyExportJob.Message.failed]
+        XCTAssertEqual(Set(messages).count, messages.count, "each failure has its own explanation")
+        XCTAssertFalse(messages.contains { $0.isEmpty })
+        let exports = directory.appendingPathComponent("Exports")
+
+        XCTAssertThrowsError(try job().run(webStorage: [:], copyRealm: { _ in throw CocoaError(.fileWriteOutOfSpace) }, progress: nil)) { error in
+            XCTAssertEqual(LegacyExportJob.message(for: error), LegacyExportJob.Message.insufficientSpace)
+        }
+        XCTAssertEqual((try? FileManager.default.contentsOfDirectory(atPath: exports.path)) ?? [], [])
+        XCTAssertFalse(FileManager.default.fileExists(atPath: directory.appendingPathComponent("ExportWork").path))
+
+        XCTAssertThrowsError(try job().run(webStorage: [:], copyRealm: { try Data("\(Self.accessToken) torn".utf8).write(to: $0) }, progress: nil)) { error in
+            let message = LegacyExportJob.message(for: error)
+            XCTAssertEqual(message, LegacyExportJob.Message.databaseUnreadable)
+            XCTAssertFalse(message.contains(Self.accessToken))
+        }
+        XCTAssertEqual(LegacyExportJob.message(for: LegacyMigrationError.unsupportedLegacySchema(22)), LegacyExportJob.Message.unsupportedVersion)
+        XCTAssertEqual(LegacyExportJob.message(for: CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: "/private/\(Self.accessToken)"])),
+                       LegacyExportJob.Message.failed, "unexpected errors are described generically, never with their paths")
+    }
 }
 
 private struct FakeRefreshTokens: LegacyRefreshTokenReading {

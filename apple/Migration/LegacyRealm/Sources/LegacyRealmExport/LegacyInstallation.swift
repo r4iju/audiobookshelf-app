@@ -94,3 +94,28 @@ public enum LegacyArchiveExporter {
         return try LegacyArchive.write(snapshot, documents: documents, to: destination) { progress?(.copyingFiles($0)) }
     }
 }
+
+public struct LegacyExportResult: Equatable {
+    public let url: URL
+    public let files: Int
+    public let bytes: Int64
+}
+
+public final class LegacyExportJob {
+    public enum Message {
+        public static let insufficientSpace = ""
+        public static let databaseUnreadable = ""
+        public static let unsupportedVersion = ""
+        public static let failed = ""
+    }
+
+    public init(documents: URL, exportsDirectory: URL, workDirectory: URL, defaults: UserDefaults, now: @escaping () -> Date = Date.init) {}
+
+    public func run(webStorage: [String: String], copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)?) throws -> LegacyExportResult {
+        throw CocoaError(.featureUnsupported)
+    }
+
+    public func discard() throws {}
+
+    public static func message(for error: Error) -> String { "" }
+}
