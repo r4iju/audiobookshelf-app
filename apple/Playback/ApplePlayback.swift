@@ -412,7 +412,7 @@ import UIKit
             #if os(iOS)
             if streamCellularConsent == nil {
                 let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.streamingKey)
-                let allowed = await AppleNetworkPolicy.request(AppleNetworkPolicy.streamingKey, title: "this listening session")
+                let allowed = await AppleNetworkPolicy.request(AppleNetworkPolicy.streamingKey, title: NativeStrings.current("this listening session"))
                 guard requestGeneration == generation, self.session?.id == session.id else { throw CancellationError() }
                 guard policy == AppleNetworkPolicy.read(AppleNetworkPolicy.streamingKey) else { throw CancellationError() }
                 streamCellularConsent = allowed

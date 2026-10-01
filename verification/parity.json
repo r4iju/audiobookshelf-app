@@ -128,7 +128,7 @@
       ],
       "verification": {
         "given": "iPhone in compact portrait and landscape",
-        "when": "Navigate library \u2192 item \u2192 player and back with native gestures",
+        "when": "Navigate library → item → player and back with native gestures",
         "then": "Touch targets and back behavior follow platform conventions; audio survives navigation"
       },
       "replacementEvidence": {
@@ -185,7 +185,7 @@
       ],
       "verification": {
         "given": "Android with gesture and button navigation",
-        "when": "Browse \u2192 play \u2192 background \u2192 return",
+        "when": "Browse → play → background → return",
         "then": "Native navigation and system controls remain coherent"
       },
       "replacementEvidence": {
@@ -990,7 +990,7 @@
         "tv"
       ],
       "verification": {
-        "given": "Opening chapter 0\u20138 seconds and next chapter 8\u201320",
+        "given": "Opening chapter 0–8 seconds and next chapter 8–20",
         "when": "Select next chapter and inspect both progress displays",
         "then": "Playback starts at eight seconds; chapter and whole-book progress differ correctly"
       },
@@ -1778,7 +1778,8 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "PreferencesJourney statistics, Year in review and Buddhist-locale calendar journeys on iPhone and iPad (APPLE-PREFERENCES.md); YearExport 28 tests on simulator (apple/Localization/HANDOFF.md); book finished/unfinished management (APPLE-BOOK-PROGRESS.md). Physical image sharing and live annual data not tested."
+          "PreferencesJourney statistics, Year in review and Buddhist-locale calendar journeys on iPhone and iPad (APPLE-PREFERENCES.md); YearExport 28 tests on simulator (apple/Localization/HANDOFF.md); book finished/unfinished management (APPLE-BOOK-PROGRESS.md). Physical image sharing and live annual data not tested.",
+          "Durable confirmed book/episode reset: 14 reset tests within 64 native tests pass; 4 iPhone and 4 iPad production journeys pass, including cancel, from-zero playback, isolation and retry. Unified completion confirmation retains 3 existing journeys. docs/modernization/APPLE-PROGRESS-RESET.md. Hardware and owner-data acceptance remain open."
         ],
         "android": [],
         "browser": []
