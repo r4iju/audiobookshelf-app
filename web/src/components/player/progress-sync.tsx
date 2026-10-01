@@ -25,7 +25,7 @@ export function useProgressSync() {
       soon = setTimeout(flush, 1_000);
     });
     flush();
-    // Always, as versions of listening that failed are sent again from IndexedDB rather than from the queue.
+    // Unconditional: failed versions of listening wait in IndexedDB, not in the queue.
     const timer = setInterval(flush, RETRY_MS);
     window.addEventListener("online", flush);
     return () => {

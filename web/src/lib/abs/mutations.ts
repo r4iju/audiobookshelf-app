@@ -81,9 +81,7 @@ export function useDiscardProgress() {
 }
 
 /** Settles a discard left unconfirmed (see discardProgress) the way the user chose. */
-function useDiscardChoice(
-  choose: (client: AbsClient, itemId: string, episodeId: string | null) => Promise<unknown>,
-) {
+function useDiscardChoice(choose: typeof keepProgress) {
   const { client, connection } = useAbs();
   const queryClient = useQueryClient();
   return useMutation({
@@ -93,7 +91,7 @@ function useDiscardChoice(
   });
 }
 
-/** Gives up the discard, so nothing is deleted, unless its delete was issued meanwhile; then it is shown as pending. */
+/** Gives up the discard: nothing is deleted, unless its delete was issued meanwhile. */
 export const useKeepProgress = () => useDiscardChoice(keepProgress);
 
 /** Deletes anyway, accepting that the unconfirmed listening may bring the old place back. */

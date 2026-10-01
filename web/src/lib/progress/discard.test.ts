@@ -579,10 +579,9 @@ describe("discardProgress", () => {
     outboxFor("conn-a").record(report("new-x", "book-x"));
 
     // Another tab still offering Keep, or recovering the discard on its own, chooses to keep.
-    const kept = await keepProgress(server.client, "book-x", null);
+    await keepProgress(server.client, "book-x", null);
     await flushReports(server.client, () => {});
-    expect({ kept, log: [...server.log], state: outboxFor("conn-a").discardState("book-x", null) }).toEqual({
-      kept: false,
+    expect({ log: [...server.log], state: outboxFor("conn-a").discardState("book-x", null) }).toEqual({
       log: [],
       state: "pending",
     });
@@ -620,7 +619,7 @@ describe("discardProgress", () => {
     expect({ result, log: server.log }).toEqual({ result: "unconfirmed", log: [] });
   });
 
-  it("saves a reading place given during a discard only once the delete is answered", async () => {
+  it("drops a reading place left waiting by a discard that then deletes, since it may hold the old place", async () => {
     vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
     const server = scriptedDeleteServer("conn-a", ["hang"]);
     usePlayerStore.getState().attach(server.client);
@@ -640,7 +639,7 @@ describe("discardProgress", () => {
     server.thaw();
     await Promise.all([discarding, saving]);
 
-    expect(server.log).toEqual(["DELETE /api/me/progress/p-x", "PATCH /api/me/progress/book-x"]);
+    expect(server.log).toEqual(["DELETE /api/me/progress/p-x"]);
   });
 
   it("sends nothing a discard forgot, after its delete, from a tab whose view of the queue still has it", async () => {

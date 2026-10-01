@@ -116,6 +116,14 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 - **RSS feeds** follow the legacy item menu. Administrators open and close them; anyone sees an open feed's address.
   Opening needs an item with audio. The legacy slug cleaning is applied before opening, and the address shown is
   exactly the one used.
+- **Listening is sent one version at a time.** Reports carry a session's cumulative totals, and 2.30.0 overwrites a
+  session it already has with whatever request finishes last. So a newer version of a session is sent only after the
+  request carrying the previous one was answered, by any tab; IndexedDB records which version each tab issued. A
+  version whose request failed without an answer, or that another tab left unanswered for five minutes, is frozen:
+  it is only ever sent again unchanged, and the session goes on under a new random id whose report carries only the
+  listening after the frozen one (its `startTime` is where the frozen one ended). However late the frozen request
+  lands, it rewrites its own session with the same values, so no session is lowered and the listening time adds up
+  to what was played, split over more than one session in the server's history.
 - **Discarding progress** is a recorded intent that ends only when the server confirms the delete. For the
   account the discard came from only:
   1. a hold is stored for the book or episode, naming the progress row to delete. While it exists, no tab delivers
@@ -125,30 +133,39 @@ server, or a physical device. The production container `audiobookshelf` (port 13
      back to the start, paused. A session still being opened for it is let go when it arrives. Playing it again
      while the hold exists starts from the beginning, not from the server's old place;
   3. the old playback session is closed without a final report;
-  4. the book is blocked in IndexedDB, and listening for it that any tab of the account recorded as sent must be
-     answered (see below);
-  5. the server's progress row is deleted;
-  6. once the delete is confirmed, the block and the hold end, and listening recorded since step 2 is delivered as
-     new progress. The block is marked finished, so a tab waking late neither blocks the book nor deletes again.
+  4. the book is blocked in IndexedDB, and the reports dropped in step 2 are retired there, so a tab whose copy of
+     the queue still has them never sends them. Anything for the book that any tab of the account recorded as sent
+     (listening, a reader place, finished) must be answered (see below);
+  5. the discard moves to **deleting** in IndexedDB, and the server's progress row is deleted;
+  6. once the delete is confirmed, the discard is **finished**: the block and the hold end, frozen listening for the
+     book (which carries the old place) is dropped, and listening recorded since step 2 is delivered as new
+     progress. A tab waking late neither blocks the book nor deletes again.
 
-  Every tab records the exact reports it is about to send in IndexedDB, checking the blocked books in the same
-  transaction, then sends those reports, leaving out any no longer queued or now held. IndexedDB orders these
-  transactions across tabs with or without Web Locks, so plain-HTTP origins are covered: a delivery recorded before
-  the block counts against the discard, and one recorded after it leaves the book out. A record ends only with the
-  server's answer to that request. A request that failed without an answer stays recorded (one entry per report),
-  since it may still reach the server, or still be running there.
+  Where a discard stands (blocked, deleting, finished or kept) is one IndexedDB record that every step changes
+  inside a transaction, so tabs agree on it with or without Web Locks. **Keep progress** succeeds only while the
+  discard is blocked. Once the delete is issued it can no longer be kept, from any tab: the hold stays until the
+  delete is answered, and the item page shows it pending. Tabs learn of each other's changes through storage events.
+
+  Every tab records exactly what it is about to send in IndexedDB, reading the queue and checking the blocked books
+  in the same transaction, then sends exactly that. A delivery recorded before the block counts against the
+  discard, and one recorded after it leaves the book out. A record ends only with the server's answer to that
+  request. A request that failed without an answer stays recorded, since it may still reach the server, or still be
+  running there. Reader places and finished changes (`PATCH /api/me/progress`) are recorded the same way. One made
+  while the book is blocked waits: it is sent if the discard is kept, and dropped if the discard deletes, since it
+  may carry the old place. The next page turn saves the place again.
 
   2.30.0 shows nothing that says a given request is done. `local-all` requests for one session run independently,
-  and one that finds no progress row creates one, so neither a copy of the report sent again nor the server holding
-  that listening (any tab may send the same queued report) proves the original cannot land after the delete. So:
+  and one that finds no progress row creates one, so neither a copy sent again nor the server holding that listening
+  proves the original cannot land after the delete. So:
 
   - if the only deliveries on their way are this tab's own, the discard waits for their answers and finishes;
-  - otherwise it is left **unconfirmed**. The item page says "Discarding progress. Listening for this that another
-    tab sent is not confirmed by the server, and could bring the old position back after the discard. It finishes
-    by itself once confirmed." and offers **Keep progress** (nothing is deleted, and the held listening is
-    delivered) and **Discard anyway** (the delete is sent; the old place can come back only if that listening still
-    lands, and discarding again then removes it). Any tab of the account finishes the discard by itself once the
-    other tab's answers are in. Nothing is decided from time passing.
+  - otherwise it is left **unconfirmed**. The item page says "Discarding progress. Progress for this sent earlier is
+    not confirmed by the server and could bring the old place back. This finishes by itself if it is confirmed;
+    otherwise keep the progress, or discard anyway and accept that the old place may return." and offers **Keep
+    progress** (nothing is deleted, and the held listening is delivered) and **Discard anyway** (the delete is sent;
+    the old place can come back only if that request still lands, and discarding again then removes it). Any tab of
+    the account finishes the discard by itself once the other tab's answers are in. Nothing is decided from time
+    passing, and nothing but the user's choice overrides an unconfirmed request.
 
   If the delete fails, the discard says so where it was asked, the item page shows "Discarding progress. It
   finishes when the server can be reached.", and the hold stays. The next delivery from any tab of that account
@@ -163,10 +180,18 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 
   - A tab that crashed, was closed or froze with a delivery on its way leaves later discards of that book
     unconfirmed until it answers or the user chooses. A request that failed without an answer does so for good,
-    until the user chooses.
-  - Keep progress pressed in the moment a waiting discard sends its delete cannot stop that delete.
-  - A browser that refuses IndexedDB delivers no listening at all; each delivery fails as an outage would, and
-    nothing is sent unrecorded.
+    until the user chooses Discard anyway.
+  - Keep progress does not bring back the unsent listening that step 2 dropped from this device.
+  - Reader places have no version guard in 2.30.0: a place whose request failed without an answer can still land
+    after a newer one and move the place back, until the next page turn saves it again.
+  - Any request that throws, including a proxy's 502 or 504, counts as failed without an answer, since the server
+    behind the proxy may still have applied it.
+  - The queue in localStorage is rewritten by each tab without a cross-tab lock. A tab removing delivered reports at
+    the moment another records one can drop that one report; the next report of the same session (every 15 seconds
+    while playing) carries the same totals and more.
+  - IndexedDB keeps one small record per playback session ever sent, and one per discard; nothing prunes them.
+  - A browser that refuses IndexedDB delivers no listening and saves no reader place; each attempt fails as an
+    outage would, and nothing is sent unrecorded.
 
   Other books and other accounts stay playable and keep delivering throughout. A storage refusal in steps 1 or 2
   fails the discard before anything is sent, so the server's progress is unchanged. A refusal part-way through

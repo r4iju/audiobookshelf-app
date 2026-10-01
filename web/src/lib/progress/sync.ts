@@ -3,7 +3,7 @@ import { localSyncResultSchema } from "@/lib/abs/schemas";
 import { deviceInfo } from "@/lib/device";
 import { randomId } from "@/lib/random-id";
 import {
-  beginSending,
+  beginChange,
   block,
   claimDelete,
   deliveryChange,
@@ -11,6 +11,7 @@ import {
   finishDelete,
   finishSending,
   keep,
+  type ProgressChange,
   inFlight as recordedDeliveries,
   type Target,
   thisPage,
@@ -61,12 +62,7 @@ export function outboxFor(connectionId: string) {
     // Another tab's holds and queue reach this one through storage events, so its discard state stays current here.
     if (typeof window !== "undefined")
       window.addEventListener("storage", (event) => {
-        if (
-          event.key === null ||
-          event.key === `abs-web:v1:outbox:${connectionId}` ||
-          event.key.startsWith(`abs-web:v1:outbox-hold:${connectionId}:`)
-        )
-          created.changed();
+        if (event.key === null || created.stores(event.key)) created.changed();
       });
     outbox = created;
     outboxes.set(connectionId, outbox);
@@ -121,20 +117,17 @@ export async function finishDiscard(
 }
 
 /**
- * Gives up this account's discard of the book or episode, so nothing is deleted and its held listening is sent, and
- * says whether it could: not once a delete has been issued.
+ * Gives up this account's discard of the book or episode, so nothing is deleted and its held listening is sent. One
+ * whose delete has been issued goes on, shown as pending.
  */
 export async function keepProgress(client: AbsClient, itemId: string, episodeId: string | null) {
   const connectionId = client.connection.id;
   const outbox = outboxFor(connectionId);
-  let kept = true;
   for (const hold of outbox.holdsFor(itemId, episodeId)) {
     const phase = await keep(connectionId, hold.id);
-    if (phase !== "kept") kept = false;
     if (phase === "kept" || phase === "finished") outbox.settled(hold.id);
     else outbox.markUnconfirmed(hold.id, false);
   }
-  return kept;
 }
 
 /** Finishes this account's discard of the book or episode without waiting for unconfirmed deliveries. */
@@ -147,16 +140,25 @@ export async function discardAnyway(client: AbsClient, itemId: string, episodeId
 
 /**
  * Changes the account's progress on a book or episode (finished, reader place). It is recorded as being sent, like
- * listening, so a discard accounts for it; during a discard it waits until the discard is done or kept.
+ * listening, so a discard accounts for it. During a discard it waits, and is sent only if the discard is kept.
  */
-export async function changeProgress(client: AbsClient, target: Target, change: object) {
+export async function changeProgress(client: AbsClient, target: Target, change: ProgressChange["change"]) {
   const connectionId = client.connection.id;
-  const item = { id: randomId(), libraryItemId: target.libraryItemId, episodeId: target.episodeId, change };
-  let sendingKey = await beginSending(connectionId, item, thisPage);
-  while (!sendingKey) {
+  const item: ProgressChange = {
+    id: randomId(),
+    libraryItemId: target.libraryItemId,
+    episodeId: target.episodeId,
+    change,
+  };
+  const waitedFor = new Set<string>();
+  let begun = await beginChange(connectionId, item, thisPage, []);
+  while (begun !== "dropped" && "blockedBy" in begun) {
+    for (const holdId of begun.blockedBy) waitedFor.add(holdId);
     await deliveryChange(WAIT_MS);
-    sendingKey = await beginSending(connectionId, item, thisPage);
+    begun = await beginChange(connectionId, item, thisPage, [...waitedFor]);
   }
+  if (begun === "dropped") return;
+  const { sendingKey } = begun;
   const episode = target.episodeId ? `/${target.episodeId}` : "";
   try {
     await client.command("PATCH", `/api/me/progress/${target.libraryItemId}${episode}`, change);

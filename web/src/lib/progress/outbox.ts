@@ -296,6 +296,8 @@ export function createOutbox(
       if (left.length !== queue.length) save(left);
       return { kind: "sent", delivered: results.filter((result) => result.success).length };
     },
+    /** Whether this outbox keeps its queue or holds under the storage key. */
+    stores: (storageKey: string) => storageKey === key || storageKey.startsWith(holdPrefix),
     /** Tells listeners that another tab changed this outbox. */
     changed: notify,
     subscribe(listener: () => void) {

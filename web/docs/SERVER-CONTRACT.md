@@ -79,16 +79,24 @@ server allows the development server's origins. OpenID cannot work cross-origin;
     bearer token.
 - `POST /api/session/local-all`
   - Listening is reported as "local sessions" with client-chosen ids and cumulative totals.
-  - Sending a session again is safe.
+  - 2.30.0 overwrites an existing session's `currentTime`, `timeListening` and `updatedAt` with each request, in
+    whatever order requests finish, and the requests of one batch run one after another before the answer. So a
+    session's next version is sent only after the previous one's request was answered. A version whose request
+    failed without an answer is only ever sent again unchanged, and the rest of the listening goes under a new
+    session id (see WEB-HANDOFF.md). Server history then shows such playback as more than one session, with the same
+    total time.
   - The server applies progress only when `updatedAt` is not older than what it has, so reports are dated in
     server time (the offset is taken from the play response).
 - `POST /api/session/:id/close`
   - Ends a playback session. When progress is discarded, the session is closed without a final report.
 - `PATCH /api/me/progress/:itemId[/:episodeId]`
   - `isFinished`, and reader places (`ebookLocation`, `ebookProgress`).
+  - 2.30.0 creates a progress row when none exists and applies any PATCH regardless of age. The client records each
+    one like listening, so a discard waits for it, and holds back one made during a discard (sent if the discard is
+    kept, dropped if it deletes).
 - `DELETE /api/me/progress/:progressId`
-  - Discard progress. Sent only after the session is closed and every `local-all` for that book that any tab
-    recorded as sent has been answered. The server creates progress afresh from a report that lands after the
+  - Discard progress. Sent only after the session is closed and every `local-all` and progress `PATCH` for that
+    book that any tab recorded as sent has been answered. Once sent, the discard can no longer be kept. The server creates progress afresh from a report that lands after the
     delete, bringing the old position back. 2.30.0 offers no way to tell that a given request is done: `local-all`
     requests run independently (a session found by id is updated, but one that finds no progress row creates
     one), so neither a copy sent again nor the server holding that listening proves the original will not land
