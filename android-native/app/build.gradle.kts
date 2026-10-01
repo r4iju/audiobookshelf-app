@@ -20,6 +20,14 @@ android {
         buildConfigField("String", "OAUTH_REDIRECT", "\"audiobookshelf-native-preview://oauth\"")
     }
 
+    val ownerKeystore = System.getenv("ABS_ANDROID_KEYSTORE")
+    if (ownerKeystore != null) signingConfigs.create("owner") {
+        storeFile = file(ownerKeystore)
+        storePassword = System.getenv("ABS_ANDROID_KEYSTORE_PASSWORD")
+        keyAlias = System.getenv("ABS_ANDROID_KEY_ALIAS")
+        keyPassword = System.getenv("ABS_ANDROID_KEY_PASSWORD")
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -28,7 +36,7 @@ android {
             isMinifyEnabled = false
             // Internal distribution only: signed locally with the existing debug keystore unless
             // ABS_ANDROID_KEYSTORE points at an owner-provided keystore.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (ownerKeystore != null) "owner" else "debug")
         }
     }
 
@@ -103,5 +111,6 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:4.1.1")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
