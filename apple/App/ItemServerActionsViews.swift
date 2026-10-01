@@ -31,7 +31,7 @@ struct ItemServerActionsSection: View {
             if case .sending(let device)? = actions.activity {
                 ProgressView(l10n("Sending to {0}…", device))
             } else if let device = actions.sent {
-                Label(l10n("Ebook sent to {0}", device), systemImage: "checkmark.circle").font(.callout).foregroundColor(.secondary)
+                Label(l10n("Ebook sent to {0}", device), systemImage: "checkmark.circle").font(.callout).foregroundColor(ShelfStyle.secondaryText)
                     .accessibilityIdentifier("send-ebook-result")
             }
             if let error = actions.error, !showingFeed {
@@ -106,7 +106,7 @@ struct RSSFeedSheet: View {
 
     private func openFeed(_ feed: RSSFeed) -> some View {
         Group {
-            Section(header: Text(l10n("RSS feed is open"))) {
+            Section(header: Text(l10n("RSS feed is open")).foregroundColor(ShelfStyle.secondaryText)) {
                 Text(actions.feedURL(feed)).font(.callout).textSelection().accessibilityIdentifier("rss-feed-url")
                 Button {
                     UIPasteboard.general.string = actions.feedURL(feed)
@@ -132,7 +132,7 @@ struct RSSFeedSheet: View {
 
     private var newFeed: some View {
         Group {
-            Section(header: Text(l10n("Feed slug")), footer: Text(l10n("The feed URL will be {0}", actions.serverAddress + "/feed/" + slug))) {
+            Section(header: Text(l10n("Feed slug")).foregroundColor(ShelfStyle.secondaryText), footer: Text(l10n("The feed URL will be {0}", actions.serverAddress + "/feed/" + slug)).foregroundColor(ShelfStyle.secondaryText)) {
                 TextField(l10n("Feed slug"), text: $slug).autocapitalization(.none).disableAutocorrection(true).accessibilityIdentifier("rss-slug")
                 if adjusted { Text(l10n("The slug had to be modified. Check it, then open the feed again.")).font(.footnote).foregroundColor(.orange).accessibilityIdentifier("rss-slug-adjusted") }
             }
@@ -162,7 +162,7 @@ struct RSSFeedSheet: View {
     }
 
     private func row(_ title: String, _ value: String, identifier: String) -> some View {
-        HStack { Text(title); Spacer(); Text(value).foregroundColor(.secondary).accessibilityIdentifier(identifier) }
+        HStack { Text(title); Spacer(); Text(value).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier(identifier) }
     }
 }
 

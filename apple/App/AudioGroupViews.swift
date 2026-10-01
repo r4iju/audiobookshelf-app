@@ -13,8 +13,10 @@ import SwiftUI
     private var generation = UUID()
     private var owner: AccountIdentity?
     init(catalog: CatalogStore, kind: AudioGroupKind) { self.catalog = catalog; self.kind = kind }
-    var canEdit: Bool { !loading && owner != nil && user != nil && (kind == .playlist || user?.permissions.update == true || user?.canManagePodcasts == true) }
-    var canDelete: Bool { !loading && owner != nil && user != nil && (kind == .playlist || user?.permissions.delete == true || user?.canManagePodcasts == true) }
+    // Server 2.30 lets a playlist's owner manage it, and authorizes collection changes by the update and delete
+    // permissions alone, whatever the account type.
+    var canEdit: Bool { !loading && owner != nil && user != nil && (kind == .playlist || user?.permissions.update == true) }
+    var canDelete: Bool { !loading && owner != nil && user != nil && (kind == .playlist || user?.permissions.delete == true) }
     func save(id: String?, name: String, description: String, members: [AudioGroupMember]) async -> Bool {
         guard !saving, canEdit, let owner else { return false }
         let request = UUID(); generation = request; loading = false; saving = true; error = nil
@@ -25,7 +27,14 @@ import SwiftUI
             selected = result
             if let index = groups.firstIndex(where: { $0.id == result.id }) { groups[index] = result } else { groups.append(result) }
             return true
-        } catch { if generation == request { self.error = NativeStrings.current("Changes could not be completed. Some membership changes may already be saved. {0}", ConnectionStore.recovery(for: error)) }; return false }
+        } catch { if generation == request { self.error = Self.saveFailure(error) }; return false }
+    }
+    private static func saveFailure(_ error: Error) -> String {
+        guard let partial = error as? AudioGroupPartialSave else { return refusal(error) }
+        return NativeStrings.current("Changes could not be completed. Some membership changes may already be saved. {0}", refusal(partial.underlying))
+    }
+    private static func refusal(_ error: Error) -> String {
+        error as? APIError == .http(403) ? NativeStrings.current("Your account is not allowed to do this on the server.") : ConnectionStore.recovery(for: error)
     }
     func delete(id: String) async -> Bool {
         guard !saving, canDelete, let owner else { return false }
@@ -35,7 +44,7 @@ import SwiftUI
             try await catalog.api.deleteAudioGroup(id: id, kind: kind, account: owner)
             guard generation == request, try await catalog.api.currentAccount() == owner else { return false }
             groups.removeAll { $0.id == id }; selected = nil; return true
-        } catch { if generation == request { self.error = ConnectionStore.recovery(for: error) }; return false }
+        } catch { if generation == request { self.error = Self.refusal(error) }; return false }
     }
     /// `event` is the realtime change that asked for this load; nothing is fetched or shown unless the catalog owns it.
     func load(id: String? = nil, for event: NativeRealtime.Event? = nil) async {
@@ -63,7 +72,7 @@ import SwiftUI
     private func nextChoice(in group: AudioGroup, downloads: NativeDownloads, player: ApplePlayback) throws -> (member: AudioGroupMember, audio: OfflineAudio?)? {
         for member in group.members where member.playable {
             let progress = user?.mediaProgress.first { $0.libraryItemId == member.libraryItemId && $0.episodeId == member.episodeId }
-            if let entry = downloads.visible.first(where: { $0.account == owner && $0.state == .ready && !$0.tracks.isEmpty && $0.supplementaryID == nil && $0.media.libraryItemID == member.libraryItemId && $0.media.episodeID == member.episodeId }) {
+            if let entry = downloads.visible.first(where: { $0.account == owner && $0.audioAvailable && $0.supplementaryID == nil && $0.media.libraryItemID == member.libraryItemId && $0.media.episodeID == member.episodeId }) {
                 let audio = try downloads.audio(entry, progress: progress)
                 let serverFinished = progress?.isFinished == true && (progress?.lastUpdate ?? 0) >= audio.serverUpdatedAt
                 if try player.hasFinishedOffline(audio, serverFinished: serverFinished) { continue }
@@ -129,11 +138,11 @@ struct AudioGroupList: View {
                 NavigationLink(destination: AudioGroupDetails(catalog: store.catalog, kind: store.kind, group: group)) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(group.name).font(.headline)
-                        Text(l10n("{0} titles", group.members.count)).font(.caption).foregroundColor(.secondary)
+                        Text(l10n("{0} titles", group.members.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                     }.padding(.vertical, 6)
                 }.accessibilityIdentifier("group-\(group.id)")
             }
-            if !store.loading, store.error == nil, store.groups.isEmpty { Text(l10n(store.kind.text("No collections yet.", "No playlists yet."))).foregroundColor(.secondary) }
+            if !store.loading, store.error == nil, store.groups.isEmpty { Text(l10n(store.kind.text("No collections yet.", "No playlists yet."))).foregroundColor(ShelfStyle.secondaryText) }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n(store.kind.title))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -173,15 +182,15 @@ struct AudioGroupDetails: View {
         let active = player.wantsPlayback && group.members.contains { $0.libraryItemId == player.itemID && $0.episodeId == player.episodeID }
         ShelfList {
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load(id: initial.id) } } }
-            if let description = group.description, !description.isEmpty { Text(description).foregroundColor(.secondary) }
+            if let description = group.description, !description.isEmpty { Text(description).foregroundColor(ShelfStyle.secondaryText) }
             Button(l10n(active ? store.kind.text("Pause collection", "Pause playlist") : store.kind.text("Play collection", "Play playlist"))) { NativeHaptic.impact("play"); Task { await store.play(group, player: player, downloads: downloads) } }
                 .disabled(store.loading || store.saving || store.starting || store.error != nil || player.preparing || !group.members.contains(where: \.playable))
             ForEach(group.members) { member in
                 if let item = member.libraryItem {
                     NavigationLink(destination: BookDetails(item: item, catalog: store.catalog, progress: store.user?.mediaProgress.first { $0.libraryItemId == item.id && $0.episodeId == member.episodeId }, episode: member.episode)) {
-                        VStack(alignment: .leading, spacing: 6) { Text(member.title).font(.headline); Text(item.author).font(.caption).foregroundColor(.secondary) }.padding(.vertical, 6)
+                        VStack(alignment: .leading, spacing: 6) { Text(member.title).font(.headline); Text(item.author).font(.caption).foregroundColor(ShelfStyle.secondaryText) }.padding(.vertical, 6)
                     }.accessibilityIdentifier("group-member-\(member.id)")
-                } else { Text(member.title).foregroundColor(.secondary) }
+                } else { Text(member.title).foregroundColor(ShelfStyle.secondaryText) }
             }
             if let error = player.error { Text(error).foregroundColor(.red) }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(group.name)
@@ -233,11 +242,11 @@ struct AudioGroupEditor: View {
     var body: some View {
         NavigationView {
             ShelfForm {
-                Section(header: Text(l10n("Details"))) {
+                Section(header: Text(l10n("Details")).foregroundColor(ShelfStyle.secondaryText)) {
                     TextField(l10n("Name"), text: $name).accessibilityIdentifier("group-name")
                     TextField(l10n("Description"), text: $description).accessibilityIdentifier("group-description")
                 }
-                Section(header: Text(l10n("Listening order"))) {
+                Section(header: Text(l10n("Listening order")).foregroundColor(ShelfStyle.secondaryText)) {
                     ForEach(members) { member in
                         HStack {
                             Text(member.title)
@@ -253,7 +262,7 @@ struct AudioGroupEditor: View {
                         }
                     }
                     Button(l10n("Choose titles")) { choosing = true }
-                    if store.kind == .playlist, group != nil, members.count == 1 { Text(l10n("To remove the last title, delete this playlist from its actions menu.")).font(.caption).foregroundColor(.secondary) }
+                    if store.kind == .playlist, group != nil, members.count == 1 { Text(l10n("To remove the last title, delete this playlist from its actions menu.")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
                 }
                 if let error = store.error { Text(error).foregroundColor(.red).accessibilityIdentifier("group-save-error") }
                 if store.saving { ProgressView(l10n("Saving changes…")) }

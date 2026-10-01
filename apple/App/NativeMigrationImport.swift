@@ -180,10 +180,10 @@ struct NativeMigrationImport: View {
 
     var body: some View {
         ShelfList {
-            Section(header: Text(l10n("Keep your listening"))) {
+            Section(header: Text(l10n("Keep your listening")).foregroundColor(ShelfStyle.secondaryText)) {
                 Text(l10n("Export your data from the previous app, then choose the export package here."))
-                Text(l10n("Your previous app and its original files stay available.")).foregroundColor(.secondary)
-                Text(l10n("Sign in again after importing to access each account.")).foregroundColor(.secondary)
+                Text(l10n("Your previous app and its original files stay available.")).foregroundColor(ShelfStyle.secondaryText)
+                Text(l10n("Sign in again after importing to access each account.")).foregroundColor(ShelfStyle.secondaryText)
                 Button(l10n("Choose export")) {
                     selectionToken = store.beginSelection()
                     choosing = selectionToken != nil
@@ -197,28 +197,28 @@ struct NativeMigrationImport: View {
                 }
             }
             if let preflight = store.preflight {
-                Section(header: Text(l10n("Ready to import"))) {
+                Section(header: Text(l10n("Ready to import")).foregroundColor(ShelfStyle.secondaryText)) {
                     Text(l10n("{0} accounts", preflight.accounts.count))
                     Text(l10n("{0} files available", preflight.adoptableFiles))
                     Text(l10n("Up to {0} of additional space", ByteCountFormatter.string(fromByteCount: preflight.requiredBytesIfCopied, countStyle: .file)))
-                    Text(l10n("Missing files and unclear account ownership will be retained for recovery.")).font(.footnote).foregroundColor(.secondary)
+                    Text(l10n("Missing files and unclear account ownership will be retained for recovery.")).font(.footnote).foregroundColor(ShelfStyle.secondaryText)
                     Button(l10n(store.outcome == nil ? "Import data" : "Repair and retry import")) { Task { await store.importSelected() } }.disabled(store.busy)
                 }
                 issueRows(preflight.issues)
             }
             if let outcome = store.outcome {
                 if let summary = store.summary {
-                    Section(header: Text(l10n("Saved import"))) {
+                    Section(header: Text(l10n("Saved import")).foregroundColor(ShelfStyle.secondaryText)) {
                         Text(summary)
                         Button(l10n("Retry pending work")) { Task { await store.sync() } }.disabled(store.busy)
                     }
                 }
-                Section(header: Text(l10n("Accounts"))) {
+                Section(header: Text(l10n("Accounts")).foregroundColor(ShelfStyle.secondaryText)) {
                     ForEach(outcome.accounts.indices, id: \.self) { index in
                         let account = outcome.accounts[index]
                         VStack(alignment: .leading, spacing: 8) {
                             Text(account.name.isEmpty ? account.username : account.name).font(.headline)
-                            Text(account.account.server).font(.caption).foregroundColor(.secondary)
+                            Text(account.account.server).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                             Button(l10n("Sign in to this account")) {
                                 connection.addServer()
                                 connection.server = account.account.server
@@ -230,11 +230,11 @@ struct NativeMigrationImport: View {
                 }
                 issueRows(outcome.issues)
                 if !store.adoptionIssues.isEmpty {
-                    Section(header: Text(l10n("Needs attention"))) {
+                    Section(header: Text(l10n("Needs attention")).foregroundColor(ShelfStyle.secondaryText)) {
                         ForEach(store.adoptionIssues.indices, id: \.self) { index in Text(store.adoptionIssues[index]).font(.callout) }
                     }
                 }
-                Section(footer: Text(l10n("Available files and unresolved records remain saved, including formats this app cannot open yet."))) {
+                Section(footer: Text(l10n("Available files and unresolved records remain saved, including formats this app cannot open yet.")).foregroundColor(ShelfStyle.secondaryText)) {
                     Text(l10n("{0} listening records retained", outcome.pendingSessions.count))
                     Text(l10n("{0} interrupted downloads retained", outcome.interruptedDownloads.count))
                 }
@@ -259,7 +259,7 @@ struct NativeMigrationImport: View {
 
     @ViewBuilder private func issueRows(_ issues: [MigrationIssue]) -> some View {
         if !issues.isEmpty {
-            Section(header: Text(l10n("Import notes"))) {
+            Section(header: Text(l10n("Import notes")).foregroundColor(ShelfStyle.secondaryText)) {
                 ForEach(issues.indices, id: \.self) { index in Text(issues[index].message).font(.callout) }
             }
         }

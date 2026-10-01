@@ -14,8 +14,14 @@ final class StubServer {
     enum Response {
         case json(Int, Any)
         case status(Int)
+        /// A file body with its content type.
+        case file(Int, String, Data)
+        /// A file body without Content-Length, as a proxy that streams the response sends it.
+        case unsizedFile(Int, String, Data)
         /// The server handled the request but the client never saw the answer.
         case lost
+        /// The loading system failed the request with this error.
+        case failure(Error)
     }
 
     private let lock = NSLock()
@@ -78,15 +84,21 @@ final class StubProtocol: URLProtocol {
         switch server.handle(request) {
         case .lost:
             client?.urlProtocol(self, didFailWithError: URLError(.networkConnectionLost))
+        case .failure(let error):
+            client?.urlProtocol(self, didFailWithError: error)
         case .status(let code):
             respond(code, Data())
         case .json(let code, let value):
             respond(code, try! JSONSerialization.data(withJSONObject: value))
+        case .file(let code, let type, let data):
+            respond(code, data, headers: ["Content-Type": type, "Content-Length": String(data.count)])
+        case .unsizedFile(let code, let type, let data):
+            respond(code, data, headers: ["Content-Type": type])
         }
     }
 
-    private func respond(_ code: Int, _ data: Data) {
-        let response = HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: "HTTP/1.1", headerFields: ["Content-Type": "application/json"])!
+    private func respond(_ code: Int, _ data: Data, headers: [String: String] = ["Content-Type": "application/json"]) {
+        let response = HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: "HTTP/1.1", headerFields: headers)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: data)
         client?.urlProtocolDidFinishLoading(self)

@@ -495,6 +495,7 @@
 "The slug had to be modified. Check it, then open the feed again." = "The slug had to be modified. Check it, then open the feed again.";
 "The username or password was not accepted." = "The username or password was not accepted.";
 "Theme" = "Theme";
+"There is not enough storage on this device for this download. Free up space, then retry." = "There is not enough storage on this device for this download. Free up space, then retry.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address.";
 "This EPUB could not be opened: {0}" = "This EPUB could not be opened: {0}";
 "This EPUB is damaged or not a supported EPUB archive." = "This EPUB is damaged or not a supported EPUB archive.";

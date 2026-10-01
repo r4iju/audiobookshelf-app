@@ -22,7 +22,7 @@ struct FeedEpisodes: View {
                     Text(error).foregroundColor(.red)
                     Button(l10n("Retry feed"), action: load).disabled(adding)
                 }
-                if !loading, episodes.isEmpty { Text(l10n("No feed episodes found")).foregroundColor(.secondary) }
+                if !loading, episodes.isEmpty { Text(l10n("No feed episodes found")).foregroundColor(ShelfStyle.secondaryText) }
                 ForEach(episodes) { episode in
                     Button {
                         if selected.contains(episode.id) { selected.remove(episode.id) }
@@ -32,8 +32,8 @@ struct FeedEpisodes: View {
                             Image(systemName: existing.contains(episode.enclosureURL ?? "") ? "checkmark.circle.fill" : selected.contains(episode.id) ? "checkmark.circle.fill" : "circle")
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(episode.title)
-                                if existing.contains(episode.enclosureURL ?? "") { Text(l10n("Already on server")).font(.caption).foregroundColor(.secondary) }
-                                else if episode.enclosureURL == nil { Text(l10n("No audio enclosure")).font(.caption).foregroundColor(.secondary) }
+                                if existing.contains(episode.enclosureURL ?? "") { Text(l10n("Already on server")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
+                                else if episode.enclosureURL == nil { Text(l10n("No audio enclosure")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
                             }
                         }
                     }.disabled(adding || episode.enclosureURL == nil || existing.contains(episode.enclosureURL ?? ""))

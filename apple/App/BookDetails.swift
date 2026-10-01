@@ -60,7 +60,7 @@ struct BookDetails: View {
                         Image(systemName: "play.fill")
                         Text(l10n((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening")).fontWeight(.semibold)
                         Spacer()
-                    }.padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
+                    }.padding(18).foregroundColor(.white).background(ShelfStyle.accentFill).cornerRadius(16)
                 }.disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
                 }
                 if episode != nil || book.mediaType == "book" {
@@ -104,13 +104,13 @@ struct BookDetails: View {
                 if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
                     VStack(alignment: .leading, spacing: 10) {
                         ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
-                        Text(l10n("{0} listened · {1}% complete", ShelfTime.describe(progress.currentTime ?? 0), Int(progress.fraction * 100))).font(.caption).foregroundColor(.secondary)
+                        Text(l10n("{0} listened · {1}% complete", ShelfTime.describe(progress.currentTime ?? 0), Int(progress.fraction * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                     }
                 }
                 if let description = episode?.description ?? book.media.metadata.description, !description.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(l10n(episode != nil ? "About this episode" : book.mediaType == "podcast" ? "About this podcast" : "About this book")).font(.title3.bold())
-                        Text(Self.plainDescription(description)).font(.body).lineSpacing(5).foregroundColor(.secondary)
+                        Text(Self.plainDescription(description)).font(.body).lineSpacing(5).foregroundColor(ShelfStyle.secondaryText)
                     }
                 }
                 if book.mediaType == "podcast", episode == nil {
@@ -123,7 +123,7 @@ struct BookDetails: View {
                             HStack(alignment: .top) {
                                 Text(chapter.title).font(.body)
                                 Spacer()
-                                Text(ShelfTime.describe(chapter.end - chapter.start)).font(.caption).foregroundColor(.secondary)
+                                Text(ShelfTime.describe(chapter.end - chapter.start)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                             }.padding(.vertical, 8)
                             Divider()
                         }
@@ -180,11 +180,11 @@ struct BookDetails: View {
     private func metadata(alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 8) {
             Text(episode?.title ?? book.title).font(.title2.weight(.semibold)).fixedSize(horizontal: false, vertical: true)
-            if episode != nil { Text(book.title).font(.subheadline).foregroundColor(.secondary) }
-            Text(book.author).font(.subheadline).foregroundColor(.secondary)
+            if episode != nil { Text(book.title).font(.subheadline).foregroundColor(ShelfStyle.secondaryText) }
+            Text(book.author).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
             if let duration = listeningDuration { Label(ShelfTime.describe(duration), systemImage: "headphones").font(.subheadline) }
             if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
-                Text(l10n("Narrated by {0}", narrators.joined(separator: ", "))).font(.footnote).foregroundColor(.secondary)
+                Text(l10n("Narrated by {0}", narrators.joined(separator: ", "))).font(.footnote).foregroundColor(ShelfStyle.secondaryText)
             }
             if episode == nil, book.mediaType == "book" { RelatedBookLinks(item: book, catalog: catalog) }
         }.multilineTextAlignment(alignment == .center ? .center : .leading)
@@ -299,20 +299,20 @@ struct BookDetails: View {
                     Image(systemName: download.failed ? "exclamationmark.triangle" : download.isFinished ? "checkmark.circle" : "arrow.down.circle")
                     Text(download.episodeDisplayTitle ?? l10n("Podcast episode"))
                     Spacer()
-                    Text(l10n(download.failed ? "Failed" : download.isFinished ? "Ready" : "Downloading on server")).font(.caption).foregroundColor(.secondary)
+                    Text(l10n(download.failed ? "Failed" : download.isFinished ? "Ready" : "Downloading on server")).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                 }
             }
             if let error = serverQueue.error { Text(error).font(.caption).foregroundColor(.red) }
             if serverQueue.hasUnsavedResults { Button(l10n("Retry saving download results"), action: serverQueue.retrySavingResults) }
             ForEach(serverQueue.failures(itemID: item.id)) { failure in
-                HStack { Image(systemName: "exclamationmark.triangle"); Text(failure.title); Spacer(); Text(l10n("Failed")).font(.caption).foregroundColor(.secondary) }
+                HStack { Image(systemName: "exclamationmark.triangle"); Text(failure.title); Spacer(); Text(l10n("Failed")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
             }
             if !serverQueue.failures(itemID: item.id).isEmpty { Button(l10n("Retry failed episodes")) { showingFeed = true } }
             if !requestedDownloads.isEmpty {
-                Text(l10n("Waiting for {0} episode(s) from your server", requestedDownloads.count)).font(.caption).foregroundColor(.secondary).accessibilityIdentifier("server-download-pending")
+                Text(l10n("Waiting for {0} episode(s) from your server", requestedDownloads.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("server-download-pending")
                 Button(l10n("Refresh downloads"), action: watchDownloads)
             }
-            if visibleEpisodes.isEmpty { Text(l10n("No episodes found")).foregroundColor(.secondary) }
+            if visibleEpisodes.isEmpty { Text(l10n("No episodes found")).foregroundColor(ShelfStyle.secondaryText) }
             ForEach(visibleEpisodes) { episode in
                 NavigationLink(destination: BookDetails(item: book, catalog: catalog, progress: progress(for: episode), episode: episode)) {
                     VStack(alignment: .leading, spacing: 8) {
@@ -320,10 +320,10 @@ struct BookDetails: View {
                         HStack {
                             if let published = episode.publishedAt { Text(Date(timeIntervalSince1970: published / 1000), style: .date) }
                             if let duration = episode.duration { Text(ShelfTime.describe(duration)) }
-                        }.font(.caption).foregroundColor(.secondary)
+                        }.font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         if let progress = progress(for: episode) {
                             ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
-                            Text(progress.isFinished == true ? l10n("Finished") : l10n("{0} listened", ShelfTime.describe(progress.currentTime ?? 0))).font(.caption).foregroundColor(.secondary)
+                            Text(progress.isFinished == true ? l10n("Finished") : l10n("{0} listened", ShelfTime.describe(progress.currentTime ?? 0))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         }
                     }.frame(maxWidth: .infinity, alignment: .leading).padding(18).background(appearance.card).cornerRadius(16)
                 }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("episode-\(episode.id)")

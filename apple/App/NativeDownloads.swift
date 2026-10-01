@@ -56,6 +56,9 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
         var cellularConsent: Bool? = nil
         var networkPolicy: String? = nil
         var parts: Range<Int> { 0..<(tracks.count + (ebook == nil ? 0 : 1)) }
+        /// Every audio part is saved, even if the ebook part is still queued or failed.
+        var audioAvailable: Bool { !tracks.isEmpty && tracks.indices.allSatisfy(finished.contains) }
+        var ebookAvailable: Bool { ebook != nil && finished.contains(tracks.count) }
         let serverPosition: Double
         let serverUpdatedAt: Double
         var generation: String
@@ -335,7 +338,11 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             let valid = ebook ? ["application/pdf", "application/epub+zip", "application/zip", "application/vnd.amazon.ebook", "application/x-mobipocket-ebook", "application/x-cbz", "application/x-cbr", "application/x-rar-compressed"].contains(type) : type.hasPrefix("audio/") || type == "video/mp4"
             guard valid || type == "application/octet-stream" else { throw Failure.invalidContent }
             let size = try file.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-            guard size > 0, response.expectedContentLength < 0 || response.expectedContentLength == size else { throw ListeningJournal.Failure.invalidData }
+            // Without a Content-Length, as behind a streaming proxy, the size the server listed for the file is the
+            // only way to tell a body that ended early from a complete one.
+            let listed = ebook ? entries[entry].ebook?.metadata?.size : entries[entry].tracks[index].metadata?.size
+            guard size > 0, response.expectedContentLength < 0 || response.expectedContentLength == size,
+                  response.expectedContentLength >= 0 || listed.map({ $0 <= 0 || $0 == Int64(size) }) ?? true else { throw ListeningJournal.Failure.invalidData }
             let target = localFile(entries[entry], index)
             if FileManager.default.fileExists(atPath: target.path) { try FileManager.default.removeItem(at: target) }
             try FileManager.default.moveItem(at: file, to: target)
@@ -344,9 +351,22 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             if next[entry].finished.count == next[entry].parts.count { next[entry].state = .ready }
             try save(next)
         } catch {
-            var next = entries; next[entry].state = .failed; next[entry].error = error.localizedDescription
-            do { try save(next) } catch { self.error = error.localizedDescription }
+            var next = entries; next[entry].state = .failed
+            next[entry].error = Self.outOfSpace(error) ? NativeStrings.current("There is not enough storage on this device for this download. Free up space, then retry.") : error.localizedDescription
+            do { try save(next) } catch {
+                // Without this the part stays queued and the refresh below starts the same transfer again. The
+                // manifest still says queued, so the next launch tries once more.
+                entries = next
+                self.error = Self.outOfSpace(error) ? next[entry].error : error.localizedDescription
+            }
             for (key, other) in tasks where key.hasPrefix(next[entry].id + ":") { other.cancel() }
+        }
+    }
+    private static func outOfSpace(_ error: Error) -> Bool {
+        let error = error as NSError
+        switch (error.domain, error.code) {
+        case (NSCocoaErrorDomain, NSFileWriteOutOfSpaceError), (NSPOSIXErrorDomain, Int(ENOSPC)), (NSPOSIXErrorDomain, Int(EDQUOT)): return true
+        default: return (error.userInfo[NSUnderlyingErrorKey] as? Error).map(outOfSpace) ?? false
         }
     }
     func cancel(_ entry: Entry) {
@@ -416,13 +436,13 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     }
 
     func ebookURL(_ entry: Entry) throws -> URL {
-        guard entry.account == account, entry.state == .ready, entry.ebook != nil else { throw APIError.signInRequired }
+        guard entry.account == account, entry.ebookAvailable else { throw APIError.signInRequired }
         let file = localFile(entry, entry.tracks.count)
         guard FileManager.default.fileExists(atPath: file.path) else { throw ListeningJournal.Failure.invalidData }
         return file
     }
     func audio(_ entry: Entry, progress: MediaProgress? = nil) throws -> OfflineAudio {
-        guard entry.account == account, entry.state == .ready else { throw APIError.signInRequired }
+        guard entry.account == account, entry.audioAvailable else { throw APIError.signInRequired }
         let files = entry.tracks.indices.map { localFile(entry, $0) }
         guard files.allSatisfy({ FileManager.default.fileExists(atPath: $0.path) }) else { throw ListeningJournal.Failure.invalidData }
         let latest = progress.flatMap { value in

@@ -34,7 +34,7 @@ struct LibrarySearch: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Image(systemName: "magnifyingglass").foregroundColor(.secondary)
+                Image(systemName: "magnifyingglass").foregroundColor(ShelfStyle.secondaryText)
                 TextField(l10n("Books, podcasts, authors, series…"), text: $search.query, onCommit: { submit() })
                     .accessibilityIdentifier("library-search")
                 if !search.query.isEmpty { Button { search.query = ""; submit() } label: { Image(systemName: "xmark.circle.fill") }.accessibilityLabel(l10n("Clear search")) }
@@ -42,11 +42,11 @@ struct LibrarySearch: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 18) {
                     switch search.state {
-                    case .idle: Text(l10n("Find your next listen.")).foregroundColor(.secondary)
+                    case .idle: Text(l10n("Find your next listen.")).foregroundColor(ShelfStyle.secondaryText)
                     case .loading: ProgressView(l10n("Searching your library…")).frame(maxWidth: .infinity)
                     case .failed(let error): RecoveryCard(message: error) { submit() }
                     case .results(let results):
-                        if results.isEmpty { Text(l10n("No results. Try another title, author, or series.")).foregroundColor(.secondary) }
+                        if results.isEmpty { Text(l10n("No results. Try another title, author, or series.")).foregroundColor(ShelfStyle.secondaryText) }
                         ForEach(results.items) { item in
                             NavigationLink(destination: BookDetails(item: item, catalog: search.catalog, progress: nil)) {
                                 BookCard(item: item, catalog: search.catalog, listLayout: true)
@@ -58,7 +58,7 @@ struct LibrarySearch: View {
                                 NavigationLink(destination: BookDetails(item: result.libraryItem, catalog: search.catalog, progress: nil, episode: episode)) {
                                     VStack(alignment: .leading, spacing: 8) {
                                         Text(episode.title).font(.headline).foregroundColor(.primary)
-                                        Text(result.libraryItem.title).font(.caption).foregroundColor(.secondary)
+                                        Text(result.libraryItem.title).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                                     }.padding(18).frame(maxWidth: .infinity, alignment: .leading).background(appearance.card).cornerRadius(16)
                                 }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("search-episode-\(episode.id)")
                             }

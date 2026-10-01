@@ -24,7 +24,7 @@ struct PlaybackContainer<Content: View>: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(player.title).font(.headline).lineLimit(1)
                                     Text(player.preparing || player.seeking ? l10n("Preparing audio…") : l10n("{0} of {1}", ShelfTime.describe(player.currentTime), ShelfTime.describe(player.session?.duration ?? 0)))
-                                        .font(.caption).foregroundColor(.secondary)
+                                        .font(.caption).foregroundColor(ShelfStyle.secondaryText)
                                 }
                                 Spacer()
                             }
@@ -64,15 +64,15 @@ struct NowListening: View {
                         if let chapter = player.currentChapter {
                             Text(chapter.title).font(.headline)
                             Text(l10n("{0} of {1}", ShelfTime.describe(player.currentTime - chapter.start), ShelfTime.describe(chapter.end - chapter.start)))
-                                .font(.caption).foregroundColor(.secondary).accessibilityIdentifier("chapter-elapsed")
+                                .font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("chapter-elapsed")
                         }
                         Text(player.title).font(.system(.title, design: .serif).bold()).multilineTextAlignment(.center)
-                        Text(player.author).foregroundColor(.secondary)
+                        Text(player.author).foregroundColor(ShelfStyle.secondaryText)
                         if let session = player.session {
-                            Text(l10n("File {0} of {1}", player.trackIndex + 1, session.audioTracks.count)).font(.caption).foregroundColor(.secondary)
+                            Text(l10n("File {0} of {1}", player.trackIndex + 1, session.audioTracks.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         }
                         Text(l10n(player.preparing ? "Preparing audio…" : player.seeking ? "Seeking…" : player.playing ? "Playing" : "Paused"))
-                            .font(.caption).foregroundColor(.secondary).accessibilityIdentifier("playback-status")
+                            .font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("playback-status")
                     }
                     let display = PlayerDisplay(player: player, at: scrubbing ? position : player.currentTime, totalTrack: totalTrack, scaleElapsed: scaleElapsed)
                     VStack(spacing: 10) {
@@ -82,7 +82,7 @@ struct NowListening: View {
                                 Text(ShelfTime.describe(total.elapsed)).accessibilityIdentifier("total-elapsed")
                                 Spacer()
                                 Text("−" + ShelfTime.describe(total.remaining)).accessibilityIdentifier("total-remaining")
-                            }.font(.caption2.monospacedDigit()).foregroundColor(.secondary)
+                            }.font(.caption2.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
                         }
                         Slider(value: Binding(get: { min(max(scrubbing ? position : player.currentTime, display.range.lowerBound), display.range.upperBound) }, set: { position = $0 }), in: display.range, onEditingChanged: { editing in
                             if editing && !scrubbing { NativeHaptic.impact("scrub") }
@@ -93,7 +93,7 @@ struct NowListening: View {
                             Text(ShelfTime.describe(display.elapsed)).accessibilityIdentifier("playback-elapsed")
                             Spacer()
                             Text("−" + ShelfTime.describe(display.remaining)).accessibilityIdentifier("playback-remaining")
-                        }.font(.caption.monospacedDigit()).foregroundColor(.secondary)
+                        }.font(.caption.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
                     }
                     if locked {
                         Button { NativeHaptic.impact("lock"); locked = false } label: { Label(l10n("Unlock player"), systemImage: "lock.fill") }
@@ -109,8 +109,8 @@ struct NowListening: View {
                         if sizeCategory.isAccessibilityCategory { VStack(alignment: .leading, spacing: 20) { listeningButtons } }
                         else { HStack(alignment: .top, spacing: 16) { listeningButtons } }
                     }.labelStyle(ListeningControlLabelStyle(stacked: !sizeCategory.isAccessibilityCategory)).font(.caption).foregroundColor(ShelfStyle.accent).multilineTextAlignment(.center)
-                    if let remaining = player.sleepRemaining { Text(l10n("Sleep in {0}", ShelfTime.describe(remaining))).font(.caption).foregroundColor(.secondary) }
-                    if player.sleepChapterEnd != nil { Text(l10n("Sleep at chapter end")).font(.caption).foregroundColor(.secondary) }
+                    if let remaining = player.sleepRemaining { Text(l10n("Sleep in {0}", ShelfTime.describe(remaining))).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
+                    if player.sleepChapterEnd != nil { Text(l10n("Sleep at chapter end")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
                     Button { panel = .settings } label: { Label(l10n("Playback settings"), systemImage: "slider.horizontal.3") }.font(.footnote)
                     if let error = player.error { Text(error).font(.callout).foregroundColor(.red).accessibilityIdentifier("playback-error") }
                     Button(l10n("Close playback")) {
@@ -118,7 +118,7 @@ struct NowListening: View {
                             do { try await player.stop(); presentation.wrappedValue.dismiss() }
                             catch { player.error = ConnectionStore.recovery(for: error) }
                         }
-                    }.font(.footnote).foregroundColor(.secondary).disabled(locked)
+                    }.font(.footnote).foregroundColor(ShelfStyle.secondaryText).disabled(locked)
                 }.padding(28).frame(maxWidth: 560).frame(maxWidth: .infinity)
             }.background(appearance.background).navigationTitle(l10n("Now listening")).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Done")) { presentation.wrappedValue.dismiss() } } }
@@ -211,7 +211,7 @@ struct ListeningControls: View {
                             Task { await player.skip(chapter.start - player.currentTime) }
                             panel = nil
                         } label: {
-                            HStack { Text(chapter.title); Spacer(); Text(ShelfTime.describe(chapter.start)).foregroundColor(.secondary) }
+                            HStack { Text(chapter.title); Spacer(); Text(ShelfTime.describe(chapter.start)).foregroundColor(ShelfStyle.secondaryText) }
                         }.accessibilityIdentifier("chapter-\(chapter.id)")
                     }
                 case .speed:
@@ -223,7 +223,7 @@ struct ListeningControls: View {
                         Text(l10n("Custom speed: {0}×", String(format: "%.1f", player.speed)))
                     }
                 case .bookmarks:
-                    Section(header: Text(l10n(editing == nil ? "Add a bookmark here" : "Edit bookmark"))) {
+                    Section(header: Text(l10n(editing == nil ? "Add a bookmark here" : "Edit bookmark")).foregroundColor(ShelfStyle.secondaryText)) {
                         TextField(l10n("Note"), text: $bookmarkTitle).accessibilityIdentifier("bookmark-title")
                         Button(l10n("Save bookmark")) {
                             NativeHaptic.impact("bookmark")
@@ -237,11 +237,11 @@ struct ListeningControls: View {
                         Text(error).foregroundColor(.red)
                         Button(l10n("Retry bookmarks")) { Task { await player.loadBookmarks() } }
                     }
-                    if player.bookmarks.isEmpty { Text(l10n("No bookmarks yet")).foregroundColor(.secondary) }
+                    if player.bookmarks.isEmpty { Text(l10n("No bookmarks yet")).foregroundColor(ShelfStyle.secondaryText) }
                     ForEach(player.bookmarks) { bookmark in
                         VStack(alignment: .leading, spacing: 12) {
                             Button(bookmark.title) { NativeHaptic.impact("bookmark"); Task { await player.skip(bookmark.time - player.currentTime) }; panel = nil }
-                            Text(ShelfTime.describe(bookmark.time)).font(.caption).foregroundColor(.secondary)
+                            Text(ShelfTime.describe(bookmark.time)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                             HStack {
                                 Button(l10n("Edit")) { editing = bookmark; bookmarkTitle = bookmark.title }.accessibilityLabel(l10n("Edit {0}", bookmark.title))
                                 Spacer()
@@ -251,7 +251,7 @@ struct ListeningControls: View {
                     }
                 case .sleep:
                     if player.sleepRemaining != nil || player.sleepChapterEnd != nil {
-                        Section(header: Text(l10n("Active timer"))) {
+                        Section(header: Text(l10n("Active timer")).foregroundColor(ShelfStyle.secondaryText)) {
                             if let remaining = player.sleepRemaining {
                                 Text(l10n("Sleep in {0}", ShelfTime.describe(remaining)))
                                 Button(l10n("Add 5 minutes")) { NativeHaptic.impact("sleep-timer"); player.adjustSleepTimer(by: 300) }
@@ -263,7 +263,7 @@ struct ListeningControls: View {
                     }
                     Toggle(l10n("Fade audio in the last minute"), isOn: $player.fadeSleepTimer)
                     if player.sleepRemaining != nil { Text(l10n("Audio volume: {0}%", Int(player.audioVolume * 100))).accessibilityIdentifier("fade-volume") }
-                    Section(header: Text(l10n("Sleep after listening"))) {
+                    Section(header: Text(l10n("Sleep after listening")).foregroundColor(ShelfStyle.secondaryText)) {
                         ForEach([5, 10, 15, 30, 45, 60], id: \.self) { minutes in
                             Button(l10n("{0} minutes", minutes)) { NativeHaptic.impact("sleep-timer"); player.setSleepTimer(seconds: Double(minutes * 60)); panel = nil }
                         }
@@ -302,7 +302,7 @@ struct ListeningControls: View {
         Image(systemName: player.wantsPlayback ? "pause.fill" : "play.fill")
             .font(large ? .system(size: 34) : .title2)
             .frame(width: large ? 80 : 44, height: large ? 80 : 44)
-            .background(large ? ShelfStyle.accent : .clear).foregroundColor(large ? .white : ShelfStyle.accent)
+            .background(large ? ShelfStyle.accentFill : .clear).foregroundColor(large ? .white : ShelfStyle.accent)
             .clipShape(Circle())
     }.accessibilityLabel(strings(player.wantsPlayback ? "Pause" : "Play"))
         .accessibilityIdentifier((prefix ?? (large ? "" : "mini-")) + (player.wantsPlayback ? "pause-playback" : "resume-playback"))

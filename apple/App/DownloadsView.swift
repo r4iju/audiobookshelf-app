@@ -9,24 +9,25 @@ struct DownloadsView: View {
             ShelfList {
                 NavigationLink(l10n("Network preferences"), destination: NativeNetworkSettings())
                 if let error = downloads.error { Text(error).foregroundColor(.red) }
-                if downloads.visible.isEmpty { Text(l10n("Save books or episodes from your library to listen offline.")).foregroundColor(.secondary) }
+                if downloads.visible.isEmpty { Text(l10n("Save books or episodes from your library to listen offline.")).foregroundColor(ShelfStyle.secondaryText) }
                 ForEach(downloads.visible) { entry in
                     if entry.state == .ready {
                         NavigationLink(destination: OfflineDetails(entry: entry)) {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(entry.media.title).font(.headline)
-                                Label(l10n("Available offline"), systemImage: "checkmark.circle.fill").font(.caption).foregroundColor(.secondary)
+                                Label(l10n("Available offline"), systemImage: "checkmark.circle.fill").font(.caption).foregroundColor(ShelfStyle.secondaryText)
                             }
                         }.accessibilityIdentifier("offline-" + entry.media.libraryItemID + (entry.supplementaryID.map { "-" + $0 } ?? ""))
                     } else {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(entry.media.title).font(.headline)
-                            Text(entry.error ?? l10n(entry.state.rawValue.capitalized)).font(.caption).foregroundColor(.secondary)
+                            Text(entry.error ?? l10n(entry.state.rawValue.capitalized)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                             if entry.state == .queued {
                                 Text(l10n("{0} of {1} files saved", entry.finished.count, entry.parts.count)).font(.caption)
                                 ProgressView(value: downloads.fraction(for: entry))
                                 Button(l10n("Cancel download")) { NativeHaptic.impact("download"); downloads.cancel(entry) }
                             } else { Button(l10n("Retry download")) { NativeHaptic.impact("download"); Task { await downloads.retry(entry) } } }
+                            if entry.audioAvailable { NavigationLink(l10n("Play offline"), destination: OfflineDetails(entry: entry)).accessibilityIdentifier("offline-audio-" + entry.media.libraryItemID) }
                             Button(l10n("Remove download")) { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player) } }
                         }.padding(.vertical, 8)
                     }
@@ -52,9 +53,9 @@ private struct OfflineDetails: View {
             VStack(alignment: .leading, spacing: 24) {
                 Image(systemName: "books.vertical.fill").font(.system(size: 64)).foregroundColor(ShelfStyle.accent)
                 Text(entry.media.title).font(.system(.largeTitle, design: .serif).bold())
-                Text(entry.media.author).foregroundColor(.secondary)
+                Text(entry.media.author).foregroundColor(ShelfStyle.secondaryText)
                 Label(l10n("Available offline"), systemImage: "checkmark.circle.fill")
-                if let ebook = entry.ebook, ["pdf", "epub"].contains(ebook.format) {
+                if let ebook = entry.ebook, entry.ebookAvailable, ["pdf", "epub"].contains(ebook.format) {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         do { reader = ReadingSource(account: entry.account, itemID: entry.media.libraryItemID, title: entry.media.title, ebook: ebook, file: try downloads.ebookURL(entry), progress: entry.readingProgress, fileID: entry.supplementaryID) }
                         catch { self.error = error.localizedDescription }

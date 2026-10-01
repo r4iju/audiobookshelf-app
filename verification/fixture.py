@@ -738,7 +738,14 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {})
             return self.respond(404, {})
 
-    return ThreadingHTTPServer((bind, port), Handler), prefix
+    return BurstTolerantServer((bind, port), Handler), prefix
+
+
+class BurstTolerantServer(ThreadingHTTPServer):
+    # Apps reach the fixture on a new connection per request, often through the realtime proxy, which reports a refused
+    # or reset connection as HTTP 503. Starting playback or a realtime init sends a burst while handler threads keep the
+    # single accept loop waiting, and the default backlog of five resets the rest of it.
+    request_queue_size = 128
 
 
 def main():

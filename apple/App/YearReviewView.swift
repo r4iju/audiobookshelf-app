@@ -99,7 +99,7 @@ struct YearReviewView: View {
             if store.loading { ProgressView(l10n("Opening your year…")) }
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load(year: store.year, copy: exportCopy) } } }
             if let stats = store.stats {
-                Section(header: Text(l10n("Your year of listening"))) {
+                Section(header: Text(l10n("Your year of listening")).foregroundColor(ShelfStyle.secondaryText)) {
                     Text(l10n("{0} minutes listened", minutes(stats.totalListeningTime))).font(.title2.bold())
                     Text(l10n("{0} books finished", stats.numBooksFinished))
                     Text(l10n("{0} books listened to", stats.numBooksListened))
@@ -108,27 +108,27 @@ struct YearReviewView: View {
                     Label(l10n("{0} podcast minutes", minutes(stats.totalPodcastListeningTime)), systemImage: "mic")
                 }
                 if !stats.topAuthors.isEmpty {
-                    Section(header: Text(l10n("Top authors"))) {
+                    Section(header: Text(l10n("Top authors")).foregroundColor(ShelfStyle.secondaryText)) {
                         ForEach(stats.topAuthors.indices, id: \.self) { index in
                             ranked(stats.topAuthors[index].name, time: stats.topAuthors[index].time)
                         }
                     }
                 }
                 if let narrator = stats.mostListenedNarrator {
-                    Section(header: Text(l10n("Top narrator"))) { ranked(narrator.name, time: narrator.time) }
+                    Section(header: Text(l10n("Top narrator")).foregroundColor(ShelfStyle.secondaryText)) { ranked(narrator.name, time: narrator.time) }
                 }
                 if !stats.topGenres.isEmpty {
-                    Section(header: Text(l10n("Top genres"))) {
+                    Section(header: Text(l10n("Top genres")).foregroundColor(ShelfStyle.secondaryText)) {
                         ForEach(stats.topGenres.indices, id: \.self) { index in
                             ranked(stats.topGenres[index].genre, time: stats.topGenres[index].time)
                         }
                     }
                 }
                 if let topMonth = stats.mostListenedMonth {
-                    Section(header: Text(l10n("Most listened month"))) { ranked(month(topMonth.month), time: topMonth.time) }
+                    Section(header: Text(l10n("Most listened month")).foregroundColor(ShelfStyle.secondaryText)) { ranked(month(topMonth.month), time: topMonth.time) }
                 }
                 if let book = stats.longestAudiobookFinished {
-                    Section(header: Text(l10n("Longest audiobook finished"))) { ranked(book.title, time: book.duration) }
+                    Section(header: Text(l10n("Longest audiobook finished")).foregroundColor(ShelfStyle.secondaryText)) { ranked(book.title, time: book.duration) }
                 }
             }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Year in review"))
@@ -160,7 +160,7 @@ struct YearReviewView: View {
     private func ranked(_ name: String, time: Double) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(name).font(.headline)
-            Text(l10n("{0} minutes", minutes(time))).font(.caption).foregroundColor(.secondary)
+            Text(l10n("{0} minutes", minutes(time))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
         }.padding(.vertical, 4)
     }
 }

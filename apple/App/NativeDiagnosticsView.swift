@@ -101,32 +101,32 @@ struct NativeDiagnosticsView: View {
             Section {
                 Toggle(l10n("Show server address"), isOn: $showAddress).accessibilityIdentifier("diagnostic-show-address")
             }
-            Section(header: Text(l10n("Recent events")), footer: Text(l10n("Events stay on this device. Passwords, tokens and address credentials are removed before they are saved."))) {
-                if diagnostics.events.isEmpty { Text(l10n("No problems recorded")).foregroundColor(.secondary) }
+            Section(header: Text(l10n("Recent events")).foregroundColor(ShelfStyle.secondaryText), footer: Text(l10n("Events stay on this device. Passwords, tokens and address credentials are removed before they are saved.")).foregroundColor(ShelfStyle.secondaryText)) {
+                if diagnostics.events.isEmpty { Text(l10n("No problems recorded")).foregroundColor(ShelfStyle.secondaryText) }
                 ForEach(diagnostics.events.reversed()) { event in
                     let shown = event.presented(maskingAddresses: !showAddress)
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Text(l10n(event.category.title)).font(.caption.bold()).foregroundColor(ShelfStyle.accent)
                             Spacer()
-                            Text(event.lastDate, style: .relative).font(.caption).foregroundColor(.secondary)
+                            Text(event.lastDate, style: .relative).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         }
                         Text(shown.message)
-                        if let detail = shown.detail { Text(detail).font(.system(.caption, design: .monospaced)).foregroundColor(.secondary) }
-                        if event.count > 1 { Text(l10n("Repeated {0} times", event.count)).font(.caption).foregroundColor(.secondary) }
+                        if let detail = shown.detail { Text(detail).font(.system(.caption, design: .monospaced)).foregroundColor(ShelfStyle.secondaryText) }
+                        if event.count > 1 { Text(l10n("Repeated {0} times", event.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
                     }.accessibilityElement(children: .combine).accessibilityIdentifier("diagnostic-event")
                 }
             }
-            Section(header: Text(l10n("Status"))) {
+            Section(header: Text(l10n("Status")).foregroundColor(ShelfStyle.secondaryText)) {
                 ForEach(statusLines(), id: \.id) { line in
                     HStack(alignment: .firstTextBaseline) {
-                        Text(line.label).foregroundColor(.secondary)
+                        Text(line.label).foregroundColor(ShelfStyle.secondaryText)
                         Spacer()
                         Text(line.value).multilineTextAlignment(.trailing)
                     }.accessibilityElement(children: .combine).accessibilityIdentifier(line.id)
                 }
             }
-            Section(footer: Text(l10n("Sharing opens the system share sheet. Review the report before sending it."))) {
+            Section(footer: Text(l10n("Sharing opens the system share sheet. Review the report before sending it.")).foregroundColor(ShelfStyle.secondaryText)) {
                 NavigationLink(destination: DiagnosticReportView(report: report())) { Text(l10n("Preview report")) }.accessibilityIdentifier("diagnostic-preview")
                 Button(l10n("Share report")) { NativeHaptic.impact("logs"); sharing = true }.accessibilityIdentifier("diagnostic-share")
                 Button(l10n("Copy report")) { NativeHaptic.impact("logs"); UIPasteboard.general.string = report() }.accessibilityIdentifier("diagnostic-copy")

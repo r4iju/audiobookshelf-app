@@ -49,9 +49,6 @@ def can_access(device, user):
 
 def make_item_actions_server(port, prefix='/abs', bind='127.0.0.1'):
     server, prefix = make_related_server(port, prefix, bind=bind)
-    # A realtime init refreshes every visible screen at once, and each item read loops back here; the default backlog of
-    # five refuses part of that burst.
-    server.socket.listen(128)
     base = server.RequestHandlerClass
     state = {'role': 'user', 'ebook': True, 'fail': None, 'feeds': {}, 'sent': [], 'requests': [], 'events': []}
 

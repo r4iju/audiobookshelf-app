@@ -79,13 +79,13 @@ struct CatalogShelf: View {
                     }
                     HStack {
                         Text(l10n(catalog.library.mediaType == "podcast" ? "All podcasts" : "All books")).font(.title3.weight(.semibold))
-                        Text("\(content.total)").font(.subheadline).foregroundColor(.secondary)
+                        Text("\(content.total)").font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
                         Spacer()
                         Button { NativeHaptic.impact("layout"); listLayout.toggle() } label: { Image(systemName: listLayout ? "square.grid.2x2" : "list.bullet").padding(10) }
                             .accessibilityLabel(l10n(listLayout ? "Show covers" : "Show list"))
                     }
                     if content.items.isEmpty {
-                        Text(l10n(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.")).foregroundColor(.secondary)
+                        Text(l10n(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.")).foregroundColor(ShelfStyle.secondaryText)
                     }
                     LazyVGrid(columns: listLayout ? [GridItem(.flexible(), alignment: .top)] : [GridItem(.adaptive(minimum: 140, maximum: 210), spacing: 16, alignment: .top)], spacing: 22) {
                         ForEach(content.items) { item in
@@ -213,8 +213,8 @@ struct BookCard: View {
     private var labels: some View {
         VStack(alignment: .leading, spacing: 5) {
             metadata(title, font: .subheadline.weight(.semibold), color: .primary)
-            metadata(author.isEmpty ? l10n("Unknown author") : author, font: .caption, color: .secondary)
-            if let duration = item.media.duration { Text(ShelfTime.describe(duration)).font(.caption).foregroundColor(.secondary) }
+            metadata(author.isEmpty ? l10n("Unknown author") : author, font: .caption, color: ShelfStyle.secondaryText)
+            if let duration = item.media.duration { Text(ShelfTime.describe(duration)).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
         }
     }
     private func metadata(_ value: String, font: Font, color: Color) -> some View {
@@ -246,9 +246,9 @@ struct ContinueCard: View {
             BookArtwork(item: item, catalog: catalog).frame(width: 64)
             VStack(alignment: .leading, spacing: 6) {
                 Text(title).font(.subheadline.weight(.semibold)).foregroundColor(.primary).lineLimit(2)
-                Text(author).font(.caption).foregroundColor(.secondary).lineLimit(1)
+                Text(author).font(.caption).foregroundColor(ShelfStyle.secondaryText).lineLimit(1)
                 ProgressView(value: progress?.fraction ?? 0).accentColor(ShelfStyle.accent)
-                Text(l10n("{0}% listened", Int((progress?.fraction ?? 0) * 100))).font(.caption).foregroundColor(.secondary)
+                Text(l10n("{0}% listened", Int((progress?.fraction ?? 0) * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
             }.frame(width: sizeCategory.isAccessibilityCategory ? 260 : 175, alignment: .leading)
         }.padding(16).background(appearance.card).cornerRadius(18)
     }
@@ -262,7 +262,7 @@ struct RecoveryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Label(l10n("Couldn't open this part of your library"), systemImage: "wifi.exclamationmark").font(.headline)
-            Text(message).font(.callout).foregroundColor(.secondary)
+            Text(message).font(.callout).foregroundColor(ShelfStyle.secondaryText)
             Button(l10n("Try again"), action: retry)
         }.padding(22).frame(maxWidth: .infinity, alignment: .leading).background(appearance.card).cornerRadius(20)
     }
