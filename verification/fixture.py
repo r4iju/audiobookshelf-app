@@ -259,6 +259,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 if group[1] == 'playlists' and entry['userId'] != self.account['id']:
                     return self.respond(403, {})
                 return self.respond(200, entry)
+            if path == '/api/me/listening-stats':
+                return self.respond(200, {'totalTime': 3660, 'days': {'2026-09-28': 1200, '2026-09-29': 1260, '2026-09-30': 1200}, 'dayOfWeek': {'Monday': 1200, 'Tuesday': 1260, 'Wednesday': 1200}, 'recentSessions': [{'id': 'stats-session', 'libraryItemId': 'book-2', 'mediaMetadata': {'title': 'Stories for Tomorrow 03', 'authorName': 'Mira Vale'}, 'timeListening': '1200', 'updatedAt': 1790784000000}]})
             if path == '/api/libraries/podcasts/items':
                 if created_podcasts:
                     time.sleep(2)

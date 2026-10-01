@@ -15,6 +15,7 @@ import SwiftUI
             try? FileManager.default.removeItem(at: ListeningSync.file)
             try? FileManager.default.removeItem(at: ReadingStore.file)
             try? FileManager.default.removeItem(at: NativeDownloads.directory)
+            UserDefaults.standard.removeObject(forKey: "previewListLayout")
             UserDefaults.standard.removeObject(forKey: "previewLibrary")
             UserDefaults.standard.removeObject(forKey: "previewServer")
             UserDefaults.standard.removeObject(forKey: "previewUsername")

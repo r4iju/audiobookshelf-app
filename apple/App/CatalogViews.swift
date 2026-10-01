@@ -39,11 +39,12 @@ struct CatalogShelf: View {
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     @StateObject private var catalog: CatalogStore
-    @State private var listLayout = false
+    @AppStorage("previewListLayout") private var listLayout = false
     @State private var filterOptions = false
     @State private var addingPodcast = false
     @State private var collectionsPresented = false
     @State private var playlistsPresented = false
+    @State private var statisticsPresented = false
     init(api: APIClient, library: Library, filter: String? = nil) {
         _catalog = StateObject(wrappedValue: CatalogStore(api: api, library: library, filter: filter))
     }
@@ -126,6 +127,7 @@ struct CatalogShelf: View {
                         if catalog.library.mediaType == "podcast", case .content(let content) = catalog.state, content.user.canManagePodcasts {
                             Button("Add podcast") { addingPodcast = true }
                         }
+                        Button("Statistics") { statisticsPresented = true }
                         Button("Downloads") { downloads.presented = true }
                         if catalog.library.mediaType == "book" {
                             Button("Collections") { collectionsPresented = true }
@@ -140,6 +142,7 @@ struct CatalogShelf: View {
             }.onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
             .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
             .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
+            .background(NavigationLink(destination: StatisticsView(api: catalog.api), isActive: $statisticsPresented) { EmptyView() }.hidden())
             .background(NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .collection), isActive: $collectionsPresented) { EmptyView() })
             .background(NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .playlist), isActive: $playlistsPresented) { EmptyView() })
     }

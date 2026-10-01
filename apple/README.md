@@ -37,6 +37,12 @@ The UI journeys exercise the actual signed app against the synthetic server: boo
 
 Run the same journeys on a dedicated iPad simulator with `ABS_QA_SIMULATOR='Audiobookshelf Native iPad QA' ./apple/scripts/verify-ui.sh`. Create that simulator using an available iPad device type and the same iOS runtime.
 
+## Display preferences and statistics
+
+The chosen list/cover layout persists through relaunch and library changes. The account menu opens Statistics, using the existing server's totals, current-user completions, seven daily listening totals and recent sessions. Reloads clear old data and responses must match the canonical account and request generation. Session durations accept the numeric and numeric-string representations permitted by server 2.30.0.
+
+Production UI journeys first failed for lost layout restoration and missing statistics; both then passed on iPhone and iPad. A numeric-string session first made the screen fail loading, then passed with the decoder correction. The latest signed preview was installed on both physical devices. Remaining preferences and broader #22 acceptance are still open. See `docs/modernization/APPLE-PREFERENCES.md` for evidence and the captured screen.
+
 ## Collections and playlists
 
 The catalog account menu opens book collections and personal book/podcast playlists. Details retain member order and selected episode identity; group playback starts the first playable unfinished member and pauses a currently playing member. Completed account-owned audio downloads are used without streaming. A reachable server refreshes progress before selection; transient connection failure can use the retained snapshot. Newer durable local progress takes precedence over an older remote completion.
