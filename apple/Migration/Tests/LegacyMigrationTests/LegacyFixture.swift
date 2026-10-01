@@ -200,6 +200,8 @@ final class FaultInjectingFileSystem: MigrationFileSystem {
     var linksUnavailable = false
     var capacity: Int64?
     private(set) var transfers: [URL] = []
+    /// Runs once, right after the first chunk of the named file has been read.
+    var afterFirstRead: (name: String, action: (URL) throws -> Void)?
 
     struct Interrupted: Error {}
 
@@ -220,6 +222,15 @@ final class FaultInjectingFileSystem: MigrationFileSystem {
 
     func availableCapacity(at directory: URL) throws -> Int64 {
         try capacity ?? real.availableCapacity(at: directory)
+    }
+
+    func read(_ handle: FileHandle, upToCount count: Int, of url: URL) throws -> Data {
+        let chunk = handle.readData(ofLength: count)
+        if let hook = afterFirstRead, hook.name == url.lastPathComponent {
+            afterFirstRead = nil
+            try hook.action(url)
+        }
+        return chunk
     }
 
     func writeAtomically(_ data: Data, to url: URL) throws {

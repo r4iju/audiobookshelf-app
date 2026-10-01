@@ -153,4 +153,28 @@ final class LegacyCommittedFileTests: XCTestCase {
         XCTAssertEqual(try migrator.committedOutcome(), first)
         XCTAssertEqual(try Data(contentsOf: decoy), Data("%PDF-1.7 synthetic".utf8))
     }
+
+    func testAFileChangedWhileItIsBeingHashedIsNeitherHandedOutNorRecordedAsVerified() throws {
+        let legacy = try fixture.legacyTreeDigest()
+        let fileSystem = FaultInjectingFileSystem()
+        fileSystem.linksUnavailable = true
+        let migrator = LegacyMigrator(root: fixture.migrationRoot(), fileSystem: fileSystem)
+        let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+        let pdf = try XCTUnwrap(try local(first, "local_li-pdf").ebook?.file)
+        var changed = false
+        fileSystem.afterFirstRead = (pdf.filename ?? "", { url in
+            let handle = try FileHandle(forWritingTo: url)
+            handle.write(Data("%XXX".utf8))
+            try handle.close()
+            changed = true
+        })
+
+        assertDamaged(try migrator.fileURL(for: pdf), "bytes read before a concurrent write match, but the file no longer holds them")
+        XCTAssertTrue(changed, "the write must land behind the read cursor")
+        assertDamaged(try migrator.committedOutcome(), "an unstable read must not be recorded as verified")
+        XCTAssertEqual(try fixture.legacyTreeDigest(), legacy)
+
+        XCTAssertEqual(try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink()).sourceFingerprint, first.sourceFingerprint)
+        XCTAssertEqual(try fixture.legacyTreeDigest(), legacy)
+    }
 }
