@@ -34,7 +34,8 @@ shared modernization documents. Issues #55 to #65.
 | `5a56386d` | Records the full local run on `5710199f` |
 | `cc26ec24` | A discard's delete is claimed in IndexedDB, so no tab can keep it once it is issued; listening goes out one session version at a time, and reader places and finished changes are recorded like listening |
 | `56e92c87` | A reader place that waited for a discard which then deleted is dropped |
-| (this commit) | Reader places are recorded when the page turns, not when their turn to be sent comes; stored coordination records are checked, and those an earlier version left are read as it meant them |
+| `df362fbd` | Reader places are recorded when the page turns, not when their turn to be sent comes; stored coordination records are checked, and those an earlier version left are read as it meant them |
+| (this commit) | Records the full local run on `df362fbd` |
 
 ## Checks
 
@@ -44,17 +45,20 @@ Run from `web/` on the Studio, against the isolated QA server only:
 npm run lint && npm run typecheck && npm test && npx playwright test
 ```
 
-Last full run, on `5710199f` (Studio, Chromium; the commit after it changes only this file). The chain was
+Last full run, on `df362fbd` (Studio, Chromium; the commit after it changes only this file), log
+`web/qa/.runtime/final-check-10.log`. The chain was
 `npm run lint && npm run typecheck && npm test && npm run build && npm run qa:deploy -- up && npx playwright test`:
 
 - Biome clean (1 info: the `recommended` field in `biome.json` is deprecated);
 - `tsc` clean;
-- vitest: 84 passed in 17 files;
+- vitest: 98 passed in 17 files;
 - production build and deployment image built;
-- Playwright: 60 passed and 1 failed in 4.4 minutes, including the 7 deployment journeys against the image built
-  from that commit. The failure was the e-reader journey: the QA server took 68 seconds to hand the mail to the
-  loopback SMTP sink (its log shows 20:36:50 to 20:37:58), the fixture stall described below. Run alone right after,
-  on the same commit, it passed.
+- Playwright: 61 passed in 3.5 minutes, including the 7 deployment journeys against the image built from that
+  commit and the e-reader journey.
+
+The run before it, on `56e92c87`, had 54 passed and 7 failed: six with `ERR_ADDRESS_INVALID` or `EADDRNOTAVAIL`
+connecting to the loopback QA ports, and one click timeout in the settings journey. The fixture networking behind
+those and the stalls below is being diagnosed separately; nothing in it was changed here.
 
 Intermittent failures seen in full runs on `df948480`, `f4e8d15f` and `5710199f`, none reproduced on retry:
 
