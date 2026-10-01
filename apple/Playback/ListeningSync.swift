@@ -17,7 +17,11 @@ import Foundation
     init(api: APIClient) {
         self.api = api
         do {
+            #if os(tvOS)
+            let journal = try ListeningJournal(file: Self.file, persistentDefaults: .standard)
+            #else
             let journal = try ListeningJournal(file: Self.file)
+            #endif
             try journal.finishRecoveredSessions()
             self.journal = journal
             loadingFailure = nil

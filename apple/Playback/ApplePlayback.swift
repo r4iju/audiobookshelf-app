@@ -13,6 +13,7 @@ import UIKit
     @Published var error: String? { didSet { failureOrigin = .playback } }
     private enum FailureOrigin { case playback, progress }
     private var failureOrigin = FailureOrigin.playback
+    var isProgressFailure: Bool { failureOrigin == .progress }
     @Published private(set) var needsSignIn = false
     @Published var speed: Float = 1
     @Published var forwardInterval = UserDefaults.standard.object(forKey: "previewSkipForward") as? Int ?? 10 {
