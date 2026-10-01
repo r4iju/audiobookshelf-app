@@ -29,7 +29,7 @@ const browserOwners: HoldOwners = {
     return release;
   },
   live: async () => {
-    if (typeof navigator === "undefined" || !navigator.locks) return new Set();
+    if (typeof navigator === "undefined" || !navigator.locks) return null;
     const { held = [], pending = [] } = await navigator.locks.query();
     return new Set(
       [...held, ...pending]
@@ -62,8 +62,16 @@ export async function deliveriesSettled(connectionId: string) {
 export async function flushReports(client: AbsClient, onUnauthorized: () => void) {
   if (inFlight) return inFlight;
   const outbox = outboxFor(client.connection.id);
-  inFlight = withLock(deliveryLock(client.connection.id), () =>
-    outbox.flush(async (sessions) => {
+  inFlight = withLock(deliveryLock(client.connection.id), async () => {
+    for (const hold of await outbox.orphaned()) {
+      try {
+        await client.command("DELETE", `/api/me/progress/${hold.progressId}`);
+        outbox.settled(hold.id);
+      } catch {
+        // Still held; sent again with the next delivery.
+      }
+    }
+    return outbox.flush(async (sessions) => {
       const response = await client.send(
         "POST",
         "/api/session/local-all",
@@ -71,8 +79,8 @@ export async function flushReports(client: AbsClient, onUnauthorized: () => void
         localSyncResultSchema,
       );
       return response.results;
-    }),
-  )
+    });
+  })
     .then((result) => {
       if (
         result.kind === "failed" &&

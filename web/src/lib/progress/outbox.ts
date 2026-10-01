@@ -82,10 +82,19 @@ export interface OutboxStorage {
 export interface HoldOwners {
   /** Marks the hold as owned until the returned release is called or the tab goes away. */
   claim: (holdId: string) => () => void;
-  live: () => Promise<Set<string>>;
+  /** The holds whose owner is alive, or null where the browser cannot tell. */
+  live: () => Promise<Set<string> | null>;
 }
 
-const noOwners: HoldOwners = { claim: () => () => {}, live: async () => new Set() };
+const noOwners: HoldOwners = { claim: () => () => {}, live: async () => null };
+
+/** A discard in progress: its listening stays queued until the delete of `progressId` is confirmed. */
+export interface Hold {
+  id: string;
+  libraryItemId: string;
+  episodeId: string | null;
+  progressId: string;
+}
 
 export interface DeliveryResult {
   id: string;
@@ -102,11 +111,13 @@ const queueSchema = z.array(listeningReportSchema);
 const holdSchema = z.object({
   libraryItemId: z.string(),
   episodeId: z.string().nullable(),
-  until: z.number(),
+  progressId: z.string(),
+  heartbeat: z.number(),
+  abandoned: z.boolean(),
 });
-/** Where owners cannot be told apart, a hold lasts this long after its owner last renewed it. */
-const HOLD_MS = 5 * 60_000;
-const RENEW_MS = 60_000;
+/** Where owners cannot be told apart, one silent this long is taken for gone, and its delete is sent again. */
+const SILENT_MS = 5 * 60_000;
+const HEARTBEAT_MS = 60_000;
 
 export function createOutbox(connectionId: string, storage: OutboxStorage, owners: HoldOwners = noOwners) {
   const key = `abs-web:v1:outbox:${connectionId}`;
@@ -126,19 +137,18 @@ export function createOutbox(connectionId: string, storage: OutboxStorage, owner
     storage.write(key, JSON.stringify(queue));
     for (const listener of listeners) listener();
   };
-  /** Holds still in force; one whose owner is gone and whose time has run out is cleared away. */
-  const liveHolds = async () => {
-    const owned = await owners.live();
-    return storage.keys(holdPrefix).flatMap((holdKey) => {
-      let hold: z.infer<typeof holdSchema> | null = null;
+  const readHolds = () =>
+    storage.keys(holdPrefix).flatMap((holdKey) => {
       try {
         const parsed = holdSchema.safeParse(JSON.parse(storage.read(holdKey) ?? "null"));
-        if (parsed.success) hold = parsed.data;
+        if (parsed.success) return [{ ...parsed.data, id: holdKey.slice(holdPrefix.length) }];
       } catch {}
-      if (hold && (owned.has(holdKey.slice(holdPrefix.length)) || hold.until > Date.now())) return [hold];
-      storage.remove(holdKey);
       return [];
     });
+  const isHeld = (libraryItemId: string, episodeId: string | null) =>
+    readHolds().some((hold) => hold.libraryItemId === libraryItemId && hold.episodeId === episodeId);
+  const notify = () => {
+    for (const listener of listeners) listener();
   };
 
   return {
@@ -150,32 +160,64 @@ export function createOutbox(connectionId: string, storage: OutboxStorage, owner
       save(load().filter((entry) => entry.libraryItemId !== libraryItemId || entry.episodeId !== episodeId));
     },
     /**
-     * Keeps a book's or episode's listening queued, in every tab, until the returned release is called. Used while
-     * its progress is being deleted, so listening recorded meanwhile is not deleted with it.
+     * Keeps a book's or episode's listening queued, in every tab, while its progress is deleted, so listening recorded
+     * meanwhile is not deleted with it. The hold ends only when the delete is confirmed: by its owner (`settle`) or,
+     * once the owner has given up (`abandon`) or is gone, by whichever tab sends the delete again (see `orphaned`).
+     * Sending it again is safe because it names the old progress row, which no later listening can be saved in.
      */
-    hold(libraryItemId: string, episodeId: string | null) {
+    hold(libraryItemId: string, episodeId: string | null, progressId: string) {
       const id = randomId();
       const holdKey = `${holdPrefix}${id}`;
-      const renew = () =>
-        storage.write(holdKey, JSON.stringify({ libraryItemId, episodeId, until: Date.now() + HOLD_MS }));
-      renew();
+      const write = (abandoned: boolean) =>
+        storage.write(
+          holdKey,
+          JSON.stringify({ libraryItemId, episodeId, progressId, heartbeat: Date.now(), abandoned }),
+        );
+      write(false);
+      notify();
       const disown = owners.claim(id);
-      const renewal = setInterval(renew, RENEW_MS);
-      return () => {
+      // Only while it still exists: another tab may already have finished it.
+      const renewal = setInterval(() => storage.read(holdKey) !== null && write(false), HEARTBEAT_MS);
+      const stop = () => {
         clearInterval(renewal);
         disown();
-        storage.remove(holdKey);
-        for (const listener of listeners) listener();
+      };
+      return {
+        settle() {
+          stop();
+          storage.remove(holdKey);
+          notify();
+        },
+        abandon() {
+          stop();
+          if (storage.read(holdKey) !== null) write(true);
+          notify();
+        },
       };
     },
+    isHeld,
+    /** Holds no live tab is finishing, whose delete must be sent again. */
+    async orphaned(): Promise<Hold[]> {
+      const live = await owners.live();
+      return readHolds()
+        .filter(
+          (hold) => hold.abandoned || (live ? !live.has(hold.id) : Date.now() - hold.heartbeat > SILENT_MS),
+        )
+        .map(({ id, libraryItemId, episodeId, progressId }) => ({
+          id,
+          libraryItemId,
+          episodeId,
+          progressId,
+        }));
+    },
+    /** Ends a hold whose delete another tab has had confirmed. */
+    settled(holdId: string) {
+      storage.remove(`${holdPrefix}${holdId}`);
+      notify();
+    },
+    hasHolds: () => readHolds().length > 0,
     async flush(send: (sessions: ListeningReport[]) => Promise<DeliveryResult[]>): Promise<FlushResult> {
-      const holds = await liveHolds();
-      const sending = load().filter(
-        (entry) =>
-          !holds.some(
-            (hold) => hold.libraryItemId === entry.libraryItemId && hold.episodeId === entry.episodeId,
-          ),
-      );
+      const sending = load().filter((entry) => !isHeld(entry.libraryItemId, entry.episodeId));
       if (sending.length === 0) return { kind: "idle" };
       let results: DeliveryResult[];
       try {

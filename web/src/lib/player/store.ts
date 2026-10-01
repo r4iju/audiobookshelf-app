@@ -167,9 +167,13 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
     set({ player: { ...player, ...change(player) } });
   };
 
-  const start = async (media: PlayerMedia, startTime: number | undefined, recovery = false) => {
+  const start = async (media: PlayerMedia, requestedTime: number | undefined, recovery = false) => {
     const { client, player: previous } = get();
     if (!client) return;
+    // The server still has the old place while its discard is pending; this device already starts over.
+    const startTime =
+      requestedTime ??
+      (outboxFor(client.connection.id).isHeld(media.itemId, media.episodeId) ? 0 : undefined);
     const preparing = ++generation;
     if (previous.phase === "active" && previous.source) {
       report(true);

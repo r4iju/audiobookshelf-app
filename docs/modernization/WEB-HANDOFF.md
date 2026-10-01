@@ -28,7 +28,8 @@ shared modernization documents. Issues #55 to #65.
 | `57ae6ae4` | README, deployment and server-contract docs, this handoff, formatting fix for `e109644f`'s spec |
 | `eb6980e3` | Discard ordering: the reset belongs to the account it came from, survives switches and new playback during the close, and waits for listening already on its way |
 | `df948480` | Discard barrier: a late session open cannot undo the reset, and listening begun after the reset is held until the delete is done |
-| (this commit) | Discard holds last as long as their tab, however slow the delete, and tabs taking or releasing holds at once keep each other's |
+| `f4e8d15f` | Discard holds last as long as their tab, however slow the delete, and tabs taking or releasing holds at once keep each other's |
+| (this commit) | A discard is kept until the server confirms its delete: refused or abandoned deletes are sent again by any tab, playing it meanwhile starts from the beginning, and the item page shows it pending |
 
 ## Checks
 
@@ -102,28 +103,33 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 - **RSS feeds** follow the legacy item menu. Administrators open and close them; anyone sees an open feed's address.
   Opening needs an item with audio. The legacy slug cleaning is applied before opening, and the address shown is
   exactly the one used.
-- **Discarding progress** happens in this order, for the account the discard came from only:
-  1. that account's listening for the book or episode is held back from delivery, in every tab, until the discard
-     ends. Each hold has its own stored entry, so tabs discarding at once never overwrite each other's. The
-     discarding tab keeps a Web Lock for its hold, so the hold lasts however long the delete takes, and ends when
-     the tab goes away. Plain-HTTP origins have no Web Locks; there the tab renews the hold every minute and it
-     lapses five minutes after the last renewal. On such an origin, a tab the browser freezes for longer than that
-     in the middle of a delete can lose its hold;
+- **Discarding progress** is a recorded intent that ends only when the server confirms the delete. For the
+  account the discard came from only:
+  1. a hold is stored for the book or episode, naming the progress row to delete. While it exists, no tab delivers
+     that account's listening for it. Each hold has its own stored entry, so tabs discarding at once never
+     overwrite each other's;
   2. this device drops its unsent listening for it, and the player (if it holds that book for that account) goes
-     back to the start, paused. A session still being opened for it is let go when it arrives;
+     back to the start, paused. A session still being opened for it is let go when it arrives. Playing it again
+     while the hold exists starts from the beginning, not from the server's old place;
   3. the old playback session is closed without a final report;
   4. deliveries already on their way for that account are answered: this tab's always, other tabs' where the browser
      offers Web Locks (secure origins). On a plain-HTTP origin another tab's delivery already sent is not waited for;
-  5. the server's progress is deleted;
-  6. the hold is released, and listening recorded since step 2 is delivered as new progress.
+  5. the server's progress row is deleted;
+  6. once the delete is confirmed, the hold ends and listening recorded since step 2 is delivered as new progress.
 
-  Other books and other accounts stay playable and keep delivering throughout. A storage refusal in steps 1 or 2, or
-  a server refusal of the delete, fails the discard, which says so where it was asked. In every such case the
-  server's progress is unchanged. A refusal part-way through step 2 can leave this device partly reset (the unsent
-  listening dropped but the saved player place not yet written); discarding again once storage accepts writes
-  finishes it. If the delete succeeds but its answer is lost, the device is already reset and the discard says it
-  failed. The server's own `user_updated` event then shows the progress gone, and deleting again is harmless: 2.30.0
-  answers 200 for progress that no longer exists.
+  If the delete fails, the discard says so where it was asked, the item page shows "Discarding progress. It
+  finishes when the server can be reached.", and the hold stays. The next delivery from any tab of that account
+  sends the delete again, and the listening is delivered only after it is confirmed. A tab that goes away or stops
+  answering mid-delete is finished the same way: where Web Locks exist, as soon as its lock is gone; on plain-HTTP
+  origins, after five minutes without its once-a-minute heartbeat. Silence never releases the listening; it only
+  lets another tab finish the delete. Sending the delete again, or a frozen tab's delete arriving late, is safe:
+  it names the old row, and 2.30.0 saves later listening in a new row with a new id (`UUIDV4`), and answers 200 for
+  a row that is already gone.
+
+  Other books and other accounts stay playable and keep delivering throughout. A storage refusal in steps 1 or 2
+  fails the discard before anything is sent, so the server's progress is unchanged. A refusal part-way through
+  step 2 can leave this device partly reset (the unsent listening dropped but the saved player place not yet
+  written); discarding again once storage accepts writes finishes it.
 
 ## Ports
 

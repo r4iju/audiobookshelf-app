@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, RotateCcw, Undo2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { InlineError } from "@/components/app/inline-error";
 import { ProgressBar } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,18 @@ import { useI18n } from "@/i18n/i18n";
 import { formatClock } from "@/lib/abs/media";
 import { useDiscardProgress, useSetFinished } from "@/lib/abs/mutations";
 import type { MediaProgress } from "@/lib/abs/schemas";
+import { outboxFor } from "@/lib/progress/sync";
+import { useAbs } from "@/lib/session/store";
+
+/** Whether this account's discard of the book or episode is still waiting for the server. */
+function useDiscardPending(itemId: string, episodeId: string | null) {
+  const outbox = outboxFor(useAbs().connection.id);
+  return useSyncExternalStore(
+    outbox.subscribe,
+    () => outbox.isHeld(itemId, episodeId),
+    () => false,
+  );
+}
 
 export function ProgressControls({
   itemId,
@@ -24,6 +36,7 @@ export function ProgressControls({
   const setFinished = useSetFinished();
   const discard = useDiscardProgress();
   const [confirming, setConfirming] = useState(false);
+  const discardPending = useDiscardPending(itemId, episodeId ?? null);
   const finished = progress?.isFinished ?? false;
   const error = setFinished.error ?? discard.error;
 
@@ -49,6 +62,11 @@ export function ProgressControls({
           </Button>
         ) : null}
       </div>
+      {discardPending ? (
+        <p role="status" className="text-sm text-muted">
+          {t("WebDiscardPending")}
+        </p>
+      ) : null}
       <InlineError error={error} />
       <ConfirmDialog
         open={confirming}

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { AbsClient } from "@/lib/abs/client";
+import { type AbsClient, AbsError } from "@/lib/abs/client";
 import { usePlayerStore } from "@/lib/player/store";
 import { discardProgress } from "./discard";
 import { createListeningReport, type ListeningReport } from "./outbox";
@@ -105,6 +105,53 @@ function slowDeleteServer(connectionId: string) {
   return { client, log, finishDelete, deleteRequested: () => deleteRequested };
 }
 
+/** What the server answers to a play request, starting from the place it has saved. */
+const playSession = (id: string, currentTime: number) => ({
+  id,
+  libraryItemId: "book-x",
+  episodeId: null,
+  mediaType: "book",
+  displayTitle: null,
+  displayAuthor: null,
+  duration: 60,
+  currentTime,
+  playMethod: 0,
+  chapters: [],
+  audioTracks: [{ index: 1, startOffset: 0, duration: 60, contentUrl: "/x.mp3", mimeType: "audio/mpeg" }],
+});
+
+/**
+ * A server whose answers to deletes are scripted in order: "hang" never answers until thawed (a frozen tab's
+ * request), "refuse" fails as an unreachable server would, "ok" deletes. It logs, in order, what it applied.
+ */
+function scriptedDeleteServer(connectionId: string, script: ("hang" | "refuse" | "ok")[]) {
+  const log: string[] = [];
+  let thaw = () => {};
+  const thawed = new Promise<void>((resolve) => {
+    thaw = resolve;
+  });
+  let deletes = 0;
+  const client = {
+    connection: { id: connectionId, serverUrl: "https://abs.example", username: connectionId },
+    url: (path: string) => `https://abs.example${path}`,
+    send: vi.fn(async (_method: string, path: string, body: { sessions: ListeningReport[] }) => {
+      if (path.includes("/play")) return playSession("s-new", 42);
+      log.push(
+        `listening ${body.sessions.map((session) => `${session.libraryItemId}@${session.currentTime}`).join(",")}`,
+      );
+      return { results: body.sessions.map((session) => ({ id: session.id, success: true })) };
+    }),
+    command: vi.fn(async (method: string, path: string) => {
+      if (method !== "DELETE") return;
+      const answer = script[deletes++] ?? "ok";
+      if (answer === "refuse") throw new AbsError("network", "Network error");
+      if (answer === "hang") await thawed;
+      log.push(`${method} ${path}`);
+    }),
+  } as unknown as AbsClient;
+  return { client, log, thaw, deletes: () => deletes };
+}
+
 beforeEach(() => {
   vi.stubGlobal("localStorage", memoryStorage());
   vi.stubGlobal("document", { createElement: () => ({ canPlayType: () => "probably" }) });
@@ -207,5 +254,71 @@ describe("discardProgress", () => {
     vi.useRealTimers();
 
     expect(server.log).toEqual(["DELETE /api/me/progress/p-x", "listening book-x@4"]);
+  });
+
+  it("finishes a discard whose tab stopped answering before delivering the listening it held", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Chrome/1", platform: "test" });
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const server = scriptedDeleteServer("conn-a", ["hang"]);
+    usePlayerStore.getState().attach(server.client);
+
+    const discarding = discardProgress(server.client, {
+      progressId: "p-x",
+      itemId: "book-x",
+      episodeId: null,
+    });
+    await vi.waitFor(() => expect(server.deletes()).toBe(1));
+    outboxFor("conn-a").record({ ...report("new-x", "book-x"), currentTime: 4 });
+    // The discarding tab is frozen: without Web Locks, nothing tells the others it is still there.
+    vi.advanceTimersByTime(60 * 60_000);
+    await flushReports(server.client, () => {});
+    // It wakes, and its request reaches the server late.
+    server.thaw();
+    await discarding;
+    vi.useRealTimers();
+
+    expect(server.log).toEqual([
+      "DELETE /api/me/progress/p-x",
+      "listening book-x@4",
+      "DELETE /api/me/progress/p-x",
+    ]);
+  });
+
+  it("keeps a refused discard and its new listening, and finishes it once the server answers", async () => {
+    const server = scriptedDeleteServer("conn-a", ["refuse"]);
+    usePlayerStore.getState().attach(server.client);
+
+    await expect(
+      discardProgress(server.client, { progressId: "p-x", itemId: "book-x", episodeId: null }),
+    ).rejects.toThrow();
+    outboxFor("conn-a").record({ ...report("new-x", "book-x"), currentTime: 4 });
+    await flushReports(server.client, () => {});
+
+    expect(server.log).toEqual(["DELETE /api/me/progress/p-x", "listening book-x@4"]);
+  });
+
+  it("plays a book whose discard is still pending from the start, not from the server's old place", async () => {
+    const server = scriptedDeleteServer("conn-a", ["refuse"]);
+    usePlayerStore.getState().attach(server.client);
+    await expect(
+      discardProgress(server.client, { progressId: "p-x", itemId: "book-x", episodeId: null }),
+    ).rejects.toThrow();
+
+    await usePlayerStore.getState().play({
+      media: {
+        itemId: "book-x",
+        episodeId: null,
+        libraryId: "lib1",
+        mediaType: "book",
+        title: "book-x",
+        author: "QA",
+        coverUrl: null,
+        duration: 60,
+        chapters: [],
+      },
+    });
+
+    const player = usePlayerStore.getState().player;
+    expect(player.phase === "active" ? player.currentTime : null).toBe(0);
   });
 });

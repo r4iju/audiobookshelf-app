@@ -135,6 +135,7 @@ export const webStrings = {
   WebCopyDiagnostics: "Copy diagnostics",
   WebCopyAddress: "Copy address",
   WebEbookSent: "Ebook sent to {0}",
+  WebDiscardPending: "Discarding progress. It finishes when the server can be reached.",
   WebEbookSendFailed: "Failed to send ebook to device: {0}",
   WebAutoRewindHelp:
     "Otherwise playback resumes a little earlier after a pause: 3 seconds after 10 seconds, up to 30 seconds after half an hour.",

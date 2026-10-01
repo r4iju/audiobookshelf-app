@@ -161,8 +161,8 @@ describe("progress outbox", () => {
       const shared = memoryStorage();
       const other = createOutbox("conn-a", shared);
       const tab = interleaving(shared);
-      tab.arm(() => other.hold("book-z", null));
-      createOutbox("conn-a", tab.storage).hold("book-x", null);
+      tab.arm(() => other.hold("book-z", null, "p-z"));
+      createOutbox("conn-a", tab.storage).hold("book-x", null, "p-x");
       other.record(queued("x", "book-x"));
       other.record(queued("z", "book-z"));
 
@@ -173,9 +173,9 @@ describe("progress outbox", () => {
       const shared = memoryStorage();
       const other = createOutbox("conn-a", shared);
       const tab = interleaving(shared);
-      const release = createOutbox("conn-a", tab.storage).hold("book-x", null);
-      tab.arm(() => other.hold("book-z", null));
-      release();
+      const held = createOutbox("conn-a", tab.storage).hold("book-x", null, "p-x");
+      tab.arm(() => other.hold("book-z", null, "p-z"));
+      held.settle();
       other.record(queued("x", "book-x"));
       other.record(queued("z", "book-z"));
 

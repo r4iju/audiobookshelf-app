@@ -103,3 +103,44 @@ test("discarding the progress of the book in the player starts it over on this d
   await expect.poll(async () => (await server())?.currentTime).toBeGreaterThan(1);
   expect((await server()).currentTime).toBeLessThan(20);
 });
+
+test("a discard the server cannot take yet stays pending, keeps new listening back, and finishes once it can", async ({
+  page,
+}) => {
+  const api = await serverApi(accounts.user);
+  const id = await itemIdByTitle("Salt and Signal");
+  await clearProgress(api, id);
+  await api.call(`/api/me/progress/${id}`, {
+    method: "PATCH",
+    body: { currentTime: 40, duration: 60, progress: 0.66 },
+  });
+  const server = async () => (await api.call(`/api/me/progress/${id}`)).body;
+  const reachable = { delete: false };
+  await page.route("**/api/me/progress/*", (route) =>
+    route.request().method() === "DELETE" && !reachable.delete ? route.abort() : route.fallback(),
+  );
+
+  await signIn(page);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("button", { name: "Discard progress" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Discard progress" }).click();
+  const pending = page.getByRole("main").getByRole("status").filter({ hasText: "Discarding progress" });
+  await expect(pending).toBeVisible();
+
+  // Listening from the start while the discard waits is kept back, so the server still has the old place.
+  await page.getByRole("button", { name: /^Play/ }).click();
+  const player = page.getByRole("region", { name: "Player" });
+  const position = () => player.getByRole("slider", { name: "Seek" }).inputValue().then(Number);
+  await expect.poll(position, { timeout: 15_000 }).toBeGreaterThan(2);
+  await player.getByRole("button", { name: "Pause", exact: true }).click();
+  expect(await position()).toBeLessThan(20);
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
+  await page.waitForTimeout(2_000);
+  expect((await server()).currentTime).toBe(40);
+
+  reachable.delete = true;
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
+  await expect(pending).toBeHidden();
+  await expect.poll(async () => (await server())?.currentTime).toBeGreaterThan(2);
+  expect((await server()).currentTime).toBeLessThan(20);
+});

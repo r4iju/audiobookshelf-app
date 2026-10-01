@@ -92,6 +92,9 @@ server allows the development server's origins. OpenID cannot work cross-origin;
     Listening for the same book recorded during the discard is held and sent after the delete, so it is not deleted
     with the old position. Opening a playback session (`/play`) does not change progress, so playing again during a
     discard is safe.
+  - A delete that fails is sent again, by row id, until it is confirmed. That relies on two 2.30.0 behaviours: the
+    delete answers 200 for a row that no longer exists, and progress saved later goes into a new row with a new
+    id, which the old delete cannot reach.
 - `POST` and `PATCH` on `/api/me/item/:id/bookmark`, `DELETE /api/me/item/:id/bookmark/:time` (bookmarks come with `/api/me`)
 - `GET /api/me/listening-stats`, `GET /api/me/stats/year/:year`, `GET /api/stats/year/:year` (administrators)
 
