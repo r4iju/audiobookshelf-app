@@ -65,6 +65,26 @@ final class CatalogJourney: TVJourney {
         capture("filtered")
     }
 
+    func testProgressFilterDropsATitleMarkedFinishedOnReturn() {
+        signIn()
+        waitForHome()
+        tab("Audiobooks")
+        XCTAssertTrue(app.buttons["item-book-0"].waitForExistence(timeout: 10))
+        select(app.buttons["library-filter"])
+        select(menuItem("Not started"))
+        let title = app.buttons["item-book-1"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["item-book-0"].exists, "In-progress titles are excluded")
+        select(title)
+        select(app.buttons["mark-finished"])
+        wait(app.buttons["mark-finished"], label: "Mark as not finished")
+        remote.press(.menu)
+        XCTAssertTrue(app.buttons["item-book-2"].waitForExistence(timeout: 10))
+        let gone = NSPredicate(format: "exists == false")
+        XCTAssertEqual(XCTWaiter().wait(for: [expectation(for: gone, evaluatedWith: title)], timeout: 10), .completed, "A finished title leaves the Not started results")
+        XCTAssertEqual(app.buttons["library-filter"].label, "Filter: Not started")
+    }
+
     func testCatalogFailureRecoversWithRetry() async throws {
         try await Fixture.configure("offline-library")
         signIn()

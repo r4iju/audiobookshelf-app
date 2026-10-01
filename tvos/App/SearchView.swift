@@ -3,7 +3,7 @@ import SwiftUI
 struct SearchView: View {
     @EnvironmentObject private var catalog: CatalogStore
     @State private var query = ""
-    @State private var results: [LibraryItem] = []
+    @State private var results: [SearchResult] = []
     @State private var searching = false
     @State private var error: String?
 
@@ -19,10 +19,10 @@ struct SearchView: View {
                         Text("No titles or episodes match “\(query)”.").font(.title3).foregroundStyle(.secondary)
                     }
                     LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
-                        ForEach(results) { item in
-                            NavigationLink(value: Route.to(item)) { ItemTile(item: item) }
+                        ForEach(results) { result in
+                            NavigationLink(value: result.route) { ItemTile(item: result.item, episodeID: result.episodeID) }
                                 .buttonStyle(.card)
-                                .accessibilityIdentifier("search.\(item.id)")
+                                .accessibilityIdentifier("search." + result.item.id + (result.episodeID.map { "." + $0 } ?? ""))
                         }
                     }
                 }

@@ -13,6 +13,7 @@
 		3518B88C73C31C85709E1C85 /* ListeningStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9DCF54C11B37504BA508579 /* ListeningStats.swift */; };
 		36078078332730C389B72106 /* OfflineAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5A7FADE8DB257513CBE566 /* OfflineAudio.swift */; };
 		3663DE343A05663BF98ECCA6 /* PodcastJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B31EF42F36CE7A230B28F4 /* PodcastJourney.swift */; };
+		38950C817DAB40C293DB9DC5 /* CatalogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135BB43ECEB37379B7AE3630 /* CatalogStoreTests.swift */; };
 		3B95AC7609006D67C4F509AC /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FE311F10522D8719513EB5 /* NowPlayingView.swift */; };
 		470B841E12FA752EAB3C4D81 /* ItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C7FA52BC8C86AB78FD34E /* ItemDetailView.swift */; };
 		4755673A3393723E50F062C9 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DFEB1C064A24D44B3F15CE /* APIClient.swift */; };
@@ -23,6 +24,7 @@
 		6FB70223C819A7434F27747E /* ServerEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715D7E78790E973158A68378 /* ServerEvents.swift */; };
 		90BAA58FF739E83E825A2751 /* CatalogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659342124C81DC7C5E07BB3A /* CatalogStore.swift */; };
 		917E944D857BC42FA92CAEE3 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE22E9CB2F259AC21DBE966D /* LibraryView.swift */; };
+		918C833A12209C49FEF99F95 /* FormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E658F1503F524B5E48D2954E /* FormatTests.swift */; };
 		A1BD679FCDAD002CB258C6F9 /* LibraryBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02865B4E245C3AA23D5FD475 /* LibraryBrowser.swift */; };
 		A4DD27B94E49EECC148A38A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABA1E0404BA6403B2756A289 /* Assets.xcassets */; };
 		A68A56DCE1EC148EE9C11C3D /* TVPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C9CC8D7EA65AD9D300C352 /* TVPlayer.swift */; };
@@ -40,6 +42,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		27C2FB470E7BE0486D1F7579 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C2AE9DF828595E5A9AD0C4DF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B2092862DCECB1354BF9D175;
+			remoteInfo = AudiobookshelfTV;
+		};
 		AA6EECD505FDFF3C8CEEB755 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C2AE9DF828595E5A9AD0C4DF /* Project object */;
@@ -56,6 +65,7 @@
 		063312A652B991AD9D34E87C /* ListeningSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningSync.swift; sourceTree = "<group>"; };
 		081251E538B89B11DDF39642 /* KeychainCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainCredentials.swift; sourceTree = "<group>"; };
 		0E5A7FADE8DB257513CBE566 /* OfflineAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineAudio.swift; sourceTree = "<group>"; };
+		135BB43ECEB37379B7AE3630 /* CatalogStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogStoreTests.swift; sourceTree = "<group>"; };
 		29ECC1816295436CA510BFB9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2E4FC5B9BCD2A7CE35D1E116 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		344FE9E115B6DD1B1751B0BC /* AudiobookshelfTV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AudiobookshelfTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,6 +87,8 @@
 		C850184BDFFE0D3242B9874A /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		CE22E9CB2F259AC21DBE966D /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		D11495E1C66F7E695A1F3872 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		DFED0402AB7D61A322B0535F /* TVAppTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TVAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E658F1503F524B5E48D2954E /* FormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatTests.swift; sourceTree = "<group>"; };
 		E7C9CC8D7EA65AD9D300C352 /* TVPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVPlayer.swift; sourceTree = "<group>"; };
 		E8B31EF42F36CE7A230B28F4 /* PodcastJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastJourney.swift; sourceTree = "<group>"; };
 		F59C7FA52BC8C86AB78FD34E /* ItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailView.swift; sourceTree = "<group>"; };
@@ -96,6 +108,15 @@
 				FEF2CDC828B2A12C335D7310 /* TVJourney.swift */,
 			);
 			path = UITests;
+			sourceTree = "<group>";
+		};
+		26CE6434BA2E844FBA6675FC /* AppTests */ = {
+			isa = PBXGroup;
+			children = (
+				135BB43ECEB37379B7AE3630 /* CatalogStoreTests.swift */,
+				E658F1503F524B5E48D2954E /* FormatTests.swift */,
+			);
+			path = AppTests;
 			sourceTree = "<group>";
 		};
 		516E80DCE8840C83243E4BA5 /* App */ = {
@@ -142,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				516E80DCE8840C83243E4BA5 /* App */,
+				26CE6434BA2E844FBA6675FC /* AppTests */,
 				6656F8F7B31785E39538B2E3 /* Core */,
 				925067041DCE7C93C759A001 /* fork-tv-completion */,
 				065C483595C4A2748D407529 /* UITests */,
@@ -185,6 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				344FE9E115B6DD1B1751B0BC /* AudiobookshelfTV.app */,
+				DFED0402AB7D61A322B0535F /* TVAppTests.xctest */,
 				FE8D8DDC9CBBCF1F06F379BC /* TVJourneyTests.xctest */,
 			);
 			name = Products;
@@ -219,6 +242,24 @@
 			productReference = FE8D8DDC9CBBCF1F06F379BC /* TVJourneyTests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		811604307BC8F00AFF7C064D /* TVAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F97865C9397F53A2DB22432F /* Build configuration list for PBXNativeTarget "TVAppTests" */;
+			buildPhases = (
+				84BA851797C1347D17F99008 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				29536256EBA1A23338A46970 /* PBXTargetDependency */,
+			);
+			name = TVAppTests;
+			packageProductDependencies = (
+			);
+			productName = TVAppTests;
+			productReference = DFED0402AB7D61A322B0535F /* TVAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		B2092862DCECB1354BF9D175 /* AudiobookshelfTV */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D5782252ACD8E1C9F73BBACD /* Build configuration list for PBXNativeTarget "AudiobookshelfTV" */;
@@ -251,6 +292,10 @@
 						ProvisioningStyle = Automatic;
 						TestTargetID = B2092862DCECB1354BF9D175;
 					};
+					811604307BC8F00AFF7C064D = {
+						DevelopmentTeam = C7X9BCC7LP;
+						ProvisioningStyle = Automatic;
+					};
 					B2092862DCECB1354BF9D175 = {
 						DevelopmentTeam = C7X9BCC7LP;
 						ProvisioningStyle = Automatic;
@@ -273,6 +318,7 @@
 			targets = (
 				B2092862DCECB1354BF9D175 /* AudiobookshelfTV */,
 				73793CC66F7D5CE52C81483E /* TVJourneyTests */,
+				811604307BC8F00AFF7C064D /* TVAppTests */,
 			);
 		};
 /* End PBXProject section */
@@ -332,9 +378,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		84BA851797C1347D17F99008 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38950C817DAB40C293DB9DC5 /* CatalogStoreTests.swift in Sources */,
+				918C833A12209C49FEF99F95 /* FormatTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		29536256EBA1A23338A46970 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B2092862DCECB1354BF9D175 /* AudiobookshelfTV */;
+			targetProxy = 27C2FB470E7BE0486D1F7579 /* PBXContainerItemProxy */;
+		};
 		B9EA03AD04DDB86913A4EE1C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B2092862DCECB1354BF9D175 /* AudiobookshelfTV */;
@@ -433,6 +493,23 @@
 			};
 			name = Debug;
 		};
+		3D69E9B2C9A0FE1AD45B53FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.forkzed.audiobookshelf.tv.apptests;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AudiobookshelfTV.app/AudiobookshelfTV";
+			};
+			name = Release;
+		};
 		7BEEFC1F8A8A2F3FFB46E636 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -510,6 +587,23 @@
 			};
 			name = Release;
 		};
+		E0EC3293CC26B73638A225E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.forkzed.audiobookshelf.tv.apptests;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AudiobookshelfTV.app/AudiobookshelfTV";
+			};
+			name = Debug;
+		};
 		E8D470380D7320925357B549 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -576,6 +670,15 @@
 			buildConfigurations = (
 				2646C8B9FC47531FD2AA3A6F /* Debug */,
 				E8D470380D7320925357B549 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F97865C9397F53A2DB22432F /* Build configuration list for PBXNativeTarget "TVAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E0EC3293CC26B73638A225E1 /* Debug */,
+				3D69E9B2C9A0FE1AD45B53FA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

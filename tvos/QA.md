@@ -7,7 +7,8 @@ Last verified October 1, 2026 (after the review fixes) on the Studio with Xcode 
 | Check | Command | Result |
 | --- | --- | --- |
 | TV core contracts | `swift test --package-path tvos/Core` | 15 passed |
-| Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 13 passed, 0 failed (338 s) |
+| TV app unit tests (`TVAppTests`) | run by `./tvos/scripts/verify-ui.sh` | 6 passed |
+| Remote-driven journeys | `./tvos/scripts/verify-ui.sh` | 15 journeys passed, 0 failed (389 s) |
 | Signed device build and install | `./tvos/scripts/deploy.sh --no-launch a5ef39a5001ef59dec9c2fa15838447215252137` | Release build signed by team `C7X9BCC7LP`, `codesign --verify --deep --strict` passes, installed on Living Room TV (tvOS 18.6) |
 
 The journeys run the Debug app with no test-only code paths beyond the launch-time reset. They operate it only through `XCUIRemote` presses (directions, Select, Menu, Play/Pause) and keyboard entry. They then assert what the screen shows and what the fixture server observed. Every journey was written first. The red run on October 1, 2026 against the previous TV app failed all 13 journeys before any implementation.
@@ -27,6 +28,10 @@ The journeys run the Debug app with no test-only code paths beyond the launch-ti
 | #28 | `RecoveryJourney.testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch` | With the server rejecting progress, listen, pause and terminate. Relaunch sends the saved listening once; details show the new server position; a second relaunch sends nothing more |
 | #29 | `PodcastJourney.testEpisodesSortAndPlaySeparatelyFromBooks` | Newest/oldest episode order, episode details, playback, server listening recorded for the episode only |
 | #29 | `PodcastJourney.testMarkEpisodeFinishedUpdatesOnlyThatEpisode` | Mark as finished sends `PATCH /api/me/progress/podcast/episode-morning`; only that episode shows Finished |
+| #29 | `PodcastJourney.testPodcastResultTileShowsItsEpisodeProgress` | A finished episode's search tile reports Finished, from that episode's progress rather than the podcast's |
+| #26, #28 | `CatalogJourney.testProgressFilterDropsATitleMarkedFinishedOnReturn` | With the Not started filter, marking a title finished and pressing Back refetches the filter so the title is gone and the filter is kept |
+
+`TVAppTests` covers what the fixture cannot produce: formatting of absurd server times (for example `1e300` seconds) saturates instead of trapping, search keeps a podcast and each of its matching episodes as separate navigable results, and only an HTTP 404 marks a cover as absent (5xx, 429, timeouts and cancellations retry). Each of those tests and the two journeys above failed first on October 1–2, 2026: the formatting test crashed with `Double value cannot be converted to Int`, search returned one result instead of three, the cover policy cached 500/503/429, the filter kept the finished title, and the tile reported no progress.
 
 Screenshots captured by those journeys:
 
@@ -53,6 +58,6 @@ Installing the build is not acceptance. These checks need a person using the Sir
 8. Leaving with the TV/Home button pauses and saves; the screen saver and Control Center keep listening.
 9. Login expiry: after server-side token revocation, the TV asks for the password and then sends the saved listening.
 
-These behaviours have no simulator journey yet and rely on the physical checks above: rapid skips across file boundaries (check 4), login expiry (check 9), progress bars on podcast tiles, and Home/Search when one of several libraries fails. The synthetic fixture has no mode that fails a single library or revokes a token.
+These behaviours have no automated test yet and rely on the physical checks above or on review: rapid skips across file boundaries (check 4), login expiry (check 9), and Home/Search when one of several libraries fails. The synthetic fixture has no mode that fails a single library or revokes a token.
 
 See [HANDOFF.md](HANDOFF.md) for the hardware storage caveat that affects check 7.

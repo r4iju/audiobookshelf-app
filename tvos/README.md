@@ -53,7 +53,7 @@ Downloads, offline playback, ebook/PDF reading, collections/playlists management
 
 - The interface is English only; there is no string catalog yet.
 - Home and Search skip a library that fails to load and show the others; they report an error only when every library fails.
-- When playback reports an error, Now Playing offers "Save progress again" even if the failure came from the media rather than from saving progress. The shared player does not expose which it was (see [HANDOFF.md](HANDOFF.md), item 2). For a media failure, start playback again from the details screen.
+- Open defect: when playback reports an error, Now Playing offers "Save progress again" even if the failure came from the media rather than from saving progress. Fixing it needs the shared player to expose the failure origin (see [HANDOFF.md](HANDOFF.md), item 2). Until then, start playback again from the details screen after a media failure.
 
 ## Build and verify
 
@@ -64,7 +64,7 @@ swift test --package-path tvos/Core
 
 # Remote-driven UI journeys on the dedicated tvOS QA simulator against owned synthetic fixtures
 # (HTTP on 20765, HTTPS on 20767 signed by a throwaway CA trusted only in that simulator):
-./tvos/scripts/verify-ui.sh
+./tvos/scripts/verify-ui.sh                                                # TV unit tests, then every journey
 ./tvos/scripts/verify-ui.sh -only-testing:TVJourneyTests/PodcastJourney   # a single journey
 
 # Signed release for the Apple TVs already registered with this account:
@@ -77,7 +77,7 @@ xcodebuild -project tvos/AudiobookshelfTV.xcodeproj \
   -derivedDataPath tvos/build build
 ```
 
-`verify-ui.sh` uses the simulator `00DD108F-2435-4FEC-9C37-3E62861A0EF6` (override with `ABS_TV_QA_SIMULATOR`) and refuses to start if its fixture ports are busy. Debug builds accept a `--reset-tv-state` launch argument that clears the saved login and listening journal so each journey starts signed out; Release builds, including every signed device build, do not contain it.
+`verify-ui.sh` uses the simulator `00DD108F-2435-4FEC-9C37-3E62861A0EF6` (override with `ABS_TV_QA_SIMULATOR`) and refuses to start if its fixture ports are busy. Debug builds accept a `--reset-tv-state` launch argument that clears the saved login and listening journal (the legacy file and the `NativeListeningJournal` defaults key) so each journey starts signed out; Release builds, including every signed device build, do not contain it.
 
 Only if editing the project specification or artwork:
 

@@ -1,14 +1,27 @@
 import SwiftUI
 
 enum Format {
+    static let longestTime: Double = 9_999 * 3600
+
+    /// Whole seconds, with server values that are invalid or absurdly long held within what can be displayed.
+    static func seconds(_ value: Double) -> Int {
+        guard value.isFinite, value > 0 else { return 0 }
+        return Int(min(value, longestTime).rounded(.down))
+    }
+
+    static func fraction(_ value: Double?) -> Double {
+        guard let value, value.isFinite else { return 0 }
+        return min(max(value, 0), 1)
+    }
+
     static func clock(_ seconds: Double) -> String {
-        let value = Int(max(seconds.isFinite ? seconds : 0, 0).rounded(.down))
+        let value = Self.seconds(seconds)
         return value >= 3600 ? String(format: "%d:%02d:%02d", value / 3600, value / 60 % 60, value % 60)
             : String(format: "%d:%02d", value / 60, value % 60)
     }
 
     static func duration(_ seconds: Double) -> String {
-        let minutes = Int(max(seconds.isFinite ? seconds : 0, 0)) / 60
+        let minutes = Self.seconds(seconds) / 60
         if minutes == 0 { return clock(seconds) }
         return minutes >= 60 ? "\(minutes / 60) h \(minutes % 60) min" : "\(minutes) min"
     }
@@ -28,11 +41,11 @@ enum Format {
         return Date(timeIntervalSince1970: milliseconds / 1000).formatted(date: .abbreviated, time: .omitted)
     }
 
-    /// Listening state for an item or episode, or nil when it has not been started.
     static func facts(_ episode: Episode) -> String {
         [published(episode.publishedAt), episode.playableDuration.map(duration)].compactMap { $0 }.joined(separator: " · ")
     }
 
+    /// Listening state for an item or episode, or nil when it has not been started.
     static func progress(_ progress: MediaProgress?, duration: Double?) -> String? {
         guard let progress else { return nil }
         if progress.isFinished == true { return "Finished" }
@@ -72,17 +85,25 @@ struct CoverView: View {
 struct ItemTile: View {
     @EnvironmentObject private var catalog: CatalogStore
     let item: LibraryItem
-    var width: CGFloat = 260
+    let episodeID: String?
+    private let width: CGFloat = 260
+
+    /// Podcast tiles stand for the episode they open: the server's matched or most recent one unless given.
+    init(item: LibraryItem, episodeID: String? = nil) {
+        self.item = item
+        self.episodeID = episodeID ?? (item.isPodcast ? item.recentEpisode?.id : nil)
+    }
 
     var body: some View {
-        let state = catalog.progress(itemID: item.id, episodeID: item.isPodcast ? item.recentEpisode?.id : nil)
+        let state = catalog.progress(itemID: item.id, episodeID: episodeID)
+        let episode = episodeID.flatMap { id in item.recentEpisode?.id == id ? item.recentEpisode : item.media.episodes?.first { $0.id == id } }
         VStack(alignment: .leading, spacing: 10) {
             ZStack(alignment: .bottom) {
                 CoverView(itemID: item.id, podcast: item.isPodcast)
                 if state?.isFinished == true {
                     HStack { Spacer(); Image(systemName: "checkmark.circle.fill").font(.title2).padding(10) }
                         .frame(maxHeight: .infinity, alignment: .top)
-                } else if let fraction = state?.progress, fraction > 0 {
+                } else if case let fraction = Format.fraction(state?.progress), fraction > 0 {
                     GeometryReader { geometry in
                         Capsule().fill(.tint).frame(width: geometry.size.width * fraction, height: 6)
                             .frame(maxHeight: .infinity, alignment: .bottom)
@@ -91,11 +112,13 @@ struct ItemTile: View {
             }
             .frame(width: width, height: width)
             .clipShape(RoundedRectangle(cornerRadius: 14))
-            Text(item.title).font(.system(size: 26, weight: .semibold)).lineLimit(2)
+            Text(episode?.title ?? item.title).font(.system(size: 26, weight: .semibold)).lineLimit(2)
                 .frame(width: width, height: 68, alignment: .topLeading)
-            Text(item.author.isEmpty ? " " : item.author).font(.system(size: 21)).foregroundStyle(.secondary).lineLimit(1)
+            Text(episode != nil ? item.title : item.author.isEmpty ? " " : item.author).font(.system(size: 21)).foregroundStyle(.secondary).lineLimit(1)
                 .frame(width: width, alignment: .leading)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityValue(Format.progress(state, duration: episode?.playableDuration ?? item.media.duration) ?? "")
     }
 }
 

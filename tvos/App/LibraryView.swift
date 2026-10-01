@@ -39,6 +39,8 @@ struct LibraryView: View {
             .catalogRoutes()
         }
         .task { if !browser.started { await browser.reload() } }
+        .onAppear { Task { await browser.refresh(progressRevision: catalog.progressRevision) } }
+        .onChange(of: catalog.progressRevision) { Task { await browser.refresh(progressRevision: catalog.progressRevision) } }
     }
 
     private var controls: some View {

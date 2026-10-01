@@ -46,6 +46,7 @@ struct LibraryFilter: Hashable, Identifiable {
     @Published private(set) var filter: LibraryFilter?
     @Published private(set) var filterData: LibraryFilters?
     private var nextPage = 0
+    private var progressRevision: Int?
     private var generation = UUID()
 
     init(library: Library, api: APIClient) {
@@ -73,6 +74,13 @@ struct LibraryFilter: Hashable, Identifiable {
     func retry() async {
         error = nil
         if items.isEmpty { await reload() } else { await loadPage() }
+    }
+
+    /// Reloads progress-filtered results once listening progress has changed since they were fetched.
+    func refresh(progressRevision revision: Int) async {
+        defer { progressRevision = revision }
+        guard let previous = progressRevision, previous != revision, filter?.group == "progress" else { return }
+        await reload()
     }
 
     func apply(sort: LibrarySort) async {

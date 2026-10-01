@@ -1,5 +1,12 @@
 import SwiftUI
 
+struct SearchResult: Identifiable, Hashable {
+    let item: LibraryItem
+    let episodeID: String?
+    var id: String { item.id + "#" + (episodeID ?? "") }
+    var route: Route { episodeID.map { .episode(item, episodeID: $0) } ?? .item(item) }
+}
+
 struct HomeShelf: Identifiable {
     let id: String
     let shelfID: String
@@ -19,7 +26,10 @@ struct HomeShelf: Identifiable {
     @Published private(set) var loadingCatalog = false
     @Published private(set) var catalogError: String?
     @Published private(set) var progress: [String: MediaProgress] = [:]
+    /// Changes whenever a title moves between not started, in progress and finished, which server progress filters depend on.
+    @Published private(set) var progressRevision = 0
     private var generation = UUID()
+    private var account = UUID()
     private var covers: [String: UIImage] = [:]
     private var missingCovers: Set<String> = []
 
@@ -78,20 +88,39 @@ struct HomeShelf: Identifiable {
     }
 
     func remember(_ user: CurrentUser) {
-        progress = Dictionary(user.mediaProgress.map { ($0.id, $0) }, uniquingKeysWith: { $1 })
+        let updated = Dictionary(user.mediaProgress.map { ($0.id, $0) }, uniquingKeysWith: { $1 })
+        if updated.mapValues(Self.stage) != progress.mapValues(Self.stage) { progressRevision += 1 }
+        progress = updated
+    }
+
+    private static func stage(_ progress: MediaProgress) -> Int {
+        progress.isFinished == true ? 2 : (progress.currentTime ?? 0) > 0 ? 1 : 0
     }
 
     func progress(itemID: String, episodeID: String? = nil) -> MediaProgress? {
         progress[itemID + ":" + (episodeID ?? "book")]
     }
 
-    func search(_ text: String) async throws -> [LibraryItem] {
-        let results = try await Self.eachLibrary(libraries) { library in
-            let response = try await self.api.search(libraryID: library.id, query: text, limit: 25)
-            return response.items + (response.episodes ?? []).map(\.libraryItem)
+    func search(_ text: String) async throws -> [SearchResult] {
+        let responses = try await Self.eachLibrary(libraries) { library in
+            [try await self.api.search(libraryID: library.id, query: text, limit: 25)]
+        }
+        return Self.merge(responses)
+    }
+
+    /// A podcast and each of its matching episodes are separate results; only exact repeats across libraries are dropped.
+    nonisolated static func merge(_ responses: [SearchResponse]) -> [SearchResult] {
+        let results = responses.flatMap { response in
+            response.items.map { SearchResult(item: $0, episodeID: nil) }
+                + (response.episodes ?? []).map { SearchResult(item: $0.libraryItem, episodeID: $0.libraryItem.recentEpisode?.id) }
         }
         var seen = Set<String>()
         return results.filter { seen.insert($0.id).inserted }
+    }
+
+    /// Server and network trouble is temporary; only a server saying there is no cover is worth remembering.
+    nonisolated static func coverIsAbsent(after error: Error) -> Bool {
+        error as? APIError == .http(404)
     }
 
     /// One unavailable library must not hide the others; fail only when every library fails.
@@ -109,13 +138,14 @@ struct HomeShelf: Identifiable {
     func cover(itemID: String) async -> UIImage? {
         if let cached = covers[itemID] { return cached }
         if missingCovers.contains(itemID) { return nil }
+        let request = account
         let data: Data
         do { data = try await api.coverData(itemID: itemID) }
         catch {
-            // Only a server answer means the cover is absent; timeouts and cancelled tiles retry later.
-            if case APIError.http = error { missingCovers.insert(itemID) }
+            if request == account, Self.coverIsAbsent(after: error) { missingCovers.insert(itemID) }
             return nil
         }
+        guard request == account else { return nil }
         guard let image = UIImage(data: data) else { missingCovers.insert(itemID); return nil }
         if covers.count >= 240 { covers.removeAll() }
         covers[itemID] = image
@@ -124,7 +154,7 @@ struct HomeShelf: Identifiable {
 
     func signOut() throws {
         try api.signOut()
-        generation = UUID()
+        generation = UUID(); account = UUID()
         libraries = []; shelves = []; progress = [:]; covers = [:]; missingCovers = []
         catalogError = nil
         loadingCatalog = false

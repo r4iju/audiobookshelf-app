@@ -50,4 +50,16 @@ final class PodcastJourney: TVJourney {
         XCTAssertEqual(label("episode-state-episode-morning"), "Finished")
         XCTAssertFalse(app.staticTexts["episode-state-episode"].exists)
     }
+
+    func testPodcastResultTileShowsItsEpisodeProgress() async throws {
+        openPodcast()
+        select(app.buttons["episode-episode"])
+        select(app.buttons["mark-finished"])
+        wait(app.buttons["mark-finished"], label: "Mark as not finished")
+        tab("Search")
+        search("Quiet")
+        let tile = app.buttons["search.podcast.episode"]
+        XCTAssertTrue(tile.waitForExistence(timeout: 10))
+        XCTAssertEqual(tile.value as? String, "Finished", "The tile reflects the matched episode, not the podcast as a book")
+    }
 }
