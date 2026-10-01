@@ -59,7 +59,11 @@ open(target, 'w').write(text.replace('name: AudiobookshelfNative\n', 'name: buil
 PY
 xcodegen generate --quiet --spec "$qa_root/project.yml" --project-root "$apple_root" --project "$apple_root"
 echo "simulator: $simulator_name ($simulator); results: $qa_root/results/$label.xcresult"
+test_filters=("$@")
+if (( ${#test_filters[@]} == 0 )); then
+    test_filters=(-only-testing:NativeJourneyTests/RemainingQAAccessibilityJourney -only-testing:NativeJourneyTests/RemainingQAGroupJourney)
+fi
 TEST_RUNNER_ABS_REMAINING_QA=1 xcodebuild -project "$apple_root/build-remaining-qa.xcodeproj" -scheme AudiobookshelfNative \
     -destination "id=$simulator" -derivedDataPath "$qa_root/derived" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
     IPHONEOS_DEPLOYMENT_TARGET=15.0 -resultBundlePath "$qa_root/results/$label.xcresult" \
-    -collect-test-diagnostics never "${@:--only-testing:NativeJourneyTests/RemainingQAJourney}" test
+    -collect-test-diagnostics never "${test_filters[@]}" test
