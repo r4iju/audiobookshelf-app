@@ -53,7 +53,7 @@ Downloads, offline playback, ebook/PDF reading, collections/playlists management
 
 ### Known limitations
 
-- The interface is English only; there is no string catalog yet.
+- Settings > Language offers the legacy app's languages, but only texts with a legacy translation are translated; the rest, and the author and series pages, stay English. See [APPLE-TV-READINESS.md](../docs/modernization/APPLE-TV-READINESS.md).
 - Home and Search skip a library that fails to load and show the others; they report an error only when every library fails.
 
 ## Build and verify
@@ -78,7 +78,7 @@ xcodebuild -project tvos/AudiobookshelfTV.xcodeproj \
   -derivedDataPath tvos/build build
 ```
 
-`verify-ui.sh` uses the simulator `00DD108F-2435-4FEC-9C37-3E62861A0EF6` (override with `ABS_TV_QA_SIMULATOR`) and refuses to start if its fixture ports are busy. Debug builds accept a `--reset-tv-state` launch argument that clears the saved login and listening journal (the legacy file and the `NativeListeningJournal` defaults key) so each journey starts signed out; Release builds, including every signed device build, do not contain it.
+`verify-ui.sh` uses the simulator `00DD108F-2435-4FEC-9C37-3E62861A0EF6` (override with `ABS_TV_QA_SIMULATOR`) and refuses to start if its fixture ports are busy. `ABS_TV_HTTP_PORT` and `ABS_TV_HTTPS_PORT` choose other fixture ports so a second simulator can run journeys in parallel. Debug builds accept a `--reset-tv-state` launch argument that clears the saved login, listening journal (the legacy file and the `NativeListeningJournal` defaults key), language choice and diagnostics log so each journey starts signed out; Release builds, including every signed device build, do not contain it.
 
 Only if editing the project specification or artwork:
 

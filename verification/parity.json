@@ -1817,7 +1817,9 @@
         ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Simulator, synthetic fixture: TVJourneyTests/ReadinessJourney/testFailedSignInIsDiagnosedWithoutCredentials (credentials and token in a sign-in address never shown or saved, masked addresses, Back focus) and testCatalogFailureIsRecordedAndClearedFromSettings (server failure recorded, status, clear); docs/modernization/APPLE-TV-READINESS.md. On-device only: tvOS has no share sheet, so no export. Physical acceptance remains open."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1852,7 +1854,9 @@
         ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Simulator: TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit (Xcode accessibility audit on sign-in, home, details, Now Playing, settings, search; spoken progress values) plus remote focus and Back in every ReadinessJourney; docs/modernization/APPLE-TV-READINESS.md. Not applicable on tvOS: Dynamic Type. VoiceOver, contrast and readability from the sofa need physical acceptance."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -1887,7 +1891,9 @@
         ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Simulator: TVJourneyTests/ReadinessJourney/testGermanLocalizesTheInterfaceAndPersists and testArabicMirrorsTheInterface (legacy translations, persistence, right-to-left), TVAppTests/FormatTests/testDurationsAndDatesFollowTheChosenLanguage; docs/modernization/APPLE-TV-READINESS.md. Texts without a legacy equivalent stay English, as the Language screen states."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
