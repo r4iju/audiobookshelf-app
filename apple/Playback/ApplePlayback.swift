@@ -579,9 +579,8 @@ import UIKit
             try await listening.flush()
             guard try await api.currentAccount() == account else { throw CancellationError() }
             try beforePublication()
-            try await listening.publications.deliver(account: account, itemID: itemID, episodeID: nil) {
-                try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction, issuing: $0)
-            }
+            try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction,
+                                      issuing: listening.publications.issuing(account: account, itemID: itemID, episodeID: nil))
         }
         readingPublication = publication
         defer { readingPublication = nil }
@@ -613,9 +612,8 @@ import UIKit
         try await prepareProgressEdit(itemID: itemID, episodeID: episodeID)
         try Task.checkCancellation()
         guard try await api.currentAccount() == owner else { throw CancellationError() }
-        try await listening.publications.deliver(account: owner, itemID: itemID, episodeID: episodeID) {
-            try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished, issuing: $0)
-        }
+        try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished,
+                                  issuing: listening.publications.issuing(account: owner, itemID: itemID, episodeID: episodeID))
         let user = try await api.me()
         guard try await api.currentAccount() == owner else { throw CancellationError() }
         try listening.rememberRemoteProgress(user, account: owner)
@@ -687,11 +685,14 @@ import UIKit
     /// The progress writes this app sends; see `PublicationLedger`.
     var publications: PublicationLedger { listening.publications }
 
-    /// Records that the owner was asked to restart the account's server.
-    func requestServerRestart(account: AccountIdentity) throws {}
+    /// Records that the owner is asked to restart the account's server now; see
+    /// `PublicationLedger.requestRestart`.
+    func requestServerRestart(account: AccountIdentity) throws {
+        try listening.publications.requestRestart(server: account.server)
+    }
 
-    /// Records the owner's confirmation that the account's server restarted after the writes a
-    /// reset is waiting for, which lets it go ahead.
+    /// Records the owner's confirmation that the account's server restarted after the last
+    /// `requestServerRestart`, which resolves the writes unresolved at that request.
     func confirmServerRestarted(account: AccountIdentity) throws {
         try listening.publications.confirmRestart(server: account.server)
     }
@@ -729,10 +730,10 @@ import UIKit
 
     /// Thrown by `resetProgress` while the server may still apply an earlier write for the media.
     /// Nothing was changed. Server 2.30 cannot confirm when such a write has finished; restarting
-    /// it ends the write, and `confirmServerRestarted` records that.
+    /// it ends the write, and `requestServerRestart` and `confirmServerRestarted` record that.
     struct UnresolvedProgressWrites: LocalizedError {
         var errorDescription: String? {
-            "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Restart the Audiobookshelf server, confirm the restart here, then discard again."
+            "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Ask for a restart here, restart the Audiobookshelf server, confirm it, then discard again."
         }
     }
 

@@ -135,7 +135,7 @@ struct BookDetails: View {
                         switch error {
                         case .load: load(monitorDownloads: true)
                         case .discard: discardProgress()
-                        case .unresolvedWrites: progressConfirmation = .serverRestarted
+                        case .unresolvedWrites: askForRestart()
                         }
                     }
                 }
@@ -160,7 +160,7 @@ struct BookDetails: View {
                 case .discard:
                     return Alert(title: Text(l10n("Confirm")), message: Text(l10n("Are you sure you want to reset your progress?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 case .serverRestarted:
-                    return Alert(title: Text(l10n("Has the server restarted?")), message: Text(l10n("Confirm only if the Audiobookshelf server was restarted after the save that got no answer. Otherwise that save may still bring the progress back.")), primaryButton: .destructive(Text(l10n("Server restarted")), action: confirmRestartAndDiscard), secondaryButton: .cancel(Text(l10n("Cancel"))))
+                    return Alert(title: Text(l10n("Restart the server now")), message: Text(l10n("Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.")), primaryButton: .destructive(Text(l10n("Server restarted")), action: confirmRestartAndDiscard), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 }
             }
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
@@ -237,8 +237,19 @@ struct BookDetails: View {
                 mediaProgress = user.mediaProgress
                 catalog.discardProgress(user, itemID: book.id, episodeID: episode?.id)
             } catch is ApplePlayback.UnresolvedProgressWrites {
-                if !Task.isCancelled { self.error = .unresolvedWrites(l10n("Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Restart the Audiobookshelf server, then try again.")) }
+                if !Task.isCancelled { self.error = .unresolvedWrites(l10n("Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart.")) }
             } catch { if !Task.isCancelled { self.error = .discard(ConnectionStore.recovery(for: error)) } }
+        }
+    }
+
+    /// The restart is asked for before the alert shows, so a restart before it does not count.
+    private func askForRestart() {
+        guard !progressBusy else { return }
+        Task {
+            do {
+                try player.requestServerRestart(account: try await catalog.api.currentAccount())
+                progressConfirmation = .serverRestarted
+            } catch { self.error = .discard(ConnectionStore.recovery(for: error)) }
         }
     }
 

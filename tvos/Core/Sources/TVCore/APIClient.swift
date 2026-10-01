@@ -183,7 +183,8 @@ import Foundation
         return try AccountIdentity(server: identified.server, userID: user.id)
     }
 
-    /// `issuing` runs right before each transmission of the request, and nothing is sent when it throws.
+    /// `issuing` runs right before each transmission of the request, the first and any resent
+    /// after a 401, and nothing is sent when it throws; see `IssuingHook`.
     public func syncListening(_ record: ListeningRecord, issuing: IssuingHook? = nil) async throws {
         guard try await currentAccount() == record.account else { throw APIError.signInRequired }
         let response = try await request("api/session/local-all", method: "POST", body: [
@@ -364,7 +365,9 @@ import Foundation
         try JSONDecoder().decode(T.self, from: await request(path, query: query, pinned: pinned))
     }
 
-    public typealias IssuingHook = @MainActor (URLRequest) throws -> Void
+    /// Runs right before one transmission and returns what receives its outcome: nil once the
+    /// server answered with success, otherwise the error, `APIError.http` for any other answer.
+    public typealias IssuingHook = @MainActor (URLRequest) throws -> @MainActor (Error?) -> Void
 
     private func request(_ path: String, method: String = "GET", query: [URLQueryItem] = [], body: [String: Any]? = nil, bodyData: Data? = nil, retry: Bool = true, pinned: UUID? = nil, issuing: IssuingHook? = nil) async throws -> Data {
         if let pinned, pinned != authGeneration { throw CancellationError() }
@@ -377,9 +380,9 @@ import Foundation
         if let body { request.httpBody = try JSONSerialization.data(withJSONObject: body) }
         else { request.httpBody = bodyData }
         if request.httpBody != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
-        try issuing?(request)
+        let transmitted = try issuing?(request)
         do {
-            let data = try await send(request)
+            let data = try await send(request, transmitted: transmitted)
             guard authGeneration == generation else { throw CancellationError() }
             return data
         }
@@ -416,10 +419,16 @@ import Foundation
         catch APIError.http(403) { throw APIError.signInRequired }
     }
 
-    private func send(_ request: URLRequest) async throws -> Data {
-        let (data, response) = try await session.data(for: request)
-        guard let response = response as? HTTPURLResponse else { throw APIError.http(0) }
-        guard (200...299).contains(response.statusCode) else { throw APIError.http(response.statusCode) }
-        return data
+    private func send(_ request: URLRequest, transmitted: (@MainActor (Error?) -> Void)? = nil) async throws -> Data {
+        do {
+            let (data, response) = try await session.data(for: request)
+            guard let response = response as? HTTPURLResponse else { throw APIError.http(0) }
+            guard (200...299).contains(response.statusCode) else { throw APIError.http(response.statusCode) }
+            transmitted?(nil)
+            return data
+        } catch {
+            transmitted?(error)
+            throw error
+        }
     }
 }

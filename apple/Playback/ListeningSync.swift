@@ -127,10 +127,15 @@ struct ProgressResetIntent: Codable, Equatable {
         let journal = try loaded()
         let account = try await api.currentAccount()
         let transfer = Task { @MainActor in
-            while let next = journal.pending(account: account).first {
+            // Listening of media whose earlier sync the server may still apply stays on this device.
+            var waiting: Set<String> = []
+            while let next = journal.pending(account: account).first(where: { !waiting.contains($0.id) }) {
                 try Task.checkCancellation()
-                try await publications.deliver(account: account, itemID: next.media.libraryItemID, episodeID: next.media.episodeID) {
-                    try await api.syncListening(next, issuing: $0)
+                do {
+                    try await api.syncListening(next, issuing: publications.issuing(account: account, itemID: next.media.libraryItemID, episodeID: next.media.episodeID))
+                } catch PublicationLedger.Failure.waiting {
+                    waiting.insert(next.id)
+                    continue
                 }
                 // Acknowledges only the revision sent, never later listening.
                 try journal.acknowledge(next)

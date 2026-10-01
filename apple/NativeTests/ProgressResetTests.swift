@@ -516,7 +516,9 @@ import XCTest
         await expectRefusedReset(book, "The reset ran though the record of earlier writes could not be read")
         XCTAssertEqual(deletes(), [api + "/me/progress/" + server.id(other, nil)])
 
-        // A restart ends every handler still running, which the owner confirms.
+        // A restart asked for now ends every handler still running, which the owner confirms.
+        try harness.player.requestServerRestart(account: alice)
+        server.restart()
         try harness.player.confirmServerRestarted(account: alice)
         _ = try await reset(book)
         XCTAssertNil(server[book, nil])

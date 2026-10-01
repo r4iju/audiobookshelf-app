@@ -83,7 +83,6 @@
 "Compact" = "Compact";
 "Complete" = "Complete";
 "Confirm" = "Confirm";
-"Confirm only if the Audiobookshelf server was restarted after the save that got no answer. Otherwise that save may still bring the progress back." = "Confirm only if the Audiobookshelf server was restarted after the save that got no answer. Otherwise that save may still bring the progress back.";
 "Connect" = "Connect";
 "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported.";
 "Connect directly to your Audiobookshelf server to stream audiobooks and podcasts." = "Connect directly to your Audiobookshelf server to stream audiobooks and podcasts.";
@@ -181,7 +180,6 @@
 "Haptic feedback" = "Haptic feedback";
 "Has ebook" = "Has ebook";
 "Has supplementary ebook" = "Has supplementary ebook";
-"Has the server restarted?" = "Has the server restarted?";
 "Heavy" = "Heavy";
 "Highlights" = "Highlights";
 "Home" = "Home";
@@ -335,7 +333,7 @@
 "Previous page" = "Previous page";
 "Previous year" = "Previous year";
 "Progress" = "Progress";
-"Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Restart the Audiobookshelf server, then try again." = "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Restart the Audiobookshelf server, then try again.";
+"Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart." = "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart.";
 "Published year" = "Published year";
 "Queued" = "Queued";
 "Queueing on your server…" = "Queueing on your server…";
@@ -363,6 +361,8 @@
 "Report" = "Report";
 "Reset timer" = "Reset timer";
 "Restart playback" = "Restart playback";
+"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.";
+"Restart the server now" = "Restart the server now";
 "Restarting…" = "Restarting…";
 "Resume" = "Resume";
 "Resume listening" = "Resume listening";

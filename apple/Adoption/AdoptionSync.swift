@@ -280,7 +280,7 @@ extension NativeMigrationAdoption {
 
     /// Errors after which the request certainly did not reach the server.
     private static func notSent(_ error: Error) -> Bool {
-        if error is SyncFailure || error is APIError { return true }
+        if error is SyncFailure || error is APIError || error is PublicationLedger.Failure { return true }
         guard let error = error as? URLError else { return false }
         return [.notConnectedToInternet, .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed, .badURL, .unsupportedURL, .secureConnectionFailed].contains(error.code)
     }
