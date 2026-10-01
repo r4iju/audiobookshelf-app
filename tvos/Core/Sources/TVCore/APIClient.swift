@@ -59,7 +59,7 @@ import Foundation
     }
 
     public func deleteBookmark(itemID: String, time: Double) async throws {
-        _ = try await request("api/me/item/\(itemID)/bookmark/\(Int(time))", method: "DELETE")
+        _ = try await request("api/me/item/\(itemID)/bookmark/\(time)", method: "DELETE")
     }
 
     public func currentAccount() async throws -> AccountIdentity {

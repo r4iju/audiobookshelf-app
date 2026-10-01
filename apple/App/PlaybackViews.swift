@@ -81,10 +81,10 @@ struct NowListening: View {
                         Button { Task { await player.skip(Double(player.forwardInterval)) } } label: { VStack { Image(systemName: "goforward").font(.largeTitle); Text("\(player.forwardInterval)").font(.caption) } }.accessibilityLabel("Forward \(player.forwardInterval) seconds")
                     }.foregroundColor(ShelfStyle.accent)
                     HStack(spacing: 24) {
-                        Button { panel = .chapters } label: { Label("Chapters", systemImage: "list.bullet") }
+                        Button { panel = .chapters } label: { Label("Chapters", systemImage: "list.bullet") }.disabled(player.session?.chapters?.isEmpty != false)
                         Button { panel = .speed } label: { VStack { Image(systemName: "speedometer"); Text(String(format: "%g×", player.speed)) } }.accessibilityLabel("Playback speed")
-                        Button { panel = .bookmarks } label: { Label("Bookmarks", systemImage: "bookmark") }
-                        Button { panel = .sleep } label: { Label("Sleep timer", systemImage: "moon") }
+                        Button { panel = .bookmarks } label: { Label("Bookmarks", systemImage: "bookmark") }.disabled(!player.bookmarkSupported)
+                        Button { panel = .sleep } label: { Label("Sleep timer", systemImage: "moon") }.disabled(player.session == nil)
                     }.labelStyle(ListeningControlLabelStyle()).font(.caption).foregroundColor(ShelfStyle.accent)
                     if let remaining = player.sleepRemaining { Text("Sleep in " + ShelfTime.describe(remaining)).font(.caption).foregroundColor(.secondary) }
                     if player.sleepChapterEnd != nil { Text("Sleep at chapter end").font(.caption).foregroundColor(.secondary) }
@@ -184,6 +184,7 @@ struct ListeningControls: View {
                         Button("End of chapter") { player.setChapterSleepTimer(); panel = nil }.disabled(player.currentChapter == nil)
                     }
                     Toggle("Fade audio in the last minute", isOn: $player.fadeSleepTimer)
+                    if player.sleepRemaining != nil { Text("Audio volume: \(Int(player.audioVolume * 100))%").accessibilityIdentifier("fade-volume") }
                     if player.sleepRemaining != nil || player.sleepChapterEnd != nil {
                         Button("Reset timer") { player.resetSleepTimer(); panel = nil }
                         Button("Cancel timer") { player.cancelSleepTimer(); panel = nil }

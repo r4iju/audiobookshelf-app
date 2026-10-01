@@ -1,9 +1,51 @@
 import XCTest
 
 @MainActor final class ListeningControlsJourney: NativeJourney {
+    func testDeletingFractionalBookmarkPreservesItsIntegerNeighbor() async throws {
+        try await FixtureControl.configure("baseline")
+        for (time, title) in [(6.0, "Whole second"), (6.5, "Half second")] {
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:19765/abs/api/me/item/book-0/bookmark")!)
+            request.httpMethod = "POST"
+            request.setValue("Bearer fresh", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONSerialization.data(withJSONObject: ["time": time, "title": title])
+            let (_, response) = try await URLSession.shared.data(for: request)
+            XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+        }
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        app.buttons["play-book"].tap()
+        app.buttons["mini-player"].tap()
+        app.buttons["pause-playback"].tap()
+        app.buttons["Bookmarks"].tap()
+        XCTAssertTrue(app.buttons["Half second"].waitForExistence(timeout: 5))
+        app.buttons["Delete Half second"].tap()
+        let deleted = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: app.buttons["Half second"])
+        await fulfillment(of: [deleted], timeout: 5)
+        XCTAssertTrue(app.buttons["Whole second"].exists)
+    }
+
+    func testDisablingAnActiveSleepFadeRestoresActualAudioVolume() async throws {
+        let app = try await openPlayer()
+        app.buttons["Sleep timer"].tap()
+        app.textFields["timer-seconds"].tap()
+        app.textFields["timer-seconds"].typeText("10")
+        app.buttons["Start timer"].tap()
+        app.buttons["resume-playback"].tap()
+        app.buttons["Sleep timer"].tap()
+        let volume = app.staticTexts["fade-volume"]
+        XCTAssertTrue(volume.waitForExistence(timeout: 5))
+        XCTAssertNotEqual(volume.label, "Audio volume: 100%")
+        let fade = app.switches["Fade audio in the last minute"]
+        fade.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        XCTAssertEqual(fade.value as? String, "0")
+        let restored = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Audio volume: 100%"), object: volume)
+        await fulfillment(of: [restored], timeout: 3)
+    }
     private func openPlayer() async throws -> XCUIApplication {
         try await FixtureControl.configure("baseline")
-        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
         app.buttons["book-book-0"].tap()
         app.buttons["play-book"].tap()
@@ -37,6 +79,7 @@ import XCTest
         app.buttons["play-book"].tap()
         app.buttons["mini-player"].tap()
         XCTAssertTrue(app.staticTexts["2×"].waitForExistence(timeout: 5))
+        capture("native-modern-player")
     }
 
     func testConfiguredSkipIntervalsSeekAcrossFilesAndPersist() async throws {

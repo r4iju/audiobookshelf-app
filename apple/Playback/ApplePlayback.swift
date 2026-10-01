@@ -23,17 +23,23 @@ import SwiftUI
     @Published private(set) var title = ""
     @Published private(set) var author = ""
     @Published private(set) var itemID: String?
+    @Published private(set) var bookmarkSupported = false
     @Published private(set) var bookmarks: [Bookmark] = []
     @Published private(set) var bookmarkBusy = false
     @Published private(set) var bookmarkError: String?
     @Published private(set) var sleepRemaining: Double?
     @Published private(set) var sleepChapterEnd: Double?
+    var audioVolume: Float { player.volume }
     private var sleepTask: Task<Void, Never>?
     private var sleepBoundary: Any?
+    private var sleepID = UUID()
     private var sleepLength: Double?
     private var sleepTick = Date()
     @Published var fadeSleepTimer = UserDefaults.standard.object(forKey: "previewSleepFade") as? Bool ?? true {
-        didSet { UserDefaults.standard.set(fadeSleepTimer, forKey: "previewSleepFade") }
+        didSet {
+            UserDefaults.standard.set(fadeSleepTimer, forKey: "previewSleepFade")
+            if !fadeSleepTimer { player.volume = 1 }
+        }
     }
     var currentChapter: Chapter? {
         session?.chapters?.last { $0.start <= currentTime && currentTime < $0.end }
@@ -116,6 +122,7 @@ import SwiftUI
             try await listening.flush()
             guard requestGeneration == generation else { return }
             itemID = item.id
+            bookmarkSupported = item.mediaType == "book"
             title = episode?.title ?? item.title
             author = item.author
             try await Self.activateAudioSession()
@@ -434,7 +441,7 @@ import SwiftUI
     }
 
     func loadBookmarks() async {
-        guard let id = itemID else { return }
+        guard bookmarkSupported, let id = itemID else { return }
         let request = generation
         do {
             let user = try await api.me()
@@ -445,7 +452,7 @@ import SwiftUI
     }
 
     func saveBookmark(title: String, editing: Bookmark?) async {
-        guard !bookmarkBusy, let id = itemID else { return }
+        guard bookmarkSupported, !bookmarkBusy, let id = itemID else { return }
         let request = generation
         bookmarkBusy = true
         defer { bookmarkBusy = false }
@@ -503,6 +510,7 @@ import SwiftUI
     }
 
     func cancelSleepTimer() {
+        sleepID = UUID()
         sleepTask?.cancel(); sleepTask = nil
         if let sleepBoundary { player.removeTimeObserver(sleepBoundary) }
         sleepBoundary = nil
@@ -517,9 +525,12 @@ import SwiftUI
         let track = session.audioTracks[trackIndex]
         guard end >= track.startOffset, end <= track.startOffset + track.duration else { return }
         let time = CMTime(seconds: end - track.startOffset, preferredTimescale: 600)
+        let timerID = sleepID
         sleepBoundary = player.addBoundaryTimeObserver(forTimes: [NSValue(time: time)], queue: .main) { [weak self] in
             Task { @MainActor in
-                guard let self, self.player.currentItem === item, self.sleepChapterEnd == end else { return }
+                guard let self, !self.seeking, self.sleepID == timerID,
+                      self.player.currentItem === item, self.sleepChapterEnd == end,
+                      self.player.currentTime().seconds + track.startOffset >= end - 0.05 else { return }
                 self.endSleepTimer()
             }
         }

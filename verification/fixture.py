@@ -147,6 +147,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'results': [podcast], 'total': 1})
             if path == '/api/libraries/podcasts/personalized':
                 return self.respond(200, [])
+            if path == '/api/libraries/podcasts/search':
+                episode = podcast['media']['episodes'][0]
+                matches = [{'libraryItem': {**podcast, 'recentEpisode': episode}}] if query.get('q', [''])[0].lower() in episode['title'].lower() else []
+                return self.respond(200, {'podcast': [], 'episodes': matches, 'tags': []})
             if path == '/api/libraries/books/items':
                 page = max(0, int(query.get('page', ['0'])[0])); limit = min(100, max(1, int(query.get('limit', ['60'])[0])))
                 mode = configuration['mode']
@@ -355,9 +359,9 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             path, _ = self.route()
             if not self.authorized():
                 return self.respond(401, {})
-            bookmark = re.fullmatch(r'/api/me/item/book-0/bookmark/([0-9]+)', path or '')
+            bookmark = re.fullmatch(r'/api/me/item/book-0/bookmark/([0-9]+(?:\.[0-9]+)?)', path or '')
             if bookmark:
-                position = int(bookmark.group(1))
+                position = float(bookmark.group(1))
                 existing = next((entry for entry in self.account['bookmarks'] if entry['libraryItemId'] == 'book-0' and entry['time'] == position), None)
                 if existing is None:
                     return self.respond(404, {})

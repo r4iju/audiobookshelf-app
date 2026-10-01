@@ -97,6 +97,7 @@ public struct LibraryItem: Decodable, Identifiable, Hashable {
     public let id: String
     public let mediaType: String
     public let media: Media
+    public let recentEpisode: Episode?
     public var title: String { media.metadata.title }
     public var author: String { media.metadata.authorName ?? media.metadata.author ?? media.metadata.authors?.map(\.name).joined(separator: ", ") ?? "" }
     public static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
@@ -129,7 +130,7 @@ public struct Chapter: Decodable, Identifiable {
     public let start: Double
     public let end: Double
 }
-public struct AudioTrack: Decodable {
+public struct AudioTrack: Decodable, Sendable {
     public let contentUrl: String
     public let startOffset: Double
     public let duration: Double
@@ -181,6 +182,10 @@ public struct Bookmark: Decodable, Identifiable {
 
 public struct SearchResponse: Decodable {
     public struct Item: Decodable { public let libraryItem: LibraryItem }
+    public struct EpisodeResult: Decodable, Identifiable {
+        public let libraryItem: LibraryItem
+        public var id: String { libraryItem.recentEpisode?.id ?? libraryItem.id }
+    }
     public struct AuthorMatch: Decodable, Identifiable { public let id: String; public let name: String }
     public struct NamedMatch: Decodable, Identifiable { public let name: String; public var id: String { name } }
     public struct SeriesMatch: Decodable, Identifiable {
@@ -190,12 +195,13 @@ public struct SearchResponse: Decodable {
     }
     public let book: [Item]?
     public let podcast: [Item]?
+    public let episodes: [EpisodeResult]?
     public let authors: [AuthorMatch]?
     public let series: [SeriesMatch]?
     public let narrators: [NamedMatch]?
     public let tags: [NamedMatch]?
     public var items: [LibraryItem] { (book ?? []).map(\.libraryItem) + (podcast ?? []).map(\.libraryItem) }
-    public var isEmpty: Bool { items.isEmpty && (authors ?? []).isEmpty && (series ?? []).isEmpty && (narrators ?? []).isEmpty && (tags ?? []).isEmpty }
+    public var isEmpty: Bool { items.isEmpty && (episodes ?? []).isEmpty && (authors ?? []).isEmpty && (series ?? []).isEmpty && (narrators ?? []).isEmpty && (tags ?? []).isEmpty }
 }
 
 public struct LibraryFilters: Decodable {

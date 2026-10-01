@@ -13,11 +13,13 @@ if [[ "$apple_target" != '--build-only' ]]; then
 fi
 apple_profile="$(python3 "$repo_root/tvos/scripts/provision.py" "${profile_args[@]}")"
 xcodegen generate --spec "$apple_root/project.yml"
+apple_actions=(build)
+if [[ "${ABS_CLEAN_BUILD:-0}" == '1' ]]; then apple_actions=(clean build); fi
 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" \
     -scheme AudiobookshelfNative -configuration Release -destination 'generic/platform=iOS' \
     -derivedDataPath "$apple_root/build-release" IPHONEOS_DEPLOYMENT_TARGET=15.0 \
     CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Development' \
-    PROVISIONING_PROFILE_SPECIFIER="$apple_profile" clean build
+    PROVISIONING_PROFILE_SPECIFIER="$apple_profile" "${apple_actions[@]}"
 apple_app="$apple_root/build-release/Build/Products/Release-iphoneos/AudiobookshelfNative.app"
 codesign --verify --deep --strict "$apple_app"
 mkdir -p "$apple_root/build-release/package/Payload"

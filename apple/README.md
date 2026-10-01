@@ -15,6 +15,8 @@ Create the dedicated simulator with `xcrun simctl create 'Audiobookshelf Native 
 
 No replacement in-memory credential store is used by the app or UI journey.
 
+Packaging reuses Xcode's local dependency cache. Use `ABS_CLEAN_BUILD=1 ./apple/scripts/deploy.sh --build-only` when a fresh rebuild is needed. Focused feature journeys reuse the sign-in helper without an extra process restart; authentication journeys and explicit persistence scenarios retain their restart checks.
+
 The provisioning helper uses the existing developer certificate and App Store Connect signing key to register the internal preview and devices. Signing, compilation, packaging and installation execute on the Studio; there is no hosted build or public release. The resulting internal IPA is `apple/build-release/AudiobookshelfNative.ipa`.
 
 Source deployment minimum remains iOS 14. Xcode 27 needs a build-only iOS 15 override; iOS 14 runtime compatibility remains unverified until an appropriate SDK/runtime is available. The override does not authorize changing the final supported audience. TLS uses platform certificate validation; allowing HTTP servers does not accept untrusted HTTPS certificates. Certificate failures explain installation and full-trust recovery.
@@ -49,7 +51,7 @@ The full-screen player uses server artwork, separate chapter and whole-book posi
 
 Duration sleep timers count time while audio plays and pause during buffering or paused playback. Timer ownership stays with the shared player after its screen is dismissed. End-of-chapter boundaries are installed on the current file, and seeking past a boundary stops audio and clears the timer. Users can reset/cancel timers and enable the final-minute fade. Broader advanced preferences and interruption/route acceptance remain unfinished work under #9/#11.
 
-Native search calls the existing server endpoint, with book/podcast results and author, series, narrator and tag links. Result expansion requests a larger supported search limit. Catalog ordering uses the baseline server sort fields, and filters use server-provided metadata and its Base64 filter contract. Filtered catalog pages retain their filter and order and suppress unrelated Continue Listening entries. The explicit-content filter follows the account permission.
+Native search calls the existing server endpoint, with book/podcast/episode results and author, series, narrator and tag links. Result expansion requests a larger supported search limit. Catalog ordering uses the baseline server sort fields, and filters use server-provided metadata and its Base64 filter contract. Filtered catalog pages retain their filter and order and suppress unrelated Continue Listening entries. The explicit-content filter follows the account permission.
 
 Signed simulator journeys verify chapter/file seeking, actual faster playback and restored speed, saved skip intervals, server bookmark create/edit/jump/delete through relaunch, actual timed audio stopping after leaving the player, a title beyond the first catalog page, and descending order plus genre filtering. Each newly introduced journey first failed through the production UI. These observations use the local 2.30.0 synthetic contract; physical and live-library acceptance remains outstanding.
 

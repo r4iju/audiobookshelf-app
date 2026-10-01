@@ -22,7 +22,7 @@ import SwiftUI
             state = .results(result)
         } catch { if generation == request { state = .failed(ConnectionStore.recovery(for: error)) } }
     }
-    func canShowMore(_ response: SearchResponse) -> Bool { response.items.count >= limit }
+    func canShowMore(_ response: SearchResponse) -> Bool { response.items.count >= limit || (response.episodes ?? []).count >= limit }
 }
 
 struct LibrarySearch: View {
@@ -49,6 +49,17 @@ struct LibrarySearch: View {
                             NavigationLink(destination: BookDetails(item: item, catalog: search.catalog, progress: nil)) {
                                 BookCard(item: item, catalog: search.catalog, listLayout: true)
                             }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("search-\(item.id)")
+                        }
+                        if !(results.episodes ?? []).isEmpty { Text("Episodes").font(.headline) }
+                        ForEach(results.episodes ?? []) { result in
+                            if let episode = result.libraryItem.recentEpisode {
+                                NavigationLink(destination: BookDetails(item: result.libraryItem, catalog: search.catalog, progress: nil, episode: episode)) {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text(episode.title).font(.headline).foregroundColor(.primary)
+                                        Text(result.libraryItem.title).font(.caption).foregroundColor(.secondary)
+                                    }.padding(18).frame(maxWidth: .infinity, alignment: .leading).background(ShelfStyle.card).cornerRadius(16)
+                                }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("search-episode-\(episode.id)")
+                            }
                         }
                         if !(results.authors ?? []).isEmpty { Text("Authors").font(.headline) }
                         ForEach(results.authors ?? []) { author in related(author.name, group: "authors", value: author.id) }

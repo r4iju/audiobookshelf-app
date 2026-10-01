@@ -5,11 +5,16 @@ struct BookDetails: View {
     let item: LibraryItem
     let catalog: CatalogStore
     let progress: MediaProgress?
+    let episode: Episode?
     @State private var expanded: LibraryItem?
     @State private var error: String?
     @State private var request: Task<Void, Never>?
     @State private var playAttempted = false
     private var book: LibraryItem { expanded ?? item }
+
+    init(item: LibraryItem, catalog: CatalogStore, progress: MediaProgress?, episode: Episode? = nil) {
+        self.item = item; self.catalog = catalog; self.progress = progress; self.episode = episode
+    }
 
     var body: some View {
         ScrollView {
@@ -17,7 +22,8 @@ struct BookDetails: View {
                 HStack(alignment: .top, spacing: 22) {
                     BookArtwork(item: book, catalog: catalog).frame(width: 120)
                     VStack(alignment: .leading, spacing: 10) {
-                        Text(book.title).font(.system(.title2, design: .serif).bold())
+                        Text(episode?.title ?? book.title).font(.system(.title2, design: .serif).bold())
+                        if episode != nil { Text(book.title).font(.subheadline).foregroundColor(.secondary) }
                         Text(book.author).font(.headline).foregroundColor(.secondary)
                         if let duration = book.media.duration { Label(ShelfTime.describe(duration), systemImage: "headphones").font(.subheadline) }
                         if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
@@ -25,10 +31,10 @@ struct BookDetails: View {
                         }
                     }
                 }
-                Button { playAttempted = true; Task { await player.start(item: book) } } label: {
+                Button { playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
                     HStack {
                         Image(systemName: "play.fill")
-                        Text((progress?.currentTime ?? 0) > 0 ? "Resume listening" : "Start listening").fontWeight(.semibold)
+                        Text(episode != nil ? "Start episode" : (progress?.currentTime ?? 0) > 0 ? "Resume listening" : "Start listening").fontWeight(.semibold)
                         Spacer()
                     }.padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
                 }.disabled(player.preparing).accessibilityIdentifier("play-book")

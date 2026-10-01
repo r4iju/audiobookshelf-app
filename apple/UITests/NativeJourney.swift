@@ -13,7 +13,7 @@ import XCTest
         add(evidence)
     }
 
-    func connectSelectAndRestore(serverURL: String) {
+    func connectSelectAndRestore(serverURL: String, verifyRestoration: Bool = true) {
         let app = XCUIApplication()
         app.launchArguments = ["--reset-preview-account"]
         app.launch()
@@ -31,6 +31,7 @@ import XCTest
         XCTAssertTrue(app.buttons["library-books"].waitForExistence(timeout: 10), app.staticTexts["connection-error"].exists ? app.staticTexts["connection-error"].label : app.debugDescription)
         app.buttons["library-books"].tap()
         XCTAssertTrue(app.staticTexts["Audiobooks"].firstMatch.waitForExistence(timeout: 10))
+        guard verifyRestoration else { return }
         app.terminate()
         app.launchArguments = []
         app.launch()
