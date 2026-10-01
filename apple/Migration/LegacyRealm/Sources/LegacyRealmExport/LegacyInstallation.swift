@@ -51,18 +51,16 @@ private struct InstallationSecrets: LegacySecretSource {
     }
 }
 
-/// Runs inside the legacy app: writes a credential-free archive the user carries to a separately
-/// identified app (such as the native preview) through the Files app.
+public enum LegacyExportProgress: Equatable {
+    case copyingDatabase
+    case readingDatabase
+    case copyingFiles(LegacyArchiveProgress)
+}
+
 public enum LegacyArchiveExporter {
-    /// - Parameter realmCopy: a consistent copy of the open legacy Realm, made by the legacy app
-    ///   with `Realm.writeCopy(toFile:)`; it is read, never modified.
     @discardableResult
-    public static func export(documents: URL, realmCopy: URL, defaults: UserDefaults, webStorage: [String: String], workDirectory: URL, to destination: URL) throws -> URL {
-        let contents = try LegacyRealmReader.read(realmAt: realmCopy, workDirectory: workDirectory)
-        var snapshot = contents.snapshot
-        snapshot.preferences = LegacyInstallation.capacitorPreferences(defaults)
-        snapshot.webStorage = webStorage
-        try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
-        return try LegacyArchive.write(snapshot, documents: documents, to: destination)
+    public static func export(documents: URL, defaults: UserDefaults, webStorage: [String: String], workDirectory: URL, to destination: URL,
+                              copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)? = nil) throws -> URL {
+        throw CocoaError(.featureUnsupported)
     }
 }

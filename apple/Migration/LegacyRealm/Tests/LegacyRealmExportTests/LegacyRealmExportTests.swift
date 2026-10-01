@@ -439,15 +439,22 @@ final class LegacyRealmExportTests: XCTestCase {
     func testLegacyExportArchiveImportsIntoASeparatelyIdentifiedApp() throws {
         try seedLegacyRealm()
         defaults.set("dark", forKey: "CapacitorStorage.theme")
-        let copy = directory.appendingPathComponent("export-copy.realm")
-        try FileManager.default.copyItem(at: realmURL, to: copy)
         let before = try digest()
+        let work = directory.appendingPathComponent("Work")
+        var phases: [LegacyExportProgress] = []
 
-        let archive = try LegacyArchiveExporter.export(documents: documents, realmCopy: copy, defaults: defaults,
+        let archive = try LegacyArchiveExporter.export(documents: documents, defaults: defaults,
                                                        webStorage: ["ereaderSettings": "{}", "device": #"{"token":"\#(Self.accessToken)"}"#],
-                                                       workDirectory: directory.appendingPathComponent("Work"),
-                                                       to: directory.appendingPathComponent("Export/Audiobookshelf.abslegacy"))
+                                                       workDirectory: work, to: directory.appendingPathComponent("Export/Audiobookshelf.absmigration"),
+                                                       copyRealm: { try FileManager.default.copyItem(at: realmURL, to: $0) },
+                                                       progress: { phases.append($0) })
         XCTAssertEqual(try digest(), before)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: work.path), "the credential-bearing database copy is removed")
+        XCTAssertEqual(phases.first, .copyingDatabase)
+        XCTAssertEqual(phases.dropFirst().first, .readingDatabase)
+        guard case let .copyingFiles(last)? = phases.last else { return XCTFail("no file progress: \(phases)") }
+        XCTAssertEqual(last.completedFiles, last.totalFiles)
+        XCTAssertGreaterThan(last.totalFiles, 0)
         for case let url as URL in FileManager.default.enumerator(at: archive, includingPropertiesForKeys: nil)! {
             guard let data = try? Data(contentsOf: url) else { continue }
             XCTAssertFalse(String(decoding: data, as: UTF8.self).contains("SYNTHETIC-"), "credential exported in \(url.lastPathComponent)")
@@ -463,6 +470,25 @@ final class LegacyRealmExportTests: XCTestCase {
         let podcast = try XCTUnwrap(outcome.downloads.first { $0.libraryItemID == "li-pod" })
         XCTAssertEqual(try Data(contentsOf: migrator.fileURL(for: XCTUnwrap(podcast.episodes.first?.track?.file))), Data("legacy-episode".utf8))
         XCTAssertEqual(outcome.progress.first { $0.episodeID == "ep-7" }?.currentTime, 30)
+    }
+
+    func testAFailedExportRemovesTheDatabaseCopyAndLeavesNoArchive() throws {
+        try seedLegacyRealm()
+        let before = try digest()
+        let work = directory.appendingPathComponent("Work")
+        let destination = directory.appendingPathComponent("Export/Audiobookshelf.absmigration")
+
+        XCTAssertThrowsError(try LegacyArchiveExporter.export(documents: documents, defaults: defaults, webStorage: [:], workDirectory: work, to: destination,
+                                                              copyRealm: { try Data("\(Self.accessToken) torn copy".utf8).write(to: $0) })) { error in
+            guard case .legacyDatabaseUnreadable? = error as? LegacyMigrationError else { return XCTFail("unexpected \(error)") }
+        }
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: work.path), "the credential-bearing database copy is removed after a failure")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: destination.path))
+        XCTAssertEqual(try digest(), before)
+        XCTAssertNoThrow(try LegacyArchiveExporter.export(documents: documents, defaults: defaults, webStorage: [:], workDirectory: work, to: destination,
+                                                          copyRealm: { try FileManager.default.copyItem(at: self.realmURL, to: $0) }),
+                         "a retry after a failure succeeds")
     }
 }
 

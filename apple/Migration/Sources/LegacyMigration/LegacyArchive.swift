@@ -4,6 +4,13 @@ import Foundation
 /// Files app: a directory holding `files/<legacy path digest>/<file name>` and `archive.json`. The archive is built
 /// under `<name>.partial` and renamed only after `archive.json` (written last) is complete, so a
 /// directory without `archive.json` is always an interrupted export.
+public struct LegacyArchiveProgress: Equatable {
+    public var completedFiles: Int
+    public var totalFiles: Int
+    public var completedBytes: Int64
+    public var totalBytes: Int64
+}
+
 public enum LegacyArchive {
     public static let manifestName = "archive.json"
     public static let formatVersion = 1
@@ -16,7 +23,7 @@ public enum LegacyArchive {
     }
 
     @discardableResult
-    public static func write(_ snapshot: LegacySnapshot, documents: URL, to destination: URL) throws -> URL {
+    public static func write(_ snapshot: LegacySnapshot, documents: URL, to destination: URL, progress: ((LegacyArchiveProgress) -> Void)? = nil) throws -> URL {
         guard !FileManager.default.fileExists(atPath: destination.path) else { throw CocoaError(.fileWriteFileExists) }
         let partial = destination.deletingLastPathComponent().appendingPathComponent(destination.lastPathComponent + ".partial")
         try? FileManager.default.removeItem(at: partial)
