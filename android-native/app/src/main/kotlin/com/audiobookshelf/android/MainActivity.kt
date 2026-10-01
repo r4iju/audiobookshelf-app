@@ -14,6 +14,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         graph.playback
         graph.serverEvents
+        graph.downloads.resumeInterrupted()
         if (savedInstanceState == null) route(intent)
         setContent { AppRoot() }
     }

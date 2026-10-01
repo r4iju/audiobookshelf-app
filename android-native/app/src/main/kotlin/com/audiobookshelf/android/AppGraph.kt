@@ -54,6 +54,10 @@ class AppGraph private constructor(val context: Context) {
         PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io).also { progressSync.publishAll() }
     }
 
+    val downloads by lazy {
+        com.audiobookshelf.android.download.Downloads(context, com.audiobookshelf.android.download.DownloadStore(File(context.filesDir, "downloads.json")), accounts, settings, journal, http)
+    }
+
     val podcastRequests by lazy { com.audiobookshelf.android.podcast.PodcastRequests(File(context.filesDir, "podcast-requests.json")) }
     val serverEvents by lazy {
         com.audiobookshelf.android.podcast.ServerEvents(scope, accounts, http).also { events ->

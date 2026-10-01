@@ -3,6 +3,8 @@ package com.audiobookshelf.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -11,6 +13,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.LibraryBooks
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.DownloadForOffline
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -76,6 +79,9 @@ private fun SignedIn(active: SessionState.Active) {
         onGenre = { name -> openFiltered(ApiClient.filter("genres", name), name) },
     )
 
+    LaunchedEffect(catalog.user) {
+        catalog.user?.let { user -> graph.downloads.adoptRemote(active.client.account, user.mediaProgress) }
+    }
     LaunchedEffect(Unit) {
         graph.openPlayerRequests.collect { if (graph.playback.state.value.now != null && model.stack.lastOrNull() != Route.Player) model.push(Route.Player) }
     }
@@ -96,8 +102,14 @@ private fun SignedIn(active: SessionState.Active) {
                         val cover = active.client.coverUrl(item.id).toString()
                         val progress = catalog.progressFor(item.id)
                         ItemDetail(item, cover, progress, padding, itemActions, primary = {
-                            PlayButton({ PlaySource.Stream(active.client, item.id, null, cover, progress?.lastUpdate) }, item.id, null, onOpened = { model.push(Route.Player) })
-                        }, extra = { AddToGroupButton(item.id, null, active, catalog) })
+                            PlayButton({ preferDownloaded(graph, active, item.id, null, progress) ?: PlaySource.Stream(active.client, item.id, null, cover, progress?.lastUpdate) },
+                                item.id, null, onOpened = { model.push(Route.Player) })
+                        }, extra = {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                DownloadButton(item, null, active, catalog)
+                                AddToGroupButton(item.id, null, active, catalog)
+                            }
+                        })
                     }
                 }
                 is Route.Episode -> RouteScaffold("", pop) { padding ->
@@ -158,6 +170,7 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
             NavigationBar {
                 NavigationBarItem(selected = tab == Tab.Library, onClick = { model.tab.value = Tab.Library }, icon = { Icon(Icons.Outlined.LibraryBooks, null) }, label = { Text("Library") }, modifier = Modifier.testTag("tab-library"))
                 NavigationBarItem(selected = tab == Tab.Search, onClick = { model.tab.value = Tab.Search }, icon = { Icon(Icons.Outlined.Search, null) }, label = { Text("Search") }, modifier = Modifier.testTag("tab-search"))
+                NavigationBarItem(selected = tab == Tab.Downloads, onClick = { model.tab.value = Tab.Downloads }, icon = { Icon(Icons.Outlined.DownloadForOffline, null) }, label = { Text("Downloads") }, modifier = Modifier.testTag("tab-downloads"))
             }
             }
         },
@@ -165,7 +178,7 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
         when (tab) {
             Tab.Library -> LibraryScreen(catalog, padding, open, onFilter = { sheet = "filter" }, onSort = { sheet = "sort" })
             Tab.Search -> SearchScreen(model.search(active), catalog, padding, open, openFiltered)
-            Tab.Downloads -> Unit
+            Tab.Downloads -> DownloadsScreen(active, catalog, padding)
         }
     }
     when (sheet) {
@@ -188,3 +201,9 @@ private fun LibraryMenu(catalog: com.audiobookshelf.android.data.CatalogModel, o
         }
     }
 }
+
+/** A finished download plays from this device even when the server is reachable, like the existing app. */
+fun preferDownloaded(graph: com.audiobookshelf.android.AppGraph, active: SessionState.Active, itemId: String, episodeId: String?, progress: com.audiobookshelf.core.MediaProgress?): PlaySource? =
+    graph.downloads.find(active.client.account, itemId, episodeId)
+        ?.takeIf { it.state == com.audiobookshelf.android.download.DownloadStore.State.COMPLETE }
+        ?.let { graph.downloads.localSource(it, progress) }

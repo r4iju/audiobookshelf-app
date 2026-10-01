@@ -238,7 +238,8 @@ fun EpisodeScreen(item: LibraryItem, episodeId: String, active: SessionState.Act
                 ProgressLine(if (progress.isFinished) 1.0 else progress.progress)
             }
         }
-        PlayButton({ PlaySource.Stream(active.client, item.id, episode.id, cover, progress?.lastUpdate) }, item.id, episode.id, onOpened = onPlayer)
+        PlayButton({ preferDownloaded(graph, active, item.id, episode.id, progress) ?: PlaySource.Stream(active.client, item.id, episode.id, cover, progress?.lastUpdate) }, item.id, episode.id, onOpened = onPlayer)
+        DownloadButton(item, episode, active, catalog)
         val finished = progress?.isFinished == true
         OutlinedButton(
             onClick = {
