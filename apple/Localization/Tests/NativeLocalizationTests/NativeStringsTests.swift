@@ -25,6 +25,25 @@ final class NativeStringsTests: XCTestCase {
         XCTAssertEqual(strings("fr")("Waiting for {0} episode(s) from your server", 3), "3 épisode(s) mis en file pour téléchargement")
     }
 
+    /// Actions and states the legacy app named differently: Disconnect signed out (it cleared the active login and
+    /// returned to the connection screen, as Sign out does), and the attempt to reach the server.
+    func testSameActionUnderTheLegacyNameShowsTheLegacyTranslation() {
+        XCTAssertEqual(strings("de")("Sign out"), "Trennen")
+        XCTAssertEqual(strings("fr")("Connecting…"), "Tentative de connexion...")
+        XCTAssertEqual(strings("ar")("Not connected"), "خادم Audiobookshelf غير متصل")
+        XCTAssertEqual(strings("de")("Mark book finished?"), "Bist du sicher, dass du diesen Artikel als beendet markieren willst?")
+    }
+
+    /// "Light" is both a theme and a haptic strength. Languages that name them differently must show each meaning's own
+    /// legacy translation, and English keeps the one wording for both.
+    func testSharedEnglishWordingIsTranslatedByItsMeaning() {
+        XCTAssertEqual(strings("de")("Light", context: .theme), "Hell")
+        XCTAssertEqual(strings("de")("Light", context: .hapticStrength), "Leicht")
+        XCTAssertEqual(strings("ar")("Light", context: .theme), "فاتح")
+        XCTAssertEqual(strings("en-us")("Light", context: .theme), "Light")
+        XCTAssertEqual(strings("en-us")("Light", context: .hapticStrength), "Light")
+    }
+
     func testEnglishKeepsTheNativeWording() {
         XCTAssertEqual(strings("en-us")("Continue listening"), "Continue listening")
     }
@@ -56,7 +75,9 @@ final class NativeStringsTests: XCTestCase {
                 let candidate = legacy[key] ?? ""
                 let usable = !candidate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !candidate.contains("<")
                     && NativeStrings.placeholders(in: candidate) == NativeStrings.placeholders(in: english)
-                XCTAssertEqual(native(english), usable ? candidate : english, "\(language.code): \(english)")
+                let parts = english.components(separatedBy: "::")
+                let shown = parts.count == 2 ? native(parts[1], context: try XCTUnwrap(NativeTextContext(rawValue: parts[0]))) : native(english)
+                XCTAssertEqual(shown, usable ? candidate : parts.last!, "\(language.code): \(english)")
             }
         }
     }

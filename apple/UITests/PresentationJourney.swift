@@ -67,6 +67,8 @@ import XCTest
         open("Einstellungen", in: app)
         XCTAssertTrue(app.navigationBars["Einstellungen"].waitForExistence(timeout: 3), "The choice must survive relaunch")
         XCTAssertTrue(app.staticTexts["Haptische Rückmeldung"].exists)
+        XCTAssertEqual(app.buttons["theme-light"].label, "Hell", "The theme keeps its legacy meaning")
+        XCTAssertEqual(app.buttons["haptic-light"].label, "Leicht", "The haptic strength keeps its legacy meaning")
         capture("Native settings in German")
         app.buttons["language-settings"].tap()
         app.buttons["language-system"].tap()
