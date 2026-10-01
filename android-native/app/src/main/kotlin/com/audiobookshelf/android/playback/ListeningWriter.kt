@@ -37,6 +37,9 @@ class ListeningWriter(
     /** Records whose listening could not be written yet. */
     val failing: StateFlow<Set<String>> = failingState
 
+    /** True while any record is open, unwritten or not yet finished. */
+    val busy: Boolean get() = synchronized(pending) { pending.isNotEmpty() }
+
     /** Adds [listened] seconds ending at [position]; [then] runs once this is in the journal. */
     fun record(recordId: String, position: Double, listened: Double, then: (suspend () -> Unit)? = null) {
         synchronized(pending) {

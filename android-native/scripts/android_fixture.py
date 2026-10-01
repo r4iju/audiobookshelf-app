@@ -20,6 +20,9 @@ from verification.fixture import make_server  # noqa: E402
 def android_server(port, prefix, bind='127.0.0.1'):
     server, prefix = make_server(port, prefix, 'baseline', 'modern', bind)
     base = server.RequestHandlerClass
+    # Listening sync can be refused on its own, whatever the shared mode, so reading and listening
+    # ordering is observable with a document present. Any reconfiguration accepts listening again.
+    refusal = {'listening': False}
 
     class AndroidHandler(base):
         def own_path(self):
@@ -68,6 +71,21 @@ def android_server(port, prefix, bind='127.0.0.1'):
                     return self.respond(200, current)
                 self.rfile = io.BytesIO(body)
             super().do_PATCH()
+
+        def do_POST(self):
+            path = self.own_path()
+            if path == '/__android__/refuse-listening':
+                data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
+                refusal['listening'] = bool(data.get('refuse'))
+                self.route()
+                return self.respond(200, refusal)
+            if path == '/__fixture__/configure':
+                refusal['listening'] = False
+            if path == '/api/session/local-all' and refusal['listening']:
+                self.rfile.read(int(self.headers.get('Content-Length', 0)))
+                self.route()
+                return self.respond(503, {})
+            super().do_POST()
 
         def do_DELETE(self):
             discard = re.fullmatch(r'/api/me/progress/([^/]+)', self.own_path() or '')

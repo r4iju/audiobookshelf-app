@@ -45,9 +45,13 @@ class ReadingStore(private val file: File) {
         val unconfirmed: List<String> = emptyList(),
         /** A newer page from another device, seen while this device's page was still unsent. */
         val conflictPage: Int? = null,
+        /** Set for any such conflict, including a position this reader cannot show as a page. */
         val conflictUpdatedAt: Double? = null,
+        /** The other device's position when it is not a page number, such as another format's location. */
+        val conflictLocation: String? = null,
     ) {
         val pending get() = primary && revision > acknowledged
+        val inConflict get() = conflictUpdatedAt != null || conflictPage != null
         val progress get() = if (pages > 0) ((page - 1).toDouble() / pages).coerceIn(0.0, 1.0) else 0.0
     }
 
@@ -68,9 +72,9 @@ class ReadingStore(private val file: File) {
     @Synchronized fun pending(account: AccountIdentity) = entries.filter { it.account == account && it.pending }
 
     /** Unsent pages that may be published; a page in conflict waits for the reader's choice. */
-    @Synchronized fun publishable(account: AccountIdentity) = pending(account).filter { it.conflictPage == null }
+    @Synchronized fun publishable(account: AccountIdentity) = pending(account).filterNot { it.inConflict }
 
-    @Synchronized fun pendingAccounts() = entries.filter { it.pending && it.conflictPage == null }.map { it.account }.toSet()
+    @Synchronized fun pendingAccounts() = entries.filter { it.pending && !it.inConflict }.map { it.account }.toSet()
 
     @Synchronized
     fun record(account: AccountIdentity, itemId: String, fileId: String, primary: Boolean, page: Int, pages: Int, now: Long = System.currentTimeMillis()) {
@@ -86,11 +90,12 @@ class ReadingStore(private val file: File) {
      */
     @Synchronized
     fun adoptRemote(account: AccountIdentity, itemId: String, fileId: String, progress: MediaProgress?): Boolean {
-        val location = progress?.ebookLocation?.trim() ?: return false
-        val page = location.toIntOrNull()?.takeIf { it > 0 } ?: return false
+        val location = progress?.ebookLocation?.trim()?.takeIf { it.isNotEmpty() } ?: return false
         val updated = progress.lastUpdate ?: return false
+        val page = location.toIntOrNull()?.takeIf { it > 0 }
         val current = entry(account, itemId, fileId)
         if (current == null) {
+            if (page == null) return false
             save(Entry(account, itemId, fileId, primary = true, page = page, updatedAt = updated, remoteUpdatedAt = updated))
             return true
         }
@@ -100,11 +105,14 @@ class ReadingStore(private val file: File) {
             return false
         }
         if (current.pending) {
-            save(current.copy(conflictPage = page, conflictUpdatedAt = updated))
+            // Kept until the reader decides, so it is neither overwritten nor asked about again and again.
+            save(current.copy(conflictPage = page, conflictUpdatedAt = updated, conflictLocation = location.takeIf { page == null }))
             return false
         }
+        // Nothing here to replace it with; the newer position stays news, so a later page asks first.
+        if (page == null) return false
         save(current.copy(page = page, updatedAt = updated, primary = true, acknowledged = current.revision, remoteUpdatedAt = updated,
-            unconfirmed = emptyList(), conflictPage = null, conflictUpdatedAt = null))
+            unconfirmed = emptyList(), conflictPage = null, conflictUpdatedAt = null, conflictLocation = null))
         return true
     }
 
@@ -142,15 +150,17 @@ class ReadingStore(private val file: File) {
         ))
     }
 
-    /** The reader's answer to a conflict: publish this device's page, or go to the other device's. */
+    /**
+     * The reader's answer to a conflict: publish this device's page, or leave the other device's position
+     * on the server, going to it when it is a page.
+     */
     @Synchronized
     fun resolveConflict(account: AccountIdentity, itemId: String, fileId: String, keepLocal: Boolean) {
-        val current = entry(account, itemId, fileId) ?: return
-        val page = current.conflictPage ?: return
+        val current = entry(account, itemId, fileId)?.takeIf { it.inConflict } ?: return
         val updated = current.conflictUpdatedAt ?: current.remoteUpdatedAt
-        save(if (keepLocal) current.copy(remoteUpdatedAt = updated, conflictPage = null, conflictUpdatedAt = null)
-            else current.copy(page = page, updatedAt = updated, acknowledged = current.revision, remoteUpdatedAt = updated,
-                unconfirmed = emptyList(), conflictPage = null, conflictUpdatedAt = null))
+        val resolved = current.copy(remoteUpdatedAt = updated, conflictPage = null, conflictUpdatedAt = null, conflictLocation = null)
+        save(if (keepLocal) resolved
+            else resolved.copy(page = current.conflictPage ?: current.page, updatedAt = updated, acknowledged = current.revision, unconfirmed = emptyList()))
     }
 
     private fun save(next: Entry) {
@@ -185,6 +195,11 @@ class ReadingSync(
     private val remoteFor: (AccountIdentity) -> ReadingRemote?,
     private val onSignInRequired: (ApiError.SignInRequired) -> Unit,
     private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
+    /**
+     * Runs one publication only when the account's listening allows it, returning false otherwise.
+     * Legacy servers time audio and reading progress together, so listening decides when reading may go.
+     */
+    private val listeningGate: suspend (AccountIdentity, suspend () -> Unit) -> Boolean = { _, publication -> publication(); true },
 ) {
     private val lock = Mutex()
     private var retry: Job? = null
@@ -199,15 +214,22 @@ class ReadingSync(
         while (true) {
             val next = store.publishable(account).firstOrNull() ?: break
             try {
-                when (store.preflight(next, remote.progress(next.itemId))) {
-                    ReadingStore.Preflight.CONFLICT -> continue
-                    ReadingStore.Preflight.ALREADY_THERE -> { store.acknowledge(next, null); continue }
-                    ReadingStore.Preflight.SEND -> Unit
+                val allowed = listeningGate(account) {
+                    when (store.preflight(next, remote.progress(next.itemId))) {
+                        ReadingStore.Preflight.CONFLICT -> Unit
+                        ReadingStore.Preflight.ALREADY_THERE -> store.acknowledge(next, null)
+                        ReadingStore.Preflight.SEND -> {
+                            store.sending(next)
+                            remote.save(next.itemId, next.page.toString(), next.progress)
+                            store.acknowledge(next, runCatching { remote.progress(next.itemId) }.getOrNull())
+                        }
+                    }
                 }
-                store.sending(next)
-                remote.save(next.itemId, next.page.toString(), next.progress)
-                store.acknowledge(next, runCatching { remote.progress(next.itemId) }.getOrNull())
+                // Listening is open or unsent; publication resumes when it ends.
+                if (!allowed) break
                 backoffMs = FIRST_RETRY_MS
+                // A page that is still publishable unchanged would only be asked about again; wait for a retry.
+                if (store.publishable(account).any { it.itemId == next.itemId && it.fileId == next.fileId && it.revision == next.revision }) { scheduleRetry(); break }
             } catch (failure: Exception) {
                 Log.i("AbsReading", "Reading position kept for retry: ${failure.javaClass.simpleName}")
                 report(com.audiobookshelf.android.data.Diagnostics.Area.SYNC, "Reading position could not be sent to ${account.server}; it is kept and retried", failure)

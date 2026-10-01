@@ -1,6 +1,10 @@
 package com.audiobookshelf.android.playback
 
 import android.content.Context
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
@@ -133,7 +137,12 @@ class PlaybackEngine(
     private val mutable = MutableStateFlow(PlayerState(speed = settings.current.playbackRate))
     val state: StateFlow<PlayerState> = mutable
 
-    private var loaded: Loaded? = null
+    // Read off the main thread by the reading gate.
+    @Volatile private var loaded: Loaded? = null
+    private val readingPublication = Mutex()
+    private val ended = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    /** Emitted when listening stops, so reading held back by it can be published. */
+    val listeningEnded: SharedFlow<Unit> = ended
     private val writer = ListeningWriter(scope, io, write = { id, position, listened -> journal.record(id, position, listened) }, finish = journal::finish)
     private var generation = 0
     private var ticker: Job? = null
@@ -185,9 +194,13 @@ class PlaybackEngine(
         startService()
         scope.launch {
             try {
+                // A reading write already under way finishes first; none starts once this open is loading.
+                readingPublication.withLock { }
+                if (request != generation) return@launch
                 open(source, request, transcode = false, at = null)
             } catch (failure: Exception) {
                 if (request != generation) return@launch
+                ended.tryEmit(Unit)
                 Log.w(TAG, "Could not open ${source.itemId}", failure)
                 report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Item ${source.itemId} could not start playing", failure)
                 accounts.handle(failure)
@@ -306,6 +319,7 @@ class PlaybackEngine(
         player.volume = 1f
         stopCurrent(closeStream = true)
         mutable.value = PlayerState(speed = mutable.value.speed)
+        if (!writer.busy) ended.tryEmit(Unit)
     }
 
     fun allowSystemSeeking() = settings.current.allowSeekingOnMediaControls
@@ -364,6 +378,7 @@ class PlaybackEngine(
             writer.finish(recordId) {
                 sync.publish(source.account)
                 media.streamSessionId?.let { if (source is PlaySource.Stream) closeStream(source.client, it) }
+                ended.tryEmit(Unit)
             }
             return
         }
@@ -450,7 +465,25 @@ class PlaybackEngine(
             sync.publish(current.source.account)
             val source = current.source
             if (closeStream && source is PlaySource.Stream) current.streamSessionId?.let { closeStream(source.client, it) }
+            ended.tryEmit(Unit)
         }
+    }
+
+    private fun listeningBusy() = loaded != null || mutable.value.loading || writer.busy
+
+    /**
+     * Runs a reading [publication] for [account] only while no listening is open, loading or unwritten,
+     * and only after the account's journaled listening is on the server. Legacy servers time audio and
+     * reading progress together, so a reading write must never outdate listening that is still unsent;
+     * when that listening cannot be sent, the reading waits with it. Returns false, sending nothing,
+     * while listening is active.
+     */
+    suspend fun publishReading(account: AccountIdentity, publication: suspend () -> Unit): Boolean = readingPublication.withLock {
+        if (listeningBusy()) return@withLock false
+        if (!sync.publish(account)) throw java.io.IOException("Listening for this account is not on the server yet")
+        if (listeningBusy()) return@withLock false
+        publication()
+        true
     }
 
     private suspend fun closeStream(client: ApiClient, sessionId: String) {

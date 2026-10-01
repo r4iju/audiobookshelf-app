@@ -154,12 +154,13 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
     }
 
     val changes by graph.reading.changes.collectAsState()
-    val conflict = remember(changes) { if (route.supplementary) null else graph.reading.entry(account, route.itemId, fileKey)?.conflictPage }
-    if (document != null && conflict != null) {
+    val conflictEntry = remember(changes) { if (route.supplementary) null else graph.reading.entry(account, route.itemId, fileKey)?.takeIf { it.inConflict } }
+    if (document != null && conflictEntry != null) {
+        val conflict = conflictEntry.conflictPage
         fun resolve(keepLocal: Boolean) {
             try {
                 graph.reading.resolveConflict(account, route.itemId, fileKey, keepLocal)
-                if (keepLocal) scope.launch { graph.readingSync.publish(account) } else page = conflict.coerceIn(1, document.pageCount)
+                if (keepLocal) scope.launch { graph.readingSync.publish(account) } else if (conflict != null) page = conflict.coerceIn(1, document.pageCount)
             } catch (failure: Exception) {
                 saveError = failure.message ?: "Your choice could not be saved on this device."
             }
@@ -167,8 +168,15 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
         AlertDialog(
             onDismissRequest = {},
             title = { Text("Continue where?") },
-            text = { Text("Another device reached page $conflict while page $page here was not yet saved to the server.") },
-            confirmButton = { TextButton(onClick = { resolve(keepLocal = false) }, modifier = Modifier.testTag("reading-conflict-remote")) { Text("Go to page $conflict") } },
+            text = {
+                Text(if (conflict != null) "Another device reached page $conflict while page $page here was not yet saved to the server."
+                    else "Another device saved a reading position this reader cannot show as a page while page $page here was not yet saved to the server.")
+            },
+            confirmButton = {
+                TextButton(onClick = { resolve(keepLocal = false) }, modifier = Modifier.testTag("reading-conflict-remote")) {
+                    Text(if (conflict != null) "Go to page $conflict" else "Keep the other position")
+                }
+            },
             dismissButton = { TextButton(onClick = { resolve(keepLocal = true) }, modifier = Modifier.testTag("reading-conflict-local")) { Text("Stay on page $page") } },
             modifier = Modifier.testTag("reading-conflict"),
         )

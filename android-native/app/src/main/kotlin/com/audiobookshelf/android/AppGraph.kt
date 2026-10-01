@@ -68,10 +68,12 @@ class AppGraph private constructor(val context: Context) {
                     override suspend fun save(itemId: String, location: String, progress: Double) = client.saveEbookProgress(itemId, location, progress)
                 }
             }
-        }, onSignInRequired = accounts::handle, report = diagnostics::record).also { sync ->
+        }, onSignInRequired = accounts::handle, report = diagnostics::record,
+            listeningGate = { account, publication -> playback.publishReading(account, publication) }).also { sync ->
             context.getSystemService(ConnectivityManager::class.java)?.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) = sync.publishAll()
             })
+            scope.launch { playback.listeningEnded.collect { sync.publishAll() } }
             sync.publishAll()
         }
     }
