@@ -77,18 +77,42 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
         let updatedAt: Double
     }
     public enum Failure: LocalizedError {
-        case invalidData
-        public var errorDescription: String? { "Saved listening data could not be read or updated. Keep the app's data for recovery and try again." }
+        case invalidData, storageFull
+        public var errorDescription: String? {
+            switch self {
+            case .invalidData: return "Saved listening data could not be read or updated. Keep the app's data for recovery and try again."
+            case .storageFull: return "Saved listening storage is full. Connect to the server to save pending listening before continuing."
+            }
+        }
     }
     private let file: URL
+    private let persistentDefaults: UserDefaults?
+    private let maximumPersistentBytes: Int
+    private let persistentKey = "NativeListeningJournal"
+    private var drainingLegacy = false
     private var records: [ListeningRecord]
     private var positions: [Position]
 
-    public init(file: URL) throws {
+    public init(file: URL, persistentDefaults: UserDefaults? = nil, maximumPersistentBytes: Int = 256_000) throws {
         self.file = file
-        if FileManager.default.fileExists(atPath: file.path) {
-            let saved = try JSONDecoder().decode(Document.self, from: Data(contentsOf: file))
-            guard saved.version == 1 else { throw Failure.invalidData }
+        self.persistentDefaults = persistentDefaults
+        self.maximumPersistentBytes = maximumPersistentBytes
+        let data: Data?
+        if let stored = persistentDefaults?.object(forKey: persistentKey) {
+            guard let value = stored as? Data else { throw Failure.invalidData }
+            data = value
+        } else if FileManager.default.fileExists(atPath: file.path) { data = try Data(contentsOf: file) }
+        else { data = nil }
+        drainingLegacy = persistentDefaults != nil && persistentDefaults?.object(forKey: persistentKey) == nil && (data?.count ?? 0) > maximumPersistentBytes
+        if let data {
+            let saved = try JSONDecoder().decode(Document.self, from: data)
+            guard saved.version == 1, Set(saved.records.map(\.id)).count == saved.records.count,
+                  saved.records.allSatisfy({ !$0.id.isEmpty && !$0.deviceID.isEmpty && !$0.media.libraryItemID.isEmpty &&
+                      $0.media.duration.isFinite && $0.media.duration > 0 && $0.media.startTime.isFinite &&
+                      $0.currentTime.isFinite && $0.currentTime >= 0 && $0.currentTime <= $0.media.duration &&
+                      $0.timeListening.isFinite && $0.timeListening >= 0 && $0.startedAt.isFinite && $0.updatedAt.isFinite &&
+                      $0.revision > 0 && $0.revision < UInt64.max && $0.acknowledged <= $0.revision
+                  }) else { throw Failure.invalidData }
             records = saved.records
             positions = saved.positions ?? []
             guard positions.allSatisfy({ $0.time.isFinite && $0.time >= 0 && $0.updatedAt.isFinite }) else { throw Failure.invalidData }
@@ -97,6 +121,7 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
     }
 
     public func begin(account: AccountIdentity, media: ListeningMedia, deviceID: String, at date: Date = Date()) throws -> String {
+        guard !drainingLegacy else { throw Failure.storageFull }
         guard media.duration.isFinite, media.duration > 0, media.startTime.isFinite else { throw Failure.invalidData }
         let id = UUID().uuidString.lowercased()
         let time = date.timeIntervalSince1970 * 1000
@@ -109,6 +134,7 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
     }
 
     public func record(id: String, position: Double, listened: Double, at date: Date = Date()) throws {
+        guard !drainingLegacy else { throw Failure.storageFull }
         guard position.isFinite, listened.isFinite, listened >= 0,
               let index = records.firstIndex(where: { $0.id == id }), !records[index].closed else { throw Failure.invalidData }
         var next = records
@@ -173,15 +199,54 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
         } else { positions.append(position) }
     }
     private func commit(_ next: [ListeningRecord], positions nextPositions: [Position]? = nil) throws {
+        var savedPositions = nextPositions ?? positions
+        var data = try JSONEncoder().encode(Document(version: 1, records: next, positions: savedPositions))
+        if let persistentDefaults {
+            if data.count > maximumPersistentBytes {
+                let required = savedPositions.filter { position in next.contains { $0.account == position.account && $0.media.libraryItemID == position.itemID && $0.media.episodeID == position.episodeID } }
+                let optional = savedPositions.filter { position in !next.contains { $0.account == position.account && $0.media.libraryItemID == position.itemID && $0.media.episodeID == position.episodeID } }.sorted { $0.updatedAt > $1.updatedAt }
+                savedPositions = required
+                data = try JSONEncoder().encode(Document(version: 1, records: next, positions: savedPositions))
+                if data.count <= maximumPersistentBytes {
+                    var lower = 0, upper = optional.count
+                    while lower < upper {
+                        let count = (lower + upper + 1) / 2
+                        let candidate = try JSONEncoder().encode(Document(version: 1, records: next, positions: required + optional.prefix(count)))
+                        if candidate.count <= maximumPersistentBytes { lower = count } else { upper = count - 1 }
+                    }
+                    savedPositions = required + optional.prefix(lower)
+                    data = try JSONEncoder().encode(Document(version: 1, records: next, positions: savedPositions))
+                }
+            }
+            if data.count > maximumPersistentBytes {
+                // A pre-existing oversized file may drain, but cannot accept new listening.
+                let existing = Dictionary(uniqueKeysWithValues: records.map { ($0.id, $0) })
+                guard drainingLegacy, next.allSatisfy({ record in
+                    guard let old = existing[record.id] else { return false }
+                    return record.revision == old.revision && record.currentTime == old.currentTime && record.timeListening == old.timeListening
+                }) else { throw Failure.storageFull }
+                try writeFile(data)
+            } else {
+                let previous = persistentDefaults.object(forKey: persistentKey)
+                persistentDefaults.set(data, forKey: persistentKey)
+                guard persistentDefaults.synchronize() else {
+                    if let previous { persistentDefaults.set(previous, forKey: persistentKey) }
+                    else { persistentDefaults.removeObject(forKey: persistentKey) }
+                    throw Failure.invalidData
+                }
+                drainingLegacy = false
+            }
+        } else { try writeFile(data) }
+        records = next
+        positions = savedPositions
+    }
+    private func writeFile(_ data: Data) throws {
         try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
-        let savedPositions = nextPositions ?? positions
-        let data = try JSONEncoder().encode(Document(version: 1, records: next, positions: savedPositions))
         var options: Data.WritingOptions = .atomic
         #if os(iOS) || os(tvOS)
         options.insert(.completeFileProtectionUntilFirstUserAuthentication)
         #endif
         try data.write(to: file, options: options)
-        records = next
-        positions = savedPositions
     }
+
 }
