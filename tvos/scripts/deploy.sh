@@ -42,7 +42,7 @@ xcodebuild -project "$tv_root/AudiobookshelfTV.xcodeproj" \
     -scheme AudiobookshelfTV -configuration Release \
     -destination 'generic/platform=tvOS' -derivedDataPath "$tv_root/build" \
     CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Development' \
-    PROVISIONING_PROFILE_SPECIFIER="$tv_profile" build
+    PROVISIONING_PROFILE_SPECIFIER="$tv_profile" clean build
 
 tv_app="$tv_root/build/Build/Products/Release-appletvos/AudiobookshelfTV.app"
 codesign --verify --deep --strict "$tv_app"

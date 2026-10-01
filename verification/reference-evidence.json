@@ -3,12 +3,65 @@
   "sourceCommit": "7014e04e",
   "legacyVersion": "0.14.2-beta",
   "checks": [
-    { "name": "web generate", "result": "passed", "command": "npm run generate" },
-    { "name": "TV core", "result": "passed", "command": "swift test", "checks": 9 },
-    { "name": "legacy iOS simulator build", "result": "passed with build-only minimum override", "toolchain": "Xcode 27", "override": "IPHONEOS_DEPLOYMENT_TARGET=15.0", "originalMinimumPreserved": true, "olderOSCompatibilityVerified": false },
-    { "name": "legacy Android debug build", "result": "passed", "toolchain": "verified local Temurin JDK 21; Gradle 8.11.1", "artifact": "android/app/build/outputs/apk/debug/app-debug.apk" },
-    { "name": "fixture contract", "result": "passed", "redFirst": true, "journeys": ["refresh, pagination, captured close progress", "player suffix byte-range probe"] },
-    { "name": "legacy production presentation", "result": "passed", "surface": "T3 local collaborative browser", "journey": ["connect to loopback fixture /abs subpath", "enter synthetic qa credentials", "observe Audiobooks library and ten recently-added titles", "select Stories for Tomorrow 01", "observe item metadata and two chapters"], "limitations": ["browser reference does not validate native audio or platform controls", "fixture does not yet emulate Socket.IO; cloud_off is expected", "snapshot capture failed; DOM and actual UI interactions were observed"] }
+    {
+      "name": "web generate",
+      "result": "passed",
+      "command": "npm run generate"
+    },
+    {
+      "name": "TV core",
+      "result": "passed",
+      "command": "swift test",
+      "checks": 9
+    },
+    {
+      "name": "TV signed release wrapper",
+      "result": "passed",
+      "command": "./verification/local-build.sh tv",
+      "regression": "clean build re-signs the refreshed embedded provisioning profile; strict codesign verification passed"
+    },
+    {
+      "name": "legacy iOS simulator build",
+      "result": "passed with build-only minimum override",
+      "toolchain": "Xcode 27",
+      "override": "IPHONEOS_DEPLOYMENT_TARGET=15.0",
+      "originalMinimumPreserved": true,
+      "olderOSCompatibilityVerified": false
+    },
+    {
+      "name": "legacy Android debug build",
+      "result": "passed",
+      "toolchain": "verified local Temurin JDK 21; Gradle 8.11.1",
+      "artifact": "android/app/build/outputs/apk/debug/app-debug.apk"
+    },
+    {
+      "name": "fixture contract",
+      "result": "passed",
+      "redFirst": true,
+      "journeys": [
+        "refresh, pagination, captured close progress",
+        "player suffix byte-range probe",
+        "distinct item identity and missing-item rejection",
+        "unsatisfiable media range rejection"
+      ]
+    },
+    {
+      "name": "legacy production presentation",
+      "result": "passed",
+      "surface": "T3 local collaborative browser",
+      "journey": [
+        "connect to loopback fixture /abs subpath",
+        "enter synthetic qa credentials",
+        "observe Audiobooks library and ten recently-added titles",
+        "select Stories for Tomorrow 01",
+        "observe item metadata and two chapters"
+      ],
+      "limitations": [
+        "browser reference does not validate native audio or platform controls",
+        "fixture does not yet emulate Socket.IO; cloud_off is expected",
+        "snapshot capture failed; DOM and actual UI interactions were observed"
+      ]
+    }
   ],
   "replacementReadiness": "not established by these baseline checks"
 }
