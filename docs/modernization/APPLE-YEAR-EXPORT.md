@@ -61,7 +61,14 @@ schemes, plus `_finished`, `_top`, `_people`, `_genres` and `_story` suffixes.
   - At most 4 requests at once. A failed, missing or undecodable cover is skipped; the rest keep server order.
   - Decodes through ImageIO thumbnails capped at 512 px and 20 MB of input. Nothing is cached or written to disk.
   - Cancellation stops queueing, cancels in-flight fetches and throws `CancellationError`.
-  - After loading it re-checks `currentAccount() == owner` and throws `YearExportArtworkError.accountChanged` otherwise.
+  - Account pinning: `currentAccount() == owner` is checked before every fetch, after every fetch (successful or
+    failed) and at the end. The first mismatch, or a fetch throwing `accountChanged`, stops the whole load with
+    `YearExportArtworkError.accountChanged`; it is never treated as a missing cover.
+  - The app uses `YearExportArtworkLoader.load(year:primary:secondary:api:authorization:)`. Its owner is
+    `APIClient.authorizationRevision` (the existing auth generation, new on every sign-in, sign-out and restore, not on
+    token refresh), so a switch A, B, A still mismatches. Each request goes through
+    `APIClient.coverData(itemID:authorization:)`, which refuses to send, and refuses a response or a 401 retry, once the
+    revision has changed. No cover request is ever sent with a later session.
 - Snapshots accept artwork only when its year and requested ID lists equal the stats they are built from.
   Artwork from another year, account load or response is dropped, leaving the gradient designs.
 - `YearExportServerSnapshot(stats:year:artwork:locale:)` copies an admin `ServerYearStats` response. Totals are cleaned
@@ -79,6 +86,8 @@ All in `tvos/Core` (TVCore) unless noted:
 - `APIClient.serverYearStats(_ year: Int)` calls `GET api/stats/year/<year>` and rejects years outside `2000...9999`
   without a request. A non-admin gets `APIError.http(403)` from the server.
 - `CurrentUser.canViewServerYearStats` is true for `root` and `admin` only.
+- `APIClient.authorizationRevision: UUID` (read-only view of the existing `authGeneration`; auth mutation is unchanged)
+  and `APIClient.coverData(itemID:authorization:)` (the cover request pinned to that revision).
 - `YearExport` module: `YearExportArtwork`, `YearExportArtworkLoader`, `YearExportArtworkError`,
   `YearExportSnapshot(stats:year:artwork:locale:)`, `YearExportServerSnapshot`, `YearExportComposer`, `YearExportSheet`.
 
@@ -86,10 +95,12 @@ All in `tvos/Core` (TVCore) unless noted:
 
 `apple/App/YearReviewView.swift` is wired in this branch:
 
-- The store builds a cover-less `YearExportSnapshot` as soon as account-checked stats arrive, then a stored, cancellable
-  task loads covers and replaces the snapshot only if the request revision and account still match.
-- For `canViewServerYearStats` accounts it then loads the server year. A 403, network error or account change leaves
-  the server share hidden. Server covers load the same way.
+- The store reads `authorizationRevision` before requesting stats and accepts them only if it is unchanged afterwards
+  (plus the existing account check). It builds a cover-less `YearExportSnapshot`, then a stored, cancellable task loads
+  covers pinned to that revision and replaces the snapshot only if the request and revision still match.
+- For `canViewServerYearStats` accounts it then loads the server year. Each step (`me`, server year, server covers)
+  re-checks the same request and revision, so a sign-in change at any point, even back to the same account, ends the
+  sequence. A 403 or network error leaves the server share hidden.
 - `load(year:)` and `invalidate()` cancel that task and clear both snapshots.
 - The share button (a menu with "Share My Year" and "Share Server Year" for admins) captures the snapshot when tapped and
   presents one `.sheet(item:)`. Covers arriving later never change an open composer.
@@ -132,6 +143,17 @@ A scratch copy with step 1 applied builds `AudiobookshelfNative` with the wired 
   year or other covers, covers actually drawn (pixel colour) in the mosaic and Finished designs, no cover ID in the PNG,
   text or accessibility label, the server designs, file names, sizes and text, hiding unfillable server lists, and
   `1e300` totals.
+- Pinning review fix on top of `dfd9bfdc`, red first against the shipped wiring (the new glue started as a stub doing
+  exactly what `YearReviewView` did: `currentAccount()` owner and unpinned `coverData`):
+  - `YearExportPinnedArtworkTests.testAccountSwitchAToBToAWhileCoversLoadAbortsWithoutRequestingUnderAnotherSession`
+    drives the real `APIClient` through a gated URL protocol: alice's first batch of 4 is held, bob signs in, those
+    covers fail with 404, alice signs in again. Before the fix covers `s4` and `s5` were requested with bob's token and
+    the load ended with `CancellationError`; now it ends with `accountChanged` and no request carries another session.
+  - `testAnAccountChangeReportedByAFetchIsNotTreatedAsAMissingCover` returned 1 cover before the fix.
+  - TVCore `PinnedCoverTests` sent `li-2` with bob's token and `li-3` with alice's new token before the fix; now only
+    the request made under the pinned revision is sent.
+  - Now 24 Export tests and 20 TVCore tests pass; the pinned tests also passed 20 repeated iterations. The scratch app
+    build with the wired view succeeds.
 - Synthetic-cover renders of every listener and server layout were inspected locally (`/tmp/yearexport-evidence/covers`,
   not committed). That pass found and fixed a mosaic drawn at full opacity and a divider drawn in copy blend mode.
 - Not verified: a live server. Loading covers and the admin year from a real account is an owner-data operation and

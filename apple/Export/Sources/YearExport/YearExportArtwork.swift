@@ -39,13 +39,19 @@ public enum YearExportArtworkLoader {
     static let maximumBytes = 20 * 1024 * 1024
 
     /// Loads covers in server order, skipping unsafe identifiers and covers that fail to
-    /// download or decode. Throws `CancellationError` when cancelled and
-    /// `YearExportArtworkError.accountChanged` when `currentAccount()` no longer returns `owner`.
-    public static func load<Account: Equatable>(
+    /// download or decode. Throws `CancellationError` when cancelled. `currentAccount()` is checked
+    /// before and after every fetch, including failed ones; the first time it is not `owner`, or a
+    /// fetch throws `accountChanged`, the whole load stops with `YearExportArtworkError.accountChanged`.
+    /// Use an owner that changes on every sign-in (see `load(year:primary:secondary:api:authorization:)`),
+    /// so signing out and back in (A, B, A) also counts as a change.
+    public static func load<Account: Equatable & Sendable>(
         year: Int, primary: [String], secondary: [String], owner: Account,
-        currentAccount: @escaping () async throws -> Account,
+        currentAccount: @escaping @Sendable () async throws -> Account,
         fetch: @escaping @Sendable (String) async throws -> Data
     ) async throws -> YearExportArtwork {
+        @Sendable func requireOwner() async throws {
+            guard try await currentAccount() == owner else { throw YearExportArtworkError.accountChanged }
+        }
         let primaryIDs = Array(primary.prefix(primaryLimit))
         let secondaryIDs = Array(secondary.prefix(secondaryLimit))
         let jobs = primaryIDs.enumerated().map { (list: 0, index: $0.offset, id: $0.element) }
@@ -57,11 +63,16 @@ public enum YearExportArtworkLoader {
             func enqueue() -> Bool {
                 guard !Task.isCancelled, let job = pending.next() else { return false }
                 group.addTask {
+                    try await requireOwner()
                     do {
                         let data = try await fetch(job.id)
+                        try await requireOwner()
                         try Task.checkCancellation()
                         return (job.list, job.index, decode(data))
                     } catch {
+                        // A failure caused by an account change must end the load, not read as a missing cover.
+                        if error as? YearExportArtworkError == .accountChanged { throw error }
+                        try await requireOwner()
                         if Task.isCancelled || error is CancellationError { throw CancellationError() }
                         return (job.list, job.index, nil)
                     }
@@ -75,7 +86,7 @@ public enum YearExportArtworkLoader {
             }
         }
         try Task.checkCancellation()
-        guard try await currentAccount() == owner else { throw YearExportArtworkError.accountChanged }
+        try await requireOwner()
         try Task.checkCancellation()
         return YearExportArtwork(
             year: year, primaryIDs: primaryIDs, secondaryIDs: secondaryIDs,
@@ -174,5 +185,16 @@ public struct YearExportServerSnapshot: Identifiable, Sendable {
         if collectionSeconds > 0 { lines.append("Total duration: \(format.longDuration(collectionSeconds)) (+\(format.longDuration(addedSeconds)) this year)") }
         if let author = topAuthors.first { lines.append("Top author: \(author.name)") }
         return lines.joined(separator: "\n")
+    }
+}
+
+public extension YearExportArtworkLoader {
+    /// Loads covers for the sign-in identified by `authorization`, the `api.authorizationRevision` read when
+    /// the stats were requested. Every request is pinned to it, so none is ever sent with a later session,
+    /// and any sign-in change (even back to the same account) aborts with `accountChanged`.
+    @MainActor static func load(year: Int, primary: [String], secondary: [String], api: APIClient, authorization: UUID) async throws -> YearExportArtwork {
+        try await load(year: year, primary: primary, secondary: secondary, owner: authorization,
+                       currentAccount: { await api.authorizationRevision },
+                       fetch: { try await api.coverData(itemID: $0, authorization: authorization) })
     }
 }

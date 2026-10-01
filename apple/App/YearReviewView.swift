@@ -20,35 +20,34 @@ import UIKit
         self.year = year; stats = nil; export = nil; serverExport = nil; error = nil; loading = true
         defer { if revision == request { loading = false } }
         do {
+            // The authorization revision changes on every sign-in, so it also catches A -> B -> A switches.
+            let authorization = api.authorizationRevision
             let owner = try await api.currentAccount()
             let value = try await api.yearListeningStats(year)
-            guard revision == request, try await api.currentAccount() == owner else { return }
+            guard revision == request, api.authorizationRevision == authorization, try await api.currentAccount() == owner else { return }
             stats = value
             export = YearExportSnapshot(stats: value, year: year)
-            extras = Task { [weak self] in await self?.loadExports(year: year, stats: value, owner: owner, request: request) }
+            extras = Task { [weak self] in await self?.loadExports(year: year, stats: value, authorization: authorization, request: request) }
         } catch { if revision == request { self.error = ConnectionStore.recovery(for: error) } }
     }
     func invalidate() { revision = UUID(); extras?.cancel(); extras = nil; stats = nil; export = nil; serverExport = nil; loading = false }
 
     /// Covers and the admin server year are optional: any failure, including a 403 or a missing
-    /// cover, leaves the export without them. Results apply only to the same request and account.
-    private func loadExports(year: Int, stats: YearListeningStats, owner: AccountIdentity, request: UUID) async {
-        let api = api
-        let current: () async throws -> AccountIdentity = { try await api.currentAccount() }
-        let cover: @Sendable (String) async throws -> Data = { try await api.coverData(itemID: $0) }
-        func valid() -> Bool { revision == request && !Task.isCancelled }
+    /// cover, leaves the export without them. Every step is scoped to the request and to the
+    /// authorization revision the stats were loaded under; any sign-in change ends the sequence.
+    private func loadExports(year: Int, stats: YearListeningStats, authorization: UUID, request: UUID) async {
+        func valid() -> Bool { revision == request && api.authorizationRevision == authorization && !Task.isCancelled }
         if let art = try? await YearExportArtworkLoader.load(
             year: year, primary: stats.finishedBooksWithCovers, secondary: stats.booksWithCovers,
-            owner: owner, currentAccount: current, fetch: cover), valid() {
+            api: api, authorization: authorization), valid() {
             export = YearExportSnapshot(stats: stats, year: year, artwork: art)
         }
-        guard valid(), let user = try? await api.me(), user.canViewServerYearStats, valid(),
-              let server = try? await api.serverYearStats(year), valid(),
-              (try? await api.currentAccount()) == owner, valid() else { return }
+        guard valid(), let user = try? await api.me(), valid(), user.canViewServerYearStats,
+              let server = try? await api.serverYearStats(year), valid() else { return }
         serverExport = YearExportServerSnapshot(stats: server, year: year, artwork: nil)
         if let art = try? await YearExportArtworkLoader.load(
             year: year, primary: [], secondary: server.booksAddedWithCovers,
-            owner: owner, currentAccount: current, fetch: cover), valid() {
+            api: api, authorization: authorization), valid() {
             serverExport = YearExportServerSnapshot(stats: server, year: year, artwork: art)
         }
     }

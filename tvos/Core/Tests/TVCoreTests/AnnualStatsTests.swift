@@ -74,3 +74,41 @@ final class AnnualStatsTests: XCTestCase {
         http.invalidateAndCancel()
     }
 }
+
+final class PinnedCoverTests: XCTestCase {
+    static func login(_ user: String, token: String) -> Data {
+        Data(#"{"user":{"id":"\#(user)","username":"\#(user)","accessToken":"\#(token)"}}"#.utf8)
+    }
+
+    @MainActor
+    func testPinnedCoverRequestsNeverRunUnderALaterAuthorizationEvenForTheSameAccount() async throws {
+        let store = MemoryCredentials()
+        store.value = Credentials(server: "https://books.example", accessToken: "token-a", refreshToken: nil, userID: "alice")
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        let http = URLSession(configuration: configuration)
+        let api = APIClient(store: store, session: http)
+        var sent: [String] = []
+        MockURLProtocol.handler = { request in
+            sent.append("\(request.url?.path ?? "") \(request.value(forHTTPHeaderField: "Authorization") ?? "")")
+            return (200, "cover")
+        }
+        let pinned = api.authorizationRevision
+        _ = try await api.coverData(itemID: "li-1", authorization: pinned)
+        try api.completeBrowserLogin(server: "https://books.example", response: Self.login("bob", token: "token-b"))
+        XCTAssertNotEqual(api.authorizationRevision, pinned)
+        do {
+            _ = try await api.coverData(itemID: "li-2", authorization: pinned)
+            XCTFail("A cover pinned to alice must not be requested with bob's session")
+        } catch { XCTAssertTrue(error is CancellationError, "\(error)") }
+        // Signing alice back in is a new authorization: the old pin stays invalid (A -> B -> A).
+        try api.completeBrowserLogin(server: "https://books.example", response: Self.login("alice", token: "token-a2"))
+        do {
+            _ = try await api.coverData(itemID: "li-3", authorization: pinned)
+            XCTFail("An old pin must not be revived by signing the same account in again")
+        } catch { XCTAssertTrue(error is CancellationError, "\(error)") }
+        XCTAssertEqual(sent, ["/api/items/li-1/cover Bearer token-a"])
+        MockURLProtocol.handler = nil
+        http.invalidateAndCancel()
+    }
+}
