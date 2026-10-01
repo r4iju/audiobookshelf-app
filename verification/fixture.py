@@ -107,6 +107,11 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
     remote_events = []
     remote_originals = {'progress': {}, 'playlists': {}}
     configuration = {'mode': 'baseline', 'failed': False}
+    # `held-sync`: 2.30 has no request barrier, so a handler keeps running after a gateway gave up
+    # on it. Each entry is such a handler's account and body, applied by release-held, or ended
+    # unapplied by a fixture restart.
+    held_handlers = []
+    server_restarts = []
     collections = [{'id': 'collection-evening', 'libraryId': 'books', 'name': 'Evening shelf', 'description': 'An established listening order.', 'books': [items[2], items[1]]}]
     playlists = [{'id': 'playlist-evening', 'libraryId': 'books', 'userId': user['id'], 'name': 'Evening queue', 'description': 'Personal listening.', 'items': [{'libraryItemId': item['id'], 'libraryItem': item} for item in [items[1], items[2]]]}]
     playlists.append({'id': 'playlist-podcasts', 'libraryId': 'podcasts', 'userId': user['id'], 'name': 'Morning episodes', 'items': [{'libraryItemId': 'podcast', 'libraryItem': podcast, 'episodeId': 'episode-morning', 'episode': {**podcast['media']['episodes'][1], 'description': '<p>The episode selected from this playlist.</p>', 'audioFile': {'duration': 20}}}]})
@@ -164,6 +169,25 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
         @property
         def progress(self):
             return progress_by_user[self.account['id']]
+
+        def sync_local(self, account, data):
+            """2.30's `syncLocalSession` for each session: stores or replaces it, then updates progress unless newer."""
+            progress = progress_by_user[account['id']]
+            results = []
+            for record in data.get('sessions', []):
+                key = (record['libraryItemId'], record.get('episodeId'))
+                local_sessions[record['id']] = record.copy()
+                current = progress.get(key, {})
+                newer_remote = current.get('lastUpdate', 0) > record['updatedAt']
+                if not newer_remote:
+                    duration = record['duration']
+                    position = record['currentTime']
+                    progress[key] = {**current, 'libraryItemId': key[0], 'episodeId': key[1], 'duration': duration, 'currentTime': position,
+                                     'progress': min(max(position / duration, 0), 1), 'isFinished': position >= duration, 'lastUpdate': record['updatedAt']}
+                reports.append({'path': '/api/session/local-all', 'currentTime': record['currentTime'], 'timeListened': record['timeListening'], 'sessionId': record['id'], 'userId': account['id']})
+                results.append({'id': record['id'], 'success': True, 'progressSynced': not newer_remote})
+            account['mediaProgress'] = list(progress.values())
+            return results
 
         def mutate_group(self, path, data):
             match = re.fullmatch(r'/api/(collections|playlists)(?:/([^/]+)(?:/batch/(add|remove))?)?', path or '')
@@ -313,7 +337,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     return self.respond(401, {})
                 return self.respond(200, {'user': {**user, 'accessToken': 'expired', 'refreshToken': 'refresh'}})
             if path == '/__fixture__/observations':
-                return self.respond(200, {'revocations': revocations, 'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None], 'collections': collections, 'playlists': playlists, 'realtimeAuthentications': realtime_authentications})
+                return self.respond(200, {'revocations': revocations, 'heldHandlers': len(held_handlers), 'serverRestarts': server_restarts, 'reports': reports, 'requests': requests, 'loginOutcomes': login_outcomes, 'localSessions': list(local_sessions.values()), 'readingProgress': [entry for entry in progress.values() if entry.get('ebookLocation') is not None], 'collections': collections, 'playlists': playlists, 'realtimeAuthentications': realtime_authentications})
             if not self.authorized():
                 return self.respond(401, {'error': 'Unauthorized'})
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
@@ -491,13 +515,23 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'userId': identity})
             if path == '/__fixture__/remote-change':
                 return self.remote_change(data)
+            if path == '/__fixture__/restart':
+                server_restarts.append({'endedHandlers': len(held_handlers)})
+                held_handlers.clear()
+                return self.respond(200, {})
+            if path == '/__fixture__/release-held':
+                released = list(held_handlers); held_handlers.clear()
+                for account, body in released:
+                    self.sync_local(account, body)
+                return self.respond(200, {'released': len(released)})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art', 'long-audio'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art', 'long-audio', 'held-sync'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
                 tokens.update(renewals=0, revoked=set(), refresh_delay=0)
                 revocations.clear()
+                held_handlers.clear(); server_restarts.clear()
                 remote_events.clear()
                 for (account_id, key), original in remote_originals['progress'].items():
                     if original is None: progress_by_user[account_id].pop(key, None)
@@ -554,7 +588,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     for item, display in zip(items, json.loads((Path(directory) / 'display.json').read_text())):
                         item['media']['metadata'].update(title=display['title'], authorName=display['author'])
                 items[0]['media']['duration'] = 1e30 if mode == 'edge-metadata' else book_duration
-                if mode in ('baseline', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'long-audio'):
+                if mode in ('baseline', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'long-audio', 'held-sync'):
                     reports.clear()
                     local_sessions.clear()
                     for account in users.values():
@@ -671,20 +705,12 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if path == '/api/session/local-all':
                 if configuration['mode'] == 'offline-progress':
                     return self.respond(503, {})
-                results = []
-                for record in data.get('sessions', []):
-                    key = (record['libraryItemId'], record.get('episodeId'))
-                    local_sessions[record['id']] = record.copy()
-                    current = self.progress.get(key, {})
-                    newer_remote = current.get('lastUpdate', 0) > record['updatedAt']
-                    if not newer_remote:
-                        duration = record['duration']
-                        position = record['currentTime']
-                        self.progress[key] = {**current, 'libraryItemId': key[0], 'episodeId': key[1], 'duration': duration, 'currentTime': position,
-                                         'progress': min(max(position / duration, 0), 1), 'isFinished': position >= duration, 'lastUpdate': record['updatedAt']}
-                    reports.append({'path': path, 'currentTime': record['currentTime'], 'timeListened': record['timeListening'], 'sessionId': record['id'], 'userId': self.account['id']})
-                    results.append({'id': record['id'], 'success': True, 'progressSynced': not newer_remote})
-                self.account['mediaProgress'] = list(self.progress.values())
+                if configuration['mode'] == 'held-sync' and not configuration['failed'] and any(record.get('libraryItemId') == 'book-0' for record in data.get('sessions', [])):
+                    # A gateway gives up on the request while its handler is still running.
+                    configuration['failed'] = True
+                    held_handlers.append((self.account, copy.deepcopy(data)))
+                    return self.respond(504, {})
+                results = self.sync_local(self.account, data)
                 if configuration['mode'] == 'lost-ack' and not configuration['failed']:
                     configuration['failed'] = True
                     return self.respond(503, {})

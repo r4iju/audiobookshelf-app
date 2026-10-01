@@ -127,10 +127,23 @@ enum Fixture {
     struct Request: Decodable { let method: String?; let path: String; let page: String? }
     struct Report: Decodable { let path: String; let currentTime: Double; let timeListened: Double; let sessionId: String? }
     struct LocalSession: Decodable { let id: String; let currentTime: Double; let timeListening: Double; let libraryItemId: String; let episodeId: String? }
+    struct Restart: Decodable { let endedHandlers: Int }
     struct Observations: Decodable {
         let requests: [Request]
         let reports: [Report]
         let localSessions: [LocalSession]
+        /// `held-sync` handlers still running after a gateway gave up on them.
+        let heldHandlers: Int
+        let serverRestarts: [Restart]
+    }
+
+    /// Restarts the synthetic server, ending its running handlers unapplied.
+    static func restartServer(base: String = TVJourney.fixture) async throws {
+        var request = URLRequest(url: URL(string: base + "/__fixture__/restart")!)
+        request.httpMethod = "POST"
+        request.httpBody = Data("{}".utf8)
+        let (_, response) = try await URLSession.shared.data(for: request)
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
     }
 
     static func observations(base: String = TVJourney.fixture) async throws -> Observations {
