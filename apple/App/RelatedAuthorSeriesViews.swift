@@ -95,11 +95,19 @@ struct RelatedSeriesView: View {
         _page = StateObject(wrappedValue: RelatedSeries(api: catalog.api, id: seriesID, libraryID: catalog.library.id))
     }
 
+    private var progressSummary: String? {
+        guard let series = page.series else { return nil }
+        let count = series.progress?.libraryItemIds.count ?? page.books.total
+        let titles = count == 1 ? l10n("1 book") : l10n("{0} books", count)
+        guard let progress = series.progress else { return titles }
+        return l10n("{0} · {1} finished", titles, progress.libraryItemIdsFinished.count)
+    }
+
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 16) {
                 Text(page.series?.name ?? name).font(.title2.weight(.semibold)).accessibilityIdentifier("series-name")
-                if let summary = page.summary {
+                if let summary = progressSummary {
                     Text(summary).font(.subheadline).foregroundColor(.secondary).accessibilityIdentifier("series-progress")
                 }
                 if let description = page.series?.description?.trimmingCharacters(in: .whitespacesAndNewlines), !description.isEmpty {
