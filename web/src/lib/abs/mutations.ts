@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { usePlayerStore } from "@/lib/player/store";
+import { type DiscardTarget, discardProgress } from "@/lib/progress/discard";
 import { useAbs } from "@/lib/session/store";
 import type { AbsClient } from "./client";
 import { feedSchema } from "./feeds";
@@ -72,19 +72,7 @@ export function useDiscardProgress() {
   const { client, connection } = useAbs();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      progressId,
-      itemId,
-      episodeId,
-    }: {
-      progressId: string;
-      itemId: string;
-      episodeId: string | null;
-    }) => {
-      // First, so nothing this device still holds can report the old position after the server forgets it.
-      await usePlayerStore.getState().startOver({ itemId, episodeId });
-      return client.command("DELETE", `/api/me/progress/${progressId}`);
-    },
+    mutationFn: (target: DiscardTarget) => discardProgress(client, target),
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
   });
 }

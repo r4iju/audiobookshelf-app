@@ -21,6 +21,16 @@ export function outboxFor(connectionId: string) {
 
 let inFlight: Promise<unknown> | null = null;
 
+/** Resolves once a delivery already on its way has been answered, however it ended. */
+export function deliveriesSettled(): Promise<void> {
+  return inFlight
+    ? inFlight.then(
+        () => undefined,
+        () => undefined,
+      )
+    : Promise.resolve();
+}
+
 /** Sends queued listening reports; an unauthorized answer is surfaced so the shell can ask for a new sign-in. */
 export async function flushReports(client: AbsClient, onUnauthorized: () => void) {
   if (inFlight) return inFlight;

@@ -87,7 +87,7 @@ interface PlayerStore {
   jump: (seconds: number) => void;
   stop: () => Promise<void>;
   /** After its progress is discarded: drops this device's unsent listening and goes back to the start. */
-  startOver: (media: Pick<PlayerMedia, "itemId" | "episodeId">) => Promise<void>;
+  startOver: (target: { connectionId: string; itemId: string; episodeId: string | null }) => Promise<void>;
   setSleep: (sleep: Sleep) => void;
   /** Records listening so far, for example before the page is hidden or closed. */
   checkpoint: () => void;
@@ -337,19 +337,27 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
       set({ player: { phase: "idle" }, listening: null, sleep: { kind: "off" } });
       persist();
     },
-    startOver: async ({ itemId, episodeId }) => {
-      const { player, client, connectionId } = get();
-      if (connectionId) outboxFor(connectionId).forget(itemId, episodeId ?? null);
-      if (player.phase !== "active" || player.media.itemId !== itemId || player.media.episodeId !== episodeId)
+    startOver: async ({ connectionId, itemId, episodeId }) => {
+      outboxFor(connectionId).forget(itemId, episodeId);
+      const isTarget = (media: PlayerMedia) => media.itemId === itemId && media.episodeId === episodeId;
+      const { player, client } = get();
+      if (get().connectionId !== connectionId) {
+        // Another account is in the player; only the discarding account's saved place changes.
+        const saved = readStored(snapshotKey(connectionId), snapshotSchema);
+        if (saved && isTarget(saved.media))
+          writeStored(snapshotKey(connectionId), { ...saved, currentTime: 0 });
         return;
-      // Closed without a final report, so the server is not told the old position again.
-      if (player.source && client) await closePlayback(client, player.source.serverSessionId);
+      }
+      if (player.phase !== "active" || !isTarget(player.media)) return;
+      // This device changes before the server is told, so a slow close cannot overwrite whatever happens meanwhile.
       set({
         player: { ...player, source: null, status: "paused", currentTime: 0, seekTo: { time: 0 } },
         listening: null,
         pausedAt: null,
       });
       persist();
+      // Closed without a final report, so the server is not told the old position again.
+      if (player.source && client) await closePlayback(client, player.source.serverSessionId);
     },
     setSleep: (sleep) => set({ sleep }),
     checkpoint: () => {

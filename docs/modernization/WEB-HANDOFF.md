@@ -25,7 +25,8 @@ shared modernization documents. Issues #55 to #65.
 | `1e810f4a` | OpenID sign-in, plain-HTTP origin fallbacks, production image, same-origin compose and nginx deployment under `/web` |
 | `eef093ba` | Discarding progress resets this device too (player position and unsent listening) |
 | `e109644f` | RSS feeds (open, view, close) and send ebook to an e-reader |
-| (this commit) | README, deployment and server-contract docs, this handoff, formatting fix for `e109644f`'s spec |
+| `57ae6ae4` | README, deployment and server-contract docs, this handoff, formatting fix for `e109644f`'s spec |
+| (this commit) | Discard ordering: the reset belongs to the account it came from, survives switches and new playback during the close, and waits for listening already on its way |
 
 ## Checks
 
@@ -99,8 +100,15 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 - **RSS feeds** follow the legacy item menu. Administrators open and close them; anyone sees an open feed's address.
   Opening needs an item with audio. The legacy slug cleaning is applied before opening, and the address shown is
   exactly the one used.
-- **Discarding progress** first drops this device's unsent listening for that book or episode, and closes its
-  player session without a final report. Nothing the device still holds can bring the old position back.
+- **Discarding progress** happens in this order, for the account the discard came from only:
+  1. this device drops its unsent listening for that book or episode, and the player (if it holds that book for
+     that account) stops at the start and stops recording;
+  2. the old playback session is closed without a final report;
+  3. any listening delivery already on its way is answered;
+  4. only then is the server's progress deleted.
+
+  Other books' unsent listening and other accounts' state are untouched. A storage or server refusal fails the
+  discard, which says so where it was asked; the client never reports a reset the server refused.
 
 ## Ports
 
