@@ -19,6 +19,8 @@ import SwiftUI
         if CommandLine.arguments.contains("--reset-preview-account") {
             try? vault.resetPreviewAccounts()
             try? FileManager.default.removeItem(at: ListeningSync.file)
+            // Uncertain writes of earlier fixture accounts would hold back this run's progress.
+            try? FileManager.default.removeItem(at: ListeningSync.publicationsFile)
             try? FileManager.default.removeItem(at: NativePodcastQueue.file)
             try? FileManager.default.removeItem(at: ReadingStore.file)
             try? FileManager.default.removeItem(at: NativeDownloads.directory)

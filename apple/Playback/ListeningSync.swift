@@ -22,6 +22,8 @@ struct ProgressResetIntent: Codable, Equatable {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("NativeListening/listening.json")
     }
+    /// Where `publications` is kept unless the resets are kept elsewhere.
+    static var publicationsFile: URL { file.deletingLastPathComponent().appendingPathComponent("publications.json") }
     private let api: APIClient
     private let journal: ListeningJournal?
     private let loadingFailure: Error?

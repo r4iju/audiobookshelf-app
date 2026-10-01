@@ -28,6 +28,7 @@
 "Already on server" = "Already on server";
 "Always" = "Always";
 "An earlier import is already saved. Choose its original export to retry or repair it." = "An earlier import is already saved. Choose its original export to retry or repair it.";
+"An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed." = "An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.";
 "Appearance" = "Appearance";
 "Apple TV" = "Apple TV";
 "Are you sure you want to reset your progress?" = "Are you sure you want to reset your progress?";
@@ -362,6 +363,7 @@
 "Reset timer" = "Reset timer";
 "Restart playback" = "Restart playback";
 "Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.";
+"Restart the server" = "Restart the server";
 "Restart the server now" = "Restart the server now";
 "Restarting…" = "Restarting…";
 "Resume" = "Resume";

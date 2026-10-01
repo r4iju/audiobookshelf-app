@@ -672,4 +672,37 @@ import XCTest
             XCTAssertNil(server[book, nil])
         }
     }
+
+    func testListeningOfOtherTitlesIsSentWhileOneTitleWaits() async throws {
+        let sync = harness.player.listening
+        let waiting = try await sync.begin(media: media(book), deviceID: "device-other")
+        try sync.record(id: waiting, position: 30, listened: 30)
+        server.holdNextWrite(item: book)
+        try? await sync.flush()
+        XCTAssertEqual(server.heldWrites, 1, "Precondition: the first sync was held")
+        try sync.record(id: waiting, position: 60, listened: 30)
+        let unrelated = try await sync.begin(media: media(other), deviceID: "device-other")
+        try sync.record(id: unrelated, position: 10, listened: 10)
+        try await sync.flush()
+        XCTAssertEqual(server.session(unrelated)?.listened, 10, "Another title's listening waited for this one")
+        XCTAssertNil(server.session(waiting), "Later listening was sent while the first sync could still be applied")
+        XCTAssertTrue(try sync.hasLocalListening(account: alice, itemID: book, episodeID: nil, newerThan: nil))
+    }
+
+    func testAnUnreadableRecordOfWritesHoldsBackNewWritesUntilARestartIsConfirmed() async throws {
+        try FileManager.default.createDirectory(at: publications.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data("{not json".utf8).write(to: publications)
+        harness.openStores()
+        let sync = harness.player.listening
+        let id = try await sync.begin(media: media(book), deviceID: "device-unreadable")
+        try sync.record(id: id, position: 12, listened: 12)
+        try await sync.flush()
+        XCTAssertNil(server.session(id), "Listening was sent though earlier writes could not be read")
+        XCTAssertTrue(try sync.hasLocalListening(account: alice, itemID: book, episodeID: nil, newerThan: nil))
+
+        try harness.player.requestServerRestart(account: alice)
+        try harness.player.confirmServerRestarted(account: alice)
+        try await sync.flush()
+        XCTAssertEqual(server.session(id)?.listened, 12)
+    }
 }
