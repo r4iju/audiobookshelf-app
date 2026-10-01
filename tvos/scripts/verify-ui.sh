@@ -2,10 +2,14 @@
 # Remote-driven tvOS journeys against owned synthetic fixtures on 20765 (HTTP) and 20767 (HTTPS): verification/fixture.py
 # extended with the 2.30 author and series endpoints by tvos/scripts/related_fixture.py.
 # Extra arguments pass to xcodebuild, for example -only-testing:TVJourneyTests/CatalogJourney.
+# ABS_TV_QA_SIMULATOR, ABS_TV_HTTP_PORT and ABS_TV_HTTPS_PORT let a parallel worktree use its own simulator and ports.
 set -euo pipefail
 tvos_root="$(cd "$(dirname "$0")/.." && pwd)"
 repo_root="$(cd "$tvos_root/.." && pwd)"
 simulator="${ABS_TV_QA_SIMULATOR:-00DD108F-2435-4FEC-9C37-3E62861A0EF6}"
+export ABS_TV_HTTP_PORT="${ABS_TV_HTTP_PORT:-20765}" ABS_TV_HTTPS_PORT="${ABS_TV_HTTPS_PORT:-20767}"
+# xcodebuild hands TEST_RUNNER_ variables to the journeys without the prefix.
+export TEST_RUNNER_ABS_TV_HTTP_PORT="$ABS_TV_HTTP_PORT" TEST_RUNNER_ABS_TV_HTTPS_PORT="$ABS_TV_HTTPS_PORT"
 fixture_dir="$(mktemp -d)"
 fixture_pids=()
 cleanup() {
@@ -14,8 +18,8 @@ cleanup() {
 }
 trap cleanup EXIT
 python3 - <<'PY'
-import socket
-for port in [20765, 20767]:
+import os, socket
+for port in [int(os.environ['ABS_TV_HTTP_PORT']), int(os.environ['ABS_TV_HTTPS_PORT'])]:
     with socket.socket() as listener:
         listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
@@ -30,13 +34,13 @@ openssl req -newkey rsa:2048 -nodes -keyout "$fixture_dir/key.pem" -out "$fixtur
 printf 'subjectAltName=IP:127.0.0.1\nextendedKeyUsage=serverAuth\n' > "$fixture_dir/server.ext"
 openssl x509 -req -in "$fixture_dir/server.csr" -CA "$fixture_dir/ca.pem" -CAkey "$fixture_dir/ca.key" -CAcreateserial \
     -days 2 -extfile "$fixture_dir/server.ext" -out "$fixture_dir/cert.pem" >> "$fixture_dir/tls.log" 2>&1
-(cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port 20765) > "$fixture_dir/http.log" 2>&1 &
+(cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port "$ABS_TV_HTTP_PORT") > "$fixture_dir/http.log" 2>&1 &
 fixture_pids+=("$!")
-(cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port 20767 --tls-cert "$fixture_dir/cert.pem" --tls-key "$fixture_dir/key.pem") > "$fixture_dir/https.log" 2>&1 &
+(cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port "$ABS_TV_HTTPS_PORT" --tls-cert "$fixture_dir/cert.pem" --tls-key "$fixture_dir/key.pem") > "$fixture_dir/https.log" 2>&1 &
 fixture_pids+=("$!")
 python3 - <<'PY'
-import socket, time
-for port in [20765, 20767]:
+import os, socket, time
+for port in [int(os.environ['ABS_TV_HTTP_PORT']), int(os.environ['ABS_TV_HTTPS_PORT'])]:
     for attempt in range(50):
         try:
             with socket.create_connection(('127.0.0.1', port), timeout=0.2):

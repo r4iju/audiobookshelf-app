@@ -2,7 +2,13 @@ import XCTest
 
 /// Drives the production TV app only through the Siri Remote and the synthetic fixture.
 @MainActor class TVJourney: XCTestCase {
-    static let fixture = "http://127.0.0.1:20765/abs"
+    static let fixture = "http://127.0.0.1:\(port("ABS_TV_HTTP_PORT", 20765))/abs"
+    static let secureFixture = "https://127.0.0.1:\(port("ABS_TV_HTTPS_PORT", 20767))/abs"
+
+    /// `verify-ui.sh` passes the ports it served, so parallel worktrees can use their own.
+    static func port(_ name: String, _ standard: Int) -> Int {
+        ProcessInfo.processInfo.environment[name].flatMap(Int.init) ?? standard
+    }
     let app = XCUIApplication()
     let remote = XCUIRemote.shared
 

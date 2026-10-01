@@ -98,7 +98,7 @@ final class CatalogJourney: TVJourney {
     }
 
     func testTrustedHTTPSServerAndLongMetadata() async throws {
-        let secure = "https://127.0.0.1:20767/abs"
+        let secure = TVJourney.secureFixture
         try await Fixture.configure("edge-metadata", base: secure)
         addTeardownBlock { try await Fixture.configure("baseline", base: secure) }
         signIn(server: secure)
