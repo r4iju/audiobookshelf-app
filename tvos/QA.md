@@ -4,7 +4,7 @@ Last verified October 2, 2026, on `feat/related-author-series` (story #21) over 
 
 ## Automated evidence
 
-Coordinator integration reran the complete suite from `feat/apple-tv-completion` on October 2: 22 core tests, 11 app unit tests and 16 remote journeys passed. The run includes the shared playback changes already merged for cellular preferences. Local result: `tvos/build/TVJourneys-20261002-012452.xcresult`; the generic tvOS simulator build also passed.
+Earlier coordinator integration reran the complete suite from `feat/apple-tv-completion` on October 2: 22 core tests, 11 app unit tests and 16 remote journeys passed. The run includes the shared playback changes already merged for cellular preferences. Local result: `tvos/build/TVJourneys-20261002-012452.xcresult`; the generic tvOS simulator build also passed.
 
 | Check | Command | Result |
 | --- | --- | --- |
@@ -73,3 +73,7 @@ Installing the build is not acceptance. These checks need a person using the Sir
 These behaviours have no automated test yet and rely on the physical checks above or on review: rapid skips across file boundaries (check 4), login expiry (check 9), and Home/Search when one of several libraries fails. The synthetic fixture has no mode that fails a single library or revokes a token.
 
 See [HANDOFF.md](HANDOFF.md) for the hardware storage caveat that affects check 7.
+
+## Current integrated TV install
+
+On October 2, root generated the TV project in the clean final-integration checkout at `829259be`, built its signed Release app locally, verified its signature with `codesign --verify --deep --strict`, and installed it on Living Room TV (tvOS 18.6) without launching it. Evidence: `/tmp/abs-apple-final-tv-device.log`. This build includes the reviewed related-author/series loaders and views, and the shared paused-progress hooks. The hooks are not a TV realtime feature without a TV event caller. Shared Core passed 48/48 in the combined checkout. The physical acceptance list above remains open.
