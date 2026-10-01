@@ -198,6 +198,15 @@ class AppGraph internal constructor(val context: Context) {
         return done
     }
 
+    val migration by lazy {
+        com.audiobookshelf.android.migration.Migration(context, scope, accounts, settings, downloads, { journal }, reading, { deviceInfo.deviceId },
+            published = { progressSync.publishAll(); readingSync.publishAll() }, report = diagnostics::record).also { migration ->
+            scope.launch {
+                accounts.session.map { (it as? com.audiobookshelf.android.data.SessionState.Active)?.client?.account }.distinctUntilChanged().collect { migration.attachSignedIn() }
+            }
+        }
+    }
+
     val podcastRequests by lazy { com.audiobookshelf.android.podcast.PodcastRequests(File(context.filesDir, "podcast-requests.json")) }
     val serverEvents by lazy {
         com.audiobookshelf.android.podcast.ServerEvents(scope, accounts, http).also { events ->

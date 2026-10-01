@@ -154,6 +154,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                     }
                 }
                 openId.error?.let { ErrorText(it, "openid-error") }
+                if (!state.adding) ImportLegacyButton()
                 if (state.connections.isNotEmpty()) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
                     Text("Saved accounts", style = MaterialTheme.typography.titleMedium)

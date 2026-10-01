@@ -163,6 +163,63 @@ Evidence: unit tests pass. In one run on `emulator-5584`: ListeningRecovery 1, L
   - AccountsJourney 3 of 3 pass after the emulator's Chrome was force-stopped.
 - **Emulator caveat:** the first AccountsJourney attempt failed because Chrome on the emulator was stuck on an old fixture tab and never requested `/auth/openid`. Force-stop Chrome before the OIDC journey if this recurs.
 
+## Migration from the legacy Android app (#52, #53)
+
+The preview keeps its own identity (`com.audiobookshelf.app.nativepreview`, debug key), as the Apple preview does. It cannot read the legacy app's private storage, so migration is a faithful export and import, not an in-place upgrade.
+
+**Export, in the legacy app.** A patch to the legacy web and Android sources adds **Settings > Export for the new app** on Android, in addition to iOS:
+- `LegacyMigrationExporter`, `LegacyMigrationExportPlugin`, `plugins/legacyMigrationExport.js`, `components/settings/LegacyMigrationExport.vue` and `pages/settings.vue`.
+- It writes `Audiobookshelf Export <date>.absmigration`. This is a zip of the iOS format 1 (`archive.json` with `formatVersion` 1 and `platform` `android`, files under `files/<digest>/<name>`, stored uncompressed). The user saves it with the system file picker.
+- Paper records are exported as the legacy app's own JSON:
+  - connections, device settings and allowlisted preferences;
+  - reader web storage (`ereaderSettings`, `ebookLocations-*`);
+  - local items, progress, sessions and running downloads.
+- Tokens, refresh tokens, custom headers and the device identity are removed. The archive is written as `.partial` and renamed only when complete, and `archive.json` is written last.
+- Nothing in the legacy installation changes.
+- `LegacyMigrationExportTest` (legacy androidTest) seeds a synthetic installation on the emulator and asserts these properties. `android-native/scripts/export-legacy-fixture.sh` rebuilds `core/src/test/resources/migration/legacy-export.absmigration` from it.
+
+**Coordinator note:** `pages/settings.vue` and `plugins/legacyMigrationExport.js` are shared with the Apple export. The Android change widens `v-if="isiOS"` and the "unavailable" text; merge this with the Apple branch's copy of those lines.
+
+**Import, in the preview.** The user opens the export in one of two ways:
+- with **Import from the previous app** on the sign-in screen or in Settings, through the system picker;
+- by opening it with the app from a file manager.
+
+The import works in these stages:
+- **Preflight writes nothing.** It shows:
+  - the accounts and titles;
+  - what is not imported (another account's rows, unscoped titles, missing or corrupt files);
+  - the space needed and free.
+- **Import stages and verifies files.** Each file is copied to `files/migration/staging/<sha256>` and checked against the export's digest. Every verified file is recorded, so an interrupted import continues without copying it again.
+- **Commit.** `outcome.json` commits the import. The same export again says it was already imported; a different one is refused. The legacy device settings and preferences are applied once.
+- **Attach after sign-in.** Nothing attaches until the matching account (canonical server and user ID) signs in here. Then:
+  - Each title is checked against the server's item (track count or the running download's indexes, and the ebook's format and ino). It is adopted as a finished download without fetching again; a running download fetches only its unfinished parts.
+  - Unsent legacy sessions go to the server under their own IDs with their absolute totals.
+  - Audio positions and PDF pages become this device's positions unless the server's are newer.
+- **Preserved, not yet used.** EPUB and other locations, and reader settings, stay in `outcome.json` until those readers exist (#65).
+
+**Rollback.** The legacy app and its data are never modified, and the export file is only read. Uninstalling the preview, or clearing its storage, removes everything the import added. The legacy app keeps working throughout.
+
+**In-place upgrade, not done.** Replacing the legacy app in place would need:
+- the same application ID `com.audiobookshelf.app`;
+- the owner's release signing key;
+- a reader for the legacy Paper/Kryo database and Capacitor storage.
+
+None of these are available or attempted here. The owner's device and key were not used.
+
+**Evidence (emulator `emulator-5584` and fixture only):**
+- `LegacyImportTest`, 8 tests: preflight, staging, corruption, interruption and resume, repeat and refusal, matching and running downloads.
+- The `ListeningJournalTest` adopt test.
+- `MigrationJourney`, 5 of 5. RED first, 5 of 5 failing before the implementation. It covers:
+  - a non-export file refused with nothing written;
+  - a corrupt PDF reported while the rest imports;
+  - import before sign-in, then on sign-in: the legacy session reaches the server with 7 s, the legacy jump, theme and settings apply, book-0 is not downloaded again, and book-4 fetches only `file/1`;
+  - offline: the PDF reopens at page 2 and audio resumes at 9 s;
+  - the same export again says it was already imported.
+- **Gaps:**
+  - The legacy export UI (plugin and Vue) is compiled but not driven on a device. Only the exporter itself ran.
+  - An adopted finished title has no cover until it is downloaded again.
+  - Migration of the owner's real legacy installation is a physical gate.
+
 ## Known limits
 
 - Listening that is held in memory because storage refuses writes is lost if the process dies before storage recovers. The player pauses and warns as soon as a write fails, which bounds the loss to the listening already played.
@@ -171,7 +228,7 @@ Evidence: unit tests pass. In one run on `emulator-5584`: ListeningRecovery 1, L
 - Physical-only gates are not yet exercised:
   - Bluetooth, lock screen and Android Auto controls, and a physical car or Desktop Head Unit.
   - Real metered networks.
-  - Migration from the legacy app on the owner's device.
+  - Export and import of the owner's real legacy installation.
 
 ## Running the checks
 

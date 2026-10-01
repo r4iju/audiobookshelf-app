@@ -23,6 +23,7 @@ class MainActivity : ComponentActivity() {
         graph.downloads.resumeInterrupted()
         graph.readingSync
         graph.startResets()
+        graph.migration
         if (savedInstanceState == null) route(intent)
         // Applied before the first frame so a locked orientation never flashes the other way at launch.
         applyOrientation(graph.settings.current.lockOrientation)
@@ -47,6 +48,7 @@ class MainActivity : ComponentActivity() {
     private fun route(intent: Intent?) {
         if (OpenIdSignIn.pending(this).handle(intent)) return
         if (intent?.getBooleanExtra(EXTRA_OPEN_PLAYER, false) == true) graph.openPlayerRequests.tryEmit(Unit)
+        if (intent?.action == Intent.ACTION_VIEW && intent.data?.scheme == "content") graph.migration.open(intent.data!!)
     }
 
     override fun onResume() {

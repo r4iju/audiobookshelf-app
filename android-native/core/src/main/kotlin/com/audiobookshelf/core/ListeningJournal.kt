@@ -100,6 +100,18 @@ class ListeningJournal(private val file: File) {
         return record.id
     }
 
+    /** Takes listening another app recorded but never sent; a session already held keeps its own total. */
+    @Synchronized
+    fun adopt(id: String, account: AccountIdentity, media: ListeningMedia, deviceId: String, startedAt: Double, updatedAt: Double, currentTime: Double, timeListening: Double) {
+        require(media.duration.isFinite() && media.duration > 0 && timeListening.isFinite() && timeListening >= 0 && currentTime.isFinite())
+        if (records.any { it.id == id }) return
+        val record = ListeningRecord(
+            id, account, media, deviceId, startedAt, updatedAt, currentTime.coerceIn(0.0, media.duration), timeListening,
+            revision = 1, acknowledged = 0, closed = true,
+        )
+        commit(records + record, remember(positions, record.position()))
+    }
+
     @Synchronized
     fun record(id: String, position: Double, listened: Double, now: Long = System.currentTimeMillis()) {
         require(position.isFinite() && listened.isFinite() && listened >= 0)

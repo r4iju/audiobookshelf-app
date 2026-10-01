@@ -46,6 +46,9 @@ android {
         resources.excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
     }
 
+    // The archive the legacy app's own exporter wrote, shared with the core import tests.
+    sourceSets["androidTest"].assets.srcDir("../core/src/test/resources/migration")
+
     testOptions {
         animationsDisabled = true
         execution = "ANDROIDX_TEST_ORCHESTRATOR"

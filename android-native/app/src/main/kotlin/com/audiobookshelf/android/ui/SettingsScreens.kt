@@ -148,6 +148,7 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         item { SettingsHeading("Storage") }
         item { DownloadLocation(settings, change) }
 
+        item { ImportLegacyButton() }
         item { SettingsHeading("Android Auto") }
         item {
             Choices("Group authors and series in letters above", (CAR_GROUPING + settings.androidAutoBrowseLimitForGrouping).distinct().sorted(), settings.androidAutoBrowseLimitForGrouping, "car-grouping", label = { it.toString() }) { value -> change { it.copy(androidAutoBrowseLimitForGrouping = value) } }

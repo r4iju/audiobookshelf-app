@@ -33,6 +33,15 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="${oauthScheme}" android:host="oauth" />
             </intent-filter>
+            <!-- Exports of the previous app, opened from a file manager, which labels them by their zip or unknown type. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="application/x-absmigration" />
+            </intent-filter>
         </activity>
         <service
             android:name=".playback.PlaybackService"

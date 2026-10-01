@@ -34,6 +34,22 @@ class ListeningJournalTest {
     }
 
     @Test
+    fun adoptedListeningIsSentUnderItsOwnIdOnceAndKeepsItsTotal() {
+        val file = folder.root.resolve("journal.json")
+        val journal = ListeningJournal(file)
+        journal.adopt("legacy-session-1", qa, book, "legacy-device", startedAt = 1_000.0, updatedAt = 8_000.0, currentTime = 9.5, timeListening = 7.0)
+        journal.adopt("legacy-session-1", qa, book, "legacy-device", startedAt = 1_000.0, updatedAt = 9_000.0, currentTime = 12.0, timeListening = 9.0)
+
+        val pending = ListeningJournal(file).pending(qa).single()
+        assertEquals("legacy-session-1", pending.id)
+        assertEquals(7.0, pending.timeListening, 0.0)
+        assertTrue(pending.closed)
+        assertEquals(9.5, journal.cachedPosition(qa, "book-0", null, newerThan = 0.0)!!, 0.0)
+        journal.acknowledge(pending)
+        assertTrue(journal.pending(qa).isEmpty())
+    }
+
+    @Test
     fun acknowledgmentRetiresOnlyTheRevisionThatWasSent() {
         val journal = ListeningJournal(folder.root.resolve("journal.json"))
         val id = journal.begin(qa, book, "device", now = 1_000)

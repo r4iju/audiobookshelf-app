@@ -9,5 +9,6 @@
             </intent-filter>
         </activity>
         <activity android:name="com.audiobookshelf.android.journeys.ForeignBrowserActivity" android:exported="true" android:label="Foreign browser" />
+        <provider android:name="com.audiobookshelf.android.journeys.ArchiveProvider" android:authorities="com.audiobookshelf.journeys.archives" android:exported="true" />
     </application>
 </manifest>

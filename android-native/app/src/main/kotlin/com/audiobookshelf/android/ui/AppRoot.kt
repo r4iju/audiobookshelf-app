@@ -48,7 +48,9 @@ fun AppRoot() {
     val graph = LocalContext.current.graph
     val settings by graph.settings.settings.collectAsState()
     val session by graph.accounts.session.collectAsState()
+    val migration by graph.migration.step.collectAsState()
     AbsTheme(settings.appearance) {
+        migration?.let { step -> MigrationScreen(step); return@AbsTheme }
         when (val state = session) {
             SessionState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             is SessionState.SignedOut -> ConnectScreen(state)

@@ -102,34 +102,74 @@ class Downloads(
         if (tree != null && !folder.granted(tree)) return Request.FolderLost(treeName)
         if (!allowMetered && settings.current.downloadUsingCellular == CellularPolicy.ASK && metered()) return Request.NeedsCellularConsent
 
-        val id = recordId(client.account, item.id, episode?.id)
-        val directory = File(context.filesDir, "downloads/$id")
-        val parts = tracks.mapIndexed { index, track ->
-            val ext = track.metadata?.ext?.takeIf { it.isNotBlank() }?.let { if (it.startsWith(".")) it else ".$it" } ?: extension(track.mimeType)
-            DownloadStore.Part(track.contentUrl!! + "/download", "track-${index + 1}$ext", track.metadata?.size, track.mimeType, fileName = track.metadata?.filename)
-        } + listOfNotNull(ebook?.let {
-            DownloadStore.Part("/api/items/${item.id}/file/${it.ino}/download", "ebook.${it.format ?: "bin"}", it.metadata?.size, null, ebookFileId = it.ino, ebookFormat = it.format, fileName = it.metadata?.filename)
-        })
-        val previous = store.get(id)
-        try { store.put(DownloadStore.Record(
-            id = id, account = client.account, itemId = item.id, episodeId = episode?.id,
-            title = episode?.title?.takeIf { it.isNotBlank() } ?: item.title,
-            author = if (episode != null) item.title else item.author.orEmpty(),
-            mediaType = item.mediaType,
-            duration = episode?.playableDuration ?: item.media.duration ?: tracks.sumOf { it.duration },
-            chapters = episode?.chapters ?: item.media.chapters,
-            tracks = tracks.mapIndexed { index, track -> track.copy(index = index, startOffset = tracks.take(index).sumOf { it.duration }) },
-            parts = parts.map { part -> previous?.parts?.firstOrNull { it.path == part.path && it.done && previous.folder == tree }?.let { part.copy(done = true, uri = it.uri) } ?: part },
-            directory = directory.path,
+        val fresh = record(client.account, item, episode, tracks, ebook).copy(
             folder = tree,
             folderName = tree?.let { treeName },
             allowMetered = allowMetered || settings.current.downloadUsingCellular == CellularPolicy.ALWAYS,
+        )
+        val id = fresh.id
+        val previous = store.get(id)
+        try { store.put(fresh.copy(
+            parts = fresh.parts.map { part -> previous?.parts?.firstOrNull { it.path == part.path && it.done && previous.folder == tree }?.let { part.copy(done = true, uri = it.uri) } ?: part },
         )) } catch (failure: IOException) {
             Log.w(TAG, "Download list not saved", failure)
             return Request.NotSaved
         }
         enqueue(id)
         return Request.Started
+    }
+
+    private fun record(account: AccountIdentity, item: LibraryItem, episode: Episode?, tracks: List<com.audiobookshelf.core.AudioTrack>, ebook: com.audiobookshelf.core.EbookFile?): DownloadStore.Record {
+        val id = recordId(account, item.id, episode?.id)
+        val parts = tracks.mapIndexed { index, track ->
+            val ext = track.metadata?.ext?.takeIf { it.isNotBlank() }?.let { if (it.startsWith(".")) it else ".$it" } ?: extension(track.mimeType)
+            DownloadStore.Part(track.contentUrl!! + "/download", "track-${index + 1}$ext", track.metadata?.size, track.mimeType, fileName = track.metadata?.filename)
+        } + listOfNotNull(ebook?.let {
+            DownloadStore.Part("/api/items/${item.id}/file/${it.ino}/download", "ebook.${it.format ?: "bin"}", it.metadata?.size, null, ebookFileId = it.ino, ebookFormat = it.format, fileName = it.metadata?.filename)
+        })
+        return DownloadStore.Record(
+            id = id, account = account, itemId = item.id, episodeId = episode?.id,
+            title = episode?.title?.takeIf { it.isNotBlank() } ?: item.title,
+            author = if (episode != null) item.title else item.author.orEmpty(),
+            mediaType = item.mediaType,
+            duration = episode?.playableDuration ?: item.media.duration ?: tracks.sumOf { it.duration },
+            chapters = episode?.chapters ?: item.media.chapters,
+            tracks = tracks.mapIndexed { index, track -> track.copy(index = index, startOffset = tracks.take(index).sumOf { it.duration }) },
+            parts = parts,
+            directory = File(context.filesDir, "downloads/$id").path,
+        )
+    }
+
+    /**
+     * Takes files another app downloaded as this item's download, in app storage. [audio] holds a file
+     * per server track (null where one is missing) and [ebook] the ebook; missing parts are downloaded.
+     * False when this item already has a download here, which is kept as it is.
+     */
+    fun adopt(account: AccountIdentity, item: LibraryItem, episode: Episode?, audio: List<File?>, ebook: File?): Boolean {
+        if (find(account, item.id, episode?.id) != null) return false
+        val tracks = if (episode != null) listOfNotNull(episode.audioTrack?.let { it.copy(duration = it.duration.takeIf { d -> d > 0 } ?: episode.playableDuration) })
+            else item.media.tracks.sortedBy { it.index ?: 0 }
+        val ebookFile = item.media.ebookFile.takeIf { episode == null && ebook != null }
+        val fresh = record(account, item, episode, tracks.takeIf { audio.isNotEmpty() }.orEmpty(), ebookFile)
+        val directory = File(fresh.directory).apply { mkdirs() }
+        val sources = audio.takeIf { it.isNotEmpty() }.orEmpty() + listOfNotNull(ebook.takeIf { ebookFile != null })
+        val parts = fresh.parts.mapIndexed { index, part ->
+            val source = sources.getOrNull(index) ?: return@mapIndexed part
+            val staging = File(directory, part.name + ".part")
+            source.copyTo(staging, overwrite = true)
+            if (!staging.renameTo(File(directory, part.name))) throw IOException("Could not move an imported file into place")
+            part.copy(done = true, size = part.size ?: source.length())
+        }
+        val complete = parts.all { it.done }
+        store.put(fresh.copy(
+            parts = parts,
+            state = if (complete) DownloadStore.State.COMPLETE else DownloadStore.State.QUEUED,
+            bytes = parts.filter { it.done }.sumOf { it.size ?: 0L },
+            completedAt = if (complete) System.currentTimeMillis() else null,
+            allowMetered = settings.current.downloadUsingCellular == CellularPolicy.ALWAYS,
+        ))
+        if (!complete) enqueue(fresh.id)
+        return true
     }
 
     /** False when the download list could not be written. */
