@@ -30,7 +30,8 @@ shared modernization documents. Issues #55 to #65.
 | `df948480` | Discard barrier: a late session open cannot undo the reset, and listening begun after the reset is held until the delete is done |
 | `f4e8d15f` | Discard holds last as long as their tab, however slow the delete, and tabs taking or releasing holds at once keep each other's |
 | `c68e6c1e` | A discard is kept until the server confirms its delete: refused or abandoned deletes are sent again by any tab, playing it meanwhile starts from the beginning, and the item page shows it pending |
-| (this commit) | A discard accounts for listening any tab already sent, on plain-HTTP origins too: tabs record exactly what they send in IndexedDB; a discard deletes once those requests are answered, and otherwise is left unconfirmed for the user to keep or discard anyway |
+| `5710199f` | A discard accounts for listening any tab already sent, on plain-HTTP origins too: tabs record exactly what they send in IndexedDB; a discard deletes once those requests are answered, and otherwise is left unconfirmed for the user to keep or discard anyway |
+| (this commit) | Records the full local run on `5710199f` |
 
 ## Checks
 
@@ -40,16 +41,19 @@ Run from `web/` on the Studio, against the isolated QA server only:
 npm run lint && npm run typecheck && npm test && npx playwright test
 ```
 
-Last full run, on `c68e6c1e` (Studio, Chromium; the commit after it changes only this file). The chain was
+Last full run, on `5710199f` (Studio, Chromium; the commit after it changes only this file). The chain was
 `npm run lint && npm run typecheck && npm test && npm run build && npm run qa:deploy -- up && npx playwright test`:
 
 - Biome clean (1 info: the `recommended` field in `biome.json` is deprecated);
 - `tsc` clean;
-- vitest: 72 passed in 17 files;
+- vitest: 84 passed in 17 files;
 - production build and deployment image built;
-- Playwright: 59 passed in 4.3 minutes, including the 5 deployment journeys against the image built from that commit.
+- Playwright: 60 passed and 1 failed in 4.4 minutes, including the 7 deployment journeys against the image built
+  from that commit. The failure was the e-reader journey: the QA server took 68 seconds to hand the mail to the
+  loopback SMTP sink (its log shows 20:36:50 to 20:37:58), the fixture stall described below. Run alone right after,
+  on the same commit, it passed.
 
-Intermittent failures seen in earlier full runs on `df948480` and `f4e8d15f`, none reproduced on retry:
+Intermittent failures seen in full runs on `df948480`, `f4e8d15f` and `5710199f`, none reproduced on retry:
 
 - Three journeys failed once each because the QA server's request to a loopback fixture on the host stalled: the
   OpenID token exchange (19884, "outgoing request timed out after 10000ms"), the SMTP sink (19886, 36 seconds to
