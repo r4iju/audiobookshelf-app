@@ -38,6 +38,11 @@ class ServerAddress private constructor(val base: HttpUrl) {
         return builder.build()
     }
 
+    /** True when [url] is on this server's origin and inside its subpath, so credentials may be attached. */
+    fun contains(url: HttpUrl): Boolean =
+        url.scheme == base.scheme && url.host == base.host && url.port == base.port &&
+            url.pathSegments.size >= prefix.size && url.pathSegments.subList(0, prefix.size) == prefix
+
     override fun toString(): String = canonical
     override fun equals(other: Any?) = other is ServerAddress && other.canonical == canonical
     override fun hashCode() = canonical.hashCode()

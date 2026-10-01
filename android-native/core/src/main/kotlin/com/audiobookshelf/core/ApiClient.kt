@@ -1,5 +1,7 @@
 package com.audiobookshelf.core
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.serialization.KSerializer
@@ -20,7 +22,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 import java.security.cert.CertPathValidatorException
-import java.util.Base64
+import okio.ByteString.Companion.decodeBase64
 import javax.net.ssl.SSLHandshakeException
 import javax.net.ssl.SSLPeerUnverifiedException
 import kotlin.coroutines.resume
@@ -189,6 +191,7 @@ class ApiClient(
     }
 
     fun mediaUrl(path: String): HttpUrl = address.mediaUrl(path)
+    fun owns(url: HttpUrl): Boolean = address.contains(url)
     fun coverUrl(itemId: String, width: Int = 400): HttpUrl = address.url("api/items/$itemId/cover", listOf("width" to "$width", "format" to "jpeg"))
 
     private suspend fun <T> get(path: String, serializer: KSerializer<T>, query: List<Pair<String, String>> = emptyList()): T =
@@ -264,9 +267,9 @@ class ApiClient(
 
 internal suspend fun OkHttpClient.execute(request: Request): String = executeBytes(request).decodeToString()
 
-internal suspend fun OkHttpClient.executeBytes(request: Request): ByteArray {
+internal suspend fun OkHttpClient.executeBytes(request: Request): ByteArray = withContext(Dispatchers.IO) {
     val response = try { newCall(request).await() } catch (error: IOException) { throw classify(error) }
-    return response.use {
+    response.use {
         if (!it.isSuccessful) throw ApiError.Http(it.code, runCatching { it.body?.string()?.take(512) }.getOrNull())
         try { it.body?.bytes() ?: ByteArray(0) } catch (error: IOException) { throw classify(error) }
     }
@@ -292,7 +295,7 @@ suspend fun Call.await(): Response = suspendCancellableCoroutine { continuation 
 internal fun jwtExpiresSoon(token: String, nowSeconds: Long = System.currentTimeMillis() / 1000): Boolean {
     val parts = token.split('.')
     if (parts.size != 3) return false
-    val payload = runCatching { String(Base64.getUrlDecoder().decode(parts[1].padEnd((parts[1].length + 3) / 4 * 4, '='))) }.getOrNull() ?: return false
+    val payload = parts[1].decodeBase64()?.utf8() ?: return false
     val expiry = Regex("\"exp\"\\s*:\\s*([0-9]+)").find(payload)?.groupValues?.get(1)?.toLongOrNull() ?: return false
     return expiry < nowSeconds + 60
 }
