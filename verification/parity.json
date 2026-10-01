@@ -99,10 +99,14 @@
         "then": "Consistent type, spacing and action hierarchy; text and artwork remain readable"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Native SwiftUI preview covering browsing, details, player, settings, PDF reading, downloads and migration import, verified per workflow by the journeys cited in the rows below; root installed the signed Release preview on the paired iPhone and iPad after PR77 (6ac3f2ee, apple/Localization/HANDOFF.md). Installation is not acceptance; owner device acceptance of the design is not recorded."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "SwiftUI TV app: 20 remote-driven journeys and 12 TVAppTests on the tvOS 27 simulator (tvos/QA.md); signed Release of 829259be installed on Living Room TV, tvOS 18.6 (/tmp/abs-apple-final-tv-device.log, recorded in c4d4ea84). The physical checks in tvos/QA.md have not been performed."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -128,8 +132,12 @@
         "then": "Touch targets and back behavior follow platform conventions; audio survives navigation"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
-        "tv": []
+        "apple-mobile": [
+          "iPhone 17 iOS 27 simulator against the synthetic 2.30.0-fixture: production SwiftUI navigation driven by ConnectionJourney, SearchJourney, PlaybackJourney, ListeningControlsJourney and PresentationJourney (12/12 on the combined app after PR77, apple/Localization/HANDOFF.md). Not hardware or live-server acceptance."
+        ],
+        "tv": [
+          "Remote-only operation on the simulator is recorded under story-05 and story-55 (tvos/QA.md). Physical remote acceptance remains open."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -154,7 +162,9 @@
         "then": "Adaptive columns and readable detail/reader controls use the available space"
       },
       "replacementEvidence": {
-        "apple-mobile": []
+        "apple-mobile": [
+          "iPad simulator (Audiobookshelf Native iPad QA, iOS 27): library sidebar and flexible grid (apple/README.md). Passed on iPad: CollectionJourney 6/6 (APPLE-GROUPS.md), artwork and book completion 4/4 (APPLE-BOOK-PROGRESS.md), preferences/statistics/annual (APPLE-PREFERENCES.md), OfflineJourney focused case (APPLE-OFFLINE.md), RelatedAuthorSeriesJourney 3/4 then the BackButton test fix passed at a0f680e9 (/tmp/abs-related-root-ipad-back.log), ItemServerActionsJourney 4/4 with root wiring (/tmp/abs-root-item-actions-ipad.log, committed as 315183c1). PresentationJourney and the corrected RealtimeJourney were not run on iPad. Physical iPad and split-screen acceptance remain open."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -234,10 +244,14 @@
         "then": "Client contacts that server directly; no replacement backend is required"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Direct connection through the shared TVCore API with no proxy or new service: ConnectionJourney.testConnectSelectLibraryAndRestoreAccountAfterRelaunch (iOS 27 simulator against the synthetic 2.30.0-fixture). HTTPS connection from the physical iPhone and iPad to the live 2.30.0 server was confirmed after trusting the homelab CA (BASELINE.md); that is connection evidence only."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Direct connection through TVCore: CatalogJourney.testTrustedHTTPSServerAndLongMetadata (simulator). HTTPS from the physical TV to the live 2.30.0 server confirmed on 2026-10-01 (BASELINE.md); connection evidence only."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -264,7 +278,9 @@
         "then": "Credentials, content and queued progress remain isolated by connection"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "SavedConnectionsJourney 3/3 (two servers, two users on one server, per-connection library choice and unsent listening recovered on switch-back), passed in /tmp/realtime-qa/final.log; OpenIDJourney relaunch restore. iOS 27 simulator against the synthetic 2.30.0-fixture. Live multi-server acceptance remains open."
+        ],
         "android": [],
         "browser": []
       },
@@ -294,10 +310,14 @@
         "then": "Supported HTTP works; valid HTTPS verifies; untrusted HTTPS gives recovery without bypass"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ConnectionJourney.testQualifiedLANHTTPConnectsWithoutWeakeningHTTPSTrust: qualified .lan HTTP connects and an untrusted HTTPS certificate is rejected (apple/README.md). It needs the Studio dev.nginx.lan alias and failed only for that reason in the realtime lane environment (/tmp/realtime-qa/final.log, Connection 4/5). Live trusted HTTPS on devices confirmed (BASELINE.md); live LAN HTTP on a device not recorded."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Trusted HTTPS through a device-only CA: CatalogJourney.testTrustedHTTPSServerAndLongMetadata; TVCoreTests.testServerRejectsCredentialsAndNonHTTPAddresses. Local HTTP on the physical TV not recorded."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -325,10 +345,14 @@
         "then": "All API/media/auth requests retain the subpath"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "All Apple journeys connect to fixtures under the /abs subpath (apple/README.md); the realtime client keeps the reverse-proxy Socket.IO path with its trailing slash (APPLE-PODCAST-QUEUE.md, PodcastJourney 9/9). TVCoreTests.testServerURLPreservesReverseProxyPathAndEncodesQuery (shared core 63/63, /tmp/abs-root-item-actions-core.log). Live reverse-proxy workflows on devices beyond connection not recorded."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "CatalogJourney.testTrustedHTTPSServerAndLongMetadata uses a reverse-proxy path; TVCoreTests.testServerURLPreservesReverseProxyPathAndEncodesQuery (shared core 48/48 at 829259be, /tmp/abs-apple-combined-core.log)."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -356,10 +380,14 @@
         "then": "Valid session restores securely; rejection is explained; password is not persisted"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Password sign-in and Keychain restore after relaunch with genuine Keychain on an ad hoc signed simulator build: ConnectionJourney.testConnectSelectLibraryAndRestoreAccountAfterRelaunch (apple/README.md). Not hardware or live-server acceptance."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Contract only: TVCore credential and sign-in tests (shared core 48/48 at 829259be). Physical remote sign-in (tvos/QA.md check 1) not performed."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -386,7 +414,9 @@
         "then": "Correct account returns to app; cancellation leaves recoverable state intact"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "OpenIDJourney 4 cases: browser sign-in with PKCE and relaunch restore, cancellation keeps the saved account, invalid callback and changed authorization state rejected, against local browser fixtures modelled on the installed 2.30.0 source (apple/README.md). The live homelab uses local authentication, so live-provider acceptance is not tested."
+        ],
         "android": [],
         "browser": []
       },
@@ -416,10 +446,14 @@
         "then": "Modern refresh is coordinated and playback continues; legacy reauth is explicit when needed"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Contract only: production TVCore follows 401 + x-refresh-token and persists refreshed credentials in the aligned candidate gate (SERVER-COMPATIBILITY.md, verification/test_upgrade_gate.py). SavedConnectionsJourney.testLegacyAccountRefreshRetainsSelectedLibraryWithoutDuplicatingConnection. Renewal during active playback has no journey."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Contract only: TVCore refresh-token candidate in the compatibility gate (SERVER-COMPATIBILITY.md). Login expiry on the TV has no automated test (tvos/QA.md check 9 open)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -447,10 +481,14 @@
         "then": "Account and queued history survive; retry succeeds without forced sign-out"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "CatalogRecoveryJourney 4/4 (/tmp/realtime-qa/green-final.log), ConnectionJourney.testInvalidServerShowsRecoveryWithoutLeavingConnectionForm, PlaybackJourney.testMediaHTTPFailureShowsErrorAndCanBeReopened, OfflineJourney with the server unavailable (HTTP 503 in the simulator, not airplane mode; APPLE-OFFLINE.md). Not hardware or live-server acceptance."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "CatalogJourney.testCatalogFailureRecoversWithRetry; RecoveryJourney.testMediaFailureOffersRestartRatherThanSavingProgress (tvOS 27 simulator, tvos/QA.md). A single failing library among several is not tested."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -478,10 +516,14 @@
         "then": "User reaches sign-in without discarding recoverable progress"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Partial: TVCoreTests.testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop; imported archive accounts arrive as reauthenticationRequired (APPLE-MIGRATION.md); pending listening stays with its account (SavedConnectionsJourney). No journey revokes a token server-side."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Contract only: TVCoreTests.testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop. The fixture cannot revoke a token; tvos/QA.md check 9 open."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -512,10 +554,14 @@
         "then": "Correct media type and items appear; stale results do not leak between libraries"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ConnectionJourney selects a library and restores it; PreferencesJourney.testChosenCatalogLayoutSurvivesRelaunchAndLibrarySwitch; SavedConnectionsJourney keeps each connection's library choice. iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "CatalogJourney opens the library and loads its pages (testLibraryLoadsNextPageAsFocusMovesDown). Browsing each real library on the TV (tvos/QA.md check 3) not performed."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -546,10 +592,14 @@
         "then": "Correct item/episode and position are prominent and resume accurately"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ConnectionJourney.testContinueListeningIncludesBookOutsideFirstCatalogPage; RealtimeJourney.testProgressFromAnotherClientUpdatesTheOpenShelfAndBookDetails (5/5 on the corrected wiring, /tmp/realtime-qa/green-final.log); finished books leave the shelf (APPLE-BOOK-PROGRESS.md). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "CatalogJourney.testContinueListeningOpensDetailsAndBackRestoresFocus (tvOS 27 simulator, tvos/QA.md)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -580,10 +630,14 @@
         "then": "Artwork fallback, labels and primary action remain readable"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PreferencesJourney.testChosenCatalogLayoutSurvivesRelaunchAndLibrarySwitch (list/cover); ArtworkJourney and the aligned grid journeys on iPhone and iPad (APPLE-BOOK-PROGRESS.md, evidence/apple-catalog-aligned-iphone.png); CatalogRecoveryJourney.testLongMetadataAndMissingArtworkRemainNavigableForReadOnlyAccount. Physical comfort review not recorded."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "CatalogJourney.testTrustedHTTPSServerAndLongMetadata (very long title, missing cover placeholder); screenshots in tvos/evidence. Across-room readability (tvos/QA.md check 2) not performed."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -614,10 +668,14 @@
         "then": "61 unique items become reachable without full-library initial load or duplicates"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ConnectionJourney.testBrowsePaginatedBooksAndExpandedMetadata (61 titles, page requested only on scroll), CatalogRecoveryJourney.testFailedNextPagePreservesBooksAndRetries, CatalogRealtimeTests pagination under realtime changes (NativeTests 50/50 at the integrated wiring, /tmp/abs-apple-final-wired-stores.log). A large real library on a device is not tested."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "CatalogJourney.testLibraryLoadsNextPageAsFocusMovesDown: the server saw pages 0 and 1, with no Load more button (tvos/QA.md)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -648,10 +706,14 @@
         "then": "Matching supported entity types navigate to their correct content"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "SearchJourney 3/3 (/tmp/realtime-qa/green-final.log): a book beyond the first page, an episode-only result that plays the matching episode; author and series results in RelatedAuthorSeriesJourney 4/4 at 0aa6b83e (/tmp/abs-related-root-final-ui.log). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "CatalogJourney.testServerSearchFindsTitlesOutsideLoadedPage; RelatedJourney author and series search; PodcastJourney.testPodcastResultTileShowsItsEpisodeProgress (tvos/QA.md)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -681,7 +743,9 @@
         "then": "Ordering/filter semantics and saved preference match the selected values"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "SearchJourney.testSortingAndGenreFilteringUseTheServerAcrossPagination; PreferencesJourney.testFinishedBookLeavesNotFinishedFilterWhenReturningToCatalog; CatalogRealtimeTests.testRemoteProgressReloadsAVisibleProgressFilteredShelf. iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": []
       },
@@ -715,7 +779,8 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "Integrated native author metadata/image, all title pages, series order/metadata, detail links and retry: RelatedAuthorSeriesJourney 4/4 pass at 0aa6b83e on Root Related QA; docs/modernization/APPLE-RELATED-AUTHOR-SERIES.md. Physical/live-server acceptance remains open."
+          "Integrated native author metadata/image, all title pages, series order/metadata, detail links and retry: RelatedAuthorSeriesJourney 4/4 pass at 0aa6b83e on Root Related QA; docs/modernization/APPLE-RELATED-AUTHOR-SERIES.md. Physical/live-server acceptance remains open.",
+          "iPad simulator (Root Related iPad QA, 13-inch, iOS 27): 3/4, then the detail-links case passed after the test selected the real BackButton at a0f680e9 (/tmp/abs-related-root-ipad-ui.log, /tmp/abs-related-root-ipad-back.log; iPhone again in /tmp/abs-related-root-phone-back.log). No app change was needed. Physical acceptance remains open."
         ],
         "android": [],
         "browser": [],
@@ -751,7 +816,9 @@
         "then": "Permitted changes persist; forbidden actions are absent or fail clearly without fake success"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "CollectionJourney 6/6 on iPhone and iPad simulators on October 1 (APPLE-GROUPS.md): order, playlist create/reorder/remove/delete through relaunch, selected podcast episode, downloaded member playback without the server. Realtime playlist edits and deletion (RealtimeJourney). Open: permission denial, partial membership failure, collection editing, podcast playlist membership editing; testCreateReorderRemoveAndDeletePlaylistThroughRelaunch failed 3 of 4 runs on pre-correction realtime wiring with no established cause (docs/handoff/APPLE-REALTIME.md on fork/apple-realtime)."
+        ],
         "android": [],
         "browser": []
       },
@@ -784,10 +851,14 @@
         "then": "Required metadata and accurate progress are visible with a clear play/resume action"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ConnectionJourney.testBrowsePaginatedBooksAndExpandedMetadata (details and chapters); RelatedAuthorSeriesJourney.testBookDetailsLeadToItsSeriesAndAuthor; details reload on other clients' progress and renames (RealtimeJourney). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "CatalogJourney.testContinueListeningOpensDetailsAndBackRestoresFocus (narrator and server progress); RelatedJourney details links (tvos/QA.md)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -816,10 +887,14 @@
         "then": "Actual audio and visible state agree; only one session is active"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PlaybackJourney 8 cases with real WAV media and server progress observations, including pause during session preparation and replacement (apple/README.md). iOS 27 simulator against the synthetic 2.30.0-fixture. Physical audio output not accepted."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "PlaybackJourney.testResumeShowsChapterAndTotalProgressAndRemoteToggles: remote Play/Pause pauses and resumes the same session (simulator)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -848,10 +923,14 @@
         "then": "Media position changes by the selected interval and clamps to valid bounds"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ListeningControlsJourney.testConfiguredSkipIntervalsSeekAcrossFilesAndPersist; PlaybackJourney.testLatestSeekWinsWhileNextFileIsPreparing and testSeekWhileClosingDoesNotJumpOrResumeOldItem; ChapterMediaControlsTests system scrub (/tmp/abs-chapter-controls-final.log). Not hardware or live-server acceptance."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Chapter-list seek: PlaybackJourney.testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying. Rapid skips across file boundaries have no automated test (tvos/QA.md check 4)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -880,10 +959,14 @@
         "then": "Continuous playback and total-book position remain correct across both files"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PlaybackJourney.testRealAudioCrossesFilesAndContinuesAfterLeavingDetails; OfflineJourney cross-file seek on downloaded audio (APPLE-OFFLINE.md). Simulator with synthetic two-file WAV; real codecs and rapid physical skips not tested."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "PlaybackJourney.testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying and testNaturalEndShowsFinished on a multi-file synthetic book. Real codecs on the TV (check 4) not performed."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -912,10 +995,14 @@
         "then": "Playback starts at eight seconds; chapter and whole-book progress differ correctly"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ListeningControlsJourney.testChapterSeekAndSpeedSurviveSessionRestoration; PresentationJourney.testChapterTrackFollowsTheChapterWithTheTotalTrackAlongside; ChapterMediaControlsTests 3/3 (/tmp/abs-chapter-controls-final.log). Not hardware or live-server acceptance."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "PlaybackJourney.testResumeShowsChapterAndTotalProgressAndRemoteToggles (chapter title, number, total progress); chapter list seek (tvos/QA.md)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -944,10 +1031,14 @@
         "then": "Actual rate changes and the selected supported preference is retained"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ListeningControlsJourney observes actually faster playback and restored speed (apple/README.md, testChapterSeekAndSpeedSurviveSessionRestoration); PresentationJourney.testElapsedTimeScalesWithPlaybackSpeedUntilTurnedOff. iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "PlaybackJourney.testSpeedSelectionAndExplicitStopClosesTheSession (simulator)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -975,7 +1066,9 @@
         "then": "Permitted operations persist and jumping reaches the saved media position"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ListeningControlsJourney.testBookmarkCreateEditJumpAndDeletePersistOnServer (through relaunch) and testDeletingFractionalBookmarkPreservesItsIntegerNeighbor. iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": []
       },
@@ -1005,7 +1098,9 @@
         "then": "Audio stops at the selected deadline/boundary without requiring the timer screen"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "ListeningControlsJourney: testShortSleepTimerActuallyStopsAndPersistsPositionAfterLeavingPlayer, testTimerAdjustmentChangesActualStopAndResetKeepsOriginalDuration, testSeekingPastChapterSleepBoundaryStopsAudioInsteadOfLeavingTimerStranded. Background and relaunch timer behaviour on a device remain open (#9/#11)."
+        ],
         "android": [],
         "browser": []
       },
@@ -1035,7 +1130,9 @@
         "then": "Fade, feedback, rewind and reset behavior matches the selected setting"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Fade: ListeningControlsJourney.testDisablingAnActiveSleepFadeRestoresActualAudioVolume. Resume rewind: testResumeRewindsAfterAPauseAndCanBeDisabledPersistently. Auto-sleep window and shake reset are Android-only in the baseline UI (apple/README.md). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": []
       },
@@ -1066,10 +1163,14 @@
         "then": "Actual audio continues and the same position/session remains authoritative"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Navigation only: audio continues after leaving details and the player (PlaybackJourney.testRealAudioCrossesFilesAndContinuesAfterLeavingDetails, the short sleep timer journey). Lock-screen and background playback on a device are not tested."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Leaving Now Playing for Home keeps playing (PlaybackJourney.testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying). TV/Home button, screen saver and Control Center (check 8) not performed."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1098,10 +1199,14 @@
         "then": "System metadata/state and actual playback agree without duplicated sessions"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Unit only: ChapterMediaControlsTests call the production system-scrub method and check Now Playing chapter metadata (APPLE-PLAYER-TRACKS.md). No physical lock-screen, headset or Bluetooth command was exercised."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "Remote Play/Pause in PlaybackJourney (simulator). Siri Remote on other tabs, Control Center and AirPlay/HomePod (check 5) not performed."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1214,10 +1319,14 @@
         "then": "Correct item/episode position and completion state synchronize"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "DurableProgressJourney 4/4 (newer remote progress kept, a new client resumes it; APPLE-OFFLINE.md); RealtimeJourney progress from another client; PausedRealtimeJourney 2/2 on the integrated app at 7404b027 with total-elapsed assertions (/tmp/abs-root-paused-realtime-green-total.log), and RED with root event forwarding removed (/tmp/abs-root-paused-realtime-mutation.log); book completion through relaunch (APPLE-BOOK-PROGRESS.md). Physical cross-device and live-server sync remain open."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "RecoveryJourney relaunch shows the new server position; PodcastJourney.testMarkEpisodeFinishedUpdatesOnlyThatEpisode; CatalogJourney.testProgressFilterDropsATitleMarkedFinishedOnReturn (tvos/QA.md). The TV has no realtime consumer; cross-device check 7 not performed."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1246,10 +1355,14 @@
         "then": "Reports survive and retry without lost history, duplicate time or stale overwrite"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "DurableProgressJourney.testUnsentListeningSurvivesTerminationAndRestoresServerProgress and testRetryAfterLostAcknowledgmentDoesNotDuplicateListening; restart-recovery journeys pass on iPhone and iPad simulators (apple/README.md); journal Core tests with real files. Process termination in the simulator; physical device and real-server multi-device acceptance remain open."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "RecoveryJourney.testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch (sent once, nothing on a second relaunch); bounded UserDefaults journal tests (APPLE-TV-LISTENING-STORAGE.md). Hardware storage caveat in tvos/HANDOFF.md; check 7 not performed."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1277,10 +1390,14 @@
         "then": "Episode identity, progress and permitted download behavior remain first-class"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PodcastJourney 9/9 on iPhone, the three failure/relaunch/retry cases on iPad (APPLE-PODCAST-QUEUE.md): episode order and filters, independent episode progress through relaunch, server downloads; downloaded episode playback (CollectionJourney). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "PodcastJourney 3 cases: episode order and playback recorded for the episode only, mark finished, search tile progress (tvos/QA.md). TV downloads are not required by the spec."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1307,7 +1424,9 @@
         "then": "Authorized actions work; ordinary account cannot gain administration capability"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PodcastJourney: testAdminDiscoversAPodcastByNameAndCreatesTheSelectedFeed, testPodcastCreationRequiresAdminAndUsesTheSelectedServerFolder, testAdminCanSelectFeedEpisodesAndQueueThemOnTheExistingServer. Item RSS feed open/view/close by role: ItemServerActionsJourney 4/4 on iPhone and iPad with root wiring (/tmp/abs-root-item-actions-ui.log, /tmp/abs-root-item-actions-phone-repeat.log, /tmp/abs-root-item-actions-ipad.log; 315183c1) and Core 63/63. Synthetic fixture only; no real feed was opened on the owner's server."
+        ],
         "android": [],
         "browser": []
       },
@@ -1337,7 +1456,9 @@
         "then": "Actual local media plays without a server connection"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "OfflineJourney 3 cases on iPhone (download, server unavailable, cross-file seek, relaunch, publication on reconnect; newer remote rewind adopted) and the focused case on iPad (APPLE-OFFLINE.md); downloaded collection/playlist members play without server access (CollectionJourney). Server unavailability is HTTP 503, not airplane mode."
+        ],
         "android": []
       },
       "gates": {
@@ -1366,7 +1487,9 @@
         "then": "Queue state and durable files are correct; no completed content is corrupted"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Partial: OfflineJourney.testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload (retry survives relaunch); Downloads screen with progress, cancel and retry (apple/README.md). Background transfer interruption, device restart and insufficient storage are not tested."
+        ],
         "android": []
       },
       "gates": {
@@ -1395,7 +1518,9 @@
         "then": "Files and latest local position remain available"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "OfflineJourney relaunch after simulator process termination keeps downloaded audio and progress (APPLE-OFFLINE.md). A device restart is not tested."
+        ],
         "android": []
       },
       "gates": {
@@ -1424,7 +1549,9 @@
         "then": "Only allowed transfers occur; prompts/denials match saved setting"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PreferencesJourney.testSeparateStreamingAndDownloadNetworkChoicesPersist: an 11-journey phone selection passed; after the final startup corrections three iPad journeys and a two-case phone selection passed (APPLE-PREFERENCES.md). Actual radio switching and metered transfers are not tested."
+        ],
         "android": []
       },
       "gates": {
@@ -1453,7 +1580,9 @@
         "then": "Files remain usable through supported workflows; unsupported iOS folder selection is not invented"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Not applicable as a folder workflow: the baseline iOS plugin reports local folder selection unavailable (BASELINE.md). The iOS downloaded/local opening workflow is covered by Downloads and OfflineJourney (story-41)."
+        ],
         "android": []
       },
       "gates": {
@@ -1483,7 +1612,9 @@
         "then": "Actual content opens through the appropriate supported mode, including format-specific failures"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PDF (required): ReaderJourney PDF cases, the ten-scenario iPhone run (apple/README.md PDF reading). EPUB is in the preview with simulator evidence, but remaining EPUB acceptance is deferred to after Phase 2 (#65, scopeAmendments). MOBI, AZW3, CBZ and CBR are not implemented natively and are deferred (#65); migration keeps their files. Send ebook to device: ItemServerActionsJourney 4/4 on iPhone and iPad (synthetic, no e-mail sent)."
+        ],
         "android": [],
         "browser": []
       },
@@ -1514,7 +1645,9 @@
         "then": "Rendered content visibly changes and preferences persist"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PDF: display preference retained while audio plays (ReaderJourney.testPDFReadingKeepsAudioPlayingAndRetainsDisplayPreference), rotation through offline relaunch. EPUB typography settings are deferred (#65). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": []
       },
@@ -1545,7 +1678,9 @@
         "then": "The same passage/page resumes, not merely an equivalent-looking stored field"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PDF: ReaderJourney newer-page cases (in-flight, lost response, lost acknowledgment then rejected retry), offline relaunch, newer remote page after reconnection (apple/README.md). Upgrade path: migration core keeps page, CFI and opaque locations from synthetic legacy data (APPLE-MIGRATION.md). Owner reading data and physical devices not tested."
+        ],
         "android": [],
         "browser": []
       },
@@ -1576,7 +1711,9 @@
         "then": "Reader and player coexist without lost location, duplicated audio or conflicting controls"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PDF: ReaderJourney.testPDFReadingKeepsAudioPlayingAndRetainsDisplayPreference and testReadingWaitsForPendingAudioAndPreservesBothPositionsOnReconnect. EPUB combined reading is deferred (#65). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
         "android": [],
         "browser": []
       },
@@ -1607,7 +1744,9 @@
         "then": "Settings persist and cause their documented platform behavior"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Synthetic legacy data only: adoption NativeTests map legacy player, network, display and language settings where the native key is unset (APPLE-MIGRATION-ADOPTION.md, 31 tests; combined NativeTests 50/50 at the integrated wiring, /tmp/abs-apple-final-wired-stores.log). Theme/haptic persistence: PreferencesJourney.testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch. The owner's real legacy settings were not tested; iOS has no baseline orientation lock (APPLE-PRESENTATION.md)."
+        ],
         "android": [],
         "browser": []
       },
@@ -1638,7 +1777,9 @@
         "then": "Displayed totals/history and persisted server state reflect actual activity/actions"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PreferencesJourney statistics, Year in review and Buddhist-locale calendar journeys on iPhone and iPad (APPLE-PREFERENCES.md); YearExport 28 tests on simulator (apple/Localization/HANDOFF.md); book finished/unfinished management (APPLE-BOOK-PROGRESS.md). Physical image sharing and live annual data not tested."
+        ],
         "android": [],
         "browser": []
       },
@@ -1670,7 +1811,9 @@
         "then": "Actionable failures are visible; passwords/tokens/private keys are absent"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PresentationJourney diagnostics journeys (connection failure without credentials, media failure, listening waiting to sync) and the redaction package tests (Diagnostics 21 on the combined app, apple/Localization/HANDOFF.md; APPLE-PRESENTATION.md). Not hardware or live-server acceptance."
+        ],
         "android": [],
         "browser": [],
         "tv": []
@@ -1703,7 +1846,9 @@
         "then": "Labels/order/focus/contrast remain usable and motion respects preferences"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Partial: PresentationJourney.testAccessibilityTextSizeKeepsPlayerControlsOnScreen; reduced motion relies on system transitions with no journey; no VoiceOver walkthrough or contrast check recorded (APPLE-PRESENTATION.md)."
+        ],
         "android": [],
         "browser": [],
         "tv": []
@@ -1736,7 +1881,9 @@
         "then": "Translations/layout are retained; controls do not silently become English-only or truncate essentials"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "PresentationJourney language journeys: saved language through relaunch, device language, Arabic right-to-left mirroring (APPLE-PRESENTATION.md). All 30 legacy languages selectable but only 18-27% of native texts translated, the rest English (apple/Localization/COVERAGE.md); playback alerts stay English."
+        ],
         "android": [],
         "browser": [],
         "tv": []
@@ -1847,7 +1994,9 @@
         "then": "Existing data remains usable without mandatory redownload or silent resets"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Synthetic data only: migration core and Realm adapter suites (core 39/39, Realm export 15/15) and adoption NativeTests (APPLE-MIGRATION.md, APPLE-MIGRATION-ADOPTION.md). Owner/private data NOT tested. The in-place route (legacy bundle identifier, team and Keychain group), a Realm written by an actual legacy build, and device rollback are not built or tested."
+        ],
         "android": []
       },
       "gates": {
@@ -1875,7 +2024,9 @@
         "then": "Import/reauthentication works where allowed; inaccessible data is explained honestly"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Export route on simulators with synthetic data: the legacy app export journey saved and re-imported an archive on iOS 26 and iOS 27 (APPLE-MIGRATION.md, 627c4dbf; merged in PR76 e875498d); native import with reauthenticationRequired accounts integrated in PR77 (6ac3f2ee). Owner/private data NOT tested; device Files save and import not tested."
+        ],
         "android": []
       },
       "gates": {
@@ -1904,7 +2055,9 @@
         "then": "Legacy remains usable; cutover happens only after acceptance and preservation"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "Separate preview identity com.forkzed.audiobookshelf.native.preview with its own Keychain group, so the working legacy app stays installed (apple/README.md); signed preview installed alongside it on the paired iPhone and iPad. Side-by-side use on a device and rollback are not tested."
+        ],
         "android": [],
         "browser": []
       },
@@ -2034,10 +2187,14 @@
         "then": "Every applicable baseline row has passing observable evidence or replacement is blocked"
       },
       "replacementEvidence": {
-        "apple-mobile": [],
+        "apple-mobile": [
+          "This matrix, docs/modernization/APPLE-*.md, tvos/QA.md and the local apple/scripts/verify-*.sh commands; reconciled at 8c1e94a5 with open items in docs/modernization/APPLE-PARITY-GAPS.md."
+        ],
         "android": [],
         "browser": [],
-        "tv": []
+        "tv": [
+          "tvos/QA.md with the exact simulator, fixture, journeys and the open physical checklist; tvos/scripts/verify-ui.sh."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -2056,7 +2213,11 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "apple-mobile": [
+          "Deferred until after Phase 2 (#65, scopeAmendments 2026-10-01). Preview EPUB has simulator evidence (apple/README.md EPUB reading) that does not count toward readiness; hardware volume navigation is untested."
+        ]
+      },
       "verification": {
         "given": "EPUB rendering, CFI location, typography, navigation and combined audio with an independently identified passage/page",
         "when": "Open representative real documents, change supported settings, restart and resume",
@@ -2080,7 +2241,11 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "apple-mobile": [
+          "Deferred until after Phase 2 (#65). Not implemented natively; migration keeps files and opaque locations (synthetic core tests, APPLE-MIGRATION.md)."
+        ]
+      },
       "verification": {
         "given": "MOBI and AZW3 rendering and supported locations/opening modes with an independently identified passage/page",
         "when": "Open representative real documents, change supported settings, restart and resume",
@@ -2103,7 +2268,11 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "apple-mobile": [
+          "ReaderJourney PDF cases, ten-scenario iPhone run: invalid file, 120-page document, authored rotation, offline relaunch, newer remote page, supplementary PDF, active audio, delayed and lost responses (apple/README.md PDF reading). iOS 27 simulator against the synthetic 2.30.0-fixture. Physical device, real annotation links and multi-device live-server acceptance remain open."
+        ]
+      },
       "verification": {
         "given": "PDF pages, rotation, links and supported location behavior with an independently identified passage/page",
         "when": "Open representative real documents, change supported settings, restart and resume",
@@ -2126,7 +2295,11 @@
         "android",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "apple-mobile": [
+          "Deferred until after Phase 2 (#65). Not implemented natively; migration keeps files and page locations (synthetic core tests, APPLE-MIGRATION.md)."
+        ]
+      },
       "verification": {
         "given": "CBZ and CBR comic extraction, images and page navigation with an independently identified passage/page",
         "when": "Open representative real documents, change supported settings, restart and resume",
@@ -2170,7 +2343,11 @@
         "apple-mobile",
         "android"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "apple-mobile": [
+          "Rewind and fade: ListeningControlsJourney.testResumeRewindsAfterAPauseAndCanBeDisabledPersistently and testDisablingAnActiveSleepFadeRestoresActualAudioVolume. Auto-sleep window, shake sensitivity, chime and reset feedback are Android-only in the baseline (apple/README.md). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ]
+      },
       "verification": {
         "given": "Playing audio with each baseline platform-specific sleep option",
         "when": "Exercise auto-window, reset, rewind/fade and supported feedback/chime",
@@ -2195,7 +2372,8 @@
       ],
       "replacementEvidence": {
         "apple-mobile": [
-          "Simulator and fixture evidence only: apple/scripts/verify-realtime.sh runs NativeJourneyTests/RealtimeJourney (progress, item, playlist, reconnection and account-switch journeys against Socket.IO 4.7.4) and tvos/Core RealtimeChangeTests; docs/modernization/APPLE-REALTIME.md. Physical-device and live-server gates remain open."
+          "Simulator and fixture evidence only: apple/scripts/verify-realtime.sh runs NativeJourneyTests/RealtimeJourney (progress, item, playlist, reconnection and account-switch journeys against Socket.IO 4.7.4) and tvos/Core RealtimeChangeTests; docs/modernization/APPLE-REALTIME.md. Physical-device and live-server gates remain open.",
+          "Root integration, committed as 7404b027: NativeTests 50/50 including the 7 CatalogRealtimeTests (/tmp/abs-apple-final-wired-stores.log); PausedRealtimeJourney 2/2 (/tmp/abs-root-paused-realtime-green-total.log) and RED with event forwarding removed (/tmp/abs-root-paused-realtime-mutation.log). RealtimeJourney 5/5 on the corrected wiring in the realtime lane (source as in 0689fb20 and fork/apple-realtime 4d22c8f1, /tmp/realtime-qa/green-final.log); iPad realtime not rerun after correction."
         ]
       },
       "verification": {
@@ -2225,6 +2403,9 @@
       "replacementEvidence": {
         "tv": [
           "Local TV core and app tests, remote-driven simulator journeys and signed Release build: tvos/scripts/verify-ui.sh, tvos/scripts/deploy.sh; tvos/QA.md."
+        ],
+        "apple-mobile": [
+          "apple/scripts/verify-ui.sh and apple/scripts/deploy.sh --build-only on the Studio: local signing with strict app and IPA signature verification (apple/README.md). No hosted compute. iOS 14 is typecheck-only (Xcode 27 build-only iOS 15 override)."
         ]
       },
       "verification": {
@@ -2253,6 +2434,9 @@
       "replacementEvidence": {
         "tv": [
           "Signed Release directly installed on paired Living Room TV, tvOS 18.6: tvos/scripts/deploy.sh --no-launch; tvos/QA.md. Installation does not establish physical acceptance."
+        ],
+        "apple-mobile": [
+          "Signed internal preview installed directly on the paired iPhone and iPad with apple/scripts/deploy.sh (apple/README.md; combined PR77 build, apple/Localization/HANDOFF.md). Installation does not establish physical acceptance."
         ]
       },
       "verification": {
@@ -2268,7 +2452,7 @@
     {
       "id": "sequential-delivery",
       "story": null,
-      "requirement": "Apple mobile and TV acceptance gates Android; Android acceptance gates Next.js",
+      "requirement": "Apple, Android and Next.js are implemented in parallel in isolated worktrees (owner approval, October 1, 2026); each platform independently passes its own acceptance before replacing a working client",
       "baselineSources": [
         "tvos/README.md"
       ],
@@ -2280,9 +2464,9 @@
       ],
       "replacementEvidence": {},
       "verification": {
-        "given": "Ticket graph and platform acceptance results",
-        "when": "Choose the next implementation frontier",
-        "then": "Apple precedes Android, which precedes Next.js; no incomplete platform gate is bypassed"
+        "given": "Isolated platform worktrees and each platform's acceptance, migration and server compatibility results",
+        "when": "A platform is proposed to replace its working client",
+        "then": "It replaces that client only after its own applicable acceptance passes; another platform's progress does not substitute for it, and the browser client is replaced only after Phase 2 acceptance"
       },
       "gates": {
         "permissions": "Apply platform/account/endpoint gates from the relevant baseline capability.",
@@ -2303,7 +2487,14 @@
         "tv",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "apple-mobile": [
+          "Shared production TVCore in the local compatibility matrix: baseline, aligned refresh-token candidate and blocked incompatible candidates (SERVER-COMPATIBILITY.md, verification/test_upgrade_gate.py). The iPhone/iPad journeys are not yet part of a candidate-server run."
+        ],
+        "tv": [
+          "Production TVCore runs in the local compatibility matrix (SERVER-COMPATIBILITY.md); the TV journeys are not yet part of a candidate-server run."
+        ]
+      },
       "verification": {
         "given": "Supported baseline and a candidate changing an observed contract",
         "when": "Run every completed client locally and align affected behavior",
