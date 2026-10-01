@@ -85,11 +85,12 @@ import Foundation
             document = saved
             return
         }
-        // Set aside rather than discarded, and every earlier write counts as unknown.
+        // Set aside rather than discarded, and every earlier write counts as unknown. Copied, not moved:
+        // until the fresh record replaces it, the unreadable one stays in place for the next launch.
         let now = Self.now
         let aside = file.deletingLastPathComponent().appendingPathComponent("publications-unreadable-\(Int(now)).json")
         do {
-            try FileManager.default.moveItem(at: file, to: aside)
+            try FileManager.default.copyItem(at: file, to: aside)
             let fresh = Document(version: 1, writes: [], unreadableBefore: now, restarts: [:])
             try Self.write(fresh, to: file)
             document = fresh
