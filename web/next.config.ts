@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
 
@@ -5,12 +6,14 @@ import type { NextConfig } from "next";
 // Audiobookshelf server). Next.js only supports a build-time basePath, so the Docker image takes it as a build arg.
 const basePath = process.env.ABS_WEB_BASE_PATH?.replace(/\/+$/, "") || "";
 
+const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
+
 const config: NextConfig = {
   basePath,
   output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
-  env: { NEXT_PUBLIC_BASE_PATH: basePath },
+  env: { NEXT_PUBLIC_BASE_PATH: basePath, NEXT_PUBLIC_CLIENT_VERSION: version },
   // The repository root has the legacy app's lockfile; this package is its own root.
   turbopack: { root: fileURLToPath(new URL(".", import.meta.url)) },
   outputFileTracingRoot: fileURLToPath(new URL(".", import.meta.url)),

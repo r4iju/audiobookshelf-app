@@ -124,7 +124,10 @@ export const webStrings = {
   WebServerVersion: "Server version {0}",
   WebClientVersion: "Browser client {0}",
   WebCopyDiagnostics: "Copy diagnostics",
+  WebAutoRewindHelp:
+    "Otherwise playback resumes a little earlier after a pause: 3 seconds after 10 seconds, up to 30 seconds after half an hour.",
   WebCopied: "Copied",
+  WebCopyFailed: "This browser did not allow copying. Select the text above to copy it.",
   WebNoPlaylists: "No playlists yet",
   WebCreatePlaylist: "Create playlist",
   WebPlaylistName: "Playlist name",

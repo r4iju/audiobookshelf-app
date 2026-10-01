@@ -44,14 +44,11 @@ export const settingsSchema = z.object({
   jumpForwardTime: jump.catch(10),
   jumpBackwardsTime: jump.catch(10),
   playbackRate: z.number().min(0.5).max(10).catch(1),
-  /** Milliseconds; 0 means end of chapter, as in the legacy sleepTimerLength setting. */
-  sleepTimerLength: z.number().min(0).catch(900_000),
   disableAutoRewind: z.boolean().catch(false),
+  allowSeekingOnMediaControls: z.boolean().catch(true),
   disableSleepTimerFadeOut: z.boolean().catch(false),
   useChapterTrack: z.boolean().catch(false),
-  useTotalTrack: z.boolean().catch(true),
   scaleElapsedTimeBySpeed: z.boolean().catch(true),
-  bookshelfView: z.enum(["grid", "list"]).catch("grid"),
   collapseSeries: z.boolean().catch(false),
   podcastEpisodesOrderBy: z
     .enum(["publishedAt", "title", "season", "episode", "filename"])

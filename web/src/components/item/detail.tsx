@@ -16,6 +16,7 @@ import type { LibraryItem } from "@/lib/abs/schemas";
 import { usePlayer, usePlayerStore } from "@/lib/player/store";
 import { useAbs } from "@/lib/session/store";
 import { htmlToText } from "@/lib/text";
+import { DownloadButton } from "./download";
 import { EpisodeList } from "./episodes";
 import { playerMediaFor } from "./play-media";
 import { ProgressControls, ProgressSummary, remainingTime } from "./progress-controls";
@@ -31,7 +32,8 @@ function ItemView({ item }: { item: LibraryItem }) {
   const { library } = useLibrary(item.libraryId);
   const progress = useItemProgress().data?.get(item.id);
   const player = usePlayer();
-  const canUpdate = can(useMe().data, "update");
+  const me = useMe().data;
+  const canUpdate = can(me, "update");
   const [showAll, setShowAll] = useState(false);
   const [adding, setAdding] = useState<"playlist" | "collection" | null>(null);
   const isBook = item.mediaType === "book";
@@ -159,6 +161,7 @@ function ItemView({ item }: { item: LibraryItem }) {
                 {t("WebAddToCollection")}
               </Button>
             ) : null}
+            {can(me, "download") ? <DownloadButton itemId={item.id} /> : null}
           </div>
 
           {description ? (

@@ -138,8 +138,13 @@ export function AudioEngine() {
       ["pause", () => store().pause()],
       ["seekbackward", (details) => store().jump(-(details.seekOffset ?? settings.jumpBackwardsTime))],
       ["seekforward", (details) => store().jump(details.seekOffset ?? settings.jumpForwardTime)],
-      ["seekto", (details) => details.seekTime !== undefined && store().seek(details.seekTime)],
     ];
+    if (settings.allowSeekingOnMediaControls) {
+      handlers.push([
+        "seekto",
+        (details) => details.seekTime !== undefined && store().seek(details.seekTime),
+      ]);
+    }
     for (const [action, handler] of handlers) {
       try {
         navigator.mediaSession.setActionHandler(action, handler);
@@ -152,7 +157,7 @@ export function AudioEngine() {
         } catch {}
       }
     };
-  }, [media, settings.jumpBackwardsTime, settings.jumpForwardTime]);
+  }, [media, settings.jumpBackwardsTime, settings.jumpForwardTime, settings.allowSeekingOnMediaControls]);
 
   // External system: page lifecycle; listening so far is recorded before the tab is hidden or closed.
   useEffect(() => {

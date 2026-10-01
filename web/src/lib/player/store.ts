@@ -4,8 +4,10 @@ import { type AbsClient, AbsError } from "@/lib/abs/client";
 import { chapterSchema } from "@/lib/abs/schemas";
 import { createListeningReport, type ListeningReport, type ReportIdentity } from "@/lib/progress/outbox";
 import { outboxFor } from "@/lib/progress/sync";
+import { useSettingsStore } from "@/lib/settings/store";
 import { readStored, removeStored, writeStored } from "@/lib/storage/local";
 import { closePlayback, openPlayback } from "./api";
+import { resumeRewind } from "./rewind";
 import { chapterIndexAt } from "./timeline";
 
 export const playerMediaSchema = z.object({
@@ -73,6 +75,8 @@ interface PlayerStore {
   connectionId: string | null;
   client: AbsClient | null;
   listening: Listening | null;
+  /** When playback last paused without a new place being chosen, so resuming can step back as the native apps do. */
+  pausedAt: number | null;
   attach: (client: AbsClient) => void;
   detach: () => void;
   play: (request: PlayRequest) => Promise<void>;
@@ -175,6 +179,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
         seekTo: { time: startTime ?? 0 },
       },
       sleep: { kind: "off" },
+      pausedAt: null,
     });
     try {
       const opened = await openPlayback(client, media.itemId, media.episodeId);
@@ -238,6 +243,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
     connectionId: null,
     client: null,
     listening: null,
+    pausedAt: null,
     attach: (client) => {
       if (get().connectionId === client.connection.id) {
         set({ client });
@@ -286,12 +292,25 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
       const { player } = get();
       if (player.phase !== "active") return;
       if (!player.source) return start(player.media, player.currentTime);
+      const { pausedAt } = get();
+      set({ pausedAt: null });
+      const rewind = pausedAt === null ? 0 : resumeRewind(Date.now() - pausedAt);
+      if (
+        rewind > 0 &&
+        player.status === "paused" &&
+        !useSettingsStore.getState().settings.disableAutoRewind
+      ) {
+        const chapter = player.media.chapters[chapterIndexAt(player.media.chapters, player.currentTime)];
+        get().seek(Math.max(chapter?.start ?? 0, player.currentTime - rewind));
+      }
       update(() => ({ status: "playing", error: null }));
     },
     pause: () => {
+      if (get().player.phase === "active") set({ pausedAt: Date.now() });
       update(() => ({ status: "paused" }));
     },
     seek: (time) => {
+      set({ pausedAt: null });
       update((player) => {
         const target = Math.max(0, Math.min(time, player.media.duration));
         return { currentTime: target, seekTo: { time: target } };
@@ -339,6 +358,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
     },
     onPaused: () => {
       tick(false);
+      if (get().player.phase === "active") set({ pausedAt: get().pausedAt ?? Date.now() });
       update((player) => (player.status === "loading" ? {} : { status: "paused" }));
       report(true);
     },

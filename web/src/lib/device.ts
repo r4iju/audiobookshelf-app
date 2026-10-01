@@ -3,6 +3,8 @@ import { readStored, writeStored } from "@/lib/storage/local";
 
 const KEY = "abs-web:v1:device-id";
 
+export const clientVersion = process.env.NEXT_PUBLIC_CLIENT_VERSION ?? "0.1.0";
+
 /** One id per browser profile so the server lists this browser as a single device across sessions. */
 export function deviceInfo() {
   let id = readStored(KEY, z.string());
@@ -13,7 +15,7 @@ export function deviceInfo() {
   return {
     deviceId: id,
     clientName: "Audiobookshelf Web",
-    clientVersion: process.env.NEXT_PUBLIC_CLIENT_VERSION ?? "0.1.0",
+    clientVersion,
     manufacturer: browserName(),
     model: navigator.platform || undefined,
   };
