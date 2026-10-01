@@ -29,7 +29,7 @@ import XCTest
         let listened = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 14
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [listened], timeout: 20)
         app.buttons["pause-playback"].tap()
         XCTAssertTrue(app.staticTexts["playback-error"].waitForExistence(timeout: 10))
@@ -112,7 +112,7 @@ import XCTest
         app.buttons["book-book-0"].tap()
         app.buttons["play-book"].tap()
         app.buttons["mini-player"].tap()
-        let elapsed = app.staticTexts["playback-elapsed"]
+        let elapsed = bookElapsed(app)
         let listened = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 14
@@ -132,7 +132,7 @@ import XCTest
         let resumed = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 14
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [resumed], timeout: 3)
         let reports = try await fixtureObservations().reports
         XCTAssertTrue(reports.contains { $0.currentTime >= 14 && $0.timeListened > 0 })

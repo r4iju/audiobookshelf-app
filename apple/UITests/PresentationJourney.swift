@@ -284,25 +284,6 @@ import XCTest
         XCTAssertEqual(XCTWaiter().wait(for: [matched], timeout: 5), .completed, "\(identifier) shows \(target.exists ? target.label : "nothing"), expected \(label)", file: file, line: line)
     }
 
-    private func openPlayerSettings(_ app: XCUIApplication) {
-        let open = app.buttons["Playback settings"]
-        for _ in 0..<3 where !(open.exists && open.isHittable) { app.swipeUp() }
-        open.tap()
-    }
-
-    /// Opens Playback settings, applies the switches in order and closes the panel.
-    private func playerSettings(_ app: XCUIApplication, _ switches: [(String, Bool)]) {
-        openPlayerSettings(app)
-        for (identifier, on) in switches {
-            let toggle = app.switches[identifier]
-            XCTAssertTrue(toggle.waitForExistence(timeout: 3), "\(identifier) is missing from Playback settings")
-            if (toggle.value as? String == "1") != on { toggle.switches.firstMatch.tap() }
-            XCTAssertEqual(toggle.value as? String, on ? "1" : "0", identifier)
-        }
-        app.buttons["panel-done"].tap()
-        app.swipeDown(); app.swipeDown()
-    }
-
     func testChapterTrackFollowsTheChapterWithTheTotalTrackAlongside() async throws {
         try await Self.configure("baseline")
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: Self.english)
