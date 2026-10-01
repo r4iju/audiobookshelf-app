@@ -17,7 +17,7 @@ import {
 } from "@/lib/settings/store";
 
 /** Changes apply as they are made so the book behind the dialog shows them. */
-export function ReaderSettingsDialog({ onClose }: { onClose: () => void }) {
+export function ReaderSettingsDialog({ onClose, paged }: { onClose: () => void; paged: boolean }) {
   const { t } = useI18n();
   const reader = useSettings().reader;
   const update = useSettingsStore((state) => state.update);
@@ -62,14 +62,16 @@ export function ReaderSettingsDialog({ onClose }: { onClose: () => void }) {
           value={reader.textStroke}
           onValid={(textStroke) => change({ textStroke })}
         />
-        <SelectField
-          label={t("LabelLayout")}
-          value={reader.spread}
-          onChange={(event) => change({ spread: shape.spread.parse(event.target.value) })}
-        >
-          <option value="none">{t("LabelLayoutSinglePage")}</option>
-          <option value="auto">{t("LabelLayoutAuto")}</option>
-        </SelectField>
+        {paged ? (
+          <SelectField
+            label={t("LabelLayout")}
+            value={reader.spread}
+            onChange={(event) => change({ spread: shape.spread.parse(event.target.value) })}
+          >
+            <option value="none">{t("LabelLayoutSinglePage")}</option>
+            <option value="auto">{t("LabelLayoutAuto")}</option>
+          </SelectField>
+        ) : null}
       </div>
       <div className="flex justify-end">
         <Button variant="ghost" onClick={onClose}>

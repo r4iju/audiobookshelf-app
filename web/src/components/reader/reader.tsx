@@ -26,7 +26,7 @@ export interface ReaderViewProps {
 const views: Record<EbookKind, React.ComponentType<ReaderViewProps> | null> = {
   pdf: dynamic(() => import("./pdf-view").then((module) => module.PdfView), { ssr: false }),
   epub: dynamic(() => import("./epub-view").then((module) => module.EpubView), { ssr: false }),
-  mobi: null,
+  mobi: dynamic(() => import("./mobi-view").then((module) => module.MobiView), { ssr: false }),
   comic: null,
 };
 

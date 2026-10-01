@@ -189,3 +189,93 @@ test("a damaged EPUB is reported as unreadable", async ({ page }) => {
   await page.goto(`/read/${id}`);
   await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
 });
+
+for (const { title, format } of [
+  { title: "Night Ferry", format: "MOBI" },
+  { title: "Glass Orchard", format: "AZW3" },
+]) {
+  test(`a ${format} book scrolls page by page, jumps by its contents, and resumes at the same passage here and from other clients`, async ({
+    page,
+  }) => {
+    const api = await serverApi(accounts.user);
+    const id = await bookId(api, title);
+    await resetProgress(api, id);
+
+    await signIn(page);
+    await page.goto(`/item/${id}`);
+    await page.getByRole("link", { name: "Read" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+    await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeInViewport();
+    await page.getByRole("button", { name: "Next page" }).click();
+    await expect(book(page).getByText("Chapter 1: Lantern 1")).not.toBeInViewport();
+    await page.getByRole("button", { name: "Previous page" }).click();
+    await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeInViewport();
+
+    await page.getByRole("button", { name: "Table of Contents" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Chapter 3: Lantern 3" }).click();
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).toBeInViewport();
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookProgress ?? 0).toBeGreaterThan(0.2);
+    await page.keyboard.press("PageDown");
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).not.toBeInViewport();
+    await page.waitForTimeout(500);
+    const passage = await book(page)
+      .locator("p")
+      .filter({ visible: true })
+      .evaluateAll((paragraphs) => {
+        const top = paragraphs.find((p) => p.getBoundingClientRect().top >= 0);
+        return top?.textContent?.slice(0, 13) ?? "";
+      });
+    expect(passage).toMatch(/^Passage 3\.\d+\./);
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation ?? "").toMatch(/^mobi:/);
+    const inChapterThree = (await serverProgress(api, id)).ebookLocation as string;
+
+    await page.reload();
+    await expect(book(page).getByText(passage)).toBeInViewport();
+
+    await page.getByRole("button", { name: "Table of Contents" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Chapter 5: Lantern 5" }).click();
+    await expect(book(page).getByText("Chapter 5: Lantern 5")).toBeInViewport();
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).not.toBe(inChapterThree);
+
+    // Another client saved its place in chapter 3; opening the book again follows it.
+    await api.call(`/api/me/progress/${id}`, { method: "PATCH", body: { ebookLocation: inChapterThree } });
+    await page.getByRole("link", { name: "Back" }).click();
+    await page.getByRole("link", { name: "Read" }).click();
+    await expect(book(page).getByText(passage)).toBeInViewport();
+  });
+}
+
+test("MOBI books take the reader's display settings and cannot run scripts", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Night Ferry");
+  await resetProgress(api, id);
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeVisible();
+  await expect(page.locator("main iframe")).toHaveAttribute("sandbox", "allow-same-origin");
+
+  await page.getByRole("button", { name: "Reader settings" }).click();
+  const settings = page.getByRole("dialog", { name: "Reader settings" });
+  await settings.getByLabel("Theme").selectOption({ label: "Light" });
+  await settings.getByRole("button", { name: "Close" }).click();
+  await expect(book(page).locator("p").first()).toHaveCSS("color", "rgb(0, 0, 0)");
+  await expect(book(page).locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+
+  await page.getByRole("button", { name: "Reader settings" }).click();
+  await settings.getByLabel("Theme").selectOption({ label: "Dark" });
+});
+
+test("a damaged MOBI is reported as unreadable", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Night Ferry");
+  await signIn(page);
+  await page.route(`**/api/items/${id}/ebook**`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/x-mobipocket-ebook",
+      body: "BOOKMOBI but not really",
+    }),
+  );
+  await page.goto(`/read/${id}`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
+});

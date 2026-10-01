@@ -142,6 +142,7 @@ export const webStrings = {
   WebEpisodesCount: "{0} episodes",
   WebEpisodesCount_one: "{0} episode",
   WebReaderSettings: "Reader settings",
+  WebBookText: "Book text",
   WebNumberRange: "Enter a whole number from {0} to {1}.",
   WebReaderLocation: "Location {0} of {1}",
   WebReaderPage: "Page {0} of {1}",

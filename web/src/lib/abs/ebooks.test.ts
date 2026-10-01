@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { pageFromLocation, pageProgress, readableEbook } from "./ebooks";
+import {
+  mobiLocation,
+  mobiPlace,
+  mobiProgress,
+  pageFromLocation,
+  pageProgress,
+  readableEbook,
+} from "./ebooks";
 import type { LibraryItem } from "./schemas";
 
 const file = (ino: string, ext: string, isSupplementary: boolean | null) => ({
@@ -60,5 +67,30 @@ describe("page locations", () => {
   it("saves the page as text and the share of pages before it", () => {
     expect(pageProgress(3, 120)).toEqual({ ebookLocation: "3", ebookProgress: 2 / 120 });
     expect(pageProgress(1, 1)).toEqual({ ebookLocation: "1", ebookProgress: 0 });
+  });
+});
+
+describe("MOBI places", () => {
+  it("reads a saved section and passage, and ignores places other formats saved", () => {
+    expect(mobiPlace("mobi:1:3:12")).toEqual({ section: 3, block: 12 });
+    expect(mobiPlace("mobi:1:0:0")).toEqual({ section: 0, block: 0 });
+    expect(mobiPlace("40")).toBeNull();
+    expect(mobiPlace("epubcfi(/6/2[a]!/4/1:0)")).toBeNull();
+    expect(mobiPlace("mobi:1:-1:2")).toBeNull();
+    expect(mobiPlace("mobi:1:1.5:2")).toBeNull();
+    expect(mobiPlace(null)).toBeNull();
+  });
+
+  it("writes places with the version of the reckoning, and ignores places from another", () => {
+    expect(mobiLocation({ section: 3, block: 12 })).toBe("mobi:1:3:12");
+    expect(mobiPlace("mobi:2:3:12")).toBeNull();
+    expect(mobiPlace("mobi:3:12")).toBeNull();
+  });
+
+  it("weighs progress by how much text each section holds", () => {
+    expect(mobiProgress([100, 300, 600], 1, 0.5)).toBeCloseTo(0.25);
+    expect(mobiProgress([100, 300, 600], 0, 0)).toBe(0);
+    expect(mobiProgress([100, 300, 600], 2, 1)).toBe(1);
+    expect(mobiProgress([], 0, 0)).toBe(0);
   });
 });
