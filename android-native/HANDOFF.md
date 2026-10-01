@@ -4,6 +4,36 @@ Branch `fork/native-android`, based on `origin/fork/native-tv` at `39ad6af657159
 Not merged into `fork/native-tv`. The app installs as the preview identity
 `com.audiobookshelf.app.nativepreview` beside the legacy `com.audiobookshelf.app`, which it never touches.
 
+## Issue mapping (for ticket maintenance)
+
+Source `87984807`: the full suite at `ecba6a5a` (79 of 79, see "Final acceptance at ecba6a5a"), plus layout fixes verified by Accessibility, Pdf, Browse, Download and Playback journeys (26 of 26) and screenshots. All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: see the follow-ups.
+
+| Issue | Status | Evidence | Open follow-ups |
+| --- | --- | --- | --- |
+| #31 connect and sign in | Done (emulator) | ConnectionJourney | |
+| #32 OpenID, multiple servers | Done (emulator) | AccountsJourney | |
+| #33 browse and inspect | Done (emulator) | BrowseJourney, FilteredScreen paths | |
+| #34 stream multi-file audio | Done (emulator) | PlaybackJourney | |
+| #35 durable listening progress | Done (emulator) | ListeningDurability, ListeningRecovery, LatePublication, ProgressReset | Listening held in memory while storage refuses writes is lost if the process dies first |
+| #36 background playback, system controls | Partial | PlaybackJourney (media session) | Lock screen, Bluetooth and headset controls on a device |
+| #37 chapters, speed, bookmarks | Done (emulator) | PlayerToolsJourney | Bookmark journey flaked once in a full run |
+| #38 sleep timers, advanced playback | Done (emulator) | PlayerToolsJourney, SettingsJourney | Shake and chime on a device |
+| #39 search and discovery | Done (emulator) | BrowseJourney | |
+| #40 collections and playlists | Done (emulator) | GroupsJourney | |
+| #41 podcasts | Done (emulator) | PodcastJourney | |
+| #42 download and manage | Done (emulator) | DownloadJourney | Real metered networks |
+| #43 offline and reconnection | Done (emulator) | DownloadJourney, MigrationJourney d, LatePublication | Real network loss |
+| #44 local files and opening | Done (emulator) | LocalFilesJourney | |
+| #46 PDF | Done (emulator) | PdfJourney (10) | |
+| #49 casting | **Not implemented** | None. The legacy app has `CastManager`/`CastPlayer`; the native app has no cast code | Whole story, including a real receiver |
+| #50 Android Auto | Partial | CarJourney | Car or Desktop Head Unit |
+| #51 preferences, statistics, diagnostics | Done (emulator) | SettingsJourney | |
+| #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `ereaderSettings` and some preferences preserved but not applied; listening history and logs not exported |
+| #53 migrate downloads and reading locations | Done for audio and PDF (emulator) | MigrationJourney c, d, f | EPUB and other locations preserved, applied when #45/#47/#48 exist; a file damaged after commit is fetched from the server, not the archive; legacy downloads in user-chosen (SAF) folders not exercised on a device |
+| #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization not met** (English only; legacy has 38 locales); TalkBack by a person; owner signing key; install on the owner's phone |
+| #45, #47, #48 | Deferred (after #65) | | Files and locations are preserved by migration |
+
+
 ## Review blockers at 25f5116e, fixed in 2b3227dc
 
 | Blocker | Fix | RED observed before the fix |

@@ -172,5 +172,22 @@
       "sha": "11060261",
       "result": "77 of 78; PlayerToolsJourney a timed out once and passed 2 of 2 when rerun with no player change"
     }
+  ],
+  "layoutFollowUp": {
+    "sha": "87984807",
+    "change": "PDF page bar and mini-player kept above the gesture area; author link alignment; empty-state icons",
+    "journeys": {
+      "AccessibilityJourney": 1,
+      "PdfJourney": 10,
+      "BrowseJourney": 4,
+      "DownloadJourney": 6,
+      "PlaybackJourney": 5,
+      "failures": 0
+    },
+    "note": "Subset run, not a full-suite run; the full single run is the one at sourceSha"
+  },
+  "notImplemented": [
+    "#49 casting",
+    "localization (#54)"
   ]
 }
