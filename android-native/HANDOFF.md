@@ -25,6 +25,47 @@ Evidence for a3d98009:
 - The commit compiles on its own, including instrumentation tests; checked in a clean temporary worktree.
 - **Behavior note:** reading is not sent to the server while a title is loaded in the player, even when paused. It is published once the player is closed, matching Apple.
 
+## Settings, statistics, diagnostics and progress reset in 50e1c2a1
+
+- Settings cover the existing app's player, sleep, orientation, haptic and cellular options. Statistics come from `/api/me/listening-stats`, and diagnostics keep redacted recent failures.
+- `SettingsJourney`: 4 of 4. Its RED was observed before the screens existed.
+- Discarding book and episode progress was added for root parity. **Its reset lifecycle was not durable; see 5068c1d3.**
+
+## Item RSS feeds and send-ebook in be65ac11
+
+These follow server 2.30 permissions, as required by the root parity audit.
+
+- **Feeds:**
+  - Administrators open (feed name, directory visibility, owner) and close an item's feed.
+  - Anyone sees and copies the address of an open feed.
+  - Only titles with audio or episodes qualify.
+- **Send-ebook:**
+  - Offered only when the title has an ebook and `/api/authorize` returns e-readers.
+  - A refused delivery is reported and not shown as sent.
+- The fixture wrapper models `/api/feeds/item/:id/open`, `/api/feeds/:id/close`, `include=rssfeed` and `/api/emails/send-ebook-to-device`. **No mail is sent and no owner feed is touched.**
+- **RED:** `ItemActionsJourney` failed 4 of 4 on the missing actions. The checks that listeners and devices without e-readers see no action passed before the failing step.
+- **GREEN:** 4 of 4.
+- `BrowseJourney` now scrolls to the description, which the progress actions moved below the fold.
+
+## Review blockers at 50e1c2a1, fixed in 5068c1d3
+
+| Blocker | Fix | RED observed before the fix |
+| --- | --- | --- |
+| No durable reset intent; DELETE before local cleanup; lost response or relaunch lost the reset | `ProgressResets` (core):<ul><li>Saves the reset before anything changes, keyed by the origin account.</li><li>Records the server progress it first saw before deleting.</li><li>Cleans up locally before the DELETE.</li><li>Removes the reset only after the DELETE (404 counts as done).</li><li>Retries on network return, account return and with backoff, and on launch.</li><li>A retry deletes only progress no newer than first seen, so progress made after the reset survives.</li></ul> | `ProgressResetsTest`, 4 tests: reset lost on restart; DELETE ran before failed cleanup; a lost response led to deleting later progress `p2`; reset dated by the device clock |
+| Reset removed the cached position, so an older server snapshot restored the old offline position | `ListeningJournal.resetPosition` stores position 0 dated at the later of the request time and the server's last update seen. `adoptRemotePosition` only takes newer positions. | `ListeningJournalTest.aResetOutranksServerSnapshotsTakenBeforeIt`: 9.5 s came back |
+| No exclusion with reading writes or audio starts | <ul><li>The DELETE runs in `PlaybackEngine.excludingTitle`, under the same gate as reading writes, after the title's listening is on the server.</li><li>A title under reset refuses to start.</li><li>Gated writes finish even when their caller is cancelled: the reader published from its own scope, so closing it released the gate mid-PATCH.</li><li>`ReadingSync` chooses its page inside the gate.</li></ul> | `ProgressResetJourney.aPageSentJustBeforeTheDiscardDoesNotBringProgressBack`: page 2 recreated the progress. `playingWhileProgressIsBeingDiscardedDoesNotResumeTheOldPosition`: progress came back at 8.2 s. |
+
+Evidence for 5068c1d3:
+- Unit tests: `./gradlew :core:test :app:testDebugUnitTest`, all pass.
+- The full journey suite passes in one run on `emulator-5584`: 55 of 55 across 14 classes.
+- The affected classes (ProgressReset, Pdf, Settings, PlayerTools) pass 20 of 20 in each of two further runs.
+- **Pending independent review:** the reset is not handed off as accepted until the reviewer clears 5068c1d3.
+
+**Fixture wrapper changes:**
+- Reconfiguring drops progress added since startup, restores startup titles and clears bookmarks. This fixes the PlayerTools and Settings cross-class failures seen in full runs.
+- Entries that exist are left for the mode, so layered modes such as `pdf-remote` then `pdf-supplementary` still work.
+- `/__android__/slow-discard` holds DELETE.
+
 ## Evidence for 2b3227dc (emulator and fixture only)
 
 - Unit tests: `./gradlew :core:test :app:testDebugUnitTest`, 24 tests, 0 failures.
@@ -36,7 +77,8 @@ Evidence for a3d98009:
 ## Known limits
 
 - Listening that is held in memory because storage refuses writes is lost if the process dies before storage recovers. The player pauses and warns as soon as a write fails, which bounds the loss to the listening already played.
-- `PlayerToolsJourney.a` (`delete-bookmark-0`) has flaked once in a full run.
+- `PlayerToolsJourney.a` (`delete-bookmark-0`) has flaked once in a full run. The fixture reset in 5068c1d3 removes the cross-class bookmark state behind the `bookmarks-empty` failure.
+- While a discard is pending (offline, or listening not yet sent), the title does not play and shows "Discarding progress" until the server confirms.
 - Physical-only gates are not yet exercised:
   - Bluetooth, lock screen and Android Auto controls.
   - Real metered networks.
