@@ -344,9 +344,23 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             if next[entry].finished.count == next[entry].parts.count { next[entry].state = .ready }
             try save(next)
         } catch {
-            var next = entries; next[entry].state = .failed; next[entry].error = error.localizedDescription
-            do { try save(next) } catch { self.error = error.localizedDescription }
+            var next = entries; next[entry].state = .failed
+            next[entry].error = Self.outOfSpace(error) ? NativeStrings.current("There is not enough storage on this device for this download. Free up space, then retry.") : error.localizedDescription
+            do { try save(next) } catch {
+                // Without this the part stays queued and the refresh below starts the same transfer again. The
+                // manifest still says queued, so the next launch tries once more.
+                entries = next
+                self.error = Self.outOfSpace(error) ? next[entry].error : error.localizedDescription
+            }
             for (key, other) in tasks where key.hasPrefix(next[entry].id + ":") { other.cancel() }
+        }
+    }
+    private static func outOfSpace(_ error: Error) -> Bool {
+        let error = error as NSError
+        switch (error.domain, error.code) {
+        case (NSCocoaErrorDomain, NSFileWriteOutOfSpaceError), (NSPOSIXErrorDomain, Int(ENOSPC)), (NSPOSIXErrorDomain, Int(EDQUOT)),
+             (NSURLErrorDomain, NSURLErrorCannotCreateFile), (NSURLErrorDomain, NSURLErrorCannotWriteToFile): return true
+        default: return (error.userInfo[NSUnderlyingErrorKey] as? Error).map(outOfSpace) ?? false
         }
     }
     func cancel(_ entry: Entry) {
