@@ -171,6 +171,65 @@ final class LegacyMigrationIntegrityTests: XCTestCase {
         XCTAssertEqual(try migrator.committedOutcome(), first)
     }
 
+    func testAFailedRepairKeepsTheMigrationCommittedToItsSource() throws {
+        let fileSystem = FaultInjectingFileSystem()
+        let migrator = LegacyMigrator(root: fixture.migrationRoot(), fileSystem: fileSystem)
+        let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+        try FileManager.default.removeItem(at: migrator.fileURL(for: try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)))
+
+        fileSystem.failAfterTransfers = fileSystem.transfers.count
+        XCTAssertThrowsError(try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink()))
+        fileSystem.failAfterTransfers = nil
+
+        XCTAssertThrowsError(try migrator.committedOutcome(), "a half-repaired migration is damaged, not absent") { error in
+            XCTAssertEqual(error as? LegacyMigrationError, .committedMigrationDamaged)
+        }
+        var other = fixture.snapshot
+        other.progress[0].currentTime = 1
+        XCTAssertThrowsError(try migrator.migrate(LegacySource(kind: .inPlace, snapshot: other, filesRoot: fixture.documents))) { error in
+            XCTAssertEqual(error as? LegacyMigrationError, .differentSourceAlreadyCommitted)
+        }
+        XCTAssertEqual(try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink()), first)
+    }
+
+    func testARepairKeepsIntactAdoptedFilesWhoseLegacySourceIsGone() throws {
+        let migrator = LegacyMigrator(root: fixture.migrationRoot())
+        let first = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+        let track = try XCTUnwrap(try local(first, "local_li-audio").tracks.first?.file)
+        try FileManager.default.removeItem(at: migrator.fileURL(for: track))
+        try FileManager.default.removeItem(at: fixture.documents.appendingPathComponent("li-pdf/companion.pdf"))
+
+        let repaired = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+
+        XCTAssertEqual(repaired, first, "the adopted PDF is intact; losing its legacy original must not lose it")
+        XCTAssertEqual(try contents(migrator, try local(repaired, "local_li-pdf").ebook?.file), "%PDF-1.7 synthetic")
+        XCTAssertEqual(try contents(migrator, track), "audio-track-one")
+    }
+
+    func testPathsDifferingOnlyByCaseGetDistinctDestinations() throws {
+        let upper = try fixture.writeFile("li-case/Track.mp3", "case-audio")
+        var lower = upper
+        lower.id = "li-case-lower"
+        lower.path = "li-case/track.mp3"
+        lower.filename = "track.mp3"
+        let owner = fixture.snapshot.connections[0]
+        fixture.snapshot.localItems.append(LegacyLocalItem(
+            id: "local_li-case", libraryItemId: "li-case", mediaType: "book", serverConnectionConfigId: owner.id, serverAddress: owner.address, serverUserId: owner.userId,
+            title: "Case", files: [upper, lower],
+            tracks: [LegacyTrack(index: 1, localFileId: upper.id, startOffset: 0, duration: 5, mimeType: "audio/mpeg"),
+                     LegacyTrack(index: 2, localFileId: lower.id, startOffset: 5, duration: 5, mimeType: "audio/mpeg")]
+        ))
+        let migrator = LegacyMigrator(root: fixture.migrationRoot())
+
+        let outcome = try migrator.migrate(fixture.inPlaceSource, secrets: RecordingSecretSink())
+
+        let paths = allFiles(outcome).map(\.path)
+        XCTAssertEqual(Set(paths.map { $0.lowercased() }).count, Set(paths).count, "destinations must not collide on a case-insensitive volume")
+        let archive = try LegacyArchive.write(fixture.snapshot, documents: fixture.documents, to: fixture.directory.appendingPathComponent("Case.abslegacy"))
+        let imported = try LegacyMigrator(root: fixture.migrationRoot("imported")).migrate(try LegacyArchive.open(archive))
+        XCTAssertTrue(try local(imported, "local_li-case").complete)
+    }
+
     // MARK: 4. Recorded owners must corroborate the connection
 
     func testRowsWhoseRecordedOwnerConflictsWithTheirConnectionAreQuarantined() throws {
