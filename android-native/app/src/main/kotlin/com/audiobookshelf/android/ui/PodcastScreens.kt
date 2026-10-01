@@ -256,6 +256,7 @@ fun EpisodeScreen(item: LibraryItem, episodeId: String, active: SessionState.Act
             modifier = Modifier.fillMaxWidth().testTag(if (finished) "episode-unfinish" else "episode-finish"),
         ) { Text(if (finished) "Mark unfinished" else "Mark finished") }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+        AddToGroupButton(item.id, episode.id, active, catalog)
         description?.let { ExpandableText(it) }
     }
 }

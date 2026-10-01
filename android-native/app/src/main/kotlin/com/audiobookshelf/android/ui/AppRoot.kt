@@ -9,9 +9,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.LibraryBooks
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -94,13 +97,30 @@ private fun SignedIn(active: SessionState.Active) {
                         val progress = catalog.progressFor(item.id)
                         ItemDetail(item, cover, progress, padding, itemActions, primary = {
                             PlayButton({ PlaySource.Stream(active.client, item.id, null, cover, progress?.lastUpdate) }, item.id, null, onOpened = { model.push(Route.Player) })
-                        })
+                        }, extra = { AddToGroupButton(item.id, null, active, catalog) })
                     }
                 }
                 is Route.Episode -> RouteScaffold("", pop) { padding ->
                     LoadItem(active.client, route.itemId, padding, graph.accounts::handle) { item, _ ->
                         EpisodeScreen(item, route.episodeId, active, catalog, padding, onPlayer = { model.push(Route.Player) })
                     }
+                }
+                is Route.Groups -> RouteScaffold(if (route.kind == COLLECTIONS) "Collections" else "Playlists", pop, actions = {
+                    if (canCreateGroup(route.kind, catalog)) IconButton(onClick = { model.push(Route.GroupEditor(route.kind, null)) }, modifier = Modifier.testTag("new-group")) {
+                        Icon(Icons.Outlined.Add, if (route.kind == COLLECTIONS) "New collection" else "New playlist")
+                    }
+                }) { padding -> GroupsScreen(route.kind, active, catalog, padding, onOpen = { model.push(Route.Group(route.kind, it)) }) }
+                is Route.Group -> RouteScaffold("", pop) { padding ->
+                    GroupScreen(route.kind, route.id, active, catalog, padding,
+                        onMember = { member -> model.push(if (member.episodeId != null) Route.Episode(member.itemId, member.episodeId) else Route.Item(member.itemId)) },
+                        onEdit = { model.push(Route.GroupEditor(route.kind, route.id)) },
+                        onDeleted = pop)
+                }
+                is Route.GroupEditor -> RouteScaffold(if (route.id == null) (if (route.kind == COLLECTIONS) "New collection" else "New playlist") else "Edit", pop) { padding ->
+                    GroupEditorScreen(route.kind, route.id, active, catalog, padding, onSaved = { id ->
+                        model.pop()
+                        if (route.id == null) model.push(Route.Group(route.kind, id))
+                    })
                 }
                 Route.AddPodcast -> RouteScaffold("Add podcast", pop) { padding -> AddPodcastScreen(active, catalog, padding, onCreated = pop) }
                 is Route.Filtered -> RouteScaffold(route.label, pop) { padding ->
@@ -127,6 +147,7 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
                 if (catalog.library?.isPodcast == true && catalog.user?.isAdmin == true) {
                     IconButton(onClick = { model.push(Route.AddPodcast) }, modifier = Modifier.testTag("add-podcast")) { Icon(Icons.Outlined.Add, "Add podcast") }
                 }
+                LibraryMenu(catalog, onRoute = model::push)
                 IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, "Accounts") }
                 IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, "Settings") }
             }
@@ -153,5 +174,17 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
             graph.settings.update { it.copy(catalogSort = sort, catalogDescending = descending) }
             catalog.apply(catalog.query.copy(sort = sort, descending = descending))
         }) { sheet = null }
+    }
+}
+
+@Composable
+private fun LibraryMenu(catalog: com.audiobookshelf.android.data.CatalogModel, onRoute: (Route) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { open = true }, modifier = Modifier.testTag("library-menu")) { Icon(Icons.Outlined.MoreVert, "More") }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            if (catalog.library?.isPodcast == false) DropdownMenuItem(text = { Text("Collections") }, onClick = { open = false; onRoute(Route.Groups(COLLECTIONS)) }, modifier = Modifier.testTag("menu-collections"))
+            DropdownMenuItem(text = { Text("Playlists") }, onClick = { open = false; onRoute(Route.Groups(PLAYLISTS)) }, modifier = Modifier.testTag("menu-playlists"))
+        }
     }
 }

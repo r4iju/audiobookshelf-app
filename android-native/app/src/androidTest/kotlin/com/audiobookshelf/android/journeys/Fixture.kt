@@ -82,6 +82,18 @@ fun ComposeTestRule.tap(tag: String) {
     onNodeWithTag(tag).performClick()
 }
 
+fun ComposeTestRule.hideKeyboard() {
+    waitForIdle()
+    if (Device.device.executeShellCommand("dumpsys input_method").contains("mInputShown=true")) Device.device.pressBack()
+    waitForIdle()
+}
+
+fun ComposeTestRule.pressBack() {
+    waitForIdle()
+    Device.device.pressBack()
+    waitForIdle()
+}
+
 fun ComposeTestRule.signIn(server: String = Fixture.server, username: String = "qa", password: String = "qa") {
     waitForTag("server-address")
     replaceText("server-address", server)

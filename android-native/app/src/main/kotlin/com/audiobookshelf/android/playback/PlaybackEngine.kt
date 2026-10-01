@@ -72,6 +72,8 @@ data class PlayerState(
     val sleepEndOfChapter: Boolean = false,
     /** Failure opening an item, keyed by `itemId/episodeId` so the item screen can explain it. */
     val openError: Pair<String, String>? = null,
+    /** Collection or playlist whose members continue after the current one ends. */
+    val queueId: String? = null,
 )
 
 /** A media source the engine can open: server stream or files already on this device. */
@@ -136,8 +138,30 @@ class PlaybackEngine(
     private val sleep = SleepController(context, settings, onShakeRestart = { if (!player.playWhenReady) resume() })
         .also { controller -> controller.bind { Triple(globalPosition(), loaded?.now?.chapters.orEmpty(), player.playbackParameters.speed) } }
 
+    private var queue: List<PlaySource> = emptyList()
+    private val main = android.os.Handler(android.os.Looper.getMainLooper())
+
+    /** The player only accepts its own thread; screens may call after a network result resumes elsewhere. */
+    private fun onMain(block: () -> Unit) {
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) block() else main.post(block)
+    }
+
     // region Commands
-    fun play(source: PlaySource) {
+    fun play(source: PlaySource) = onMain {
+        queue = emptyList()
+        mutable.value = mutable.value.copy(queueId = null)
+        start(source)
+    }
+
+    /** Plays [sources] in order as one group; members already finished should be left out by the caller. */
+    fun playQueue(id: String, sources: List<PlaySource>) = onMain {
+        val first = sources.firstOrNull() ?: return@onMain
+        start(first)
+        queue = sources.drop(1)
+        mutable.value = mutable.value.copy(queueId = id)
+    }
+
+    private fun start(source: PlaySource) {
         val current = loaded
         if (current != null && current.source.itemId == source.itemId && current.source.episodeId == source.episodeId && mutable.value.error == null) {
             if (mutable.value.finished) seekTo(0.0)
@@ -258,6 +282,7 @@ class PlaybackEngine(
 
     /** Stops playback, publishes listening, and closes the server stream session. */
     fun close() {
+        queue = emptyList()
         generation++
         sleep.cancel()
         player.volume = 1f
@@ -439,6 +464,12 @@ class PlaybackEngine(
         current.lastRecordedPosition = -1.0
         scope.launch(io) { runCatching { journal.record(current.recordId, end, current.unrecordedListening.also { current.unrecordedListening = 0.0 }) } }
             .invokeOnCompletion { scope.launch { sync.publish(current.source.account) } }
+        val next = queue.firstOrNull()
+        if (next == null) mutable.value = mutable.value.copy(queueId = null)
+        else {
+            queue = queue.drop(1)
+            start(next)
+        }
     }
 
     private fun onError(error: PlaybackException) {

@@ -128,6 +128,9 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
         user = current.copy(mediaProgress = others + progress)
     }
 
+    /** Reads progress made on other clients before choosing what to play. */
+    suspend fun freshUser(): User = client.me().also { user = it }
+
     fun refreshUser() {
         scope.launch { runCatching { client.me() }.onSuccess { user = it }.onFailure { accounts.handle(it) } }
     }
