@@ -76,6 +76,7 @@ test("an item that does not exist says so instead of a blank page", async ({ pag
 test("the keyboard can skip straight to the content", async ({ page }) => {
   await signIn(page);
   await page.goto(`/library/${qa.libraries.books}`);
+  await expect(page.getByRole("heading", { level: 1, name: "Audiobooks" })).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
   await page.keyboard.press("Enter");
