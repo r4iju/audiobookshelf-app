@@ -1,7 +1,11 @@
 import json
+import os
 import selectors
+import signal
 import subprocess
 import sys
+import threading
+import time
 import unittest
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -26,6 +30,34 @@ class FixtureJourneyBase(unittest.TestCase):
                         {'Content-Type': 'application/json', **({'Authorization': 'Bearer ' + token} if token else {}), **(headers or {})})
         with urlopen(value, timeout=3) as response:
             return json.load(response)
+
+
+class ConnectionBurstJourney(FixtureJourneyBase):
+    def test_a_burst_queued_while_the_fixture_is_busy_is_answered_in_full(self):
+        # Every app request reaches the fixture on a new connection through the realtime proxy, which reports any refused or
+        # reset connection as HTTP 503. Starting playback right after the PDF reader closes sends such a burst while
+        # handler threads keep the single accept loop waiting; stopping the process holds that loop deterministically.
+        answered, failures = [], []
+
+        def observe():
+            try:
+                with urlopen(self.address + '/__fixture__/observations', timeout=10) as response:
+                    answered.append(response.status)
+            except OSError as error:
+                failures.append(repr(error))
+
+        os.kill(self.server.pid, signal.SIGSTOP)
+        try:
+            clients = [threading.Thread(target=observe) for _ in range(40)]
+            for client in clients:
+                client.start()
+            time.sleep(0.5)
+        finally:
+            os.kill(self.server.pid, signal.SIGCONT)
+        for client in clients:
+            client.join()
+        self.assertEqual(failures, [])
+        self.assertEqual(answered, [200] * 40)
 
 
 class LocalReferenceJourney(FixtureJourneyBase):
