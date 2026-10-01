@@ -1899,7 +1899,8 @@
       },
       "replacementEvidence": {
         "apple-mobile": [
-          "PresentationJourney covers saved language through relaunch, device language and Arabic right-to-left layout (APPLE-PRESENTATION.md). All 30 legacy languages are selectable. Generated non-English coverage is 15–21% at 315183c1; semantic mappings cover supported playback controls, while unmapped text uses explicit English fallback. Cellular consent now uses the shared lookup with generated English templates. This is not full translation or hardware acceptance."
+          "PresentationJourney covers saved language through relaunch, device language and Arabic right-to-left layout (APPLE-PRESENTATION.md). All 30 legacy languages are selectable. Generated non-English coverage is 15–21% at 315183c1; semantic mappings cover supported playback controls, while unmapped text uses explicit English fallback. Cellular consent now uses the shared lookup with generated English templates. This is not full translation or hardware acceptance.",
+          "October 2 audit (APPLE-PRESENTATION.md): all 502 unmapped texts were compared with the 381 legacy English strings and their legacy screens; 26 same-meaning labels were added (RED c42f43c5, fix e5697339), so 159 of 635 texts are mapped and each language is 18-25% translated. Light stays English because the theme and haptic meanings differ in 17 of the 29 translated legacy languages. The remaining 476 texts have no legacy equivalent and stay English. Language journeys (German saved choice through relaunch, French device language, Arabic right-to-left) passed on the iPhone simulator with an uncommitted probe showing the new German and Arabic Settings labels. Full localization parity is not met."
         ],
         "android": [],
         "browser": [],

@@ -12,9 +12,51 @@ then English. A change applies to open screens without relaunch, and Arabic and 
 
 Native text is keyed by its English wording. A language shows a translation only where `legacy-equivalents.json` names a
 legacy key with the same meaning and that language's legacy file has a usable value (non-empty, no markup, same
-placeholders). Native screens show 358 distinct texts and 98 have such a key, so each language is between 18% (`lt`) and
-27% translated (`COVERAGE.md`). The rest stays English, and the Language screen shows each language's share and says so.
-System controls follow the device language. Dates and durations use the chosen locale.
+placeholders). Native screens, tvOS and the year export together show 635 distinct texts, and 159 have such a key, so
+each language is between 18% (`lt`) and 25% translated (`COVERAGE.md`). The rest stays English, and the Language screen
+shows each language's share and says so. System controls follow the device language. Dates and durations use the chosen
+locale. This is partial localization, not parity with the legacy app's coverage.
+
+### Audit of reusable legacy translations
+
+On October 2 every one of the 502 then unmapped texts was compared with the 381 legacy English strings
+(`strings/en-us.json`), and each candidate was checked against the legacy screen that showed it. 26 were added, each the
+label a legacy screen used for the same control or message (RED `c42f43c5`, fix `e5697339`):
+
+| Native text | Legacy key | Legacy screen |
+| --- | --- | --- |
+| Reading settings, Font size, Text weight, Line spacing | `HeaderEreaderSettings`, `LabelFontScale`, `LabelFontBoldness`, `LabelLineSpacing` | `components/readers/Reader.vue` settings |
+| Appearance | `LabelTheme` | `pages/settings.vue` theme |
+| Network preferences | `HeaderDataSettings` | `pages/settings.vue`, the cellular streaming and download section |
+| Show server address | `ButtonUnmaskServerAddress` | `pages/logs.vue` |
+| Add server | `ButtonAddNewServer` | `ServerConnectForm.vue` |
+| Your libraries | `HeaderLibraries` | `LibrariesModal.vue` |
+| Statistics, Your listening | `ButtonUserStats`, `HeaderYourStats` | side drawer entry and `pages/stats.vue` |
+| minutes, minutes listening | `LabelStatsMinutes`, `LabelStatsMinutesListening` | `pages/stats.vue` and the daily chart |
+| Bookmarks, Add a bookmark here | `LabelYourBookmarks`, `ButtonCreateBookmark` | `BookmarksModal.vue` |
+| Sleep (player panel) | `LabelSleepTimer` | sleep timer, as `Sleep timer` already was |
+| New playlist, No playlists yet. | `HeaderNewPlaylist`, `MessageNoUserPlaylists` | `playlists/AddCreateModal.vue` |
+| No collections yet. | `MessageNoCollections` | `LazyBookshelf.vue` |
+| Open RSS feeds | `LabelRSSFeedOpen` | `FilterModal.vue` filter |
+| Server folder, Automatically download new episodes | `LabelFolder`, `LabelAutoDownloadEpisodes` | `NewPodcastForm.vue` |
+| Waiting for {0} episode(s) from your server | `MessageEpisodesQueuedForDownload` | episodes queued on the server |
+| Loading (tvOS player state) | `MessageLoading` | loading indicators |
+| Yes, No (RSS feed values) | `ButtonYes`, `LabelNo` | |
+
+Considered and left English, because the legacy text means something else in at least one language or names a different
+action:
+
+- `Light` is both a theme and a haptic strength in one native key. The legacy app has `LabelThemeLight` and `LabelLight`,
+  and 17 of the 29 translated languages translate them differently (de *Hell* and *Leicht*). Either one would be wrong in one list, so both
+  lists show English `Light` until the two uses have separate texts. `System` has no legacy key.
+- Sign out (legacy Disconnect), Connecting… (Attempting server connection), Diagnostics (Logs), No problems recorded
+  (No logs), Podcast feed (`HeaderRSSFeed` is a feed the server publishes for an item), Mark as not finished (the legacy
+  has only the failure toast), and the year headings Top authors and Top genres (as `HANDOFF.md` explains).
+
+The other 476 texts have no legacy equivalent and stay English in every language: connection, sign-in and certificate
+recovery, migration import, diagnostics, downloads and storage states, collection and podcast management, PDF and EPUB
+reader messages, 71 tvOS-only texts and 78 year export templates. They need translators; no machine translation or
+generic fallback is presented as complete.
 
 Migration keeps any supported legacy `languageCode`, `en-us` included, only when no native choice exists. The legacy app
 always showed the saved code's language, whatever the device language, so adopting it preserves what the person saw. The
