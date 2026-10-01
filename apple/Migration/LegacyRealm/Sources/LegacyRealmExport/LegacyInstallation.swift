@@ -101,21 +101,75 @@ public struct LegacyExportResult: Equatable {
     public let bytes: Int64
 }
 
+/// The legacy app's export action: one dated `.absmigration` package in `exportsDirectory`,
+/// replacing earlier ones, ready to hand to the system document exporter.
 public final class LegacyExportJob {
+    /// Shown to the user; they never include paths or values from the failed operation.
     public enum Message {
-        public static let insufficientSpace = ""
-        public static let databaseUnreadable = ""
-        public static let unsupportedVersion = ""
-        public static let failed = ""
+        public static let insufficientSpace = "There is not enough free space to prepare the export. Free some space and try again; nothing was changed."
+        public static let databaseUnreadable = "The app's library database could not be read for the export. Nothing was changed; try again, or restart the app first."
+        public static let unsupportedVersion = "This version of the library database cannot be exported. Nothing was changed."
+        public static let failed = "The export could not be prepared. Nothing was changed; try again."
     }
 
-    public init(documents: URL, exportsDirectory: URL, workDirectory: URL, defaults: UserDefaults, now: @escaping () -> Date = Date.init) {}
+    private let documents: URL
+    private let exportsDirectory: URL
+    private let workDirectory: URL
+    private let defaults: UserDefaults
+    private let now: () -> Date
+
+    public init(documents: URL, exportsDirectory: URL, workDirectory: URL, defaults: UserDefaults, now: @escaping () -> Date = Date.init) {
+        self.documents = documents
+        self.exportsDirectory = exportsDirectory
+        self.workDirectory = workDirectory
+        self.defaults = defaults
+        self.now = now
+    }
 
     public func run(webStorage: [String: String], copyRealm: (URL) throws -> Void, progress: ((LegacyExportProgress) -> Void)?) throws -> LegacyExportResult {
-        throw CocoaError(.featureUnsupported)
+        try discard()
+        var copied: LegacyArchiveProgress?
+        do {
+            let url = try LegacyArchiveExporter.export(documents: documents, defaults: defaults, webStorage: webStorage, workDirectory: workDirectory,
+                                                       to: exportsDirectory.appendingPathComponent("\(name()).absmigration"), copyRealm: copyRealm) { report in
+                if case let .copyingFiles(files) = report { copied = files }
+                progress?(report)
+            }
+            return LegacyExportResult(url: url, files: copied?.totalFiles ?? 0, bytes: copied?.totalBytes ?? 0)
+        } catch {
+            try? discard()
+            throw error
+        }
     }
 
-    public func discard() throws {}
+    /// Removes every package this job wrote; the legacy data itself is never touched.
+    public func discard() throws {
+        if FileManager.default.fileExists(atPath: exportsDirectory.path) {
+            try FileManager.default.removeItem(at: exportsDirectory)
+        }
+    }
 
-    public static func message(for error: Error) -> String { "" }
+    public static func message(for error: Error) -> String {
+        switch error {
+        case LegacyMigrationError.legacyDatabaseUnreadable:
+            return Message.databaseUnreadable
+        case LegacyMigrationError.unsupportedLegacySchema:
+            return Message.unsupportedVersion
+        default:
+            return isOutOfSpace(error as NSError) ? Message.insufficientSpace : Message.failed
+        }
+    }
+
+    private static func isOutOfSpace(_ error: NSError) -> Bool {
+        if error.domain == NSCocoaErrorDomain && error.code == NSFileWriteOutOfSpaceError { return true }
+        if error.domain == NSPOSIXErrorDomain && error.code == Int(ENOSPC) { return true }
+        return (error.userInfo[NSUnderlyingErrorKey] as? NSError).map(isOutOfSpace) ?? false
+    }
+
+    private func name() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HHmm"
+        return "Audiobookshelf Export \(formatter.string(from: now()))"
+    }
 }
