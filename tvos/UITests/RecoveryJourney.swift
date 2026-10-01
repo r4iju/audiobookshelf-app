@@ -46,6 +46,74 @@ final class RecoveryJourney: TVJourney {
         XCTAssertEqual(after.localSessions.filter { $0.libraryItemId == "book-0" }.map(\.timeListening).reduce(0, +), recovered.timeListening, accuracy: 0.01)
     }
 
+    /// Story 14 on the TV: a login the server revoked is signed in again on a form the remote can read and reach
+    /// whole, for the same account and server; Back leaves the book paused, and the listening held meanwhile is
+    /// sent once the account signs in again, without playing by itself.
+    func testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying() async throws {
+        launch(reset: true)
+        assertSignInFormFits("First sign-in")
+        enter(TVJourney.fixture, into: app.textFields["serverURL"])
+        enter("qa", into: app.textFields["username"])
+        enter("qa", into: app.secureTextFields["password"])
+        select(app.buttons["connect"])
+        waitForHome()
+        select(app.buttons["continue-listening.book-0"])
+        select(app.buttons["play-item"])
+        wait(app.staticTexts["playback-status"], label: "Playing", timeout: 20)
+        sleep(2)
+        try await Fixture.revoke("qa")
+        let revoked = try await observations().reports.count
+        remote.press(.playPause)
+        wait(app.staticTexts["playback-status"], label: "Paused")
+        let alert = app.alerts["Sign in again"].firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 10), "Pausing for a revoked login did not ask to sign in again")
+        let stoppedAt = seconds("now-playing-elapsed")
+        select(alert.buttons["Sign in"].firstMatch)
+
+        let password = app.secureTextFields["password"]
+        XCTAssertTrue(password.waitForExistence(timeout: 10))
+        capture("Signing in again")
+        assertSignInFormFits("Signing in again")
+        XCTAssertEqual(app.textFields["serverURL"].value as? String, TVJourney.fixture)
+        XCTAssertEqual(app.textFields["username"].value as? String, "qa")
+        XCTAssertFalse(app.textFields["serverURL"].isEnabled)
+        XCTAssertFalse(app.textFields["username"].isEnabled)
+        focus(password)
+        focus(app.buttons["connect"])
+        focus(app.buttons["sign-in-diagnostics"])
+
+        // Back closes sign-in and keeps the book paused where it stopped, its listening still held on the TV.
+        remote.press(.menu)
+        XCTAssertTrue(password.waitForNonExistence(timeout: 5), "Back did not close signing in again")
+        wait(app.staticTexts["playback-status"], label: "Paused")
+        sleep(2)
+        XCTAssertEqual(seconds("now-playing-elapsed"), stoppedAt)
+        let held = try await observations().reports.count
+        XCTAssertEqual(held, revoked, "A revoked login's listening reached the server")
+
+        select(app.buttons.matching(NSPredicate(format: "label == %@", "Sign in again")).firstMatch)
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        select(alert.buttons["Sign in"].firstMatch)
+        enter("qa", into: password)
+        let beforeSignIn = try await observations().requests.count
+        select(app.buttons["connect"])
+        XCTAssertTrue(password.waitForNonExistence(timeout: 15), "Signing in again did not close sign-in")
+
+        var delivered: Fixture.Report?
+        for _ in 0..<40 where delivered == nil {
+            delivered = try await observations().reports.dropFirst(held).last { $0.path == "/api/session/local-all" && $0.userId == "00000000-0000-4000-8000-000000000001" }
+            if delivered == nil { try await Task.sleep(nanoseconds: 250_000_000) }
+        }
+        let report = try XCTUnwrap(delivered, "The held listening was not sent after signing in again")
+        XCTAssertEqual(report.currentTime, Double(stoppedAt), accuracy: 1)
+        sleep(3)
+        XCTAssertEqual(label("playback-status"), "Paused", "Audio started by itself after signing in again")
+        XCTAssertEqual(seconds("now-playing-elapsed"), stoppedAt)
+        let afterSignIn = try await observations().requests.dropFirst(beforeSignIn)
+        XCTAssertFalse(afterSignIn.contains { $0.path.hasPrefix("/audio/") }, "Audio loaded again after signing in")
+        capture("Signed in again")
+    }
+
     func testMediaFailureOffersRestartRatherThanSavingProgress() async throws {
         try await Fixture.configure("broken-audio")
         signIn()
