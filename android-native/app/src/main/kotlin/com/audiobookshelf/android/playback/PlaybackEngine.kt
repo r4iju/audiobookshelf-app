@@ -283,7 +283,10 @@ class PlaybackEngine(
         player.pause()
     }
 
-    fun toggle() = if (player.playWhenReady) pause() else resume()
+    fun toggle() = if (playsWhenReady()) pause() else resume()
+
+    /** The player keeps wanting to play after the end of the last file, but nothing plays then. */
+    private fun playsWhenReady() = player.playWhenReady && player.playbackState != Player.STATE_ENDED
 
     fun seekTo(position: Double) {
         pausedAt = 0
@@ -731,12 +734,12 @@ class PlaybackEngine(
     private fun listen(player: Player) {
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                mutable.value = mutable.value.copy(playing = player.playWhenReady && mutable.value.error == null)
+                mutable.value = mutable.value.copy(playing = playsWhenReady() && mutable.value.error == null)
                 if (!isPlaying) persist(force = true)
             }
 
             override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-                mutable.value = mutable.value.copy(playing = playWhenReady && mutable.value.error == null)
+                mutable.value = mutable.value.copy(playing = playsWhenReady() && mutable.value.error == null)
                 if (!playWhenReady && reason != Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM) {
                     pausedAt = System.currentTimeMillis()
                     loaded?.let { current -> persist(current, force = true) { sync.publish(current.source.account) } }
