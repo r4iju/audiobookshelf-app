@@ -1,0 +1,447 @@
+# Swedish drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Konton
+title_new_collection	Ny samling
+action_retry	Försök igen
+action_read	Läs %1$s
+action_mark_finished	Markera som avslutad
+choose_library	Välj bibliotek
+all_titles	Alla titlar
+all_podcasts	Alla poddar
+filter	Filter
+sort	Sortera
+theme_system	System
+screen_orientation	Skärmorientering
+jump_forward	Hoppa framåt
+jump_back	Hoppa bakåt
+set_settings_not_saved	Inställningarna kunde inte sparas på den här enheten, så inget ändrades. Frigör lagringsutrymme och försök igen.
+set_orientation_follow_device	Följ enheten
+set_orientation_portrait	Stående
+set_orientation_landscape	Liggande
+set_rewind_on_resume	Spola tillbaka lite vid återupptagning
+set_rewind_on_resume_detail	Backar några sekunder efter en paus, mer efter en längre.
+set_seek_system_controls	Spola från systemkontrollerna
+set_seek_system_controls_detail	Låter låsskärmen och aviseringen flytta positionsreglaget.
+set_mp3_index_seeking	Exakt spolning i MP3
+set_mp3_index_seeking_detail	Bygger ett spolindex för MP3-filer med opålitlig längd. Spolningen startar långsammare.
+set_shake_to_reset	Skaka för att återställa
+set_shake_to_reset_detail	Om du skakar telefonen medan timern går startar den om.
+set_sleep_fade_out	Tona ut
+set_sleep_fade_out_detail	Sänker volymen under den sista minuten.
+set_vibrate_on_reset	Vibrera vid återställning
+set_auto_sleep_timer_detail	Startar timern vid uppspelning mellan %1$s och %2$s.
+set_heading_mobile_data	Mobildata
+set_storage	Lagring
+set_heading_support	Support
+set_diagnostics	Diagnostik
+set_something_went_wrong	Något gick fel.
+set_statistics_unavailable	Statistiken är inte tillgänglig
+set_try_again	Försök igen
+set_minutes_listened:one	%1$d minut lyssnad
+set_minutes_listened:other	%1$d minuter lyssnade
+set_days_listened:one	%1$d dag med lyssnande
+set_days_listened:other	%1$d dagar med lyssnande
+set_titles_finished:one	%1$d titel avslutad
+set_titles_finished:other	%1$d titlar avslutade
+set_day_minutes_listened:one	%1$s, %2$d minut lyssnad
+set_day_minutes_listened:other	%1$s, %2$d minuter lyssnade
+set_set_aside_failed	Kunde inte läggas åt sidan. Försök igen.
+set_connection	Anslutning
+set_diagnostics_area_media	Media
+set_diagnostics_area_sync	Synkronisering
+set_unreadable_resets_title	Sparade rensningar av förlopp kunde inte läsas
+set_unreadable_resets_detail	Vilken titel som helst kan vara bland dem, så inget spelas upp och ingen läsposition skickas förrän du bestämmer dig. Om du lägger dem åt sidan behålls filen på den här enheten, och förlopp som de skulle rensa finns kvar på din server.
+set_set_them_aside	Lägg dem åt sidan
+set_listening_storage_title	Lyssnande från innan appen stängdes kunde inte sparas
+set_listening_storage_detail	Lagringen på den här enheten är otillgänglig eller full. Inget spelas upp och inget lyssnande skickas förrän det har sparats; det behålls tills dess.
+set_unreadable_writes_title	Poster om obesvarade sparningar av förlopp kunde inte läsas
+set_unreadable_writes_detail	En sparning för vilken titel som helst kan fortfarande nå din server, så inget lyssnande eller läsande skickas och inget förlopp rensas förrän du bestämmer dig. Om du lägger dem åt sidan behålls filen på den här enheten; en sen sparning kan då ta tillbaka förlopp som du rensar.
+set_diagnostics_server	Server %1$s
+set_diagnostics_signed_in_as	Inloggad som %1$s
+set_diagnostics_app_version	App %1$s
+set_recent_problems	Senaste problem
+set_clear	Rensa
+set_no_problems	Inga problem har registrerats på den här enheten.
+set_unreadable_writes_confirm_title	Lägga oläsbara poster åt sidan?
+set_unreadable_writes_confirm_detail	Lyssnande och läspositioner skickas igen och rensningar kan genomföras.
+set_set_aside	Lägg åt sidan
+set_unreadable_resets_confirm_title	Lägga oläsbara rensningar åt sidan?
+set_unreadable_resets_confirm_detail	Titlar spelas upp och läspositioner skickas igen. Rensa förloppet igen för titlar som du fortfarande vill börja om.
+set_signed_in	Inloggad
+set_other_accounts	Andra konton
+set_server_sign_in_required	%1$s · inloggning krävs
+set_remove_account	Ta bort %1$s
+set_switch_to_account	Byt till det här kontot
+set_add_account	Lägg till konto
+set_sign_out_of	Logga ut från %1$s
+set_sign_out_detail	Tar bort kontot från enheten. Hämtningar och ej skickat lyssnande för kontot finns kvar tills det loggar in igen.
+set_accounts_footer	Varje konto har sitt eget förlopp, sina egna hämtningar och sitt eget biblioteksval. De blandas aldrig när du byter.
+set_remove_account_confirm	Ta bort %1$s?
+set_remove_account_detail	Du kan lägga till kontot igen senare. Dess hämtningar och ej skickat lyssnande finns kvar på den här enheten.
+set_add_an_account	Lägg till ett konto
+set_connect_intro	Anslut direkt till din egen server. Inget går via någon annan tjänst.
+set_change_server	Byt server
+set_sign_in	Logga in
+set_sign_in_openid	Logga in med OpenID
+set_saved_accounts	Sparade konton
+set_use_account	Använd
+set_edit	Redigera
+set_add_podcast	Lägg till podd
+set_not_available_yet	Inte tillgängligt än
+set_not_available_yet_detail	Den här delen av förhandsversionen byggs fortfarande.
+set_import_previous_app	Importera från den tidigare appen
+set_import_interrupted	En import slutfördes inte. Välj samma export för att fortsätta där den stannade.
+set_import_already	Den här exporten har redan importerats. Titlar, lyssnande och positioner från den finns på den här enheten.
+set_import_preflight	%1$s\nDen tidigare appen och den här filen läses bara; inget i dem ändras. Titlar, lyssnande och positioner kopplas till ett konto när det loggar in här. Lösenord finns inte i exporten, så varje konto loggar in igen.
+set_import_account_signed_in	%1$s · inloggad
+set_import_account_sign_in_later	%1$s · logga in efter importen
+set_import_titles	Titlar
+set_import_title_partial	%1$s · resten hämtas igen
+set_not_imported	Inte importerad
+set_import_space	Kräver %1$s; %2$s ledigt.
+set_import_no_space	Det finns inte tillräckligt med ledigt utrymme på den här enheten. Frigör utrymme och välj sedan exporten igen.
+set_import_progress	Kopierar filer: %1$d av %2$d. Om appen stängs väljer du samma export igen för att fortsätta.
+set_import_done	Importerade %1$d titlar, %2$d lyssningstillfällen och %3$d positioner. Inställningar från den tidigare appen tillämpades.
+set_import_waiting	Logga in på %1$s som %2$s för att koppla dess titlar, lyssnande och positioner.
+set_import	Importera
+set_continue	Fortsätt
+set_close	Stäng
+set_import_file_unreadable	Den valda filen kunde inte läsas. Välj den igen, eller spara den på den här enheten först.
+set_import_stopped	Importen stoppades innan den var klar. Inget gick förlorat: välj samma export igen för att fortsätta där den stannade.
+set_import_item_gone	Den finns inte längre på servern, så den togs inte över.
+set_import_file_changed	En fil ändrades på den här enheten efter att den importerades, så den hämtas igen från servern.
+set_openid_not_enabled	OpenID-inloggning är inte aktiverad på den här servern. Använd ditt användarnamn och lösenord.
+set_openid_canceled	Inloggningen i webbläsaren avbröts. Dina sparade konton finns kvar.
+set_openid_invalid	Svaret från inloggningen i webbläsaren kunde inte verifieras. Försök logga in igen och kontrollera serverns inställningar för OpenID-omdirigering.
+set_vault_unreadable	Sparade inloggningar kunde inte dekrypteras. De finns kvar på enheten; logga in igen för att fortsätta.
+set_session_ended	Din session för %1$s har upphört. Logga in igen; ej skickat lyssnande och hämtningar finns kvar.
+set_play_blocked_listening_storage	Lyssnande från innan appen stängdes kunde inte sparas eftersom lagringen är otillgänglig, så inget spelas upp förrän det går. Frigör utrymme och försök sedan igen.
+set_play_blocked_unreadable_resets	Sparade rensningar av förlopp kunde inte läsas, så inget spelas upp förrän de har lösts i Diagnostik.
+set_play_blocked_discarding	Förloppet för den här titeln håller fortfarande på att rensas. Den spelas upp från början när det är klart.
+dl_not_saved	Hämtningslistan kunde inte sparas på den här enheten, så inget ändrades. Frigör lagringsutrymme och försök igen.
+dl_not_allowed	Ditt konto får inte hämta.
+dl_no_audio	Det här objektet har inget ljud att hämta.
+dl_no_space	Det finns inte tillräckligt med ledigt utrymme på den här enheten för %1$s om utrymme ska hållas ledigt för systemet.
+dl_folder_lost_nothing_downloaded	Åtkomsten till %1$s togs bort, så inget hämtades. Välj hämtningsmappen igen i Inställningar.
+dl_downloading_percent	Hämtar %1$d%%
+dl_cancel_download	Avbryt hämtningen
+dl_downloaded_plays_offline	Hämtad · spelas upp offline
+dl_failed	Hämtningen misslyckades.
+dl_discard	Släng
+dl_cellular_title	Hämta via mobildata?
+dl_cellular_message	Du använder en anslutning med datagräns. Du kan ändra detta i Inställningar.
+dl_not_now	Inte nu
+dl_folder_cannot_be_kept	Den mappen kan inte behållas för hämtningar. Välj en annan.
+dl_saved_in_folder	Hämtningar sparas i %1$s
+dl_saved_in_app_storage	Hämtningar sparas i appens lagring
+dl_folder_visible_to_other_apps	Andra appar på den här enheten kan se de här filerna. Hämtningar som gjorts före en ändring stannar där de är.
+dl_folder_private_to_app	Bara den här appen kan se de här filerna. Välj en mapp för att spara hämtningar där andra appar kan nå dem.
+dl_choose_folder	Välj mapp
+dl_use_app_storage	Använd appens lagring
+dl_ebook_missing	E-boken saknas på den här enheten. Hämta den igen för att öppna den.
+dl_no_app_opens_format	Ingen app på den här enheten kan öppna %1$s-filer. Installera en som kan det och försök igen.
+dl_no_app_opens_this_kind	Ingen app på den här enheten kan öppna den här typen av filer. Installera en som kan det och försök igen.
+dl_folder_lost_choose_again_open	Den här hämtningen finns i %1$s, och åtkomsten till %1$s togs bort. Välj %1$s igen för att öppna den.
+dl_folder_lost_choose_again_play	Den här hämtningen finns i %1$s, och åtkomsten till %1$s togs bort. Välj %1$s igen för att spela upp den.
+dl_names_or	%1$s eller %2$s
+dl_names_and	%1$s och %2$s
+dl_remove_title	Ta bort hämtningen?
+dl_remove_message	"%1$s" tas bort från den här enheten. Ditt lyssningsförlopp behålls.
+dl_keep	Behåll
+dl_not_that_folder	Det är inte %1$s. Välj mappen som de här hämtningarna finns i.
+dl_folder_access_not_kept	Åtkomsten till den mappen kunde inte behållas. Försök igen.
+dl_no_downloads	Inga hämtningar
+dl_no_downloads_message	Hämta böcker eller avsnitt från deras sida för att lyssna utan anslutning.
+dl_access_removed_title	Åtkomsten till %1$s togs bort
+dl_downloads_kept_there:one	%1$d hämtning finns kvar där. Välj %2$s igen för att spela upp och öppna den.
+dl_downloads_kept_there:other	%1$d hämtningar finns kvar där. Välj %2$s igen för att spela upp och öppna dem.
+dl_choose_again	Välj %1$s igen
+dl_some_files_missing	Vissa filer saknas på den här enheten
+dl_size_in_folder	%1$s i %2$s
+dl_open_in_another_app	Öppna %1$s i en annan app
+dl_download_again_named	Hämta %1$s igen
+dl_the_chosen_folder	den valda mappen
+dl_files_missing_play	Vissa filer i den här hämtningen saknas på den här enheten. Hämta den igen för att spela upp den.
+dl_play_named	Spela upp %1$s
+dl_retry_named	Försök igen med %1$s
+dl_cancel_named	Avbryt %1$s
+dl_remove_named	Ta bort %1$s
+dl_sign_in_again	Logga in på det här kontot igen för att hämta.
+dl_folder_lost_choose_in_downloads	Åtkomsten till %1$s togs bort. Välj mappen igen i Hämtningar.
+dl_connection_interrupted	Anslutningen avbröts.
+dl_error_retrying	%1$s Försöker igen…
+dl_server_refused	Servern nekade hämtningen.
+dl_server_sent_type_not_audio	Servern skickade %1$s i stället för ljud, så inget sparades. Kontrollera din server eller proxy och försök igen.
+dl_server_sent_unknown_not_audio	Servern skickade ett okänt svar i stället för ljud, så inget sparades. Kontrollera din server eller proxy och försök igen.
+dl_size_mismatch	Den hämtade filen var %1$d byte men servern angav %2$d, så den kastades. Försök igen för att hämta den på nytt.
+dl_server_sent_not_pdf	Servern skickade något annat än PDF-filen, så inget sparades. Kontrollera din server eller proxy och försök igen.
+rd_positions_not_restored	Sparade läspositioner kunde inte återställas, så sidor sparas inte. Originaldata behålls.
+rd_positions_not_overwritten	Sparade läspositioner kunde inte läsas, så de skrivs inte över.
+rd_not_a_pdf	Den här filen är inte en PDF som den här enheten kan öppna.
+rd_document_not_opened	Dokumentet kunde inte öppnas.
+rd_page_not_saved	Den här sidan kunde inte sparas på den här enheten.
+rd_choice_not_saved	Ditt val kunde inte sparas på den här enheten.
+rd_conflict_title	Fortsätta var?
+rd_conflict_page	En annan enhet nådde sida %1$d medan sida %2$d här ännu inte hade sparats på servern.
+rd_conflict_location	En annan enhet sparade en läsposition som den här läsaren inte kan visa som en sida, medan sida %1$d här ännu inte hade sparats på servern.
+rd_go_to_page_number	Gå till sida %1$d
+rd_keep_other_position	Behåll den andra positionen
+rd_stay_on_page	Stanna på sida %1$d
+rd_close_reader	Stäng läsaren
+rd_rotate_pages	Rotera sidor
+rd_continuous_scrolling	Kontinuerlig rullning
+rd_document_error_title	Dokumentet kunde inte öppnas
+rd_try_again	Försök igen
+rd_go_to_page	Gå till sida
+rd_previous_page	Föregående sida
+rd_next_page	Nästa sida
+rd_page_of	Sida %1$d av %2$d
+rd_page_number	Sida %1$d
+rd_download_folder_lost	Den här hämtningen finns i %1$s, och åtkomsten till %1$s togs bort. Välj mappen igen i Hämtningar.
+rd_downloaded_document_missing	Det hämtade dokumentet saknas på den här enheten. Hämta det igen.
+rd_document_not_stored	Dokumentet kunde inte lagras för läsning.
+rd_supplementary_pdf	kompletterande PDF
+rd_format_not_available	Läsning av %1$s är inte tillgänglig i den här förhandsversionen än. Din läsposition på servern behålls.
+rd_ebook_not_available	Läsning av den här e-boken är inte tillgänglig i den här förhandsversionen än. Din läsposition på servern behålls.
+grp_unavailable_title	Otillgänglig titel
+grp_could_not_load_collections	Det gick inte att läsa in samlingar.
+grp_could_not_load_playlists	Det gick inte att läsa in spellistor.
+grp_collections_unavailable	Samlingar är inte tillgängliga
+grp_playlists_unavailable	Spellistor är inte tillgängliga
+grp_no_collections_yet	Inga samlingar än
+grp_no_playlists_yet	Inga spellistor än
+grp_create_one_hint	Skapa en för att hålla ihop titlar i din egen ordning.
+grp_title_count:one	%1$d titel
+grp_title_count:other	%1$d titlar
+grp_collection_deleted	Den här samlingen har tagits bort.
+grp_playlist_deleted	Den här spellistan har tagits bort.
+grp_could_not_load	Det gick inte att läsa in.
+grp_collection_unavailable	Samlingen är inte tillgänglig
+grp_playlist_unavailable	Spellistan är inte tillgänglig
+grp_nothing_in_collection_can_play	Inget i den här samlingen kan spelas upp.
+grp_nothing_in_playlist_can_play	Inget i den här spellistan kan spelas upp.
+grp_could_not_start_playback	Det gick inte att starta uppspelningen.
+grp_resume	Återuppta
+grp_play_collection	Spela upp samlingen
+grp_play_playlist	Spela upp spellistan
+grp_edit_collection	Redigera samlingen
+grp_edit_playlist	Redigera spellistan
+grp_delete_collection	Ta bort samlingen
+grp_delete_playlist	Ta bort spellistan
+grp_no_titles_yet	Inga titlar än
+grp_delete_collection_question	Ta bort samlingen?
+grp_delete_playlist_question	Ta bort spellistan?
+grp_delete_group_explanation	”%1$s” tas bort från din server. Titlarna i den behålls.
+grp_not_deleted	Inte borttagen: %1$s
+grp_not_deleted_try_again	Inte borttagen: försök igen
+grp_not_allowed_to_change_collection	Ditt serverkonto får inte ändra den här samlingen.
+grp_not_allowed_to_change_playlist	Ditt serverkonto får inte ändra den här spellistan.
+grp_collection_no_longer_exists	Den här samlingen finns inte längre.
+grp_playlist_no_longer_exists	Den här spellistan finns inte längre.
+grp_not_saved	Inte sparad: %1$s
+grp_not_saved_try_again	Inte sparad: försök igen
+grp_saving	Sparar…
+grp_create_collection	Skapa samling
+grp_create_playlist	Skapa spellista
+grp_save_changes	Spara ändringar
+grp_choose_at_least_one_title	Välj minst en titel.
+grp_order	Ordning
+grp_move_up	Flytta upp %1$s
+grp_remove_member	Ta bort %1$s
+grp_add_titles	Lägg till titlar
+grp_add_episodes_hint	Lägg till avsnitt från en podds avsnittssida.
+grp_add_to_playlist_or_collection	Lägg till i spellista eller samling
+grp_add_to	Lägg till i
+grp_nothing_to_add_to	Det finns inget du kan lägga till i här än.
+grp_added_to	Tillagd i %1$s
+grp_not_added	Inte tillagd: %1$s
+grp_not_added_try_again	Inte tillagd: försök igen
+grp_already_included	Redan tillagd
+grp_close	Stäng
+grp_titles_could_not_load	Titlarna kunde inte läsas in
+grp_nothing_here	Inget här
+pod_feed_episodes	Avsnitt i flödet
+pod_sort_newest_first	Nyaste först, tryck för äldsta först
+pod_sort_oldest_first	Äldsta först, tryck för nyaste först
+pod_episodes_queued:one	%1$d avsnitt köat på din server: %2$s
+pod_episodes_queued:other	%1$d avsnitt köade på din server: %2$s
+pod_server_could_not_download	Din server kunde inte hämta ”%1$s”.
+pod_dismiss	Stäng
+pod_no_episodes_yet	Inga avsnitt än
+pod_no_episodes_match_filter	Inga avsnitt matchar filtret
+pod_episode_details	Avsnittsinformation
+pod_untitled_episode	Namnlöst avsnitt
+pod_play_named	Spela upp %1$s
+pod_episode_not_available	Avsnittet är inte tillgängligt
+pod_episode_may_have_been_removed	Det kan ha tagits bort från servern.
+pod_percent_listened	%1$d%% lyssnat
+pod_feed_could_not_open	Flödet kunde inte öppnas.
+pod_retry_feed	Läs in flödet igen
+pod_no_feed_episodes	Inga avsnitt hittades i flödet
+pod_already_on_server	Redan på servern
+pod_selected	Vald
+pod_not_selected	Inte vald
+pod_no_audio_enclosure	Ingen ljudbilaga
+pod_not_queued	Inte köat: %1$s
+pod_not_queued_try_again	Inte köat: försök igen
+pod_queueing_on_server	Köar på din server…
+pod_add_selected_episodes	Lägg till valda avsnitt på servern
+pod_something_went_wrong	Något gick fel.
+pod_adding_not_available	Det går inte att lägga till poddar
+pod_adding_needs_permission	Ditt serverkonto behöver behörighet att hantera poddar i ett poddbibliotek.
+pod_search_podcasts	Sök poddar
+pod_or_rss_feed_url	Eller RSS-flödets URL
+pod_enter_complete_feed_url	Ange en fullständig flödes-URL med HTTP eller HTTPS.
+pod_preview_feed	Förhandsgranska flödet
+pod_create_podcast	Skapa podd
+pod_choose_different_feed	Välj ett annat flöde
+item_something_went_wrong	Något gick fel. Försök igen.
+item_feed_subscribe_at	Poddappar kan prenumerera på den här titeln på:
+item_copied	Kopierad
+item_copy_address	Kopiera adressen
+item_hidden_from_directories	Dold för poddkataloger
+item_feed_public_warning	Alla som har adressen kan lyssna på den här titeln utan att logga in.
+item_feed_name	Flödesnamn
+item_feed_name_rule	Endast bokstäver, siffror, - och _
+item_hide_from_directories	Dölj för poddkataloger
+item_done	Klar
+item_sending	Skickar…
+item_sent_to	Skickad till %1$s
+item_send_ebook_explanation	Din server mejlar e-boken till den enhet du väljer.
+item_ereader_or_ebook_gone	%1$s eller den här e-boken är inte längre tillgänglig på servern. Inget skickades.
+item_not_sent_to	Inte skickad till %1$s. %2$s
+item_not_saved_try_again	Inte sparat. Försök igen.
+item_mark_unfinished	Markera som inte avslutad
+item_discard_uncertain	En tidigare sparning av den här titelns förlopp fick inget svar och kan fortfarande nå din server. Om den kommer fram efter rensningen tar den tillbaka förloppet. Din server kan inte tala om för appen om det sker.
+item_discard_anyway	Rensa ändå
+item_discard_under_way	Den här rensningen pågår redan och kan inte återkallas.
+item_keep_progress	Behåll förloppet
+item_discard_pending	Rensar förloppet. Det slutförs när din server kan nås och lyssnandet för den här titeln har skickats.
+item_discard_anyway_question	Rensa ändå?
+item_discard_anyway_explanation	Förloppet tas bort nu. Om den tidigare sparningen når din server efteråt kommer titelns förlopp tillbaka och du kan rensa det igen.
+item_discard	Rensa
+item_discard_progress_question	Rensa förloppet?
+item_discard_progress_explanation	Din position och avslutad-status för den här titeln tas bort från servern för alla enheter.
+item_could_not_load	Titeln kunde inte läsas in
+item_narrated_by	Uppläst av
+item_series	Serie: %1$s
+item_series_with_sequence	Serie: %1$s #%2$s
+item_episode_count:one	%1$d avsnitt
+item_episode_count:other	%1$d avsnitt
+item_listened_and_left	%1$d%% lyssnat · %2$s kvar
+item_chapter_number	Kapitel %1$d
+pl_minimize_player	Minimera spelaren
+pl_nothing_playing	Inget spelas upp
+pl_chapter_number	Kapitel %1$d
+pl_try_again	Försök igen
+pl_speed_value	Hastighet %1$s
+pl_sleep	Insomning
+pl_position_of_duration	%1$s av %2$s
+pl_buffering	Buffrar
+pl_previous_chapter	Föregående kapitel
+pl_next_chapter	Nästa kapitel
+pl_jump_forward_seconds:one	Hoppa framåt %1$d sekund
+pl_jump_forward_seconds:other	Hoppa framåt %1$d sekunder
+pl_jump_back_seconds:one	Hoppa bakåt %1$d sekund
+pl_jump_back_seconds:other	Hoppa bakåt %1$d sekunder
+pl_jump_forward_minutes:one	Hoppa framåt %1$d minut
+pl_jump_forward_minutes:other	Hoppa framåt %1$d minuter
+pl_jump_back_minutes:one	Hoppa bakåt %1$d minut
+pl_jump_back_minutes:other	Hoppa bakåt %1$d minuter
+pl_open_player	Öppna spelaren
+pl_playback_stopped	Uppspelningen stoppades
+pl_listening_unsaved	En del lyssnande har inte sparats på den här enheten än. Det behålls och sparas så snart lagringen tillåter.
+pl_playing	Spelar upp
+pl_resume	Återuppta
+pl_streaming_cellular_refused	Strömning via mobildata är avstängd i Inställningar. Anslut till Wi-Fi eller hämta den här titeln först.
+pl_stream_cellular_title	Strömma via mobildata?
+pl_stream_cellular_message	Du använder en anslutning med datagräns. Du kan ändra detta i Inställningar.
+pl_not_now	Inte nu
+pl_sleep_stops_end_of_chapter	Stoppar i slutet av det här kapitlet, om %1$s
+pl_sleep_stops_in	Stoppar om %1$s
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Stäng av
+pl_bookmark_not_saved_reason	Bokmärket sparades inte: %1$s
+pl_bookmark_not_saved	Bokmärket sparades inte: försök igen
+pl_bookmark_add_at	Lägg till vid %1$s
+pl_bookmark_go_to	Gå till bokmärket
+pl_bookmark_default	Bokmärke
+pl_bookmark_rename_named	Byt namn på %1$s
+pl_bookmark_delete_named	Ta bort %1$s
+pl_bookmark_at	Bokmärke vid %1$s
+pl_bookmark_rename	Byt namn på bokmärket
+pl_bookmark_new	Nytt bokmärke
+pl_untitled	Namnlöst
+pl_playback_stopped_reason	Uppspelningen stoppades: %1$s. Din position behålls.
+pl_playback_stopped_unknown	Uppspelningen stoppades: ljudet kunde inte läsas in. Din position behålls.
+pl_no_playable_audio	Det här objektet har inget spelbart ljud.
+pl_could_not_start	Uppspelningen kunde inte starta.
+pl_listening_save_failed	Lyssnandet kunde inte sparas på den här enheten, så uppspelningen pausades. Frigör lagringsutrymme och försök igen.
+cast_casting_to	Castar till %1$s
+cast_cast	Casta
+cast_playing_on	Spelar upp på %1$s
+cast_connecting_to	Ansluter till %1$s…
+cast_playing_on_phone	Spelar upp på den här telefonen
+cast_stop	Sluta casta
+cast_looking	Söker efter cast-enheter…
+cast_none_found	Inga cast-enheter hittades. Kontrollera att mottagaren är påslagen och på samma Wi-Fi-nätverk som den här telefonen.
+cast_close	Stäng
+cast_download_not_castable	Hämtade kopior spelas bara upp på den här telefonen. Sluta casta för att lyssna här, eller strömma titeln i stället.
+cast_resumed_without_title	Castningen stoppades eftersom appen startades om under castning. Öppna titeln igen för att fortsätta lyssna från den senaste plats som den här telefonen sparade.
+cast_needs_play_services	Castning kräver Google Play-tjänster, som den här enheten saknar eller behöver uppdatera.
+cast_could_not_start	Castning kunde inte starta på den här enheten: %1$s.
+cast_connect_failed_named	Det gick inte att ansluta till %1$s. Kontrollera att den är påslagen och på samma Wi-Fi-nätverk som den här telefonen.
+cast_connect_failed	Det gick inte att ansluta till mottagaren. Kontrollera att den är påslagen och på samma Wi-Fi-nätverk som den här telefonen.
+cast_connection_lost_named	Anslutningen till %1$s bröts. Uppspelningen fortsätter på den här telefonen.
+cast_connection_lost	Anslutningen till mottagaren bröts. Uppspelningen fortsätter på den här telefonen.
+auto_continue	Fortsätt
+auto_recent	Senaste
+auto_discovery	Upptäck
+auto_authors_count:one	%1$d författare
+auto_authors_count:other	%1$d författare
+auto_series_count:one	%1$d serie
+auto_series_count:other	%1$d serier
+lib_books_count:one	%1$d bok
+lib_books_count:other	%1$d böcker
+lib_items_count:one	%1$d objekt
+lib_items_count:other	%1$d objekt
+lib_selected	Vald
+lib_all_filters	Alla filter
+lib_nothing_to_filter	Det finns inget att filtrera efter här.
+lib_sort_descending_switch	Fallande, byt till stigande
+lib_sort_ascending_switch	Stigande, byt till fallande
+lib_sort_descending	Fallande
+lib_sort_ascending	Stigande
+lib_unavailable	Biblioteket är inte tillgängligt
+lib_unavailable_message	%1$s Ditt konto och ej skickat lyssnande behålls.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Visa omslag
+lib_show_list	Visa lista
+lib_filtered	Filtrerat
+lib_empty_title	Inget här än
+lib_empty_message	Det här biblioteket har inga objekt som du har åtkomst till.
+lib_page_error	Fler titlar kunde inte läsas in
+lib_card_finished	%1$s, avslutad
+lib_card_percent_listened	%1$s, %2$d procent lyssnat
+lib_search_in	Sök i %1$s
+lib_search_library	Sök i biblioteket
+lib_clear_search	Rensa sökningen
+lib_search_failed	Sökningen misslyckades
+lib_search_idle_title	Hitta något att lyssna på
+lib_search_idle_message	Sök efter titlar, författare, serier, uppläsare och avsnitt.
+lib_search_no_match	Inget matchar "%1$s". Försök med färre ord eller en annan stavning.
+err_invalid_server	Ange en serveradress som börjar med http:// eller https://, till exempel https://books.example.com/abs.
+err_unsafe_media_url	Servern returnerade en medieadress utanför den här servern. Den öppnades inte.
+err_sign_in_required	Din session accepteras inte längre. Logga in igen; ej skickat lyssnande behålls.
+err_untrusted	Serverns certifikat är inte betrott av den här enheten. Installera serverns certifikatutfärdare i Android-inställningar > Säkerhet > Kryptering och användaruppgifter och försök sedan igen.
+err_offline	Servern kunde inte nås. Kontrollera adressen eller din anslutning och försök igen.
+err_forbidden	Ditt konto får inte göra detta.
+err_not_found	Det här innehållet är inte längre tillgängligt på servern.
+err_server_problem	Servern hade ett tillfälligt problem (HTTP %1$d). Försök igen.
+err_rejected	Servern avvisade begäran (HTTP %1$d).
+err_invalid_response	Servern skickade ett svar som den här appen inte kunde läsa.
+err_no_audio	Det här objektet har inget spelbart ljud.
+err_login_rejected	Användarnamnet eller lösenordet godtogs inte.
+err_publications_unreadable	Poster om obesvarade sparningar av förlopp kunde inte läsas. Lös dem i Diagnostik först.
+err_discards_unreadable	Sparade rensningar av förlopp kunde inte läsas. Lös dem i Diagnostik först.

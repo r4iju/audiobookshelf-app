@@ -1,0 +1,476 @@
+# Catalan drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Comptes
+title_new_collection	Col·lecció nova
+action_retry	Torna-ho a provar
+action_read	Llegeix %1$s
+action_mark_finished	Marca com a acabat
+choose_library	Tria una biblioteca
+all_titles	Tots els títols
+all_podcasts	Tots els pòdcasts
+filter	Filtre
+sort	Ordena
+no_bookmarks	Encara no hi ha marcadors
+theme_system	Sistema
+screen_orientation	Orientació de la pantalla
+jump_forward	Salta endavant
+jump_back	Salta enrere
+shake_sensitivity	Sensibilitat de la sacsejada
+streaming_on_mobile_data	Reproducció en línia amb dades mòbils
+set_settings_not_saved	No s'han pogut desar els paràmetres en aquest dispositiu, així que no ha canviat res. Allibereu espai i torneu-ho a provar.
+set_orientation_follow_device	Segueix el dispositiu
+set_orientation_portrait	Vertical
+set_orientation_landscape	Horitzontal
+set_haptic_light	Lleuger
+set_unit_seconds_short	%1$ds
+set_unit_minutes_short	%1$dm
+set_rewind_on_resume	Rebobina una mica en reprendre
+set_rewind_on_resume_detail	Torna uns segons enrere després d'una pausa, i més després d'una pausa més llarga.
+set_seek_system_controls	Desplaçament des dels controls del sistema
+set_seek_system_controls_detail	Permet que la pantalla de bloqueig i la notificació moguin la barra de posició.
+set_mp3_index_seeking	Desplaçament precís en MP3
+set_mp3_index_seeking_detail	Crea un índex de desplaçament per als fitxers MP3 amb durades poc fiables. El desplaçament comença més lentament.
+set_shake_to_reset	Sacseja per reiniciar
+set_shake_to_reset_detail	Sacsejar el telèfon mentre el temporitzador funciona el torna a iniciar.
+set_sleep_fade_out	Esvaïment
+set_sleep_fade_out_detail	Abaixa el volum durant l'últim minut.
+set_vibrate_on_reset	Vibra en reiniciar
+set_sleep_chime	So quan gairebé s'acaba
+set_auto_sleep_timer_detail	Inicia el temporitzador quan es reprodueix entre les %1$s i les %2$s.
+set_auto_sleep_starts_at	Comença a les
+set_heading_mobile_data	Dades mòbils
+set_storage	Emmagatzematge
+set_series_first_to_last	Del primer a l'últim
+set_series_last_to_first	De l'últim al primer
+set_heading_support	Suport
+set_diagnostics	Diagnòstic
+set_something_went_wrong	Alguna cosa ha anat malament.
+set_statistics_unavailable	Les estadístiques no estan disponibles
+set_try_again	Torna-ho a provar
+set_minutes_listened:one	%1$d minut escoltat
+set_minutes_listened:many	%1$d minuts escoltats
+set_minutes_listened:other	%1$d minuts escoltats
+set_days_listened:one	%1$d dia escoltat
+set_days_listened:many	%1$d dies escoltats
+set_days_listened:other	%1$d dies escoltats
+set_titles_finished:one	%1$d títol acabat
+set_titles_finished:many	%1$d títols acabats
+set_titles_finished:other	%1$d títols acabats
+set_day_minutes_listened:one	%1$s, %2$d minut escoltat
+set_day_minutes_listened:many	%1$s, %2$d minuts escoltats
+set_day_minutes_listened:other	%1$s, %2$d minuts escoltats
+set_set_aside_failed	No s'ha pogut deixar de banda. Torneu-ho a provar.
+set_connection	Connexió
+set_diagnostics_area_media	Multimèdia
+set_diagnostics_area_sync	Sincronització
+set_unreadable_resets_title	No s'han pogut llegir els descarts de progrés desats
+set_unreadable_resets_detail	Qualsevol títol hi pot estar afectat, així que no es reprodueix res ni s'envia cap posició de lectura fins que decidiu. Deixar-los de banda manté el fitxer en aquest dispositiu, i qualsevol progrés que s'havia de descartar es queda al vostre servidor.
+set_set_them_aside	Deixa'ls de banda
+set_listening_storage_title	No s'ha pogut desar l'escolta d'abans que es tanqués l'aplicació
+set_listening_storage_detail	L'emmagatzematge d'aquest dispositiu no està disponible o és ple. No es reprodueix res ni s'envia cap escolta fins que es desi; es conserva fins aleshores.
+set_unreadable_writes_title	No s'han pogut llegir els registres de desaments de progrés sense resposta
+set_unreadable_writes_detail	Un desament de qualsevol títol encara pot arribar al vostre servidor, així que no s'envia cap escolta ni lectura i no es descarta cap progrés fins que decidiu. Deixar-los de banda manté el fitxer en aquest dispositiu; un desament tardà pot recuperar després el progrés que descarteu.
+set_diagnostics_server	Servidor %1$s
+set_diagnostics_signed_in_as	Sessió iniciada com a %1$s
+set_diagnostics_app_version	Aplicació %1$s
+set_recent_problems	Problemes recents
+set_clear	Esborra
+set_no_problems	No s'ha registrat cap problema en aquest dispositiu.
+set_unreadable_writes_confirm_title	Voleu deixar de banda els registres il·legibles?
+set_unreadable_writes_confirm_detail	Les posicions d'escolta i de lectura es tornen a enviar i els descarts poden continuar.
+set_set_aside	Deixa de banda
+set_unreadable_resets_confirm_title	Voleu deixar de banda els descarts il·legibles?
+set_unreadable_resets_confirm_detail	Els títols es reprodueixen i les posicions de lectura es tornen a enviar. Torneu a descartar el progrés de qualsevol títol que encara vulgueu començar de nou.
+set_signed_in	Sessió iniciada
+set_other_accounts	Altres comptes
+set_server_sign_in_required	%1$s · cal iniciar la sessió
+set_remove_account	Elimina %1$s
+set_switch_to_account	Canvia a aquest compte
+set_add_account	Afegeix un compte
+set_sign_out_of	Tanca la sessió de %1$s
+set_sign_out_detail	Elimina aquest compte del dispositiu. Les baixades i l'escolta no enviada es conserven fins que torni a iniciar la sessió.
+set_accounts_footer	Cada compte manté el seu propi progrés, baixades i biblioteca triada. Canviar de compte mai no els barreja.
+set_remove_account_confirm	Voleu eliminar %1$s?
+set_remove_account_detail	Podeu tornar a afegir el compte més endavant. Les seves baixades i l'escolta no enviada es queden en aquest dispositiu.
+set_add_an_account	Afegiu un compte
+set_connect_intro	Connecteu-vos directament al vostre propi servidor. Res no passa per cap altre servei.
+set_change_server	Canvia de servidor
+set_sign_in	Inicia la sessió
+set_sign_in_openid	Inicia la sessió amb OpenID
+set_saved_accounts	Comptes desats
+set_use_account	Utilitza
+set_edit	Edita
+set_add_podcast	Afegeix un pòdcast
+set_not_available_yet	Encara no disponible
+set_not_available_yet_detail	Aquesta part de la versió preliminar encara s'està construint.
+set_import_previous_app	Importa de l'aplicació anterior
+set_import_interrupted	Una importació no s'ha acabat. Trieu la mateixa exportació per continuar on es va aturar.
+set_import_already	Aquesta exportació ja s'ha importat. Els títols, l'escolta i les posicions que conté són en aquest dispositiu.
+set_import_preflight	%1$s\nL'aplicació anterior i aquest fitxer només es llegeixen; no s'hi canvia res. Els títols, l'escolta i les posicions s'associen a un compte quan hi inicia la sessió. Les contrasenyes no són a l'exportació, així que cada compte ha de tornar a iniciar la sessió.
+set_import_account_signed_in	%1$s · sessió iniciada
+set_import_account_sign_in_later	%1$s · inicieu la sessió després d'importar
+set_import_titles	Títols
+set_import_title_partial	%1$s · la resta es torna a baixar
+set_not_imported	No importat
+set_import_space	Calen %1$s; hi ha %2$s lliures.
+set_import_no_space	No hi ha prou espai lliure en aquest dispositiu. Allibereu espai i torneu a triar l'exportació.
+set_import_progress	S'estan copiant els fitxers: %1$d de %2$d. Si l'aplicació es tanca, torneu a triar la mateixa exportació per continuar.
+set_import_done	S'han importat %1$d títols, %2$d sessions d'escolta i %3$d posicions. S'han aplicat els paràmetres de l'aplicació anterior.
+set_import_waiting	Inicieu la sessió a %1$s com a %2$s per associar-hi els títols, l'escolta i les posicions.
+set_import	Importa
+set_continue	Continua
+set_close	Tanca
+set_import_file_unreadable	No s'ha pogut llegir el fitxer triat. Torneu-lo a triar o deseu-lo primer en aquest dispositiu.
+set_import_stopped	La importació s'ha aturat abans d'acabar. No s'ha perdut res: torneu a triar la mateixa exportació per continuar on es va aturar.
+set_import_item_gone	Ja no és al servidor, així que no s'ha incorporat.
+set_import_file_changed	Un fitxer ha canviat en aquest dispositiu després d'importar-lo, així que es torna a baixar del servidor.
+set_openid_not_enabled	L'inici de sessió amb OpenID no està activat en aquest servidor. Utilitzeu el nom d'usuari i la contrasenya.
+set_openid_canceled	S'ha cancel·lat l'inici de sessió al navegador. Els comptes desats es conserven.
+set_openid_invalid	No s'ha pogut verificar la resposta de l'inici de sessió al navegador. Torneu a iniciar la sessió i comproveu la configuració de redirecció OpenID del servidor.
+set_vault_unreadable	No s'han pogut desxifrar els inicis de sessió desats. Es conserven al dispositiu; torneu a iniciar la sessió per continuar.
+set_session_ended	La vostra sessió a %1$s ha finalitzat. Torneu a iniciar la sessió; l'escolta no enviada i les baixades es conserven.
+set_play_blocked_listening_storage	No s'ha pogut desar l'escolta d'abans que es tanqués l'aplicació perquè l'emmagatzematge no està disponible, així que no es reprodueix res fins que es pugui desar. Allibereu espai i torneu-ho a provar.
+set_play_blocked_unreadable_resets	No s'han pogut llegir els descarts de progrés desats, així que no es reprodueix res fins que es resolguin a Diagnòstic.
+set_play_blocked_discarding	El progrés d'aquest títol encara s'està descartant. Es reproduirà des del principi quan s'hagi acabat.
+dl_not_saved	No s'ha pogut desar la llista de baixades en aquest dispositiu, així que no ha canviat res. Allibereu espai i torneu-ho a provar.
+dl_not_allowed	El vostre compte no té permís per baixar.
+dl_no_audio	Aquest element no té àudio per baixar.
+dl_no_space	No hi ha prou espai lliure en aquest dispositiu per a %1$s si es deixa espai lliure per al sistema.
+dl_folder_lost_nothing_downloaded	S'ha retirat l'accés a %1$s, així que no s'ha baixat res. Torneu a triar la carpeta de baixades a Paràmetres.
+dl_downloading_percent	S'està baixant: %1$d%%
+dl_cancel_download	Cancel·la la baixada
+dl_downloaded_plays_offline	Baixat · es reprodueix sense connexió
+dl_failed	La baixada ha fallat.
+dl_discard	Descarta
+dl_cellular_title	Voleu baixar amb dades mòbils?
+dl_cellular_message	Esteu en una connexió amb límit de dades. Podeu canviar-ho a Paràmetres.
+dl_not_now	Ara no
+dl_folder_cannot_be_kept	No es pot conservar aquesta carpeta per a les baixades. Trieu-ne una altra.
+dl_saved_in_folder	Les baixades es desen a %1$s
+dl_saved_in_app_storage	Les baixades es desen a l'emmagatzematge de l'aplicació
+dl_folder_visible_to_other_apps	Altres aplicacions d'aquest dispositiu poden veure aquests fitxers. Les baixades fetes abans d'un canvi es queden on són.
+dl_folder_private_to_app	Només aquesta aplicació pot veure aquests fitxers. Trieu una carpeta per desar les baixades on altres aplicacions hi puguin accedir.
+dl_choose_folder	Tria una carpeta
+dl_use_app_storage	Utilitza l'emmagatzematge de l'aplicació
+dl_ebook_missing	El llibre electrònic no és en aquest dispositiu. Torneu-lo a baixar per obrir-lo.
+dl_no_app_opens_format	Cap aplicació d'aquest dispositiu no obre fitxers %1$s. Instal·leu-ne una que ho faci i torneu-ho a provar.
+dl_no_app_opens_this_kind	Cap aplicació d'aquest dispositiu no obre aquest tipus de fitxers. Instal·leu-ne una que ho faci i torneu-ho a provar.
+dl_folder_lost_choose_again_open	Aquesta baixada és a %1$s, i s'ha retirat l'accés a %1$s. Torneu a triar %1$s per obrir-la.
+dl_folder_lost_choose_again_play	Aquesta baixada és a %1$s, i s'ha retirat l'accés a %1$s. Torneu a triar %1$s per reproduir-la.
+dl_names_or	%1$s o %2$s
+dl_names_and	%1$s i %2$s
+dl_remove_title	Voleu eliminar la baixada?
+dl_remove_message	«%1$s» s'eliminarà d'aquest dispositiu. El vostre progrés d'escolta es conserva.
+dl_keep	Conserva
+dl_not_that_folder	Aquesta no és %1$s. Trieu la carpeta on hi ha aquestes baixades.
+dl_folder_access_not_kept	No s'ha pogut conservar l'accés a aquesta carpeta. Torneu-ho a provar.
+dl_no_downloads	Cap baixada
+dl_no_downloads_message	Baixeu llibres o episodis des de la seva pàgina per escoltar-los sense connexió.
+dl_access_removed_title	S'ha retirat l'accés a %1$s
+dl_downloads_kept_there:one	S'hi conserva %1$d baixada. Torneu a triar %2$s per reproduir-la i obrir-la.
+dl_downloads_kept_there:many	S'hi conserven %1$d baixades. Torneu a triar %2$s per reproduir-les i obrir-les.
+dl_downloads_kept_there:other	S'hi conserven %1$d baixades. Torneu a triar %2$s per reproduir-les i obrir-les.
+dl_choose_again	Torna a triar %1$s
+dl_some_files_missing	Falten alguns fitxers en aquest dispositiu
+dl_size_in_folder	%1$s a %2$s
+dl_open_in_another_app	Obre %1$s en una altra aplicació
+dl_download_again_named	Torna a baixar %1$s
+dl_the_chosen_folder	la carpeta triada
+dl_files_missing_play	Falten alguns fitxers d'aquesta baixada en aquest dispositiu. Torneu-la a baixar per reproduir-la.
+dl_play_named	Reprodueix %1$s
+dl_retry_named	Torna a provar %1$s
+dl_cancel_named	Cancel·la %1$s
+dl_remove_named	Elimina %1$s
+dl_sign_in_again	Torneu a iniciar la sessió en aquest compte per baixar.
+dl_folder_lost_choose_in_downloads	S'ha retirat l'accés a %1$s. Torneu a triar la carpeta a Baixades.
+dl_connection_interrupted	S'ha interromput la connexió.
+dl_error_retrying	%1$s S'està tornant a provar…
+dl_server_refused	El servidor ha rebutjat la baixada.
+dl_server_sent_type_not_audio	El servidor ha enviat %1$s en lloc d'àudio, així que no s'ha desat res. Comproveu el servidor o el servidor intermediari i torneu-ho a provar.
+dl_server_sent_unknown_not_audio	El servidor ha enviat una resposta desconeguda en lloc d'àudio, així que no s'ha desat res. Comproveu el servidor o el servidor intermediari i torneu-ho a provar.
+dl_size_mismatch	El fitxer baixat tenia %1$d bytes però el servidor n'indicava %2$d, així que s'ha descartat. Torneu-ho a provar per baixar-lo de nou.
+dl_server_sent_not_pdf	El servidor ha enviat una altra cosa que no és el PDF, així que no s'ha desat res. Comproveu el servidor o el servidor intermediari i torneu-ho a provar.
+dl_notification_downloading	S'està baixant %1$s
+rd_positions_not_restored	No s'han pogut restaurar les posicions de lectura desades, així que no es desen les pàgines. Es conserven les dades originals.
+rd_positions_not_overwritten	No s'han pogut llegir les posicions de lectura desades, així que no se sobreescriuen.
+rd_not_a_pdf	Aquest fitxer no és un PDF que aquest dispositiu pugui obrir.
+rd_document_not_opened	No s'ha pogut obrir el document.
+rd_page_not_saved	No s'ha pogut desar aquesta pàgina en aquest dispositiu.
+rd_choice_not_saved	No s'ha pogut desar la vostra elecció en aquest dispositiu.
+rd_conflict_title	On voleu continuar?
+rd_conflict_page	Un altre dispositiu ha arribat a la pàgina %1$d mentre la pàgina %2$d d'aquí encara no s'havia desat al servidor.
+rd_conflict_location	Un altre dispositiu ha desat una posició de lectura que aquest lector no pot mostrar com a pàgina mentre la pàgina %1$d d'aquí encara no s'havia desat al servidor.
+rd_go_to_page_number	Ves a la pàgina %1$d
+rd_keep_other_position	Conserva l'altra posició
+rd_stay_on_page	Queda't a la pàgina %1$d
+rd_close_reader	Tanca el lector
+rd_rotate_pages	Gira les pàgines
+rd_continuous_scrolling	Desplaçament continu
+rd_document_error_title	No s'ha pogut obrir aquest document
+rd_try_again	Torna-ho a provar
+rd_go_to_page	Ves a la pàgina
+rd_previous_page	Pàgina anterior
+rd_next_page	Pàgina següent
+rd_page_of	Pàgina %1$d de %2$d
+rd_page_number	Pàgina %1$d
+rd_download_folder_lost	Aquesta baixada és a %1$s, i s'ha retirat l'accés a %1$s. Torneu a triar la carpeta a Baixades.
+rd_downloaded_document_missing	El document baixat no és en aquest dispositiu. Torneu-lo a baixar.
+rd_document_not_stored	No s'ha pogut emmagatzemar el document per llegir-lo.
+rd_supplementary_pdf	PDF suplementari
+rd_format_not_available	La lectura de %1$s encara no està disponible en aquesta versió preliminar. Es conserva la vostra posició de lectura al servidor.
+rd_ebook_not_available	La lectura d'aquest llibre electrònic encara no està disponible en aquesta versió preliminar. Es conserva la vostra posició de lectura al servidor.
+grp_unavailable_title	Títol no disponible
+grp_could_not_load_collections	No s'han pogut carregar les col·leccions.
+grp_could_not_load_playlists	No s'han pogut carregar les llistes de reproducció.
+grp_collections_unavailable	Col·leccions no disponibles
+grp_playlists_unavailable	Llistes de reproducció no disponibles
+grp_no_collections_yet	Encara no hi ha col·leccions
+grp_no_playlists_yet	Encara no hi ha llistes de reproducció
+grp_create_one_hint	Creeu-ne una per agrupar títols en el vostre propi ordre.
+grp_title_count:one	%1$d títol
+grp_title_count:many	%1$d títols
+grp_title_count:other	%1$d títols
+grp_collection_deleted	S'ha suprimit aquesta col·lecció.
+grp_playlist_deleted	S'ha suprimit aquesta llista de reproducció.
+grp_could_not_load	No s'ha pogut carregar.
+grp_collection_unavailable	Col·lecció no disponible
+grp_playlist_unavailable	Llista de reproducció no disponible
+grp_nothing_in_collection_can_play	No es pot reproduir res d'aquesta col·lecció.
+grp_nothing_in_playlist_can_play	No es pot reproduir res d'aquesta llista de reproducció.
+grp_could_not_start_playback	No s'ha pogut iniciar la reproducció.
+grp_resume	Reprèn
+grp_play_collection	Reprodueix la col·lecció
+grp_play_playlist	Reprodueix la llista
+grp_edit_collection	Edita la col·lecció
+grp_edit_playlist	Edita la llista de reproducció
+grp_delete_collection	Suprimeix la col·lecció
+grp_delete_playlist	Suprimeix la llista de reproducció
+grp_no_titles_yet	Encara no hi ha títols
+grp_delete_collection_question	Voleu suprimir la col·lecció?
+grp_delete_playlist_question	Voleu suprimir la llista de reproducció?
+grp_delete_group_explanation	«%1$s» s'elimina del vostre servidor. Els títols que conté es conserven.
+grp_not_deleted	No s'ha suprimit: %1$s
+grp_not_deleted_try_again	No s'ha suprimit: torneu-ho a provar
+grp_not_allowed_to_change_collection	El vostre compte del servidor no té permís per modificar aquesta col·lecció.
+grp_not_allowed_to_change_playlist	El vostre compte del servidor no té permís per modificar aquesta llista de reproducció.
+grp_collection_no_longer_exists	Aquesta col·lecció ja no existeix.
+grp_playlist_no_longer_exists	Aquesta llista de reproducció ja no existeix.
+grp_not_saved	No s'ha desat: %1$s
+grp_not_saved_try_again	No s'ha desat: torneu-ho a provar
+grp_saving	S'està desant…
+grp_create_collection	Crea la col·lecció
+grp_create_playlist	Crea la llista de reproducció
+grp_save_changes	Desa els canvis
+grp_choose_at_least_one_title	Trieu almenys un títol.
+grp_order	Ordre
+grp_move_up	Mou %1$s amunt
+grp_remove_member	Elimina %1$s
+grp_add_titles	Afegeix títols
+grp_add_episodes_hint	Afegiu episodis des de la pàgina d'episodi d'un pòdcast.
+grp_add_to_playlist_or_collection	Afegeix a una llista de reproducció o col·lecció
+grp_add_to	Afegeix a
+grp_nothing_to_add_to	Encara no hi ha res on pugueu afegir-ho.
+grp_added_to	S'ha afegit a %1$s
+grp_not_added	No s'ha afegit: %1$s
+grp_not_added_try_again	No s'ha afegit: torneu-ho a provar
+grp_already_included	Ja hi és
+grp_close	Tanca
+grp_titles_could_not_load	No s'han pogut carregar els títols
+grp_nothing_here	Aquí no hi ha res
+pod_feed_episodes	Episodis del canal
+pod_sort_newest_first	Primer els més recents; toqueu per veure primer els més antics
+pod_sort_oldest_first	Primer els més antics; toqueu per veure primer els més recents
+pod_episodes_queued:one	%1$d episodi a la cua del vostre servidor: %2$s
+pod_episodes_queued:many	%1$d episodis a la cua del vostre servidor: %2$s
+pod_episodes_queued:other	%1$d episodis a la cua del vostre servidor: %2$s
+pod_server_could_not_download	El vostre servidor no ha pogut baixar «%1$s».
+pod_dismiss	Descarta
+pod_no_episodes_yet	Encara no hi ha episodis
+pod_no_episodes_match_filter	Cap episodi coincideix amb aquest filtre
+pod_episode_details	Detalls de l'episodi
+pod_untitled_episode	Episodi sense títol
+pod_play_named	Reprodueix %1$s
+pod_episode_not_available	Episodi no disponible
+pod_episode_may_have_been_removed	Pot ser que s'hagi eliminat del servidor.
+pod_percent_listened	%1$d%% escoltat
+pod_feed_could_not_open	No s'ha pogut obrir el canal.
+pod_retry_feed	Torna a provar el canal
+pod_no_feed_episodes	No s'ha trobat cap episodi al canal
+pod_already_on_server	Ja és al servidor
+pod_selected	Seleccionat
+pod_not_selected	No seleccionat
+pod_no_audio_enclosure	Sense fitxer d'àudio adjunt
+pod_not_queued	No s'ha posat a la cua: %1$s
+pod_not_queued_try_again	No s'ha posat a la cua: torneu-ho a provar
+pod_queueing_on_server	S'està posant a la cua del vostre servidor…
+pod_add_selected_episodes	Afegeix els episodis seleccionats al servidor
+pod_something_went_wrong	Alguna cosa ha anat malament.
+pod_adding_not_available	No es poden afegir pòdcasts
+pod_adding_needs_permission	El vostre compte del servidor necessita permís de gestió de pòdcasts en una biblioteca de pòdcasts.
+pod_search_podcasts	Cerca pòdcasts
+pod_or_rss_feed_url	O URL del canal RSS
+pod_enter_complete_feed_url	Introduïu un URL de canal HTTP o HTTPS complet.
+pod_preview_feed	Previsualitza el canal
+pod_create_podcast	Crea el pòdcast
+pod_choose_different_feed	Tria un altre canal
+item_something_went_wrong	Alguna cosa ha anat malament. Torneu-ho a provar.
+item_feed_subscribe_at	Les aplicacions de pòdcasts es poden subscriure a aquest títol a:
+item_copied	S'ha copiat
+item_copy_address	Copia l'adreça
+item_hidden_from_directories	Ocult als directoris de pòdcasts
+item_feed_public_warning	Qualsevol persona amb l'adreça pot escoltar aquest títol sense iniciar la sessió.
+item_feed_name	Nom del canal
+item_feed_name_rule	Només lletres, números, - i _
+item_hide_from_directories	Amaga dels directoris de pòdcasts
+item_owner_name	Nom del propietari
+item_owner_email	Correu electrònic del propietari
+item_done	Fet
+item_sending	S'està enviant…
+item_sent_to	S'ha enviat a %1$s
+item_send_ebook_explanation	El vostre servidor envia per correu electrònic el llibre al dispositiu que trieu.
+item_ereader_or_ebook_gone	%1$s o aquest llibre electrònic ja no està disponible al servidor. No s'ha enviat res.
+item_not_sent_to	No s'ha enviat a %1$s. %2$s
+item_not_saved_try_again	No s'ha desat. Torneu-ho a provar.
+item_mark_unfinished	Marca com a no acabat
+item_discard_uncertain	Un desament anterior del progrés d'aquest títol no ha rebut resposta i encara pot arribar al vostre servidor. Si arriba després de descartar-lo, el progrés tornarà. El vostre servidor no pot indicar a aquesta aplicació si passarà.
+item_discard_anyway	Descarta igualment
+item_discard_under_way	Aquest descart ja està en curs i no es pot retirar.
+item_keep_progress	Conserva el progrés
+item_discard_pending	S'està descartant el progrés. Acabarà quan es pugui contactar amb el vostre servidor i s'hagi enviat l'escolta d'aquest títol.
+item_discard_anyway_question	Voleu descartar-lo igualment?
+item_discard_anyway_explanation	El progrés s'elimina ara. Si el desament anterior arriba després al vostre servidor, el progrés d'aquest títol tornarà i el podreu tornar a descartar.
+item_discard	Descarta
+item_discard_progress_question	Voleu descartar el progrés?
+item_discard_progress_explanation	La vostra posició i l'estat d'acabat d'aquest títol s'eliminen del servidor per a tots els dispositius.
+item_could_not_load	No s'ha pogut carregar aquest títol
+item_narrated_by	Narrat per
+item_series	Sèrie: %1$s
+item_series_with_sequence	Sèrie: %1$s núm. %2$s
+item_episode_count:one	%1$d episodi
+item_episode_count:many	%1$d episodis
+item_episode_count:other	%1$d episodis
+item_listened_and_left	%1$d%% escoltat · en queden %2$s
+item_chapter_number	Capítol %1$d
+pl_minimize_player	Minimitza el reproductor
+pl_nothing_playing	No s'està reproduint res
+pl_chapter_number	Capítol %1$d
+pl_try_again	Torna-ho a provar
+pl_speed_value	Velocitat %1$s
+pl_sleep	Temporitzador
+pl_position_of_duration	%1$s de %2$s
+pl_buffering	S'està carregant
+pl_previous_chapter	Capítol anterior
+pl_next_chapter	Capítol següent
+pl_jump_forward_seconds:one	Salta %1$d segon endavant
+pl_jump_forward_seconds:many	Salta %1$d segons endavant
+pl_jump_forward_seconds:other	Salta %1$d segons endavant
+pl_jump_back_seconds:one	Salta %1$d segon enrere
+pl_jump_back_seconds:many	Salta %1$d segons enrere
+pl_jump_back_seconds:other	Salta %1$d segons enrere
+pl_jump_forward_minutes:one	Salta %1$d minut endavant
+pl_jump_forward_minutes:many	Salta %1$d minuts endavant
+pl_jump_forward_minutes:other	Salta %1$d minuts endavant
+pl_jump_back_minutes:one	Salta %1$d minut enrere
+pl_jump_back_minutes:many	Salta %1$d minuts enrere
+pl_jump_back_minutes:other	Salta %1$d minuts enrere
+pl_open_player	Obre el reproductor
+pl_playback_stopped	S'ha aturat la reproducció
+pl_listening_unsaved	Part de l'escolta encara no s'ha desat en aquest dispositiu. Es conserva i es desarà tan aviat com l'emmagatzematge ho permeti.
+pl_playing	S'està reproduint
+pl_resume	Reprèn
+pl_streaming_cellular_refused	La reproducció en línia amb dades mòbils està desactivada a Paràmetres. Connecteu-vos a una xarxa Wi-Fi o baixeu primer aquest títol.
+pl_stream_cellular_title	Voleu reproduir en línia amb dades mòbils?
+pl_stream_cellular_message	Esteu en una connexió amb límit de dades. Podeu canviar-ho a Paràmetres.
+pl_not_now	Ara no
+pl_sleep_stops_end_of_chapter	S'aturarà al final d'aquest capítol, d'aquí a %1$s
+pl_sleep_stops_in	S'aturarà d'aquí a %1$s
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Desactiva
+pl_bookmark_not_saved_reason	No s'ha desat el marcador: %1$s
+pl_bookmark_not_saved	No s'ha desat el marcador: torneu-ho a provar
+pl_bookmark_add_at	Afegeix a %1$s
+pl_bookmark_go_to	Ves al marcador
+pl_bookmark_default	Marcador
+pl_bookmark_rename_named	Canvia el nom de %1$s
+pl_bookmark_delete_named	Suprimeix %1$s
+pl_bookmark_at	Marcador a %1$s
+pl_bookmark_rename	Canvia el nom del marcador
+pl_bookmark_new	Marcador nou
+pl_untitled	Sense títol
+pl_playback_stopped_reason	S'ha aturat la reproducció: %1$s. Es conserva la vostra posició.
+pl_playback_stopped_unknown	S'ha aturat la reproducció: no s'ha pogut carregar l'àudio. Es conserva la vostra posició.
+pl_no_playable_audio	Aquest element no té àudio reproduïble.
+pl_could_not_start	No s'ha pogut iniciar la reproducció.
+pl_listening_save_failed	No s'ha pogut desar l'escolta en aquest dispositiu, així que s'ha posat en pausa la reproducció. Allibereu espai i torneu-ho a provar.
+cast_casting_to	S'està emetent a %1$s
+cast_cast	Emet
+cast_playing_on	S'està reproduint a %1$s
+cast_connecting_to	S'està connectant a %1$s…
+cast_playing_on_phone	S'està reproduint en aquest telèfon
+cast_stop	Atura l'emissió
+cast_looking	S'estan cercant dispositius d'emissió…
+cast_none_found	No s'ha trobat cap dispositiu d'emissió. Comproveu que el receptor estigui engegat i a la mateixa xarxa Wi-Fi que aquest telèfon.
+cast_close	Tanca
+cast_download_not_castable	Les còpies baixades només es reprodueixen en aquest telèfon. Atureu l'emissió per escoltar-les aquí o reproduïu el títol en línia.
+cast_resumed_without_title	L'emissió s'ha aturat perquè l'aplicació s'ha reiniciat mentre emetia. Torneu a obrir el títol per continuar escoltant des de l'últim punt que ha desat aquest telèfon.
+cast_needs_play_services	L'emissió necessita els serveis de Google Play, que aquest dispositiu no té o ha d'actualitzar.
+cast_could_not_start	No s'ha pogut iniciar l'emissió en aquest dispositiu: %1$s.
+cast_connect_failed_named	No s'ha pogut connectar a %1$s. Comproveu que estigui engegat i a la mateixa xarxa Wi-Fi que aquest telèfon.
+cast_connect_failed	No s'ha pogut connectar al receptor. Comproveu que estigui engegat i a la mateixa xarxa Wi-Fi que aquest telèfon.
+cast_connection_lost_named	S'ha perdut la connexió amb %1$s. La reproducció continua en aquest telèfon.
+cast_connection_lost	S'ha perdut la connexió amb el receptor. La reproducció continua en aquest telèfon.
+auto_continue	Continua
+auto_recent	Recents
+auto_discovery	Descobreix
+auto_authors_count:one	%1$d autor
+auto_authors_count:many	%1$d autors
+auto_authors_count:other	%1$d autors
+auto_series_count:one	%1$d sèrie
+auto_series_count:many	%1$d sèries
+auto_series_count:other	%1$d sèries
+lib_books_count:one	%1$d llibre
+lib_books_count:many	%1$d llibres
+lib_books_count:other	%1$d llibres
+lib_items_count:one	%1$d element
+lib_items_count:many	%1$d elements
+lib_items_count:other	%1$d elements
+lib_selected	Seleccionat
+lib_all_filters	Tots els filtres
+lib_nothing_to_filter	Aquí no hi ha res per filtrar.
+lib_sort_descending_switch	Descendent; canvia a ascendent
+lib_sort_ascending_switch	Ascendent; canvia a descendent
+lib_sort_descending	Descendent
+lib_sort_ascending	Ascendent
+lib_unavailable	Biblioteca no disponible
+lib_unavailable_message	%1$s El vostre compte i l'escolta no enviada es conserven.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Mostra les portades
+lib_show_list	Mostra la llista
+lib_filtered	Filtrat
+lib_empty_title	Encara no hi ha res
+lib_empty_message	Aquesta biblioteca no té cap element al qual pugueu accedir.
+lib_page_error	No s'han pogut carregar més títols
+lib_card_finished	%1$s, acabat
+lib_card_percent_listened	%1$s, %2$d per cent escoltat
+lib_search_in	Cerca a %1$s
+lib_search_library	Cerca a la biblioteca
+lib_clear_search	Esborra la cerca
+lib_search_failed	La cerca ha fallat
+lib_search_idle_title	Trobeu alguna cosa per escoltar
+lib_search_idle_message	Cerqueu títols, autors, sèries, narradors i episodis.
+lib_search_no_match	Res no coincideix amb «%1$s». Proveu amb menys paraules o una altra ortografia.
+err_invalid_server	Introduïu una adreça de servidor que comenci per http:// o https://, per exemple https://books.example.com/abs.
+err_unsafe_media_url	El servidor ha retornat una adreça multimèdia fora d'aquest servidor. No s'ha obert.
+err_sign_in_required	La vostra sessió ja no s'accepta. Torneu a iniciar la sessió; l'escolta no enviada es conserva.
+err_untrusted	Aquest dispositiu no confia en el certificat del servidor. Instal·leu l'autoritat de certificació del vostre servidor a Configuració d'Android > Seguretat > Encriptació i credencials i torneu-ho a provar.
+err_offline	No s'ha pogut contactar amb el servidor. Comproveu l'adreça o la connexió i torneu-ho a provar.
+err_forbidden	El vostre compte no té permís per fer això.
+err_not_found	Aquest contingut ja no està disponible al servidor.
+err_server_problem	El servidor ha tingut un problema temporal (HTTP %1$d). Torneu-ho a provar.
+err_rejected	El servidor ha rebutjat la sol·licitud (HTTP %1$d).
+err_invalid_response	El servidor ha enviat una resposta que aquesta aplicació no pot llegir.
+err_no_audio	Aquest element no té àudio reproduïble.
+err_login_rejected	No s'ha acceptat el nom d'usuari o la contrasenya.
+err_publications_unreadable	No s'han pogut llegir els registres de desaments de progrés sense resposta. Resoleu-los primer a Diagnòstic.
+err_discards_unreadable	No s'han pogut llegir els descarts de progrés desats. Resoleu-los primer a Diagnòstic.

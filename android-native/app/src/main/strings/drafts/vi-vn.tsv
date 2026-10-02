@@ -1,0 +1,448 @@
+# Vietnamese drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Tài khoản
+title_new_collection	Bộ sưu tập mới
+action_retry	Thử lại
+action_read	Đọc %1$s
+action_mark_finished	Đánh dấu là hoàn thành
+choose_library	Chọn thư viện
+all_titles	Tất cả đầu sách
+all_podcasts	Tất cả podcast
+filter	Bộ lọc
+sort	Sắp xếp
+theme_system	Hệ thống
+theme_black	Đen
+screen_orientation	Hướng màn hình
+jump_forward	Tua tới
+jump_back	Tua lùi
+streaming_on_mobile_data	Phát trực tuyến bằng dữ liệu di động
+series_books_order	Thứ tự sách trong chuỗi
+set_settings_not_saved	Không thể lưu cài đặt trên thiết bị này nên không có gì thay đổi. Hãy giải phóng bộ nhớ rồi thử lại.
+set_orientation_follow_device	Theo thiết bị
+set_orientation_portrait	Dọc
+set_orientation_landscape	Ngang
+set_unit_seconds_short	%1$d giây
+set_unit_minutes_short	%1$d phút
+set_rewind_on_resume	Lùi lại một chút khi tiếp tục
+set_rewind_on_resume_detail	Lùi lại vài giây sau khi tạm dừng, lâu hơn nếu tạm dừng lâu.
+set_seek_system_controls	Tua từ điều khiển hệ thống
+set_seek_system_controls_detail	Cho phép màn hình khóa và thông báo di chuyển thanh vị trí.
+set_mp3_index_seeking	Tua MP3 chính xác
+set_mp3_index_seeking_detail	Tạo chỉ mục tua cho các tệp MP3 có độ dài không đáng tin cậy. Việc tua sẽ bắt đầu chậm hơn.
+set_shake_to_reset	Lắc để đặt lại
+set_shake_to_reset_detail	Lắc điện thoại khi bộ đếm đang chạy sẽ khởi động lại bộ đếm.
+set_sleep_fade_out	Giảm dần âm lượng
+set_sleep_fade_out_detail	Giảm âm lượng trong phút cuối cùng.
+set_vibrate_on_reset	Rung khi đặt lại
+set_sleep_chime	Phát tiếng chuông khi sắp hết giờ
+set_auto_sleep_timer_detail	Bật bộ đếm khi phát trong khoảng từ %1$s đến %2$s.
+set_heading_mobile_data	Dữ liệu di động
+set_storage	Bộ nhớ
+set_car_grouping	Nhóm tác giả và chuỗi theo chữ cái khi vượt quá
+set_series_first_to_last	Từ đầu đến cuối
+set_series_last_to_first	Từ cuối đến đầu
+set_heading_support	Hỗ trợ
+set_diagnostics	Chẩn đoán
+set_something_went_wrong	Đã xảy ra lỗi.
+set_statistics_unavailable	Không có thống kê
+set_try_again	Thử lại
+set_minutes_listened:other	Đã nghe %1$d phút
+set_days_listened:other	Đã nghe %1$d ngày
+set_titles_finished:other	Đã hoàn thành %1$d đầu sách
+set_day_minutes_listened:other	%1$s, đã nghe %2$d phút
+set_set_aside_failed	Không thể để riêng. Hãy thử lại.
+set_connection	Kết nối
+set_diagnostics_area_media	Phương tiện
+set_diagnostics_area_sync	Đồng bộ
+set_unreadable_resets_title	Không đọc được các lệnh hủy tiến độ đã lưu
+set_unreadable_resets_detail	Bất kỳ đầu sách nào cũng có thể nằm trong số đó, nên sẽ không phát gì và không gửi vị trí đọc nào cho đến khi bạn quyết định. Để riêng chúng sẽ giữ tệp trên thiết bị này, và tiến độ mà chúng định hủy vẫn còn trên máy chủ của bạn.
+set_set_them_aside	Để riêng chúng
+set_listening_storage_title	Không thể lưu phần đã nghe trước khi ứng dụng đóng
+set_listening_storage_detail	Bộ nhớ trên thiết bị này không khả dụng hoặc đã đầy. Sẽ không phát gì và không gửi dữ liệu nghe nào cho đến khi lưu được; dữ liệu được giữ lại đến lúc đó.
+set_unreadable_writes_title	Không đọc được bản ghi các lần lưu tiến độ chưa có phản hồi
+set_unreadable_writes_detail	Một lần lưu của bất kỳ đầu sách nào vẫn có thể đến máy chủ của bạn, nên sẽ không gửi dữ liệu nghe hay đọc nào và không hủy tiến độ nào cho đến khi bạn quyết định. Để riêng chúng sẽ giữ tệp trên thiết bị này; khi đó một lần lưu đến muộn có thể khôi phục tiến độ bạn đã hủy.
+set_diagnostics_server	Máy chủ %1$s
+set_diagnostics_signed_in_as	Đã đăng nhập với tên %1$s
+set_diagnostics_app_version	Ứng dụng %1$s
+set_recent_problems	Sự cố gần đây
+set_clear	Xóa
+set_no_problems	Không có sự cố nào được ghi lại trên thiết bị này.
+set_unreadable_writes_confirm_title	Để riêng các bản ghi không đọc được?
+set_unreadable_writes_confirm_detail	Dữ liệu nghe và vị trí đọc sẽ được gửi lại, và các lệnh hủy có thể tiếp tục.
+set_set_aside	Để riêng
+set_unreadable_resets_confirm_title	Để riêng các lệnh hủy không đọc được?
+set_unreadable_resets_confirm_detail	Các đầu sách sẽ phát và vị trí đọc sẽ được gửi lại. Hãy hủy tiến độ lần nữa cho đầu sách nào bạn vẫn muốn bắt đầu lại.
+set_signed_in	Đã đăng nhập
+set_other_accounts	Tài khoản khác
+set_server_sign_in_required	%1$s · cần đăng nhập
+set_remove_account	Xóa %1$s
+set_switch_to_account	Chuyển sang tài khoản này
+set_add_account	Thêm tài khoản
+set_sign_out_of	Đăng xuất khỏi %1$s
+set_sign_out_detail	Xóa tài khoản này khỏi thiết bị. Các bản tải xuống và dữ liệu nghe chưa gửi của tài khoản vẫn được giữ cho đến khi đăng nhập lại.
+set_accounts_footer	Mỗi tài khoản có tiến độ, bản tải xuống và lựa chọn thư viện riêng. Việc chuyển đổi không bao giờ trộn lẫn chúng.
+set_remove_account_confirm	Xóa %1$s?
+set_remove_account_detail	Bạn có thể thêm lại tài khoản này sau. Các bản tải xuống và dữ liệu nghe chưa gửi của tài khoản vẫn ở trên thiết bị này.
+set_add_an_account	Thêm một tài khoản
+set_connect_intro	Kết nối trực tiếp tới máy chủ của riêng bạn. Không có gì đi qua dịch vụ khác.
+set_change_server	Đổi máy chủ
+set_sign_in	Đăng nhập
+set_sign_in_openid	Đăng nhập bằng OpenID
+set_saved_accounts	Tài khoản đã lưu
+set_use_account	Dùng
+set_edit	Sửa
+set_add_podcast	Thêm podcast
+set_not_available_yet	Chưa khả dụng
+set_not_available_yet_detail	Phần này của bản xem trước vẫn đang được xây dựng.
+set_import_previous_app	Nhập từ ứng dụng trước
+set_import_interrupted	Một lần nhập chưa hoàn tất. Hãy chọn cùng tệp xuất để tiếp tục từ chỗ đã dừng.
+set_import_already	Tệp xuất này đã được nhập. Các đầu sách, dữ liệu nghe và vị trí từ tệp này đã có trên thiết bị.
+set_import_preflight	%1$s\nỨng dụng trước và tệp này chỉ được đọc; không có gì trong đó bị thay đổi. Đầu sách, dữ liệu nghe và vị trí sẽ gắn vào một tài khoản khi tài khoản đó đăng nhập tại đây. Mật khẩu không có trong tệp xuất, nên mỗi tài khoản cần đăng nhập lại.
+set_import_account_signed_in	%1$s · đã đăng nhập
+set_import_account_sign_in_later	%1$s · đăng nhập sau khi nhập
+set_import_titles	Đầu sách
+set_import_title_partial	%1$s · phần còn lại sẽ được tải xuống lại
+set_not_imported	Chưa nhập
+set_import_space	Cần %1$s; còn trống %2$s.
+set_import_no_space	Thiết bị này không đủ dung lượng trống. Hãy giải phóng dung lượng rồi chọn lại tệp xuất.
+set_import_progress	Đang sao chép tệp: %1$d trên %2$d. Nếu ứng dụng đóng, hãy chọn lại cùng tệp xuất để tiếp tục.
+set_import_done	Đã nhập %1$d đầu sách, %2$d phiên nghe và %3$d vị trí. Cài đặt từ ứng dụng trước đã được áp dụng.
+set_import_waiting	Đăng nhập vào %1$s với tên %2$s để gắn các đầu sách, dữ liệu nghe và vị trí của tài khoản đó.
+set_import	Nhập
+set_continue	Tiếp tục
+set_close	Đóng
+set_import_file_unreadable	Không thể đọc tệp đã chọn. Hãy chọn lại, hoặc lưu tệp vào thiết bị này trước.
+set_import_stopped	Quá trình nhập đã dừng trước khi hoàn tất. Không có gì bị mất: hãy chọn lại cùng tệp xuất để tiếp tục từ chỗ đã dừng.
+set_import_item_gone	Mục này không còn trên máy chủ nên không được tiếp nhận.
+set_import_file_changed	Một tệp đã thay đổi trên thiết bị này sau khi được nhập, nên sẽ được tải lại từ máy chủ.
+set_openid_not_enabled	Máy chủ này chưa bật đăng nhập OpenID. Hãy dùng tên người dùng và mật khẩu.
+set_openid_canceled	Đăng nhập qua trình duyệt đã bị hủy. Các tài khoản đã lưu của bạn vẫn được giữ.
+set_openid_invalid	Không thể xác minh phản hồi đăng nhập từ trình duyệt. Hãy thử đăng nhập lại và kiểm tra cài đặt chuyển hướng OpenID của máy chủ.
+set_vault_unreadable	Không thể giải mã các thông tin đăng nhập đã lưu. Chúng vẫn được giữ trên thiết bị; hãy đăng nhập lại để tiếp tục.
+set_session_ended	Phiên của bạn trên %1$s đã kết thúc. Hãy đăng nhập lại; dữ liệu nghe chưa gửi và các bản tải xuống vẫn được giữ.
+set_play_blocked_listening_storage	Không thể lưu phần đã nghe trước khi ứng dụng đóng vì bộ nhớ không khả dụng, nên sẽ không phát gì cho đến khi lưu được. Hãy giải phóng dung lượng rồi thử lại.
+set_play_blocked_unreadable_resets	Không đọc được các lệnh hủy tiến độ đã lưu, nên sẽ không phát gì cho đến khi chúng được xử lý trong Chẩn đoán.
+set_play_blocked_discarding	Tiến độ của đầu sách này vẫn đang được hủy. Sách sẽ phát từ đầu khi việc này hoàn tất.
+dl_not_saved	Không thể lưu danh sách tải xuống trên thiết bị này nên không có gì thay đổi. Hãy giải phóng bộ nhớ rồi thử lại.
+dl_not_allowed	Tài khoản của bạn không được phép tải xuống.
+dl_no_audio	Mục này không có âm thanh để tải xuống.
+dl_no_space	Thiết bị này không đủ dung lượng trống cho %1$s mà vẫn chừa bộ nhớ cho hệ thống.
+dl_folder_lost_nothing_downloaded	Quyền truy cập %1$s đã bị gỡ nên không có gì được tải xuống. Hãy chọn lại thư mục tải xuống trong Cài đặt.
+dl_downloading_percent	Đang tải xuống %1$d%%
+dl_cancel_download	Hủy tải xuống
+dl_downloaded_plays_offline	Đã tải xuống · phát ngoại tuyến
+dl_failed	Tải xuống thất bại.
+dl_discard	Bỏ
+dl_cellular_title	Tải xuống bằng dữ liệu di động?
+dl_cellular_message	Bạn đang dùng kết nối tính phí theo dung lượng. Bạn có thể thay đổi điều này trong Cài đặt.
+dl_not_now	Để sau
+dl_folder_cannot_be_kept	Không thể dùng thư mục đó cho tải xuống. Hãy chọn thư mục khác.
+dl_saved_in_folder	Bản tải xuống được lưu trong %1$s
+dl_saved_in_app_storage	Bản tải xuống được lưu trong bộ nhớ ứng dụng
+dl_folder_visible_to_other_apps	Các ứng dụng khác trên thiết bị này có thể thấy các tệp này. Bản tải xuống trước khi thay đổi vẫn ở nguyên chỗ cũ.
+dl_folder_private_to_app	Chỉ ứng dụng này mới thấy các tệp này. Hãy chọn một thư mục để lưu bản tải xuống ở nơi ứng dụng khác truy cập được.
+dl_choose_folder	Chọn thư mục
+dl_use_app_storage	Dùng bộ nhớ ứng dụng
+dl_ebook_missing	Ebook không còn trên thiết bị này. Hãy tải xuống lại để mở.
+dl_no_app_opens_format	Không có ứng dụng nào trên thiết bị này mở được tệp %1$s. Hãy cài một ứng dụng mở được rồi thử lại.
+dl_no_app_opens_this_kind	Không có ứng dụng nào trên thiết bị này mở được loại tệp này. Hãy cài một ứng dụng mở được rồi thử lại.
+dl_folder_lost_choose_again_open	Bản tải xuống này nằm trong %1$s, và quyền truy cập %1$s đã bị gỡ. Hãy chọn lại %1$s để mở.
+dl_folder_lost_choose_again_play	Bản tải xuống này nằm trong %1$s, và quyền truy cập %1$s đã bị gỡ. Hãy chọn lại %1$s để phát.
+dl_names_or	%1$s hoặc %2$s
+dl_names_and	%1$s và %2$s
+dl_remove_title	Xóa bản tải xuống?
+dl_remove_message	"%1$s" sẽ bị xóa khỏi thiết bị này. Tiến độ nghe của bạn vẫn được giữ.
+dl_keep	Giữ
+dl_not_that_folder	Đó không phải %1$s. Hãy chọn thư mục chứa các bản tải xuống này.
+dl_folder_access_not_kept	Không thể giữ quyền truy cập thư mục đó. Hãy thử lại.
+dl_no_downloads	Không có bản tải xuống
+dl_no_downloads_message	Tải sách hoặc tập từ trang của chúng để nghe khi không có kết nối.
+dl_access_removed_title	Quyền truy cập %1$s đã bị gỡ
+dl_downloads_kept_there:other	%1$d bản tải xuống được giữ ở đó. Hãy chọn lại %2$s để phát và mở.
+dl_choose_again	Chọn lại %1$s
+dl_some_files_missing	Một số tệp không còn trên thiết bị này
+dl_size_in_folder	%1$s trong %2$s
+dl_open_in_another_app	Mở %1$s bằng ứng dụng khác
+dl_download_again_named	Tải xuống lại %1$s
+dl_the_chosen_folder	thư mục đã chọn
+dl_files_missing_play	Một số tệp của bản tải xuống này không còn trên thiết bị. Hãy tải xuống lại để phát.
+dl_play_named	Phát %1$s
+dl_retry_named	Thử lại %1$s
+dl_cancel_named	Hủy %1$s
+dl_remove_named	Xóa %1$s
+dl_sign_in_again	Hãy đăng nhập lại tài khoản này để tải xuống.
+dl_folder_lost_choose_in_downloads	Quyền truy cập %1$s đã bị gỡ. Hãy chọn lại thư mục trong Tải xuống.
+dl_connection_interrupted	Kết nối bị gián đoạn.
+dl_error_retrying	%1$s Đang thử lại…
+dl_server_refused	Máy chủ đã từ chối tải xuống.
+dl_server_sent_type_not_audio	Máy chủ đã gửi %1$s thay vì âm thanh, nên không có gì được lưu. Hãy kiểm tra máy chủ hoặc proxy rồi thử lại.
+dl_server_sent_unknown_not_audio	Máy chủ đã gửi một phản hồi không xác định thay vì âm thanh, nên không có gì được lưu. Hãy kiểm tra máy chủ hoặc proxy rồi thử lại.
+dl_size_mismatch	Tệp đã tải xuống có %1$d byte nhưng máy chủ ghi %2$d, nên tệp đã bị loại bỏ. Hãy thử lại để tải xuống lần nữa.
+dl_server_sent_not_pdf	Máy chủ đã gửi thứ khác chứ không phải tệp PDF, nên không có gì được lưu. Hãy kiểm tra máy chủ hoặc proxy rồi thử lại.
+dl_notification_downloading	Đang tải xuống %1$s
+rd_positions_not_restored	Không thể khôi phục các vị trí đọc đã lưu, nên các trang không được lưu. Dữ liệu gốc vẫn được giữ.
+rd_positions_not_overwritten	Không đọc được các vị trí đọc đã lưu, nên chúng không bị ghi đè.
+rd_not_a_pdf	Tệp này không phải PDF mà thiết bị này mở được.
+rd_document_not_opened	Không thể mở tài liệu.
+rd_page_not_saved	Không thể lưu trang này trên thiết bị này.
+rd_choice_not_saved	Không thể lưu lựa chọn của bạn trên thiết bị này.
+rd_conflict_title	Tiếp tục từ đâu?
+rd_conflict_page	Một thiết bị khác đã đến trang %1$d trong khi trang %2$d ở đây chưa được lưu lên máy chủ.
+rd_conflict_location	Một thiết bị khác đã lưu một vị trí đọc mà trình đọc này không hiển thị được dưới dạng trang, trong khi trang %1$d ở đây chưa được lưu lên máy chủ.
+rd_go_to_page_number	Đi tới trang %1$d
+rd_keep_other_position	Giữ vị trí kia
+rd_stay_on_page	Ở lại trang %1$d
+rd_close_reader	Đóng trình đọc
+rd_rotate_pages	Xoay trang
+rd_continuous_scrolling	Cuộn liên tục
+rd_document_error_title	Không thể mở tài liệu này
+rd_try_again	Thử lại
+rd_go_to_page	Đi tới trang
+rd_previous_page	Trang trước
+rd_next_page	Trang sau
+rd_page_of	Trang %1$d / %2$d
+rd_page_number	Trang %1$d
+rd_download_folder_lost	Bản tải xuống này nằm trong %1$s, và quyền truy cập %1$s đã bị gỡ. Hãy chọn lại thư mục trong Tải xuống.
+rd_downloaded_document_missing	Tài liệu đã tải xuống không còn trên thiết bị này. Hãy tải xuống lại.
+rd_document_not_stored	Không thể lưu tài liệu để đọc.
+rd_supplementary_pdf	PDF bổ sung
+rd_format_not_available	Bản xem trước này chưa hỗ trợ đọc %1$s. Vị trí đọc của bạn trên máy chủ vẫn được giữ.
+rd_ebook_not_available	Bản xem trước này chưa hỗ trợ đọc ebook này. Vị trí đọc của bạn trên máy chủ vẫn được giữ.
+grp_unavailable_title	Đầu sách không khả dụng
+grp_could_not_load_collections	Không thể tải bộ sưu tập.
+grp_could_not_load_playlists	Không thể tải danh sách phát.
+grp_collections_unavailable	Bộ sưu tập không khả dụng
+grp_playlists_unavailable	Danh sách phát không khả dụng
+grp_no_collections_yet	Chưa có bộ sưu tập nào
+grp_no_playlists_yet	Chưa có danh sách phát nào
+grp_create_one_hint	Tạo một cái để gom các đầu sách theo thứ tự của riêng bạn.
+grp_title_count:other	%1$d đầu sách
+grp_collection_deleted	Bộ sưu tập này đã bị xóa.
+grp_playlist_deleted	Danh sách phát này đã bị xóa.
+grp_could_not_load	Không thể tải.
+grp_collection_unavailable	Bộ sưu tập không khả dụng
+grp_playlist_unavailable	Danh sách phát không khả dụng
+grp_nothing_in_collection_can_play	Không có gì trong bộ sưu tập này có thể phát.
+grp_nothing_in_playlist_can_play	Không có gì trong danh sách phát này có thể phát.
+grp_could_not_start_playback	Không thể bắt đầu phát.
+grp_resume	Tiếp tục
+grp_play_collection	Phát bộ sưu tập
+grp_play_playlist	Phát danh sách phát
+grp_edit_collection	Sửa bộ sưu tập
+grp_edit_playlist	Sửa danh sách phát
+grp_delete_collection	Xóa bộ sưu tập
+grp_delete_playlist	Xóa danh sách phát
+grp_no_titles_yet	Chưa có đầu sách nào
+grp_delete_collection_question	Xóa bộ sưu tập?
+grp_delete_playlist_question	Xóa danh sách phát?
+grp_delete_group_explanation	“%1$s” sẽ bị xóa khỏi máy chủ của bạn. Các đầu sách trong đó vẫn được giữ.
+grp_not_deleted	Chưa xóa: %1$s
+grp_not_deleted_try_again	Chưa xóa: hãy thử lại
+grp_not_allowed_to_change_collection	Tài khoản máy chủ của bạn không được phép thay đổi bộ sưu tập này.
+grp_not_allowed_to_change_playlist	Tài khoản máy chủ của bạn không được phép thay đổi danh sách phát này.
+grp_collection_no_longer_exists	Bộ sưu tập này không còn tồn tại.
+grp_playlist_no_longer_exists	Danh sách phát này không còn tồn tại.
+grp_not_saved	Chưa lưu: %1$s
+grp_not_saved_try_again	Chưa lưu: hãy thử lại
+grp_saving	Đang lưu…
+grp_create_collection	Tạo bộ sưu tập
+grp_create_playlist	Tạo danh sách phát
+grp_save_changes	Lưu thay đổi
+grp_choose_at_least_one_title	Hãy chọn ít nhất một đầu sách.
+grp_order	Thứ tự
+grp_move_up	Di chuyển %1$s lên
+grp_remove_member	Xóa %1$s
+grp_add_titles	Thêm đầu sách
+grp_add_episodes_hint	Thêm tập từ trang danh sách tập của podcast.
+grp_add_to_playlist_or_collection	Thêm vào danh sách phát hoặc bộ sưu tập
+grp_add_to	Thêm vào
+grp_nothing_to_add_to	Chưa có nơi nào để bạn thêm vào.
+grp_added_to	Đã thêm vào %1$s
+grp_not_added	Chưa thêm: %1$s
+grp_not_added_try_again	Chưa thêm: hãy thử lại
+grp_already_included	Đã có sẵn
+grp_close	Đóng
+grp_titles_could_not_load	Không thể tải các đầu sách
+grp_nothing_here	Không có gì ở đây
+pod_feed_episodes	Các tập trong feed
+pod_sort_newest_first	Mới nhất trước, chạm để xem cũ nhất trước
+pod_sort_oldest_first	Cũ nhất trước, chạm để xem mới nhất trước
+pod_episodes_queued:other	Đã xếp hàng %1$d tập trên máy chủ của bạn: %2$s
+pod_server_could_not_download	Máy chủ của bạn không thể tải xuống “%1$s”.
+pod_dismiss	Bỏ qua
+pod_no_episodes_yet	Chưa có tập nào
+pod_no_episodes_match_filter	Không có tập nào khớp với bộ lọc này
+pod_episode_details	Chi tiết tập
+pod_untitled_episode	Tập không có tiêu đề
+pod_play_named	Phát %1$s
+pod_episode_not_available	Tập không khả dụng
+pod_episode_may_have_been_removed	Có thể tập này đã bị xóa khỏi máy chủ.
+pod_percent_listened	Đã nghe %1$d%%
+pod_feed_could_not_open	Không thể mở feed.
+pod_retry_feed	Thử lại feed
+pod_no_feed_episodes	Không tìm thấy tập nào trong feed
+pod_already_on_server	Đã có trên máy chủ
+pod_selected	Đã chọn
+pod_not_selected	Chưa chọn
+pod_no_audio_enclosure	Không có tệp âm thanh đính kèm
+pod_not_queued	Chưa xếp hàng: %1$s
+pod_not_queued_try_again	Chưa xếp hàng: hãy thử lại
+pod_queueing_on_server	Đang xếp hàng trên máy chủ của bạn…
+pod_add_selected_episodes	Thêm các tập đã chọn vào máy chủ
+pod_something_went_wrong	Đã xảy ra lỗi.
+pod_adding_not_available	Không thể thêm podcast
+pod_adding_needs_permission	Tài khoản máy chủ của bạn cần quyền quản lý podcast trong một thư viện podcast.
+pod_search_podcasts	Tìm podcast
+pod_or_rss_feed_url	Hoặc URL RSS feed
+pod_enter_complete_feed_url	Nhập URL feed HTTP hoặc HTTPS đầy đủ.
+pod_preview_feed	Xem trước feed
+pod_create_podcast	Tạo podcast
+pod_choose_different_feed	Chọn feed khác
+item_something_went_wrong	Đã xảy ra lỗi. Hãy thử lại.
+item_rss_feed	RSS feed
+item_feed_subscribe_at	Các ứng dụng podcast có thể đăng ký đầu sách này tại:
+item_copied	Đã sao chép
+item_copy_address	Sao chép địa chỉ
+item_hidden_from_directories	Ẩn khỏi danh bạ podcast
+item_feed_public_warning	Bất kỳ ai có địa chỉ đều có thể nghe đầu sách này mà không cần đăng nhập.
+item_feed_name	Tên feed
+item_feed_name_rule	Chỉ chữ cái, chữ số, - và _
+item_hide_from_directories	Ẩn khỏi danh bạ podcast
+item_done	Xong
+item_sending	Đang gửi…
+item_sent_to	Đã gửi đến %1$s
+item_send_ebook_explanation	Máy chủ của bạn sẽ gửi ebook qua email đến thiết bị bạn chọn.
+item_ereader_or_ebook_gone	%1$s hoặc ebook này không còn khả dụng trên máy chủ. Chưa có gì được gửi.
+item_not_sent_to	Chưa gửi đến %1$s. %2$s
+item_not_saved_try_again	Chưa lưu. Hãy thử lại.
+item_mark_unfinished	Đánh dấu là chưa hoàn thành
+item_discard_uncertain	Một lần lưu tiến độ trước đó của đầu sách này chưa nhận được phản hồi và vẫn có thể đến máy chủ của bạn. Nếu nó đến sau khi hủy, tiến độ sẽ quay lại. Máy chủ của bạn không thể cho ứng dụng này biết liệu điều đó có xảy ra hay không.
+item_discard_anyway	Vẫn hủy
+item_discard_under_way	Lệnh hủy này đang được thực hiện và không thể rút lại.
+item_keep_progress	Giữ tiến độ
+item_discard_pending	Đang hủy tiến độ. Việc này sẽ hoàn tất khi kết nối được với máy chủ của bạn và dữ liệu nghe của đầu sách này đã được gửi.
+item_discard_anyway_question	Vẫn hủy?
+item_discard_anyway_explanation	Tiến độ sẽ bị xóa ngay. Nếu lần lưu trước đó đến máy chủ của bạn sau đó, tiến độ của đầu sách này sẽ quay lại và bạn có thể hủy lần nữa.
+item_discard	Hủy
+item_discard_progress_question	Hủy tiến độ?
+item_discard_progress_explanation	Vị trí và trạng thái hoàn thành của bạn cho đầu sách này sẽ bị xóa khỏi máy chủ trên mọi thiết bị.
+item_could_not_load	Không thể tải đầu sách này
+item_narrated_by	Người đọc
+item_series	Chuỗi: %1$s
+item_series_with_sequence	Chuỗi: %1$s #%2$s
+item_episode_count:other	%1$d tập
+item_listened_and_left	Đã nghe %1$d%% · còn %2$s
+item_chapter_number	Chương %1$d
+pl_minimize_player	Thu nhỏ trình phát
+pl_nothing_playing	Không có gì đang phát
+pl_chapter_number	Chương %1$d
+pl_try_again	Thử lại
+pl_speed_value	Tốc độ %1$s
+pl_sleep	Hẹn giờ ngủ
+pl_position_of_duration	%1$s / %2$s
+pl_buffering	Đang tải đệm
+pl_previous_chapter	Chương trước
+pl_next_chapter	Chương sau
+pl_jump_forward_seconds:other	Tua tới %1$d giây
+pl_jump_back_seconds:other	Tua lùi %1$d giây
+pl_jump_forward_minutes:other	Tua tới %1$d phút
+pl_jump_back_minutes:other	Tua lùi %1$d phút
+pl_open_player	Mở trình phát
+pl_playback_stopped	Đã dừng phát
+pl_listening_unsaved	Một phần dữ liệu nghe chưa được lưu trên thiết bị này. Dữ liệu được giữ lại và sẽ được lưu ngay khi bộ nhớ cho phép.
+pl_playing	Đang phát
+pl_resume	Tiếp tục
+pl_streaming_cellular_refused	Phát trực tuyến bằng dữ liệu di động đã bị tắt trong Cài đặt. Hãy kết nối Wi-Fi hoặc tải đầu sách này xuống trước.
+pl_stream_cellular_title	Phát trực tuyến bằng dữ liệu di động?
+pl_stream_cellular_message	Bạn đang dùng kết nối tính phí theo dung lượng. Bạn có thể thay đổi điều này trong Cài đặt.
+pl_not_now	Để sau
+pl_sleep_stops_end_of_chapter	Dừng ở cuối chương này, sau %1$s nữa
+pl_sleep_stops_in	Dừng sau %1$s
+pl_sleep_minus_minutes	−%1$d phút
+pl_sleep_plus_minutes	+%1$d phút
+pl_sleep_minutes	%1$d phút
+pl_sleep_turn_off	Tắt
+pl_bookmark_not_saved_reason	Chưa lưu đánh dấu: %1$s
+pl_bookmark_not_saved	Chưa lưu đánh dấu: hãy thử lại
+pl_bookmark_add_at	Thêm tại %1$s
+pl_bookmark_go_to	Đi tới đánh dấu
+pl_bookmark_default	Đánh dấu
+pl_bookmark_rename_named	Đổi tên %1$s
+pl_bookmark_delete_named	Xóa %1$s
+pl_bookmark_at	Đánh dấu tại %1$s
+pl_bookmark_rename	Đổi tên đánh dấu
+pl_bookmark_new	Đánh dấu mới
+pl_untitled	Không có tiêu đề
+pl_playback_stopped_reason	Đã dừng phát: %1$s. Vị trí của bạn vẫn được giữ.
+pl_playback_stopped_unknown	Đã dừng phát: không thể tải âm thanh. Vị trí của bạn vẫn được giữ.
+pl_no_playable_audio	Mục này không có âm thanh phát được.
+pl_could_not_start	Không thể bắt đầu phát.
+pl_listening_save_failed	Không thể lưu dữ liệu nghe trên thiết bị này nên đã tạm dừng phát. Hãy giải phóng bộ nhớ rồi thử lại.
+cast_casting_to	Đang truyền tới %1$s
+cast_cast	Truyền
+cast_playing_on	Đang phát trên %1$s
+cast_connecting_to	Đang kết nối tới %1$s…
+cast_playing_on_phone	Đang phát trên điện thoại này
+cast_stop	Dừng truyền
+cast_looking	Đang tìm thiết bị truyền…
+cast_none_found	Không tìm thấy thiết bị truyền nào. Hãy kiểm tra thiết bị nhận đã bật và dùng cùng mạng Wi-Fi với điện thoại này.
+cast_close	Đóng
+cast_download_not_castable	Bản tải xuống chỉ phát được trên điện thoại này. Hãy dừng truyền để nghe tại đây, hoặc phát trực tuyến đầu sách.
+cast_resumed_without_title	Đã dừng truyền vì ứng dụng khởi động lại trong lúc truyền. Hãy mở lại đầu sách để nghe tiếp từ vị trí cuối cùng điện thoại này đã lưu.
+cast_needs_play_services	Truyền cần Dịch vụ Google Play, mà thiết bị này không có hoặc cần cập nhật.
+cast_could_not_start	Không thể bắt đầu truyền trên thiết bị này: %1$s.
+cast_connect_failed_named	Không thể kết nối tới %1$s. Hãy kiểm tra thiết bị đã bật và dùng cùng mạng Wi-Fi với điện thoại này.
+cast_connect_failed	Không thể kết nối tới thiết bị nhận. Hãy kiểm tra thiết bị đã bật và dùng cùng mạng Wi-Fi với điện thoại này.
+cast_connection_lost_named	Mất kết nối tới %1$s. Tiếp tục phát trên điện thoại này.
+cast_connection_lost	Mất kết nối tới thiết bị nhận. Tiếp tục phát trên điện thoại này.
+auto_continue	Tiếp tục
+auto_recent	Gần đây
+auto_discovery	Khám phá
+auto_authors_count:other	%1$d tác giả
+auto_series_count:other	%1$d chuỗi
+lib_books_count:other	%1$d sách
+lib_items_count:other	%1$d mục
+lib_filter_ebooks	Ebook
+lib_filter_no_series	Không có chuỗi
+lib_selected	Đã chọn
+lib_all_filters	Tất cả bộ lọc
+lib_nothing_to_filter	Không có gì để lọc ở đây.
+lib_sort_random	Ngẫu nhiên
+lib_sort_progress_updated	Tiến độ: cập nhật gần nhất
+lib_sort_progress_started	Tiến độ: đã bắt đầu
+lib_sort_progress_finished	Tiến độ: đã hoàn thành
+lib_sort_descending_switch	Giảm dần, chuyển sang tăng dần
+lib_sort_ascending_switch	Tăng dần, chuyển sang giảm dần
+lib_sort_descending	Giảm dần
+lib_sort_ascending	Tăng dần
+lib_unavailable	Thư viện không khả dụng
+lib_unavailable_message	%1$s Tài khoản và dữ liệu nghe chưa gửi của bạn vẫn được giữ.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Hiện ảnh bìa
+lib_show_list	Hiện danh sách
+lib_filtered	Đã lọc
+lib_empty_title	Chưa có gì ở đây
+lib_empty_message	Thư viện này không có mục nào bạn có thể truy cập.
+lib_page_error	Không thể tải thêm đầu sách
+lib_card_finished	%1$s, đã hoàn thành
+lib_card_percent_listened	%1$s, đã nghe %2$d phần trăm
+lib_search_in	Tìm trong %1$s
+lib_search_library	Tìm trong thư viện
+lib_clear_search	Xóa tìm kiếm
+lib_search_failed	Tìm kiếm thất bại
+lib_search_idle_title	Tìm nội dung để nghe
+lib_search_idle_message	Tìm đầu sách, tác giả, chuỗi, người đọc và tập.
+lib_search_no_match	Không có kết quả cho "%1$s". Hãy thử ít từ hơn hoặc cách viết khác.
+err_invalid_server	Nhập địa chỉ máy chủ bắt đầu bằng http:// hoặc https://, ví dụ https://books.example.com/abs.
+err_unsafe_media_url	Máy chủ trả về một địa chỉ phương tiện nằm ngoài máy chủ này. Địa chỉ đó đã không được mở.
+err_sign_in_required	Phiên của bạn không còn được chấp nhận. Hãy đăng nhập lại; dữ liệu nghe chưa gửi vẫn được giữ.
+err_untrusted	Chứng chỉ của máy chủ không được thiết bị này tin cậy. Hãy cài đặt tổ chức cấp chứng chỉ của máy chủ trong Cài đặt Android > Bảo mật > Mã hóa và thông tin xác thực, rồi thử lại.
+err_offline	Không thể kết nối tới máy chủ. Hãy kiểm tra địa chỉ hoặc kết nối của bạn rồi thử lại.
+err_forbidden	Tài khoản của bạn không được phép làm việc này.
+err_not_found	Nội dung này không còn khả dụng trên máy chủ.
+err_server_problem	Máy chủ gặp sự cố tạm thời (HTTP %1$d). Hãy thử lại.
+err_rejected	Máy chủ đã từ chối yêu cầu (HTTP %1$d).
+err_invalid_response	Máy chủ đã gửi một phản hồi mà ứng dụng này không đọc được.
+err_no_audio	Mục này không có âm thanh phát được.
+err_login_rejected	Tên người dùng hoặc mật khẩu không được chấp nhận.
+err_publications_unreadable	Không đọc được bản ghi các lần ghi tiến độ chưa có phản hồi. Hãy xử lý chúng trong Chẩn đoán trước.
+err_discards_unreadable	Không đọc được các lệnh hủy tiến độ đã lưu. Hãy xử lý chúng trong Chẩn đoán trước.

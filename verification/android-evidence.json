@@ -179,7 +179,7 @@
   "readiness": {
     "migration": "Legacy export (legacy app instrumented test) and native import verified with synthetic archives: refusal, corruption, resume after interruption with rehashing of staged files, account binding, adoption with damaged files fetched again, repeated export recognised",
     "accessibility": "AccessibilityJourney runs Accessibility Test Framework 4.1.1 checks (errors fail) on the main screens",
-    "localization": "PARTIAL: UI text in resources with legacy translations in 33 languages; core error messages English",
+    "localization": "PARTIAL: UI text and core errors in resources in 33 languages; beyond legacy translations machine-drafted, not native-reviewed",
     "backupRollback": "Separate identity; the legacy app and its data are never modified, so uninstalling the preview is the rollback. Listening already sent to the server is not undone"
   },
   "physicalGates": [
@@ -237,12 +237,14 @@
   "notImplemented": [],
   "localization": {
     "status": "partial",
-    "strings": 579,
+    "strings": 577,
     "withLegacyTranslation": 146,
     "languagesOffered": 33,
-    "journey": "LocalizationJourney (German main screens; Arabic right-to-left top bar and sort options)",
+    "coveragePerLanguage": "576 of 577 in each of the 33 offered languages (app_name stays the product name): legacy translations 120 to 146, the rest machine-drafted",
+    "drafts": "app/src/main/strings/drafts/<legacy code>.tsv, machine-drafted, not reviewed by a native speaker; native review open",
+    "journey": "LocalizationJourney (German main screens; German connection and sign-in errors; Arabic right-to-left top bar and sort options)",
     "legacyLanguageMigration": "MigrationJourney g: the legacy lang preference is applied on Android 13 and later when offered and no app language is chosen",
-    "untranslated": "Copy the legacy app only had in English stays English (about 430 strings); the 11 core ApiError messages and diagnostics entries are English; download, playback-save and import issue texts resolved earlier keep their language until produced again"
+    "untranslated": "Diagnostics entries are English by design; download, playback-save and import issue texts resolved earlier keep their language until produced again; et, fa, gu, hi, is, lt, lv and uz are not offered"
   },
   "casting": {
     "status": "implemented; physical receiver acceptance pending",

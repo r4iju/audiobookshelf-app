@@ -172,7 +172,7 @@
     <string name="set_import_previous_app">Import from the previous app</string>
     <string name="set_import_interrupted">An import did not finish. Choose the same export to continue where it stopped.</string>
     <string name="set_import_already">This export was already imported. Titles, listening and positions from it are on this device.</string>
-    <string name="set_import_preflight">%1$s\\nThe previous app and this file are only read; nothing in them changes. Titles, listening and positions attach to an account once it signs in here. Passwords are not in the export, so each account signs in again.</string>
+    <string name="set_import_preflight">%1$s\nThe previous app and this file are only read; nothing in them changes. Titles, listening and positions attach to an account once it signs in here. Passwords are not in the export, so each account signs in again.</string>
     <string name="set_import_account_signed_in">%1$s · signed in</string>
     <string name="set_import_account_sign_in_later">%1$s · sign in after importing</string>
     <string name="set_import_titles">Titles</string>

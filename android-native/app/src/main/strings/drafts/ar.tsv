@@ -1,0 +1,515 @@
+# Arabic drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	الحسابات
+title_new_collection	مجموعة جديدة
+action_retry	إعادة المحاولة
+action_read	قراءة %1$s
+action_mark_finished	وضع علامة "مكتمل"
+choose_library	اختيار المكتبة
+all_titles	كل العناوين
+all_podcasts	كل البودكاست
+filter	تصفية
+sort	ترتيب
+theme_system	النظام
+screen_orientation	اتجاه الشاشة
+jump_forward	القفز للأمام
+jump_back	القفز للخلف
+set_settings_not_saved	تعذّر حفظ الإعدادات على هذا الجهاز، لذا لم يتغير شيء. حرّر بعض مساحة التخزين ثم حاول مرة أخرى.
+set_orientation_follow_device	حسب الجهاز
+set_orientation_portrait	عمودي
+set_orientation_landscape	أفقي
+set_haptic_light	خفيف
+set_rewind_on_resume	الرجوع قليلًا عند الاستئناف
+set_rewind_on_resume_detail	يرجع بضع ثوانٍ بعد الإيقاف المؤقت، وأكثر بعد إيقاف أطول.
+set_seek_system_controls	تغيير الموضع من عناصر تحكم النظام
+set_seek_system_controls_detail	يسمح لشاشة القفل والإشعار بتحريك شريط الموضع.
+set_mp3_index_seeking	تنقّل دقيق في MP3
+set_mp3_index_seeking_detail	ينشئ فهرس تنقّل لملفات MP3 ذات المدد غير الموثوقة. يبدأ التنقّل بشكل أبطأ.
+set_shake_to_reset	الرج لإعادة الضبط
+set_shake_to_reset_detail	رجّ الهاتف أثناء عمل المؤقت يعيد تشغيله من البداية.
+set_sleep_fade_out	خفض الصوت تدريجيًا
+set_sleep_fade_out_detail	يخفض مستوى الصوت خلال الدقيقة الأخيرة.
+set_vibrate_on_reset	الاهتزاز عند إعادة الضبط
+set_auto_sleep_timer_detail	يبدأ المؤقت عند التشغيل بين %1$s و%2$s.
+set_heading_mobile_data	بيانات الجوال
+set_storage	التخزين
+set_heading_support	الدعم
+set_diagnostics	التشخيص
+set_something_went_wrong	حدث خطأ ما.
+set_statistics_unavailable	الإحصائيات غير متاحة
+set_try_again	حاول مرة أخرى
+set_minutes_listened:zero	%1$d دقيقة استماع
+set_minutes_listened:one	%1$d دقيقة استماع
+set_minutes_listened:two	%1$d دقيقتا استماع
+set_minutes_listened:few	%1$d دقائق استماع
+set_minutes_listened:many	%1$d دقيقة استماع
+set_minutes_listened:other	%1$d دقيقة استماع
+set_days_listened:zero	%1$d يوم استماع
+set_days_listened:one	%1$d يوم استماع
+set_days_listened:two	%1$d يوما استماع
+set_days_listened:few	%1$d أيام استماع
+set_days_listened:many	%1$d يومًا من الاستماع
+set_days_listened:other	%1$d يوم استماع
+set_titles_finished:zero	%1$d عنوان مكتمل
+set_titles_finished:one	%1$d عنوان مكتمل
+set_titles_finished:two	%1$d عنوانان مكتملان
+set_titles_finished:few	%1$d عناوين مكتملة
+set_titles_finished:many	%1$d عنوانًا مكتملًا
+set_titles_finished:other	%1$d عنوان مكتمل
+set_day_minutes_listened:zero	%1$s، %2$d دقيقة استماع
+set_day_minutes_listened:one	%1$s، %2$d دقيقة استماع
+set_day_minutes_listened:two	%1$s، %2$d دقيقتا استماع
+set_day_minutes_listened:few	%1$s، %2$d دقائق استماع
+set_day_minutes_listened:many	%1$s، %2$d دقيقة استماع
+set_day_minutes_listened:other	%1$s، %2$d دقيقة استماع
+set_set_aside_failed	تعذّر وضعها جانبًا. حاول مرة أخرى.
+set_connection	الاتصال
+set_diagnostics_area_media	الوسائط
+set_diagnostics_area_sync	المزامنة
+set_unreadable_resets_title	تعذّرت قراءة عمليات إلغاء التقدم المحفوظة
+set_unreadable_resets_detail	قد يكون أي عنوان من بينها، لذا لن يُشغَّل شيء ولن يُرسَل أي موضع قراءة حتى تقرر. وضعها جانبًا يُبقي الملف على هذا الجهاز، ويبقى أي تقدم كان من المفترض إلغاؤه على خادمك.
+set_set_them_aside	وضعها جانبًا
+set_listening_storage_title	تعذّر حفظ الاستماع الذي سبق إغلاق التطبيق
+set_listening_storage_detail	مساحة التخزين على هذا الجهاز غير متاحة أو ممتلئة. لن يُشغَّل شيء ولن يُرسَل أي استماع حتى يتم حفظه، وسيُحتفَظ به إلى ذلك الحين.
+set_unreadable_writes_title	تعذّرت قراءة سجلات عمليات حفظ التقدم التي لم يصلها رد
+set_unreadable_writes_detail	قد يصل حفظٌ لأي عنوان إلى خادمك، لذا لن يُرسَل أي استماع أو قراءة ولن يُلغى أي تقدم حتى تقرر. وضعها جانبًا يُبقي الملف على هذا الجهاز، وقد يعيد حفظٌ متأخر تقدمًا قمت بإلغائه.
+set_diagnostics_server	الخادم %1$s
+set_diagnostics_signed_in_as	تم تسجيل الدخول باسم %1$s
+set_diagnostics_app_version	التطبيق %1$s
+set_recent_problems	المشاكل الأخيرة
+set_clear	مسح
+set_no_problems	لا توجد مشاكل مسجلة على هذا الجهاز.
+set_unreadable_writes_confirm_title	وضع السجلات غير المقروءة جانبًا؟
+set_unreadable_writes_confirm_detail	ستُرسَل مواضع الاستماع والقراءة مجددًا ويمكن تنفيذ عمليات الإلغاء.
+set_set_aside	وضع جانبًا
+set_unreadable_resets_confirm_title	وضع عمليات الإلغاء غير المقروءة جانبًا؟
+set_unreadable_resets_confirm_detail	ستُشغَّل العناوين وتُرسَل مواضع القراءة مجددًا. ألغِ التقدم مرة أخرى لأي عنوان لا تزال تريد البدء فيه من جديد.
+set_signed_in	تم تسجيل الدخول
+set_other_accounts	حسابات أخرى
+set_server_sign_in_required	%1$s · يلزم تسجيل الدخول
+set_remove_account	إزالة %1$s
+set_switch_to_account	التبديل إلى هذا الحساب
+set_add_account	إضافة حساب
+set_sign_out_of	تسجيل الخروج من %1$s
+set_sign_out_detail	يزيل هذا الحساب من الجهاز. تبقى تنزيلاته والاستماع غير المُرسَل حتى يسجّل الدخول مجددًا.
+set_accounts_footer	يحتفظ كل حساب بتقدمه وتنزيلاته واختيار مكتبته. التبديل لا يخلط بينها أبدًا.
+set_remove_account_confirm	إزالة %1$s؟
+set_remove_account_detail	يمكنك إضافة الحساب مجددًا لاحقًا. تبقى تنزيلاته والاستماع غير المُرسَل على هذا الجهاز.
+set_add_an_account	أضف حسابًا
+set_connect_intro	اتصل مباشرة بخادمك الخاص. لا يمر أي شيء عبر خدمة أخرى.
+set_change_server	تغيير الخادم
+set_sign_in	تسجيل الدخول
+set_sign_in_openid	تسجيل الدخول عبر OpenID
+set_saved_accounts	الحسابات المحفوظة
+set_use_account	استخدام
+set_edit	تعديل
+set_add_podcast	إضافة بودكاست
+set_not_available_yet	غير متاح بعد
+set_not_available_yet_detail	هذا الجزء من النسخة التجريبية لا يزال قيد الإنشاء.
+set_import_previous_app	الاستيراد من التطبيق السابق
+set_import_interrupted	لم يكتمل استيراد. اختر ملف التصدير نفسه للمتابعة من حيث توقف.
+set_import_already	تم استيراد ملف التصدير هذا بالفعل. العناوين والاستماع والمواضع الموجودة فيه أصبحت على هذا الجهاز.
+set_import_preflight	%1$s\nتتم قراءة التطبيق السابق وهذا الملف فقط، ولا يتغير فيهما شيء. ترتبط العناوين والاستماع والمواضع بحساب بمجرد تسجيل دخوله هنا. كلمات المرور ليست ضمن ملف التصدير، لذا يسجّل كل حساب الدخول مجددًا.
+set_import_account_signed_in	%1$s · تم تسجيل الدخول
+set_import_account_sign_in_later	%1$s · سجّل الدخول بعد الاستيراد
+set_import_titles	العناوين
+set_import_title_partial	%1$s · سيُنزَّل الباقي مجددًا
+set_not_imported	لم يُستورَد
+set_import_space	يلزم %1$s، والمتاح %2$s.
+set_import_no_space	لا توجد مساحة فارغة كافية على هذا الجهاز. حرّر بعض المساحة ثم اختر ملف التصدير مجددًا.
+set_import_progress	جارٍ نسخ الملفات: %1$d من %2$d. إذا أُغلق التطبيق، فاختر ملف التصدير نفسه مجددًا للمتابعة.
+set_import_done	تم استيراد %1$d عنوان و%2$d جلسة استماع و%3$d موضع. تم تطبيق إعدادات التطبيق السابق.
+set_import_waiting	سجّل الدخول إلى %1$s باسم %2$s لربط عناوينه واستماعه ومواضعه.
+set_import	استيراد
+set_continue	متابعة
+set_close	إغلاق
+set_import_file_unreadable	تعذّرت قراءة الملف المختار. اختره مجددًا، أو احفظه على هذا الجهاز أولًا.
+set_import_stopped	توقف الاستيراد قبل اكتماله. لم يُفقد شيء: اختر ملف التصدير نفسه مجددًا للمتابعة من حيث توقف.
+set_import_item_gone	لم يعد موجودًا على الخادم، لذا لم يُعتمَد.
+set_import_file_changed	تغيّر ملف على هذا الجهاز بعد استيراده، لذا يُنزَّل مجددًا من الخادم.
+set_openid_not_enabled	تسجيل الدخول عبر OpenID غير مفعّل على هذا الخادم. استخدم اسم المستخدم وكلمة المرور.
+set_openid_canceled	أُلغي تسجيل الدخول عبر المتصفح. حساباتك المحفوظة باقية.
+set_openid_invalid	تعذّر التحقق من رد تسجيل الدخول عبر المتصفح. أعد محاولة تسجيل الدخول وتحقق من إعدادات إعادة توجيه OpenID على الخادم.
+set_vault_unreadable	تعذّر فك تشفير بيانات تسجيل الدخول المحفوظة. هي محفوظة على الجهاز؛ سجّل الدخول مجددًا للمتابعة.
+set_session_ended	انتهت جلستك على %1$s. سجّل الدخول مجددًا؛ يُحتفَظ بالاستماع غير المُرسَل والتنزيلات.
+set_play_blocked_listening_storage	تعذّر حفظ الاستماع الذي سبق إغلاق التطبيق لأن التخزين غير متاح، لذا لن يُشغَّل شيء حتى يمكن حفظه. حرّر بعض المساحة ثم حاول مرة أخرى.
+set_play_blocked_unreadable_resets	تعذّرت قراءة عمليات إلغاء التقدم المحفوظة، لذا لن يُشغَّل شيء حتى تُحلّ في التشخيص.
+set_play_blocked_discarding	لا يزال تقدم هذا العنوان قيد الإلغاء. سيُشغَّل من البداية بمجرد انتهاء ذلك.
+dl_not_saved	تعذّر حفظ قائمة التنزيلات على هذا الجهاز، لذا لم يتغير شيء. حرّر بعض مساحة التخزين ثم حاول مرة أخرى.
+dl_not_allowed	حسابك غير مسموح له بالتنزيل.
+dl_no_audio	لا يحتوي هذا العنصر على صوت لتنزيله.
+dl_no_space	لا توجد مساحة فارغة كافية على هذا الجهاز لـ %1$s مع إبقاء مساحة تخزين متاحة للنظام.
+dl_folder_lost_nothing_downloaded	أُزيل الوصول إلى %1$s، لذا لم يُنزَّل شيء. اختر مجلد التنزيل مجددًا في الإعدادات.
+dl_downloading_percent	جارٍ التنزيل %1$d%%
+dl_cancel_download	إلغاء التنزيل
+dl_downloaded_plays_offline	تم التنزيل · يعمل دون اتصال
+dl_failed	فشل التنزيل.
+dl_discard	تجاهل
+dl_cellular_title	التنزيل عبر بيانات الجوال؟
+dl_cellular_message	أنت متصل بشبكة محدودة الاستهلاك. يمكنك تغيير ذلك في الإعدادات.
+dl_not_now	ليس الآن
+dl_folder_cannot_be_kept	لا يمكن الاحتفاظ بهذا المجلد للتنزيلات. اختر مجلدًا آخر.
+dl_saved_in_folder	تُحفَظ التنزيلات في %1$s
+dl_saved_in_app_storage	تُحفَظ التنزيلات في مساحة تخزين التطبيق
+dl_folder_visible_to_other_apps	يمكن للتطبيقات الأخرى على هذا الجهاز رؤية هذه الملفات. تبقى التنزيلات التي تمت قبل التغيير في مكانها.
+dl_folder_private_to_app	هذا التطبيق وحده يمكنه رؤية هذه الملفات. اختر مجلدًا لحفظ التنزيلات حيث يمكن للتطبيقات الأخرى الوصول إليها.
+dl_choose_folder	اختيار مجلد
+dl_use_app_storage	استخدام مساحة تخزين التطبيق
+dl_ebook_missing	الكتاب الإلكتروني غير موجود على هذا الجهاز. نزّله مجددًا لفتحه.
+dl_no_app_opens_format	لا يوجد تطبيق على هذا الجهاز يفتح ملفات %1$s. ثبّت تطبيقًا يفتحها ثم حاول مرة أخرى.
+dl_no_app_opens_this_kind	لا يوجد تطبيق على هذا الجهاز يفتح هذا النوع من الملفات. ثبّت تطبيقًا يفتحها ثم حاول مرة أخرى.
+dl_folder_lost_choose_again_open	هذا التنزيل موجود في %1$s، وقد أُزيل الوصول إلى %1$s. اختر %1$s مجددًا لفتحه.
+dl_folder_lost_choose_again_play	هذا التنزيل موجود في %1$s، وقد أُزيل الوصول إلى %1$s. اختر %1$s مجددًا لتشغيله.
+dl_names_or	%1$s أو %2$s
+dl_names_and	%1$s و%2$s
+dl_remove_title	إزالة التنزيل؟
+dl_remove_message	ستتم إزالة "%1$s" من هذا الجهاز. يُحتفَظ بتقدم استماعك.
+dl_keep	إبقاء
+dl_not_that_folder	هذا ليس %1$s. اختر المجلد الذي توجد فيه هذه التنزيلات.
+dl_folder_access_not_kept	تعذّر الاحتفاظ بالوصول إلى هذا المجلد. حاول مرة أخرى.
+dl_no_downloads	لا توجد تنزيلات
+dl_no_downloads_message	نزّل الكتب أو الحلقات من صفحاتها للاستماع إليها دون اتصال.
+dl_access_removed_title	أُزيل الوصول إلى %1$s
+dl_downloads_kept_there:zero	يوجد هناك %1$d تنزيل. اختر %2$s مجددًا لتشغيلها وفتحها.
+dl_downloads_kept_there:one	يوجد هناك %1$d تنزيل. اختر %2$s مجددًا لتشغيله وفتحه.
+dl_downloads_kept_there:two	يوجد هناك %1$d تنزيلان. اختر %2$s مجددًا لتشغيلهما وفتحهما.
+dl_downloads_kept_there:few	توجد هناك %1$d تنزيلات. اختر %2$s مجددًا لتشغيلها وفتحها.
+dl_downloads_kept_there:many	يوجد هناك %1$d تنزيلًا. اختر %2$s مجددًا لتشغيلها وفتحها.
+dl_downloads_kept_there:other	يوجد هناك %1$d تنزيل. اختر %2$s مجددًا لتشغيلها وفتحها.
+dl_choose_again	اختيار %1$s مجددًا
+dl_some_files_missing	بعض الملفات غير موجودة على هذا الجهاز
+dl_size_in_folder	%1$s في %2$s
+dl_open_in_another_app	فتح %1$s في تطبيق آخر
+dl_download_again_named	تنزيل %1$s مجددًا
+dl_the_chosen_folder	المجلد المختار
+dl_files_missing_play	بعض ملفات هذا التنزيل غير موجودة على هذا الجهاز. نزّله مجددًا لتشغيله.
+dl_play_named	تشغيل %1$s
+dl_retry_named	إعادة محاولة %1$s
+dl_cancel_named	إلغاء %1$s
+dl_remove_named	إزالة %1$s
+dl_sign_in_again	سجّل الدخول إلى هذا الحساب مجددًا للتنزيل.
+dl_folder_lost_choose_in_downloads	أُزيل الوصول إلى %1$s. اختر المجلد مجددًا في التنزيلات.
+dl_connection_interrupted	انقطع الاتصال.
+dl_error_retrying	%1$s جارٍ إعادة المحاولة…
+dl_server_refused	رفض الخادم التنزيل.
+dl_server_sent_type_not_audio	أرسل الخادم %1$s بدلًا من الصوت، لذا لم يُحفَظ شيء. تحقق من الخادم أو الوكيل (proxy) ثم أعد المحاولة.
+dl_server_sent_unknown_not_audio	أرسل الخادم ردًا غير معروف بدلًا من الصوت، لذا لم يُحفَظ شيء. تحقق من الخادم أو الوكيل (proxy) ثم أعد المحاولة.
+dl_size_mismatch	كان حجم الملف المنزَّل %1$d بايت بينما ذكر الخادم %2$d، لذا تم تجاهله. أعد المحاولة لتنزيله مجددًا.
+dl_server_sent_not_pdf	أرسل الخادم شيئًا غير ملف PDF، لذا لم يُحفَظ شيء. تحقق من الخادم أو الوكيل (proxy) ثم أعد المحاولة.
+dl_notification_downloading	جارٍ تنزيل %1$s
+rd_positions_not_restored	تعذّرت استعادة مواضع القراءة المحفوظة، لذا لا يتم حفظ الصفحات. يُحتفَظ بالبيانات الأصلية.
+rd_positions_not_overwritten	تعذّرت قراءة مواضع القراءة المحفوظة، لذا لن يُكتَب فوقها.
+rd_not_a_pdf	هذا الملف ليس ملف PDF يمكن لهذا الجهاز فتحه.
+rd_document_not_opened	تعذّر فتح المستند.
+rd_page_not_saved	تعذّر حفظ هذه الصفحة على هذا الجهاز.
+rd_choice_not_saved	تعذّر حفظ اختيارك على هذا الجهاز.
+rd_conflict_title	المتابعة من أين؟
+rd_conflict_page	وصل جهاز آخر إلى الصفحة %1$d بينما لم تُحفَظ الصفحة %2$d هنا على الخادم بعد.
+rd_conflict_location	حفظ جهاز آخر موضع قراءة لا يستطيع هذا القارئ عرضه كصفحة، بينما لم تُحفَظ الصفحة %1$d هنا على الخادم بعد.
+rd_go_to_page_number	الانتقال إلى الصفحة %1$d
+rd_keep_other_position	الإبقاء على الموضع الآخر
+rd_stay_on_page	البقاء في الصفحة %1$d
+rd_close_reader	إغلاق القارئ
+rd_rotate_pages	تدوير الصفحات
+rd_continuous_scrolling	تمرير متواصل
+rd_document_error_title	تعذّر فتح هذا المستند
+rd_try_again	حاول مرة أخرى
+rd_go_to_page	الانتقال إلى صفحة
+rd_previous_page	الصفحة السابقة
+rd_next_page	الصفحة التالية
+rd_page_of	الصفحة %1$d من %2$d
+rd_page_number	الصفحة %1$d
+rd_download_folder_lost	هذا التنزيل موجود في %1$s، وقد أُزيل الوصول إلى %1$s. اختر المجلد مجددًا في التنزيلات.
+rd_downloaded_document_missing	المستند المنزَّل غير موجود على هذا الجهاز. نزّله مجددًا.
+rd_document_not_stored	تعذّر تخزين المستند للقراءة.
+rd_supplementary_pdf	ملف PDF تكميلي
+rd_format_not_available	قراءة %1$s غير متاحة في هذه النسخة التجريبية بعد. يُحتفَظ بموضع قراءتك على الخادم.
+rd_ebook_not_available	قراءة هذا الكتاب الإلكتروني غير متاحة في هذه النسخة التجريبية بعد. يُحتفَظ بموضع قراءتك على الخادم.
+grp_unavailable_title	عنوان غير متاح
+grp_could_not_load_collections	تعذّر تحميل المجموعات.
+grp_could_not_load_playlists	تعذّر تحميل قوائم التشغيل.
+grp_collections_unavailable	المجموعات غير متاحة
+grp_playlists_unavailable	قوائم التشغيل غير متاحة
+grp_no_collections_yet	لا توجد مجموعات بعد
+grp_no_playlists_yet	لا توجد قوائم تشغيل بعد
+grp_create_one_hint	أنشئ واحدة لتجمع العناوين معًا بترتيبك الخاص.
+grp_title_count:zero	%1$d عنوان
+grp_title_count:one	%1$d عنوان
+grp_title_count:two	%1$d عنوانان
+grp_title_count:few	%1$d عناوين
+grp_title_count:many	%1$d عنوانًا
+grp_title_count:other	%1$d عنوان
+grp_collection_deleted	تم حذف هذه المجموعة.
+grp_playlist_deleted	تم حذف قائمة التشغيل هذه.
+grp_could_not_load	تعذّر التحميل.
+grp_collection_unavailable	المجموعة غير متاحة
+grp_playlist_unavailable	قائمة التشغيل غير متاحة
+grp_nothing_in_collection_can_play	لا يوجد في هذه المجموعة ما يمكن تشغيله.
+grp_nothing_in_playlist_can_play	لا يوجد في قائمة التشغيل هذه ما يمكن تشغيله.
+grp_could_not_start_playback	تعذّر بدء التشغيل.
+grp_resume	استئناف
+grp_play_collection	تشغيل المجموعة
+grp_play_playlist	تشغيل قائمة التشغيل
+grp_edit_collection	تعديل المجموعة
+grp_edit_playlist	تعديل قائمة التشغيل
+grp_delete_collection	حذف المجموعة
+grp_delete_playlist	حذف قائمة التشغيل
+grp_no_titles_yet	لا توجد عناوين بعد
+grp_delete_collection_question	حذف المجموعة؟
+grp_delete_playlist_question	حذف قائمة التشغيل؟
+grp_delete_group_explanation	ستتم إزالة “%1$s” من خادمك. يُحتفَظ بالعناوين التي فيها.
+grp_not_deleted	لم يتم الحذف: %1$s
+grp_not_deleted_try_again	لم يتم الحذف: حاول مرة أخرى
+grp_not_allowed_to_change_collection	حسابك على الخادم غير مسموح له بتغيير هذه المجموعة.
+grp_not_allowed_to_change_playlist	حسابك على الخادم غير مسموح له بتغيير قائمة التشغيل هذه.
+grp_collection_no_longer_exists	هذه المجموعة لم تعد موجودة.
+grp_playlist_no_longer_exists	قائمة التشغيل هذه لم تعد موجودة.
+grp_not_saved	لم يتم الحفظ: %1$s
+grp_not_saved_try_again	لم يتم الحفظ: حاول مرة أخرى
+grp_saving	جارٍ الحفظ…
+grp_create_collection	إنشاء مجموعة
+grp_create_playlist	إنشاء قائمة تشغيل
+grp_save_changes	حفظ التغييرات
+grp_choose_at_least_one_title	اختر عنوانًا واحدًا على الأقل.
+grp_order	الترتيب
+grp_move_up	نقل %1$s لأعلى
+grp_remove_member	إزالة %1$s
+grp_add_titles	إضافة عناوين
+grp_add_episodes_hint	أضف الحلقات من صفحة حلقات البودكاست.
+grp_add_to_playlist_or_collection	إضافة إلى قائمة تشغيل أو مجموعة
+grp_add_to	إضافة إلى
+grp_nothing_to_add_to	لا يوجد ما يمكنك الإضافة إليه هنا بعد.
+grp_added_to	تمت الإضافة إلى %1$s
+grp_not_added	لم تتم الإضافة: %1$s
+grp_not_added_try_again	لم تتم الإضافة: حاول مرة أخرى
+grp_already_included	مضاف بالفعل
+grp_close	إغلاق
+grp_titles_could_not_load	تعذّر تحميل العناوين
+grp_nothing_here	لا يوجد شيء هنا
+pod_filter_in_progress	قيد المتابعة
+pod_feed_episodes	حلقات التغذية
+pod_sort_newest_first	الأحدث أولًا، انقر لعرض الأقدم أولًا
+pod_sort_oldest_first	الأقدم أولًا، انقر لعرض الأحدث أولًا
+pod_episodes_queued:zero	أُضيفت %1$d حلقة إلى قائمة الانتظار على خادمك: %2$s
+pod_episodes_queued:one	أُضيفت %1$d حلقة إلى قائمة الانتظار على خادمك: %2$s
+pod_episodes_queued:two	أُضيفت %1$d حلقتان إلى قائمة الانتظار على خادمك: %2$s
+pod_episodes_queued:few	أُضيفت %1$d حلقات إلى قائمة الانتظار على خادمك: %2$s
+pod_episodes_queued:many	أُضيفت %1$d حلقة إلى قائمة الانتظار على خادمك: %2$s
+pod_episodes_queued:other	أُضيفت %1$d حلقة إلى قائمة الانتظار على خادمك: %2$s
+pod_server_could_not_download	تعذّر على خادمك تنزيل “%1$s”.
+pod_dismiss	تجاهل
+pod_no_episodes_yet	لا توجد حلقات بعد
+pod_no_episodes_match_filter	لا توجد حلقات تطابق هذا الفلتر
+pod_episode_details	تفاصيل الحلقة
+pod_untitled_episode	حلقة بلا عنوان
+pod_play_named	تشغيل %1$s
+pod_episode_not_available	الحلقة غير متاحة
+pod_episode_may_have_been_removed	ربما أُزيلت من الخادم.
+pod_percent_listened	تم الاستماع إلى %1$d%%
+pod_feed_could_not_open	تعذّر فتح التغذية.
+pod_retry_feed	إعادة محاولة التغذية
+pod_no_feed_episodes	لم يتم العثور على حلقات في التغذية
+pod_already_on_server	موجودة على الخادم بالفعل
+pod_selected	محددة
+pod_not_selected	غير محددة
+pod_no_audio_enclosure	لا يوجد مرفق صوتي
+pod_not_queued	لم تُضَف إلى قائمة الانتظار: %1$s
+pod_not_queued_try_again	لم تُضَف إلى قائمة الانتظار: حاول مرة أخرى
+pod_queueing_on_server	جارٍ الإضافة إلى قائمة الانتظار على خادمك…
+pod_add_selected_episodes	إضافة الحلقات المحددة إلى الخادم
+pod_something_went_wrong	حدث خطأ ما.
+pod_adding_not_available	إضافة البودكاست غير متاحة
+pod_adding_needs_permission	يحتاج حسابك على الخادم إلى صلاحية إدارة البودكاست في مكتبة بودكاست.
+pod_search_podcasts	البحث عن بودكاست
+pod_or_rss_feed_url	أو عنوان URL لتغذية RSS
+pod_enter_complete_feed_url	أدخل عنوان URL كاملًا لتغذية HTTP أو HTTPS.
+pod_preview_feed	معاينة التغذية
+pod_create_podcast	إنشاء بودكاست
+pod_choose_different_feed	اختيار تغذية مختلفة
+item_something_went_wrong	حدث خطأ ما. حاول مرة أخرى.
+item_feed_subscribe_at	يمكن لتطبيقات البودكاست الاشتراك في هذا العنوان عبر:
+item_copied	تم النسخ
+item_copy_address	نسخ العنوان
+item_hidden_from_directories	مخفي من أدلة البودكاست
+item_feed_public_warning	يمكن لأي شخص لديه العنوان الاستماع إلى هذا العنوان دون تسجيل الدخول.
+item_feed_name	اسم التغذية
+item_feed_name_rule	أحرف وأرقام و- و_ فقط
+item_hide_from_directories	إخفاء من أدلة البودكاست
+item_done	تم
+item_sending	جارٍ الإرسال…
+item_sent_to	تم الإرسال إلى %1$s
+item_send_ebook_explanation	يرسل خادمك الكتاب الإلكتروني بالبريد الإلكتروني إلى الجهاز الذي تختاره.
+item_ereader_or_ebook_gone	%1$s أو هذا الكتاب الإلكتروني لم يعد متاحًا على الخادم. لم يُرسَل شيء.
+item_not_sent_to	لم يتم الإرسال إلى %1$s. %2$s
+item_not_saved_try_again	لم يتم الحفظ. حاول مرة أخرى.
+item_mark_unfinished	وضع علامة "غير مكتمل"
+item_discard_uncertain	لم يصل رد على عملية حفظ سابقة لتقدم هذا العنوان، وقد تصل إلى خادمك. إذا وصلت بعد الإلغاء، فستعيد التقدم. لا يستطيع خادمك إخبار هذا التطبيق بما إذا كانت ستصل.
+item_discard_anyway	الإلغاء على أي حال
+item_discard_under_way	عملية الإلغاء هذه جارية بالفعل ولا يمكن التراجع عنها.
+item_keep_progress	الإبقاء على التقدم
+item_discard_pending	جارٍ إلغاء التقدم. ينتهي ذلك بمجرد أن يصبح خادمك متاحًا ويُرسَل استماع هذا العنوان.
+item_discard_anyway_question	الإلغاء على أي حال؟
+item_discard_anyway_explanation	ستتم إزالة التقدم الآن. إذا وصلت عملية الحفظ السابقة إلى خادمك لاحقًا، فسيعود تقدم هذا العنوان ويمكنك إلغاؤه مجددًا.
+item_discard	إلغاء التقدم
+item_discard_progress_question	إلغاء التقدم؟
+item_discard_progress_explanation	ستتم إزالة موضعك وحالة الاكتمال لهذا العنوان من الخادم لجميع الأجهزة.
+item_could_not_load	تعذّر تحميل هذا العنوان
+item_narrated_by	بصوت
+item_series	السلسلة: %1$s
+item_series_with_sequence	السلسلة: %1$s #%2$s
+item_episode_count:zero	%1$d حلقة
+item_episode_count:one	%1$d حلقة
+item_episode_count:two	%1$d حلقتان
+item_episode_count:few	%1$d حلقات
+item_episode_count:many	%1$d حلقة
+item_episode_count:other	%1$d حلقة
+item_listened_and_left	تم الاستماع إلى %1$d%% · متبقٍ %2$s
+item_chapter_number	الفصل %1$d
+pl_minimize_player	تصغير المشغل
+pl_nothing_playing	لا يتم تشغيل شيء
+pl_chapter_number	الفصل %1$d
+pl_try_again	حاول مرة أخرى
+pl_speed_value	السرعة %1$s
+pl_sleep	النوم
+pl_position_of_duration	%1$s من %2$s
+pl_buffering	جارٍ التخزين المؤقت
+pl_previous_chapter	الفصل السابق
+pl_next_chapter	الفصل التالي
+pl_jump_forward_seconds:zero	القفز للأمام %1$d ثانية
+pl_jump_forward_seconds:one	القفز للأمام %1$d ثانية
+pl_jump_forward_seconds:two	القفز للأمام %1$d ثانيتين
+pl_jump_forward_seconds:few	القفز للأمام %1$d ثوانٍ
+pl_jump_forward_seconds:many	القفز للأمام %1$d ثانية
+pl_jump_forward_seconds:other	القفز للأمام %1$d ثانية
+pl_jump_back_seconds:zero	القفز للخلف %1$d ثانية
+pl_jump_back_seconds:one	القفز للخلف %1$d ثانية
+pl_jump_back_seconds:two	القفز للخلف %1$d ثانيتين
+pl_jump_back_seconds:few	القفز للخلف %1$d ثوانٍ
+pl_jump_back_seconds:many	القفز للخلف %1$d ثانية
+pl_jump_back_seconds:other	القفز للخلف %1$d ثانية
+pl_jump_forward_minutes:zero	القفز للأمام %1$d دقيقة
+pl_jump_forward_minutes:one	القفز للأمام %1$d دقيقة
+pl_jump_forward_minutes:two	القفز للأمام %1$d دقيقتين
+pl_jump_forward_minutes:few	القفز للأمام %1$d دقائق
+pl_jump_forward_minutes:many	القفز للأمام %1$d دقيقة
+pl_jump_forward_minutes:other	القفز للأمام %1$d دقيقة
+pl_jump_back_minutes:zero	القفز للخلف %1$d دقيقة
+pl_jump_back_minutes:one	القفز للخلف %1$d دقيقة
+pl_jump_back_minutes:two	القفز للخلف %1$d دقيقتين
+pl_jump_back_minutes:few	القفز للخلف %1$d دقائق
+pl_jump_back_minutes:many	القفز للخلف %1$d دقيقة
+pl_jump_back_minutes:other	القفز للخلف %1$d دقيقة
+pl_open_player	فتح المشغل
+pl_playback_stopped	توقف التشغيل
+pl_listening_unsaved	بعض الاستماع لم يُحفَظ على هذا الجهاز بعد. يُحتفَظ به وسيُحفَظ بمجرد أن يسمح التخزين بذلك.
+pl_playing	قيد التشغيل
+pl_resume	استئناف
+pl_streaming_cellular_refused	البث عبر بيانات الجوال متوقف في الإعدادات. اتصل بشبكة Wi-Fi أو نزّل هذا العنوان أولًا.
+pl_stream_cellular_title	البث عبر بيانات الجوال؟
+pl_stream_cellular_message	أنت متصل بشبكة محدودة الاستهلاك. يمكنك تغيير ذلك في الإعدادات.
+pl_not_now	ليس الآن
+pl_sleep_stops_end_of_chapter	يتوقف في نهاية هذا الفصل، بعد %1$s
+pl_sleep_stops_in	يتوقف بعد %1$s
+pl_sleep_minus_minutes	−%1$d د
+pl_sleep_plus_minutes	+%1$d د
+pl_sleep_minutes	%1$d د
+pl_sleep_turn_off	إيقاف
+pl_bookmark_not_saved_reason	لم تُحفَظ العلامة المرجعية: %1$s
+pl_bookmark_not_saved	لم تُحفَظ العلامة المرجعية: حاول مرة أخرى
+pl_bookmark_add_at	إضافة عند %1$s
+pl_bookmark_go_to	الانتقال إلى العلامة المرجعية
+pl_bookmark_default	علامة مرجعية
+pl_bookmark_rename_named	إعادة تسمية %1$s
+pl_bookmark_delete_named	حذف %1$s
+pl_bookmark_at	علامة مرجعية عند %1$s
+pl_bookmark_rename	إعادة تسمية العلامة المرجعية
+pl_bookmark_new	علامة مرجعية جديدة
+pl_untitled	بلا عنوان
+pl_playback_stopped_reason	توقف التشغيل: %1$s. يُحتفَظ بموضعك.
+pl_playback_stopped_unknown	توقف التشغيل: تعذّر تحميل الصوت. يُحتفَظ بموضعك.
+pl_no_playable_audio	لا يحتوي هذا العنصر على صوت قابل للتشغيل.
+pl_could_not_start	تعذّر بدء التشغيل.
+pl_listening_save_failed	تعذّر حفظ الاستماع على هذا الجهاز، لذا تم إيقاف التشغيل مؤقتًا. حرّر بعض مساحة التخزين ثم حاول مرة أخرى.
+cast_casting_to	جارٍ البث إلى %1$s
+cast_cast	بث
+cast_playing_on	قيد التشغيل على %1$s
+cast_connecting_to	جارٍ الاتصال بـ %1$s…
+cast_playing_on_phone	قيد التشغيل على هذا الهاتف
+cast_stop	إيقاف البث
+cast_looking	جارٍ البحث عن أجهزة البث…
+cast_none_found	لم يتم العثور على أجهزة بث. تأكد من أن جهاز الاستقبال قيد التشغيل ومتصل بشبكة Wi-Fi نفسها التي يتصل بها هذا الهاتف.
+cast_close	إغلاق
+cast_download_not_castable	تُشغَّل النسخ المنزَّلة على هذا الهاتف فقط. أوقف البث للاستماع هنا، أو شغّل العنوان عبر البث المباشر بدلًا من ذلك.
+cast_resumed_without_title	توقف البث لأن التطبيق أُعيد تشغيله أثناء البث. افتح العنوان مجددًا لمتابعة الاستماع من آخر موضع حفظه هذا الهاتف.
+cast_needs_play_services	يحتاج البث إلى خدمات Google Play، وهي غير موجودة على هذا الجهاز أو تحتاج إلى تحديث.
+cast_could_not_start	تعذّر بدء البث على هذا الجهاز: %1$s.
+cast_connect_failed_named	تعذّر الاتصال بـ %1$s. تأكد من أنه قيد التشغيل ومتصل بشبكة Wi-Fi نفسها التي يتصل بها هذا الهاتف.
+cast_connect_failed	تعذّر الاتصال بجهاز الاستقبال. تأكد من أنه قيد التشغيل ومتصل بشبكة Wi-Fi نفسها التي يتصل بها هذا الهاتف.
+cast_connection_lost_named	انقطع الاتصال بـ %1$s. يستمر التشغيل على هذا الهاتف.
+cast_connection_lost	انقطع الاتصال بجهاز الاستقبال. يستمر التشغيل على هذا الهاتف.
+auto_continue	متابعة
+auto_recent	الأخيرة
+auto_discovery	استكشاف
+auto_authors_count:zero	%1$d مؤلف
+auto_authors_count:one	%1$d مؤلف
+auto_authors_count:two	%1$d مؤلفان
+auto_authors_count:few	%1$d مؤلفين
+auto_authors_count:many	%1$d مؤلفًا
+auto_authors_count:other	%1$d مؤلف
+auto_series_count:zero	%1$d سلسلة
+auto_series_count:one	%1$d سلسلة
+auto_series_count:two	%1$d سلسلتان
+auto_series_count:few	%1$d سلاسل
+auto_series_count:many	%1$d سلسلة
+auto_series_count:other	%1$d سلسلة
+lib_books_count:zero	%1$d كتاب
+lib_books_count:one	%1$d كتاب
+lib_books_count:two	%1$d كتابان
+lib_books_count:few	%1$d كتب
+lib_books_count:many	%1$d كتابًا
+lib_books_count:other	%1$d كتاب
+lib_items_count:zero	%1$d عنصر
+lib_items_count:one	%1$d عنصر
+lib_items_count:two	%1$d عنصران
+lib_items_count:few	%1$d عناصر
+lib_items_count:many	%1$d عنصرًا
+lib_items_count:other	%1$d عنصر
+lib_filter_in_progress	قيد المتابعة
+lib_selected	محدد
+lib_all_filters	كل الفلاتر
+lib_nothing_to_filter	لا يوجد ما يمكن التصفية به هنا.
+lib_sort_descending_switch	تنازلي، التبديل إلى تصاعدي
+lib_sort_ascending_switch	تصاعدي، التبديل إلى تنازلي
+lib_sort_descending	تنازلي
+lib_sort_ascending	تصاعدي
+lib_unavailable	المكتبة غير متاحة
+lib_unavailable_message	%1$s يُحتفَظ بحسابك والاستماع غير المُرسَل.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	عرض الأغلفة
+lib_show_list	عرض القائمة
+lib_filtered	مُصفّاة
+lib_empty_title	لا يوجد شيء هنا بعد
+lib_empty_message	لا تحتوي هذه المكتبة على عناصر يمكنك الوصول إليها.
+lib_page_error	تعذّر تحميل المزيد من العناوين
+lib_card_finished	%1$s، مكتمل
+lib_card_percent_listened	%1$s، تم الاستماع إلى %2$d بالمئة
+lib_search_in	البحث في %1$s
+lib_search_library	البحث في المكتبة
+lib_clear_search	مسح البحث
+lib_search_failed	فشل البحث
+lib_search_idle_title	اعثر على شيء للاستماع إليه
+lib_search_idle_message	ابحث في العناوين والمؤلفين والسلاسل والرواة والحلقات.
+lib_search_no_match	لا يوجد ما يطابق "%1$s". جرّب كلمات أقل أو تهجئة أخرى.
+err_invalid_server	أدخل عنوان خادم يبدأ بـ http:// أو https://، مثل https://books.example.com/abs.
+err_unsafe_media_url	أعاد الخادم عنوان وسائط خارج هذا الخادم. لم يتم فتحه.
+err_sign_in_required	لم تعد جلستك مقبولة. سجّل الدخول مجددًا؛ يُحتفَظ بالاستماع غير المُرسَل.
+err_untrusted	شهادة الخادم غير موثوقة على هذا الجهاز. ثبّت المرجع المصدّق لخادمك في إعدادات Android > الأمان > التشفير وبيانات الاعتماد، ثم حاول مرة أخرى.
+err_offline	تعذّر الوصول إلى الخادم. تحقق من العنوان أو من اتصالك ثم حاول مرة أخرى.
+err_forbidden	حسابك غير مسموح له بفعل ذلك.
+err_not_found	هذا المحتوى لم يعد متاحًا على الخادم.
+err_server_problem	واجه الخادم مشكلة مؤقتة (HTTP %1$d). حاول مرة أخرى.
+err_rejected	رفض الخادم الطلب (HTTP %1$d).
+err_invalid_response	أرسل الخادم ردًا لم يتمكن هذا التطبيق من قراءته.
+err_no_audio	لا يحتوي هذا العنصر على صوت قابل للتشغيل.
+err_login_rejected	لم يُقبَل اسم المستخدم أو كلمة المرور.
+err_publications_unreadable	تعذّرت قراءة سجلات عمليات كتابة التقدم التي لم يصلها رد. عالجها في التشخيص أولًا.
+err_discards_unreadable	تعذّرت قراءة عمليات إلغاء التقدم المحفوظة. عالجها في التشخيص أولًا.

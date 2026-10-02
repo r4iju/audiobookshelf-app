@@ -1,0 +1,449 @@
+# Danish drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Konti
+title_new_collection	Ny samling
+action_retry	Prøv igen
+action_read	Læs %1$s
+action_mark_finished	Markér som færdig
+choose_library	Vælg bibliotek
+all_titles	Alle titler
+all_podcasts	Alle podcasts
+filter	Filtrer
+sort	Sortér
+theme_system	System
+screen_orientation	Skærmretning
+jump_forward	Spring frem
+jump_back	Spring tilbage
+set_settings_not_saved	Indstillingerne kunne ikke gemmes på denne enhed, så intet blev ændret. Frigør noget lagerplads, og prøv igen.
+set_orientation_follow_device	Følg enheden
+set_orientation_portrait	Stående
+set_orientation_landscape	Liggende
+set_haptic_light	Let
+set_rewind_on_resume	Spol lidt tilbage ved genoptagelse
+set_rewind_on_resume_detail	Går et par sekunder tilbage efter en pause, mere efter en længere pause.
+set_seek_system_controls	Spol fra systemets betjening
+set_seek_system_controls_detail	Lader låseskærmen og notifikationen flytte positionslinjen.
+set_mp3_index_seeking	Præcis spoling i MP3
+set_mp3_index_seeking_detail	Opbygger et søgeindeks for MP3-filer med upålidelig længde. Spoling starter langsommere.
+set_shake_to_reset	Ryst for at nulstille
+set_shake_to_reset_detail	Hvis du ryster telefonen, mens timeren kører, starter den forfra.
+set_sleep_fade_out	Udtoning
+set_sleep_fade_out_detail	Sænker lydstyrken i det sidste minut.
+set_vibrate_on_reset	Vibrer ved nulstilling
+set_auto_sleep_timer_detail	Starter timeren ved afspilning mellem %1$s og %2$s.
+set_heading_mobile_data	Mobildata
+set_storage	Lagerplads
+set_heading_support	Support
+set_diagnostics	Diagnosticering
+set_something_went_wrong	Noget gik galt.
+set_statistics_unavailable	Statistik er ikke tilgængelig
+set_try_again	Prøv igen
+set_minutes_listened:one	%1$d minut lyttet
+set_minutes_listened:other	%1$d minutter lyttet
+set_days_listened:one	%1$d dag lyttet
+set_days_listened:other	%1$d dage lyttet
+set_titles_finished:one	%1$d titel færdig
+set_titles_finished:other	%1$d titler færdige
+set_day_minutes_listened:one	%1$s, %2$d minut lyttet
+set_day_minutes_listened:other	%1$s, %2$d minutter lyttet
+set_set_aside_failed	Kunne ikke lægges til side. Prøv igen.
+set_connection	Forbindelse
+set_diagnostics_area_media	Medier
+set_diagnostics_area_sync	Synkronisering
+set_unreadable_resets_title	Gemte anmodninger om at kassere fremgang kunne ikke læses
+set_unreadable_resets_detail	Enhver titel kan være berørt, så intet afspilles, og ingen læseposition sendes, før du beslutter dig. Hvis du lægger dem til side, bliver filen på denne enhed, og al fremgang, der skulle kasseres, bliver på din server.
+set_set_them_aside	Læg dem til side
+set_listening_storage_title	Lytning fra før appen lukkede kunne ikke gemmes
+set_listening_storage_detail	Lagerpladsen på denne enhed er utilgængelig eller fuld. Intet afspilles, og ingen lytning sendes, før den er gemt; indtil da bevares den.
+set_unreadable_writes_title	Registreringer af ubesvarede gemninger af fremgang kunne ikke læses
+set_unreadable_writes_detail	En gemning for en hvilken som helst titel kan stadig nå din server, så ingen lytning eller læsning sendes, og ingen fremgang kasseres, før du beslutter dig. Hvis du lægger dem til side, bliver filen på denne enhed; en forsinket gemning kan så bringe fremgang tilbage, som du kasserer.
+set_diagnostics_server	Server %1$s
+set_diagnostics_signed_in_as	Logget ind som %1$s
+set_diagnostics_app_version	App %1$s
+set_recent_problems	Seneste problemer
+set_clear	Ryd
+set_no_problems	Ingen problemer registreret på denne enhed.
+set_unreadable_writes_confirm_title	Læg ulæselige registreringer til side?
+set_unreadable_writes_confirm_detail	Lytte- og læsepositioner sendes igen, og kasseringer kan gennemføres.
+set_set_aside	Læg til side
+set_unreadable_resets_confirm_title	Læg ulæselige kasseringer til side?
+set_unreadable_resets_confirm_detail	Titler afspilles, og læsepositioner sendes igen. Kassér fremgangen igen for de titler, du stadig vil starte forfra på.
+set_signed_in	Logget ind
+set_other_accounts	Andre konti
+set_server_sign_in_required	%1$s · login påkrævet
+set_remove_account	Fjern %1$s
+set_switch_to_account	Skift til denne konto
+set_add_account	Tilføj konto
+set_sign_out_of	Log ud af %1$s
+set_sign_out_detail	Fjerner denne konto fra enheden. Downloads og ikke-sendt lytning for den bevares, indtil den logger ind igen.
+set_accounts_footer	Hver konto har sin egen fremgang, egne downloads og eget biblioteksvalg. Skift blander dem aldrig.
+set_remove_account_confirm	Fjern %1$s?
+set_remove_account_detail	Du kan tilføje kontoen igen senere. Dens downloads og ikke-sendte lytning bliver på denne enhed.
+set_add_an_account	Tilføj en konto
+set_connect_intro	Forbind direkte til din egen server. Intet sendes via en anden tjeneste.
+set_change_server	Skift server
+set_sign_in	Log ind
+set_sign_in_openid	Log ind med OpenID
+set_saved_accounts	Gemte konti
+set_use_account	Brug
+set_edit	Rediger
+set_add_podcast	Tilføj podcast
+set_not_available_yet	Ikke tilgængelig endnu
+set_not_available_yet_detail	Denne del af preview-versionen er stadig under udvikling.
+set_import_previous_app	Importér fra den tidligere app
+set_import_interrupted	En import blev ikke færdig. Vælg den samme eksport for at fortsætte, hvor den stoppede.
+set_import_already	Denne eksport er allerede importeret. Titler, lytning og positioner fra den er på denne enhed.
+set_import_preflight	%1$s\nDen tidligere app og denne fil bliver kun læst; intet i dem ændres. Titler, lytning og positioner knyttes til en konto, når den logger ind her. Adgangskoder er ikke med i eksporten, så hver konto skal logge ind igen.
+set_import_account_signed_in	%1$s · logget ind
+set_import_account_sign_in_later	%1$s · log ind efter import
+set_import_titles	Titler
+set_import_title_partial	%1$s · resten downloades igen
+set_not_imported	Ikke importeret
+set_import_space	Kræver %1$s; %2$s ledig.
+set_import_no_space	Der er ikke nok ledig plads på denne enhed. Frigør noget plads, og vælg derefter eksporten igen.
+set_import_progress	Kopierer filer: %1$d af %2$d. Hvis appen lukker, så vælg den samme eksport igen for at fortsætte.
+set_import_done	Importerede %1$d titler, %2$d lyttesessioner og %3$d positioner. Indstillingerne fra den tidligere app blev anvendt.
+set_import_waiting	Log ind på %1$s som %2$s for at knytte dens titler, lytning og positioner.
+set_import	Importér
+set_continue	Fortsæt
+set_close	Luk
+set_import_file_unreadable	Den valgte fil kunne ikke læses. Vælg den igen, eller gem den først på denne enhed.
+set_import_stopped	Importen stoppede, før den blev færdig. Intet gik tabt: Vælg den samme eksport igen for at fortsætte, hvor den stoppede.
+set_import_item_gone	Den findes ikke længere på serveren, så den blev ikke overtaget.
+set_import_file_changed	En fil blev ændret på denne enhed efter importen, så den downloades igen fra serveren.
+set_openid_not_enabled	Login med OpenID er ikke aktiveret på denne server. Brug dit brugernavn og din adgangskode.
+set_openid_canceled	Login i browseren blev annulleret. Dine gemte konti bevares.
+set_openid_invalid	Svaret fra login i browseren kunne ikke verificeres. Prøv at logge ind igen, og tjek serverens OpenID-omdirigeringsindstillinger.
+set_vault_unreadable	Gemte logins kunne ikke dekrypteres. De bevares på enheden; log ind igen for at fortsætte.
+set_session_ended	Din session for %1$s er udløbet. Log ind igen; ikke-sendt lytning og downloads bevares.
+set_play_blocked_listening_storage	Lytning fra før appen lukkede kunne ikke gemmes, fordi lagerpladsen er utilgængelig, så intet afspilles, før det kan lade sig gøre. Frigør noget plads, og prøv igen.
+set_play_blocked_unreadable_resets	Gemte anmodninger om at kassere fremgang kunne ikke læses, så intet afspilles, før de er løst under Diagnosticering.
+set_play_blocked_discarding	Fremgangen for denne titel er stadig ved at blive kasseret. Den afspilles fra begyndelsen, når det er gjort.
+dl_not_saved	Downloadlisten kunne ikke gemmes på denne enhed, så intet blev ændret. Frigør noget lagerplads, og prøv igen.
+dl_not_allowed	Din konto har ikke tilladelse til at downloade.
+dl_no_audio	Dette element har ingen lyd at downloade.
+dl_no_space	Ikke nok ledig plads på denne enhed til %1$s, når der skal være lagerplads ledig til systemet.
+dl_folder_lost_nothing_downloaded	Adgangen til %1$s blev fjernet, så intet blev downloadet. Vælg downloadmappen igen under Indstillinger.
+dl_downloading_percent	Downloader %1$d%%
+dl_cancel_download	Annuller download
+dl_downloaded_plays_offline	Downloadet · afspilles offline
+dl_failed	Downloaden mislykkedes.
+dl_discard	Kassér
+dl_cellular_title	Download via mobildata?
+dl_cellular_message	Du bruger en forbindelse med datapris. Du kan ændre dette under Indstillinger.
+dl_not_now	Ikke nu
+dl_folder_cannot_be_kept	Den mappe kan ikke bruges til downloads. Vælg en anden.
+dl_saved_in_folder	Downloads gemmes i %1$s
+dl_saved_in_app_storage	Downloads gemmes i appens lager
+dl_folder_visible_to_other_apps	Andre apps på denne enhed kan se disse filer. Downloads fra før en ændring bliver, hvor de er.
+dl_folder_private_to_app	Kun denne app kan se disse filer. Vælg en mappe for at gemme downloads, hvor andre apps kan få adgang til dem.
+dl_choose_folder	Vælg mappe
+dl_use_app_storage	Brug appens lager
+dl_ebook_missing	E-bogen mangler på denne enhed. Download den igen for at åbne den.
+dl_no_app_opens_format	Ingen app på denne enhed kan åbne %1$s-filer. Installer en, der kan, og prøv igen.
+dl_no_app_opens_this_kind	Ingen app på denne enhed kan åbne denne type filer. Installer en, der kan, og prøv igen.
+dl_folder_lost_choose_again_open	Denne download ligger i %1$s, og adgangen til %1$s blev fjernet. Vælg %1$s igen for at åbne den.
+dl_folder_lost_choose_again_play	Denne download ligger i %1$s, og adgangen til %1$s blev fjernet. Vælg %1$s igen for at afspille den.
+dl_names_or	%1$s eller %2$s
+dl_names_and	%1$s og %2$s
+dl_remove_title	Fjern download?
+dl_remove_message	"%1$s" fjernes fra denne enhed. Din lyttefremgang bevares.
+dl_keep	Behold
+dl_not_that_folder	Det er ikke %1$s. Vælg den mappe, som disse downloads ligger i.
+dl_folder_access_not_kept	Adgangen til den mappe kunne ikke bevares. Prøv igen.
+dl_no_downloads	Ingen downloads
+dl_no_downloads_message	Download bøger eller afsnit fra deres side for at lytte uden forbindelse.
+dl_access_removed_title	Adgangen til %1$s blev fjernet
+dl_downloads_kept_there:one	%1$d download ligger der. Vælg %2$s igen for at afspille og åbne den.
+dl_downloads_kept_there:other	%1$d downloads ligger der. Vælg %2$s igen for at afspille og åbne dem.
+dl_choose_again	Vælg %1$s igen
+dl_some_files_missing	Nogle filer mangler på denne enhed
+dl_size_in_folder	%1$s i %2$s
+dl_open_in_another_app	Åbn %1$s i en anden app
+dl_download_again_named	Download %1$s igen
+dl_the_chosen_folder	den valgte mappe
+dl_files_missing_play	Nogle filer fra denne download mangler på denne enhed. Download den igen for at afspille den.
+dl_play_named	Afspil %1$s
+dl_retry_named	Prøv %1$s igen
+dl_cancel_named	Annuller %1$s
+dl_remove_named	Fjern %1$s
+dl_sign_in_again	Log ind på denne konto igen for at downloade.
+dl_folder_lost_choose_in_downloads	Adgangen til %1$s blev fjernet. Vælg mappen igen under Downloads.
+dl_connection_interrupted	Forbindelsen blev afbrudt.
+dl_error_retrying	%1$s Prøver igen…
+dl_server_refused	Serveren afviste downloaden.
+dl_server_sent_type_not_audio	Serveren sendte %1$s i stedet for lyd, så intet blev gemt. Tjek din server eller proxy, og prøv igen.
+dl_server_sent_unknown_not_audio	Serveren sendte et ukendt svar i stedet for lyd, så intet blev gemt. Tjek din server eller proxy, og prøv igen.
+dl_size_mismatch	Den downloadede fil var %1$d bytes, men serveren angav %2$d, så den blev kasseret. Prøv igen for at downloade den på ny.
+dl_server_sent_not_pdf	Serveren sendte noget andet end PDF'en, så intet blev gemt. Tjek din server eller proxy, og prøv igen.
+dl_notification_downloading	Downloader %1$s
+rd_positions_not_restored	Gemte læsepositioner kunne ikke gendannes, så sider gemmes ikke. De oprindelige data bevares.
+rd_positions_not_overwritten	Gemte læsepositioner kunne ikke læses, så de overskrives ikke.
+rd_not_a_pdf	Denne fil er ikke en PDF, som denne enhed kan åbne.
+rd_document_not_opened	Dokumentet kunne ikke åbnes.
+rd_page_not_saved	Denne side kunne ikke gemmes på denne enhed.
+rd_choice_not_saved	Dit valg kunne ikke gemmes på denne enhed.
+rd_conflict_title	Fortsæt hvor?
+rd_conflict_page	En anden enhed nåede side %1$d, mens side %2$d her endnu ikke var gemt på serveren.
+rd_conflict_location	En anden enhed gemte en læseposition, som denne læser ikke kan vise som en side, mens side %1$d her endnu ikke var gemt på serveren.
+rd_go_to_page_number	Gå til side %1$d
+rd_keep_other_position	Behold den anden position
+rd_stay_on_page	Bliv på side %1$d
+rd_close_reader	Luk læser
+rd_rotate_pages	Rotér sider
+rd_continuous_scrolling	Fortløbende rulning
+rd_document_error_title	Dette dokument kunne ikke åbnes
+rd_try_again	Prøv igen
+rd_go_to_page	Gå til side
+rd_previous_page	Forrige side
+rd_next_page	Næste side
+rd_page_of	Side %1$d af %2$d
+rd_page_number	Side %1$d
+rd_download_folder_lost	Denne download ligger i %1$s, og adgangen til %1$s blev fjernet. Vælg mappen igen under Downloads.
+rd_downloaded_document_missing	Det downloadede dokument mangler på denne enhed. Download det igen.
+rd_document_not_stored	Dokumentet kunne ikke gemmes til læsning.
+rd_supplementary_pdf	supplerende PDF
+rd_format_not_available	Læsning af %1$s er endnu ikke tilgængelig i denne preview-version. Din læseposition på serveren bevares.
+rd_ebook_not_available	Læsning af denne e-bog er endnu ikke tilgængelig i denne preview-version. Din læseposition på serveren bevares.
+grp_unavailable_title	Utilgængelig titel
+grp_could_not_load_collections	Samlinger kunne ikke indlæses.
+grp_could_not_load_playlists	Playlister kunne ikke indlæses.
+grp_collections_unavailable	Samlinger er ikke tilgængelige
+grp_playlists_unavailable	Playlister er ikke tilgængelige
+grp_no_collections_yet	Ingen samlinger endnu
+grp_no_playlists_yet	Ingen playlister endnu
+grp_create_one_hint	Opret en for at samle titler i din egen rækkefølge.
+grp_title_count:one	%1$d titel
+grp_title_count:other	%1$d titler
+grp_collection_deleted	Denne samling blev slettet.
+grp_playlist_deleted	Denne playliste blev slettet.
+grp_could_not_load	Kunne ikke indlæses.
+grp_collection_unavailable	Samlingen er ikke tilgængelig
+grp_playlist_unavailable	Playlisten er ikke tilgængelig
+grp_nothing_in_collection_can_play	Intet i denne samling kan afspilles.
+grp_nothing_in_playlist_can_play	Intet i denne playliste kan afspilles.
+grp_could_not_start_playback	Afspilningen kunne ikke startes.
+grp_resume	Genoptag
+grp_play_collection	Afspil samling
+grp_play_playlist	Afspil playliste
+grp_edit_collection	Rediger samling
+grp_edit_playlist	Rediger playliste
+grp_delete_collection	Slet samling
+grp_delete_playlist	Slet playliste
+grp_no_titles_yet	Ingen titler endnu
+grp_delete_collection_question	Slet samling?
+grp_delete_playlist_question	Slet playliste?
+grp_delete_group_explanation	“%1$s” fjernes fra din server. Titlerne i den bevares.
+grp_not_deleted	Ikke slettet: %1$s
+grp_not_deleted_try_again	Ikke slettet: prøv igen
+grp_not_allowed_to_change_collection	Din serverkonto har ikke tilladelse til at ændre denne samling.
+grp_not_allowed_to_change_playlist	Din serverkonto har ikke tilladelse til at ændre denne playliste.
+grp_collection_no_longer_exists	Denne samling findes ikke længere.
+grp_playlist_no_longer_exists	Denne playliste findes ikke længere.
+grp_not_saved	Ikke gemt: %1$s
+grp_not_saved_try_again	Ikke gemt: prøv igen
+grp_saving	Gemmer…
+grp_create_collection	Opret samling
+grp_create_playlist	Opret playliste
+grp_save_changes	Gem ændringer
+grp_choose_at_least_one_title	Vælg mindst én titel.
+grp_order	Rækkefølge
+grp_move_up	Flyt %1$s op
+grp_remove_member	Fjern %1$s
+grp_add_titles	Tilføj titler
+grp_add_episodes_hint	Tilføj afsnit fra en podcasts afsnitsside.
+grp_add_to_playlist_or_collection	Tilføj til playliste eller samling
+grp_add_to	Tilføj til
+grp_nothing_to_add_to	Der er intet, du kan tilføje til her endnu.
+grp_added_to	Tilføjet til %1$s
+grp_not_added	Ikke tilføjet: %1$s
+grp_not_added_try_again	Ikke tilføjet: prøv igen
+grp_already_included	Allerede med
+grp_close	Luk
+grp_titles_could_not_load	Titler kunne ikke indlæses
+grp_nothing_here	Intet her
+pod_feed_episodes	Afsnit i feedet
+pod_sort_newest_first	Nyeste først, tryk for ældste først
+pod_sort_oldest_first	Ældste først, tryk for nyeste først
+pod_episodes_queued:one	%1$d afsnit sat i kø på din server: %2$s
+pod_episodes_queued:other	%1$d afsnit sat i kø på din server: %2$s
+pod_server_could_not_download	Din server kunne ikke downloade “%1$s”.
+pod_dismiss	Afvis
+pod_no_episodes_yet	Ingen afsnit endnu
+pod_no_episodes_match_filter	Ingen afsnit matcher dette filter
+pod_episode_details	Afsnitsdetaljer
+pod_untitled_episode	Afsnit uden titel
+pod_play_named	Afspil %1$s
+pod_episode_not_available	Afsnittet er ikke tilgængeligt
+pod_episode_may_have_been_removed	Det er muligvis fjernet fra serveren.
+pod_percent_listened	%1$d%% lyttet
+pod_feed_could_not_open	Feedet kunne ikke åbnes.
+pod_retry_feed	Prøv feedet igen
+pod_no_feed_episodes	Ingen afsnit fundet i feedet
+pod_already_on_server	Allerede på serveren
+pod_selected	Valgt
+pod_not_selected	Ikke valgt
+pod_no_audio_enclosure	Ingen vedhæftet lydfil
+pod_not_queued	Ikke sat i kø: %1$s
+pod_not_queued_try_again	Ikke sat i kø: prøv igen
+pod_queueing_on_server	Sætter i kø på din server…
+pod_add_selected_episodes	Tilføj valgte afsnit til serveren
+pod_something_went_wrong	Noget gik galt.
+pod_adding_not_available	Tilføjelse af podcasts er ikke tilgængelig
+pod_adding_needs_permission	Din serverkonto skal have tilladelse til at administrere podcasts i et podcastbibliotek.
+pod_search_podcasts	Søg efter podcasts
+pod_or_rss_feed_url	Eller RSS-feed-URL
+pod_enter_complete_feed_url	Angiv en fuldstændig HTTP- eller HTTPS-feed-URL.
+pod_preview_feed	Forhåndsvis feed
+pod_create_podcast	Opret podcast
+pod_choose_different_feed	Vælg et andet feed
+item_something_went_wrong	Noget gik galt. Prøv igen.
+item_feed_subscribe_at	Podcastapps kan abonnere på denne titel på:
+item_copied	Kopieret
+item_copy_address	Kopiér adresse
+item_hidden_from_directories	Skjult i podcastkataloger
+item_feed_public_warning	Alle med adressen kan lytte til denne titel uden at logge ind.
+item_feed_name	Feednavn
+item_feed_name_rule	Kun bogstaver, tal, - og _
+item_hide_from_directories	Skjul i podcastkataloger
+item_done	Færdig
+item_sending	Sender…
+item_sent_to	Sendt til %1$s
+item_send_ebook_explanation	Din server sender e-bogen via e-mail til den enhed, du vælger.
+item_ereader_or_ebook_gone	%1$s eller denne e-bog er ikke længere tilgængelig på serveren. Intet blev sendt.
+item_not_sent_to	Ikke sendt til %1$s. %2$s
+item_not_saved_try_again	Ikke gemt. Prøv igen.
+item_mark_unfinished	Markér som ikke færdig
+item_discard_uncertain	En tidligere gemning af denne titels fremgang fik intet svar og kan stadig nå din server. Hvis den ankommer efter kasseringen, bringer den fremgangen tilbage. Din server kan ikke fortælle denne app, om det sker.
+item_discard_anyway	Kassér alligevel
+item_discard_under_way	Denne kassering er allerede i gang og kan ikke trækkes tilbage.
+item_keep_progress	Behold fremgang
+item_discard_pending	Kasserer fremgang. Det afsluttes, når din server kan nås, og denne titels lytning er sendt.
+item_discard_anyway_question	Kassér alligevel?
+item_discard_anyway_explanation	Fremgangen fjernes nu. Hvis den tidligere gemning når din server bagefter, kommer denne titels fremgang tilbage, og du kan kassere den igen.
+item_discard	Kassér
+item_discard_progress_question	Kassér fremgang?
+item_discard_progress_explanation	Din position og færdig-status for denne titel fjernes fra serveren for alle enheder.
+item_could_not_load	Denne titel kunne ikke indlæses
+item_narrated_by	Læst op af
+item_series	Serie: %1$s
+item_series_with_sequence	Serie: %1$s #%2$s
+item_episode_count:one	%1$d afsnit
+item_episode_count:other	%1$d afsnit
+item_listened_and_left	%1$d%% lyttet · %2$s tilbage
+item_chapter_number	Kapitel %1$d
+pl_minimize_player	Minimer afspiller
+pl_nothing_playing	Intet afspilles
+pl_chapter_number	Kapitel %1$d
+pl_try_again	Prøv igen
+pl_speed_value	Hastighed %1$s
+pl_sleep	Søvntimer
+pl_position_of_duration	%1$s af %2$s
+pl_buffering	Buffer
+pl_previous_chapter	Forrige kapitel
+pl_next_chapter	Næste kapitel
+pl_jump_forward_seconds:one	Spring %1$d sekund frem
+pl_jump_forward_seconds:other	Spring %1$d sekunder frem
+pl_jump_back_seconds:one	Spring %1$d sekund tilbage
+pl_jump_back_seconds:other	Spring %1$d sekunder tilbage
+pl_jump_forward_minutes:one	Spring %1$d minut frem
+pl_jump_forward_minutes:other	Spring %1$d minutter frem
+pl_jump_back_minutes:one	Spring %1$d minut tilbage
+pl_jump_back_minutes:other	Spring %1$d minutter tilbage
+pl_open_player	Åbn afspiller
+pl_playback_stopped	Afspilning stoppet
+pl_listening_unsaved	Noget lytning er endnu ikke gemt på denne enhed. Den bevares og gemmes, så snart lagerpladsen tillader det.
+pl_playing	Afspiller
+pl_resume	Genoptag
+pl_streaming_cellular_refused	Streaming via mobildata er slået fra under Indstillinger. Opret forbindelse til Wi-Fi, eller download denne titel først.
+pl_stream_cellular_title	Stream via mobildata?
+pl_stream_cellular_message	Du bruger en forbindelse med datapris. Du kan ændre dette under Indstillinger.
+pl_not_now	Ikke nu
+pl_sleep_stops_end_of_chapter	Stopper ved slutningen af dette kapitel, om %1$s
+pl_sleep_stops_in	Stopper om %1$s
+pl_sleep_minus_minutes	−%1$d min.
+pl_sleep_plus_minutes	+%1$d min.
+pl_sleep_minutes	%1$d min.
+pl_sleep_turn_off	Slå fra
+pl_bookmark_not_saved_reason	Bogmærke ikke gemt: %1$s
+pl_bookmark_not_saved	Bogmærke ikke gemt: prøv igen
+pl_bookmark_add_at	Tilføj ved %1$s
+pl_bookmark_go_to	Gå til bogmærke
+pl_bookmark_default	Bogmærke
+pl_bookmark_rename_named	Omdøb %1$s
+pl_bookmark_delete_named	Slet %1$s
+pl_bookmark_at	Bogmærke ved %1$s
+pl_bookmark_rename	Omdøb bogmærke
+pl_bookmark_new	Nyt bogmærke
+pl_untitled	Uden titel
+pl_playback_stopped_reason	Afspilning stoppet: %1$s. Din position bevares.
+pl_playback_stopped_unknown	Afspilning stoppet: lyden kunne ikke indlæses. Din position bevares.
+pl_no_playable_audio	Dette element har ingen lyd, der kan afspilles.
+pl_could_not_start	Afspilningen kunne ikke starte.
+pl_listening_save_failed	Lytning kunne ikke gemmes på denne enhed, så afspilningen blev sat på pause. Frigør noget lagerplads, og prøv igen.
+cast_casting_to	Caster til %1$s
+cast_cast	Cast
+cast_playing_on	Afspiller på %1$s
+cast_connecting_to	Opretter forbindelse til %1$s…
+cast_playing_on_phone	Afspiller på denne telefon
+cast_stop	Stop casting
+cast_looking	Søger efter cast-enheder…
+cast_none_found	Ingen cast-enheder fundet. Tjek, at modtageren er tændt og på det samme Wi-Fi-netværk som denne telefon.
+cast_close	Luk
+cast_download_not_castable	Downloadede kopier afspilles kun på denne telefon. Stop casting for at lytte her, eller stream titlen i stedet.
+cast_resumed_without_title	Casting stoppede, fordi appen genstartede under casting. Åbn titlen igen for at lytte videre fra det sidste sted, denne telefon gemte.
+cast_needs_play_services	Casting kræver Google Play-tjenester, som denne enhed ikke har eller skal opdatere.
+cast_could_not_start	Casting kunne ikke starte på denne enhed: %1$s.
+cast_connect_failed_named	Kunne ikke oprette forbindelse til %1$s. Tjek, at den er tændt og på det samme Wi-Fi-netværk som denne telefon.
+cast_connect_failed	Kunne ikke oprette forbindelse til modtageren. Tjek, at den er tændt og på det samme Wi-Fi-netværk som denne telefon.
+cast_connection_lost_named	Forbindelsen til %1$s blev afbrudt. Afspilningen fortsætter på denne telefon.
+cast_connection_lost	Forbindelsen til modtageren blev afbrudt. Afspilningen fortsætter på denne telefon.
+auto_continue	Fortsæt
+auto_recent	Seneste
+auto_discovery	Opdag
+auto_authors_count:one	%1$d forfatter
+auto_authors_count:other	%1$d forfattere
+auto_series_count:one	%1$d serie
+auto_series_count:other	%1$d serier
+lib_books_count:one	%1$d bog
+lib_books_count:other	%1$d bøger
+lib_items_count:one	%1$d element
+lib_items_count:other	%1$d elementer
+lib_selected	Valgt
+lib_all_filters	Alle filtre
+lib_nothing_to_filter	Der er intet at filtrere efter her.
+lib_sort_descending_switch	Faldende, skift til stigende
+lib_sort_ascending_switch	Stigende, skift til faldende
+lib_sort_descending	Faldende
+lib_sort_ascending	Stigende
+lib_unavailable	Biblioteket er ikke tilgængeligt
+lib_unavailable_message	%1$s Din konto og ikke-sendt lytning bevares.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Vis omslag
+lib_show_list	Vis liste
+lib_filtered	Filtreret
+lib_empty_title	Intet her endnu
+lib_empty_message	Dette bibliotek har ingen elementer, du har adgang til.
+lib_page_error	Flere titler kunne ikke indlæses
+lib_card_finished	%1$s, færdig
+lib_card_percent_listened	%1$s, %2$d procent lyttet
+lib_search_in	Søg i %1$s
+lib_search_library	Søg i biblioteket
+lib_clear_search	Ryd søgning
+lib_search_failed	Søgningen mislykkedes
+lib_search_idle_title	Find noget at lytte til
+lib_search_idle_message	Søg efter titler, forfattere, serier, oplæsere og afsnit.
+lib_search_no_match	Intet matcher "%1$s". Prøv færre ord eller en anden stavemåde.
+err_invalid_server	Angiv en serveradresse, der starter med http:// eller https://, for eksempel https://books.example.com/abs.
+err_unsafe_media_url	Serveren returnerede en medieadresse uden for denne server. Den blev ikke åbnet.
+err_sign_in_required	Din session accepteres ikke længere. Log ind igen; ikke-sendt lytning bevares.
+err_untrusted	Denne enhed har ikke tillid til serverens certifikat. Installer din servers certifikatudsteder under Android-indstillinger > Sikkerhed > Kryptering og loginoplysninger, og prøv igen.
+err_offline	Serveren kunne ikke nås. Tjek adressen eller din forbindelse, og prøv igen.
+err_forbidden	Din konto har ikke tilladelse til at gøre dette.
+err_not_found	Dette indhold er ikke længere tilgængeligt på serveren.
+err_server_problem	Serveren havde et midlertidigt problem (HTTP %1$d). Prøv igen.
+err_rejected	Serveren afviste anmodningen (HTTP %1$d).
+err_invalid_response	Serveren sendte et svar, som denne app ikke kunne læse.
+err_no_audio	Dette element har ingen lyd, der kan afspilles.
+err_login_rejected	Brugernavnet eller adgangskoden blev ikke accepteret.
+err_publications_unreadable	Registreringer af ubesvarede gemninger af fremgang kunne ikke læses. Løs dem først under Diagnosticering.
+err_discards_unreadable	Gemte anmodninger om at kassere fremgang kunne ikke læses. Løs dem først under Diagnosticering.

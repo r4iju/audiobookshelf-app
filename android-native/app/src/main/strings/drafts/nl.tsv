@@ -1,0 +1,448 @@
+# Dutch drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Accounts
+title_new_collection	Nieuwe collectie
+action_retry	Opnieuw proberen
+action_read	%1$s lezen
+action_mark_finished	Markeren als voltooid
+choose_library	Bibliotheek kiezen
+all_titles	Alle titels
+all_podcasts	Alle podcasts
+filter	Filteren
+sort	Sorteren
+theme_system	Systeem
+screen_orientation	Schermstand
+jump_forward	Vooruitspringen
+jump_back	Terugspringen
+set_settings_not_saved	De instellingen konden niet op dit apparaat worden opgeslagen, dus er is niets gewijzigd. Maak wat opslagruimte vrij en probeer het opnieuw.
+set_orientation_follow_device	Zoals apparaat
+set_orientation_portrait	Staand
+set_orientation_landscape	Liggend
+set_rewind_on_resume	Iets terugspoelen bij hervatten
+set_rewind_on_resume_detail	Gaat na een pauze een paar seconden terug, na een langere pauze meer.
+set_seek_system_controls	Zoeken via systeembediening
+set_seek_system_controls_detail	Laat het vergrendelscherm en de melding de positiebalk verplaatsen.
+set_mp3_index_seeking	Nauwkeurig zoeken in MP3
+set_mp3_index_seeking_detail	Bouwt een zoekindex voor MP3-bestanden met een onbetrouwbare lengte. Zoeken start langzamer.
+set_shake_to_reset	Schudden om te resetten
+set_shake_to_reset_detail	Schud de telefoon terwijl de timer loopt om hem opnieuw te starten.
+set_sleep_fade_out	Uitfaden
+set_sleep_fade_out_detail	Verlaagt het volume tijdens de laatste minuut.
+set_vibrate_on_reset	Trillen bij reset
+set_auto_sleep_timer_detail	Start de timer bij afspelen tussen %1$s en %2$s.
+set_heading_mobile_data	Mobiele data
+set_storage	Opslag
+set_heading_support	Ondersteuning
+set_diagnostics	Diagnose
+set_something_went_wrong	Er ging iets mis.
+set_statistics_unavailable	Statistieken niet beschikbaar
+set_try_again	Opnieuw proberen
+set_minutes_listened:one	%1$d minuut geluisterd
+set_minutes_listened:other	%1$d minuten geluisterd
+set_days_listened:one	%1$d dag geluisterd
+set_days_listened:other	%1$d dagen geluisterd
+set_titles_finished:one	%1$d titel voltooid
+set_titles_finished:other	%1$d titels voltooid
+set_day_minutes_listened:one	%1$s, %2$d minuut geluisterd
+set_day_minutes_listened:other	%1$s, %2$d minuten geluisterd
+set_set_aside_failed	Kon niet opzij worden gezet. Probeer het opnieuw.
+set_connection	Verbinding
+set_diagnostics_area_media	Media
+set_diagnostics_area_sync	Synchronisatie
+set_unreadable_resets_title	Opgeslagen verzoeken om voortgang te wissen konden niet worden gelezen
+set_unreadable_resets_detail	Elke titel kan erbij horen, dus er wordt niets afgespeeld en geen leespositie verzonden totdat je beslist. Als je ze opzij zet, blijft het bestand op dit apparaat en blijft alle voortgang die gewist zou worden op je server.
+set_set_them_aside	Opzij zetten
+set_listening_storage_title	Luistertijd van voordat de app sloot kon niet worden opgeslagen
+set_listening_storage_detail	De opslag op dit apparaat is niet beschikbaar of vol. Er wordt niets afgespeeld en geen luistertijd verzonden totdat die is opgeslagen; tot dan wordt die bewaard.
+set_unreadable_writes_title	Gegevens over onbeantwoorde voortgangsopslag konden niet worden gelezen
+set_unreadable_writes_detail	Een opslag van een willekeurige titel kan je server nog bereiken, dus er wordt geen luister- of leesvoortgang verzonden en geen voortgang gewist totdat je beslist. Als je ze opzij zet, blijft het bestand op dit apparaat; een late opslag kan dan voortgang terugbrengen die je wist.
+set_diagnostics_server	Server %1$s
+set_diagnostics_signed_in_as	Ingelogd als %1$s
+set_diagnostics_app_version	App %1$s
+set_recent_problems	Recente problemen
+set_clear	Wissen
+set_no_problems	Geen problemen vastgelegd op dit apparaat.
+set_unreadable_writes_confirm_title	Onleesbare gegevens opzij zetten?
+set_unreadable_writes_confirm_detail	Luister- en leesposities worden weer verzonden en wissen kan doorgaan.
+set_set_aside	Opzij zetten
+set_unreadable_resets_confirm_title	Onleesbare wisverzoeken opzij zetten?
+set_unreadable_resets_confirm_detail	Titels worden weer afgespeeld en leesposities weer verzonden. Wis de voortgang opnieuw voor elke titel die je nog opnieuw wilt beginnen.
+set_signed_in	Ingelogd
+set_other_accounts	Andere accounts
+set_server_sign_in_required	%1$s · inloggen vereist
+set_remove_account	%1$s verwijderen
+set_switch_to_account	Naar dit account wisselen
+set_add_account	Account toevoegen
+set_sign_out_of	Uitloggen bij %1$s
+set_sign_out_detail	Verwijdert dit account van het apparaat. Downloads en niet-verzonden luistertijd blijven bewaard tot het opnieuw inlogt.
+set_accounts_footer	Elk account heeft zijn eigen voortgang, downloads en bibliotheekkeuze. Wisselen haalt ze nooit door elkaar.
+set_remove_account_confirm	%1$s verwijderen?
+set_remove_account_detail	Je kunt het account later opnieuw toevoegen. De downloads en niet-verzonden luistertijd blijven op dit apparaat.
+set_add_an_account	Een account toevoegen
+set_connect_intro	Maak direct verbinding met je eigen server. Niets loopt via een andere dienst.
+set_change_server	Server wijzigen
+set_sign_in	Inloggen
+set_sign_in_openid	Inloggen met OpenID
+set_saved_accounts	Opgeslagen accounts
+set_use_account	Gebruiken
+set_edit	Bewerken
+set_add_podcast	Podcast toevoegen
+set_not_available_yet	Nog niet beschikbaar
+set_not_available_yet_detail	Dit deel van de preview wordt nog gebouwd.
+set_import_previous_app	Importeren uit de vorige app
+set_import_interrupted	Een import is niet voltooid. Kies dezelfde export om verder te gaan waar hij stopte.
+set_import_already	Deze export is al geïmporteerd. Titels, luistertijd en posities ervan staan op dit apparaat.
+set_import_preflight	%1$s\nDe vorige app en dit bestand worden alleen gelezen; er verandert niets in. Titels, luistertijd en posities worden aan een account gekoppeld zodra het hier inlogt. Wachtwoorden zitten niet in de export, dus elk account moet opnieuw inloggen.
+set_import_account_signed_in	%1$s · ingelogd
+set_import_account_sign_in_later	%1$s · inloggen na het importeren
+set_import_titles	Titels
+set_import_title_partial	%1$s · de rest wordt opnieuw gedownload
+set_not_imported	Niet geïmporteerd
+set_import_space	Vereist %1$s; %2$s vrij.
+set_import_no_space	Er is niet genoeg vrije ruimte op dit apparaat. Maak ruimte vrij en kies de export daarna opnieuw.
+set_import_progress	Bestanden kopiëren: %1$d van %2$d. Als de app sluit, kies dan dezelfde export opnieuw om verder te gaan.
+set_import_done	%1$d titels, %2$d luistersessies en %3$d posities geïmporteerd. De instellingen van de vorige app zijn toegepast.
+set_import_waiting	Log in bij %1$s als %2$s om de titels, luistertijd en posities te koppelen.
+set_import	Importeren
+set_continue	Doorgaan
+set_close	Sluiten
+set_import_file_unreadable	Het gekozen bestand kon niet worden gelezen. Kies het opnieuw of sla het eerst op dit apparaat op.
+set_import_stopped	De import is gestopt voordat hij klaar was. Er is niets verloren: kies dezelfde export opnieuw om verder te gaan waar hij stopte.
+set_import_item_gone	Het staat niet meer op de server en is daarom niet overgenomen.
+set_import_file_changed	Een bestand is na het importeren op dit apparaat gewijzigd en wordt daarom opnieuw van de server gedownload.
+set_openid_not_enabled	Inloggen met OpenID is niet ingeschakeld op deze server. Gebruik je gebruikersnaam en wachtwoord.
+set_openid_canceled	Inloggen via de browser is geannuleerd. Je opgeslagen accounts blijven bewaard.
+set_openid_invalid	Het antwoord van het inloggen via de browser kon niet worden geverifieerd. Probeer opnieuw in te loggen en controleer de OpenID-doorverwijsinstellingen van de server.
+set_vault_unreadable	Opgeslagen inloggegevens konden niet worden ontsleuteld. Ze blijven op het apparaat bewaard; log opnieuw in om verder te gaan.
+set_session_ended	Je sessie voor %1$s is beëindigd. Log opnieuw in; niet-verzonden luistertijd en downloads blijven bewaard.
+set_play_blocked_listening_storage	Luistertijd van voordat de app sloot kon niet worden opgeslagen omdat er geen opslag beschikbaar is, dus er wordt niets afgespeeld totdat dat lukt. Maak ruimte vrij en probeer het opnieuw.
+set_play_blocked_unreadable_resets	Opgeslagen verzoeken om voortgang te wissen konden niet worden gelezen, dus er wordt niets afgespeeld totdat ze in Diagnose zijn opgelost.
+set_play_blocked_discarding	De voortgang van deze titel wordt nog gewist. Daarna wordt hij vanaf het begin afgespeeld.
+dl_not_saved	De downloadlijst kon niet op dit apparaat worden opgeslagen, dus er is niets gewijzigd. Maak wat opslagruimte vrij en probeer het opnieuw.
+dl_not_allowed	Je account mag niet downloaden.
+dl_no_audio	Dit item heeft geen audio om te downloaden.
+dl_no_space	Niet genoeg vrije ruimte op dit apparaat voor %1$s als er opslag vrij moet blijven voor het systeem.
+dl_folder_lost_nothing_downloaded	De toegang tot %1$s is ingetrokken, dus er is niets gedownload. Kies de downloadmap opnieuw in Instellingen.
+dl_downloading_percent	Downloaden %1$d%%
+dl_cancel_download	Download annuleren
+dl_downloaded_plays_offline	Gedownload · speelt offline af
+dl_failed	De download is mislukt.
+dl_discard	Verwijderen
+dl_cellular_title	Downloaden via mobiele data?
+dl_cellular_message	Je gebruikt een verbinding met datalimiet. Je kunt dit wijzigen in Instellingen.
+dl_not_now	Niet nu
+dl_folder_cannot_be_kept	Die map kan niet voor downloads worden gebruikt. Kies een andere.
+dl_saved_in_folder	Downloads worden opgeslagen in %1$s
+dl_saved_in_app_storage	Downloads worden opgeslagen in de app-opslag
+dl_folder_visible_to_other_apps	Andere apps op dit apparaat kunnen deze bestanden zien. Downloads van vóór een wijziging blijven waar ze zijn.
+dl_folder_private_to_app	Alleen deze app kan deze bestanden zien. Kies een map om downloads op te slaan waar andere apps erbij kunnen.
+dl_choose_folder	Map kiezen
+dl_use_app_storage	App-opslag gebruiken
+dl_ebook_missing	Het e-boek ontbreekt op dit apparaat. Download het opnieuw om het te openen.
+dl_no_app_opens_format	Geen enkele app op dit apparaat opent %1$s-bestanden. Installeer een app die dat wel doet en probeer het opnieuw.
+dl_no_app_opens_this_kind	Geen enkele app op dit apparaat opent dit soort bestanden. Installeer een app die dat wel doet en probeer het opnieuw.
+dl_folder_lost_choose_again_open	Deze download staat in %1$s en de toegang tot %1$s is ingetrokken. Kies %1$s opnieuw om hem te openen.
+dl_folder_lost_choose_again_play	Deze download staat in %1$s en de toegang tot %1$s is ingetrokken. Kies %1$s opnieuw om hem af te spelen.
+dl_names_or	%1$s of %2$s
+dl_names_and	%1$s en %2$s
+dl_remove_title	Download verwijderen?
+dl_remove_message	'%1$s' wordt van dit apparaat verwijderd. Je luistervoortgang blijft bewaard.
+dl_keep	Behouden
+dl_not_that_folder	Dat is niet %1$s. Kies de map waarin deze downloads staan.
+dl_folder_access_not_kept	De toegang tot die map kon niet worden bewaard. Probeer het opnieuw.
+dl_no_downloads	Geen downloads
+dl_no_downloads_message	Download boeken of afleveringen vanaf hun pagina om zonder verbinding te luisteren.
+dl_access_removed_title	Toegang tot %1$s is ingetrokken
+dl_downloads_kept_there:one	Daar staat %1$d download. Kies %2$s opnieuw om hem af te spelen en te openen.
+dl_downloads_kept_there:other	Daar staan %1$d downloads. Kies %2$s opnieuw om ze af te spelen en te openen.
+dl_choose_again	%1$s opnieuw kiezen
+dl_some_files_missing	Sommige bestanden ontbreken op dit apparaat
+dl_size_in_folder	%1$s in %2$s
+dl_open_in_another_app	%1$s openen in een andere app
+dl_download_again_named	%1$s opnieuw downloaden
+dl_the_chosen_folder	de gekozen map
+dl_files_missing_play	Sommige bestanden van deze download ontbreken op dit apparaat. Download hem opnieuw om hem af te spelen.
+dl_play_named	%1$s afspelen
+dl_retry_named	%1$s opnieuw proberen
+dl_cancel_named	%1$s annuleren
+dl_remove_named	%1$s verwijderen
+dl_sign_in_again	Log opnieuw in bij dit account om te downloaden.
+dl_folder_lost_choose_in_downloads	De toegang tot %1$s is ingetrokken. Kies de map opnieuw in Downloads.
+dl_connection_interrupted	De verbinding is onderbroken.
+dl_error_retrying	%1$s Opnieuw proberen…
+dl_server_refused	De server heeft de download geweigerd.
+dl_server_sent_type_not_audio	De server stuurde %1$s in plaats van audio, dus er is niets opgeslagen. Controleer je server of proxy en probeer het opnieuw.
+dl_server_sent_unknown_not_audio	De server stuurde een onbekend antwoord in plaats van audio, dus er is niets opgeslagen. Controleer je server of proxy en probeer het opnieuw.
+dl_size_mismatch	Het gedownloade bestand was %1$d bytes, maar de server gaf %2$d op, dus het is verwijderd. Probeer het opnieuw om het opnieuw te downloaden.
+dl_server_sent_not_pdf	De server stuurde iets anders dan de PDF, dus er is niets opgeslagen. Controleer je server of proxy en probeer het opnieuw.
+dl_notification_downloading	%1$s downloaden
+rd_positions_not_restored	Opgeslagen leesposities konden niet worden hersteld, dus pagina's worden niet opgeslagen. De oorspronkelijke gegevens blijven bewaard.
+rd_positions_not_overwritten	Opgeslagen leesposities konden niet worden gelezen, dus ze worden niet overschreven.
+rd_not_a_pdf	Dit bestand is geen PDF die dit apparaat kan openen.
+rd_document_not_opened	Het document kon niet worden geopend.
+rd_page_not_saved	Deze pagina kon niet op dit apparaat worden opgeslagen.
+rd_choice_not_saved	Je keuze kon niet op dit apparaat worden opgeslagen.
+rd_conflict_title	Waar verdergaan?
+rd_conflict_page	Een ander apparaat heeft pagina %1$d bereikt terwijl pagina %2$d hier nog niet op de server was opgeslagen.
+rd_conflict_location	Een ander apparaat heeft een leespositie opgeslagen die deze lezer niet als pagina kan tonen, terwijl pagina %1$d hier nog niet op de server was opgeslagen.
+rd_go_to_page_number	Naar pagina %1$d
+rd_keep_other_position	De andere positie aanhouden
+rd_stay_on_page	Op pagina %1$d blijven
+rd_close_reader	Lezer sluiten
+rd_rotate_pages	Pagina's draaien
+rd_continuous_scrolling	Doorlopend scrollen
+rd_document_error_title	Dit document kon niet worden geopend
+rd_try_again	Opnieuw proberen
+rd_go_to_page	Naar pagina
+rd_previous_page	Vorige pagina
+rd_next_page	Volgende pagina
+rd_page_of	Pagina %1$d van %2$d
+rd_page_number	Pagina %1$d
+rd_download_folder_lost	Deze download staat in %1$s en de toegang tot %1$s is ingetrokken. Kies de map opnieuw in Downloads.
+rd_downloaded_document_missing	Het gedownloade document ontbreekt op dit apparaat. Download het opnieuw.
+rd_document_not_stored	Het document kon niet worden opgeslagen om te lezen.
+rd_supplementary_pdf	aanvullende PDF
+rd_format_not_available	%1$s lezen is nog niet beschikbaar in deze preview. Je leespositie op de server blijft bewaard.
+rd_ebook_not_available	Dit e-boek lezen is nog niet beschikbaar in deze preview. Je leespositie op de server blijft bewaard.
+grp_unavailable_title	Niet-beschikbare titel
+grp_could_not_load_collections	Kan collecties niet laden.
+grp_could_not_load_playlists	Kan afspeellijsten niet laden.
+grp_collections_unavailable	Collecties niet beschikbaar
+grp_playlists_unavailable	Afspeellijsten niet beschikbaar
+grp_no_collections_yet	Nog geen collecties
+grp_no_playlists_yet	Nog geen afspeellijsten
+grp_create_one_hint	Maak er een om titels in je eigen volgorde bij elkaar te houden.
+grp_title_count:one	%1$d titel
+grp_title_count:other	%1$d titels
+grp_collection_deleted	Deze collectie is verwijderd.
+grp_playlist_deleted	Deze afspeellijst is verwijderd.
+grp_could_not_load	Kan niet laden.
+grp_collection_unavailable	Collectie niet beschikbaar
+grp_playlist_unavailable	Afspeellijst niet beschikbaar
+grp_nothing_in_collection_can_play	Niets in deze collectie kan worden afgespeeld.
+grp_nothing_in_playlist_can_play	Niets in deze afspeellijst kan worden afgespeeld.
+grp_could_not_start_playback	Kan afspelen niet starten.
+grp_resume	Hervatten
+grp_play_collection	Collectie afspelen
+grp_play_playlist	Afspeellijst afspelen
+grp_edit_collection	Collectie bewerken
+grp_edit_playlist	Afspeellijst bewerken
+grp_delete_collection	Collectie verwijderen
+grp_delete_playlist	Afspeellijst verwijderen
+grp_no_titles_yet	Nog geen titels
+grp_delete_collection_question	Collectie verwijderen?
+grp_delete_playlist_question	Afspeellijst verwijderen?
+grp_delete_group_explanation	‘%1$s’ wordt van je server verwijderd. De titels erin blijven bewaard.
+grp_not_deleted	Niet verwijderd: %1$s
+grp_not_deleted_try_again	Niet verwijderd: probeer het opnieuw
+grp_not_allowed_to_change_collection	Je serveraccount mag deze collectie niet wijzigen.
+grp_not_allowed_to_change_playlist	Je serveraccount mag deze afspeellijst niet wijzigen.
+grp_collection_no_longer_exists	Deze collectie bestaat niet meer.
+grp_playlist_no_longer_exists	Deze afspeellijst bestaat niet meer.
+grp_not_saved	Niet opgeslagen: %1$s
+grp_not_saved_try_again	Niet opgeslagen: probeer het opnieuw
+grp_saving	Opslaan…
+grp_create_collection	Collectie maken
+grp_create_playlist	Afspeellijst maken
+grp_save_changes	Wijzigingen opslaan
+grp_choose_at_least_one_title	Kies minstens één titel.
+grp_order	Volgorde
+grp_move_up	%1$s omhoog verplaatsen
+grp_remove_member	%1$s verwijderen
+grp_add_titles	Titels toevoegen
+grp_add_episodes_hint	Voeg afleveringen toe vanaf de afleveringspagina van een podcast.
+grp_add_to_playlist_or_collection	Toevoegen aan afspeellijst of collectie
+grp_add_to	Toevoegen aan
+grp_nothing_to_add_to	Er is hier nog niets waaraan je kunt toevoegen.
+grp_added_to	Toegevoegd aan %1$s
+grp_not_added	Niet toegevoegd: %1$s
+grp_not_added_try_again	Niet toegevoegd: probeer het opnieuw
+grp_already_included	Al opgenomen
+grp_close	Sluiten
+grp_titles_could_not_load	Titels konden niet worden geladen
+grp_nothing_here	Niets hier
+pod_feed_episodes	Feedafleveringen
+pod_sort_newest_first	Nieuwste eerst, tik voor oudste eerst
+pod_sort_oldest_first	Oudste eerst, tik voor nieuwste eerst
+pod_episodes_queued:one	%1$d aflevering in de wachtrij op je server: %2$s
+pod_episodes_queued:other	%1$d afleveringen in de wachtrij op je server: %2$s
+pod_server_could_not_download	Je server kon ‘%1$s’ niet downloaden.
+pod_dismiss	Sluiten
+pod_no_episodes_yet	Nog geen afleveringen
+pod_no_episodes_match_filter	Geen afleveringen die aan dit filter voldoen
+pod_episode_details	Afleveringsdetails
+pod_untitled_episode	Aflevering zonder titel
+pod_play_named	%1$s afspelen
+pod_episode_not_available	Aflevering niet beschikbaar
+pod_episode_may_have_been_removed	Mogelijk is deze van de server verwijderd.
+pod_percent_listened	%1$d%% geluisterd
+pod_feed_could_not_open	De feed kon niet worden geopend.
+pod_retry_feed	Feed opnieuw proberen
+pod_no_feed_episodes	Geen feedafleveringen gevonden
+pod_already_on_server	Al op de server
+pod_selected	Geselecteerd
+pod_not_selected	Niet geselecteerd
+pod_no_audio_enclosure	Geen audiobijlage
+pod_not_queued	Niet in de wachtrij gezet: %1$s
+pod_not_queued_try_again	Niet in de wachtrij gezet: probeer het opnieuw
+pod_queueing_on_server	In de wachtrij zetten op je server…
+pod_add_selected_episodes	Geselecteerde afleveringen aan server toevoegen
+pod_something_went_wrong	Er ging iets mis.
+pod_adding_not_available	Podcasts toevoegen is niet beschikbaar
+pod_adding_needs_permission	Je serveraccount heeft toestemming nodig om podcasts te beheren in een podcastbibliotheek.
+pod_search_podcasts	Podcasts zoeken
+pod_or_rss_feed_url	Of RSS-feed-URL
+pod_enter_complete_feed_url	Voer een volledige HTTP- of HTTPS-feed-URL in.
+pod_preview_feed	Voorbeeld van feed
+pod_create_podcast	Podcast maken
+pod_choose_different_feed	Een andere feed kiezen
+item_something_went_wrong	Er ging iets mis. Probeer het opnieuw.
+item_feed_subscribe_at	Podcast-apps kunnen zich op deze titel abonneren via:
+item_copied	Gekopieerd
+item_copy_address	Adres kopiëren
+item_hidden_from_directories	Verborgen in podcastgidsen
+item_feed_public_warning	Iedereen met het adres kan zonder in te loggen naar deze titel luisteren.
+item_feed_name	Feednaam
+item_feed_name_rule	Alleen letters, cijfers, - en _
+item_hide_from_directories	Verbergen in podcastgidsen
+item_done	Klaar
+item_sending	Verzenden…
+item_sent_to	Verzonden naar %1$s
+item_send_ebook_explanation	Je server mailt het e-boek naar het apparaat dat je kiest.
+item_ereader_or_ebook_gone	%1$s of dit e-boek is niet meer beschikbaar op de server. Er is niets verzonden.
+item_not_sent_to	Niet verzonden naar %1$s. %2$s
+item_not_saved_try_again	Niet opgeslagen. Probeer het opnieuw.
+item_mark_unfinished	Markeren als niet voltooid
+item_discard_uncertain	Een eerdere opslag van de voortgang van deze titel kreeg geen antwoord en kan je server nog bereiken. Als die na het wissen aankomt, komt de voortgang terug. Je server kan deze app niet vertellen of dat gebeurt.
+item_discard_anyway	Toch wissen
+item_discard_under_way	Dit wissen is al bezig en kan niet worden ingetrokken.
+item_keep_progress	Voortgang behouden
+item_discard_pending	Voortgang wordt gewist. Dit is klaar zodra je server bereikbaar is en de luistertijd van deze titel is verzonden.
+item_discard_anyway_question	Toch wissen?
+item_discard_anyway_explanation	De voortgang wordt nu verwijderd. Als de eerdere opslag je server daarna bereikt, komt de voortgang van deze titel terug en kun je die opnieuw wissen.
+item_discard	Wissen
+item_discard_progress_question	Voortgang wissen?
+item_discard_progress_explanation	Je positie en voltooid-status voor deze titel worden voor alle apparaten van de server verwijderd.
+item_could_not_load	Deze titel kon niet worden geladen
+item_narrated_by	Verteld door
+item_series	Serie: %1$s
+item_series_with_sequence	Serie: %1$s #%2$s
+item_episode_count:one	%1$d aflevering
+item_episode_count:other	%1$d afleveringen
+item_listened_and_left	%1$d%% geluisterd · nog %2$s
+item_chapter_number	Hoofdstuk %1$d
+pl_minimize_player	Speler minimaliseren
+pl_nothing_playing	Er wordt niets afgespeeld
+pl_chapter_number	Hoofdstuk %1$d
+pl_try_again	Opnieuw proberen
+pl_speed_value	Snelheid %1$s
+pl_sleep	Slaaptimer
+pl_position_of_duration	%1$s van %2$s
+pl_buffering	Bufferen
+pl_previous_chapter	Vorig hoofdstuk
+pl_next_chapter	Volgend hoofdstuk
+pl_jump_forward_seconds:one	%1$d seconde vooruit
+pl_jump_forward_seconds:other	%1$d seconden vooruit
+pl_jump_back_seconds:one	%1$d seconde terug
+pl_jump_back_seconds:other	%1$d seconden terug
+pl_jump_forward_minutes:one	%1$d minuut vooruit
+pl_jump_forward_minutes:other	%1$d minuten vooruit
+pl_jump_back_minutes:one	%1$d minuut terug
+pl_jump_back_minutes:other	%1$d minuten terug
+pl_open_player	Speler openen
+pl_playback_stopped	Afspelen gestopt
+pl_listening_unsaved	Een deel van de luistertijd is nog niet op dit apparaat opgeslagen. Die wordt bewaard en opgeslagen zodra de opslag het toelaat.
+pl_playing	Speelt af
+pl_resume	Hervatten
+pl_streaming_cellular_refused	Streamen via mobiele data is uitgeschakeld in Instellingen. Maak verbinding met wifi of download deze titel eerst.
+pl_stream_cellular_title	Streamen via mobiele data?
+pl_stream_cellular_message	Je gebruikt een verbinding met datalimiet. Je kunt dit wijzigen in Instellingen.
+pl_not_now	Niet nu
+pl_sleep_stops_end_of_chapter	Stopt aan het einde van dit hoofdstuk, over %1$s
+pl_sleep_stops_in	Stopt over %1$s
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Uitschakelen
+pl_bookmark_not_saved_reason	Bladwijzer niet opgeslagen: %1$s
+pl_bookmark_not_saved	Bladwijzer niet opgeslagen: probeer het opnieuw
+pl_bookmark_add_at	Toevoegen op %1$s
+pl_bookmark_go_to	Naar bladwijzer
+pl_bookmark_default	Bladwijzer
+pl_bookmark_rename_named	%1$s hernoemen
+pl_bookmark_delete_named	%1$s verwijderen
+pl_bookmark_at	Bladwijzer op %1$s
+pl_bookmark_rename	Bladwijzer hernoemen
+pl_bookmark_new	Nieuwe bladwijzer
+pl_untitled	Zonder titel
+pl_playback_stopped_reason	Afspelen gestopt: %1$s. Je positie blijft bewaard.
+pl_playback_stopped_unknown	Afspelen gestopt: de audio kon niet worden geladen. Je positie blijft bewaard.
+pl_no_playable_audio	Dit item heeft geen afspeelbare audio.
+pl_could_not_start	Afspelen kon niet starten.
+pl_listening_save_failed	Luistertijd kon niet op dit apparaat worden opgeslagen, dus het afspelen is gepauzeerd. Maak wat opslagruimte vrij en probeer het opnieuw.
+cast_casting_to	Casten naar %1$s
+cast_cast	Casten
+cast_playing_on	Speelt af op %1$s
+cast_connecting_to	Verbinden met %1$s…
+cast_playing_on_phone	Speelt af op deze telefoon
+cast_stop	Casten stoppen
+cast_looking	Zoeken naar cast-apparaten…
+cast_none_found	Geen cast-apparaten gevonden. Controleer of de ontvanger aan staat en op hetzelfde wifinetwerk zit als deze telefoon.
+cast_close	Sluiten
+cast_download_not_castable	Gedownloade kopieën spelen alleen op deze telefoon af. Stop met casten om hier te luisteren, of stream de titel in plaats daarvan.
+cast_resumed_without_title	Casten is gestopt omdat de app tijdens het casten opnieuw is gestart. Open de titel opnieuw om verder te luisteren vanaf de laatste plek die deze telefoon heeft opgeslagen.
+cast_needs_play_services	Casten vereist Google Play-services, die dit apparaat niet heeft of die moeten worden bijgewerkt.
+cast_could_not_start	Casten kon niet starten op dit apparaat: %1$s.
+cast_connect_failed_named	Kan geen verbinding maken met %1$s. Controleer of het aan staat en op hetzelfde wifinetwerk zit als deze telefoon.
+cast_connect_failed	Kan geen verbinding maken met de ontvanger. Controleer of die aan staat en op hetzelfde wifinetwerk zit als deze telefoon.
+cast_connection_lost_named	De verbinding met %1$s is verbroken. Het afspelen gaat verder op deze telefoon.
+cast_connection_lost	De verbinding met de ontvanger is verbroken. Het afspelen gaat verder op deze telefoon.
+auto_continue	Verdergaan
+auto_recent	Recent
+auto_discovery	Ontdekken
+auto_authors_count:one	%1$d auteur
+auto_authors_count:other	%1$d auteurs
+auto_series_count:one	%1$d serie
+auto_series_count:other	%1$d series
+lib_books_count:one	%1$d boek
+lib_books_count:other	%1$d boeken
+lib_items_count:one	%1$d item
+lib_items_count:other	%1$d items
+lib_selected	Geselecteerd
+lib_all_filters	Alle filters
+lib_nothing_to_filter	Hier is niets om op te filteren.
+lib_sort_descending_switch	Aflopend, wisselen naar oplopend
+lib_sort_ascending_switch	Oplopend, wisselen naar aflopend
+lib_sort_descending	Aflopend
+lib_sort_ascending	Oplopend
+lib_unavailable	Bibliotheek niet beschikbaar
+lib_unavailable_message	%1$s Je account en niet-verzonden luistertijd blijven bewaard.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Covers tonen
+lib_show_list	Lijst tonen
+lib_filtered	Gefilterd
+lib_empty_title	Hier is nog niets
+lib_empty_message	Deze bibliotheek heeft geen items waartoe je toegang hebt.
+lib_page_error	Meer titels konden niet worden geladen
+lib_card_finished	%1$s, voltooid
+lib_card_percent_listened	%1$s, %2$d procent geluisterd
+lib_search_in	Zoeken in %1$s
+lib_search_library	Bibliotheek doorzoeken
+lib_clear_search	Zoekopdracht wissen
+lib_search_failed	Zoeken mislukt
+lib_search_idle_title	Vind iets om naar te luisteren
+lib_search_idle_message	Zoek naar titels, auteurs, series, vertellers en afleveringen.
+lib_search_no_match	Niets komt overeen met '%1$s'. Probeer minder woorden of een andere spelling.
+err_invalid_server	Voer een serveradres in dat begint met http:// of https://, bijvoorbeeld https://books.example.com/abs.
+err_unsafe_media_url	De server gaf een media-adres buiten deze server terug. Het is niet geopend.
+err_sign_in_required	Je sessie wordt niet meer geaccepteerd. Log opnieuw in; niet-verzonden luistertijd blijft bewaard.
+err_untrusted	Het certificaat van de server wordt niet vertrouwd door dit apparaat. Installeer de certificeringsinstantie van je server via Android-instellingen > Beveiliging > Versleuteling en inloggegevens en probeer het opnieuw.
+err_offline	De server is niet bereikbaar. Controleer het adres of je verbinding en probeer het opnieuw.
+err_forbidden	Je account mag dit niet doen.
+err_not_found	Deze inhoud is niet meer beschikbaar op de server.
+err_server_problem	De server had een tijdelijk probleem (HTTP %1$d). Probeer het opnieuw.
+err_rejected	De server heeft het verzoek geweigerd (HTTP %1$d).
+err_invalid_response	De server stuurde een antwoord dat deze app niet kon lezen.
+err_no_audio	Dit item heeft geen afspeelbare audio.
+err_login_rejected	De gebruikersnaam of het wachtwoord werd niet geaccepteerd.
+err_publications_unreadable	Gegevens over onbeantwoorde voortgangsopslag konden niet worden gelezen. Los dit eerst op in Diagnose.
+err_discards_unreadable	Opgeslagen verzoeken om voortgang te wissen konden niet worden gelezen. Los dit eerst op in Diagnose.
