@@ -21,6 +21,9 @@ const OVERLAP = 48;
 /** Room left above a passage the reader is taken to. */
 const LEAD = 16;
 const XLINK = "http://www.w3.org/1999/xlink";
+/** Where a book's link really points, kept on the link while its own href becomes a fragment of the section. */
+const LINK = "data-abs-href";
+const LINK_FRAGMENT = "#abs-link-";
 
 type Spot = { block: number } | { edge: "start" | "end" } | { anchor: (doc: Document) => Element | null };
 interface Target {
@@ -51,6 +54,22 @@ function blocksOf(doc: Document) {
   }
   return blocks;
 }
+
+/**
+ * Points each link at a fragment of its own section, keeping where it really points. Following one then only changes
+ * the section's address, which the reader sees without the book running a script or sending it an event.
+ */
+function routeLinks(doc: Document) {
+  doc.querySelectorAll("a").forEach((link, index) => {
+    const href = link.getAttribute("href") ?? link.getAttributeNS(XLINK, "href");
+    if (!href || link.hasAttribute(LINK)) return;
+    link.setAttribute(LINK, href);
+    if (link.hasAttribute("href")) link.setAttribute("href", `${LINK_FRAGMENT}${index}`);
+    else link.setAttributeNS(XLINK, "href", `${LINK_FRAGMENT}${index}`);
+  });
+}
+
+const withoutFragment = (url: string) => url.split("#")[0];
 
 /** Scrolls the section to a spot, reporting whether it moved. */
 function scrollTo(doc: Document, spot: Spot) {
@@ -86,6 +105,7 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
   const { t } = useI18n();
   const settings = useSettings().reader;
   const frame = useRef<HTMLIFrameElement>(null);
+  const area = useRef<HTMLDivElement>(null);
   const lastSaved = useRef(start);
   /** Set when the reader, not the person reading, scrolled the section, so that scroll is not saved. */
   const quietScroll = useRef(false);
@@ -155,14 +175,16 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
   const onFrameKey = useEffectEvent((event: KeyboardEvent) => {
     if (turnForKey(event, turns)) event.preventDefault();
   });
-  const onFrameClick = useEffectEvent((event: MouseEvent, view: Window & typeof globalThis) => {
-    const link = event.target instanceof view.Element ? event.target.closest("a") : null;
-    if (!link || !ready) return;
-    event.preventDefault();
-    const href = link.getAttribute("href") ?? link.getAttributeNS(XLINK, "href");
-    if (!href) return;
+  const openLink = useEffectEvent((href: string | null) => {
+    if (!href || !ready) return;
     if (!ready.book.isExternal(href)) void follow(href);
     else if (/^https?:/i.test(href)) window.open(href, "_blank", "noopener,noreferrer");
+  });
+  const onFrameClick = useEffectEvent((event: MouseEvent, view: Window & typeof globalThis) => {
+    const link = event.target instanceof view.Element ? event.target.closest("a") : null;
+    if (!link) return;
+    event.preventDefault();
+    openLink(link.getAttribute(LINK));
   });
   const keepPassageInView = useEffectEvent((settings: ReaderSettings) => {
     if (!loaded) return;
@@ -211,7 +233,7 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
     if (!view) return;
     const element = frame.current;
     /** Whether the frame still shows this section: one being replaced by the next reads as scrolled to its top. */
-    const showing = () => element?.contentDocument === doc && element.src === doc.URL;
+    const showing = () => element?.contentDocument === doc && element.src === withoutFragment(doc.URL);
     let latest = measure(doc, target.section);
     if (target.moved) save(latest);
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -224,8 +246,30 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
     // Arriving at the target has already scrolled; only later scrolling counts.
     quietScroll.current = false;
     let scrolled = doc.scrollingElement?.scrollTop;
+    // Nor does it report keys there, so a click in the text hands the keyboard back to the reader; a link reached with
+    // Tab keeps it, and Enter follows it like a click.
+    let heard = false;
+    const hear = () => {
+      heard = true;
+    };
+    doc.addEventListener("abs-probe", hear);
+    doc.dispatchEvent(new view.Event("abs-probe"));
+    doc.removeEventListener("abs-probe", hear);
     let frameRequest = requestAnimationFrame(function watch() {
       frameRequest = requestAnimationFrame(watch);
+      if (element?.contentDocument !== doc) return;
+      // A link followed in the book shows as its section's address taking the link's fragment.
+      if (view.location.hash.startsWith(LINK_FRAGMENT)) {
+        const hash = view.location.hash;
+        view.history.replaceState(null, "", withoutFragment(doc.URL));
+        const link = Array.from(doc.querySelectorAll(`[${LINK}]`)).find(
+          (candidate) => (candidate.getAttribute("href") ?? candidate.getAttributeNS(XLINK, "href")) === hash,
+        );
+        openLink(link?.getAttribute(LINK) ?? null);
+      }
+      const inText = !doc.activeElement || doc.activeElement === doc.body;
+      if (!heard && document.activeElement === element && inText)
+        area.current?.focus({ preventScroll: true });
       if (!showing() || doc.scrollingElement?.scrollTop === scrolled) return;
       scrolled = doc.scrollingElement?.scrollTop;
       const quiet = quietScroll.current;
@@ -257,6 +301,7 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
     const doc = frame.current?.contentDocument;
     if (!doc?.body || !shown) return;
     applyReaderCss(doc, mobiCss(settings));
+    routeLinks(doc);
     quietScroll.current = scrollTo(doc, shown.target.spot) && !shown.target.moved;
     setLoaded({ doc, target: shown.target });
   };
@@ -264,7 +309,7 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
   const background = readerThemes[settings.theme].background;
   return (
     <>
-      <div className="relative min-h-0 flex-1" style={{ background }}>
+      <div ref={area} tabIndex={-1} className="relative min-h-0 flex-1 outline-none" style={{ background }}>
         {shown ? (
           <iframe
             ref={frame}
