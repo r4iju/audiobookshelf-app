@@ -1,6 +1,6 @@
 # Combined 2.30.0 server candidate: promotion and rollback runbook
 
-**Status: reviewable, not executed.** Nothing here has been run against the owner's server, container, compose file or data. Promotion needs the owner's explicit decision, and the owner runs every step below. Commands use placeholders for the owner's own names and paths; a filled-in private copy is kept outside the repository with the rest of the private evidence.
+**Status: promoted locally on October 3, 2026, with explicit owner authorization.** The owner selected “Deploy the verified server candidate,” authorizing the agent to back up config/metadata and deploy the exact candidate below. The execution record is at the end of this document. Physical client acceptance remains separate. Commands below remain a reusable procedure with placeholders; filled values, owner data and backups stay private.
 
 ## What would be promoted
 
@@ -28,7 +28,7 @@ All must hold. The compatibility matrix is in `SERVER-COMPATIBILITY.md`. Gate 1 
 3. The owner accepts that physical-device acceptance (playback, background controls, downloads, readers) happens **after** promotion, on the owner's devices, and is part of this runbook's verification, not of the synthetic matrix.
 4. The image ID and `User.js` hash verify on the machine that runs the server (step 1 below).
 
-## Steps (owner only)
+## Promotion steps (owner or explicitly authorized operator)
 
 Placeholders: `$COMPOSE` the compose file, `$SERVICE` and `$CONTAINER` the server's service and container name, `$DATA` the directory holding its `config` and `metadata` bind mounts, `$BACKUP` a backup directory on another disk, `$PKG` the private candidate package.
 
@@ -109,3 +109,11 @@ docker compose -f "$COMPOSE" up -d --no-deps --pull never "$SERVICE"
 - **The next upstream release.** A later upstream image does not contain these patches unless upstream fixed the same defects. Before moving off this candidate, run the same matrix against that release; the pinned 2.30.0 failures (cold-cache race, first progress) are the regression checks.
 - **Restoring data costs progress.** A data restore discards progress since the backup, including progress synced from offline devices afterwards. Prefer the image-only rollback.
 - **Synthetic matrix only.** The matrix used synthetic libraries and accounts. Owner libraries, real devices and physical media controls are verified only by the owner's acceptance after promotion.
+
+## Local promotion record (October 3, 2026)
+
+- Exact `cd703e87` image and both patched file hashes verified before and after deployment. The retained pinned base was tagged and saved as a local rollback image archive; the candidate image archive checksum matches the recorded package.
+- Only the server was stopped for a consistent config/metadata archive. All 517 application files matched the stopped source byte-for-byte, with the SQLite database present. macOS metadata entries were retained. An initial comparison rejected those extra metadata entries and automatically restarted the exact base; the corrected comparison then passed before promotion.
+- The local compose service persists the candidate tag with `pull_policy: never`. No port, mount, network, account or API contract changed. The existing frontend and nginx image/start times are unchanged.
+- Read-only HTTP and trusted HTTPS deployment checks each passed 4/4: frontend/static asset, server status (2.30.0 initialized), live-updates endpoint and server interface. Startup recorded one invalid socket-token rejection; no database/schema failure was observed. Physical authentication/playback acceptance is still required.
+- No owner-account playback, progress mutation, device launch, data restore or legacy retirement was performed. The synthetic compatibility matrix was reused, not repeated against owner data. This promotion does not close platform readiness tickets.

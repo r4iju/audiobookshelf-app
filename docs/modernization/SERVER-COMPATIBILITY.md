@@ -15,9 +15,9 @@ The automated matrix below tests synthetic contracts drawn from the existing cli
 
 The legacy-to-refresh authentication candidate demonstrates an aligned client: the same shipped TVCore accepts both supported authentication response shapes and persists the refreshed credentials. Unrecognized catalog/event changes deliberately block adoption. They are fault injection, not invented adapters for hypothetical upstream changes.
 
-## Combined 2.30.0 server candidate (local, not deployed)
+## Combined 2.30.0 server candidate (locally promoted October 3, 2026)
 
-The deployed server stays on the pinned 2.30.0 image. Two locally packaged candidates replace server files to fix defects that the native clients found against it: Apple's user-cache race and Android's first progress from a local session. Promotion is the owner's decision; `SERVER-CANDIDATE-RUNBOOK.md` is the reviewable procedure. Every row ran on a synthetic server and synthetic accounts.
+The owner explicitly authorized local promotion of session-only candidate `cd703e87`, now deployed after a consistent verified config/metadata backup and read-only HTTP/HTTPS checks (4/4 each). It fixes Apple's user-cache race and Android's first progress from a local session. The held `c649a2bd` candidate was not deployed. `SERVER-CANDIDATE-RUNBOOK.md` records the promotion and exact rollback artifacts. Every matrix row below ran on a synthetic server and synthetic accounts; promotion does not turn those rows into owner-device acceptance.
 
 | Client | `candidate` `c649a2bd` (**held**) | `session` `cd703e87` | Evidence |
 | --- | --- | --- | --- |
