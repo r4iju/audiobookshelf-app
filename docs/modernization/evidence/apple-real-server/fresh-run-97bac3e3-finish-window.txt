@@ -1,0 +1,16 @@
+Container abs-apple-qa, run-all.sh at 97bac3e3: every server log line from the start before test4e to the end of its
+60 s poll, LocalAuth lines (the probe's once-a-second logins) left out.
+
+[2026-10-02 08:39:38.679] INFO: [Server] Init v2.30.0
+[2026-10-02 08:39:38.780] INFO: Listening on port :80
+[2026-10-02 08:40:00.204] INFO: [SocketAuthority] Socket Connected to /socket.io jo_HIaY-viHR-V7zAAAB
+[2026-10-02 08:40:00.220] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (5a018348-4bb9-47cb-aca7-71beb79ff8b0) (updatedAt: 1790930370648.191)
+[2026-10-02 08:40:00.237] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.2008167755102 (previously 34.392997609000005)
+[2026-10-02 08:40:00.240] INFO: [MediaProgress] Marking media progress as finished because time remaining (2.2448979564160254e-7) is less than 10 seconds (media item 6a61c248-a575-44c6-9a23-3eb6a71992a7)
+[2026-10-02 08:40:00.244] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 08:39:30.648 +00:00' (media item 6a61c248-a575-44c6-9a23-3eb6a71992a7)
+[2026-10-02 08:41:02.750] INFO: [SocketAuthority] Socket jo_HIaY-viHR-V7zAAAB disconnected from client "qa" after 62546ms (Reason: transport close)
+[2026-10-02 08:41:05.829] INFO: [Server] Init v2.30.0
+[2026-10-02 08:41:05.907] WARN: Removed 1 sessions that were 3 seconds or less
+[2026-10-02 08:41:05.926] INFO: Listening on port :80
+[2026-10-02 08:41:07.365] INFO: [Server] Init v2.30.0
+[2026-10-02 08:41:07.466] INFO: Listening on port :80

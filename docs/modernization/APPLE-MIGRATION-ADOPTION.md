@@ -334,13 +334,15 @@ Tests that were not are no longer in it (see below).
 
 1. Pending sessions against a live 2.30 server (synthetic account) for each path, including a
    server restart between the legacy app's last `/sync` and adoption.
-   Run against an isolated 2.30.0 container (`APPLE-REAL-SERVER-QA.md`), each of these was
+   Run against an isolated 2.30.0 container (`APPLE-REAL-SERVER-QA.md`). Each session was
    accepted exactly once, and a second sync sent nothing:
    - an open streamed session, through `/sync`
    - a streamed session closed by a restart, through `local-all` with the stored total plus the
      delta
    - a downloaded session, through `local-all` with its whole total
-   - newer and older legacy positions
+
+   The newer legacy position was uploaded. The older one was refused, and the server kept its
+   newer position.
 
    Not covered there: a downloaded `play_local_` session that the legacy app had already posted.
 2. Physical device: adopted audio plays offline, PDF reopens on the same page, the native removal of
