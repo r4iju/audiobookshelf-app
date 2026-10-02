@@ -1,0 +1,22 @@
+{
+  "WebNavLibrary": "Бібліятэка",
+  "WebMore": "Больш",
+  "WebStats": "Статыстыка",
+  "WebSignOut": "Выйсці",
+  "WebPrevious": "Папярэдні",
+  "WebNext": "Далей",
+  "WebLatestEpisodes": "Апошнія эпізоды",
+  "WebPlayer": "Медыяпрайгравальнік",
+  "WebPreviousChapter": "Папярэдні раздзел",
+  "WebNextChapter": "Наступны раздзел",
+  "WebMarkFinished": "Пазначыць як скончана",
+  "WebEbookSent": "Электронная кніга адпраўлена на прыладу \"{0}\"",
+  "WebAddToCollection": "Дадаць у калекцыю",
+  "WebNewPlaylist": "Імя новага спіса прайгравання",
+  "WebDelete": "Выдаліць",
+  "WebClose": "Закрыць",
+  "WebListeningSessions": "Сеансы праслухоўвання",
+  "WebRefresh": "Абнавіць",
+  "WebYearInReview": "Вынікі {0} года",
+  "WebLanguageServerDefault": "Мова сервера па змаўчанні"
+}
