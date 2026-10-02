@@ -396,6 +396,7 @@ Before this, every Android journey had only run against the Python and Node fixt
 - It runs under this lane's own name and ports: `abs-android-qa`, with the server on 28870 and its helpers on 28874-28876.
 - Data is the synthetic library and the synthetic `qa` account, and the server is recreated fresh on each run.
 - The emulator reaches it as 10.0.2.2, so turning the emulator's networking off really cuts it off.
+- `scripts/require-local-image.sh` stops the run unless that exact image is already cached, so the shared `server.mjs` cannot pull it.
 - No owner server, owner data, real identity provider or receiver is involved. The Apple and web QA containers are not touched.
 
 **Results** (RealServerJourney, emulator-5584)
