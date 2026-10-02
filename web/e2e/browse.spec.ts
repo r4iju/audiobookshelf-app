@@ -173,3 +173,20 @@ test("the bookshelf and a series' books can be shown as a list with each book's 
   await page.getByRole("button", { name: "List view" }).click();
   await expect(grid(page).getByRole("link").first()).not.toContainText(/\d+[hms](?![a-z])/);
 });
+
+test("each page's title names what it shows, after loading it and after moving to it", async ({ page }) => {
+  await signIn(page);
+  await page.goto(`/library/${qa.libraries.books}/items?sort=media.metadata.title&desc=1`);
+  await expect(page).toHaveTitle("Audiobooks · Audiobookshelf");
+
+  await grid(page)
+    .getByRole("link", { name: /The Long Tide/ })
+    .click();
+  await expect(page.getByRole("heading", { level: 1, name: "The Long Tide" })).toBeVisible();
+  await expect(page).toHaveTitle("The Long Tide · Audiobookshelf");
+
+  await page.getByRole("link", { name: "Settings" }).click();
+  await expect(page).toHaveTitle("Settings · Audiobookshelf");
+  await page.reload();
+  await expect(page).toHaveTitle("Settings · Audiobookshelf");
+});
