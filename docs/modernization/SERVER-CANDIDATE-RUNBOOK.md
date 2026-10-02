@@ -12,7 +12,7 @@
 | Layers | the base's 9 layers unchanged, plus one layer per replaced file |
 | `server/models/User.js` | base `2174eec7b50b43ed3e0da55c4e54edaa90f9f98c30cefb9b4819430b744f6a1d`, candidate `d36db80057337ae071a436a7753cb3aa024e97373e8d4cc9e805d1c048486097` |
 | `server/managers/PlaybackSessionManager.js` | base `e196eea6e727fbe634a985ee475f5f50782069e6debc4a81f7a2517114885428`, candidate `a140b5679a81e8b48b3485f6bd7e2bee0c20fb6bd79819a61279e465c8f685ae` |
-| Patches, in order | Apple user cache `b59ea8c8…0f94` (`evidence/apple-real-server/server-usercache`), session-only first progress `ed88f5e0…8fcb` (`evidence/web-real-server/server-combined`) |
+| Patches, in order | Apple user cache `b59ea8c8…0a94` (`evidence/apple-real-server/server-usercache`), session-only first progress `ed88f5e0…8fcb` (`evidence/web-real-server/server-combined`) |
 | Saved image | `abs-server-candidate-2.30.0-usercache-firstprogress-session.tar`, SHA-256 `4e8d60b873dae59ceed49ff991a16c8eb4fa32eccf4196db72b723f4483f02a6`, in the private package beside the earlier candidate, with the build context and both patches |
 | Source of the proof | `fork/native-tv` at `a23db59b` (#94, #101, #102, #103) and this change |
 | Held, not for promotion | `abs-server-candidate:2.30.0-usercache-firstprogress`, `sha256:c649a2bd…9abd` (`User.js` `15ee2c33…ac4`). It stores progress first created by PATCH within 10 s of the end as finished. Kept unchanged as historical evidence. |
@@ -40,8 +40,9 @@ STAMP=$(date +%Y%m%d-%H%M%S)
 
 # 1. Verify the artifacts. Load from the saved tar only if the image is missing, after checking the tar.
 docker image inspect "$CANDIDATE" --format '{{.Id}}' \
-  || { shasum -a 256 "$PKG/abs-server-candidate-2.30.0-usercache-firstprogress-session.tar"; \
-       docker load -i "$PKG/abs-server-candidate-2.30.0-usercache-firstprogress-session.tar"; }
+  || { test "$(shasum -a 256 "$PKG/abs-server-candidate-2.30.0-usercache-firstprogress-session.tar" | cut -d' ' -f1)" \
+            = 4e8d60b873dae59ceed49ff991a16c8eb4fa32eccf4196db72b723f4483f02a6 \
+       && docker load -i "$PKG/abs-server-candidate-2.30.0-usercache-firstprogress-session.tar"; }
 test "$(docker image inspect "$CANDIDATE" --format '{{.Id}}')" = "$CANDIDATE_ID"
 docker run --rm --pull=never --network none --entrypoint sha256sum "$CANDIDATE" \
   /app/server/models/User.js /app/server/managers/PlaybackSessionManager.js
@@ -57,7 +58,8 @@ cp "$COMPOSE" "$BACKUP/compose-before-$STAMP.yml"
 docker compose -f "$COMPOSE" stop "$SERVICE"
 tar -C "$DATA" -czf "$BACKUP/abs-config-metadata-$STAMP.tgz" config metadata
 shasum -a 256 "$BACKUP/abs-config-metadata-$STAMP.tgz" | tee -a "$BACKUP/abs-before-$STAMP.txt"
-tar -tzf "$BACKUP/abs-config-metadata-$STAMP.tgz" | grep -c absdatabase.sqlite   # must be 1
+tar -tzf "$BACKUP/abs-config-metadata-$STAMP.tgz" | grep -cx 'config/absdatabase.sqlite'   # must be 1
+#    Stop here if tar reported any error (for example root-owned files): the backup is incomplete.
 
 # 4. Switch the service to the candidate, pinned and never pulled. In $COMPOSE, for $SERVICE only:
 #      image: abs-server-candidate:2.30.0-usercache-firstprogress-session
@@ -73,7 +75,7 @@ docker logs --since 5m "$CONTAINER" 2>&1 | grep -iE 'error|exception' || true
 
 Then the owner's acceptance, on the owner's devices and accounts:
 
-- browser: sign in, open an item, play, pause, reload and resume; a book with no progress yet starts and its progress appears; a position set from another device near the end of a short item stays unfinished;
+- browser: sign in, open an item, play, pause, reload and resume; a book with no progress yet starts and its progress appears; a position set from another device near the end of a short item with no progress yet stays unfinished;
 - iPhone/iPad and Android: resume a book, finish one, and confirm it stays finished after reconnecting; an offline session synced later creates the row with the right position;
 - Apple TV: resume and progress persistence;
 - another device sees progress without reloading.
@@ -91,6 +93,7 @@ docker exec "$CONTAINER" sha256sum /app/server/models/User.js /app/server/manage
 #    2174eec7…a1d and e196eea6…5428
 
 # Data restore, only if the data itself is damaged. Loses everything written since the backup.
+# The compose image must already name the base digest (image-only rollback above) before the final up.
 docker compose -f "$COMPOSE" stop "$SERVICE"
 mv "$DATA/config" "$DATA/config.failed-$STAMP"; mv "$DATA/metadata" "$DATA/metadata.failed-$STAMP"
 tar -C "$DATA" -xzf "$BACKUP/abs-config-metadata-$STAMP.tgz"
@@ -99,6 +102,7 @@ docker compose -f "$COMPOSE" up -d --no-deps --pull never "$SERVICE"
 
 ## Risks
 
+- **Downtime between steps 3 and 5.** The server is stopped from the backup until the candidate starts. If the compose edit is wrong, `up` fails and the server stays down: restore `$BACKUP/compose-before-$STAMP.yml` and `up` again.
 - **A floating tag.** If the service names `audiobookshelf:latest`, any `docker compose pull` or `up --pull always` replaces both the base and the candidate with whatever upstream publishes. Pin by tag or digest with `pull_policy: never`, for the candidate and for rollback alike.
 - **Local-only image.** The tag exists only on this machine. Keep the saved tar and its checksum with the backup; a pruned image is restored from the tar, not rebuilt.
 - **arm64 only.** The image runs on the Studio's arm64 Docker. Another host needs a fresh build and fresh verification.

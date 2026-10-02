@@ -31,7 +31,7 @@ The browser saw this in `e2e/podcasts.spec.ts:171` and `:194`. Both seed episode
 
 ## The fix
 
-`first-progress-session-candidate.patch` replaces `6313948f` and applies after Apple's patch. `createUpdateMediaProgressFromPayload(payload, { fromPlaybackSession })` runs `applyProgressUpdate` on a new row only when the flag is set. `PlaybackSessionManager` sets it at its three callers: `syncLocalSession`, in both branches, and `syncSession` for streamed sessions. Thresholds still come from the payload. PATCH and the batch PATCH create progress exactly as stock does. The Android author agreed to this shape and confirmed Android does not depend on PATCH-created progress being finished.
+`first-progress-session-candidate.patch` replaces `6313948f` and applies after Apple's patch. `createUpdateMediaProgressFromPayload(payload, { fromPlaybackSession })` runs `applyProgressUpdate` on a new row only when the flag is set. `PlaybackSessionManager` sets it at its three callers: `syncLocalSession`, in both branches, and `syncSession` for streamed sessions. Thresholds still come from the payload. PATCH and the batch PATCH create progress exactly as stock does. A row created by a session now takes the session's `lastUpdate` as its time, where stock used the server's time; this is what keeps an older offline session from replacing newer listening, and the rows stay valid on stock after a rollback. The Android author agreed to this shape and confirmed Android does not depend on PATCH-created progress being finished.
 
 ## Results
 
