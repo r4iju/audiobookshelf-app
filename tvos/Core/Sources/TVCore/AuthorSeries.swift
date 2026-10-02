@@ -231,12 +231,16 @@ public struct SeriesPage: Decodable {
 
     public func sequence(of item: LibraryItem) -> String? { item.series.first { $0.id == id }?.sequence }
 
+    public struct Counts: Equatable {
+        public let books: Int
+        /// Known only when the server reports the series progress.
+        public let finished: Int?
+    }
+
     /// How many books the series has and, when the server reports progress, how many are finished.
-    public var summary: String? {
+    public var counts: Counts? {
         guard let series else { return nil }
-        let count = series.progress?.libraryItemIds.count ?? books.total
-        let books = count == 1 ? "1 book" : "\(count) books"
-        return series.progress.map { books + " · \($0.libraryItemIdsFinished.count) finished" } ?? books
+        return Counts(books: series.progress?.libraryItemIds.count ?? books.total, finished: series.progress?.libraryItemIdsFinished.count)
     }
 
     public func load() async {
