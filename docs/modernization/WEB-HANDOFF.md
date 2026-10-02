@@ -63,6 +63,7 @@ from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` u
 | `88c125d7` | A Collapse Series switch on the bookshelf; series stay collapsed with a filter, as in the legacy bookshelf |
 | `38fc37b3` | A list view of the bookshelf and a series' books, kept on this device; a missing cover too small for text shows its icon |
 | `de8958cd` | Each page's title names it after its main heading |
+| `5874f663` | QA only: the QA server's mail goes to the sink on its own loopback, not through the VM's gateway |
 
 ## Checks
 
@@ -147,10 +148,22 @@ Phase 2 readiness commits, checked by the journeys they affect (logs in `web/qa/
   needed a word boundary), both recorded in `list-view-green.log`; the product code did not change between them.
   Full run on `de8958cd` (`gaps-full.log`): Biome and `tsc` clean, vitest 115 passed, Chromium 72 of 73 journeys
   passed. The e-reader journey failed: the QA server logged that it was sending the ebook, but its delivery to the
-  loopback mail sink was not answered within 10 seconds, at a host load average near 100. Nothing on this branch
-  touches that path. Unchanged, it passed 3 of 3 alone, and the fixture network check then found no stalls
+  loopback mail sink was not answered within 10 seconds, at a host load average near 100 (a correlation, not a
+  shown cause). Unchanged, it passed 3 of 3 alone, and the fixture network check then found no stalls
   (`gaps-ereader-rerun.log`; the failure's trace is kept in `gaps-full-ereader-failure/`). This run is therefore not a
   clean full run.
+- Post-merge QA of #93 on the merge `3e8f8c21` (its `web/` is `de8958cd`'s), `postmerge-93.log`: Biome and `tsc`
+  clean, vitest 115 passed, Chromium 72 of 73 journeys passed, deployment included. The e-reader journey failed the
+  same way, with no answer or error logged for at least four minutes (trace, server log and name lookups in
+  `postmerge-93-ereader-failure/`). The cause is in the fixture setup: the server's mailer (nodemailer) resolves the
+  mail host `host.docker.internal` through DNS, which answers `192.168.5.2`, the VM's host gateway, instead of the
+  hosts entry (`127.0.0.1`) that keeps the other fixtures on the server's own loopback. That gateway route is the one
+  `qa/server.mjs` already records as dropping connection attempts under load. The fixture network check connected
+  through the hosts entry, so it never measured the mailer's route. `5874f663` names `127.0.0.1` in the mail settings
+  and checks that address; the sink then answered 394 of 394 attempts within 12 ms and the journey passed 3 of 3
+  (`mail-loopback-check.log`). No assertion or timeout changed. Full run on `5874f663` (`mail-loopback-full.log`):
+  Biome and `tsc` clean, vitest 115 passed, Chromium 73 of 73 journeys passed, at a host load average of 8 to 32,
+  lower than during the two failures.
 - Not rerun for these commits: the deployment, connect, statistics and OpenID journeys, whose code they do not touch.
 
 Every behaviour change since the first commit started from a failing test that was observed failing, then made to
