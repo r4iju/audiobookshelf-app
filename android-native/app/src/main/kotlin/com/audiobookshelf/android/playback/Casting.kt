@@ -3,9 +3,11 @@ package com.audiobookshelf.android.playback
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import androidx.media3.cast.CastPlayer
 import androidx.media3.cast.MediaItemConverter
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.mediarouter.media.MediaRouteSelector
 import androidx.mediarouter.media.MediaRouter
 import com.google.android.gms.cast.CastMediaControlIntent
@@ -95,6 +97,36 @@ internal class CastConverter : MediaItemConverter {
     }
 }
 
+/**
+ * What moves between the phone and a receiver when Media3 switches players. The switch itself cannot
+ * be refused, so a downloaded title is kept on the phone, which Media3 only stops, and the receiver
+ * session is ended; when Media3 switches back, the phone resumes where it was.
+ */
+internal class CastHandover(private val phone: Player, private val endSession: () -> Unit, private val explain: (String) -> Unit) {
+    private var keptOnPhone = false
+    private var resume = false
+
+    fun transfer(from: Player, to: Player) {
+        when {
+            to !== phone && (0 until from.mediaItemCount).any { !CastExtras.castable(from.getMediaItemAt(it)) } -> {
+                keptOnPhone = true
+                resume = from.playWhenReady
+                explain(DOWNLOAD_NOT_CASTABLE)
+                endSession()
+            }
+            to === phone && keptOnPhone -> {
+                keptOnPhone = false
+                phone.playWhenReady = resume
+            }
+            else -> CastPlayer.TransferCallback.DEFAULT.transferState(from, to)
+        }
+    }
+
+    companion object {
+        const val DOWNLOAD_NOT_CASTABLE = "Downloaded copies play on this phone only. Stop casting to listen here, or stream the title instead."
+    }
+}
+
 data class CastReceiver(val id: String, val name: String, val description: String?)
 
 data class CastStatus(
@@ -142,7 +174,7 @@ class CastRoutes(private val context: Context) {
             refresh(problem = "Could not connect to ${mutable.value.connecting ?: "the receiver"}. Check that it is on and on the same Wi-Fi network as this phone.")
         override fun onSessionEnding(session: CastSession) = Unit
         override fun onSessionEnded(session: CastSession, error: Int) =
-            refresh(problem = if (error != 0) "The connection to ${session.castDevice?.friendlyName ?: "the receiver"} was lost. Playback continues on this phone." else null)
+            refresh(problem = if (error != 0) "The connection to ${session.castDevice?.friendlyName ?: "the receiver"} was lost. Playback continues on this phone." else mutable.value.problem)
         override fun onSessionResuming(session: CastSession, sessionId: String) = refresh()
         override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) = refresh(problem = null)
         override fun onSessionResumeFailed(session: CastSession, error: Int) = refresh()

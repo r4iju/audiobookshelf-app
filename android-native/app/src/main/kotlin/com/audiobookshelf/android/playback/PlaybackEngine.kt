@@ -202,7 +202,7 @@ class PlaybackEngine(
 
     private fun start(source: PlaySource) {
         if (source is PlaySource.Local && casting?.status?.value?.connectedTo != null) {
-            mutable.value = mutable.value.copy(openError = itemKey(source.itemId, source.episodeId) to DOWNLOAD_NOT_CASTABLE)
+            mutable.value = mutable.value.copy(openError = itemKey(source.itemId, source.episodeId) to CastHandover.DOWNLOAD_NOT_CASTABLE)
             return
         }
         val current = loaded
@@ -474,16 +474,8 @@ class PlaybackEngine(
             .setSeekBackIncrementMs(settings.current.jumpBackwardsTime * 1000L)
             .setSeekForwardIncrementMs(settings.current.jumpForwardTime * 1000L)
             .build()
-        return CastPlayer.Builder(context).setLocalPlayer(exo).setRemotePlayer(remote).setTransferCallback(::transfer).build()
-    }
-
-    private fun transfer(from: Player, to: Player) {
-        if (to !== exo && (0 until from.mediaItemCount).any { !CastExtras.castable(from.getMediaItemAt(it)) }) {
-            from.pause()
-            casting?.explain(DOWNLOAD_NOT_CASTABLE)
-            return
-        }
-        CastPlayer.TransferCallback.DEFAULT.transferState(from, to)
+        val handover = CastHandover(exo, endSession = { main.post { casting?.disconnect() } }, explain = { main.post { casting?.explain(it) } })
+        return CastPlayer.Builder(context).setLocalPlayer(exo).setRemotePlayer(remote).setTransferCallback(handover::transfer).build()
     }
 
     private fun mediaItem(id: String, uri: String, now: NowPlaying, mime: String?, cast: android.os.Bundle? = null): MediaItem = MediaItem.Builder()
@@ -761,7 +753,6 @@ class PlaybackEngine(
         private const val SETTLE_TIMEOUT_MS = 10_000L
         private const val SAVE_ERROR = "Listening could not be saved on this device, so playback paused. Free some storage and try again."
         private const val PUBLISH_INTERVAL_MS = 15_000L
-        private const val DOWNLOAD_NOT_CASTABLE = "Downloaded copies play on this phone only. Stop casting to listen here, or stream the title instead."
 
         /** Same thresholds as the existing Android app, keyed by how long playback was paused. */
         fun autoRewindSeconds(pausedMs: Long): Double = when {
