@@ -202,46 +202,50 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
     };
   }, [file]);
 
-  // External system: the shown section's document, which reports scrolling, keys and link clicks. A layout
-  // effect, so leaving the reader can still measure the place before the frame is taken down.
+  // External system: the shown section's document, whose scrolling is watched and which reports keys and link
+  // clicks. A layout effect, so leaving the reader can still measure the place before the frame is taken down.
   useLayoutEffect(() => {
     if (!loaded) return;
     const { doc, target } = loaded;
     const view = doc.defaultView;
     if (!view) return;
+    const element = frame.current;
+    /** Whether the frame still shows this section: one being replaced by the next reads as scrolled to its top. */
+    const showing = () => element?.contentDocument === doc && element.src === doc.URL;
     let latest = measure(doc, target.section);
     if (target.moved) save(latest);
-    let frameRequest = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const flush = () => {
       clearTimeout(timer);
       unsaved.current = false;
       save(latest);
     };
-    const onScroll = () => {
+    // WebKit sends no events from a document that may not run scripts, so its scrolling is watched from here.
+    // Arriving at the target has already scrolled; only later scrolling counts.
+    quietScroll.current = false;
+    let scrolled = doc.scrollingElement?.scrollTop;
+    let frameRequest = requestAnimationFrame(function watch() {
+      frameRequest = requestAnimationFrame(watch);
+      if (!showing() || doc.scrollingElement?.scrollTop === scrolled) return;
+      scrolled = doc.scrollingElement?.scrollTop;
       const quiet = quietScroll.current;
       quietScroll.current = false;
       if (!quiet) unsaved.current = true;
-      cancelAnimationFrame(frameRequest);
-      frameRequest = requestAnimationFrame(() => {
-        latest = measure(doc, target.section);
-        clearTimeout(timer);
-        if (unsaved.current) timer = setTimeout(flush, 300);
-      });
-    };
+      latest = measure(doc, target.section);
+      clearTimeout(timer);
+      if (unsaved.current) timer = setTimeout(flush, 300);
+    });
     const onKey = (event: KeyboardEvent) => onFrameKey(event);
     const onClick = (event: MouseEvent) => onFrameClick(event, view);
-    view.addEventListener("scroll", onScroll);
     doc.addEventListener("keydown", onKey);
     doc.addEventListener("click", onClick);
     return () => {
-      view.removeEventListener("scroll", onScroll);
       doc.removeEventListener("keydown", onKey);
       doc.removeEventListener("click", onClick);
       cancelAnimationFrame(frameRequest);
       if (!unsaved.current) return;
       // A section replaced by the next has already left the frame; its last measured place stands.
-      if (doc.defaultView) latest = measure(doc, target.section);
+      if (showing()) latest = measure(doc, target.section);
       flush();
     };
   }, [loaded]);

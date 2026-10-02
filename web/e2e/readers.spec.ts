@@ -215,6 +215,7 @@ for (const { title, format } of [
     await page.getByRole("dialog").getByRole("button", { name: "Chapter 3: Lantern 3" }).click();
     await expect(book(page).getByText("Chapter 3: Lantern 3")).toBeInViewport();
     await expect.poll(async () => (await serverProgress(api, id))?.ebookProgress ?? 0).toBeGreaterThan(0.2);
+    const atChapterThree = (await serverProgress(api, id)).ebookLocation as string;
     await page.keyboard.press("PageDown");
     await expect(book(page).getByText("Chapter 3: Lantern 3")).not.toBeInViewport();
     await page.waitForTimeout(500);
@@ -227,6 +228,8 @@ for (const { title, format } of [
       });
     expect(passage).toMatch(/^Passage 3\.\d+\./);
     await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation ?? "").toMatch(/^mobi:/);
+    // The place a page further on, not the one the contents jump saved first.
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).not.toBe(atChapterThree);
     const inChapterThree = (await serverProgress(api, id)).ebookLocation as string;
 
     await page.reload();
