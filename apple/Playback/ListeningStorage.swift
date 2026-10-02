@@ -5,7 +5,9 @@ import Foundation
 /// An Apple TV app has no persistent files. Apart from 500 KB of user defaults, everything it saves must be purgeable
 /// (App Programming Guide for tvOS, "Local Storage for Your App Is Limited"), and Application Support cannot be written
 /// on a device (#114). There the records are kept in user defaults; files that an earlier build left are only read.
-/// The journal has 256 KB of that space (`ListeningJournal`), the record of sent progress 96 KB and the resets 16 KB.
+/// The journal has 256 KB of that space (`ListeningJournal`), the record of sent progress 64 KB plus one 64 KB copy set
+/// aside when it was unreadable, and the resets 16 KB: 400 KB, leaving room for the app's other defaults. The journal and
+/// the resets set nothing aside; an unreadable one stops saving instead.
 struct ListeningStorage {
     /// The folder of the saved files.
     let folder: URL
@@ -29,7 +31,7 @@ struct ListeningStorage {
     static let publicationsKey = "NativeListeningPublications"
     static let resetsKey = "NativeListeningResets"
 
-    var publications: SavedRecord { SavedRecord(file: publicationsFile, defaults: defaults, key: Self.publicationsKey, maximumBytes: 96_000) }
+    var publications: SavedRecord { SavedRecord(file: publicationsFile, defaults: defaults, key: Self.publicationsKey, maximumBytes: 64_000) }
     var resets: SavedRecord { SavedRecord(file: resetsFile, defaults: defaults, key: Self.resetsKey, maximumBytes: 16_000) }
 }
 
@@ -64,12 +66,13 @@ struct SavedRecord {
         try data.write(to: file, options: options)
     }
 
-    /// Keeps bytes that could not be read beside the record, never replacing an earlier copy.
+    /// Keeps bytes that could not be read beside the record, never replacing an earlier copy. Defaults hold one copy, so
+    /// their space stays bounded; while it is taken this throws and the unreadable record stays in place.
     func setAside(_ data: Data, named name: String) throws {
         if let defaults {
             // Bytes read from an earlier build's file stay in that file, which is never rewritten here.
             guard defaults.object(forKey: key) != nil else { return }
-            let aside = key + "." + name
+            let aside = key + ".unreadable"
             guard defaults.object(forKey: aside) == nil else { throw CocoaError(.fileWriteFileExists) }
             guard data.count <= maximumBytes else { throw ListeningJournal.Failure.storageFull }
             try Self.store(data, forKey: aside, in: defaults)

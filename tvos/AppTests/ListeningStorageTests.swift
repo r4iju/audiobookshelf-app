@@ -86,4 +86,24 @@ import XCTest
         XCTAssertTrue(relaunched.unresolved(account: account, itemID: "book-0", episodeID: nil))
         XCTAssertFalse(relaunched.unresolved(account: account, itemID: "book-1", episodeID: nil))
     }
+
+    /// Space kept in defaults stays bounded however often the record becomes unreadable: one earlier copy is kept, and
+    /// a second unreadable record is kept in place while nothing is sent.
+    func testRepeatedlyUnreadableRecordsKeepOneBoundedCopyAndStopSending() throws {
+        let storage = try unwritableStorage()
+        let first = Data("{\"version\":1,\"writes\":[{".utf8), second = Data("{\"version\":1,\"writes\":[[".utf8)
+        defaults.set(first, forKey: ListeningStorage.publicationsKey)
+        _ = sync(storage)
+        XCTAssertNotEqual(defaults.data(forKey: ListeningStorage.publicationsKey), first, "The first unreadable record is set aside and replaced")
+
+        defaults.set(second, forKey: ListeningStorage.publicationsKey)
+        let ledger = sync(storage).publications
+        XCTAssertThrowsError(try ledger.issue(write(20))) { error in
+            guard case PublicationLedger.Failure.unreadable = error else { return XCTFail("Expected the record to stay unreadable, got \(error)") }
+        }
+        let kept = defaults.dictionaryRepresentation().filter { $0.key.hasPrefix(ListeningStorage.publicationsKey) }
+        XCTAssertEqual(kept.count, 2, "The record and one earlier copy: \(kept.keys.sorted())")
+        XCTAssertEqual(kept[ListeningStorage.publicationsKey] as? Data, second, "The unreadable record stays in place")
+        XCTAssertTrue(kept.values.contains { $0 as? Data == first }, "The earlier copy is kept")
+    }
 }
