@@ -14,14 +14,18 @@ import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.ConnectionPool
 import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 import java.security.cert.CertPathValidatorException
+import java.util.concurrent.TimeUnit
+import okio.BufferedSink
 import okio.ByteString.Companion.encodeUtf8
 import okio.ByteString.Companion.decodeBase64
 import javax.net.ssl.SSLHandshakeException
@@ -256,18 +260,35 @@ class ApiClient(
 
     private suspend fun execute(path: String, method: String, query: List<Pair<String, String>>, body: JsonElement?, resendWhenDropped: Boolean = false): String =
         authorized(path) { token ->
-            val payload = body?.toString()?.toRequestBody(JsonType)
-            val request = Request.Builder().url(address.url(path, query)).header("Authorization", "Bearer $token")
-                .method(method, payload ?: if (method == "GET" || method == "DELETE") null else ByteArray(0).toRequestBody(JsonType)).build()
+            val payload = when {
+                method == "GET" -> null
+                body != null -> body.toString().toRequestBody(JsonType).once()
+                method == "DELETE" -> ByteArray(0).toRequestBody().once()
+                else -> ByteArray(0).toRequestBody(JsonType).once()
+            }
+            val request = Request.Builder().url(address.url(path, query)).header("Authorization", "Bearer $token").method(method, payload).build()
             val client = if (method == "GET") http else writes
             try { client.execute(request) } catch (dropped: ApiError.Offline) { if (resendWhenDropped) client.execute(request) else throw dropped }
         }
 
     /**
-     * OkHttp sends a request again by itself when a reused connection fails, even after the request
-     * was written. For a write that hides a lost answer while the server may still apply the original.
+     * Writes get a new connection each time. OkHttp checks an idle pooled connection for a close only
+     * after 10 s, and servers such as Node close them after 5 s, so a write on one was lost.
      */
-    private val writes by lazy { http.newBuilder().retryOnConnectionFailure(false).build() }
+    private val writes by lazy { http.newBuilder().connectionPool(ConnectionPool(0, 1, TimeUnit.SECONDS)).build() }
+
+    /**
+     * OkHttp would send a request again by itself when its connection fails, even after the request was
+     * written. For a write that hides a lost answer while the server may still apply the original. A
+     * one-shot body is never sent twice, while a connection that could not be made still tries the
+     * server's next address.
+     */
+    private fun RequestBody.once(): RequestBody = object : RequestBody() {
+        override fun contentType() = this@once.contentType()
+        override fun contentLength() = this@once.contentLength()
+        override fun isOneShot() = true
+        override fun writeTo(sink: BufferedSink) = this@once.writeTo(sink)
+    }
 
     private suspend fun <T> authorized(path: String, call: suspend (String) -> T): T {
         val used = bearer()

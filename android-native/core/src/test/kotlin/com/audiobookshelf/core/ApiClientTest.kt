@@ -152,4 +152,42 @@ class ApiClientTest {
         assertEquals("The spent refresh token is not sent again", 1, refreshes.get())
         assertEquals("No close was sent with the expired token", 0, closes.get())
     }
+
+    @Test
+    fun aWriteIsNotSentOnAConnectionTheServerClosedWhileIdle() = runBlocking {
+        val writes = AtomicInteger()
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                // The server answers, keeps the connection open for reuse, then closes it as idle.
+                if (request.method == "GET") return MockResponse().setBody("""{"libraries":[]}""").setSocketPolicy(okhttp3.mockwebserver.SocketPolicy.DISCONNECT_AT_END)
+                writes.incrementAndGet()
+                return MockResponse().setBody("""{"results":[{"id":"s1","success":true}]}""")
+            }
+        }
+        server.start()
+        val address = ServerAddress.parse(server.url("/abs").toString())
+        val client = ApiClient(OkHttpClient(), Credentials(address.canonical, "u1", "qa", "fresh", "refresh"), { _, _ -> }, DeviceInfo("device"))
+        client.libraries()
+        Thread.sleep(500)
+        val outcome = runCatching { client.syncLocal(listOf(kotlinx.serialization.json.buildJsonObject { put("id", kotlinx.serialization.json.JsonPrimitive("s1")) })) }
+        assertEquals("The write reaches the server on a live connection, got $outcome", setOf("s1"), outcome.getOrNull())
+        assertEquals(1, writes.get())
+    }
+
+    @Test
+    fun aWriteReachesTheServerWhenItsFirstAddressRefusesTheConnection() = runBlocking {
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest) = MockResponse().setBody("""{"results":[{"id":"s1","success":true}]}""")
+        }
+        server.start(java.net.InetAddress.getByName("127.0.0.1"), 0)
+        // A dual-stack host whose IPv6 address does not answer; nothing is sent before the connection is made.
+        val dns = object : okhttp3.Dns {
+            override fun lookup(hostname: String) = listOf(java.net.InetAddress.getByName("::1"), java.net.InetAddress.getByName("127.0.0.1"))
+        }
+        val address = ServerAddress.parse("http://books.test:${server.port}/abs")
+        val client = ApiClient(OkHttpClient.Builder().dns(dns).build(), Credentials(address.canonical, "u1", "qa", "fresh", "refresh"), { _, _ -> }, DeviceInfo("device"))
+        val outcome = runCatching { client.syncLocal(listOf(kotlinx.serialization.json.buildJsonObject { put("id", kotlinx.serialization.json.JsonPrimitive("s1")) })) }
+        assertEquals("The write is sent once over the address that answers, got $outcome", setOf("s1"), outcome.getOrNull())
+        assertEquals(1, server.requestCount)
+    }
 }
