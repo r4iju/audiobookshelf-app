@@ -2,8 +2,10 @@
 
 This increment starts from merged PR #124, `32c8316fd21f8c4c164b9fd656c64174cd814d1f`.
 It finishes the two concrete software gaps recorded below: bookmark creation/current-time marking and missing
-in-use translation-table entries. Root inspected the bookmark and source-generator changes without blockers;
-**final loader and pinned-PR review remains pending**. Root owns the sole consolidated client-only deployment.
+in-use translation-table entries. Root posted its final source review on PR #126 and cleared exact source
+`36a7e5e280eebf9005ecf2123c13a88383e19dcb` with no blockers. It inspected loaders, source mappings,
+catalog/provenance, unchanged original tables and the 90 inherited holes. Runtime/journey blobs remain
+unchanged from checked `4e7d6900`; this follow-up changes documentation only. Root owns the sole consolidated client-only deployment.
 No deployment, image build or new delivery package is performed by this increment.
 
 ## Bookmark main flow
@@ -62,11 +64,11 @@ server bookmarks and mutation lifecycle remain query-owned.
 
 | Issue | Current software / criteria | Remaining gate |
 | --- | --- | --- |
-| #57 | Bookmark current-time and inline-title gaps implemented; existing playback evidence retained | Root review/deployment, explicit pending playback criteria, physical audio/Safari/Media Session and real-network/owner acceptance |
+| #57 | Bookmark current-time and inline-title gaps implemented; existing playback evidence retained | Root deployment, explicit pending playback criteria, physical audio/Safari/Media Session and real-network/owner acceptance |
 | #59, #60, #63 | Root reconciled and closed against their own criteria | Do not reopen from blanket physical-readiness gates |
 | #61 | Reviewed rotation implementation merged in #124 | Root serves reviewed final rotation build, then root can reconcile/close |
 | #64 | All 347 in-use catalog entries covered in 29 non-English tables; usable originals preserved | English page/error/initial-render limitations, native-speaker quality, touch/AT/scalable-text/contrast acceptance and original pending criteria |
-| #65 | Bounded software increment ready for final checks/review | Root pinned review, consolidated internal deployment/acceptance and legacy retirement criteria |
+| #65 | Bounded software increment ready for final checks/review | Root confirms this docs-only delta, consolidated internal deployment/acceptance and legacy retirement criteria |
 
 Original SPEC and ticket acceptance criteria remain unchanged. Hardware/native-speaker/owner limits are
 tracked separately from software gaps; closed feature tickets are not reopened. This pass stops at PR handoff.
