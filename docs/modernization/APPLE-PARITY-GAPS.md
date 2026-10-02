@@ -22,6 +22,8 @@ Root reset journeys pass 4/4 at `da6460ef`, result `apple/build-reset/Root-Publi
 
 ## Remaining local gates
 
+Status update after the a39bb589 audit: items 1 to 4 below are kept as written at the time. The later final runs on the integrated source close them at simulator level: broad iPhone 90 of 90 plus the gated 5 (`APPLE-FINAL-MOBILE-BROAD-PHONE.md`); iPad 89 plus the corrected playlist journey, the 3 gated audits and `CollectionJourney` 6 of 6 (`APPLE-FINAL-BROAD-ACCEPTANCE-IPAD.md`); TV 40 of 40 including the recovery journeys (below); and reset 4 of 4, publication recovery 1 of 1 and playback authorization 1 of 1. Items 5 to 8 stay open.
+
 1. **Final combined phone and tablet suites.** Initial broad runs predate the integrated source. Whole-book time assertions and iPad duplicate menu selection are corrected without relaxing their numeric thresholds. Account-switch restoration is still intermittent in the phone slice; the iPad timer interaction is still under diagnosis. No final full-suite pass is claimed.
 2. **TV unanswered-save recovery.** The remote-operable request-before-restart / confirm-after-restart flow is integrated. All three recovery journeys pass in the root 39-case run at `f2cdf7ad`. A final run covering subsequent storage, localization and sign-in layout changes is in progress.
 3. **Combined reset/recovery and authorization UI.** Unit safety passes; run the journeys on the final source, including preservation of held listening and no automatic playback after sign-in.
@@ -32,6 +34,15 @@ Root reset journeys pass 4/4 at `da6460ef`, result `apple/build-reset/Root-Publi
 8. **Interruption and route behavior.** The production-handler simulator probe passed 9/9 while decoding audio. Real calls, Siri, alarms, CarPlay/Bluetooth and media-services-reset recovery remain unverified.
 
 ## Physical, live-server and owner gates (none performed)
+
+The isolated real-server run (`APPLE-REAL-SERVER-QA.md`) covers some of the software side, against a throwaway synthetic 2.30.0 container rather than the owner's server:
+
+- main phone and TV journeys
+- offline publishing after the server returns
+- cross-client resume
+- pending migration sessions accepted by the server
+
+Every gate below still needs a device, the owner, or owner data.
 
 - **iPhone and iPad:**
   - lock screen, headset and Bluetooth controls
