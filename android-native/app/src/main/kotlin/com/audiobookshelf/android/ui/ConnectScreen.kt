@@ -4,12 +4,15 @@ import com.audiobookshelf.android.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -87,7 +90,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
 
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
-            Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
+            Modifier.fillMaxSize().safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (state.adding) {
@@ -96,7 +99,11 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                 }
             } else Spacer(Modifier.height(48.dp))
             Column(Modifier.widthIn(max = 480.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Icon(Icons.AutoMirrored.Outlined.LibraryBooks, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
+                Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primaryContainer) {
+                    Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+                        Icon(Icons.AutoMirrored.Outlined.LibraryBooks, null, Modifier.size(32.dp), tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
                 Text(if (state.adding) stringResource(R.string.set_add_an_account) else "Audiobookshelf", style = MaterialTheme.typography.headlineMedium)
                 Text(stringResource(R.string.set_connect_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 state.notice?.let {
@@ -109,14 +116,14 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                     OutlinedTextField(
                         value = address, onValueChange = { address = it; connectionError = null },
                         label = { Text(stringResource(R.string.server_address)) }, placeholder = { Text("https://books.example.com/abs") },
-                        singleLine = true, modifier = Modifier.fillMaxWidth().testTag("server-address"),
+                        shape = MaterialTheme.shapes.medium, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("server-address"),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go, autoCorrectEnabled = false),
                         keyboardActions = KeyboardActions(onGo = { connect() }),
                         isError = connectionError != null,
                     )
                     connectionError?.let { ErrorText(it, "connection-error") }
-                    Button(onClick = ::connect, enabled = !busy && address.isNotBlank(), modifier = Modifier.fillMaxWidth().height(52.dp).testTag("connect")) {
-                        if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp) else Text(stringResource(R.string.connect))
+                    Button(onClick = ::connect, enabled = !busy && address.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("connect")) {
+                        if (busy) CircularProgressIndicator(Modifier.size(20.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp) else Text(stringResource(R.string.connect))
                     }
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -124,10 +131,10 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                         Text(connected.first.canonical, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if ("local" in connected.second.authMethods) {
-                        OutlinedTextField(username, { username = it; signInError = null }, label = { Text(stringResource(R.string.username)) }, singleLine = true,
+                        OutlinedTextField(username, { username = it; signInError = null }, label = { Text(stringResource(R.string.username)) }, shape = MaterialTheme.shapes.medium, singleLine = true,
                             modifier = Modifier.fillMaxWidth().testTag("username"),
                             keyboardOptions = KeyboardOptions(autoCorrectEnabled = false, imeAction = ImeAction.Next))
-                        OutlinedTextField(password, { password = it; signInError = null }, label = { Text(stringResource(R.string.password)) }, singleLine = true,
+                        OutlinedTextField(password, { password = it; signInError = null }, label = { Text(stringResource(R.string.password)) }, shape = MaterialTheme.shapes.medium, singleLine = true,
                             visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth().testTag("password"),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done))
                         signInError?.let { ErrorText(it, "sign-in-error") }
@@ -145,13 +152,13 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                                 }
                             },
                             enabled = !busy && username.isNotBlank(),
-                            modifier = Modifier.fillMaxWidth().height(52.dp).testTag("sign-in"),
-                        ) { if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp) else Text(stringResource(R.string.set_sign_in)) }
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("sign-in"),
+                        ) { if (busy) CircularProgressIndicator(Modifier.size(20.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp) else Text(stringResource(R.string.set_sign_in)) }
                     }
                     if ("openid" in connected.second.authMethods) {
                         OutlinedButton(
                             onClick = { openId.start(connected.first, context) },
-                            modifier = Modifier.fillMaxWidth().height(52.dp).testTag("openid-sign-in"),
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("openid-sign-in"),
                         ) { Text(stringResource(R.string.set_sign_in_openid)) }
                     }
                 }

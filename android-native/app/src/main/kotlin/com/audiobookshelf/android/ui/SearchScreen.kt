@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import com.audiobookshelf.android.data.CatalogModel
 import com.audiobookshelf.android.data.SearchModel
 import com.audiobookshelf.android.graph
@@ -63,6 +64,7 @@ fun SearchScreen(search: SearchModel, catalog: CatalogModel, padding: PaddingVal
                 placeholder = { Text(catalog.library?.name?.let { stringResource(R.string.lib_search_in, it) } ?: stringResource(R.string.lib_search_library)) },
                 leadingIcon = { Icon(Icons.Outlined.Search, null) },
                 trailingIcon = { if (search.query.isNotEmpty()) IconButton(onClick = { search.update("", catalog.library?.id) }) { Icon(Icons.Outlined.Close, stringResource(R.string.lib_clear_search)) } },
+                shape = MaterialTheme.shapes.medium,
                 singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 modifier = Modifier.fillMaxWidth().padding(16.dp).focusRequester(focus).testTag("search-field"),
             )
@@ -105,9 +107,9 @@ private fun <T> androidx.compose.foundation.lazy.LazyListScope.section(title: St
 @Composable
 private fun ResultRow(item: LibraryItem, client: ApiClient?, tag: String, onClick: () -> Unit) {
     ListItem(
-        headlineContent = { Text(item.recentEpisode?.title ?: item.title, maxLines = 2) },
-        supportingContent = { Text(if (item.recentEpisode != null) item.title else item.author, maxLines = 1) },
-        leadingContent = { Box(Modifier.widthIn(max = 56.dp)) { Cover(client?.coverUrl(item.id)?.toString(), item.title, Modifier.fillMaxWidth(), podcast = item.isPodcast) } },
+        headlineContent = { Text(item.recentEpisode?.title ?: item.title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis) },
+        supportingContent = { Text(if (item.recentEpisode != null) item.title else item.author, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        leadingContent = { Box(Modifier.widthIn(max = 64.dp)) { Cover(client?.coverUrl(item.id)?.toString(), item.title, Modifier.fillMaxWidth(), podcast = item.isPodcast) } },
         modifier = Modifier.clickable(role = Role.Button, onClick = onClick).testTag(tag),
     )
 }
@@ -115,7 +117,7 @@ private fun ResultRow(item: LibraryItem, client: ApiClient?, tag: String, onClic
 @Composable
 private fun LinkRow(title: String, detail: String?, icon: androidx.compose.ui.graphics.vector.ImageVector, tag: String, onClick: () -> Unit) {
     ListItem(
-        headlineContent = { Text(title) },
+        headlineContent = { Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis) },
         supportingContent = detail?.let { { Text(it) } },
         leadingContent = { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) },
         modifier = Modifier.clickable(role = Role.Button, onClick = onClick).testTag(tag),

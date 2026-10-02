@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.semantics.heading
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Headphones
 import androidx.compose.material.icons.outlined.Podcasts
@@ -81,13 +84,15 @@ fun ProgressLine(fraction: Double, modifier: Modifier = Modifier) {
 @Composable
 fun MessageState(title: String, message: String?, modifier: Modifier = Modifier, icon: ImageVector = Icons.Outlined.Info, tag: String? = null, action: String? = null, actionTag: String? = null, onAction: (() -> Unit)? = null) {
     Column(
-        modifier.fillMaxWidth().padding(32.dp).let { if (tag != null) it.testTag(tag) else it },
+        modifier.fillMaxWidth().padding(horizontal = ShelfSpacing.page, vertical = ShelfSpacing.section).let { if (tag != null) it.testTag(tag) else it },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Icon(icon, null, Modifier.size(32.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
-        if (message != null) Text(message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        Box(Modifier.size(64.dp).background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(icon, null, Modifier.size(28.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center, modifier = Modifier.widthIn(max = 440.dp))
+        if (message != null) Text(message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.widthIn(max = 440.dp))
         if (action != null && onAction != null) {
             Button(onClick = onAction, modifier = if (actionTag != null) Modifier.testTag(actionTag) else Modifier) { Text(action) }
         }
@@ -119,5 +124,5 @@ fun Modifier.describe(text: String) = semantics { contentDescription = text }
 
 @Composable
 fun SectionTitle(text: String, modifier: Modifier = Modifier) {
-    Text(text, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+    Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = modifier.padding(horizontal = ShelfSpacing.page, vertical = 12.dp).semantics { heading() })
 }
