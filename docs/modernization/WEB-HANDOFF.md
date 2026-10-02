@@ -57,6 +57,7 @@ from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` u
 | `f474124b` | A series longer than one page pages through all its books (it stopped at the first 24) |
 | `67192033` | Page keys pressed in an open reader dialog stay in the dialog instead of turning the page behind it |
 | `6ee58e3c` | Labels with a matching legacy string use its key, so every translated language gets them; seconds and minutes are formatted for the language; the player's cover link has a name; the search icon follows right-to-left layouts |
+| `f01daaeb` | From review: the bookmarks list shows loading and failure, podcast episodes offer no bookmarks (as in the legacy player), and two legacy keys that were not true equivalents are back to web strings |
 
 ## Checks
 
@@ -129,6 +130,11 @@ Phase 2 readiness commits, checked by the journeys they affect (logs in `web/qa/
 - On `6ee58e3c`: Biome and `tsc` clean, vitest 115 passed (`l10n-static.log`); in Chromium the playback, podcasts,
   browse, readers, settings, session, lists and item-actions journeys passed 53 of 53 (`phase2-chromium.log`); the
   bookmarks and dialog-keys journeys passed in Firefox and WebKit (`phase2-ff-webkit.log`).
+- Review fixes in `f01daaeb`: Biome and `tsc` clean, vitest 115 passed (`review-fixes-static.log`); the playback,
+  podcasts, lists and session journeys passed 25 of 25 in Chromium (`review-fixes-chromium.log`) and the bookmarks
+  journey in Firefox and WebKit (`review-fixes-ff-webkit.log`). Review also suggested that a click on a dialog's own
+  text could leave the page keys turning pages; a journey for it passed on the earlier source in all three engines
+  (`dialog-keys-body-red.log`), so nothing was changed and the journey was not kept.
 - Not rerun for these commits: the deployment, connect, statistics and OpenID journeys, whose code they do not touch.
 
 Every behaviour change since the first commit started from a failing test that was observed failing, then made to
@@ -198,6 +204,8 @@ Secondary gaps left open, none blocking a main workflow:
 - About 200 web-only strings (`web/src/i18n/web-strings.ts`) are English in every language, since no legacy string
   means the same. Page titles on the connect and OpenID return pages and client error messages
   (`src/lib/abs/client.ts`) are English too. The server-rendered `lang="en"` shows until the chosen language loads.
+- The bookmarks list does not mark the bookmark at the current time, and does not create a bookmark with a typed
+  title, as the legacy list does; creating stays a player button.
 - Routes have no titles of their own; the reader's arrows do not flip in right-to-left languages.
 - No journey covers a token refresh mid-session, a server under a subpath, or the message shown when the browser
   blocks autoplay.
