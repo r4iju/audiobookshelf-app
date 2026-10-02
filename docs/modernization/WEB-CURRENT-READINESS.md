@@ -1,6 +1,10 @@
 # Bounded web finishing pass, October 2, 2026
 
-Candidate software: `7b2a916c61c87a3533ca819d8b29c09bc7a7059e`, based on `d3152a5d`.
+Candidate software was checked at `7b2a916c61c87a3533ca819d8b29c09bc7a7059e`, originally based on `d3152a5d`.
+The PR is now rebased onto `f63b7906` (Android #123). Native provenance was regenerated against its actual merged
+tables: all 29 generated locale files are byte-identical to the checked candidate, coverage is unchanged, and
+30 source-table hashes changed. Only provenance changed under the implementation files. The existing package
+is retained; no second package or unit/build/browser repeat was performed for this update.
 No deployment or owner-library check was performed in this pass. Root owns merging and client-only promotion.
 The original acceptance criteria in SPEC.md and issues #55–65 remain in force. Native EPUB/MOBI/comics deferral
 applies to mobile; browser readers remain in scope.
@@ -48,7 +52,8 @@ acceptance remains open for reused text as well as future translations.
   115/115 unit tests across 17 files; `ABS_WEB_BASE_PATH=/web npm run build` passed. An initial final-check
   attempt stopped at TypeScript's canvas element narrowing errors before units/build; corrected before the
   successful candidate check. No broad browser repeat or extra engine sweep.
-- One root source review covered shared primary/companion rendering, authored rotation addition, viewport
+- The delivery root explicitly reported its fresh source review after the initial candidate, with no blocking
+  runtime issue. It covered shared primary/companion rendering, authored rotation addition, viewport
   link/text alignment, schema-checked persisted orientation, cancellation, exact translation mapping and
   language-loader fallback. No blocking finding remains. Frontend bars opened: state, types, components;
   `useEffect` hits at PDF lines 37, 139, 150 name the pdf.js/ResizeObserver external systems.
