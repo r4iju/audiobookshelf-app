@@ -13,6 +13,7 @@ import { PAGE_SIZE, useFilterData, useItems } from "@/lib/abs/queries";
 import type { FilterData, Library } from "@/lib/abs/schemas";
 import { useSettings, useSettingsStore } from "@/lib/settings/store";
 import { ItemCard } from "./cards";
+import { ListViewToggle } from "./list-view-toggle";
 import { Pager } from "./pager";
 import { useLibrary } from "./use-library";
 
@@ -77,6 +78,7 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
   const go = (change: Partial<BrowseState>) => router.push(hrefFor({ ...state, page: 1, ...change }));
   const total = items.data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const layout = settings.bookshelfListView ? "list" : "grid";
   const groups = filterGroups(t, mediaType, filterData.data?.filterdata);
 
   return (
@@ -148,6 +150,7 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
               }}
             />
           ) : null}
+          <ListViewToggle />
         </div>
       </header>
 
@@ -170,10 +173,10 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
           aria-busy={items.isPlaceholderData}
           className={items.isPlaceholderData ? "opacity-60 transition-opacity" : undefined}
         >
-          <CardGrid shape={shape} label={t("WebLibraryItems")}>
+          <CardGrid shape={shape} label={t("WebLibraryItems")} layout={layout}>
             {items.data.results.map((item) => (
               <li key={item.id}>
-                <ItemCard item={item} shape={shape} />
+                <ItemCard item={item} shape={shape} layout={layout} />
               </li>
             ))}
           </CardGrid>

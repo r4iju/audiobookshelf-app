@@ -1,13 +1,21 @@
 "use client";
 
-import { MediaCard } from "@/components/media/item-card";
+import { type CardLayout, MediaCard } from "@/components/media/item-card";
 import { useI18n } from "@/i18n/i18n";
-import { authorImageUrl, authorLine, type CoverShape, coverUrl } from "@/lib/abs/media";
+import { authorImageUrl, authorLine, type CoverShape, coverUrl, formatDuration } from "@/lib/abs/media";
 import { useEpisodeProgress, useItemProgress } from "@/lib/abs/queries";
 import type { Author, LibraryItem, Series } from "@/lib/abs/schemas";
 import { useAbs } from "@/lib/session/store";
 
-export function ItemCard({ item, shape }: { item: LibraryItem; shape: CoverShape }) {
+export function ItemCard({
+  item,
+  shape,
+  layout,
+}: {
+  item: LibraryItem;
+  shape: CoverShape;
+  layout?: CardLayout;
+}) {
   const { t } = useI18n();
   const { client } = useAbs();
   const episode = item.recentEpisode;
@@ -27,14 +35,24 @@ export function ItemCard({ item, shape }: { item: LibraryItem; shape: CoverShape
         progressLabel={t("LabelProgress")}
         finishedLabel={t("LabelFinished")}
         missingCoverLabel={t("WebNoCover")}
+        layout={layout}
       />
     );
   }
+  const numEpisodes = item.media.numEpisodes;
   return (
     <MediaCard
       href={episode ? `/item/${item.id}/episode/${episode.id}` : `/item/${item.id}`}
       title={episode ? episode.title : item.media.metadata.title}
       subtitle={episode ? item.media.metadata.title : authorLine(item)}
+      detail={
+        item.mediaType === "podcast"
+          ? numEpisodes
+            ? t("WebEpisodesCount", numEpisodes)
+            : undefined
+          : formatDuration(item.media.duration) || undefined
+      }
+      layout={layout}
       cover={coverUrl(client, item)}
       shape={shape}
       badge={

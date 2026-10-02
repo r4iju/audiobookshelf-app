@@ -7,7 +7,9 @@ import { EmptyState } from "@/components/ui/status";
 import { useI18n } from "@/i18n/i18n";
 import { encodeFilter } from "@/lib/abs/browse";
 import { PAGE_SIZE, useItems, useSeries, useSeriesList } from "@/lib/abs/queries";
+import { useSettings } from "@/lib/settings/store";
 import { ItemCard, SeriesCard } from "./cards";
+import { ListViewToggle } from "./list-view-toggle";
 import { Pager } from "./pager";
 import { useLibrary } from "./use-library";
 
@@ -64,22 +66,26 @@ export function SeriesDetail({
     false,
   );
   const pages = Math.max(1, Math.ceil((books.data?.total ?? 0) / PAGE_SIZE));
+  const layout = useSettings().bookshelfListView ? "list" : "grid";
   return (
     <div className="flex flex-col gap-6">
       <QueryState query={series}>
         {(data) => (
-          <header>
-            <p className="text-sm font-medium text-muted">{t("LabelSeries")}</p>
-            <h1 className="text-2xl font-bold tracking-tight lg:text-3xl">{data.name}</h1>
+          <header className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-muted">{t("LabelSeries")}</p>
+              <h1 className="text-2xl font-bold tracking-tight lg:text-3xl">{data.name}</h1>
+            </div>
+            <ListViewToggle />
           </header>
         )}
       </QueryState>
       <QueryState query={books}>
         {(data) => (
-          <CardGrid shape={shape} label={t("WebLibraryItems")}>
+          <CardGrid shape={shape} label={t("WebLibraryItems")} layout={layout}>
             {data.results.map((item) => (
               <li key={item.id}>
-                <ItemCard item={item} shape={shape} />
+                <ItemCard item={item} shape={shape} layout={layout} />
               </li>
             ))}
           </CardGrid>

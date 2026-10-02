@@ -139,3 +139,37 @@ test("series can be collapsed into one card each on the bookshelf, and stay coll
   await page.getByLabel("Collapse Series").uncheck();
   await expect(page.getByText(`${all} items`)).toBeVisible();
 });
+
+test("the bookshelf and a series' books can be shown as a list with each book's length, and stay so", async ({
+  page,
+}) => {
+  const api = await serverApi(accounts.user);
+  const found = await api.call(
+    `/api/libraries/${qa.libraries.books}/search?q=${encodeURIComponent("The Long Tide")}`,
+  );
+  const tide = found.body.book[0].libraryItem;
+  const length = `${Math.floor(tide.media.duration / 60)}m`;
+  await signIn(page);
+  await page.goto(`/library/${qa.libraries.books}/items?sort=media.metadata.title&desc=1`);
+  const first = grid(page).getByRole("link").first();
+  await expect(first).toContainText("The Long Tide");
+  await expect(first).not.toContainText(length);
+
+  await page.getByRole("button", { name: "List view" }).click();
+  await expect(page.getByRole("button", { name: "List view" })).toHaveAttribute("aria-pressed", "true");
+  await expect(first).toContainText("The Long Tide");
+  await expect(first).toContainText(length);
+
+  await page.reload();
+  await expect(grid(page).getByRole("link").first()).toContainText(length);
+
+  const series = (await api.call(`/api/libraries/${qa.libraries.books}/series?limit=100`)).body.results.find(
+    (entry: { books: { media: { duration: number } }[] }) =>
+      entry.books.length > 1 && entry.books.every((book) => book.media.duration > 0),
+  );
+  await page.goto(`/library/${qa.libraries.books}/series/${series.id}`);
+  await expect(page.getByRole("button", { name: "List view" })).toHaveAttribute("aria-pressed", "true");
+  await expect(grid(page).getByRole("link").first()).toContainText(/\d+[hms](?![a-z])/);
+  await page.getByRole("button", { name: "List view" }).click();
+  await expect(grid(page).getByRole("link").first()).not.toContainText(/\d+[hms](?![a-z])/);
+});

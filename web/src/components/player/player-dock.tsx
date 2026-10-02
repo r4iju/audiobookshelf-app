@@ -113,6 +113,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               title={media.title}
               shape="square"
               missingLabel={t("WebNoCover")}
+              compact
               className="rounded-lg"
             />
           </Link>
