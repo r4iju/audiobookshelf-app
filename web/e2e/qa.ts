@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { z } from "zod";
 
 const stateSchema = z.object({
@@ -56,8 +56,14 @@ export async function serverApi(account: Account) {
   return { token, call };
 }
 
+/** The path the client is mounted under, such as /web behind a proxy; empty when it serves from the root. */
+export const clientPath = new URL(process.env.ABS_WEB_URL ?? "http://127.0.0.1:19881").pathname.replace(
+  /\/+$/,
+  "",
+);
+
 export async function signIn(page: Page, account: Account = accounts.user, serverUrl = qa.origin) {
-  await page.goto("/connect");
+  await page.goto(`${clientPath}/connect`);
   await page.getByLabel("Server address").fill(serverUrl);
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByLabel("Username").fill(account.username);
@@ -77,4 +83,13 @@ export async function itemIdByTitle(title: string) {
 export async function clearProgress(api: Awaited<ReturnType<typeof serverApi>>, itemId: string) {
   const progress = await api.call(`/api/me/progress/${itemId}`);
   if (progress.body?.id) await api.call(`/api/me/progress/${progress.body.id}`, { method: "DELETE" });
+}
+
+/** Chooses from one of the app's selects as a person does: opens the labelled field's list and picks by name. */
+export async function choose(scope: Page | Locator, label: string, option: string) {
+  const page = "keyboard" in scope ? scope : scope.page();
+  await scope.getByRole("combobox", { name: label }).click();
+  const list = page.getByRole("listbox");
+  await list.getByRole("option", { name: option, exact: true }).click();
+  await expect(list).toBeHidden();
 }

@@ -9,8 +9,9 @@ import { AddToPlaylistDialog } from "@/components/lists/add-to-list";
 import { ProgressBar } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog, Dialog } from "@/components/ui/dialog";
-import { SelectField } from "@/components/ui/field";
+import { Checkbox } from "@/components/ui/field";
 import { QueryState } from "@/components/ui/query-state";
+import { SelectField } from "@/components/ui/select";
 import { EmptyState } from "@/components/ui/status";
 import { useI18n } from "@/i18n/i18n";
 import {
@@ -60,18 +61,13 @@ export function EpisodeList({ item }: { item: LibraryItem }) {
             <SelectField
               label={t("WebSortBy")}
               value={state.sort}
-              onChange={(event) => {
-                const sort = episodeSorts.find(([key]) => key === event.target.value)?.[0];
+              options={episodeSorts.map(([value, label]) => ({ value, label: t(label) }))}
+              onChange={(value) => {
+                const sort = episodeSorts.find(([key]) => key === value)?.[0];
                 if (sort) saveChoice({ podcastEpisodesOrderBy: sort });
               }}
               className="min-w-0 flex-1 sm:w-44 sm:flex-none"
-            >
-              {episodeSorts.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {t(label)}
-                </option>
-              ))}
-            </SelectField>
+            />
             <SortDirection
               desc={state.desc}
               onChange={(desc) => saveChoice({ podcastEpisodesOrderDesc: desc })}
@@ -80,18 +76,13 @@ export function EpisodeList({ item }: { item: LibraryItem }) {
           <SelectField
             label={t("WebFilterBy")}
             value={state.filter}
-            onChange={(event) => {
-              const filter = episodeFilters.find(([key]) => key === event.target.value)?.[0];
+            options={episodeFilters.map(([value, label]) => ({ value, label: t(label) }))}
+            onChange={(value) => {
+              const filter = episodeFilters.find(([key]) => key === value)?.[0];
               if (filter) saveChoice({ podcastEpisodesFilterBy: filter });
             }}
             className="w-full sm:w-44"
-          >
-            {episodeFilters.map(([value, label]) => (
-              <option key={value} value={value}>
-                {t(label)}
-              </option>
-            ))}
-          </SelectField>
+          />
           {admin && feedUrl ? (
             <Button onClick={() => setDialog({ kind: "feed", feedUrl })}>
               <RefreshCw aria-hidden className="size-4" />
@@ -318,14 +309,13 @@ function FindEpisodesDialog({
               <ul className="flex max-h-80 flex-col gap-1 overflow-y-auto">
                 {offered.map(({ episode, downloaded }, index) => (
                   <li key={episode.enclosure?.url ?? index}>
-                    <label className="flex items-start gap-3 rounded-xl px-2 py-2 hover:bg-surface-2 has-disabled:opacity-60">
-                      <input
-                        type="checkbox"
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-surface-2 has-disabled:cursor-not-allowed has-disabled:opacity-60">
+                      <Checkbox
                         name="episode"
                         value={index}
                         disabled={downloaded || !episode.enclosure}
                         defaultChecked={false}
-                        className="mt-1 size-4 accent-[var(--accent-strong)]"
+                        className="mt-0.5"
                       />
                       <span className="flex min-w-0 flex-col">
                         <span className="text-sm font-medium break-words">{episode.title}</span>

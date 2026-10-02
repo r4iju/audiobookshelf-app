@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { accounts, clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
+import { accounts, choose, clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
 
 type Api = Awaited<ReturnType<typeof serverApi>>;
 
@@ -74,7 +74,7 @@ test("podcast episodes keep their identity in playlists", async ({ page }) => {
   await signIn(page);
   await page.goto(`/item/${podcastId}`);
   const episodes = page.getByRole("region", { name: "Episodes" });
-  await episodes.getByLabel("Filter").selectOption({ label: "All" });
+  await choose(episodes, "Filter", "All");
   await episodes.getByRole("button", { name: "Add Episode 2: Evening 2 to playlist" }).click();
   const dialog = page.getByRole("dialog", { name: "Add to Playlist" });
   await dialog.getByLabel("New playlist").fill("Evening queue");

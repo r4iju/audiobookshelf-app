@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { accounts, qa, serverApi, signIn, stack } from "./qa";
+import { accounts, choose, qa, serverApi, signIn, stack } from "./qa";
 
 type Api = Awaited<ReturnType<typeof serverApi>>;
 
@@ -43,9 +43,9 @@ test("episodes sort and filter by progress, and an episode plays with its own pr
     .toEqual(["Episode 4: Evening 4", "Episode 3: Evening 3", "Episode 1: Evening 1"]);
   await expect(page.getByRole("button", { name: "Find new episodes" })).toHaveCount(0);
 
-  await episodes.getByLabel("Filter").selectOption({ label: "Complete" });
+  await choose(episodes, "Filter", "Complete");
   await expect.poll(() => episodeTitles(page)).toEqual(["Episode 2: Evening 2"]);
-  await episodes.getByLabel("Filter").selectOption({ label: "All" });
+  await choose(episodes, "Filter", "All");
   await episodes.getByRole("button", { name: "Ascending" }).click();
   await expect
     .poll(() => episodeTitles(page))
@@ -127,7 +127,7 @@ test("an administrator adds a podcast from its feed and downloads an episode on 
 
   await expect(page.getByLabel("Title")).toHaveValue("QA Feed Show");
   await expect(page.getByLabel("Author")).toHaveValue("QA Feed Studio");
-  await page.getByLabel("Folder").selectOption("/podcasts");
+  await choose(page, "Folder", "/podcasts");
   await page.getByRole("button", { name: "Create" }).click();
 
   await expect(page.getByRole("heading", { level: 1, name: "QA Feed Show" })).toBeVisible();

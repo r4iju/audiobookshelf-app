@@ -158,6 +158,8 @@ export const webStrings = {
   WebMoveDown: "Move down",
   WebRemoveFromCollection: "Remove from collection",
   WebAddToCollection: "Add to collection",
+  WebOpenInNewTab: "Open in new tab",
+  WebItemActions: "Actions for {0}",
   WebOrderSaved: "Order saved",
   WebAddPodcast: "Add podcast",
   WebFindNewEpisodes: "Find new episodes",

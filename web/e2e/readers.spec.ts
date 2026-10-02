@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { accounts, qa, serverApi, signIn } from "./qa";
+import { languages } from "../src/i18n/languages";
+import { accounts, choose, qa, serverApi, signIn } from "./qa";
 
 type Api = Awaited<ReturnType<typeof serverApi>>;
 
@@ -160,8 +161,8 @@ test("EPUB display settings apply to the text and are kept in this browser", asy
 
   await page.getByRole("button", { name: "Reader settings" }).click();
   const settings = page.getByRole("dialog", { name: "Reader settings" });
-  await settings.getByLabel("Theme").selectOption({ label: "Light" });
-  await settings.getByLabel("Font family").selectOption({ label: "Sans" });
+  await choose(settings, "Theme", "Light");
+  await choose(settings, "Font family", "Sans");
   await settings.getByLabel("Font scale").fill("150");
   await settings.getByRole("button", { name: "Close" }).click();
 
@@ -174,8 +175,8 @@ test("EPUB display settings apply to the text and are kept in this browser", asy
   await expect(book(page).locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await page.getByRole("button", { name: "Reader settings" }).click();
   await expect(settings.getByLabel("Font scale")).toHaveValue("150");
-  await settings.getByLabel("Theme").selectOption({ label: "Dark" });
-  await settings.getByLabel("Font family").selectOption({ label: "Serif" });
+  await choose(settings, "Theme", "Dark");
+  await choose(settings, "Font family", "Serif");
   await settings.getByLabel("Font scale").fill("100");
 });
 
@@ -334,13 +335,13 @@ test("MOBI books take the reader's display settings and cannot run scripts", asy
 
   await page.getByRole("button", { name: "Reader settings" }).click();
   const settings = page.getByRole("dialog", { name: "Reader settings" });
-  await settings.getByLabel("Theme").selectOption({ label: "Light" });
+  await choose(settings, "Theme", "Light");
   await settings.getByRole("button", { name: "Close" }).click();
   await expect(book(page).locator("p").first()).toHaveCSS("color", "rgb(0, 0, 0)");
   await expect(book(page).locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
 
   await page.getByRole("button", { name: "Reader settings" }).click();
-  await settings.getByLabel("Theme").selectOption({ label: "Dark" });
+  await choose(settings, "Theme", "Dark");
 });
 
 test("a damaged MOBI is reported as unreadable", async ({ page }) => {
@@ -459,13 +460,13 @@ test("arrow keys move within an open reader dialog without turning the page behi
   await expect(page.getByText("Page 1 of 12")).toBeVisible();
 });
 
-async function chooseLanguage(page: import("@playwright/test").Page, code: string) {
+async function chooseLanguage(page: import("@playwright/test").Page, code: "ar" | "he") {
   await page.getByRole("link", { name: "Settings", exact: true }).click();
-  await page.getByLabel("Language").selectOption(code);
+  await choose(page, "Language", languages[code]);
   await expect(page.locator("html")).toHaveAttribute("lang", code);
 }
 
-for (const code of ["ar", "he"]) {
+for (const code of ["ar", "he"] as const) {
   test(`in a right-to-left language (${code}), the reader's arrows, arrow keys and swipes follow the mirrored layout`, async ({
     page,
   }) => {

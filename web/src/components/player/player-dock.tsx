@@ -15,10 +15,11 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Cover } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
 import { InlineToggle } from "@/components/ui/field";
+import { SelectField } from "@/components/ui/select";
 import { Alert } from "@/components/ui/status";
 import { formatUnit, type Translate, useI18n } from "@/i18n/i18n";
 import { formatClock } from "@/lib/abs/media";
@@ -75,7 +76,6 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
   const createBookmark = useCreateBookmark();
   const expanded = settings.playerExpanded;
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
-  const ids = useId();
   const { media, currentTime, status } = player;
   const chapters = media.chapters;
   const chapterIndex = chapterIndexAt(chapters, currentTime);
@@ -186,19 +186,32 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               <SkipForward aria-hidden className="size-5 rtl:rotate-180" />
             </Button>
           </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            aria-expanded={expanded}
-            aria-label={expanded ? t("WebCollapsePlayer") : t("WebExpandPlayer")}
-            onClick={() => updateSettings({ playerExpanded: !expanded })}
-          >
-            {expanded ? (
-              <ChevronDown aria-hidden className="size-5" />
-            ) : (
-              <ChevronUp aria-hidden className="size-5" />
-            )}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-expanded={expanded}
+              aria-label={expanded ? t("WebCollapsePlayer") : t("WebExpandPlayer")}
+              onClick={() => updateSettings({ playerExpanded: !expanded })}
+            >
+              {expanded ? (
+                <ChevronDown aria-hidden className="size-5" />
+              ) : (
+                <ChevronUp aria-hidden className="size-5" />
+              )}
+            </Button>
+            <span aria-hidden className="h-6 w-px bg-line" />
+            <Button
+              size="icon"
+              variant="ghost"
+              className="text-muted hover:text-fg"
+              aria-label={t("LabelClosePlayer")}
+              title={t("LabelClosePlayer")}
+              onClick={() => void actions().stop()}
+            >
+              <X aria-hidden className="size-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 text-xs text-muted tabular-nums">
@@ -231,21 +244,14 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
         <div
           className={`${expanded ? "flex" : "hidden"} max-h-[min(24rem,30dvh)] flex-wrap items-end gap-3 overflow-y-auto p-1 -m-1`}
         >
-          <div className="flex flex-col gap-1 text-xs font-medium">
-            <label htmlFor={`${ids}-speed`}>{t("LabelPlaybackSpeed")}</label>
-            <select
-              id={`${ids}-speed`}
-              value={String(speed)}
-              onChange={(event) => updateSettings({ playbackRate: Number(event.target.value) })}
-              className="min-h-9 rounded-lg border border-line bg-surface px-2 text-sm focus-ring"
-            >
-              {rateOptions.map((rate) => (
-                <option key={rate} value={String(rate)}>
-                  {rate}×
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            size="sm"
+            label={t("LabelPlaybackSpeed")}
+            value={String(speed)}
+            options={rateOptions.map((rate) => ({ value: String(rate), label: `${rate}×` }))}
+            onChange={(rate) => updateSettings({ playbackRate: Number(rate) })}
+            className="min-w-24"
+          />
           <div className="flex gap-1">
             <Button
               size="sm"
@@ -264,33 +270,30 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               +
             </Button>
           </div>
-          <div className="flex flex-col gap-1 text-xs font-medium">
-            <label htmlFor={`${ids}-sleep`}>{t("LabelSleepTimer")}</label>
-            <select
-              id={`${ids}-sleep`}
-              value={sleepValue(sleep)}
-              onChange={(event) => {
-                const value = event.target.value;
-                if (value === "off") actions().setSleep({ kind: "off" });
-                else if (value === "chapter" && chapter)
-                  actions().setSleep({ kind: "chapter-end", at: chapter.end });
-                else if (value !== "running")
-                  actions().setSleep({ kind: "until", endsAt: Date.now() + Number(value) * 60_000 });
-              }}
-              className="min-h-9 rounded-lg border border-line bg-surface px-2 text-sm focus-ring"
-            >
-              <option value="off">{t("LabelOff")}</option>
-              {sleep.kind === "until" ? (
-                <option value="running">{t("WebSleepTimerActive", formatClock(sleepRemaining))}</option>
-              ) : null}
-              {sleepPresetsMinutes.map((minutes) => (
-                <option key={minutes} value={String(minutes)}>
-                  {formatUnit(locale, minutes, "minute")}
-                </option>
-              ))}
-              {chapters.length ? <option value="chapter">{t("LabelEndOfChapter")}</option> : null}
-            </select>
-          </div>
+          <SelectField
+            size="sm"
+            label={t("LabelSleepTimer")}
+            value={sleepValue(sleep)}
+            options={[
+              { value: "off", label: t("LabelOff") },
+              ...(sleep.kind === "until"
+                ? [{ value: "running", label: t("WebSleepTimerActive", formatClock(sleepRemaining)) }]
+                : []),
+              ...sleepPresetsMinutes.map((minutes) => ({
+                value: String(minutes),
+                label: formatUnit(locale, minutes, "minute"),
+              })),
+              ...(chapters.length ? [{ value: "chapter", label: t("LabelEndOfChapter") }] : []),
+            ]}
+            onChange={(value) => {
+              if (value === "off") actions().setSleep({ kind: "off" });
+              else if (value === "chapter" && chapter)
+                actions().setSleep({ kind: "chapter-end", at: chapter.end });
+              else if (value !== "running")
+                actions().setSleep({ kind: "until", endsAt: Date.now() + Number(value) * 60_000 });
+            }}
+            className="min-w-32"
+          />
           {sleep.kind === "until" ? (
             <div className="flex gap-1">
               <Button
@@ -357,12 +360,6 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               {t("ToastBookmarkCreateFailed")}
             </span>
           ) : null}
-          <div className="ms-auto flex items-center gap-3">
-            <Button size="sm" variant="ghost" onClick={() => void actions().stop()}>
-              <X aria-hidden className="size-4" />
-              {t("LabelClosePlayer")}
-            </Button>
-          </div>
         </div>
       </div>
       {bookmarksOpen ? (

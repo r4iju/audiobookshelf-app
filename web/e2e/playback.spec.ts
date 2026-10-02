@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { expect, type Page, test } from "@playwright/test";
-import { clearProgress, itemIdByTitle, qa, serverApi, signIn, stack } from "./qa";
+import { choose, clearProgress, itemIdByTitle, qa, serverApi, signIn, stack } from "./qa";
 
 // "The Long Tide": three 30 s MP3 files, one chapter per file. Chromium plays MP3 natively.
 
@@ -80,7 +80,7 @@ test("the sleep timer can stop at the end of the chapter", async ({ page }) => {
   await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(0.5);
   await player(page).getByRole("slider", { name: "Seek" }).fill("26");
   await player(page).getByRole("button", { name: "Open full player" }).click();
-  await player(page).getByLabel("Sleep timer").selectOption({ label: "End of Chapter" });
+  await choose(player(page), "Sleep timer", "End of Chapter");
   await expect(player(page).getByRole("button", { name: "Play", exact: true })).toBeVisible({
     timeout: 15_000,
   });
@@ -96,12 +96,12 @@ test("speed and bookmarks are kept", async ({ page }) => {
   await page.getByRole("button", { name: /^Play/ }).click();
   await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(1);
   await player(page).getByRole("button", { name: "Open full player" }).click();
-  await player(page).getByLabel("Playback Speed", { exact: true }).selectOption("1.5");
+  await choose(player(page), "Playback Speed", "1.5×");
   await player(page).getByRole("button", { name: "Create Bookmark" }).click();
   await expect.poll(async () => (await api.call("/api/me")).body.bookmarks.length).toBe(1);
 
   await page.reload();
-  await expect(player(page).getByLabel("Playback Speed", { exact: true })).toHaveValue("1.5");
+  await expect(player(page).getByRole("combobox", { name: "Playback Speed" })).toHaveText("1.5×");
 });
 
 test("bookmarks are listed, take the player to their place, and can be renamed and removed", async ({
@@ -160,7 +160,7 @@ test("the time shown can follow the chapter, and elapsed time can ignore the spe
   await seek.fill("40");
   await expect.poll(() => position(page)).toBe(40);
   await player(page).getByRole("button", { name: "Open full player" }).click();
-  await player(page).getByLabel("Playback Speed", { exact: true }).selectOption("2");
+  await choose(player(page), "Playback Speed", "2×");
 
   // The second of three chapters: the seek bar covers only it, and the times count within it.
   await player(page).getByLabel("Chapter Track").check();

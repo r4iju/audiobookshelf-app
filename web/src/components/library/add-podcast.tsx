@@ -7,8 +7,9 @@ import { z } from "zod";
 import { errorMessage } from "@/components/app/errors";
 import { MediaRow } from "@/components/media/media-row";
 import { Button } from "@/components/ui/button";
-import { SelectField, TextField, Toggle } from "@/components/ui/field";
+import { TextField, Toggle } from "@/components/ui/field";
 import { QueryState } from "@/components/ui/query-state";
+import { SelectField } from "@/components/ui/select";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
 import { useI18n } from "@/i18n/i18n";
 import { AbsError } from "@/lib/abs/client";
@@ -228,13 +229,13 @@ function NewPodcastForm({
         />
       </div>
       <TextField label={t("LabelFeedURL")} value={metadata.feedUrl ?? feedUrl} readOnly />
-      <SelectField label={t("LabelFolder")} name="folderId" defaultValue={initial.folderId} required>
-        {library.folders.map((entry) => (
-          <option key={entry.id} value={entry.id}>
-            {entry.fullPath}
-          </option>
-        ))}
-      </SelectField>
+      <SelectField
+        label={t("LabelFolder")}
+        name="folderId"
+        defaultValue={initial.folderId}
+        required
+        options={library.folders.map((entry) => ({ value: entry.id, label: entry.fullPath }))}
+      />
       <p className="text-sm text-muted break-all">
         {path ? t("WebPodcastSavedTo", path) : t("WebNoPodcastFolder")}
       </p>
