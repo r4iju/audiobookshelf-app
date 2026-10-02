@@ -16,3 +16,7 @@ Private evidence: `/Volumes/ai-ssd/code/audiobookshelf-delivery/2026-10-03/reade
 - T3 `preview_press` returned an automation client error for PageDown, Tab and Escape, including after retry/open. These attempts are not keyboard success evidence. Retained reader keyboard/offline/audio/other-format evidence on unchanged engines remains applicable; no new complete format matrix is claimed.
 
 Physical Safari/VoiceOver, native-speaker approval and actual owner migration/cutover remain unverified. The owner's current physical-check deferral does not waive translation quality, synthetic migration correctness or safe cutover. Existing preservation contracts, associations, unknown locations, queued progress and legacy fallback are unchanged. Root coordinates fresh independent review, packaging and production deployment; this branch must not merge before that review.
+
+## Fresh review follow-up
+
+Independent review reproduced a missing initial English OAuth title: the English loader contains legacy strings only. Initial server strings now include the existing web English fallback before applying the selected bundle. English and German HTTP responses both contain their intended titles; focused TypeScript/Biome passed. The first manual assertion expected the heading rather than the metadata title and was corrected, without changing runtime behavior. No new tests were backfilled. Root coordinates the final merged-source image build; the earlier standalone candidate package predates this small fallback change.
