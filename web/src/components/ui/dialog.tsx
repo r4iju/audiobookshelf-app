@@ -1,6 +1,7 @@
 "use client";
 
-import { type ReactNode, useEffect, useId, useRef } from "react";
+import { type ReactNode, useEffect, useId, useState } from "react";
+import { PopupLayer } from "./popup";
 
 /** A modal built on the native dialog element: focus trapping, Escape and the top layer come from the browser. */
 export function Dialog({
@@ -14,31 +15,32 @@ export function Dialog({
   title: string;
   children: ReactNode;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
   const titleId = useId();
 
   // External system: the dialog element's modal state.
   useEffect(() => {
-    const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
-  }, [open]);
+  }, [open, dialog]);
 
   return (
     <dialog
-      ref={ref}
+      ref={setDialog}
       onClose={onClose}
       aria-labelledby={titleId}
       className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-[var(--radius-card)] bg-surface p-0 text-fg shadow-2xl backdrop:bg-black/60"
     >
       {open ? (
-        <div className="flex flex-col gap-4 p-5">
-          <h2 id={titleId} className="text-lg font-semibold">
-            {title}
-          </h2>
-          {children}
-        </div>
+        <PopupLayer value={dialog}>
+          <div className="flex flex-col gap-4 p-5">
+            <h2 id={titleId} className="text-lg font-semibold">
+              {title}
+            </h2>
+            {children}
+          </div>
+        </PopupLayer>
       ) : null}
     </dialog>
   );

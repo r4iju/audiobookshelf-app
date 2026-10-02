@@ -4,7 +4,8 @@ import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { SelectField, TextField } from "@/components/ui/field";
+import { TextField } from "@/components/ui/field";
+import { SelectField } from "@/components/ui/select";
 import { useI18n } from "@/i18n/i18n";
 import {
   type ReaderNumber,
@@ -30,20 +31,22 @@ export function ReaderSettingsDialog({ onClose, paged }: { onClose: () => void; 
         <SelectField
           label={t("LabelTheme")}
           value={reader.theme}
-          onChange={(event) => change({ theme: shape.theme.parse(event.target.value) })}
-        >
-          <option value="dark">{t("LabelThemeDark")}</option>
-          <option value="black">{t("LabelThemeBlack")}</option>
-          <option value="light">{t("LabelThemeLight")}</option>
-        </SelectField>
+          options={[
+            { value: "dark", label: t("LabelThemeDark") },
+            { value: "black", label: t("LabelThemeBlack") },
+            { value: "light", label: t("LabelThemeLight") },
+          ]}
+          onChange={(theme) => change({ theme: shape.theme.parse(theme) })}
+        />
         <SelectField
           label={t("LabelFontFamily")}
           value={reader.font}
-          onChange={(event) => change({ font: shape.font.parse(event.target.value) })}
-        >
-          <option value="serif">{t("LabelFontFamilySerif")}</option>
-          <option value="sans-serif">{t("LabelFontFamilySans")}</option>
-        </SelectField>
+          options={[
+            { value: "serif", label: t("LabelFontFamilySerif") },
+            { value: "sans-serif", label: t("LabelFontFamilySans") },
+          ]}
+          onChange={(font) => change({ font: shape.font.parse(font) })}
+        />
         <NumberSetting
           name="fontScale"
           label={t("LabelFontScale")}
@@ -66,11 +69,12 @@ export function ReaderSettingsDialog({ onClose, paged }: { onClose: () => void; 
           <SelectField
             label={t("LabelLayout")}
             value={reader.spread}
-            onChange={(event) => change({ spread: shape.spread.parse(event.target.value) })}
-          >
-            <option value="none">{t("LabelLayoutSinglePage")}</option>
-            <option value="auto">{t("LabelLayoutAuto")}</option>
-          </SelectField>
+            options={[
+              { value: "none", label: t("LabelLayoutSinglePage") },
+              { value: "auto", label: t("LabelLayoutAuto") },
+            ]}
+            onChange={(spread) => change({ spread: shape.spread.parse(spread) })}
+          />
         ) : null}
       </div>
       <div className="flex justify-end">

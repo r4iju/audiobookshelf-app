@@ -4,7 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { errorMessage } from "@/components/app/errors";
 import { CardGrid } from "@/components/media/item-card";
 import { Button } from "@/components/ui/button";
-import { InlineToggle, SelectField } from "@/components/ui/field";
+import { InlineToggle } from "@/components/ui/field";
+import { SelectField } from "@/components/ui/select";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
 import { type Translate, useI18n } from "@/i18n/i18n";
 import { type BrowseState, browseToParams, encodeFilter, naturalDesc, sortsFor } from "@/lib/abs/browse";
@@ -107,35 +108,20 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
             <SelectField
               label={t("WebSortBy")}
               value={state.sort}
-              onChange={(event) => go({ sort: event.target.value, desc: naturalDesc(event.target.value) })}
+              options={sortsFor(mediaType).map(([value, label]) => ({ value, label: t(label) }))}
+              onChange={(sort) => go({ sort, desc: naturalDesc(sort) })}
               className="min-w-0 flex-1 sm:w-48 sm:flex-none"
-            >
-              {sortsFor(mediaType).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {t(label)}
-                </option>
-              ))}
-            </SelectField>
+            />
             <SortDirection desc={state.desc} onChange={(desc) => go({ desc })} />
           </div>
           <div className="flex w-full items-end gap-2 sm:w-auto">
             <SelectField
               label={t("WebFilterBy")}
               value={state.filter ?? ""}
-              onChange={(event) => go({ filter: event.target.value || null })}
+              options={[{ value: "", label: t("LabelAll") }, ...groups]}
+              onChange={(filter) => go({ filter: filter || null })}
               className="min-w-0 flex-1 sm:w-48 sm:flex-none"
-            >
-              <option value="">{t("LabelAll")}</option>
-              {groups.map((group) => (
-                <optgroup key={group.label} label={group.label}>
-                  {group.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </SelectField>
+            />
             <ListViewToggle />
           </div>
         </div>

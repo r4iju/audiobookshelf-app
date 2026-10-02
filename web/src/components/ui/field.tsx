@@ -27,29 +27,6 @@ export function TextField({
   );
 }
 
-export function SelectField({
-  label,
-  className = "",
-  children,
-  ...props
-}: ComponentProps<"select"> & { label: string }) {
-  const id = useId();
-  return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label htmlFor={id} className="text-sm font-medium">
-        {label}
-      </label>
-      <select
-        id={id}
-        className="min-h-11 rounded-xl border border-line bg-surface px-3 text-base text-fg focus-ring"
-        {...props}
-      >
-        {children}
-      </select>
-    </div>
-  );
-}
-
 export function Toggle({
   label,
   help,

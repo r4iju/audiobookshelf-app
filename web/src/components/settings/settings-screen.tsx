@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { SelectField, TextField, Toggle } from "@/components/ui/field";
+import { TextField, Toggle } from "@/components/ui/field";
 import { Section } from "@/components/ui/section";
+import { SelectField } from "@/components/ui/select";
 import { formatUnit, useI18n } from "@/i18n/i18n";
 import { isLanguageCode, languages } from "@/i18n/languages";
 import { clientVersion } from "@/lib/device";
@@ -29,27 +30,23 @@ export function SettingsScreen() {
           <SelectField
             label={t("LabelTheme")}
             value={settings.theme}
-            onChange={(event) => update({ theme: settingsSchema.shape.theme.parse(event.target.value) })}
-          >
-            <option value="system">{t("WebThemeSystem")}</option>
-            <option value="dark">{t("LabelThemeDark")}</option>
-            <option value="black">{t("LabelThemeBlack")}</option>
-            <option value="light">{t("LabelThemeLight")}</option>
-          </SelectField>
+            options={[
+              { value: "system", label: t("WebThemeSystem") },
+              { value: "dark", label: t("LabelThemeDark") },
+              { value: "black", label: t("LabelThemeBlack") },
+              { value: "light", label: t("LabelThemeLight") },
+            ]}
+            onChange={(theme) => update({ theme: settingsSchema.shape.theme.parse(theme) })}
+          />
           <SelectField
             label={t("LabelLanguage")}
             value={settings.language ?? ""}
-            onChange={(event) =>
-              update({ language: isLanguageCode(event.target.value) ? event.target.value : null })
-            }
-          >
-            <option value="">{t("WebLanguageServerDefault")}</option>
-            {Object.entries(languages).map(([code, name]) => (
-              <option key={code} value={code} lang={code}>
-                {name}
-              </option>
-            ))}
-          </SelectField>
+            options={[
+              { value: "", label: t("WebLanguageServerDefault") },
+              ...Object.entries(languages).map(([code, name]) => ({ value: code, label: name, lang: code })),
+            ]}
+            onChange={(code) => update({ language: isLanguageCode(code) ? code : null })}
+          />
         </div>
         <Toggle
           label={t("WebReduceMotion")}
@@ -62,26 +59,22 @@ export function SettingsScreen() {
         <div className="grid gap-4 sm:grid-cols-2">
           <SelectField
             label={t("LabelJumpBackwardsTime")}
-            value={settings.jumpBackwardsTime}
-            onChange={(event) => update({ jumpBackwardsTime: jumpChoice.parse(event.target.value) })}
-          >
-            {jumpTimes.map((seconds) => (
-              <option key={seconds} value={seconds}>
-                {formatUnit(locale, seconds, "second")}
-              </option>
-            ))}
-          </SelectField>
+            value={String(settings.jumpBackwardsTime)}
+            options={jumpTimes.map((seconds) => ({
+              value: String(seconds),
+              label: formatUnit(locale, seconds, "second"),
+            }))}
+            onChange={(seconds) => update({ jumpBackwardsTime: jumpChoice.parse(seconds) })}
+          />
           <SelectField
             label={t("LabelJumpForwardsTime")}
-            value={settings.jumpForwardTime}
-            onChange={(event) => update({ jumpForwardTime: jumpChoice.parse(event.target.value) })}
-          >
-            {jumpTimes.map((seconds) => (
-              <option key={seconds} value={seconds}>
-                {formatUnit(locale, seconds, "second")}
-              </option>
-            ))}
-          </SelectField>
+            value={String(settings.jumpForwardTime)}
+            options={jumpTimes.map((seconds) => ({
+              value: String(seconds),
+              label: formatUnit(locale, seconds, "second"),
+            }))}
+            onChange={(seconds) => update({ jumpForwardTime: jumpChoice.parse(seconds) })}
+          />
         </div>
         <Toggle
           label={t("LabelDisableAutoRewind")}
