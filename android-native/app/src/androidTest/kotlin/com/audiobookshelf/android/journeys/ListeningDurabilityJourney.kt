@@ -33,7 +33,7 @@ class ListeningDurabilityJourney {
             try {
                 // Device storage refuses writes exactly while the title is stopped and handed back.
                 check(files.setWritable(false, false))
-                compose.tap("player-close")
+                compose.closePlayer()
                 Thread.sleep(2_000)
             } finally {
                 files.setWritable(true, true)

@@ -54,7 +54,7 @@ class PlaybackJourney {
             compose.tap("play-pause")
             compose.waitForTag("player-paused")
             eventually(20_000) { reports().any { it.getString("path") == "/api/session/local-all" && it.getDouble("timeListened") > 0 } }
-            compose.tap("player-close")
+            compose.closePlayer()
             compose.waitUntil(10_000) { !compose.isShown("mini-player") && !compose.isShown("player-screen") }
             eventually(10_000) { Fixture.requests().any { it.getString("path").matches(Regex("/api/session/session-\\d+/close")) } }
         }

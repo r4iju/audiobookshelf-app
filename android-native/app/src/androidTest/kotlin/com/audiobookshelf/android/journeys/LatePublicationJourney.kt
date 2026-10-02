@@ -59,7 +59,7 @@ class LatePublicationJourney {
             compose.waitUntil(10_000) { compose.shownSeconds() >= 0 }
             val start = compose.shownSeconds()
             compose.waitForSeconds(start + 4)
-            compose.tap("player-close")
+            compose.closePlayer()
             eventually(20_000) { heldLate() }
             // The lost write is sent again, and that copy is acknowledged.
             eventually(30_000) { sessions("book-0").any { it.optDouble("currentTime") >= start + 3 } }
@@ -91,7 +91,7 @@ class LatePublicationJourney {
             compose.tap("play-pause")
             compose.waitForTag("player-playing", 15_000)
             compose.waitForSeconds(compose.shownSeconds() + 5)
-            compose.tap("player-close")
+            compose.closePlayer()
             eventually(40_000) { lateApplied() > 0 }
             Thread.sleep(2_000)
             val listened = sessions("book-0").sumOf { it.optDouble("timeListening") }

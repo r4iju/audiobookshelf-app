@@ -24,7 +24,7 @@ class ProgressResetJourney {
         waitUntil(10_000) { shownSeconds() >= 0 }
         val start = shownSeconds()
         waitForSeconds(start + 4)
-        tap("player-close")
+        closePlayer()
         return start
     }
 
@@ -120,7 +120,7 @@ class ProgressResetJourney {
             compose.waitForDiscard()
             if (played) {
                 Thread.sleep(2_000)
-                compose.tap("player-close")
+                compose.closePlayer()
                 eventually(60_000) {
                     Fixture.observations().getJSONArray("localSessions").objects().any { it.getString("libraryItemId") == "book-0" }
                 }

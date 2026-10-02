@@ -26,6 +26,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -166,6 +168,7 @@ private fun SignedIn(active: SessionState.Active) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Home(model: MainViewModel, active: SessionState.Active, open: (LibraryItem) -> Unit, openFiltered: (String, String) -> Unit) {
     val graph = LocalContext.current.graph
@@ -182,6 +185,13 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
                 IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, stringResource(R.string.title_accounts)) }
                 IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, stringResource(R.string.title_settings)) }
             }
+            else TopAppBar(
+                title = { Text(stringResource(if (tab == Tab.Search) R.string.tab_search else R.string.tab_downloads)) },
+                actions = {
+                    IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, stringResource(R.string.title_accounts)) }
+                    IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, stringResource(R.string.title_settings)) }
+                },
+            )
         },
         bottomBar = {
             Column {

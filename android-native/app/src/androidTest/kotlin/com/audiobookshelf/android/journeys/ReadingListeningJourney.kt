@@ -25,7 +25,7 @@ class ReadingListeningJourney {
             compose.waitUntil(10_000) { compose.shownSeconds() >= 0 }
             val start = compose.shownSeconds()
             compose.waitForSeconds(start + 4)
-            compose.tap("player-close")
+            compose.closePlayer()
             // Well past any clock difference between the emulator and the server.
             Thread.sleep(3_000)
             compose.tap("read-ebook")

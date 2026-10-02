@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -115,7 +116,7 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
             }
             DownloadStore.State.FAILED -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(record.error ?: stringResource(R.string.dl_failed), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("download-error"))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     OutlinedButton(onClick = { if (!graph.downloads.retry(record.id)) message = notSaved }, modifier = Modifier.testTag("download-retry")) { Icon(Icons.Outlined.Refresh, null); Text(stringResource(R.string.action_retry), Modifier.padding(start = 6.dp)) }
                     TextButton(onClick = { if (!graph.downloads.delete(record.id)) message = notSaved }) { Text(stringResource(R.string.dl_discard)) }
                 }
@@ -161,7 +162,7 @@ fun DownloadLocation(settings: DeviceSettings, change: ((DeviceSettings) -> Devi
         Text(if (settings.downloadFolder != null) stringResource(R.string.dl_folder_visible_to_other_apps)
             else stringResource(R.string.dl_folder_private_to_app),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             OutlinedButton(onClick = { choose.launch(null) }, modifier = Modifier.testTag("choose-download-folder")) {
                 Icon(Icons.Outlined.Folder, null); Text(stringResource(R.string.dl_choose_folder), Modifier.padding(start = 6.dp))
             }
@@ -271,51 +272,55 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
                     DownloadStore.State.FAILED -> "download-failed-$key"
                     else -> "downloading-$key"
                 }
-                Row(Modifier.fillMaxWidth().testTag(tag), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Cover(File(record.directory, "cover.jpg").takeIf { it.exists() }, record.title, Modifier.size(56.dp), podcast = record.mediaType == "podcast")
-                    Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
-                        Text(record.title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                        if (record.author.isNotBlank()) Text(record.author, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        when (record.state) {
-                            DownloadStore.State.COMPLETE -> if (record.id in missing) Text(stringResource(R.string.dl_some_files_missing), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                                else Text(formatBytes(record.bytes.takeIf { it > 0 } ?: record.total ?: 0).let { size -> record.folderName?.let { stringResource(R.string.dl_size_in_folder, size, it) } ?: size }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            DownloadStore.State.FAILED -> Text(record.error ?: stringResource(R.string.dl_failed), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                            else -> {
-                                val fraction = record.fraction()
-                                if (fraction != null) LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) else LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
-                                record.error?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                Column(Modifier.fillMaxWidth().testTag(tag), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Cover(File(record.directory, "cover.jpg").takeIf { it.exists() }, record.title, Modifier.size(56.dp), podcast = record.mediaType == "podcast")
+                        Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
+                            Text(record.title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            if (record.author.isNotBlank()) Text(record.author, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            when (record.state) {
+                                DownloadStore.State.COMPLETE -> if (record.id in missing) Text(stringResource(R.string.dl_some_files_missing), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                    else Text(formatBytes(record.bytes.takeIf { it > 0 } ?: record.total ?: 0).let { size -> record.folderName?.let { stringResource(R.string.dl_size_in_folder, size, it) } ?: size }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                DownloadStore.State.FAILED -> Text(record.error ?: stringResource(R.string.dl_failed), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                else -> {
+                                    val fraction = record.fraction()
+                                    if (fraction != null) LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) else LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
+                                    Text(record.error ?: if (fraction != null) stringResource(R.string.dl_downloading_percent, (fraction * 100).toInt()) else stringResource(R.string.dl_downloading), style = MaterialTheme.typography.bodySmall)
+                                }
                             }
                         }
                     }
-                    val readable = record.ebook?.takeIf { record.state == DownloadStore.State.COMPLETE && it.ebookFormat == "pdf" }
-                    if (readable != null) IconButton(
-                        onClick = { onRead(Route.Reader(record.itemId, readable.ebookFileId!!, supplementary = false, title = record.title, downloadId = record.id)) },
-                        modifier = Modifier.testTag("read-offline-$key"),
-                    ) { Icon(Icons.AutoMirrored.Outlined.MenuBook, stringResource(R.string.action_read, record.title)) }
-                    if (record.state == DownloadStore.State.COMPLETE && record.ebook != null && record.id !in missing) IconButton(
-                        onClick = { message = openElsewhere(context, graph, record); looked++ },
-                        modifier = Modifier.testTag("open-elsewhere-$key"),
-                    ) { Icon(Icons.AutoMirrored.Outlined.OpenInNew, stringResource(R.string.dl_open_in_another_app, record.title)) }
-                    when {
-                        record.id in missing -> IconButton(onClick = { message = if (graph.downloads.retry(record.id)) null else notSaved }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, stringResource(R.string.dl_download_again_named, record.title)) }
-                        record.state == DownloadStore.State.COMPLETE -> if (record.audio.isNotEmpty()) IconButton(
-                            onClick = {
-                                message = when {
-                                    graph.downloads.folderLost(record) -> folderLostMessage(context, record.folderName ?: context.getString(R.string.dl_the_chosen_folder), play = true)
-                                    graph.downloads.missing(record) -> context.getString(R.string.dl_files_missing_play)
-                                    else -> { graph.playback.play(graph.downloads.localSource(record, catalog.progressFor(record.itemId, record.episodeId))); null }
-                                }
-                                looked++
-                            },
-                            modifier = Modifier.testTag("play-offline-$key"),
-                        ) { Icon(Icons.Filled.PlayArrow, stringResource(R.string.dl_play_named, record.title)) }
-                        record.state == DownloadStore.State.FAILED -> IconButton(onClick = { message = if (graph.downloads.retry(record.id)) null else notSaved }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, stringResource(R.string.dl_retry_named, record.title)) }
-                        else -> IconButton(onClick = { message = if (graph.downloads.delete(record.id)) null else notSaved }, modifier = Modifier.testTag("cancel-download-$key")) { Icon(Icons.Outlined.Close, stringResource(R.string.dl_cancel_named, record.title)) }
+                    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        val readable = record.ebook?.takeIf { record.state == DownloadStore.State.COMPLETE && it.ebookFormat == "pdf" }
+                        if (readable != null) IconButton(
+                            onClick = { onRead(Route.Reader(record.itemId, readable.ebookFileId!!, supplementary = false, title = record.title, downloadId = record.id)) },
+                            modifier = Modifier.testTag("read-offline-$key"),
+                        ) { Icon(Icons.AutoMirrored.Outlined.MenuBook, stringResource(R.string.action_read, record.title)) }
+                        if (record.state == DownloadStore.State.COMPLETE && record.ebook != null && record.id !in missing) IconButton(
+                            onClick = { message = openElsewhere(context, graph, record); looked++ },
+                            modifier = Modifier.testTag("open-elsewhere-$key"),
+                        ) { Icon(Icons.AutoMirrored.Outlined.OpenInNew, stringResource(R.string.dl_open_in_another_app, record.title)) }
+                        when {
+                            record.id in missing -> OutlinedButton(onClick = { message = if (graph.downloads.retry(record.id)) null else notSaved }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, stringResource(R.string.dl_download_again_named, record.title)); Text(stringResource(R.string.action_download), Modifier.padding(start = 6.dp)) }
+                            record.state == DownloadStore.State.COMPLETE -> if (record.audio.isNotEmpty()) OutlinedButton(
+                                onClick = {
+                                    message = when {
+                                        graph.downloads.folderLost(record) -> folderLostMessage(context, record.folderName ?: context.getString(R.string.dl_the_chosen_folder), play = true)
+                                        graph.downloads.missing(record) -> context.getString(R.string.dl_files_missing_play)
+                                        else -> { graph.playback.play(graph.downloads.localSource(record, catalog.progressFor(record.itemId, record.episodeId))); null }
+                                    }
+                                    looked++
+                                },
+                                modifier = Modifier.testTag("play-offline-$key"),
+                            ) { Icon(Icons.Filled.PlayArrow, stringResource(R.string.dl_play_named, record.title)); Text(stringResource(R.string.action_play), Modifier.padding(start = 6.dp)) }
+                            record.state == DownloadStore.State.FAILED -> OutlinedButton(onClick = { message = if (graph.downloads.retry(record.id)) null else notSaved }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, stringResource(R.string.dl_retry_named, record.title)); Text(stringResource(R.string.action_retry), Modifier.padding(start = 6.dp)) }
+                            else -> TextButton(onClick = { message = if (graph.downloads.delete(record.id)) null else notSaved }, modifier = Modifier.testTag("cancel-download-$key")) { Icon(Icons.Outlined.Close, stringResource(R.string.dl_cancel_named, record.title)); Text(stringResource(R.string.action_cancel), Modifier.padding(start = 6.dp)) }
+                        }
+                        if (record.state != DownloadStore.State.QUEUED && record.state != DownloadStore.State.RUNNING) {
+                            IconButton(onClick = { removing = record }, modifier = Modifier.testTag("delete-download-$key")) { Icon(Icons.Outlined.Delete, stringResource(R.string.dl_remove_named, record.title)) }
+                        }
                     }
-                    if (record.state != DownloadStore.State.QUEUED && record.state != DownloadStore.State.RUNNING) {
-                        IconButton(onClick = { removing = record }, modifier = Modifier.testTag("delete-download-$key")) { Icon(Icons.Outlined.Delete, stringResource(R.string.dl_remove_named, record.title)) }
                     }
-                }
             }
         }
     }

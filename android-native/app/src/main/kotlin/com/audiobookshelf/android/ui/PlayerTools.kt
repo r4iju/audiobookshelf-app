@@ -2,6 +2,8 @@ package com.audiobookshelf.android.ui
 
 import com.audiobookshelf.android.R
 import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -57,13 +59,13 @@ private val sleepPresets = listOf(5, 10, 15, 30, 45, 60, 90)
 @Composable
 fun SleepSheet(engine: PlaybackEngine, state: PlayerState, onDismiss: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.sleep_timer), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
             val remaining = state.sleepRemaining
             if (remaining != null) {
                 Text(if (state.sleepEndOfChapter) stringResource(R.string.pl_sleep_stops_end_of_chapter, formatClock(remaining)) else stringResource(R.string.pl_sleep_stops_in, formatClock(remaining)),
                     style = MaterialTheme.typography.bodyLarge)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = { engine.adjustSleep(-300.0) }, modifier = Modifier.testTag("sleep-subtract")) { Text(stringResource(R.string.pl_sleep_minus_minutes, 5)) }
                     OutlinedButton(onClick = { engine.adjustSleep(300.0); onDismiss() }, modifier = Modifier.testTag("sleep-add")) { Text(stringResource(R.string.pl_sleep_plus_minutes, 5)) }
                     Button(onClick = { engine.cancelSleep(); onDismiss() }, modifier = Modifier.testTag("sleep-cancel")) { Text(stringResource(R.string.pl_sleep_turn_off)) }
@@ -103,8 +105,8 @@ fun BookmarksSheet(client: ApiClient, itemId: String, position: Double, onSeek: 
     }
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.bookmarks), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).semantics { heading() })
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.bookmarks), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
                 Button(onClick = { adding = true }, modifier = Modifier.testTag("add-bookmark")) { Text(stringResource(R.string.pl_bookmark_add_at, formatClock(position))) }
             }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("bookmark-error")) }
