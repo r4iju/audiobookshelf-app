@@ -50,6 +50,11 @@ export function translate(strings: Record<string, string> | null, locale: string
   };
 }
 
+/** A measure in the reader's language, such as "15 sec" or "5 min". */
+export function formatUnit(locale: string, value: number, unit: string) {
+  return new Intl.NumberFormat(locale, { style: "unit", unit, unitDisplay: "short" }).format(value);
+}
+
 export function I18nProvider({ code, children }: { code: LanguageCode; children: ReactNode }) {
   const [loaded, setLoaded] = useState<{ code: LanguageCode; strings: Record<string, string> } | null>(null);
 

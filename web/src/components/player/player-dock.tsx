@@ -19,7 +19,7 @@ import { useId, useState } from "react";
 import { Cover } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/status";
-import { type Translate, useI18n } from "@/i18n/i18n";
+import { formatUnit, type Translate, useI18n } from "@/i18n/i18n";
 import { formatClock } from "@/lib/abs/media";
 import { useCreateBookmark } from "@/lib/abs/mutations";
 import { type Player, type Sleep, usePlayer, usePlayerStore } from "@/lib/player/store";
@@ -66,7 +66,7 @@ export function PlayerDock({ fullWindow = false }: { fullWindow?: boolean }) {
 }
 
 function Dock({ player, pending, fullWindow }: { player: Active; pending: number; fullWindow: boolean }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const settings = useSettings();
   const updateSettings = useSettingsStore((state) => state.update);
   const sleep = usePlayerStore((state) => state.sleep);
@@ -102,7 +102,11 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 lg:px-6">
         {error ? <Alert>{error}</Alert> : null}
         <div className="flex items-center gap-3">
-          <Link href={`/item/${media.itemId}`} className="w-12 shrink-0 rounded-lg focus-ring">
+          <Link
+            href={`/item/${media.itemId}`}
+            aria-label={media.title}
+            className="w-12 shrink-0 rounded-lg focus-ring"
+          >
             <Cover
               src={media.coverUrl}
               title={media.title}
@@ -133,7 +137,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
             <Button
               size="icon"
               variant="ghost"
-              aria-label={t("WebJumpBack", `${settings.jumpBackwardsTime} s`)}
+              aria-label={t("WebJumpBack", formatUnit(locale, settings.jumpBackwardsTime, "second"))}
               onClick={() => actions().jump(-settings.jumpBackwardsTime)}
             >
               <RotateCcw aria-hidden className="size-5" />
@@ -155,7 +159,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
             <Button
               size="icon"
               variant="ghost"
-              aria-label={t("WebJumpForward", `${settings.jumpForwardTime} s`)}
+              aria-label={t("WebJumpForward", formatUnit(locale, settings.jumpForwardTime, "second"))}
               onClick={() => actions().jump(settings.jumpForwardTime)}
             >
               <RotateCw aria-hidden className="size-5" />
@@ -271,7 +275,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               ) : null}
               {sleepPresetsMinutes.map((minutes) => (
                 <option key={minutes} value={String(minutes)}>
-                  {minutes} min
+                  {formatUnit(locale, minutes, "minute")}
                 </option>
               ))}
               {chapters.length ? <option value="chapter">{t("LabelEndOfChapter")}</option> : null}
@@ -328,7 +332,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
           <div className="ms-auto flex items-center gap-3">
             <Button size="sm" variant="ghost" onClick={() => void actions().stop()}>
               <X aria-hidden className="size-4" />
-              {t("WebClose")}
+              {t("LabelClosePlayer")}
             </Button>
           </div>
         </div>

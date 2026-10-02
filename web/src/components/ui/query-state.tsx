@@ -16,7 +16,7 @@ export function QueryState<T>({
   children: (data: T) => ReactNode;
 }) {
   const { t } = useI18n();
-  if (query.isPending) return <Spinner label={t("WebLoading")} />;
+  if (query.isPending) return <Spinner label={t("MessageLoading")} />;
   if (query.isError) {
     return (
       <Alert

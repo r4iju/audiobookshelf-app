@@ -34,7 +34,7 @@ export function AddPodcast({ libraryId, q, feed }: { libraryId: string; q: strin
   const chosen = search.data?.find((result) => result.feedUrl === feedUrl);
   const hrefFor = (params: Record<string, string>) => `${pathname}?${new URLSearchParams(params)}`;
 
-  if (me.isPending || libraries.isPending) return <Spinner label={t("WebLoading")} />;
+  if (me.isPending || libraries.isPending) return <Spinner label={t("MessageLoading")} />;
   if (me.isError || libraries.isError) return <Alert>{errorMessage(t, me.error ?? libraries.error)}</Alert>;
   if (!library) return <Alert>{t("WebNotFound")}</Alert>;
   if (!isAdmin(me.data) || library.mediaType !== "podcast") return <Alert>{t("WebForbidden")}</Alert>;
@@ -48,7 +48,7 @@ export function AddPodcast({ libraryId, q, feed }: { libraryId: string; q: strin
           action={(form) => router.replace(hrefFor({ q: String(form.get("q") ?? "") }))}
         >
           <TextField
-            label={t("WebPodcastSearchLabel")}
+            label={t("MessagePodcastSearchField")}
             name="q"
             type="search"
             required
@@ -110,7 +110,7 @@ function FeedPreview({
 }) {
   const { t } = useI18n();
   const podcastFeed = usePodcastFeed(feedUrl);
-  if (podcastFeed.isPending) return <Spinner label={t("WebLoading")} />;
+  if (podcastFeed.isPending) return <Spinner label={t("MessageLoading")} />;
   // The server answers 404 or 400 when it cannot fetch or parse the feed; that is not a missing page here.
   if (podcastFeed.isError)
     return (
@@ -228,7 +228,7 @@ function NewPodcastForm({
         />
       </div>
       <TextField label={t("LabelFeedURL")} value={metadata.feedUrl ?? feedUrl} readOnly />
-      <SelectField label={t("WebFolder")} name="folderId" defaultValue={initial.folderId} required>
+      <SelectField label={t("LabelFolder")} name="folderId" defaultValue={initial.folderId} required>
         {library.folders.map((entry) => (
           <option key={entry.id} value={entry.id}>
             {entry.fullPath}
@@ -239,7 +239,7 @@ function NewPodcastForm({
         {path ? t("WebPodcastSavedTo", path) : t("WebNoPodcastFolder")}
       </p>
       <Toggle label={t("LabelAutoDownloadEpisodes")} name="autoDownloadEpisodes" />
-      <p className="text-sm text-muted">{t("WebEpisodesCount", feed.podcast.episodes.length)}</p>
+      <p className="text-sm text-muted">{t("LabelNumEpisodes", feed.podcast.episodes.length)}</p>
       {create.error ? <Alert>{errorMessage(t, create.error)}</Alert> : null}
       <div className="flex justify-end">
         <Button type="submit" variant="primary" disabled={!path || create.isPending}>

@@ -141,7 +141,7 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
       </header>
 
       {items.isPending ? (
-        <Spinner label={t("WebLoading")} />
+        <Spinner label={t("MessageLoading")} />
       ) : items.isError ? (
         <Alert
           action={

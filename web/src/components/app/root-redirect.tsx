@@ -19,7 +19,7 @@ export function RootRedirect() {
     if (session.phase === "signed-out") router.replace("/connect");
   }, [session.phase, router]);
 
-  if (session.phase !== "signed-in") return <Spinner label={t("WebLoading")} />;
+  if (session.phase !== "signed-in") return <Spinner label={t("MessageLoading")} />;
   return <LibraryRedirect connectionId={session.connection.id} />;
 }
 
@@ -37,5 +37,5 @@ function LibraryRedirect({ connectionId }: { connectionId: string }) {
 
   if (libraries.isError) return <Alert>{errorMessage(t, libraries.error)}</Alert>;
   if (libraries.isSuccess && !target) return <EmptyState title={t("WebNoLibraries")} />;
-  return <Spinner label={t("WebLoading")} />;
+  return <Spinner label={t("MessageLoading")} />;
 }

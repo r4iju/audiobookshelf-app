@@ -147,7 +147,7 @@ export function ListDetail({
           title={deletion.label}
           body={t("WebConfirm")}
           confirmLabel={t("WebDelete")}
-          cancelLabel={t("WebCancel")}
+          cancelLabel={t("ButtonCancel")}
           busy={busy}
           onClose={() => setConfirming(false)}
           onConfirm={() => {

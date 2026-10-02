@@ -69,7 +69,7 @@ export function ComicView({ file, start, onPlace }: ReaderViewProps) {
     };
   }, [file]);
 
-  if (opened.phase === "loading") return <Spinner label={t("WebLoading")} />;
+  if (opened.phase === "loading") return <Spinner label={t("MessageLoading")} />;
   if (opened.phase === "failed") return <Alert>{t("WebDocumentUnreadable")}</Alert>;
   return (
     <ComicPages
@@ -195,7 +195,7 @@ function ComicImage({ archive, path, page }: { archive: ComicArchive; path: stri
     };
   }, [archive, path]);
 
-  if (extracted.phase === "loading") return <Spinner label={t("WebLoading")} />;
+  if (extracted.phase === "loading") return <Spinner label={t("MessageLoading")} />;
   if (extracted.phase === "failed") return <Alert>{t("WebDocumentUnreadable")}</Alert>;
   return (
     <img

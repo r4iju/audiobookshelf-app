@@ -283,7 +283,7 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
           </div>
         ) : !loaded ? (
           <div className="absolute inset-0 bg-bg">
-            <Spinner label={t("WebLoading")} />
+            <Spinner label={t("MessageLoading")} />
           </div>
         ) : null}
       </div>

@@ -46,7 +46,7 @@ export function SignedInShell({ children }: { children: ReactNode }) {
     if (session.phase === "signed-out") router.replace("/connect");
   }, [session.phase, router]);
 
-  if (session.phase !== "signed-in") return <Spinner label={t("WebLoading")} />;
+  if (session.phase !== "signed-in") return <Spinner label={t("MessageLoading")} />;
   return <Shell key={session.connection.id}>{children}</Shell>;
 }
 
@@ -62,7 +62,7 @@ type Section = {
 };
 
 const sections: Section[] = [
-  { key: "home", phone: "bar", href: (id) => `/library/${id}`, label: "WebHome", icon: Home, for: "any" },
+  { key: "home", phone: "bar", href: (id) => `/library/${id}`, label: "ButtonHome", icon: Home, for: "any" },
   {
     key: "items",
     phone: "bar",
@@ -208,7 +208,7 @@ function Shell({ children }: { children: ReactNode }) {
 
             <nav aria-label={t("WebNavLibrary")} className="px-4 pt-3 lg:px-0 lg:pt-0">
               {libraries.isPending ? (
-                <p className="px-3 text-sm text-muted">{t("WebLoading")}</p>
+                <p className="px-3 text-sm text-muted">{t("MessageLoading")}</p>
               ) : libraries.isError ? (
                 <p className="px-3 text-sm text-danger">{errorMessage(t, libraries.error)}</p>
               ) : (
