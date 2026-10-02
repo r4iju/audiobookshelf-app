@@ -48,12 +48,14 @@
 "Duration" = "Продължителност";
 "Ebooks" = "Е-книги";
 "End of chapter" = "Край на глава";
+"Episode number" = "Епизод";
 "Episodes" = "Епизоди";
 "Explicit content" = "Експлицитно";
 "Feed slug" = "идентификатор на RSS емисия";
 "File created" = "Дата на създаване на файла";
 "File modified" = "Дата на модификация на файла";
 "File size" = "Размер";
+"Filename" = "Име на файла";
 "Finished" = "Дата на приключване";
 "Font" = "Шрифт";
 "Font size" = "Мащаб на шрифта";
@@ -112,6 +114,7 @@
 "Podcasts" = "Подкасти";
 "Prevent indexing" = "Предотвратете индексиране";
 "Progress" = "Прогрес";
+"Published date" = "Дата на публикуване";
 "Published year" = "Година на публикуване";
 "RSS feed" = "RSS емисия";
 "RSS feed URL" = "URL на емисия";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Скалируй изминалото време спрямо скоростта";
 "Search" = "Търси в";
+"Season" = "Сезон";
 "Select a device" = "Избери устройство";
 "Send ebook to device" = "Изпратете е-книга до устройство";
 "Series" = "От сериите";

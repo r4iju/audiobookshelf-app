@@ -44,10 +44,12 @@
 "Downloads" = "Tải Xuống";
 "Duration" = "Thời Lượng";
 "End of chapter" = "Kết Thúc Chương";
+"Episode number" = "Tập Phim";
 "Episodes" = "Tập Phim";
 "File created" = "Thời Gian Tạo Tập Tin";
 "File modified" = "Tập Tin Đã Sửa Đổi";
 "File size" = "Kích Thước";
+"Filename" = "Tên Tập Tin";
 "Finished" = "Hoàn Thành";
 "Font size" = "Tỷ Lệ Phông Chữ";
 "Forward interval" = "Nhảy Chuyển Tiếp Thời Gian";
@@ -100,6 +102,7 @@
 "Podcasts" = "Podcasts";
 "Prevent indexing" = "Ngăn Chặn Lập Chỉ Mục";
 "Progress" = "Tiến Độ";
+"Published date" = "Ngày Xuất Bản";
 "Published year" = "Năm Xuất Bản";
 "RSS feed URL" = "URL Feed";
 "RSS feed is open" = "RSS Feed đã được Mở";
@@ -110,6 +113,7 @@
 "Remove download" = "Xóa mục địa phương";
 "Scale elapsed time by speed" = "Tỷ Lệ Thời Gian Đã Trôi Theo Tốc Độ";
 "Search" = "Tìm Kiếm";
+"Season" = "Mùa";
 "Select a device" = "Chọn Một Thiết Bị";
 "Send ebook to device" = "Gửi Ebook đến Thiết Bị";
 "Series" = "Chuỗi";

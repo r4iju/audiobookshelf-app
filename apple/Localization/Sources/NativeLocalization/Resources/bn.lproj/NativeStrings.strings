@@ -48,12 +48,14 @@
 "Duration" = "সময়কাল";
 "Ebooks" = "ই-বইগুলো";
 "End of chapter" = "অধ্যায়ের সমাপ্তি";
+"Episode number" = "পর্ব";
 "Episodes" = "পর্ব";
 "Explicit content" = "অশ্লীল ভাষা";
 "Feed slug" = "আরএসএস ফিড স্লাগ";
 "File created" = "ফাইল জন্মের সময়";
 "File modified" = "ফাইল পরিবর্তিত";
 "File size" = "আকার";
+"Filename" = "ফাইলের নাম";
 "Finished" = "সমাপ্ত";
 "Font" = "ফন্টের ধরন";
 "Font size" = "ফন্ট স্কেল";
@@ -112,6 +114,7 @@
 "Podcasts" = "পডকাস্টগুলো";
 "Prevent indexing" = "সূচীকরণ প্রতিরোধ করুন";
 "Progress" = "প্রগতি";
+"Published date" = "প্রকাশের তারিখ";
 "Published year" = "প্রকাশের বছর";
 "RSS feed" = "আরএসএস ফিডগুলো";
 "RSS feed URL" = "ফিড ইউআরএল";
@@ -125,6 +128,7 @@
 "Sans serif" = "স্যান্স";
 "Scale elapsed time by speed" = "অতিবাহিত সময় গতি দ্বারা স্কেল করুন";
 "Search" = "অনুসন্ধান";
+"Season" = "সেশন";
 "Select a device" = "একটি ডিভাইস নির্বাচন করুন";
 "Send ebook to device" = "ডিভাইসে ইবুক পাঠান";
 "Series" = "সিরিজ";

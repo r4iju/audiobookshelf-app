@@ -48,12 +48,14 @@
 "Duration" = "Varighed";
 "Ebooks" = "E-bøger";
 "End of chapter" = "Slutningen af kapitel";
+"Episode number" = "Afsnit";
 "Episodes" = "Afsnit";
 "Explicit content" = "Voksenindhold";
 "Feed slug" = "RSS-feed-slug";
 "File created" = "Oprettelsestidspunkt for fil";
 "File modified" = "Fil ændret";
 "File size" = "Størrelse";
+"Filename" = "Filnavn";
 "Finished" = "Færdig";
 "Font" = "Skrifttypefamilie";
 "Font size" = "Skriftstørrelse";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcast";
 "Prevent indexing" = "Forhindr indeksering";
 "Progress" = "Fremskridt";
+"Published date" = "Udgivelsesdato";
 "Published year" = "Udgivelsesår";
 "RSS feed" = "RSS Feed";
 "RSS feed URL" = "Feed-URL";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Skalér Forløbet Tid med Hastighed";
 "Search" = "Søg";
+"Season" = "Sæson";
 "Select a device" = "Vælg en Enhed";
 "Send ebook to device" = "Send e-bog til enhed";
 "Series" = "Serie";

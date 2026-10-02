@@ -48,12 +48,14 @@
 "Duration" = "Duração";
 "Ebooks" = "E-books";
 "End of chapter" = "Fim do Capítulo";
+"Episode number" = "Episódio";
 "Episodes" = "Episódios";
 "Explicit content" = "Explícito";
 "Feed slug" = "Slug do Feed RSS";
 "File created" = "Criação do Arquivo";
 "File modified" = "Modificação do Arquivo";
 "File size" = "Tamanho";
+"Filename" = "Nome do Arquivo";
 "Finished" = "Concluído";
 "Font" = "Família de fontes";
 "Font size" = "Escala de fonte";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcasts";
 "Prevent indexing" = "Impedir Indexação";
 "Progress" = "Progresso";
+"Published date" = "Data de Publicação";
 "Published year" = "Ano de Publicação";
 "RSS feed" = "Feed RSS";
 "RSS feed URL" = "URL do Feed";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Proporcionalizar Tempo Decorrido com a Velocidade";
 "Search" = "Pesquisar";
+"Season" = "Temporada";
 "Select a device" = "Selecione um dispositivo";
 "Send ebook to device" = "Enviar Ebook para Dispositivo";
 "Series" = "Série";

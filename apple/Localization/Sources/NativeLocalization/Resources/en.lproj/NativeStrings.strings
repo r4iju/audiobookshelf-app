@@ -145,6 +145,7 @@
 "End of chapter" = "End of chapter";
 "Enter a complete HTTP or HTTPS RSS feed URL." = "Enter a complete HTTP or HTTPS RSS feed URL.";
 "Enter an http:// or https:// server address, without credentials, a query, or a fragment." = "Enter an http:// or https:// server address, without credentials, a query, or a fragment.";
+"Episode number" = "Episode number";
 "Episodes" = "Episodes";
 "Events stay on this device. Passwords, tokens and address credentials are removed before they are saved." = "Events stay on this device. Passwords, tokens and address credentials are removed before they are saved.";
 "Every playable title in this group is finished." = "Every playable title in this group is finished.";
@@ -158,6 +159,7 @@
 "File modified" = "File modified";
 "File size" = "File size";
 "File {0} of {1}" = "File {0} of {1}";
+"Filename" = "Filename";
 "Filter" = "Filter";
 "Filter episodes" = "Filter episodes";
 "Filter library" = "Filter library";
@@ -332,6 +334,7 @@
 "Previous year" = "Previous year";
 "Progress" = "Progress";
 "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart." = "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart.";
+"Published date" = "Published date";
 "Published year" = "Published year";
 "Queued" = "Queued";
 "Queueing on your server…" = "Queueing on your server…";
@@ -394,6 +397,7 @@
 "Search podcasts" = "Search podcasts";
 "Searching your library…" = "Searching your library…";
 "Searching…" = "Searching…";
+"Season" = "Season";
 "Secure sign-in could not be prepared. Try again." = "Secure sign-in could not be prepared. Try again.";
 "Seeking…" = "Seeking…";
 "Select a device" = "Select a device";

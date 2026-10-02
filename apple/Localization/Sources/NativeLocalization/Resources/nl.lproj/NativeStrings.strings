@@ -48,12 +48,14 @@
 "Duration" = "Duur";
 "Ebooks" = "Eboeken";
 "End of chapter" = "Einde van het Hoofdstuk";
+"Episode number" = "Aflevering";
 "Episodes" = "Afleveringen";
 "Explicit content" = "Expliciet";
 "Feed slug" = "RSS-feed slug";
 "File created" = "Aanmaaktijd bestand";
 "File modified" = "Bestand gewijzigd";
 "File size" = "Grootte";
+"Filename" = "Bestandsnaam";
 "Finished" = "Voltooid";
 "Font" = "Letterfamilie";
 "Font size" = "Lettertype schaal";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcasts";
 "Prevent indexing" = "Voorkom indexering";
 "Progress" = "Voortgang";
+"Published date" = "Publicatiedatum";
 "Published year" = "Jaar van uitgave";
 "RSS feed" = "RSS Feed";
 "RSS feed URL" = "Feed URL";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Schaal verstreken tijd per snelheid";
 "Search" = "Zoeken";
+"Season" = "Seizoen";
 "Select a device" = "Apparaat Selecteren";
 "Send ebook to device" = "Verzend Ebook naar Apparaat";
 "Series" = "Serie";

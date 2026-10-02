@@ -165,5 +165,9 @@
   "Connecting…": "MessageAttemptingServerConnection",
   "Connecting": "MessageAttemptingServerConnection",
   "Mark book finished?": "MessageConfirmMarkAsFinished",
-  "Not connected": "MessageAudiobookshelfServerNotConnected"
+  "Not connected": "MessageAudiobookshelfServerNotConnected",
+  "Published date": "LabelPubDate",
+  "Season": "LabelSeason",
+  "Episode number": "LabelEpisode",
+  "Filename": "LabelFilename"
 }

@@ -48,12 +48,14 @@
 "Duration" = "Längd";
 "Ebooks" = "E-böcker";
 "End of chapter" = "Kapitlets slut";
+"Episode number" = "Avsnitt";
 "Episodes" = "Avsnitt";
 "Explicit content" = "Vuxeninnehåll";
 "Feed slug" = "Slug för RSS-flödet";
 "File created" = "Skapad";
 "File modified" = "Ändrad";
 "File size" = "Storlek";
+"Filename" = "Filnamn";
 "Finished" = "Avslutad";
 "Font" = "Teckensnittsfamilj";
 "Font size" = "Teckenstorlek";
@@ -112,6 +114,7 @@
 "Podcasts" = "Poddar";
 "Prevent indexing" = "Förhindra indexering";
 "Progress" = "Förlopp";
+"Published date" = "Publiceringsdatum";
 "Published year" = "Utgivningsår";
 "RSS feed" = "RSS-flöde";
 "RSS feed URL" = "Flödets URL";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans serif";
 "Scale elapsed time by speed" = "Justera den visade uppspelningstiden efter uppspelningshastigheten.";
 "Search" = "Sök";
+"Season" = "Säsong";
 "Select a device" = "Välj en enhet";
 "Send ebook to device" = "Skicka e-bok till enhet";
 "Series" = "Serie";

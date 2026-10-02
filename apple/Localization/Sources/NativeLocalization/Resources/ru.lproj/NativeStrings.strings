@@ -48,12 +48,14 @@
 "Duration" = "Длительность";
 "Ebooks" = "E-книги";
 "End of chapter" = "Конец главы";
+"Episode number" = "Выпуск";
 "Episodes" = "Выпуски";
 "Explicit content" = "18+";
 "Feed slug" = "Ключевое слово RSS-ленты";
 "File created" = "Дата создания";
 "File modified" = "Дата модификации";
 "File size" = "Размер";
+"Filename" = "Имя файла";
 "Finished" = "Закончен";
 "Font" = "Семейство шрифта";
 "Font size" = "Масштаб шрифта";
@@ -112,6 +114,7 @@
 "Podcasts" = "Подкасты";
 "Prevent indexing" = "Запретить индексирование";
 "Progress" = "Прогресс";
+"Published date" = "Дата публикации";
 "Published year" = "Год публикации";
 "RSS feed" = "RSS-лента";
 "RSS feed URL" = "URL-адрес ленты";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Масштабирование затраченного времени по скорости";
 "Search" = "Поиск";
+"Season" = "Сезон";
 "Select a device" = "Выбор девайса";
 "Send ebook to device" = "Отправить e-книгу на устройство";
 "Series" = "Серия";
