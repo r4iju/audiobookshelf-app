@@ -159,6 +159,13 @@ Read-only, on 2026-10-02, without changing or restarting anything:
 
 No owner hostnames, addresses or account details are recorded here, since this repository is public.
 
+For a deployment beside an existing proxy, `web/deploy/existing-proxy.conf` is the one route to add, and
+`web/qa/smoke.mjs <origin>` is a read-only check of the result (GET requests only, no sign-in). The smoke check was
+run on 2026-10-02 against the QA deployment fixture only while Docker's storage was failing
+(`web/qa/.runtime/smoke-qa-deploy.log`): it reported the client's scripts and the server's interface answering 500,
+and the server's status and live channel answering. It was not run against a healthy deployment or the owner's
+server.
+
 ## Decisions and known differences
 
 - **Server 2.30.0 only.** OpenID needs the same origin, and a return address without a port. Port-addressed

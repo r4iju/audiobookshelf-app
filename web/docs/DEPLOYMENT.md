@@ -79,7 +79,20 @@ Run the client container on its own and add one route. The proxy must:
 - allow WebSocket upgrades for `/socket.io` (the live updates channel) and leave streams unbuffered with long
   timeouts.
 
-`deploy/nginx.conf` is a complete, commented example.
+`deploy/nginx.conf` is a complete, commented example. For nginx in Docker that already proxies the server:
+
+1. Start only the client, on the Docker network the proxy is on (the bundled proxy is not started):
+
+   ```sh
+   ABS_SERVER_NETWORK=<proxy's network> docker compose -f deploy/compose.yaml up --detach --build --wait abs-web
+   ```
+
+2. Include `deploy/existing-proxy.conf` in the proxy's `server` block for the server's host name, beside its
+   `location /`. Leave that location as it is.
+3. Check the configuration (`nginx -t`) and reload the proxy, then run the smoke check below.
+
+A proxy that passes `Host` as `$host` drops the port. That is fine on the default ports, but OpenID return
+addresses then lack any other port.
 
 ### The base path is fixed when the image is built
 
@@ -202,7 +215,10 @@ The journeys cover:
 - playback, a comic and a PDF over the one origin;
 - the client's own port: no framework header, and nothing outside `/web`.
 
-Against a real deployment, check by hand:
+Against a real deployment, `node qa/smoke.mjs https://abs.example` checks, with GET requests only and without
+signing in, that `/web/connect` answers without `x-powered-by` and loads its scripts from the same origin, that the
+server's `/status` and live updates channel answer through the proxy, and that the server's own interface still
+answers at `/`. Then check by hand:
 
 - `curl -I https://abs.example/web/connect` answers 200 without `x-powered-by`;
 - the server's own interface still signs in at `https://abs.example/`;
