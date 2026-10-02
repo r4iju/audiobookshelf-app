@@ -6,7 +6,7 @@ import XCTest
         app.buttons["Sleep timer"].tap()
         app.textFields["timer-seconds"].tap()
         app.textFields["timer-seconds"].typeText("3")
-        app.buttons["Start timer"].tap()
+        startTimer(app)
         waitForPanelToClose(app, "Sleep")
         app.buttons["Sleep timer"].tap()
         let extend = app.buttons["Add 5 minutes"]
@@ -80,7 +80,7 @@ import XCTest
         app.buttons["Sleep timer"].tap()
         app.textFields["timer-seconds"].tap()
         app.textFields["timer-seconds"].typeText("10")
-        app.buttons["Start timer"].tap()
+        startTimer(app)
         waitForPanelToClose(app, "Sleep")
         app.buttons["resume-playback"].tap()
         app.buttons["Sleep timer"].tap()
@@ -92,6 +92,16 @@ import XCTest
         XCTAssertEqual(fade.value as? String, "0")
         let restored = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Audio volume: 100%"), object: volume)
         await fulfillment(of: [restored], timeout: 3)
+    }
+    /// UI tests run with a hardware keyboard attached, so after typing, iPadOS minimizes the visible software keyboard on the
+    /// next touch and the Sleep sheet re-centres under it, losing the tap on Start. Return ends editing first, as it does for a
+    /// person typing on that keyboard, so Start is tapped where it is.
+    private func startTimer(_ app: XCUIApplication) {
+        app.textFields["timer-seconds"].typeText("\n")
+        let keyboard = app.keyboards.firstMatch
+        let hidden = expectation(for: NSPredicate { _, _ in !keyboard.exists || keyboard.frame.height == 0 }, evaluatedWith: keyboard)
+        XCTAssertEqual(XCTWaiter().wait(for: [hidden], timeout: 5), .completed, "Return hides the software keyboard")
+        app.buttons["Start timer"].tap()
     }
     private func openPlayer() async throws -> XCUIApplication {
         try await FixtureControl.configure("baseline")
@@ -204,7 +214,7 @@ import XCTest
         let duration = app.textFields["timer-seconds"]
         duration.tap()
         duration.typeText("3")
-        app.buttons["Start timer"].tap()
+        startTimer(app)
         app.buttons["resume-playback"].tap()
         app.buttons["Done"].tap()
         XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 8))

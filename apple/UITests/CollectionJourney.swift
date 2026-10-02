@@ -53,6 +53,7 @@ import XCTest
         let play = app.buttons[podcast ? "Play playlist" : "Play collection"]
         XCTAssertTrue(play.waitForExistence(timeout: 5))
         let initialRequests = try await fixtureRequests().count
+        addTeardownBlock { try await FixtureControl.configure("baseline") }
         try await FixtureControl.configure("offline-library")
         play.tap()
         XCTAssertTrue(app.buttons["mini-pause-playback"].waitForExistence(timeout: 5), "An available downloaded member must play while its server is unavailable")
