@@ -276,6 +276,23 @@ for (const { title, format } of [
   });
 }
 
+test("Tab is never held in one place by a MOBI book", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Night Ferry");
+  await resetProgress(api, id);
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeInViewport();
+  await page.getByRole("link", { name: "Back" }).focus();
+  const reached = new Set<string>();
+  for (let press = 0; press < 6; press++) {
+    await page.keyboard.press("Tab");
+    await page.waitForTimeout(100);
+    reached.add(await page.evaluate(() => document.activeElement?.outerHTML.slice(0, 80) ?? ""));
+  }
+  expect(reached.size).toBeGreaterThan(1);
+});
+
 test("MOBI books take the reader's display settings and cannot run scripts", async ({ page }) => {
   const api = await serverApi(accounts.user);
   const id = await bookId(api, "Night Ferry");
