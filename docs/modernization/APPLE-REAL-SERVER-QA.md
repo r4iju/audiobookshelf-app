@@ -140,7 +140,7 @@ It applies cleanly to the pinned file. It is not in the app, the owner's server 
 | Check | Pinned 2.30.0 | Candidate |
 | --- | --- | --- |
 | `concurrent-load-check.js` | exit 1, two objects | exit 0, one shared object |
-| `diag-race.sh`, 10 tries | 8 stale | 0 stale; every try shows the later load returning the cached object |
+| `diag-race.sh`, 10 tries, judged from each try's rows (the script's exit status is not a result) | 8 stale | 0 stale; every try's reads were finished, and each shows the later load returning the cached object |
 | native run, same cases and order as `97bac3e3` (`server-usercache/run-candidate.sh`) | `test4e` failed at `97bac3e3` (1 of 2 fresh runs) | all 8 cases exit 0, `test4e` included: 90.2 s, finished, at once and after a restart |
 
 The native run used the app at `386fed27`, whose `apple/` and `tvos/` are identical to `97bac3e3`, and the probes from `97bac3e3`. The image was the pinned `ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53…` with only `models/User.js` replaced. The file in the container had SHA-256 `b1480234…`, which is the pinned file (`2174eec7…`) with the patch applied (`server-usercache/native-candidate-tested.txt`). It met the failing run's precondition: the server had just started, the row was unfinished at 34.4 s from the TV, and the app's sync and socket reached the server 10 ms apart. A single native pass does not show the race was hit in that run; the controlled checks above are the proof (`native-candidate-output.txt`, `native-candidate-results.txt`, `native-candidate-server-long-tide.txt`).

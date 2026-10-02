@@ -5,6 +5,8 @@
 # before the finish was written, is stored last, the server keeps returning the earlier progress until it restarts.
 # Each try first sets an unfinished position, restarts, fires both requests at once, then reads the progress twice
 # and once more after a further restart. At most five tries.
+# Its exit status is not the result: the recorded runs are judged from the per-try rows (STALE lines and the
+# reads), as kept with the outputs. Request errors are not counted either.
 source "$(dirname "$0")/common.sh"
 resolve_ids || exit 1
 I=$ABS_RS_LONG_TIDE

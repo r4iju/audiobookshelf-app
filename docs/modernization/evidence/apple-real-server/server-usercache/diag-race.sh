@@ -7,6 +7,8 @@
 # and once more after a further restart. TRIES tries (default 5), all of them run. Against the owned diagnostic
 # container abs-apple-diag, whose models/User.js is instrumented with instrumentation-*.patch; the DIAG lines show
 # which user object each request used.
+# Its exit status is not the result: the recorded runs are judged from the per-try rows (STALE lines and the
+# reads), as kept with the outputs. Request errors are not counted either.
 source "$(dirname "$0")/common-diag.sh"
 resolve_ids || exit 1
 I=$ABS_RS_LONG_TIDE
