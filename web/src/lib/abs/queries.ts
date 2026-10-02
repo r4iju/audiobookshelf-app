@@ -49,8 +49,8 @@ export const keys = {
   ebook: (connectionId: string, path: string) => [connectionId, "ebook", path] as const,
   filterData: (connectionId: string, libraryId: string) =>
     [connectionId, "library", libraryId, "filterdata"] as const,
-  search: (connectionId: string, libraryId: string, q: string) =>
-    [connectionId, "library", libraryId, "search", q] as const,
+  search: (connectionId: string, libraryId: string, q: string, limit: number) =>
+    [connectionId, "library", libraryId, "search", q, limit] as const,
   seriesList: (connectionId: string, libraryId: string, page: number) =>
     [connectionId, "library", libraryId, "series", page] as const,
   series: (connectionId: string, libraryId: string, seriesId: string) =>
@@ -205,16 +205,41 @@ export function useFilterData(libraryId: string) {
   });
 }
 
-export function useSearch(libraryId: string, q: string) {
+/**
+ * Up to `limit` matches of each kind, with the limit they were found under. The server has no paging, so one more
+ * than that is asked for: `more` says some kind returned it, and a larger limit would show further matches.
+ */
+export function useSearch(libraryId: string, q: string, limit: number) {
   const { client, connection } = useAbs();
   return useQuery({
-    queryKey: keys.search(connection.id, libraryId, q),
-    queryFn: ({ signal }) =>
-      client.get(
-        `/api/libraries/${libraryId}/search?${new URLSearchParams({ q, limit: "12" })}`,
+    queryKey: keys.search(connection.id, libraryId, q, limit),
+    queryFn: async ({ signal }) => {
+      const found = await client.get(
+        `/api/libraries/${libraryId}/search?${new URLSearchParams({ q, limit: String(limit + 1) })}`,
         searchResultsSchema,
         signal,
-      ),
+      );
+      const kinds = [
+        found.book,
+        found.podcast,
+        found.series,
+        found.authors,
+        found.narrators,
+        found.tags,
+        found.genres,
+      ];
+      return {
+        book: found.book.slice(0, limit),
+        podcast: found.podcast.slice(0, limit),
+        series: found.series.slice(0, limit),
+        authors: found.authors.slice(0, limit),
+        narrators: found.narrators.slice(0, limit),
+        tags: found.tags.slice(0, limit),
+        genres: found.genres.slice(0, limit),
+        limit,
+        more: kinds.some((matches) => matches.length > limit),
+      };
+    },
     enabled: q.trim().length > 0,
     placeholderData: keepPreviousData,
   });
