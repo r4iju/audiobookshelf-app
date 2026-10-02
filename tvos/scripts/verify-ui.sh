@@ -2,17 +2,24 @@
 # Remote-driven tvOS journeys against owned synthetic fixtures on 20765 (HTTP) and 20767 (HTTPS): verification/fixture.py
 # extended with the 2.30 author and series endpoints by tvos/scripts/related_fixture.py.
 # Extra arguments pass to xcodebuild, for example -only-testing:TVJourneyTests/CatalogJourney.
-# ABS_TV_QA_SIMULATOR, ABS_TV_HTTP_PORT and ABS_TV_HTTPS_PORT let a parallel worktree use its own simulator and ports.
+# Without ABS_TV_QA_SIMULATOR the run leases a pooled Apple TV (`sim acquire tv`). ABS_TV_QA_SIMULATOR, ABS_TV_HTTP_PORT and ABS_TV_HTTPS_PORT let a parallel worktree use its own simulator and ports.
 set -euo pipefail
 tvos_root="$(cd "$(dirname "$0")/.." && pwd)"
 repo_root="$(cd "$tvos_root/.." && pwd)"
-simulator="${ABS_TV_QA_SIMULATOR:-00DD108F-2435-4FEC-9C37-3E62861A0EF6}"
+simulator="${ABS_TV_QA_SIMULATOR:-}"
+leased_simulator=""
+if [[ -z "$simulator" ]]; then
+    # Erased first so throwaway CAs from earlier runs are not still trusted.
+    simulator="$(sim acquire tv --fresh --no-boot --for "audiobookshelf tvOS verify-ui")"
+    leased_simulator="$simulator"
+fi
 export ABS_TV_HTTP_PORT="${ABS_TV_HTTP_PORT:-20765}" ABS_TV_HTTPS_PORT="${ABS_TV_HTTPS_PORT:-20767}"
 # xcodebuild hands TEST_RUNNER_ variables to the journeys without the prefix.
 export TEST_RUNNER_ABS_TV_HTTP_PORT="$ABS_TV_HTTP_PORT" TEST_RUNNER_ABS_TV_HTTPS_PORT="$ABS_TV_HTTPS_PORT"
 fixture_dir="$(mktemp -d)"
 fixture_pids=()
 cleanup() {
+    if [[ -n "$leased_simulator" ]]; then sim release "$leased_simulator" || true; fi
     for pid in ${fixture_pids[@]+"${fixture_pids[@]}"}; do kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true; done
     rm -rf "$fixture_dir"
 }
