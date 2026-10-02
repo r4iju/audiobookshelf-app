@@ -65,6 +65,46 @@ import XCTest
         XCTAssertEqual(try downloads.audio(relaunched).files.map { try Data(contentsOf: $0) }, [audio])
     }
 
+    func testSavingFailedDownloadAgainRestoresPDFWithoutDownloadingFinishedAudio() async throws {
+        let audio = AdoptionHarness.wav(seconds: 1, tone: 220)
+        let pdf = Data("%PDF-1.4 recovered companion".utf8)
+        let audioPath = "/abs/api/items/book-1/file/ino-1/download"
+        let pdfPath = "/abs/api/items/book-1/file/ino-pdf/download"
+        stub.route("GET", audioPath) { _ in .file(200, "audio/wav", audio) }
+        stub.route("GET", pdfPath) { _ in .status(503) }
+        let api = APIClient(store: credentials, session: stub.session())
+        try api.restoreSavedCredentials()
+        var downloads = store(api)
+        let item = try JSONDecoder().decode(LibraryItem.self, from: JSONSerialization.data(withJSONObject: ["id": "book-1", "mediaType": "book", "media": ["metadata": ["title": "Synthetic book"]]]))
+
+        serveItem(ebook: false)
+        await downloads.enqueue(item: item, episode: nil)
+        try await wait(downloads) { $0?.state == .ready }
+        XCTAssertEqual(downloads.visible.first?.state, .ready)
+        serveItem(ebook: true)
+        await downloads.enqueue(item: item, episode: nil)
+        try await wait(downloads) { $0?.state == .failed }
+        XCTAssertEqual(downloads.visible.first?.state, .failed)
+
+        stub.route("GET", pdfPath) { _ in .file(200, "application/pdf", pdf) }
+        await downloads.enqueue(item: item, episode: nil)
+        try await wait(downloads) { $0?.state == .ready }
+        let restored = try XCTUnwrap(downloads.visible.first)
+        XCTAssertEqual(restored.state, .ready, "Saving an existing failed download retries its unfinished parts")
+        XCTAssertNil(restored.error)
+        XCTAssertEqual(try downloads.audio(restored).files.map { try Data(contentsOf: $0) }, [audio])
+        XCTAssertEqual(try Data(contentsOf: downloads.ebookURL(restored)), pdf)
+        XCTAssertEqual(stub.requests("GET", audioPath).count, 1, "Completed audio is retained")
+        XCTAssertEqual(stub.requests("GET", pdfPath).count, 2)
+
+        downloads = store(api)
+        try await wait(downloads) { $0 != nil }
+        let relaunched = try XCTUnwrap(downloads.visible.first)
+        XCTAssertEqual(relaunched.state, .ready)
+        XCTAssertEqual(try downloads.audio(relaunched).files.map { try Data(contentsOf: $0) }, [audio])
+        XCTAssertEqual(try Data(contentsOf: downloads.ebookURL(relaunched)), pdf)
+    }
+
     /// A transfer the system could not write for a reason other than space, here a permission failure, must not be
     /// reported as a full device.
     func testFileWriteFailureWithoutAStorageCauseIsNotReportedAsInsufficientStorage() async throws {

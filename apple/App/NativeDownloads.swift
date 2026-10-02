@@ -245,6 +245,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                     policyBlocked = true
                     for (key, task) in tasks where key.hasPrefix(next[index].id + ":" + oldGeneration + ":") { task.cancel() }
                     next[index].generation = UUID().uuidString
+                    next[index].state = .queued; next[index].error = nil
                     next[index].cellularConsent = policy == .ask ? consent : nil; next[index].networkPolicy = policy.rawValue
                     try save(next)
                     policyBlocked = false
