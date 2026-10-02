@@ -2754,7 +2754,30 @@
       ],
       "preservation": "Preserve deferred-format files, associations, settings and locations during migration; validate opening/resume in the deferred reader tickets.",
       "browserScope": "unchanged",
-      "readiness": "Deferred mobile reader capabilities do not block Apple/Android readiness or downstream implementation."
+      "readiness": "Deferred mobile reader capabilities do not block Apple/Android readiness or downstream implementation.",
+      "supersededBy": "2026-10-03"
+    },
+    {
+      "date": "2026-10-03",
+      "approvedBy": "owner",
+      "platforms": [
+        "apple-mobile",
+        "android"
+      ],
+      "requiredReaders": [
+        "pdf",
+        "epub",
+        "mobi",
+        "azw3",
+        "cbz",
+        "cbr"
+      ],
+      "deferredUntil": null,
+      "supersedes": "2026-10-01 reader deferral",
+      "readiness": "All listed mobile reader formats are current Phase 1 implementation and acceptance requirements; no dependency on #65.",
+      "preservation": "Keep legacy document files, associations, settings and locations intact; verify opening, navigation and resumed reading alongside audio.",
+      "browserScope": "unchanged",
+      "tvScope": "audio/podcast focused; no new document reader requirement"
     }
   ]
 }
