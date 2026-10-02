@@ -20,7 +20,7 @@ The final broad journey run on iPad for the corrected mobile source, against the
 | Playlist deletion, after the fix | same | 9c88031d plus the fix | 10 of 10 passed | `playlist-green.log` |
 | `CollectionJourney` class | `verify-ui.sh` | ba8ad8ec | 6 of 6 passed | `collection-ba8ad8ec.log` |
 
-On iPad all 93 broad journeys and the 3 gated audits pass with the correction. 89 of them passed in the single broad run. The playlist journey passed after the fix. The 3 audits passed in their own gated runner; in the broad run they count as skipped, not passed.
+Combined evidence covers the 90 ordinary journeys and 3 gated audits: 89 journeys passed in the broad run, the playlist journey passed after its test correction, and the 3 audits passed in their separate gated runner. The broad run was not repeated after the correction; its recorded result remains 89 passed, 1 failed and 3 skipped.
 
 The dedicated stages were not rerun, because the app code has not changed since they passed on iPad at 9e46bc19: presentation 12 of 12, realtime 11 of 11, related authors and series 4 of 4, item server actions 4 of 4, progress reset 4 of 4 and publication recovery 1 of 1. `PlaybackAuthorizationJourney`, `RemainingQAJourney` and `RemainingQAGroupJourney` are outside this selection, as they were in the first broad run.
 
