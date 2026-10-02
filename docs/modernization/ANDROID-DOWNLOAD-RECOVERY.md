@@ -1,0 +1,23 @@
+# Android cancelled-download recovery (#42)
+
+Both Cancel controls previously called `Downloads.delete`, deleting the durable record and all completed audio/PDF parts. Cancel now saves a retryable stopped record with a cancellation explanation and cancels its WorkManager task. Completed files and partial staging remain until Retry finishes or the user explicitly chooses Discard/Remove. The existing failed state represents stopped work, so existing persisted records and Retry controls remain compatible. The new explanation falls back to English outside the default language.
+
+`retry` already clears the error and queues the retained record. `request` (save again) already queues a fresh record while copying matching completed parts in the same folder. The worker skips completed parts whose files exist. Android therefore did not share Apple's stale failed/cancelled queue-state defect fixed in #127; its gap was destructive cancellation.
+
+## Narrow proof
+
+Base: `1841ae9d734a600a0b34c3c1e98acd4d4f6a2365`. The final `DownloadRecoveryJourney` was run against unchanged production code before restoring the fix. It failed with “Cancel must retain the persisted download and completed audio”. With the fix, the same single test passed (1/1).
+
+The journey uses production UI, ApiClient, WorkManager, DownloadStore, file storage, audio playback and PDF rendering against owned synthetic HTTP routes and generated WAV/PDF media. Two audio files finish, the PDF returns HTTP 403, Retry holds the PDF request, Cancel keeps the durable record and both audio digests, and Retry completes the PDF. Durable state is decoded from disk at failed, cancelled and complete stages. Only two audio download requests occur throughout the flow. Reopening the activity with the fixture in offline-library mode plays across the audio boundary and renders the downloaded PDF.
+
+Local commands: `JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home android-native/gradlew -p android-native --offline :app:assembleDebug :app:assembleDebugAndroidTest --console=plain`; install both APKs on the explicitly selected emulator; run `adb -s emulator-5586 shell am instrument -w -r -e class com.audiobookshelf.android.journeys.DownloadRecoveryJourney -e absServer http://127.0.0.1:28885/abs com.audiobookshelf.app.nativepreview.test/androidx.test.runner.AndroidJUnitRunner`. Owned backend: `python3 android-native/scripts/android_fixture.py --port 28889`; realtime proxy: `node verification/realtime/native-fixture.mjs 28885 28889`; only emulator-5586 reverses port 28885.
+
+Private evidence: `/Volumes/ai-ssd/code/audiobookshelf-delivery/2026-10-03/android-download-recovery/` contains final RED/GREEN and build logs, persisted complete state, fixture observations, completed media, signed debug preview APK and source/input hashes in the handoff. Earlier setup failures are retained separately and are not product regressions. Normal font size and explicit keyboard dismissal/scrolling were needed for the current UI; the emulator's prior font setting and preview state were backed up.
+
+## Limits and remaining acceptance
+
+This is one emulator/synthetic-fixture journey, not a live server version acceptance run. The fixture models modern Audiobookshelf routes (including Android's 2.30 routes); no real server version was newly tested. Offline-library rejects remote browsing, but is not airplane mode; server observations must show that local audio/PDF opening makes no remote media requests. Activity relaunch and durable file decoding are covered, not process termination or device reboot. The fresh-request Save-again path and the Downloads-list Cancel control are source-reviewed, not separately driven. Cancellation during active body delivery, storage exhaustion and SAF revoke/regrant are not newly exercised.
+
+Historical unit69/full88, main-server4/4 and focused controls proof was reused, not rerun. No lint, localization, broad QA or cloud build was run. The signed debug APK is a review candidate, not the owner's installed `4ef1a06b` build or retained signed `171ec609` migration APK.
+
+Issue #42 stays open for owner/hardware acceptance of real metered-network permissions, storage/SAF management and interruption/reboot behavior on the intended device. Issue #54's owner signing/install, real migration, physical integrations, TalkBack and native-language review remain separate. The owner phone, apps, upstream data, server, VPN/routes and global ADB were not changed. Root performs one fresh review and merges; cleanup of owned fixtures/emulator/intermediates/worktree is deferred until root confirms merge, preserving caches, packages and owner files.

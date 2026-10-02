@@ -107,7 +107,7 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
                     Text(record.error ?: if (fraction != null) stringResource(R.string.dl_downloading_percent, (fraction * 100).toInt()) else stringResource(R.string.dl_downloading), style = MaterialTheme.typography.bodyMedium)
                     if (fraction != null) LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth()) else LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
-                IconButton(onClick = { if (!graph.downloads.delete(record.id)) message = notSaved }, modifier = Modifier.testTag("download-cancel")) { Icon(Icons.Outlined.Close, stringResource(R.string.dl_cancel_download)) }
+                IconButton(onClick = { if (!graph.downloads.cancel(record.id)) message = notSaved }, modifier = Modifier.testTag("download-cancel")) { Icon(Icons.Outlined.Close, stringResource(R.string.dl_cancel_download)) }
             }
             DownloadStore.State.COMPLETE -> Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.CheckCircle, null, tint = MaterialTheme.colorScheme.primary)
@@ -314,7 +314,7 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
                                 modifier = Modifier.testTag("play-offline-$key"),
                             ) { Icon(Icons.Filled.PlayArrow, stringResource(R.string.dl_play_named, record.title)); Text(stringResource(R.string.action_play), Modifier.padding(start = 6.dp)) }
                             record.state == DownloadStore.State.FAILED -> OutlinedButton(onClick = { message = if (graph.downloads.retry(record.id)) null else notSaved }, modifier = Modifier.testTag("download-retry-$key")) { Icon(Icons.Outlined.Refresh, stringResource(R.string.dl_retry_named, record.title)); Text(stringResource(R.string.action_retry), Modifier.padding(start = 6.dp)) }
-                            else -> TextButton(onClick = { message = if (graph.downloads.delete(record.id)) null else notSaved }, modifier = Modifier.testTag("cancel-download-$key")) { Icon(Icons.Outlined.Close, stringResource(R.string.dl_cancel_named, record.title)); Text(stringResource(R.string.action_cancel), Modifier.padding(start = 6.dp)) }
+                            else -> TextButton(onClick = { message = if (graph.downloads.cancel(record.id)) null else notSaved }, modifier = Modifier.testTag("cancel-download-$key")) { Icon(Icons.Outlined.Close, stringResource(R.string.dl_cancel_named, record.title)); Text(stringResource(R.string.action_cancel), Modifier.padding(start = 6.dp)) }
                         }
                         if (record.state != DownloadStore.State.QUEUED && record.state != DownloadStore.State.RUNNING) {
                             IconButton(onClick = { removing = record }, modifier = Modifier.testTag("delete-download-$key")) { Icon(Icons.Outlined.Delete, stringResource(R.string.dl_remove_named, record.title)) }

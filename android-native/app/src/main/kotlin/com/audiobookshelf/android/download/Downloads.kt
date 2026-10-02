@@ -185,6 +185,20 @@ class Downloads(
         return true
     }
 
+    /** Stops transfer work but retains verified files and a durable, explicitly retryable record. */
+    fun cancel(id: String): Boolean {
+        try {
+            store.update(id) {
+                if (it.state == DownloadStore.State.COMPLETE) it
+                else it.copy(state = DownloadStore.State.FAILED, error = context.getString(R.string.dl_cancelled))
+            } ?: return true
+        } catch (failure: IOException) {
+            Log.w(TAG, "Download list not saved", failure); return false
+        }
+        WorkManager.getInstance(context).cancelUniqueWork(workName(id))
+        return true
+    }
+
     /**
      * Removes the record and then its files, so a record never points at deleted files; listening history
      * in the journal is kept. False when the download list could not be written and nothing was removed.

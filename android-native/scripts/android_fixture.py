@@ -33,6 +33,7 @@ def android_server(port, prefix, bind='127.0.0.1'):
     # ordering is observable with a document present. Any reconfiguration accepts listening again.
     refusal = {'listening': False, 'reading': False}
     discard_delay = {'seconds': 0}
+    download_control = {'mode': 'normal', 'held': 0}
     # A write whose answer never reaches the client while the server applies it later, as when a
     # server handler is still waiting on its database after the client's connection has failed.
     late = {'armed': {}, 'applied': []}
@@ -159,6 +160,17 @@ def android_server(port, prefix, bind='127.0.0.1'):
             return True
 
         def do_GET(self):
+            if self.own_path() == '/__android__/download-control':
+                return self.respond(200, download_control)
+            if self.own_path() == '/api/items/book-0/file/pdf/download':
+                if download_control['mode'] == 'fail':
+                    self.route()
+                    return self.respond(403, {})
+                if download_control['mode'] == 'hold':
+                    download_control['held'] += 1
+                    deadline = time.monotonic() + 30
+                    while download_control['mode'] == 'hold' and time.monotonic() < deadline:
+                        time.sleep(0.05)
             # Handlers are reused across keep-alive requests, so the marker is cleared for each one.
             self.feed_item = None
             if self.own_path() == '/__android__/actions':
@@ -233,6 +245,9 @@ def android_server(port, prefix, bind='127.0.0.1'):
             super().do_PATCH()
 
         def do_POST(self):
+            if self.own_path() == '/__android__/download-control':
+                download_control['mode'] = self.body()['mode']
+                return self.respond(200, download_control)
             path = self.own_path()
             if path == '/__android__/ereader-devices':
                 actions['devices'] = [{'name': name} for name in self.body().get('names', [])]
