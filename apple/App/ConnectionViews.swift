@@ -163,7 +163,7 @@ struct LibraryChooser: View {
                         Button(l10n("Downloads")) { downloads.presented = true }
                         Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
                         Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }
-                    } label: { Image(systemName: "person.crop.circle") }.accessibilityIdentifier("account")
+                    } label: { Image(systemName: "person.crop.circle") }.accessibilityLabel(l10n("Account")).accessibilityIdentifier("account")
                 } }
         }.navigationViewStyle(StackNavigationViewStyle())
     }
