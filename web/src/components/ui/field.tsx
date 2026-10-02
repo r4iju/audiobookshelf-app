@@ -67,7 +67,7 @@ export function Toggle({
         type="checkbox"
         role="switch"
         aria-checked={props.checked}
-        className="mt-1 size-5 accent-[var(--accent-strong)] focus-ring"
+        className="mt-1 size-5 shrink-0 accent-[var(--accent-strong)] focus-ring"
         {...props}
       />
     </div>
