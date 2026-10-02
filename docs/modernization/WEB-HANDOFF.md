@@ -3,7 +3,8 @@
 Branch `fork/nextjs-client`, based on `origin/fork/native-tv` at `39ad6af65715957c585e7b0f0d20238ebe60ee8f`. The
 client is the isolated `web/` package. It does not touch the legacy Nuxt app, the native apps, the server, or the
 shared modernization documents. Issues #55 to #65. Phase 2 readiness work continues on `fork/web-phase2-readiness`,
-from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` unchanged under `web/`).
+from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` unchanged under `web/`), merged as
+`68842296` (PR #92). The remaining software gaps continue on `fork/web-remaining-gaps` from `68842296`.
 
 - How to run and deploy it: [web/README.md](../../web/README.md), [web/docs/DEPLOYMENT.md](../../web/docs/DEPLOYMENT.md)
 - What it needs from the server: [web/docs/SERVER-CONTRACT.md](../../web/docs/SERVER-CONTRACT.md)
@@ -58,6 +59,10 @@ from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` u
 | `67192033` | Page keys pressed in an open reader dialog stay in the dialog instead of turning the page behind it |
 | `6ee58e3c` | Labels with a matching legacy string use its key, so every translated language gets them; seconds and minutes are formatted for the language; the player's cover link has a name; the search icon follows right-to-left layouts |
 | `f01daaeb` | From review: the bookmarks list shows loading and failure, podcast episodes offer no bookmarks (as in the legacy player), and two legacy keys that were not true equivalents are back to web strings |
+| `c5304c69` | The player's Chapter Track and Scale Elapsed Time by Speed switches; remaining time is always at the current speed, as in the legacy player |
+| `88c125d7` | A Collapse Series switch on the bookshelf; series stay collapsed with a filter, as in the legacy bookshelf |
+| `38fc37b3` | A list view of the bookshelf and a series' books, kept on this device; a missing cover too small for text shows its icon |
+| `de8958cd` | Each page's title names it after its main heading |
 
 ## Checks
 
@@ -135,6 +140,17 @@ Phase 2 readiness commits, checked by the journeys they affect (logs in `web/qa/
   journey in Firefox and WebKit (`review-fixes-ff-webkit.log`). Review also suggested that a click on a dialog's own
   text could leave the page keys turning pages; a journey for it passed on the earlier source in all three engines
   (`dialog-keys-body-red.log`), so nothing was changed and the journey was not kept.
+- Remaining gaps on `fork/web-remaining-gaps`, code at `de8958cd`. Each behaviour failed first: the player's time
+  switches (`time-display-red.log`), Collapse Series (`collapse-filter-red.log` for the unit test, then
+  `collapse-series-red.log`), the list view (`list-view-red.log`) and page titles (`titles-red.log`). The list view
+  journey's first passing attempts failed on its own setup (a comics series without lengths, then a pattern that
+  needed a word boundary), both recorded in `list-view-green.log`; the product code did not change between them.
+  Full run on `de8958cd` (`gaps-full.log`): Biome and `tsc` clean, vitest 115 passed, Chromium 72 of 73 journeys
+  passed. The e-reader journey failed: the QA server logged that it was sending the ebook, but its delivery to the
+  loopback mail sink was not answered within 10 seconds, at a host load average near 100. Nothing on this branch
+  touches that path. Unchanged, it passed 3 of 3 alone, and the fixture network check then found no stalls
+  (`gaps-ereader-rerun.log`; the failure's trace is kept in `gaps-full-ereader-failure/`). This run is therefore not a
+  clean full run.
 - Not rerun for these commits: the deployment, connect, statistics and OpenID journeys, whose code they do not touch.
 
 Every behaviour change since the first commit started from a failing test that was observed failing, then made to
@@ -197,35 +213,37 @@ Software gaps found against the baseline and fixed on this branch: bookmarks wer
 episode in Continue Listening did not resume (`30e8ea60`), series stopped at 24 books (`f474124b`), page keys turned
 pages behind reader dialogs (`67192033`), and the localization and accessibility items in `6ee58e3c`.
 
-Secondary gaps left open, none blocking a main workflow:
+Closed on `fork/web-remaining-gaps`: the chapter-track, speed-scaled time and collapsed-series preferences have
+controls, the bookshelf has a list view, and pages have titles. Gaps still open:
 
-- Stored preferences with no control yet: chapter track (`useChapterTrack`), elapsed time scaled by speed
-  (`scaleElapsedTimeBySpeed`) and collapsed series (`collapseSeries`). There is no list view of a library.
 - About 200 web-only strings (`web/src/i18n/web-strings.ts`) are English in every language, since no legacy string
   means the same. Page titles on the connect and OpenID return pages and client error messages
   (`src/lib/abs/client.ts`) are English too. The server-rendered `lang="en"` shows until the chosen language loads.
 - The bookmarks list does not mark the bookmark at the current time, and does not create a bookmark with a typed
   title, as the legacy list does; creating stays a player button.
-- Routes have no titles of their own; the reader's arrows do not flip in right-to-left languages.
+- The reader's arrows do not flip in right-to-left languages.
+- In WebKit, links inside a MOBI or AZW3 book and page keys with the focus inside it do nothing (see "Remaining
+  gates"). The spec's navigation and keyboard requirement is not met there; this stays open and is being
+  investigated without letting the book's own scripts run.
 - No journey covers a token refresh mid-session, a server under a subpath, or the message shown when the browser
   blocks autoplay.
-- `parity.json` has 61 browser rows with empty `replacementEvidence.browser`. It is a shared document this lane does
-  not edit; the journeys above are the evidence to record there.
+- `parity.json`: the browser rows' `replacementEvidence.browser` is filled on this branch from these journeys,
+  stating what each shows and what it does not.
 
 Readiness by issue. Every issue stays open: each still needs a physical or owner check that fixtures cannot show.
 
 | Issue | Software on fixtures | Still open |
 | --- | --- | --- |
 | #55 connect, authenticate, deploy | Done: password and OpenID sign-in, saved servers, same-origin deployment under `/web` with its own server, internal deployment | A real identity provider; owner sign-in on the deployment |
-| #56 browse and discover | Done, with series pages | List view and collapsed series (secondary) |
-| #57 audiobook playback | Done, with the bookmarks list | Safari, physical audio, lock screen and Media Session; chapter-track and speed-scaled time preferences (secondary) |
+| #56 browse and discover | Done, with series pages, list view and collapsed series | Owner acceptance |
+| #57 audiobook playback | Done, with the bookmarks list and the chapter-track and speed-scaled time switches | Safari, physical audio, lock screen and Media Session |
 | #58 progress and recovery | Done | Long sessions on real networks |
 | #59 podcasts, collections, playlists | Done, with Continue Listening episodes | Owner feeds are not mutated by tests; checking them is the owner's |
 | #60 EPUB | Done in Chromium, Firefox and WebKit | Safari by hand |
 | #61 PDF | Done in Chromium, Firefox and WebKit | Safari by hand |
-| #62 MOBI | Done; WebKit limits above | Safari by hand |
+| #62 MOBI | Done in Chromium and Firefox | WebKit: in-book links and keys with the focus in the book (open, under investigation); Safari by hand |
 | #63 comics | Done, with dialog keys | Safari by hand |
-| #64 preferences and browser capabilities | Done for the controls present | Secondary preferences above; web-only strings untranslated |
+| #64 preferences and browser capabilities | Done for the stored preferences, which all have controls now | About 200 web-only strings untranslated; reader arrows in right-to-left languages |
 | #65 internal deployment, retire legacy | Deployed internally, smoke checked read-only | Owner acceptance; the legacy client stays until then |
 
 ## Internal deployment

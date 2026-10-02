@@ -103,7 +103,10 @@
           "Native SwiftUI preview covering browsing, details, player, settings, PDF reading, downloads and migration import, verified per workflow by the journeys cited in the rows below; root installed the signed Release preview on the paired iPhone and iPad after PR77 (6ac3f2ee, apple/Localization/HANDOFF.md). Installation is not acceptance; owner device acceptance of the design is not recorded."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd (synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library): e2e/browse.spec.ts \"cards keep one height whether or not a book has a cover or a long title\" (No cover fallback, equal card heights), \"the bookshelf and a series' books can be shown as a list with each book's length, and stay so\" and \"each page's title names what it shows, after loading it and after moving to it\"; e2e/lists.spec.ts \"on a phone, every section of the library stays reachable\" at 390x844.",
+          "Not verified: a visual design review of home, detail and player on each supported browser and screen size, Safari, real phones and tablets, and owner acceptance of the presentation. No screenshot comparison is part of the journeys."
+        ],
         "tv": [
           "SwiftUI TV app: 20 remote-driven journeys and 12 TVAppTests on the tvOS 27 simulator (tvos/QA.md); signed Release of 829259be installed on Living Room TV, tvOS 18.6 (/tmp/abs-apple-final-tv-device.log, recorded in c4d4ea84). The physical checks in tvos/QA.md have not been performed."
         ]
@@ -248,7 +251,10 @@
           "Direct connection through the shared TVCore API with no proxy or new service: ConnectionJourney.testConnectSelectLibraryAndRestoreAccountAfterRelaunch (iOS 27 simulator against the synthetic 2.30.0-fixture). HTTPS connection from the physical iPhone and iPad to the live 2.30.0 server was confirmed after trusting the homelab CA (BASELINE.md); that is connection evidence only."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/connect.spec.ts \"password sign-in reaches the library and survives a reload\" signs in directly to the QA server, and e2e/deployment.spec.ts \"pages, deep links, readers and media are all served from the one origin\" records every request origin and finds only the deployment's own. web/docs/DEPLOYMENT.md: the client's Node process serves pages only and never sees credentials or media. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: signing in to the owner's own server; the internal /web deployment was only smoke-checked read-only, with no sign-in."
+        ],
         "tv": [
           "Direct connection through TVCore: CatalogJourney.testTrustedHTTPSServerAndLongMetadata (simulator). HTTPS from the physical TV to the live 2.30.0 server confirmed on 2026-10-01 (BASELINE.md); connection evidence only."
         ]
@@ -282,7 +288,10 @@
           "SavedConnectionsJourney 3/3 (two servers, two users on one server, per-connection library choice and unsent listening recovered on switch-back), passed in /tmp/realtime-qa/final.log; OpenIDJourney relaunch restore. iOS 27 simulator against the synthetic 2.30.0-fixture. Live multi-server acceptance remains open."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Partial. Saved servers exist (edd63ce0). Chromium journey e2e/settings.spec.ts \"the account section names the server and user, and switching returns to the server list\" shows the saved server listed after Switch Server/User. Unit tests in src/lib/player/store.test.ts (\"forgets unsent listening of the account the discard came from, not of the one signed in now\", \"does not stop playback resumed after switching accounts away and back during the close\") cover per-account isolation. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: no journey saves two servers or accounts with different libraries, switches between them, restarts the browser and checks that credentials, content and queued progress stay isolated per connection."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -314,7 +323,10 @@
           "ConnectionJourney.testQualifiedLANHTTPConnectsWithoutWeakeningHTTPSTrust: qualified .lan HTTP connects and an untrusted HTTPS certificate is rejected (apple/README.md). It needs the Studio dev.nginx.lan alias and failed only for that reason in the realtime lane environment (/tmp/realtime-qa/final.log, Connection 4/5). Live trusted HTTPS on devices confirmed (BASELINE.md); live LAN HTTP on a device not recorded."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Plain HTTP: every journey uses the plain-HTTP loopback QA server, and e2e/deployment.spec.ts runs on the plain-HTTP origin http://abs-web.test (no Web Locks, crypto.subtle fallbacks). e2e/connect.spec.ts \"an unreachable server address is reported without signing in\" covers a bad address. Chromium on de8958cd. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "HTTPS: only the read-only smoke check (web/qa/smoke.mjs, 4 of 4, GET only, no sign-in) on the internal /web deployment over HTTPS. Not verified: signing in over trusted HTTPS, and recovery from an untrusted certificate (the browser owns certificate trust; no journey covers it)."
+        ],
         "tv": [
           "Trusted HTTPS through a device-only CA: CatalogJourney.testTrustedHTTPSServerAndLongMetadata; TVCoreTests.testServerRejectsCredentialsAndNonHTTPAddresses. Local HTTP on the physical TV not recorded."
         ]
@@ -349,7 +361,10 @@
           "All Apple journeys connect to fixtures under the /abs subpath (apple/README.md); the realtime client keeps the reverse-proxy Socket.IO path with its trailing slash (APPLE-PODCAST-QUEUE.md, PodcastJourney 9/9). TVCoreTests.testServerURLPreservesReverseProxyPathAndEncodesQuery (shared core 63/63, /tmp/abs-root-item-actions-core.log). Live reverse-proxy workflows on devices beyond connection not recorded."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Unit only: src/lib/abs/client.test.ts \"resolves paths under the server subpath with the bearer token\". web/docs/DEPLOYMENT.md documents ABS_WEB_SERVER as a subpath such as /audiobookshelf. The deployment journeys serve the client under /web but the server at the origin's root.",
+          "Not verified: no journey signs in, browses and plays against a server under a subpath, so it is not shown that all API, media, socket and auth requests keep the subpath."
+        ],
         "tv": [
           "CatalogJourney.testTrustedHTTPSServerAndLongMetadata uses a reverse-proxy path; TVCoreTests.testServerURLPreservesReverseProxyPathAndEncodesQuery (shared core 48/48 at 829259be, /tmp/abs-apple-combined-core.log)."
         ]
@@ -384,7 +399,10 @@
           "Password sign-in and Keychain restore after relaunch with genuine Keychain on an ad hoc signed simulator build: ConnectionJourney.testConnectSelectLibraryAndRestoreAccountAfterRelaunch (apple/README.md). Not hardware or live-server acceptance."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/connect.spec.ts \"password sign-in reaches the library and survives a reload\" (session restored after reload; the password is absent from localStorage) and \"a wrong password explains the failure and keeps the server\" (alert mentions username or password; username kept). Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: restore after fully closing and reopening the browser (a reload was used), and Firefox, WebKit or Safari for these two journeys. Tokens are stored in localStorage by design (DEPLOYMENT.md)."
+        ],
         "tv": [
           "Contract only: TVCore credential and sign-in tests (shared core 48/48 at 829259be). Physical remote sign-in (tvos/QA.md check 1) not performed."
         ]
@@ -418,7 +436,10 @@
           "OpenIDJourney 4 cases: browser sign-in with PKCE and relaunch restore, cancellation keeps the saved account, invalid callback and changed authorization state rejected, against local browser fixtures modelled on the installed 2.30.0 source (apple/README.md). The live homelab uses local authentication, so live-provider acceptance is not tested."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd against the production image behind nginx (e2e/deployment.spec.ts): \"signing in through the server's OpenID provider returns to the client signed in, and survives a reload\" (qa-openid account created, code removed from the address), \"a refused OpenID sign-in says so and leads back to signing in\" and \"an OpenID return with no sign-in in progress is not accepted\". Unit: src/lib/abs/auth.test.ts. Fixture: loopback OpenID provider (qa/oidc.mjs) and synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a real identity provider (consent screens, key rotation, logout), the owner's server, Safari. OpenID needs a same-origin, port-less deployment on 2.30.0 (DEPLOYMENT.md)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -451,7 +472,10 @@
           "Simulator, synthetic fixture: PlaybackAuthorizationTests.testExpiredAccessDuringStreamingRenewsOnceAndPlaybackContinuesIntoTheNextFile. The server rejects the access token mid-stream (fixture expire-access); the production player renews through one shared refresh, saves the token and continues into the next file under the same account; a seek made while a delayed renewal waits is where the reloaded file starts (testSeekDuringDelayedRenewalIsWhereTheReloadedFileStarts, APPLE-PLAYBACK-AUTHORIZATION.md). No live-server or hardware run."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Unit only: src/lib/abs/client.test.ts \"refreshes once for concurrent expired requests and persists the rotated tokens before retrying\" and \"reports a rejected refresh as unauthorized without discarding the connection\". SERVER-CONTRACT.md: a server returning only user.token is kept as a legacy token.",
+          "Not verified: no journey expires the token during playback to show playback continuing, and no legacy bearer-only server was tested (only 2.30.0). Cross-tab refresh coordination uses navigator.locks, absent on plain-HTTP origins; not journeyed."
+        ],
         "tv": [
           "Contract only: TVCore refresh-token candidate in the compatibility gate (SERVER-COMPATIBILITY.md). Login expiry on the TV has no automated test (tvos/QA.md check 9 open).",
           "Shared player change only (APPLE-PLAYBACK-AUTHORIZATION.md); the TV builds but no TV journey renews during playback, and tvos/QA.md check 9 stays open."
@@ -487,7 +511,10 @@
           "CatalogRecoveryJourney 4/4 (/tmp/realtime-qa/green-final.log), ConnectionJourney.testInvalidServerShowsRecoveryWithoutLeavingConnectionForm, PlaybackJourney.testMediaHTTPFailureShowsErrorAndCanBeReopened, OfflineJourney with the server unavailable (HTTP 503 in the simulator, not airplane mode; APPLE-OFFLINE.md). Not hardware or live-server acceptance."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journey on de8958cd: e2e/playback.spec.ts \"listening while the server is unreachable is kept and delivered later\" aborts progress requests as disconnected, shows \"waiting to sync\", then after the route is restored and the page reloaded the server has the position, with no sign-out. Unit: src/lib/abs/client.test.ts \"treats a transport failure as offline, not as a sign-out\"; src/lib/progress/outbox.test.ts. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a real network disconnect (requests were aborted by Playwright), a disconnect while browsing, and long sessions on real networks."
+        ],
         "tv": [
           "CatalogJourney.testCatalogFailureRecoversWithRetry; RecoveryJourney.testMediaFailureOffersRestartRatherThanSavingProgress (tvOS 27 simulator, tvos/QA.md). A single failing library among several is not tested."
         ]
@@ -523,7 +550,10 @@
           "Simulator, synthetic fixture: PlaybackAuthorizationTests revocation tests (streamed and downloaded) and PlaybackAuthorizationJourney.testRevokedLoginStopsPlaybackAndSigningInAgainDeliversItsListening on a 120 s synthetic book (fixture long-audio). The fixture revokes the account while audio decodes; the journey fails with the player's revocation handling removed and passes with it, stopping at the first rejected server contact within the 15 s sync interval; audio stops, cannot be resumed, the app asks to sign in again for that server and username, another account does not send the held listening, and signing in again delivers it (APPLE-PLAYBACK-AUTHORIZATION.md). Revocation is noticed at the next server contact. No live-server or hardware run."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Journey e2e/session.spec.ts \"an ended session asks to sign in again and returns to the same page\": with revoked tokens the banner offers Sign in, the username is kept, and after signing in the same item page returns. Chromium on de8958cd; the session journeys also ran in Firefox 153 and WebKit 26.5 at 74d63f16. Unit: client.test.ts \"reports a rejected refresh as unauthorized without discarding the connection\". Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified by a journey: that queued unsent progress survives the reauthentication and is delivered afterwards (DEPLOYMENT.md states it; outbox unit tests only)."
+        ],
         "tv": [
           "Contract only: TVCoreTests.testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop. tvos/QA.md check 9 open.",
           "Shared player change only: a revoked login stops audio and blocks resuming until RootView's existing sign-in prompt completes. No TV journey; tvos/QA.md check 9 stays open."
@@ -562,7 +592,10 @@
           "ConnectionJourney selects a library and restores it; PreferencesJourney.testChosenCatalogLayoutSurvivesRelaunchAndLibrarySwitch; SavedConnectionsJourney keeps each connection's library choice. iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/connect.spec.ts shows Audiobooks and Podcasts libraries; e2e/podcasts.spec.ts \"an item's page shows its own library's sections\" marks Podcasts current with Latest offered; book and podcast items are opened in e2e/browse.spec.ts and e2e/podcasts.spec.ts. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a journey that switches libraries back and forth and checks that results from one library never appear in the other."
+        ],
         "tv": [
           "CatalogJourney opens the library and loads its pages (testLibraryLoadsNextPageAsFocusMovesDown). Browsing each real library on the TV (tvos/QA.md check 3) not performed."
         ]
@@ -600,7 +633,10 @@
           "ConnectionJourney.testContinueListeningIncludesBookOutsideFirstCatalogPage; RealtimeJourney.testProgressFromAnotherClientUpdatesTheOpenShelfAndBookDetails (5/5 on the corrected wiring, /tmp/realtime-qa/green-final.log); finished books leave the shelf (APPLE-BOOK-PROGRESS.md). iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journey on de8958cd: e2e/podcasts.spec.ts \"an episode being listened to continues from the home page's Continue Listening\" opens the episode from the shelf with its own 25% progress (fixed in 30e8ea60). e2e/playback.spec.ts \"a reload brings the player back at the same position\" resumes within 2 s after reload. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: choosing a book from Continue Listening and checking playback starts at its saved position, and that the episode's playback (not just its page) resumes at the saved position."
+        ],
         "tv": [
           "CatalogJourney.testContinueListeningOpensDetailsAndBackRestoresFocus (tvOS 27 simulator, tvos/QA.md)."
         ]
@@ -638,7 +674,10 @@
           "PreferencesJourney.testChosenCatalogLayoutSurvivesRelaunchAndLibrarySwitch (list/cover); ArtworkJourney and the aligned grid journeys on iPhone and iPad (APPLE-BOOK-PROGRESS.md, evidence/apple-catalog-aligned-iphone.png); CatalogRecoveryJourney.testLongMetadataAndMissingArtworkRemainNavigableForReadOnlyAccount. Physical comfort review not recorded."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/browse.spec.ts \"cards keep one height whether or not a book has a cover or a long title\" (No cover fallback with a long title) and \"the bookshelf and a series' books can be shown as a list with each book's length, and stay so\" (List view toggle kept after reload, on the bookshelf and a series); e2e/browse.spec.ts \"search leads to a book, its series and its author\" opens a title with its Play action. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a human readability review of grid and list on real screens and Safari."
+        ],
         "tv": [
           "CatalogJourney.testTrustedHTTPSServerAndLongMetadata (very long title, missing cover placeholder); screenshots in tvos/evidence. Across-room readability (tvos/QA.md check 2) not performed."
         ]
@@ -676,7 +715,10 @@
           "ConnectionJourney.testBrowsePaginatedBooksAndExpandedMetadata (61 titles, page requested only on scroll), CatalogRecoveryJourney.testFailedNextPagePreservesBooksAndRetries, CatalogRealtimeTests pagination under realtime changes (NativeTests 50/50 at the integrated wiring, /tmp/abs-apple-final-wired-stores.log). A large real library on a device is not tested."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/browse.spec.ts \"sort, filter and page live in the address and survive a reload\" pages the library with the server's limit/page query, and \"a series longer than one page shows all its books, page by page in order\" shows 24 then the remaining 2 of 26 books (fixed in f474124b). Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: the 61-item, page-size-60 case with a check that all items are reachable without duplicates; paging uses Next links rather than scroll-loading."
+        ],
         "tv": [
           "CatalogJourney.testLibraryLoadsNextPageAsFocusMovesDown: the server saw pages 0 and 1, with no Load more button (tvos/QA.md)."
         ]
@@ -714,7 +756,10 @@
           "SearchJourney 3/3 (/tmp/realtime-qa/green-final.log): a book beyond the first page, an episode-only result that plays the matching episode; author and series results in RelatedAuthorSeriesJourney 4/4 at 0aa6b83e (/tmp/abs-related-root-final-ui.log). iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journey on de8958cd: e2e/browse.spec.ts \"search leads to a book, its series and its author\" searches \"long tide\", opens the book, then reaches its series and author through links on the book page. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: selecting author, series and podcast results directly from search, and podcast search in the browser UI."
+        ],
         "tv": [
           "CatalogJourney.testServerSearchFindsTitlesOutsideLoadedPage; RelatedJourney author and series search; PodcastJourney.testPodcastResultTileShowsItsEpisodeProgress (tvos/QA.md)."
         ]
@@ -751,7 +796,10 @@
           "SearchJourney.testSortingAndGenreFilteringUseTheServerAcrossPagination; PreferencesJourney.testFinishedBookLeavesNotFinishedFilterWhenReturningToCatalog; CatalogRealtimeTests.testRemoteProgressReloadsAVisibleProgressFilteredShelf. iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/browse.spec.ts \"sort, filter and page live in the address and survive a reload\" (title sort, descending, series filter) and \"series can be collapsed into one card each on the bookshelf, and stay collapsed\" (counts match the server's collapseseries totals); e2e/podcasts.spec.ts \"episodes sort and filter by progress, and an episode plays with its own progress\" (Complete/All filters, ascending order kept on the next visit). Unit: browse.test.ts, episodes.test.ts. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Restart is shown by reload, not by closing the browser. Not every legacy sort and filter option has its own journey."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -787,7 +835,9 @@
           "iPad simulator (Root Related iPad QA, 13-inch, iOS 27): 3/4, then the detail-links case passed after the test selected the real BackButton at a0f680e9 (/tmp/abs-related-root-ipad-ui.log, /tmp/abs-related-root-ipad-back.log; iPhone again in /tmp/abs-related-root-phone-back.log). No app change was needed. Physical acceptance remains open."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/browse.spec.ts \"search leads to a book, its series and its author\" (series Harbor Lights lists its two books in order and leads back to The Long Tide; author Mira Vale lists Salt and Signal) and \"a series longer than one page shows all its books, page by page in order\". Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library."
+        ],
         "tv": [
           "TV related author/series search, metadata, order, detail links and retry: RelatedJourney 4/4 pass at ccc7bac3; shared loaders 41/41 on integrated 0aa6b83e. tvos/QA.md. Physical/live-server acceptance remains open."
         ]
@@ -825,7 +875,10 @@
           "Remaining local QA (APPLE-REMAINING-QA.md, iPhone simulator; RemainingQAGroupJourney also on iPad): a 403 edit now says the account is not allowed instead of claiming a partial save (RED 9768ad9e, fix 3546707d). Probed correct without changes: read-only absence of editing, partial membership failure and retry, collection editing through relaunch, an unavailable collection member skipped on play, and podcast playlist episode add/reorder/remove (fixture patch kept with the evidence, not committed). Round 2: collection edit and delete follow permissions.update/delete as server 2.30 CollectionController.middleware authorizes them; an admin (default delete: false) is no longer offered deletion (RED 9cc81daf, fix 2d0154c8)."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/lists.spec.ts \"a playlist is built from item pages, plays the next unfinished item and is emptied\", \"podcast episodes keep their identity in playlists\" and \"collections follow the account's permissions\" (changes checked on the server; an account without delete sees no Delete; a limited account sees no remove or Add to Collection). Unit: src/lib/abs/lists.test.ts. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: reordering playlist or collection items (no journey), and an explicit server rejection of a forbidden action; forbidden actions were only shown absent."
+        ]
       },
       "gates": {
         "permissions": "Account/item ownership and permissions required by the actual management endpoint; explicitly exercise rejection.",
@@ -860,7 +913,10 @@
           "ConnectionJourney.testBrowsePaginatedBooksAndExpandedMetadata (details and chapters); RelatedAuthorSeriesJourney.testBookDetailsLeadToItsSeriesAndAuthor; details reload on other clients' progress and renames (RealtimeJourney). iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/browse.spec.ts \"search leads to a book, its series and its author\" (book page with Play, Read, three chapters, series and author links); e2e/session.spec.ts \"progress from another device appears without reloading\" (Your Progress shows 50%); e2e/podcasts.spec.ts episode page progress. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified by assertion: description, narrator and duration on the details page, and expanding chapter or metadata controls."
+        ],
         "tv": [
           "CatalogJourney.testContinueListeningOpensDetailsAndBackRestoresFocus (narrator and server progress); RelatedJourney details links (tvos/QA.md)."
         ]
@@ -896,7 +952,10 @@
           "PlaybackJourney 8 cases with real WAV media and server progress observations, including pause during session preparation and replacement (apple/README.md). iOS 27 simulator against the synthetic 2.30.0-fixture. Physical audio output not accepted."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Journeys e2e/playback.spec.ts \"a multi-file book plays across files and its progress reaches the server\" and \"a reload brings the player back at the same position\": the player's position advances while playing, pauses, resumes, and the server records the session. Chromium on de8958cd; playback journeys also ran in Firefox 153 and WebKit 26.5 at 74d63f16. Fixture: real MP3 decoded by the browser, synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: audible output on physical hardware, Safari, the browser's autoplay-blocked message (no journey), and a single active session across tabs (a second tab is a second player by design)."
+        ],
         "tv": [
           "PlaybackJourney.testResumeShowsChapterAndTotalProgressAndRemoteToggles: remote Play/Pause pauses and resumes the same session (simulator)."
         ]
@@ -932,7 +991,10 @@
           "ListeningControlsJourney.testConfiguredSkipIntervalsSeekAcrossFilesAndPersist; PlaybackJourney.testLatestSeekWinsWhileNextFileIsPreparing and testSeekWhileClosingDoesNotJumpOrResumeOldItem; ChapterMediaControlsTests system scrub (/tmp/abs-chapter-controls-final.log). Not hardware or live-server acceptance."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journey on de8958cd: e2e/settings.spec.ts \"jump times and auto rewind change how the player moves\" (Jump forward 15 s and Jump back 10 s move the position by those intervals). Unit: src/lib/player/timeline.test.ts \"clamps times before the start and after the end\". Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified by a journey: skipping across a file boundary and clamping at the book's start and end."
+        ],
         "tv": [
           "Chapter-list seek: PlaybackJourney.testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying. Rapid skips across file boundaries have no automated test (tvos/QA.md check 4)."
         ]
@@ -968,7 +1030,10 @@
           "PlaybackJourney.testRealAudioCrossesFilesAndContinuesAfterLeavingDetails; OfflineJourney cross-file seek on downloaded audio (APPLE-OFFLINE.md). Simulator with synthetic two-file WAV; real codecs and rapid physical skips not tested."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journey on de8958cd: e2e/playback.spec.ts \"a multi-file book plays across files and its progress reaches the server\" (three 30 s MP3 files; Next chapter moves past 31 s into the second file and the server records over 30 s). Unit: src/lib/player/timeline.test.ts \"maps a book time to the file that contains it and the offset inside that file\". Also Firefox and WebKit at 74d63f16. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: playing continuously through a file boundary without a gap, seeking backward across it in a journey, and audible continuity on hardware."
+        ],
         "tv": [
           "PlaybackJourney.testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying and testNaturalEndShowsFinished on a multi-file synthetic book. Real codecs on the TV (check 4) not performed."
         ]
@@ -1004,7 +1069,9 @@
           "ListeningControlsJourney.testChapterSeekAndSpeedSurviveSessionRestoration; PresentationJourney.testChapterTrackFollowsTheChapterWithTheTotalTrackAlongside; ChapterMediaControlsTests 3/3 (/tmp/abs-chapter-controls-final.log). Not hardware or live-server acceptance."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/playback.spec.ts \"the time shown can follow the chapter, and elapsed time can ignore the speed while remaining time keeps it\" (Chapter Track bounds the seek bar to the second chapter, about 30 to 60 s, and shows times within it; kept after reload) and \"a multi-file book plays across files...\" (Next chapter starts past 31 s). Unit: timeline.test.ts chapter tests. Fixture chapters are 30 s each, not 0-8 and 8-20. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library."
+        ],
         "tv": [
           "PlaybackJourney.testResumeShowsChapterAndTotalProgressAndRemoteToggles (chapter title, number, total progress); chapter list seek (tvos/QA.md)."
         ]
@@ -1040,7 +1107,10 @@
           "ListeningControlsJourney observes actually faster playback and restored speed (apple/README.md, testChapterSeekAndSpeedSurviveSessionRestoration); PresentationJourney.testElapsedTimeScalesWithPlaybackSpeedUntilTurnedOff. iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/playback.spec.ts \"speed and bookmarks are kept\" (1.5x kept after reload) and \"the time shown can follow the chapter...\" (times at 2x halve as expected). Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: that the media element's actual playback rate changed audibly or measurably (the journeys check the selected value and displayed times, not position advancing faster)."
+        ],
         "tv": [
           "PlaybackJourney.testSpeedSelectionAndExplicitStopClosesTheSession (simulator)."
         ]
@@ -1075,7 +1145,10 @@
           "ListeningControlsJourney.testBookmarkCreateEditJumpAndDeletePersistOnServer (through relaunch) and testDeletingFractionalBookmarkPreservesItsIntegerNeighbor. iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/playback.spec.ts \"bookmarks are listed, take the player to their place, and can be renamed and removed\" (create, rename, jump to saved time, remove, all checked on the server) and \"speed and bookmarks are kept\". The bookmarks journey also passed in Firefox and WebKit on f01daaeb. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Known differences: the list does not mark the bookmark at the current time and does not create a bookmark with a typed title (creation is a player button). Not verified: two bookmarked passages, and an explicit server rejection."
+        ]
       },
       "gates": {
         "permissions": "Account/item ownership and permissions required by the actual management endpoint; explicitly exercise rejection.",
@@ -1107,7 +1180,10 @@
           "ListeningControlsJourney: testShortSleepTimerActuallyStopsAndPersistsPositionAfterLeavingPlayer, testTimerAdjustmentChangesActualStopAndResetKeepsOriginalDuration, testSeekingPastChapterSleepBoundaryStopsAudioInsteadOfLeavingTimerStranded. Background and relaunch timer behaviour on a device remain open (#9/#11)."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Journey e2e/playback.spec.ts \"the sleep timer can stop at the end of the chapter\" stops between 28 and 31 s in a 30 s chapter; fixed in a2db7a36 and passed 3 of 3 in Firefox and WebKit and in Chromium (sleep-fix.log); Chromium on de8958cd. Unit: store.test.ts \"stops where the chapter ends with its file...\". Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a duration timer (no journey), the fade-out, and stopping while the tab is backgrounded or the device sleeps."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1139,7 +1215,10 @@
           "Fade: ListeningControlsJourney.testDisablingAnActiveSleepFadeRestoresActualAudioVolume. Resume rewind: testResumeRewindsAfterAPauseAndCanBeDisabledPersistently. Auto-sleep window and shake reset are Android-only in the baseline UI (apple/README.md). iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/settings.spec.ts \"jump times and auto rewind change how the player moves\" (auto rewind after a 2-minute pause, off when disabled) and \"seeking from the system media controls can be turned off\" (seekto handler removed). Unit: src/lib/player/rewind.test.ts. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: the sleep timer fade-out setting, behaviour with the tab in the background, and physical media controls. The Android-only automatic sleep timer, chime and shake/haptic options are not ported (WEB-HANDOFF.md decisions)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1172,7 +1251,10 @@
           "Navigation only: audio continues after leaving details and the player (PlaybackJourney.testRealAudioCrossesFilesAndContinuesAfterLeavingDetails, the short sleep timer journey). Lock-screen and background playback on a device are not tested."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Browser equivalent: one persistent player for the tab. Chromium journeys on de8958cd keep playing while navigating within the app, e.g. e2e/readers.spec.ts \"reading a book's PDF while its audio plays keeps both positions\" and e2e/lists.spec.ts playlist playback. Settings shows a Browser limits notice: playback continues while the tab is open, background tabs may be throttled, closing the tab stops it. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a locked screen, a backgrounded tab or browser, and Safari on iPhone; these physical checks are outstanding."
+        ],
         "tv": [
           "Leaving Now Playing for Home keeps playing (PlaybackJourney.testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying). TV/Home button, screen saver and Control Center (check 8) not performed."
         ]
@@ -1208,7 +1290,10 @@
           "Unit only: ChapterMediaControlsTests call the production system-scrub method and check Now Playing chapter metadata (APPLE-PLAYER-TRACKS.md). No physical lock-screen, headset or Bluetooth command was exercised."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Browser equivalent is the Media Session API. Chromium journey on de8958cd: e2e/settings.spec.ts \"seeking from the system media controls can be turned off\" checks that play, pause, seekbackward, seekforward and seekto handlers are registered while playing. Metadata is set in src/components/player/audio-engine.tsx. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: any lock-screen, notification, headset or Bluetooth control actually operated, the metadata shown by the OS, and Safari. Physical checks are outstanding."
+        ],
         "tv": [
           "Remote Play/Pause in PlaybackJourney (simulator). Siri Remote on other tabs, Control Center and AirPlay/HomePod (check 5) not performed."
         ]
@@ -1244,7 +1329,10 @@
           "Local observation only: docs/modernization/evidence/playback-final/InterruptionRouteProbe.swift posts interruption and route notifications to the production handlers while synthetic audio decodes on a simulator; 9/9 behave as documented (APPLE-PLAYBACK-AUTHORIZATION.md). Real calls, Bluetooth and headsets on hardware are unproven."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "No browser-specific handling or journey: interruption by calls and audio route changes is left to the operating system and browser.",
+          "Not verified: call or system interruption, route disconnect and reconnect, and that position is kept afterwards. Physical device checks are outstanding."
+        ],
         "tv": [
           "Shared handlers observed on iOS simulator only (APPLE-PLAYBACK-AUTHORIZATION.md); nothing run on a TV."
         ]
@@ -1332,7 +1420,10 @@
           "DurableProgressJourney 4/4 (newer remote progress kept, a new client resumes it; APPLE-OFFLINE.md); RealtimeJourney progress from another client; PausedRealtimeJourney 2/2 on the integrated app at 7404b027 with total-elapsed assertions (/tmp/abs-root-paused-realtime-green-total.log), and RED with root event forwarding removed (/tmp/abs-root-paused-realtime-mutation.log); book completion through relaunch (APPLE-BOOK-PROGRESS.md). Physical cross-device and live-server sync remain open."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Journeys on de8958cd: e2e/session.spec.ts \"progress from another device appears without reloading\" (another client's PATCH shows live at 50%) and \"finishing and discarding progress reach the server\"; e2e/readers.spec.ts resume journeys follow places saved by another client. Session journeys also ran in Firefox and WebKit at 74d63f16 (one Firefox flake, then 2 of 2). Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "The other device is the server API driven by the test, not a second real client UI. Not verified: finishing on a native app and resuming in the browser."
+        ],
         "tv": [
           "RecoveryJourney relaunch shows the new server position; PodcastJourney.testMarkEpisodeFinishedUpdatesOnlyThatEpisode; CatalogJourney.testProgressFilterDropsATitleMarkedFinishedOnReturn (tvos/QA.md). The TV has no realtime consumer; cross-device check 7 not performed."
         ]
@@ -1368,7 +1459,10 @@
           "DurableProgressJourney.testUnsentListeningSurvivesTerminationAndRestoresServerProgress and testRetryAfterLostAcknowledgmentDoesNotDuplicateListening; restart-recovery journeys pass on iPhone and iPad simulators (apple/README.md); journal Core tests with real files. Process termination in the simulator; physical device and real-server multi-device acceptance remain open."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journey on de8958cd: e2e/playback.spec.ts \"listening while the server is unreachable is kept and delivered later\" (queue survives a reload and is delivered). Unit: src/lib/progress/outbox.test.ts (\"keeps only the newest cumulative report per session and survives a reload\", \"goes on under another session after a request fails without an answer, so that one landing late lowers nothing\") and discard.test.ts. Plain-HTTP two-tab cases in e2e/deployment.spec.ts. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: killing the browser process before acknowledgment (a reload was used). Known limit: tabs rewrite the localStorage queue without a cross-tab lock and can drop one report (WEB-HANDOFF.md)."
+        ],
         "tv": [
           "RecoveryJourney.testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch (sent once, nothing on a second relaunch); bounded UserDefaults journal tests (APPLE-TV-LISTENING-STORAGE.md). Hardware storage caveat in tvos/HANDOFF.md; check 7 not performed."
         ]
@@ -1403,7 +1497,10 @@
           "PodcastJourney 9/9 on iPhone, the three failure/relaunch/retry cases on iPad (APPLE-PODCAST-QUEUE.md): episode order and filters, independent episode progress through relaunch, server downloads; downloaded episode playback (CollectionJourney). iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/podcasts.spec.ts \"episodes sort and filter by progress, and an episode plays with its own progress\", \"latest episodes list the newest unfinished episodes across podcasts and play them\", \"an episode has its own page with progress, finishing and discarding\" and \"an administrator adds a podcast from its feed and downloads an episode on the server\". Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Downloads for offline listening are a native-app feature; the browser explains this and offers saving the original file. Not verified: downloading an episode file to the browser, and real podcast feeds."
+        ],
         "tv": [
           "PodcastJourney 3 cases: episode order and playback recorded for the episode only, mark finished, search tile progress (tvos/QA.md). TV downloads are not required by the spec."
         ]
@@ -1437,7 +1534,10 @@
           "PodcastJourney: testAdminDiscoversAPodcastByNameAndCreatesTheSelectedFeed, testPodcastCreationRequiresAdminAndUsesTheSelectedServerFolder, testAdminCanSelectFeedEpisodesAndQueueThemOnTheExistingServer. Item RSS feed open/view/close by role: ItemServerActionsJourney 4/4 on iPhone and iPad with root wiring (/tmp/abs-root-item-actions-ui.log, /tmp/abs-root-item-actions-phone-repeat.log, /tmp/abs-root-item-actions-ipad.log; 315183c1) and Core 63/63. Synthetic fixture only; no real feed was opened on the owner's server."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/podcasts.spec.ts \"an administrator adds a podcast from its feed and downloads an episode on the server\", \"a feed the server cannot read is reported as such\", \"an administrator follows the server's download queue, clears it, and removes an episode\"; an ordinary account is offered no Find new episodes or Remove from Server. Fixture: loopback podcast feed (qa/feed.mjs) and synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: an ordinary account directly attempting the admin endpoints (only absence of controls was shown), and the owner's feeds."
+        ]
       },
       "gates": {
         "permissions": "Baseline admin/root account gate for add-podcast; do not expose it as permitted for ordinary users.",
@@ -1627,7 +1727,10 @@
           "PDF (required): ReaderJourney PDF cases, the ten-scenario iPhone run (apple/README.md PDF reading). EPUB is in the preview with simulator evidence, but remaining EPUB acceptance is deferred to after Phase 2 (#65, scopeAmendments). MOBI, AZW3, CBZ and CBR are not implemented natively and are deferred (#65); migration keeps their files. Send ebook to device: ItemServerActionsJourney 4/4 on iPhone and iPad (synthetic, no e-mail sent)."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Journeys on de8958cd in e2e/readers.spec.ts open EPUB, PDF, MOBI, AZW3, CBZ and CBR content, a supplementary PDF (\"reading a book's PDF while its audio plays keeps both positions\"), and report damaged EPUB, MOBI, comic and undeliverable documents. The 13 reader journeys passed in Chromium, Firefox and WebKit on 8c597c9f. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Offline reading is a native-app feature; the browser offers downloading the original file. Known WebKit limit, open and under investigation: links inside MOBI/AZW3 books and keys pressed with focus inside the book do nothing. Not verified: Safari, real-world documents."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1660,7 +1763,10 @@
           "PDF: display preference retained while audio plays (ReaderJourney.testPDFReadingKeepsAudioPlayingAndRetainsDisplayPreference), rotation through offline relaunch. EPUB typography settings are deferred (#65). iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Journeys on de8958cd: e2e/readers.spec.ts \"EPUB display settings apply to the text and are kept in this browser\" (theme, font family and font scale change computed styles and persist after reload) and \"MOBI books take the reader's display settings and cannot run scripts\". Reader journeys also passed in Firefox and WebKit on 8c597c9f. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: layout and navigation options, settings for PDF and comics, and Safari."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1693,7 +1799,10 @@
           "PDF: ReaderJourney newer-page cases (in-flight, lost response, lost acknowledgment then rejected retry), offline relaunch, newer remote page after reconnection (apple/README.md). Upgrade path: migration core keeps page, CFI and opaque locations from synthetic legacy data (APPLE-MIGRATION.md). Owner reading data and physical devices not tested."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Journeys on de8958cd in e2e/readers.spec.ts resume the same PDF page, EPUB chapter (CFI), MOBI/AZW3 passage and comic page after reload and from a place another client saved on the server. EPUB CFIs are saved as the legacy reader saves them. Passed in Chromium, Firefox and WebKit on 8c597c9f. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a location written by the actual legacy client before upgrading. MOBI/AZW3 use a new browser-only place format, so no legacy MOBI location exists to resume."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1726,7 +1835,10 @@
           "PDF: ReaderJourney.testPDFReadingKeepsAudioPlayingAndRetainsDisplayPreference and testReadingWaitsForPendingAudioAndPreservesBothPositionsOnReconnect. EPUB combined reading is deferred (#65). iOS 27 simulator against the synthetic 2.30.0-fixture."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Journey e2e/readers.spec.ts \"reading a book's PDF while its audio plays keeps both positions\": audio keeps playing while a supplementary PDF pages, and the server gets both ebookLocation and currentTime. Chromium on de8958cd; reader journeys also passed in Firefox and WebKit on 8c597c9f. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: EPUB or other formats with audio, switching screens repeatedly, and duplicated audio across tabs (a second tab is a second player by design)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1759,7 +1871,10 @@
           "Synthetic legacy data only: adoption NativeTests map legacy player, network, display and language settings where the native key is unset (APPLE-MIGRATION-ADOPTION.md, 31 tests; combined NativeTests 50/50 at the integrated wiring, /tmp/abs-apple-final-wired-stores.log). Theme/haptic persistence: PreferencesJourney.testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch. The owner's real legacy settings were not tested; iOS has no baseline orientation lock (APPLE-PRESENTATION.md)."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/settings.spec.ts \"display preferences apply at once and are kept after a reload\" (theme, reduce motion, German, Arabic right-to-left), \"jump times and auto rewind change how the player moves\", \"seeking from the system media controls can be turned off\", \"the account section names the server and user...\"; player and bookshelf switches kept after reload (playback and browse journeys). Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Haptics and orientation have no browser equivalent and are not ported (WEB-HANDOFF.md). Not verified: migrating settings from the legacy browser client, and restart by closing the browser."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -1793,7 +1908,10 @@
           "Durable confirmed book/episode reset: 14 reset tests within 64 native tests pass; final four iPhone and four actual iPad simulator journeys pass, including cancel, from-zero playback, isolation, visible Try again and foreground recovery. Three existing completion-confirmation journeys also pass. Signed build installed on both owner devices without launching. PR79, docs/modernization/APPLE-PROGRESS-RESET-QA.md. Hardware and owner-data acceptance remain open."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/stats.spec.ts \"statistics show the account's listening as the server records it\" (totals and recent sessions match the server), the two year-in-review journeys (admin sees the server's year, others do not), and \"on a phone, statistics are reachable from the header\"; e2e/session.spec.ts \"finishing and discarding progress reach the server\". Unit: src/lib/abs/stats.test.ts. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: an explicit server rejection of a forbidden progress change. Year in review is HTML, not the legacy canvas image."
+        ]
       },
       "gates": {
         "permissions": "Account/item ownership and permissions required by the actual management endpoint; explicitly exercise rejection.",
@@ -1827,7 +1945,11 @@
           "PresentationJourney diagnostics journeys (connection failure without credentials, media failure, listening waiting to sync) and the redaction package tests (Diagnostics 21 on the combined app, apple/Localization/HANDOFF.md; APPLE-PRESENTATION.md). Not hardware or live-server acceptance."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/settings.spec.ts \"diagnostics describe this browser and server without any credentials\" (copied text has origin, server version and user agent, and no token or password). Failures shown in journeys: unreachable server, wrong password, damaged documents, undeliverable ebook, unreadable feed, failed e-reader delivery. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: certificate trust failures (owned by the browser) and failed file downloads. Some client error messages are English only.",
+          "On de8958cd the e-reader journey (e2e/item-actions.spec.ts \"an ebook is sent to an e-reader the account may use, and a failed delivery says so\") failed once in the full run: the QA server's mail delivery to the loopback sink was not answered within 10 s at a host load average near 100. Unchanged, it then passed 3 of 3 alone and the fixture network check found no stalls (web/qa/.runtime/gaps-full.log, gaps-ereader-rerun.log)."
+        ],
         "tv": [
           "Simulator, synthetic fixture: TVJourneyTests/ReadinessJourney/testFailedSignInIsDiagnosedWithoutCredentials (credentials and token in a sign-in address never shown or saved, masked addresses, Back focus) and testCatalogFailureIsRecordedAndClearedFromSettings (server failure recorded, status, clear); docs/modernization/APPLE-TV-READINESS.md. On-device only: tvOS has no share sheet, so no export. Physical acceptance remains open."
         ]
@@ -1865,7 +1987,10 @@
           "Remaining local QA (APPLE-REMAINING-QA.md): the XCUITest contrast audit of eight main screens in light, dark and black passes on iPhone and iPad simulators after raising the accent and secondary text to 4.5:1 (RED 5a8a9a5b, fix 30a66e60); each dismissal is measured from a screenshot. Reduced motion is a source observation: no custom animation, with no journey toggling it. No VoiceOver walkthrough."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/browse.spec.ts \"the keyboard can skip straight to the content\"; e2e/settings.spec.ts reduce motion and right-to-left direction; e2e/readers.spec.ts \"arrow keys move within an open reader dialog without turning the page behind it\" (also Firefox and WebKit); all journeys locate controls by accessible role and name; \"each page's title names what it shows...\". Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a screen reader by hand, contrast measurement, browser zoom or large text, high contrast mode, and Safari. Known gap: the reader's arrows do not flip in right-to-left languages."
+        ],
         "tv": [
           "Simulator: TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit (Xcode accessibility audit on sign-in, home, details, Now Playing, settings, search; spoken progress values) plus remote focus and Back in every ReadinessJourney; docs/modernization/APPLE-TV-READINESS.md. Not applicable on tvOS: Dynamic Type. VoiceOver, contrast and readability from the sofa need physical acceptance."
         ]
@@ -1904,7 +2029,10 @@
           "Context pass (APPLE-PRESENTATION.md): theme and haptic strength names are looked up by meaning (NativeTextContext), so Light shows the legacy LabelThemeLight or LabelLight translation (de Hell and Leicht) while English labels and selectors stay Light; Sign out (legacy Disconnect, which cleared the active login), Connecting (Attempting server connection), Not connected and Mark book finished? reuse their legacy translations (RED 0217f5b1, fix 31176905). 167 of 638 texts are mapped, 19-26% per language; 471 texts have no legacy equivalent and stay English. German, French and Arabic language journeys and the theme and haptic preferences journey passed on the iPhone simulator. Full localization parity is not met."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Chromium journey on de8958cd: e2e/settings.spec.ts \"display preferences apply at once and are kept after a reload\" switches to German (headings and labels translated, lang=de) and Arabic (dir=rtl). 6ee58e3c reuses legacy translation keys and locale formatting. Unit: src/i18n/translate.test.ts. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified and known gaps: about 200 web-only strings (src/i18n/web-strings.ts), the connect and OpenID page titles and client error messages are English in every language; lang=\"en\" shows until the language loads; no truncation check with long translations across all screens."
+        ],
         "tv": [
           "Simulator: TVJourneyTests/ReadinessJourney/testGermanLocalizesTheInterfaceAndPersists and testArabicMirrorsTheInterface (legacy translations, persistence, right-to-left), TVAppTests/FormatTests/testDurationsAndDatesFollowTheChosenLanguage; docs/modernization/APPLE-TV-READINESS.md. Texts without a legacy equivalent stay English, as the Language screen states."
         ]
@@ -2081,7 +2209,10 @@
           "Separate preview identity com.forkzed.audiobookshelf.native.preview with its own Keychain group, so the working legacy app stays installed (apple/README.md); signed preview installed alongside it on the paired iPhone and iPad. Side-by-side use on a device and rollback are not tested."
         ],
         "android": [],
-        "browser": []
+        "browser": [
+          "Web lane: the legacy interface stays served by the server at / and was not changed. The new client was deployed internally at /web beside the owner's server from 68842296, with the 45149135 image kept for rollback; web/qa/smoke.mjs passed 4 of 4 over HTTP and HTTPS (GET only, no sign-in), and server and proxy start times were unchanged.",
+          "Not done: owner sign-in and playback on the deployment, owner acceptance, and any cutover. The browser client replaces nothing until Phase 2 acceptance."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -2106,7 +2237,10 @@
         "then": "Modern real server-connected client operates without a required cloud intermediary"
       },
       "replacementEvidence": {
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd: e2e/deployment.spec.ts runs the production image from web/Dockerfile behind nginx on one origin, \"a fresh visit finds the server the client is deployed beside and goes straight to signing in\", OpenID and password sign-in, readers and playback, with every request going only to that origin. Internally deployed at /web from 68842296 and smoke-checked read-only. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: signing in and playing on the owner's server, Safari, and owner acceptance of the visual identity."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -2131,7 +2265,11 @@
         "then": "Actual applicable workflows work; unsupported native capabilities are explained"
       },
       "replacementEvidence": {
-        "browser": []
+        "browser": [
+          "Chromium journeys on de8958cd across e2e/connect, browse, playback, podcasts, readers, session, lists, settings, stats and item-actions specs cover sign-in, browse and search, playback, podcasts, all reader formats and progress sync, checked on the server. Playback, reader and session journeys also ran in Firefox 153 and WebKit 26.5 from 74d63f16. Settings explains native-only features under Browser limits. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: Safari, physical audio, the owner's server, token refresh mid-playback, a server under a subpath, and the autoplay-blocked message (no journeys).",
+          "On de8958cd the e-reader journey (e2e/item-actions.spec.ts \"an ebook is sent to an e-reader the account may use, and a failed delivery says so\") failed once in the full run: the QA server's mail delivery to the loopback sink was not answered within 10 s at a host load average near 100. Unchanged, it then passed 3 of 3 alone and the fixture network check found no stalls (web/qa/.runtime/gaps-full.log, gaps-ereader-rerun.log)."
+        ]
       },
       "gates": {
         "permissions": "Authenticated account must have access to the selected library/item; preserve actual endpoint authorization.",
@@ -2156,7 +2294,10 @@
         "then": "Documented connection model works without undisclosed credentials/media relay"
       },
       "replacementEvidence": {
-        "browser": []
+        "browser": [
+          "web/docs/DEPLOYMENT.md documents same-origin /web and separate-origin topologies, ABS_WEB_SERVER, OpenID return addresses, HTTPS and plain-HTTP LAN use. Chromium journeys on de8958cd in e2e/deployment.spec.ts build the image locally, self-host it behind nginx on plain HTTP and find only the one origin in all requests, including media. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: a server under a subpath (unit test only), the separate-origin topology, and the owner's LAN deployment beyond the read-only smoke check."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -2181,7 +2322,10 @@
         "then": "Clear limitation and supported alternative appear; operation is not falsely reported successful"
       },
       "replacementEvidence": {
-        "browser": []
+        "browser": [
+          "Chromium journey on de8958cd: e2e/settings.spec.ts \"diagnostics describe this browser and server without any credentials\" checks the Browser limits region says offline downloads, local folders, casting and Android Auto are \"not available here\". The client also has messages for offline downloads (use Download to save the original file), OpenID on a separate origin, and autoplay blocked. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: no journey shows the offline-download message, the separate-origin OpenID message, or the autoplay-blocked message."
+        ]
       },
       "gates": {
         "permissions": "No additional server permission for presentation/build/migration checks.",
@@ -2213,7 +2357,10 @@
           "This matrix, docs/modernization/APPLE-*.md, tvos/QA.md and the local apple/scripts/verify-*.sh commands; reconciled at 8c1e94a5 with open items in docs/modernization/APPLE-PARITY-GAPS.md."
         ],
         "android": [],
-        "browser": [],
+        "browser": [
+          "Web lane: web/README.md, web/docs/DEPLOYMENT.md, web/docs/SERVER-CONTRACT.md and docs/modernization/WEB-HANDOFF.md record commits, checks, logs in web/qa/.runtime/ and remaining gates. Full local run on de8958cd (web/qa/.runtime/gaps-full.log): Biome and tsc clean, 115 unit tests passed, 72 of 73 Chromium journeys passed and the e-reader journey failed once on a fixture mail stall (passed 3 of 3 alone after). Firefox and WebKit ran only the journeys named in the rows. Local only, no hosted CI. All evidence is fixture evidence on the synthetic 2.30.0 QA server.",
+          "Not met: several browser rows above still have unproved parts (Safari, physical audio, owner server, subpath, token refresh mid-playback), so the browser replacement stays blocked."
+        ],
         "tv": [
           "tvos/QA.md with the exact simulator, fixture, journeys and the open physical checklist; tvos/scripts/verify-ui.sh."
         ]
@@ -2238,6 +2385,10 @@
       "replacementEvidence": {
         "apple-mobile": [
           "Deferred until after Phase 2 (#65, scopeAmendments 2026-10-01). Preview EPUB has simulator evidence (apple/README.md EPUB reading) that does not count toward readiness; hardware volume navigation is untested."
+        ],
+        "browser": [
+          "Journeys on de8958cd: e2e/readers.spec.ts \"an EPUB pages through, jumps by its contents, and resumes at the saved passage here and from other clients\" (CFI saved; chapter 3 resumes after reload and from another client's place), \"EPUB display settings apply to the text and are kept in this browser\" and \"a damaged EPUB is reported as unreadable\". Passed in Chromium, Firefox and WebKit on 8c597c9f. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: EPUB with audio playing together (only PDF was journeyed), real-world EPUBs, and Safari."
         ]
       },
       "verification": {
@@ -2266,6 +2417,10 @@
       "replacementEvidence": {
         "apple-mobile": [
           "Deferred until after Phase 2 (#65). Not implemented natively; migration keeps files and opaque locations (synthetic core tests, APPLE-MIGRATION.md)."
+        ],
+        "browser": [
+          "Journeys on de8958cd: e2e/readers.spec.ts \"a MOBI book scrolls page by page...\" and \"a AZW3 book scrolls page by page, jumps by its contents, and resumes at the same passage here and from other clients\", \"MOBI books take the reader's display settings and cannot run scripts\", \"a damaged MOBI is reported as unreadable\". After 8c597c9f the MOBI and AZW3 journeys passed 48 of 48 repeated in Firefox and WebKit. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Open, under investigation: in WebKit, links inside the book and keys pressed with focus inside the book do nothing (frame sandboxed without scripts). Places use a browser-only format. Not verified: Safari, real-world books."
         ]
       },
       "verification": {
@@ -2293,6 +2448,10 @@
       "replacementEvidence": {
         "apple-mobile": [
           "ReaderJourney PDF cases, ten-scenario iPhone run: invalid file, 120-page document, authored rotation, offline relaunch, newer remote page, supplementary PDF, active audio, delayed and lost responses (apple/README.md PDF reading). iOS 27 simulator against the synthetic 2.30.0-fixture. Physical device, real annotation links and multi-device live-server acceptance remain open."
+        ],
+        "browser": [
+          "Journey on de8958cd: e2e/readers.spec.ts \"a PDF turns pages and follows its links, and resumes where it was left here and on other clients\" (Next page, arrow key, go to page, an internal link to page 3; page saved as text and resumed after reload and from another client's page 40), plus \"a document the server cannot deliver is reported, with a way back\". Passed in Chromium, Firefox and WebKit on 8c597c9f. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: rotation (no rotation control or journey found), PDF display settings, and Safari."
         ]
       },
       "verification": {
@@ -2320,6 +2479,10 @@
       "replacementEvidence": {
         "apple-mobile": [
           "Deferred until after Phase 2 (#65). Not implemented natively; migration keeps files and page locations (synthetic core tests, APPLE-MIGRATION.md)."
+        ],
+        "browser": [
+          "Journeys on de8958cd: e2e/readers.spec.ts \"a CBZ comic shows its pages in order...\" and \"a CBR comic shows its pages in order, and resumes at the saved page here and from other clients\" (decoded page images checked by pixel, numeric page order, page list, comic details, resume after reload and from another client), \"arrow keys move within an open reader dialog...\" and \"a damaged comic is reported as unreadable\". Passed in Chromium, Firefox and WebKit. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: Safari and real-world comics."
         ]
       },
       "verification": {
@@ -2396,6 +2559,10 @@
         "apple-mobile": [
           "Simulator and fixture evidence only: apple/scripts/verify-realtime.sh runs NativeJourneyTests/RealtimeJourney (progress, item, playlist, reconnection and account-switch journeys against Socket.IO 4.7.4) and tvos/Core RealtimeChangeTests; docs/modernization/APPLE-REALTIME.md. Physical-device and live-server gates remain open.",
           "Root integration, committed as 7404b027: NativeTests 50/50 including the 7 CatalogRealtimeTests (/tmp/abs-apple-final-wired-stores.log); PausedRealtimeJourney 2/2 (/tmp/abs-root-paused-realtime-green-total.log) and RED with event forwarding removed (/tmp/abs-root-paused-realtime-mutation.log). RealtimeJourney 5/5 on the corrected wiring in the realtime lane (source as in 0689fb20 and fork/apple-realtime 4d22c8f1, /tmp/realtime-qa/green-final.log); iPad realtime not rerun after correction."
+        ],
+        "browser": [
+          "Journey e2e/session.spec.ts \"progress from another device appears without reloading\" shows a progress change from the API live over socket.io. Chromium on de8958cd; in Firefox it failed once then passed 2 of 2 (engines-rerun.log). SERVER-CONTRACT.md lists the handled events. Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
+          "Not verified: playlist and user events and reconnect after a disconnect in a journey, and that queued progress survives a socket reconnect."
         ]
       },
       "verification": {
@@ -2428,6 +2595,10 @@
         ],
         "apple-mobile": [
           "apple/scripts/verify-ui.sh and apple/scripts/deploy.sh --build-only on the Studio: local signing with strict app and IPA signature verification (apple/README.md). No hosted compute. iOS 14 is typecheck-only (Xcode 27 build-only iOS 15 override)."
+        ],
+        "browser": [
+          "On the Studio, from web/: npm run lint, typecheck, vitest, npm run build and the production Docker image from web/Dockerfile, then Playwright against the local QA fixtures. Last full run on 296259de (final-check-16.log); later commits by affected journeys, logs in web/qa/.runtime/. No hosted compute or CI. Signing does not apply to the browser client.",
+          "Not verified: a full-suite rerun on de8958cd; the fixture network check failed once under heavy Studio load and passed when rerun alone."
         ]
       },
       "verification": {
@@ -2459,6 +2630,10 @@
         ],
         "apple-mobile": [
           "Signed internal preview installed directly on the paired iPhone and iPad with apple/scripts/deploy.sh (apple/README.md; combined PR77 build, apple/Localization/HANDOFF.md). Installation does not establish physical acceptance."
+        ],
+        "browser": [
+          "Deployed internally at /web beside the owner's server from 68842296, following DEPLOYMENT.md \"Using your own reverse proxy\", with the 45149135 image kept for rollback. web/qa/smoke.mjs passed 4 of 4 over HTTP and HTTPS (GET only), /status stayed 200, and the server and proxy did not restart. The legacy interface is still served at /. No public store or hosted service.",
+          "Not verified: any sign-in or playback against the owner's library on the deployment. The public route admits only app user agents, so the browser client is LAN or VPN only."
         ]
       },
       "verification": {
@@ -2484,7 +2659,12 @@
         "tv",
         "browser"
       ],
-      "replacementEvidence": {},
+      "replacementEvidence": {
+        "browser": [
+          "The browser client is the isolated web/ package on its own branches and worktree; it does not touch the legacy Nuxt app, native apps or server. It has replaced nothing: the legacy interface stays at / and the new client runs only at /web internally.",
+          "Phase 2 acceptance has not passed (Safari, physical audio, owner sign-in and owner acceptance remain), so replacement of the browser client remains blocked."
+        ]
+      },
       "verification": {
         "given": "Isolated platform worktrees and each platform's acceptance, migration and server compatibility results",
         "when": "A platform is proposed to replace its working client",
@@ -2515,6 +2695,10 @@
         ],
         "tv": [
           "Production TVCore runs in the local compatibility matrix (SERVER-COMPATIBILITY.md); the TV journeys are not yet part of a candidate-server run."
+        ],
+        "browser": [
+          "The QA server is pinned to 2.30.0 by digest in web/qa/server.mjs, and SERVER-CONTRACT.md \"Alignment needed after a server release\" lists the steps: change the digest, run the full suite, check the listed contract areas, report shared endpoint changes. Only 2.30.0 has been tested.",
+          "Not verified: no candidate server version has been run against the browser client. The owner's compose names the server by the latest tag, so a pull could upgrade it without these checks (WEB-HANDOFF.md)."
         ]
       },
       "verification": {
