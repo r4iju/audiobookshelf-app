@@ -1,0 +1,11 @@
+--- a/server/models/User.js
++++ b/server/models/User.js
+@@ -816,6 +816,8 @@
+         newMediaProgressPayload.finishedAt = null
+       }
+       mediaProgress = await this.sequelize.models.mediaProgress.create(newMediaProgressPayload)
++      // New progress follows the same finished rule and lastUpdate as an update to existing progress
++      mediaProgress = await mediaProgress.applyProgressUpdate(progressPayload)
+       this.mediaProgresses.push(mediaProgress)
+     }
+     userCache.maybeInvalidate(this)
