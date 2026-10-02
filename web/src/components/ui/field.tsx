@@ -73,3 +73,28 @@ export function Toggle({
     </div>
   );
 }
+
+/** A switch with its label beside it, for toolbars and control rows. */
+export function InlineToggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex min-h-9 items-center gap-2 text-xs font-medium">
+      <input
+        type="checkbox"
+        role="switch"
+        aria-checked={checked}
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="size-4 accent-[var(--accent-strong)] focus-ring"
+      />
+      {label}
+    </label>
+  );
+}

@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useId, useState } from "react";
 import { Cover } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
+import { InlineToggle } from "@/components/ui/field";
 import { Alert } from "@/components/ui/status";
 import { formatUnit, type Translate, useI18n } from "@/i18n/i18n";
 import { formatClock } from "@/lib/abs/media";
@@ -84,9 +85,9 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
       ? { min: chapter.start, max: chapter.end }
       : { min: 0, max: media.duration };
   const speed = settings.playbackRate;
-  const scale = settings.scaleElapsedTimeBySpeed ? speed : 1;
-  const elapsed = (currentTime - range.min) / scale;
-  const remaining = (range.max - currentTime) / scale;
+  // As in the legacy player, remaining time is always at the current speed; the setting changes elapsed time only.
+  const elapsed = (currentTime - range.min) / (settings.scaleElapsedTimeBySpeed ? speed : 1);
+  const remaining = (range.max - currentTime) / speed;
   const error = errorText(t, player);
   const rateOptions = (ratePresets as readonly number[]).includes(speed)
     ? ratePresets
@@ -112,6 +113,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               title={media.title}
               shape="square"
               missingLabel={t("WebNoCover")}
+              compact
               className="rounded-lg"
             />
           </Link>
@@ -299,6 +301,20 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               </Button>
             </div>
           ) : null}
+          <div className="flex flex-col gap-1 text-xs font-medium">
+            {chapters.length ? (
+              <InlineToggle
+                label={t("LabelChapterTrack")}
+                checked={settings.useChapterTrack}
+                onChange={(checked) => updateSettings({ useChapterTrack: checked })}
+              />
+            ) : null}
+            <InlineToggle
+              label={t("LabelScaleElapsedTimeBySpeed")}
+              checked={settings.scaleElapsedTimeBySpeed}
+              onChange={(checked) => updateSettings({ scaleElapsedTimeBySpeed: checked })}
+            />
+          </div>
           {media.episodeId ? null : (
             <>
               <Button

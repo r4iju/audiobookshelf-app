@@ -9,7 +9,7 @@ const shapes: Record<CoverShape, string> = { book: "aspect-[1/1.6]", square: "as
 /**
  * Every cover sits in a box of the library's shape so grids and shelves stay aligned whatever the image's own
  * proportions; mismatched art is contained over a blurred copy of itself. Missing or unloadable art becomes a
- * typographic placeholder of the same size.
+ * typographic placeholder of the same size, or just its icon when `compact` leaves no room for text.
  */
 export function Cover({
   src,
@@ -17,6 +17,7 @@ export function Cover({
   subtitle,
   shape,
   missingLabel,
+  compact = false,
   className = "",
 }: {
   src: string | null;
@@ -24,6 +25,7 @@ export function Cover({
   subtitle?: string;
   shape: CoverShape;
   missingLabel: string;
+  compact?: boolean;
   className?: string;
 }) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
@@ -51,6 +53,11 @@ export function Cover({
             className="absolute inset-0 size-full object-contain"
           />
         </>
+      ) : compact ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-surface-3 to-surface-2">
+          <BookOpen aria-hidden className="size-5 text-muted" />
+          <span className="sr-only">{missingLabel}</span>
+        </div>
       ) : (
         <div className="absolute inset-0 flex flex-col justify-between bg-gradient-to-br from-surface-3 to-surface-2 p-3">
           <BookOpen aria-hidden className="size-5 text-muted" />

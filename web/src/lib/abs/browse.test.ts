@@ -45,7 +45,7 @@ describe("browse state in the address", () => {
     );
   });
 
-  it("builds the server items query with a 0-based page and collapsed series only when unfiltered", () => {
+  it("builds the server items query with a 0-based page, collapsing series with or without a filter as the legacy bookshelf does", () => {
     const query = new URLSearchParams(
       itemsQuery(
         { sort: "media.metadata.title", desc: false, filter: null, page: 3 },
@@ -67,7 +67,7 @@ describe("browse state in the address", () => {
         { limit: 24, collapseSeries: true },
       ),
     );
-    expect(filtered.get("collapseseries")).toBe("0");
+    expect(filtered.get("collapseseries")).toBe("1");
     expect(filtered.get("filter")).toBe("series.abc");
   });
 });

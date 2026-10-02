@@ -50,6 +50,7 @@ export const settingsSchema = z.object({
   useChapterTrack: z.boolean().catch(false),
   scaleElapsedTimeBySpeed: z.boolean().catch(true),
   collapseSeries: z.boolean().catch(false),
+  bookshelfListView: z.boolean().catch(false),
   podcastEpisodesOrderBy: z
     .enum(["publishedAt", "title", "season", "episode", "filename"])
     .catch("publishedAt"),

@@ -34,6 +34,7 @@ import * as registry from "@/lib/session/registry";
 import { useSession, useSessionStore } from "@/lib/session/store";
 import { errorMessage } from "./errors";
 import { useOnline } from "./online";
+import { useHeadingTitle } from "./page-title";
 import { useRealtime } from "./realtime";
 
 export function SignedInShell({ children }: { children: ReactNode }) {
@@ -141,6 +142,7 @@ function Shell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ libraryId?: string }>();
+  useHeadingTitle();
   const libraries = useLibraries();
   const admin = isAdmin(useMe().data);
   const shownLibrary = useCurrentLibrary((state) => state.libraryId);

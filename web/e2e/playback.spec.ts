@@ -142,6 +142,40 @@ test("bookmarks are listed, take the player to their place, and can be renamed a
   await expect(dialog).toContainText("No Bookmarks");
 });
 
+test("the time shown can follow the chapter, and elapsed time can ignore the speed while remaining time keeps it", async ({
+  page,
+}) => {
+  const { id, account } = await fresh();
+  const clock = (seconds: number) =>
+    `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+  await signIn(page, account);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("button", { name: /^Play/ }).click();
+  await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(1);
+  await player(page).getByRole("button", { name: "Pause", exact: true }).click();
+  const seek = player(page).getByRole("slider", { name: "Seek" });
+  await seek.fill("40");
+  await expect.poll(() => position(page)).toBe(40);
+  await player(page).getByLabel("Playback Speed", { exact: true }).selectOption("2");
+
+  // The second of three chapters: the seek bar covers only it, and the times count within it.
+  await player(page).getByLabel("Chapter Track").check();
+  const start = Number(await seek.getAttribute("min"));
+  const end = Number(await seek.getAttribute("max"));
+  expect(start).toBeGreaterThan(29);
+  expect(end).toBeLessThan(61);
+  await expect(player(page).getByText(`Elapsed ${clock((40 - start) / 2)}`)).toBeVisible();
+  await expect(player(page).getByText(`Remaining -${clock((end - 40) / 2)}`)).toBeVisible();
+
+  await player(page).getByLabel("Scale Elapsed Time by Speed").uncheck();
+  await expect(player(page).getByText(`Elapsed ${clock(40 - start)}`)).toBeVisible();
+  await expect(player(page).getByText(`Remaining -${clock((end - 40) / 2)}`)).toBeVisible();
+
+  await page.reload();
+  await expect(player(page).getByLabel("Chapter Track")).toBeChecked();
+  await expect(player(page).getByLabel("Scale Elapsed Time by Speed")).not.toBeChecked();
+});
+
 test("listening held by a delete that may still be running is sent once a restart the user was asked for is confirmed", async ({
   page,
 }) => {

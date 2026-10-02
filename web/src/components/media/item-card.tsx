@@ -4,16 +4,22 @@ import type { ReactNode } from "react";
 import type { CoverShape } from "@/lib/abs/media";
 import { Cover, ProgressBar } from "./cover";
 
+export type CardLayout = "grid" | "list";
+
 export interface CardProgress {
   value: number;
   finished: boolean;
 }
 
-/** Fixed-height text block under a fixed-shape cover keeps every card in a row the same height. */
+/**
+ * Fixed-height text block under a fixed-shape cover keeps every card in a row the same height. As a list row, the
+ * cover sits beside the text, which adds `detail` (such as the length), as in the legacy bookshelf's list view.
+ */
 export function MediaCard({
   href,
   title,
   subtitle,
+  detail,
   cover,
   shape,
   badge,
@@ -21,10 +27,12 @@ export function MediaCard({
   progressLabel,
   finishedLabel,
   missingCoverLabel,
+  layout = "grid",
 }: {
   href: string;
   title: string;
   subtitle?: string;
+  detail?: string;
   cover: string | null;
   shape: CoverShape;
   badge?: string;
@@ -32,7 +40,40 @@ export function MediaCard({
   progressLabel: string;
   finishedLabel: string;
   missingCoverLabel: string;
+  layout?: CardLayout;
 }) {
+  const partly = progress && !progress.finished && progress.value > 0 ? progress.value : null;
+  if (layout === "list") {
+    return (
+      <Link
+        href={href}
+        className="group flex w-full items-center gap-3 rounded-xl p-2 hover:bg-surface-2 focus-ring"
+      >
+        <div className="relative w-14 shrink-0">
+          <Cover missingLabel={missingCoverLabel} src={cover} title={title} shape={shape} compact />
+          {partly !== null ? (
+            <div aria-hidden className="absolute inset-x-0 bottom-0">
+              <ProgressBar value={partly} label={progressLabel} />
+            </div>
+          ) : null}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold">{title}</p>
+          {subtitle ? <p className="truncate text-xs text-muted">{subtitle}</p> : null}
+          {detail ? <p className="text-xs text-muted tabular-nums">{detail}</p> : null}
+          {partly !== null ? (
+            <span className="sr-only">{`${progressLabel} ${Math.round(partly * 100)}%`}</span>
+          ) : null}
+        </div>
+        {badge ? (
+          <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold">{badge}</span>
+        ) : null}
+        {progress?.finished ? (
+          <CheckCircle2 aria-label={finishedLabel} className="size-4 shrink-0 text-success" />
+        ) : null}
+      </Link>
+    );
+  }
   return (
     <Link href={href} className="group flex w-full flex-col gap-2 rounded-xl focus-ring">
       <div className="relative">
@@ -78,11 +119,20 @@ export function CardGrid({
   shape,
   children,
   label,
+  layout = "grid",
 }: {
   shape: CoverShape;
   children: ReactNode;
   label?: string;
+  layout?: CardLayout;
 }) {
+  if (layout === "list") {
+    return (
+      <ul aria-label={label} className="flex flex-col gap-1">
+        {children}
+      </ul>
+    );
+  }
   return (
     <ul
       aria-label={label}

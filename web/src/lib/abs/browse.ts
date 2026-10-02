@@ -116,6 +116,6 @@ export function itemsQuery(state: BrowseState, options: { limit: number; collaps
     include: "rssfeed,numEpisodesIncomplete",
   });
   if (state.filter) params.set("filter", state.filter);
-  params.set("collapseseries", options.collapseSeries && !state.filter ? "1" : "0");
+  params.set("collapseseries", options.collapseSeries ? "1" : "0");
   return params.toString();
 }
