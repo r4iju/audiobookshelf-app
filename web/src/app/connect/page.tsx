@@ -10,7 +10,13 @@ export default async function ConnectPage({
 }) {
   const { server, username, next } = await searchParams;
   return (
-    <ConnectScreen initialServer={server ?? ""} initialUsername={username ?? ""} next={safeNext(next)} />
+    <ConnectScreen
+      initialServer={server ?? ""}
+      initialUsername={username ?? ""}
+      next={safeNext(next)}
+      // Read per request, so one image serves any deployment.
+      configuredServer={process.env.ABS_WEB_SERVER}
+    />
   );
 }
 

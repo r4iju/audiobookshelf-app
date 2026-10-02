@@ -60,8 +60,10 @@ network.
    | `ABS_PROXY_BIND` | `80` | Where the proxy listens: `80`, `0.0.0.0:80`, `192.168.1.10:80`, ... |
    | `ABS_WEB_BIND` | `127.0.0.1:3000` | The client's own port, for checking it directly. |
    | `ABS_WEB_IMAGE` | `audiobookshelf-web:local` | Tag for the built image. |
+   | `ABS_WEB_SERVER` | `/` | The server the client signs in to first. See [The client's own server](#the-clients-own-server). |
 
-3. Open `http://<host>/web` and choose the server at `http://<host>` (the same origin, without `/web`).
+3. Open `http://<host>/web`. A browser with no saved servers checks the server at `http://<host>` (the same origin,
+   without `/web`) and goes straight to signing in to it.
 
 Compose never creates, stops or changes the server container. `docker compose -f deploy/compose.yaml down` removes
 only the client and the proxy.
@@ -93,6 +95,23 @@ Run the client container on its own and add one route. The proxy must:
 
 A proxy that passes `Host` as `$host` drops the port. That is fine on the default ports, but OpenID return
 addresses then lack any other port.
+
+### The client's own server
+
+`ABS_WEB_SERVER` is read by the running client, so one image serves any deployment. It names where the server
+answers:
+
+- a path on the client's own origin: `/` when the server is at the origin's root beside `/web`, or a subpath such as
+  `/audiobookshelf` when the proxy serves it there;
+- or a full address, `https://abs.example`.
+
+On a first visit, with no servers saved in that browser, the connect page checks that server's `/status` and opens
+its sign-in. If the check fails, the page says why and the address can be corrected. "Change server" always leads
+to the address field, prefilled with the deployment's server. Browsers with saved servers see them listed as before.
+
+Unset or empty, the client names no server and people enter the address themselves; that suits a client serving
+several servers. Nothing is guessed from the host name, and the client's own base path is never taken for the
+server's.
 
 ### The base path is fixed when the image is built
 

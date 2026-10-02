@@ -67,3 +67,15 @@ export function normalizeServerAddress(input: string): AddressResult {
   const path = url.pathname.replace(/\/+$/, "");
   return { ok: true, url: `${url.origin}${path}`, assumedScheme };
 }
+
+/**
+ * The server a deployment names for the client (ABS_WEB_SERVER): a path on the client's own origin, such as "/" when
+ * the server answers at the origin's root beside the client's base path, or a full address. Anything else names none.
+ */
+export function deployedServer(configured: string | undefined, origin: string) {
+  const value = configured?.trim() ?? "";
+  const onOrigin = value.startsWith("/") && !value.startsWith("//");
+  if (!onOrigin && !/^https?:\/\//i.test(value)) return null;
+  const address = normalizeServerAddress(onOrigin ? `${origin}${value}` : value);
+  return address.ok ? address.url : null;
+}

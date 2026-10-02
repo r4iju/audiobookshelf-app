@@ -32,10 +32,10 @@ function originsOf(page: Page) {
   return seen;
 }
 
+/** The deployment names its own server, so a fresh visit is already at signing in to it. */
 async function chooseServer(page: Page) {
   await page.goto(`${web}/connect`);
-  await page.getByLabel("Server address").fill(origin);
-  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Sign in to abs-web.test" })).toBeVisible();
 }
 
 async function signInHere(page: Page, account: Account) {
@@ -45,6 +45,32 @@ async function signInHere(page: Page, account: Account) {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page.getByRole("navigation", { name: "Library" })).toBeVisible();
 }
+
+test("a fresh visit finds the server the client is deployed beside and goes straight to signing in", async ({
+  page,
+}) => {
+  await page.goto(`${web}/connect`);
+  await expect(page.getByRole("heading", { level: 1, name: "Sign in to abs-web.test" })).toBeVisible();
+  // The server is the origin's root, not the client's /web.
+  await expect(page.getByText(`${origin} · Server version 2.30.0`, { exact: true })).toBeVisible();
+  await page.getByLabel("Username").fill(accounts.user.username);
+  await page.getByLabel("Password").fill(accounts.user.password);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("navigation", { name: "Library" })).toBeVisible();
+});
+
+test("another server can still be chosen by hand", async ({ page }) => {
+  await page.goto(`${web}/connect`);
+  await page.getByRole("button", { name: "Change server" }).click();
+  const address = page.getByLabel("Server address");
+  await expect(address).toHaveValue(origin);
+  // The QA server answers only its own origin, so the address typed here is checked and found unreachable.
+  await address.fill("http://127.0.0.1:19880");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Could not reach the server at http://127.0.0.1:19880",
+  );
+});
 
 test("signing in through the server's OpenID provider returns to the client signed in, and survives a reload", async ({
   page,

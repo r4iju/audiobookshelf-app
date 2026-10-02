@@ -11,6 +11,11 @@ services:
         ABS_WEB_BASE_PATH: /web
     image: ${ABS_WEB_IMAGE:-audiobookshelf-web:local}
     restart: unless-stopped
+    environment:
+      # The server the connect page checks and signs in to first: "/" is this origin's root, where the proxy below
+      # serves the server; a subpath such as /audiobookshelf or a full https:// address also works. Unset, people
+      # enter the address themselves.
+      ABS_WEB_SERVER: ${ABS_WEB_SERVER:-/}
     read_only: true
     # Next.js writes its runtime cache under .next/cache; nothing else in the image changes.
     tmpfs: [/tmp, /app/.next/cache]

@@ -16,6 +16,7 @@ import {
   probeServer,
   startOpenId,
 } from "@/lib/abs/auth";
+import { deployedServer } from "@/lib/abs/connection";
 import { keys } from "@/lib/abs/queries";
 import type { ServerStatus } from "@/lib/abs/schemas";
 import * as registry from "@/lib/session/registry";
@@ -65,11 +66,14 @@ export function ConnectScreen({
   initialServer,
   initialUsername,
   next,
+  configuredServer,
 }: {
   initialServer: string;
   initialUsername: string;
   /** Where to go after signing in; only same-app paths are accepted. */
   next: string;
+  /** The server this deployment is beside, as configured (see deployedServer). */
+  configuredServer?: string;
 }) {
   const { t } = useI18n();
   const router = useRouter();
@@ -79,11 +83,18 @@ export function ConnectScreen({
   // Stays disabled until hydration has restored saved servers, so an early click cannot submit a dead form.
   const restoring = useSession().phase === "restoring";
   const [saved, setSaved] = useState<registry.SavedConnection[]>([]);
+  /** The deployment's own server, and whether this browser had no saved servers when the page opened. */
+  const [own, setOwn] = useState<{ server: string; firstVisit: boolean } | null>(null);
 
   // External system: saved servers are read from this browser's storage after mount.
   useEffect(() => {
-    setSaved(registry.loadRegistry().connections);
-  }, []);
+    const connections = registry.loadRegistry().connections;
+    setSaved(connections);
+    setOwn({
+      server: deployedServer(configuredServer, location.origin) ?? "",
+      firstVisit: connections.length === 0,
+    });
+  }, [configuredServer]);
 
   const [state, submit, pending] = useActionState(
     async (previous: Step, form: FormData): Promise<Step> => {
@@ -126,14 +137,16 @@ export function ConnectScreen({
     { step: "address", error: null, attempted: "" },
   );
 
-  // External system: the server; a link that names a server (for example "sign in again") checks it right away.
+  // External system: the server; a link that names a server (for example "sign in again") checks it right away, as
+  // does a first visit to a deployment that names its own server.
+  const checkFirst = initialServer || (own?.firstVisit ? own.server : "");
   useEffect(() => {
-    if (!initialServer || restoring) return;
+    if (!checkFirst || restoring) return;
     const form = new FormData();
-    form.set("server", initialServer);
+    form.set("server", checkFirst);
     form.set("intent", "probe");
     startTransition(() => submit(form));
-  }, [initialServer, restoring, submit]);
+  }, [checkFirst, restoring, submit]);
 
   const reusable = saved.filter((entry) => entry.auth);
   const signedOut = saved.filter((entry) => !entry.auth);
@@ -168,7 +181,7 @@ export function ConnectScreen({
                 inputMode="url"
                 autoComplete="url"
                 required
-                defaultValue={state.attempted || initialServer}
+                defaultValue={state.attempted || initialServer || own?.server}
                 placeholder="https://"
                 help={t("WebServerAddressHelp")}
               />
