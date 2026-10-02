@@ -1,6 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
+import { ActionsButton, ContextActions, type MenuAction } from "@/components/ui/menu";
 import type { CoverShape } from "@/lib/abs/media";
 import { Cover, ProgressBar } from "./cover";
 
@@ -28,6 +29,7 @@ export function MediaCard({
   finishedLabel,
   missingCoverLabel,
   layout = "grid",
+  menu,
 }: {
   href: string;
   title: string;
@@ -41,10 +43,13 @@ export function MediaCard({
   finishedLabel: string;
   missingCoverLabel: string;
   layout?: CardLayout;
+  menu?: { label: string; actions: MenuAction[] };
 }) {
   const partly = progress && !progress.finished && progress.value > 0 ? progress.value : null;
   if (layout === "list") {
-    return (
+    return withMenu(
+      menu,
+      layout,
       <Link
         href={href}
         className="group flex w-full items-center gap-3 rounded-xl p-2 hover:bg-surface-2 focus-ring"
@@ -71,10 +76,12 @@ export function MediaCard({
         {progress?.finished ? (
           <CheckCircle2 aria-label={finishedLabel} className="size-4 shrink-0 text-success" />
         ) : null}
-      </Link>
+      </Link>,
     );
   }
-  return (
+  return withMenu(
+    menu,
+    layout,
     <Link href={href} className="group flex w-full flex-col gap-2 rounded-xl focus-ring">
       <div className="relative">
         <Cover
@@ -86,12 +93,12 @@ export function MediaCard({
           className="transition-transform group-hover:-translate-y-0.5"
         />
         {badge ? (
-          <span className="absolute top-2 right-2 rounded-full bg-overlay px-2 py-0.5 text-xs font-semibold text-white">
+          <span className="absolute end-2 top-2 rounded-full bg-overlay px-2 py-0.5 text-xs font-semibold text-white">
             {badge}
           </span>
         ) : null}
         {progress?.finished ? (
-          <span className="absolute right-2 bottom-2 rounded-full bg-overlay p-1 text-success">
+          <span className="absolute end-2 bottom-2 rounded-full bg-overlay p-1 text-success">
             <CheckCircle2 aria-label={finishedLabel} className="size-4" />
           </span>
         ) : null}
@@ -109,7 +116,27 @@ export function MediaCard({
           <span className="sr-only">{`${progressLabel} ${Math.round(progress.value * 100)}%`}</span>
         ) : null}
       </div>
-    </Link>
+    </Link>,
+  );
+}
+
+const menuButtons: Record<CardLayout, string> = {
+  grid: "absolute top-2 start-2 bg-overlay text-white shadow-sm hover:bg-black/80 [@media(hover:hover)]:opacity-0 group-hover/card:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+  list: "shrink-0 text-muted hover:bg-surface-2 hover:text-fg",
+};
+
+/** Right-click, a long press or the keyboard open the card's own menu; the button offers the same to touch. */
+function withMenu(
+  menu: { label: string; actions: MenuAction[] } | undefined,
+  layout: CardLayout,
+  card: ReactElement,
+) {
+  if (!menu) return card;
+  return (
+    <div className={layout === "grid" ? "group/card relative" : "flex items-center gap-1"}>
+      <ContextActions actions={menu.actions}>{card}</ContextActions>
+      <ActionsButton actions={menu.actions} label={menu.label} className={menuButtons[layout]} />
+    </div>
   );
 }
 

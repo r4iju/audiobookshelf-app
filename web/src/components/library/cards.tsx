@@ -1,10 +1,19 @@
 "use client";
 
+import { BookOpen, CheckCircle2, ExternalLink, FolderPlus, Info, ListPlus, Play, Undo2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { playerMediaFor } from "@/components/item/play-media";
+import { AddToCollectionDialog, AddToPlaylistDialog } from "@/components/lists/add-to-list";
 import { type CardLayout, MediaCard } from "@/components/media/item-card";
+import type { MenuAction } from "@/components/ui/menu";
 import { useI18n } from "@/i18n/i18n";
 import { authorImageUrl, authorLine, type CoverShape, coverUrl, formatDuration } from "@/lib/abs/media";
-import { useEpisodeProgress, useItemProgress } from "@/lib/abs/queries";
-import type { Author, LibraryItem, Series } from "@/lib/abs/schemas";
+import { useSetFinished } from "@/lib/abs/mutations";
+import { can } from "@/lib/abs/permissions";
+import { useEpisodeProgress, useItemProgress, useMe } from "@/lib/abs/queries";
+import type { Author, LibraryItem, MediaProgress, Series } from "@/lib/abs/schemas";
+import { usePlayerStore } from "@/lib/player/store";
 import { useAbs } from "@/lib/session/store";
 
 export function ItemCard({
@@ -39,40 +48,146 @@ export function ItemCard({
       />
     );
   }
+  return <PlayableCard item={item} shape={shape} layout={layout} progress={progress} />;
+}
+
+/** A book, or a podcast's latest episode, with its own menu of what its details page offers. */
+function PlayableCard({
+  item,
+  shape,
+  layout,
+  progress,
+}: {
+  item: LibraryItem;
+  shape: CoverShape;
+  layout?: CardLayout;
+  progress: MediaProgress | undefined;
+}) {
+  const { t } = useI18n();
+  const { client } = useAbs();
+  const router = useRouter();
+  const me = useMe().data;
+  const setFinished = useSetFinished();
+  const [adding, setAdding] = useState<"playlist" | "collection" | null>(null);
+  const episode = item.recentEpisode;
+  const isBook = item.mediaType === "book";
+  const href = episode ? `/item/${item.id}/episode/${episode.id}` : `/item/${item.id}`;
+  const title = episode ? episode.title : item.media.metadata.title;
+  const playable = episode
+    ? !!episode.audioFile
+    : (item.media.numTracks ?? item.media.tracks?.length ?? 0) > 0;
+  const finished = progress?.isFinished ?? false;
+  const started = !!progress && !finished && progress.currentTime > 0;
+  const actions: MenuAction[] = [
+    ...(playable
+      ? [
+          {
+            key: "play",
+            label: started ? t("WebResume") : t("ButtonPlay"),
+            icon: Play,
+            onSelect: () =>
+              void usePlayerStore
+                .getState()
+                .play({ media: playerMediaFor(client, item, episode ?? undefined) }),
+          },
+        ]
+      : []),
+    ...(isBook && item.media.ebookFile
+      ? [
+          {
+            key: "read",
+            label: t("ButtonRead"),
+            icon: BookOpen,
+            onSelect: () => router.push(`/read/${item.id}`),
+          },
+        ]
+      : []),
+    { key: "details", label: t("HeaderDetails"), icon: Info, onSelect: () => router.push(href) },
+    {
+      key: "tab",
+      label: t("WebOpenInNewTab"),
+      icon: ExternalLink,
+      onSelect: () => window.open(href, "_blank", "noopener"),
+    },
+    ...(isBook || episode
+      ? [
+          {
+            key: "playlist",
+            label: t("LabelAddToPlaylist"),
+            icon: ListPlus,
+            onSelect: () => setAdding("playlist"),
+          },
+        ]
+      : []),
+    ...(isBook && can(me, "update")
+      ? [
+          {
+            key: "collection",
+            label: t("WebAddToCollection"),
+            icon: FolderPlus,
+            onSelect: () => setAdding("collection"),
+          },
+        ]
+      : []),
+    ...(isBook || episode
+      ? [
+          {
+            key: "finished",
+            label: finished ? t("WebMarkNotFinished") : t("WebMarkFinished"),
+            icon: finished ? Undo2 : CheckCircle2,
+            onSelect: () =>
+              setFinished.mutate({ itemId: item.id, episodeId: episode?.id ?? null, finished: !finished }),
+          },
+        ]
+      : []),
+  ];
   const numEpisodes = item.media.numEpisodes;
   return (
-    <MediaCard
-      href={episode ? `/item/${item.id}/episode/${episode.id}` : `/item/${item.id}`}
-      title={episode ? episode.title : item.media.metadata.title}
-      subtitle={episode ? item.media.metadata.title : authorLine(item)}
-      detail={
-        item.mediaType === "podcast"
-          ? numEpisodes
-            ? t("WebEpisodesCount", numEpisodes)
+    <>
+      <MediaCard
+        href={href}
+        menu={{ label: t("WebItemActions", title), actions }}
+        title={title}
+        subtitle={episode ? item.media.metadata.title : authorLine(item)}
+        detail={
+          item.mediaType === "podcast"
+            ? numEpisodes
+              ? t("WebEpisodesCount", numEpisodes)
+              : undefined
+            : formatDuration(item.media.duration) || undefined
+        }
+        layout={layout}
+        cover={coverUrl(client, item)}
+        shape={shape}
+        badge={
+          item.mediaType === "podcast" && !episode && item.numEpisodesIncomplete
+            ? String(item.numEpisodesIncomplete)
             : undefined
-          : formatDuration(item.media.duration) || undefined
-      }
-      layout={layout}
-      cover={coverUrl(client, item)}
-      shape={shape}
-      badge={
-        item.mediaType === "podcast" && !episode && item.numEpisodesIncomplete
-          ? String(item.numEpisodesIncomplete)
-          : undefined
-      }
-      progress={
-        progress
-          ? {
-              value:
-                progress.ebookProgress && !progress.duration ? progress.ebookProgress : progress.progress,
-              finished: progress.isFinished,
-            }
-          : undefined
-      }
-      progressLabel={t("LabelProgress")}
-      finishedLabel={t("LabelFinished")}
-      missingCoverLabel={t("WebNoCover")}
-    />
+        }
+        progress={
+          progress
+            ? {
+                value:
+                  progress.ebookProgress && !progress.duration ? progress.ebookProgress : progress.progress,
+                finished: progress.isFinished,
+              }
+            : undefined
+        }
+        progressLabel={t("LabelProgress")}
+        finishedLabel={t("LabelFinished")}
+        missingCoverLabel={t("WebNoCover")}
+      />
+      {adding === "playlist" ? (
+        <AddToPlaylistDialog
+          libraryId={item.libraryId}
+          entry={{ libraryItemId: item.id, episodeId: episode?.id ?? null }}
+          onClose={() => setAdding(null)}
+        />
+      ) : null}
+      {adding === "collection" ? (
+        <AddToCollectionDialog libraryId={item.libraryId} itemId={item.id} onClose={() => setAdding(null)} />
+      ) : null}
+    </>
   );
 }
 
