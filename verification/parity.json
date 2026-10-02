@@ -1990,7 +1990,7 @@
         "android": [],
         "browser": [
           "Chromium journeys on de8958cd: e2e/browse.spec.ts \"the keyboard can skip straight to the content\"; e2e/settings.spec.ts reduce motion and right-to-left direction; e2e/readers.spec.ts \"arrow keys move within an open reader dialog without turning the page behind it\" (also Firefox and WebKit); all journeys locate controls by accessible role and name; \"each page's title names what it shows...\". Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
-          "Not verified: a screen reader by hand, contrast measurement, browser zoom or large text, high contrast mode, and Safari. Known gap: the reader's arrows do not flip in right-to-left languages."
+          "Not verified: a screen reader by hand, contrast measurement, browser zoom or large text, high contrast mode, and Safari. Right-to-left reader controls, on 9a9252df (fork/web-reader-rtl, not merged or deployed): e2e/readers.spec.ts \"in a right-to-left language (ar|he), the reader's arrows, arrow keys and swipes follow the mirrored layout\" failed first and passes in Chromium, Firefox and WebKit (web/qa/.runtime/reader-rtl-red.log, reader-rtl-green.log). Swipes use synthetic touch pointer events, not a touch screen."
         ],
         "tv": [
           "Simulator: TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit (Xcode accessibility audit on sign-in, home, details, Now Playing, settings, search; spoken progress values) plus remote focus and Back in every ReadinessJourney; docs/modernization/APPLE-TV-READINESS.md. Not applicable on tvOS: Dynamic Type. VoiceOver, contrast and readability from the sofa need physical acceptance."
