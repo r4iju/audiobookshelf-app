@@ -1,6 +1,6 @@
 {
   "platform": "android-native",
-  "sourceSha": "ecba6a5a711e9350cf36f355fdb8380ca5fc045f",
+  "sourceSha": "87c18a1c0bd0fc5026978cc2790326f773bc9f6f",
   "evidenceKind": "emulator and synthetic loopback fixture only; no live server, owner account or physical device",
   "identity": {
     "applicationId": "com.audiobookshelf.app.nativepreview",
@@ -30,8 +30,8 @@
     }
   },
   "journeys": {
-    "classes": 21,
-    "tests": 79,
+    "classes": 22,
+    "tests": 80,
     "failures": 0,
     "singleRun": true,
     "byClass": {
@@ -95,6 +95,11 @@
         "failures": 0,
         "errors": 0
       },
+      "LocalizationJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
       "MigrationJourney": {
         "tests": 6,
         "failures": 0,
@@ -144,8 +149,8 @@
   },
   "artifact": {
     "path": "android-native/app/build/outputs/apk/release/app-release.apk",
-    "sha256": "872a95b30e68fb9ccdc3e822810b16130b7185975d877681b79e066ceec126e6",
-    "bytes": 22068344,
+    "sha256": "f776af23cd8880e4eacee4f712290d071ca12b744be875964f5a1b9c279918b2",
+    "bytes": 22198112,
     "signer": "local Android debug key (CN=Android Debug), certificate SHA-256 118d754789a01ef088d67fabb4a9be5fd51447997cf20dcaa66ab59f2a13f688",
     "distribution": "local internal install only; not uploaded or published"
   },
@@ -171,6 +176,10 @@
     {
       "sha": "11060261",
       "result": "77 of 78; PlayerToolsJourney a timed out once and passed 2 of 2 when rerun with no player change"
+    },
+    {
+      "sha": "f065e892",
+      "result": "79 of 80; AccountsJourney c timed out waiting for the browser's approval page because Chrome was not force-stopped before the run; passed in the full run at 87c18a1c"
     }
   ],
   "layoutFollowUp": {
@@ -187,7 +196,14 @@
     "note": "Subset run, not a full-suite run; the full single run is the one at sourceSha"
   },
   "notImplemented": [
-    "#49 casting",
-    "localization (#54)"
-  ]
+    "#49 casting"
+  ],
+  "localization": {
+    "status": "partial",
+    "strings": 87,
+    "withLegacyTranslation": 72,
+    "languagesOffered": 33,
+    "journey": "LocalizationJourney (German)",
+    "untranslated": "About 350 English UI lines remain unextracted (errors, dialogs, downloads, PDF reader, podcasts, groups, migration, diagnostics, statistics, accessibility descriptions); Playing, Resume, Edit, Read PDF and Mark finished/unfinished stay English"
+  }
 }

@@ -6,7 +6,7 @@ Not merged into `fork/native-tv`. The app installs as the preview identity
 
 ## Issue mapping (for ticket maintenance)
 
-Source `87984807`: the full suite at `ecba6a5a` (79 of 79, see "Final acceptance at ecba6a5a"), plus layout fixes verified by Accessibility, Pdf, Browse, Download and Playback journeys (26 of 26) and screenshots. All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: see the follow-ups.
+Source `87c18a1c`: the full suite passes 80 of 80 journeys in 22 classes in one run, unit tests pass (core 56, app 6), and the packaged APK has SHA-256 `f776af23cd8880e4eacee4f712290d071ca12b744be875964f5a1b9c279918b2` (22198112 bytes, debug-key signed, `com.audiobookshelf.app.nativepreview` 0.15.0-native-preview; see `verification/android-evidence.json`). All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: casting (#49) is not implemented and localization is partial.
 
 | Issue | Status | Evidence | Open follow-ups |
 | --- | --- | --- | --- |
@@ -30,7 +30,7 @@ Source `87984807`: the full suite at `ecba6a5a` (79 of 79, see "Final acceptance
 | #51 preferences, statistics, diagnostics | Done (emulator) | SettingsJourney | |
 | #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `ereaderSettings` and some preferences preserved but not applied; listening history and logs not exported |
 | #53 migrate downloads and reading locations | Done for audio and PDF (emulator) | MigrationJourney c, d, f | EPUB and other locations preserved, applied when #45/#47/#48 exist; a file damaged after commit is fetched from the server, not the archive; legacy downloads in user-chosen (SAF) folders not exercised on a device |
-| #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization partial**: main screens carry legacy translations in 32 languages; about 350 UI lines are still English only (see Localization); TalkBack by a person; owner signing key; install on the owner's phone |
+| #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization partial**: main screens carry legacy translations in 33 languages besides English (LocalizationJourney); about 350 UI lines are still English only (see Localization); TalkBack by a person; owner signing key; install on the owner's phone |
 | #45, #47, #48 | Deferred (after #65) | | Files and locations are preserved by migration |
 
 
