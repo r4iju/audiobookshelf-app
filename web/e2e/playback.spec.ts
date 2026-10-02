@@ -89,6 +89,76 @@ test("the sleep timer can stop at the end of the chapter", async ({ page }) => {
   expect(stoppedAt).toBeLessThan(31);
 });
 
+test("the bookmark at the current playback second is identified", async ({ page }) => {
+  const { api, id, account } = await fresh();
+  await api.call(`/api/me/item/${id}/bookmark`, {
+    method: "POST",
+    body: { time: 10, title: "The current passage" },
+  });
+  await api.call(`/api/me/item/${id}/bookmark`, {
+    method: "POST",
+    body: { time: 20, title: "Another passage" },
+  });
+  await signIn(page, account);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("button", { name: /^Play/ }).click();
+  await expect.poll(() => position(page)).toBeGreaterThan(0);
+  await player(page).getByRole("button", { name: "Pause", exact: true }).click();
+  await player(page).getByRole("button", { name: "Open full player" }).click();
+  await player(page).getByRole("slider", { name: "Seek" }).fill("10");
+  await player(page).getByRole("button", { name: "Your Bookmarks" }).click();
+  const dialog = page.getByRole("dialog", { name: "Your Bookmarks" });
+  await expect(dialog.getByRole("button", { name: /^The current passage/ })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  await expect(dialog.getByRole("button", { name: /^Another passage/ })).not.toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+});
+
+test("a typed bookmark title reaches the server and failed creation stays retryable", async ({ page }) => {
+  const { api, id, account } = await fresh();
+  await signIn(page, account);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("button", { name: /^Play/ }).click();
+  await expect.poll(() => position(page)).toBeGreaterThan(1);
+  await player(page).getByRole("button", { name: "Pause", exact: true }).click();
+  await player(page).getByRole("slider", { name: "Seek" }).fill("10");
+  const second = 10;
+  await player(page).getByRole("button", { name: "Open full player" }).click();
+  await player(page).getByRole("button", { name: "Your Bookmarks" }).click();
+  const dialog = page.getByRole("dialog", { name: "Your Bookmarks" });
+  await dialog
+    .getByRole("textbox", { name: "Title", exact: true })
+    .fill("A passage to return to", { timeout: 5000 });
+  const endpoint = `${qa.origin}/api/me/item/${id}/bookmark`;
+  await page.route(endpoint, (route) =>
+    route.request().method() === "POST" ? route.fulfill({ status: 500, body: "Failed" }) : route.continue(),
+  );
+  await dialog.getByRole("button", { name: "Create Bookmark", exact: true }).click();
+  await expect(dialog.getByRole("alert")).toContainText("Failed to create bookmark");
+  await expect(dialog.getByRole("textbox", { name: "Title", exact: true })).toHaveValue(
+    "A passage to return to",
+  );
+  await expect.poll(async () => (await api.call("/api/me")).body.bookmarks.length).toBe(0);
+  await page.unroute(endpoint);
+  await dialog.getByRole("button", { name: "Create Bookmark", exact: true }).click();
+  await expect
+    .poll(async () =>
+      (await api.call("/api/me")).body.bookmarks.map((b: { title: string; time: number }) => ({
+        title: b.title,
+        time: b.time,
+      })),
+    )
+    .toEqual([{ title: "A passage to return to", time: second }]);
+  await page.keyboard.press("Escape");
+  await player(page).getByRole("slider", { name: "Seek" }).fill("15");
+  await player(page).getByRole("button", { name: "Create Bookmark", exact: true }).click();
+  await expect.poll(async () => (await api.call("/api/me")).body.bookmarks.length).toBe(2);
+});
+
 test("speed and bookmarks are kept", async ({ page }) => {
   const { api, id, account } = await fresh();
   await signIn(page, account);

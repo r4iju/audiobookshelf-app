@@ -1,0 +1,20 @@
+{
+  "WebNavLibrary": "라이브러리",
+  "WebMore": "더보기",
+  "WebStats": "내 통계",
+  "WebAscending": "오름차순",
+  "WebDescending": "내림차순",
+  "WebPageOf": "{0}/{1} 페이지",
+  "WebPreviousChapter": "이전 챕터",
+  "WebNextChapter": "다음 챕터",
+  "WebClose": "닫기",
+  "WebDelete": "삭제",
+  "WebMarkFinished": "완료로 표시",
+  "WebMarkNotFinished": "완료되지 않음으로 표시",
+  "WebEbookSent": "{0}(으)로 전자책을 보냈습니다",
+  "WebReaderPage": "{0}/{1} 페이지",
+  "WebRefresh": "새로 고침",
+  "WebLatestEpisodes": "최신 에피소드",
+  "WebNewCollection": "새로운 컬렉션",
+  "WebNewPlaylist": "새로운 플레이리스트"
+}

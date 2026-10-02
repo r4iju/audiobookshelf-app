@@ -1,0 +1,18 @@
+{
+  "WebPageOf": { "source": "apple", "key": "Page {0} of {1}" },
+  "WebReaderPage": { "source": "apple", "key": "Page {0} of {1}" },
+  "WebMarkNotFinished": { "source": "apple", "key": "Mark as not finished" },
+  "WebNewCollection": { "source": "apple", "key": "New collection" },
+  "WebFilterBy": { "source": "apple", "key": "Filter" },
+  "WebPreviousChapter": { "source": "apple", "key": "Previous chapter" },
+  "WebNextChapter": { "source": "apple", "key": "Next chapter" },
+  "WebEbookSent": { "source": "apple", "key": "Ebook sent to {0}" },
+  "WebRefresh": { "source": "apple", "key": "Refresh" },
+  "WebAscending": { "source": "android", "key": "lib_sort_ascending" },
+  "WebDescending": { "source": "android", "key": "lib_sort_descending" },
+  "WebClose": { "source": "android", "key": "cast_close" },
+  "WebMore": { "source": "android", "key": "menu_more" },
+  "WebNavLibrary": { "source": "android", "key": "tab_library" },
+  "WebNewPlaylist": { "source": "android", "key": "title_new_playlist" },
+  "WebStats": { "source": "android", "key": "title_statistics" }
+}

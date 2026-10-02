@@ -1,0 +1,431 @@
+{
+  "sourceSha256": {
+    "web/src/i18n/native-equivalents.json": "8528156160a3a0331271d6a2a339a20bb51bce0e8787029f75cbbeb6bbe180c8",
+    "web/src/i18n/native-gap-equivalents.json": "1ac9569396ddd6baca5206333373c3727b54b17d19232e1b88b37b7b23000170",
+    "web/src/i18n/server-equivalents.json": "c959d3dfaa14cb2b90d8670fb1a820ec35f1888d872631ded34e96bfdc0681cd",
+    "android-native/app/src/main/res/values/strings.xml": "acc3b976e712fd66e56951014098ce4df5a10ec5201ab468354510e43c970afd",
+    "web/src/i18n/strings/ar.json": "c9eacae6d0b32fd7eeacd2d5368293be52564dac2eafd72abdf268386d82d001",
+    "web/src/i18n/server-strings/ar.json": "73c54be056f9fbe0516e8dc80c09d94e8122ce6a4b19c80030f0045eb192eeab",
+    "web/src/i18n/native-strings/ar.json": "6a0452107e710510f0279e76cdead507a828a812dc52bbfe641effdd3a68f72e",
+    "apple/Localization/translations/ar.json": "b43b4c86c1a658b5e144d4193c3bfe7bb06a5df63aa0f57fec946ffbad84f212",
+    "android-native/app/src/main/res/values-ar/strings.xml": "fb38ed000feab6e7a57cfe61626e0487f6bb20f1a7bb31b467710f528d2272af",
+    "web/src/i18n/strings/be.json": "99ef3e34b6070c2325f9c413cd7f9e418aecb76125a011f32395620717502649",
+    "web/src/i18n/server-strings/be.json": "28cce4ff9297da46888054ed3445569675c71a6c8c1c0922cb47c93170ff87bd",
+    "web/src/i18n/native-strings/be.json": "c819c9e123542f8e5c889af6cf5a704fffcd7baaef19082ca8cfa27941b2721f",
+    "apple/Localization/translations/be.json": "920dc3c1c1e778990638e2dab239bea5568718d4464d01137c0d0b6d540945e3",
+    "android-native/app/src/main/res/values-be/strings.xml": "fb376c2ed27e827f6fc13408e4a4258933cfd9e8b1643d86767c2ede332280be",
+    "web/src/i18n/strings/bg.json": "ce306a2df0df1f7c248bcb73eedd89f8fe3f731ce3f540c5332f78a34c2f003e",
+    "web/src/i18n/server-strings/bg.json": "0c0a43566009c71d3b291281652904d55ba14198b1dac9c6d296c8fcce629b62",
+    "web/src/i18n/native-strings/bg.json": "abe32ab68e21336dcd7601987b4f00ef1f05c8dc311079835d3655af5f8c2fb0",
+    "apple/Localization/translations/bg.json": "10ab650fdb9720e73f7a59b7acceeeeb54c6ec989e051ba4049928b24e529131",
+    "android-native/app/src/main/res/values-bg/strings.xml": "c7840a93094fc05140fe9add4f7cd83f4c01a95c28bf90d2b5a8244fac8c231e",
+    "web/src/i18n/strings/bn.json": "a2fb5bd3bc5ca37c5b0fb4336237c184200519da7eaddd44bc22c91e14faa167",
+    "web/src/i18n/server-strings/bn.json": "bcdf4504e63e4537b3927573336d1f8b7aedd2e0d25811319b4d1673f1b75cd5",
+    "web/src/i18n/native-strings/bn.json": "9b498b8dc66bc2ed28423c3c9da3a957d7c20c90898b33e317dd5b095db63b08",
+    "apple/Localization/translations/bn.json": "748d38d37a1f6330f992b0bcca64a1ef8f6f4166ab6407f6ceda21c9bbe4d780",
+    "android-native/app/src/main/res/values-bn/strings.xml": "283ea13e223da522c8307b7c1f39dd39377bd42edeb2c3a0408493332579f148",
+    "web/src/i18n/strings/ca.json": "0ea3a5c05cfa5c66d41617c2cd3376e30fba05b5de20be39edc5cd8b1c7ac38b",
+    "web/src/i18n/server-strings/ca.json": "664c0ed9a7175bce2c1abb7fe0d11cebc494df9abbaa01448e8d8ef8894dc8d1",
+    "web/src/i18n/native-strings/ca.json": "94dbd89300086f9fc38de8efed3e38f8e7266a014a0cfcf41d5a5c26cecec8e1",
+    "apple/Localization/translations/ca.json": "bf439772a45fe9bc3ee613fb9d0e0d258bae8a431b34dbb74e4b40ba8e80db96",
+    "android-native/app/src/main/res/values-ca/strings.xml": "11c1c3d206efc75f87d3922b895de230f1d94496ca88c76a48301831e8cae266",
+    "web/src/i18n/strings/cs.json": "956ab5ac87585f5d7c7125fbd7bcf19aa1e5c49b3df766edafd1f74035edab81",
+    "web/src/i18n/server-strings/cs.json": "8aa83f06b544fa6fe96eb54013a9fd073e298469ebde50988c8c22d5d7eb30c3",
+    "web/src/i18n/native-strings/cs.json": "61f548ce308d87181a4e5182dd6019439f988c75d9b1324e5a8275a0219af5c3",
+    "apple/Localization/translations/cs.json": "d5cdfe94f84dfb709f2fcff9fcc3d6b5beafc3ca98e2933cd893248483aae174",
+    "android-native/app/src/main/res/values-cs/strings.xml": "34abeb3d1daa1127224bab11de0a94816fea040d35c6132dd20d43d4aaa40f7e",
+    "web/src/i18n/strings/da.json": "4725da9bb6eb5581b120f3bc6b42eff853485d17013b53003809b2c9af8b1ad8",
+    "web/src/i18n/server-strings/da.json": "d642d0382de3f87d3f4b9ad713f3912e538d32bfb197076fb0b7a514d0c6db96",
+    "web/src/i18n/native-strings/da.json": "a9a755e48ec4d815e037dfbdecd31f2a44f7a399997a083b0aa280c0908aef56",
+    "apple/Localization/translations/da.json": "bfc8245d91a4a05de85f78fe6a266cbccecea09dbe76ffb689816049a61b8740",
+    "android-native/app/src/main/res/values-da/strings.xml": "4145c8b34cc00823bd91e7df4de763d6f7c2fe49464b868a2477ca0bc33af67b",
+    "web/src/i18n/strings/de.json": "37238421e36d64d5a50debaf4f2264849b109634609ec15a9511b830a99f67ad",
+    "web/src/i18n/server-strings/de.json": "c926f49505899ae66f3f2be1c11485fce9ad45872956cd37793b48a0314c60a1",
+    "web/src/i18n/native-strings/de.json": "7ce7ecb37b05e54f86200e45c85fc529794daa29cea06a8e9a68d3aca4b15786",
+    "apple/Localization/translations/de.json": "6c74fe971c198ebe25b85b945771e88f26a3c45e26afc9aee958dd33081f4d2b",
+    "android-native/app/src/main/res/values-de/strings.xml": "13d4081920917fa286e755e1fdb5b2dc916beced8942fa8592e5dede0ec57bd3",
+    "web/src/i18n/strings/es.json": "489d1e9d3214cecb2294a0380d2be1e4f3cc24f41371a2a1c1b3e6e939fb8f51",
+    "web/src/i18n/server-strings/es.json": "53f8549b356953336f46c0f68e309c41997da51275888d30af606707e171aea4",
+    "web/src/i18n/native-strings/es.json": "199e16bb891c69a380e4ec8b4394fd42bb5f07a7fc74e570741b319ff39c51cb",
+    "apple/Localization/translations/es.json": "2cd8b43e7d3b1fa15c2153609fdb7859bd339f14fb65823f634dc1fb464662b3",
+    "android-native/app/src/main/res/values-es/strings.xml": "5cedae4c954913f7bff39a6fa621d68d570da060ab5f0ce63725732b85f06351",
+    "web/src/i18n/strings/fi.json": "4743b9d5caa9bae77e7ab8402b694cddfa6ff7e07fb9107b326c14cdd59d2d46",
+    "web/src/i18n/server-strings/fi.json": "9bae3a1f619c1e2a8bbb32ac6881789018d4f99aaf4909ed9c463d1c538084cc",
+    "web/src/i18n/native-strings/fi.json": "30bca13c713ffc8995f38bdba24a02d45c3f558183add9acbaa6f889a21c7f23",
+    "apple/Localization/translations/fi.json": "79bd0767fe40e993a608a32b430369f08e8da97aa9127d7c190dd679a82c3b90",
+    "android-native/app/src/main/res/values-fi/strings.xml": "932b581a673ba496ad19ebf1910da45ed73f2866c4f343c7777b479187f83ab0",
+    "web/src/i18n/strings/fr.json": "4edfd5a967424bf542bfd9f242d62d3cef47369f451806ac3fa668d2174979f4",
+    "web/src/i18n/server-strings/fr.json": "d7cdfabfb8c0b8cc9aeba85c8d52ee4efe741122be48b2251ea128e5fc24aa7b",
+    "web/src/i18n/native-strings/fr.json": "a752bb3580e5ae69110aa7f67bc4ae9289da0969d8e4ccc236703aebf1f4df34",
+    "apple/Localization/translations/fr.json": "72464d99b20f361e19e15b7a4294de581d29426955d87660e5c133ed5b62bf39",
+    "android-native/app/src/main/res/values-fr/strings.xml": "d6b95665f0d9b68cd46d4b0de8449f56232d1df1f2f44e243f2ee9067b6f1ece",
+    "web/src/i18n/strings/he.json": "97145983d9db9636edc8e1f3065f40e462c147d1581abf4c6bfef327d6213be1",
+    "web/src/i18n/server-strings/he.json": "ed3d1474992296fbd26ed1a0ce1c826cc1aeb9f37665815c33db52f54260159c",
+    "web/src/i18n/native-strings/he.json": "3f791fbb904d6c77c0ddb5d02768fb65247861fe49788a6df515c34d36d11e14",
+    "apple/Localization/translations/he.json": "48724b4711cd815400c3ccec7b89ced7b8e25592e143e7d75e3cd0aad8fbe2ad",
+    "android-native/app/src/main/res/values-iw/strings.xml": "89d882e4aaf30ee215e9c8f5ff1b706509cfe3ffa7cc5ce812c99a0d50d72f6c",
+    "web/src/i18n/strings/hr.json": "cf0b01b52ba793428ecdff786fdad920b3b0037170b1411d8a810c93f70f1730",
+    "web/src/i18n/server-strings/hr.json": "494d6cc9b19a938a2255bd2f3b9eab49cb22382ceeb31f678c0cba94c8f5a877",
+    "web/src/i18n/native-strings/hr.json": "97435ca7b7970d5b68311a46b6965d98171c60fe6dd60f5ae05ca79b3787daf1",
+    "apple/Localization/translations/hr.json": "0a9a719f3da35a41e2f96019d6c700e988a220e853065ad822688e7f19eeebd1",
+    "android-native/app/src/main/res/values-hr/strings.xml": "8adcfca343727c06f708b78cf3bf2670a1ce20b5da4bdf2df7bd9713d9594948",
+    "web/src/i18n/strings/hu.json": "42d6b309538752338bc104c362bc3f5ad99a06dc328ba5efbb5db82794d4995e",
+    "web/src/i18n/server-strings/hu.json": "76215a8bea82bfa0eb9dc162a609c014b35b84e4e3f51ac0fd871ff1540c489c",
+    "web/src/i18n/native-strings/hu.json": "27ef9fccf1e4387e5994a6169de7a9d5188a4ef2de55dfdce105e34651750b08",
+    "apple/Localization/translations/hu.json": "9f1cd6fac13b2ccce5528cc7c3fc57006b26239b8b3441ec0819b5e4cc1f60fc",
+    "android-native/app/src/main/res/values-hu/strings.xml": "b8758f534883084103be2c6520947c8367de3116dd26d3ebe5ee0e0a6a5888d1",
+    "web/src/i18n/strings/it.json": "8e9afd15601143f7d87464904e27e23caafd9d01ea98ab7bd3a71764ca3de1a3",
+    "web/src/i18n/server-strings/it.json": "6041c7cf0ade7ce3344d6b574a08c41bfb2ed510c75def68c63203102d07943b",
+    "web/src/i18n/native-strings/it.json": "08a306bb20120fe78de210162fd89dc05eb771ffea42baf6ea969b7f58b45ecc",
+    "apple/Localization/translations/it.json": "a99cb9e77a969753255aa6e9a561aee137d8aa16bb6c11f487cfbd4d74ea2781",
+    "android-native/app/src/main/res/values-it/strings.xml": "1488c22bad29edcf705c9992a1e34bd5b1eb98a70f95581841e9c6066be83360",
+    "web/src/i18n/strings/ko.json": "008e2df9890570b7c4bebbd704f96143417080412943dd5db9b856dac82ff1f5",
+    "web/src/i18n/native-strings/ko.json": "03ff4caf167be14fc06c6321bd53d120833833ab76f4fef3cdc41d08983f3a0e",
+    "apple/Localization/translations/ko.json": "d713758597a7651bc02207f14d381384fbe709f5bd08eef74c85ea9465b96f89",
+    "android-native/app/src/main/res/values-ko/strings.xml": "92f743d20371078d8a903719fff0f507db30edf7c4405cfba9ec637ed97644a8",
+    "web/src/i18n/strings/lt.json": "2991da9939300f8e6e3af316dc58ee53646ba784b5c0c2587cd6824fff164a67",
+    "web/src/i18n/server-strings/lt.json": "2c8ec9a25213d5510b58d30bc22dd0c10ac70664ebc478014a0db3934a542550",
+    "web/src/i18n/native-strings/lt.json": "9c02b4da229678486f088ebbc8a0d95327a69a033a27eabad56c55ace60861c7",
+    "apple/Localization/translations/lt.json": "8760523db0555bfc78bb9454e9138728f8156e21878ade4d910020d9df548707",
+    "android-native/app/src/main/res/values-lt/strings.xml": "b477fec2cd52d3b3021f45fde5599326ce827511a009c07c7718eb2d5f6b16f1",
+    "web/src/i18n/strings/nl.json": "be7028b19afcd589ac6bee85d4c8427120b9ebfc3bb46f1e5bc1b3fe6194f42b",
+    "web/src/i18n/server-strings/nl.json": "67c7c3772f7da1c8411e5edc45c543046b4dede919c10a2f5b287d3e497a31c7",
+    "web/src/i18n/native-strings/nl.json": "9804a3d323346e78f02f8dff0eacda1885fac9e10010a7455e31be6249da9788",
+    "apple/Localization/translations/nl.json": "cf021af619d840d403932c1027b019bdefc3c346e61bb966c103f18b7d7ba82d",
+    "android-native/app/src/main/res/values-nl/strings.xml": "b3eaaa6aa55927ce374e8ac31b16a79305adcbe5175771451049e5e784695c88",
+    "web/src/i18n/strings/no.json": "42cf646c37258541cc26071bc2491ca9588c1f647225c23dc42d9e84d3c5a5ea",
+    "web/src/i18n/server-strings/no.json": "3098caaae3d624ddbf7856d557a5f2a033efcc49badbd44ec18ab7eae89d64e8",
+    "web/src/i18n/native-strings/no.json": "fa0380b5558b494d6484e9f15fa77ab0e874a3a32e12753fcefd8a888d29bdc5",
+    "apple/Localization/translations/no.json": "66098a5487a6c72f74da542c0998250b2ab44bcde4d54f600af589d32dd1e32b",
+    "android-native/app/src/main/res/values-nb/strings.xml": "757454721a1f6c7bfd3d40a4829eadc3252a71aa640a1245c53d91e770f15fde",
+    "web/src/i18n/strings/pl.json": "bd2ee1fa2a07fd4779c5fb561302e6405a1f2ce8233b9683414f18d2354c43b0",
+    "web/src/i18n/server-strings/pl.json": "0b24e06784809d4e80d6cb7aef285452ad2fb786fb5ae57446a1634acb595c5d",
+    "web/src/i18n/native-strings/pl.json": "9702bd4af91e6acf1ab3c02d58f4ba295c928b493650d687f3f880849b17b7e7",
+    "apple/Localization/translations/pl.json": "cfb94ab7a809f5479da65533c84dcee959c81fe5e5d7d63dd0665440fd6582c8",
+    "android-native/app/src/main/res/values-pl/strings.xml": "7be63e023dbee52fdb860e344caa18fee27e51418eec303a245a906b28288d30",
+    "web/src/i18n/strings/pt-br.json": "9f8e6b53f904fc759ce1af3080b394b5ab640a9dde2251116b9835b52fd5cc41",
+    "web/src/i18n/server-strings/pt-br.json": "e4d3948fc1d053dc19d4c872e2ef37c5a29c6d440e9ed4acb277fc176c0f9381",
+    "web/src/i18n/native-strings/pt-br.json": "63efac24704a4f6b9ac0601fb9e50209de18b44d20bf27922a384fd1f0b61d8f",
+    "apple/Localization/translations/pt-br.json": "8456a5798145085563ea5c7bc69d94675b3538e2a309a12549c9575c87b64d63",
+    "android-native/app/src/main/res/values-pt-rBR/strings.xml": "2702af53f236f9ac0ade2d775d7fb361e3ae296cd8b2c7b96adbbdc8174d5379",
+    "web/src/i18n/strings/ru.json": "03a25181685ad4af7bfb8a676245630fa2197ce41a10b4a4b1469dc314feacf6",
+    "web/src/i18n/server-strings/ru.json": "662b4cd75c91a5b2219f0e1a506d41860fbc9d3a1a079f7b1b02f767b850c1b4",
+    "web/src/i18n/native-strings/ru.json": "2ffffb779aad9e9d4278c7a9e7d12e3969b4626a56ffd17fe459afa7752e1f91",
+    "apple/Localization/translations/ru.json": "a168d59c5855a3fe3fecba1d0aa9a19f7240f2f1a0e6da794ffb2697d750c728",
+    "android-native/app/src/main/res/values-ru/strings.xml": "ccd57e9d4de7915ad61e9055538f6364c6e54c997584282c3497eb32d8f018b5",
+    "web/src/i18n/strings/sk.json": "20e5f98ee8dc63be7e2efd4068cd36ee61316c08ae95e65799291e1c61d9a928",
+    "web/src/i18n/server-strings/sk.json": "576739a6c5eed68ecbd2c0c1857fc2c4421c1bcfaae18e6eeda609741c7c164d",
+    "web/src/i18n/native-strings/sk.json": "3ed61f15afb4ace1f4ed38ef542f05befa59ca261cb8d972201a063268163571",
+    "apple/Localization/translations/sk.json": "946b1f1d80bbf4f80e439766e8a5b03a8841c5146c9e8e9405c92850a127dbd8",
+    "android-native/app/src/main/res/values-sk/strings.xml": "1cb84f15058041b93fe971f82c3efc36d6c7fab5006c19efe7ca7d296f370e49",
+    "web/src/i18n/strings/sl.json": "4a57216ab92b184d5b5dc50ab684e0b1f27a23c046311a98ad6ae86002dd8405",
+    "web/src/i18n/server-strings/sl.json": "597de4e6fa84466dc22583c7bba5953c4523a8f7d3910fa7b195975168ea779b",
+    "web/src/i18n/native-strings/sl.json": "b04da79505f5f617048df1d3f43c1d185bc7afd8cb046f9165038001c70fe29c",
+    "apple/Localization/translations/sl.json": "11a15e92064376ffe1329da912eb7822db68c8014421ea945f591a3a8bdb1a31",
+    "android-native/app/src/main/res/values-sl/strings.xml": "50a6bcda510bb66c1aff3f17effc58fe52968e7cd96f16651e876b9990982dbd",
+    "web/src/i18n/strings/sv.json": "1d7a6ce027b45b67226c3f8ef02cc50f1e07ced3d432347523cebc478294dd62",
+    "web/src/i18n/server-strings/sv.json": "8372596ec18d1e25e8bf40dd4ef7c36b173a0632624d9f476c416007bda2907e",
+    "web/src/i18n/native-strings/sv.json": "d520650c3c5df5128180d248f2534551a4226e1342ee4f184f4f4710b63995d2",
+    "apple/Localization/translations/sv.json": "4d6a26e984aea8ef08d5b48fc1100f4cfcfbc49156f463e8a802e6d7d7fe2793",
+    "android-native/app/src/main/res/values-sv/strings.xml": "144eebd78c14c17fcbd61673b5079c1e3bb6c1690b183ebb99c7109d32605ea8",
+    "web/src/i18n/strings/tr.json": "8f9dba5082926928c89923b653e93a092076c7fbb053266bce4fca6939d06b66",
+    "web/src/i18n/server-strings/tr.json": "09d43b915904a92ce68fda8523e93fd311d68ba4a6a80378058475ca3571ced2",
+    "web/src/i18n/native-strings/tr.json": "02e6ea74379c8a5748f8e180f7ba9e658bf308109300a0befc7f53c87d48789f",
+    "apple/Localization/translations/tr.json": "5462a5386ea6b5c6ff33c401f62419fb48714d5d81d4d27aabeb610237ec080f",
+    "android-native/app/src/main/res/values-tr/strings.xml": "f787ee7b8661095e590ebed30ed33bb87e3486a4e8b41e234b30fd62d16b3817",
+    "web/src/i18n/strings/uk.json": "8453e75d56cc5fb6e915b3a52bc2a2400b81c57738524b08e23d655e475975cd",
+    "web/src/i18n/server-strings/uk.json": "c4e25032b3cb35016eb4951dfb13e1d5daa94de3502160bf89b38321d925ab79",
+    "web/src/i18n/native-strings/uk.json": "990468ebee39ac8d0e27c166c1b1897c3eda5bbcdef89705d2553f6ce1120940",
+    "apple/Localization/translations/uk.json": "c462ac29326d5560af812dae29ade0c86cdad034f04ab9142689625e4e6af090",
+    "android-native/app/src/main/res/values-uk/strings.xml": "2cab5252a07ef582e4585b1ad5246355cf85aa854640a23a1914a939db1a335d",
+    "web/src/i18n/strings/vi-vn.json": "b3dee5e9482a7f5ce910073599e46ea0cc93070f2aa621fbc235e3b0760f3c78",
+    "web/src/i18n/server-strings/vi-vn.json": "413e827d7c81b5d55cba10fb33924abf155332c778139cd83df210eb8f2955f8",
+    "web/src/i18n/native-strings/vi-vn.json": "e331ea679f1ec95794a19188b75741db374345e73a4e017a163f60b1a6bdf0c6",
+    "apple/Localization/translations/vi-vn.json": "b3493fe9903bb05f738add4a10afa452b781476dc8069a0a5207dd10b7044342",
+    "android-native/app/src/main/res/values-vi/strings.xml": "fa2b9991af6c3d323f7f03b889feae97d511bc11344d120e2ad2d2a3e1faad24",
+    "web/src/i18n/strings/zh-cn.json": "0e0ff583ac1d626f29172668ae1a417df74ea6f8d6371f76bf75885acf6ea685",
+    "web/src/i18n/server-strings/zh-cn.json": "bf5de825e4c35a8ee27c5ff93fda0811d68e8ba27713a978a88a37caf9c1ae31",
+    "web/src/i18n/native-strings/zh-cn.json": "228bd546f3b6ad6d8c065b1d2842120db14fe9471a668019acf3eb03d6fc70c3",
+    "apple/Localization/translations/zh-cn.json": "f960ce5129eadcac4cce154c589f81e9f06be29960b7bef60754ab4dfc59d9de",
+    "android-native/app/src/main/res/values-zh-rCN/strings.xml": "6d0b6fe40b574c7efd5a1ea4a7d855b4cc784f5a9d014bcb44244e728e2c1e5b"
+  },
+  "entries": {
+    "ar": {
+      "WebClose": {
+        "source": "android",
+        "key": "cast_close"
+      }
+    },
+    "be": {
+      "WebAscending": {
+        "source": "android",
+        "key": "lib_sort_ascending"
+      },
+      "WebDescending": {
+        "source": "android",
+        "key": "lib_sort_descending"
+      },
+      "WebPageOf": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      },
+      "WebMarkNotFinished": {
+        "source": "apple",
+        "key": "Mark as not finished"
+      },
+      "WebReaderPage": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      },
+      "WebNewCollection": {
+        "source": "apple",
+        "key": "New collection"
+      }
+    },
+    "bg": {},
+    "bn": {
+      "WebClose": {
+        "source": "android",
+        "key": "cast_close"
+      }
+    },
+    "ca": {
+      "WebClose": {
+        "source": "android",
+        "key": "cast_close"
+      }
+    },
+    "cs": {},
+    "da": {
+      "WebFilterBy": {
+        "source": "apple",
+        "key": "Filter"
+      }
+    },
+    "de": {
+      "WebFilterBy": {
+        "source": "apple",
+        "key": "Filter"
+      }
+    },
+    "es": {},
+    "fi": {},
+    "fr": {},
+    "he": {
+      "WebAscending": {
+        "source": "android",
+        "key": "lib_sort_ascending"
+      },
+      "WebDescending": {
+        "source": "android",
+        "key": "lib_sort_descending"
+      },
+      "WebPageOf": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      },
+      "WebReaderPage": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      }
+    },
+    "hr": {},
+    "hu": {},
+    "it": {},
+    "ko": {
+      "WebNavLibrary": {
+        "source": "legacy",
+        "key": "ButtonLibrary"
+      },
+      "WebMore": {
+        "source": "legacy",
+        "key": "LabelMore"
+      },
+      "WebStats": {
+        "source": "android",
+        "key": "title_statistics"
+      },
+      "WebAscending": {
+        "source": "android",
+        "key": "lib_sort_ascending"
+      },
+      "WebDescending": {
+        "source": "android",
+        "key": "lib_sort_descending"
+      },
+      "WebPageOf": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      },
+      "WebPreviousChapter": {
+        "source": "apple",
+        "key": "Previous chapter"
+      },
+      "WebNextChapter": {
+        "source": "apple",
+        "key": "Next chapter"
+      },
+      "WebClose": {
+        "source": "android",
+        "key": "cast_close"
+      },
+      "WebDelete": {
+        "source": "legacy",
+        "key": "ButtonDelete"
+      },
+      "WebMarkFinished": {
+        "source": "legacy",
+        "key": "MessageMarkAsFinished"
+      },
+      "WebMarkNotFinished": {
+        "source": "apple",
+        "key": "Mark as not finished"
+      },
+      "WebEbookSent": {
+        "source": "apple",
+        "key": "Ebook sent to {0}"
+      },
+      "WebReaderPage": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      },
+      "WebRefresh": {
+        "source": "apple",
+        "key": "Refresh"
+      },
+      "WebLatestEpisodes": {
+        "source": "legacy",
+        "key": "HeaderLatestEpisodes"
+      },
+      "WebNewCollection": {
+        "source": "apple",
+        "key": "New collection"
+      },
+      "WebNewPlaylist": {
+        "source": "android",
+        "key": "title_new_playlist"
+      }
+    },
+    "lt": {
+      "WebPageOf": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      },
+      "WebReaderPage": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      }
+    },
+    "nl": {
+      "WebFilterBy": {
+        "source": "apple",
+        "key": "Filter"
+      }
+    },
+    "no": {
+      "WebFilterBy": {
+        "source": "apple",
+        "key": "Filter"
+      }
+    },
+    "pl": {
+      "WebEbookSent": {
+        "source": "apple",
+        "key": "Ebook sent to {0}"
+      }
+    },
+    "pt-br": {
+      "WebAscending": {
+        "source": "android",
+        "key": "lib_sort_ascending"
+      },
+      "WebDescending": {
+        "source": "android",
+        "key": "lib_sort_descending"
+      },
+      "WebPageOf": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      },
+      "WebClose": {
+        "source": "android",
+        "key": "cast_close"
+      },
+      "WebReaderPage": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      }
+    },
+    "ru": {},
+    "sk": {
+      "WebFilterBy": {
+        "source": "apple",
+        "key": "Filter"
+      }
+    },
+    "sl": {
+      "WebFilterBy": {
+        "source": "apple",
+        "key": "Filter"
+      }
+    },
+    "sv": {
+      "WebFilterBy": {
+        "source": "apple",
+        "key": "Filter"
+      }
+    },
+    "tr": {},
+    "uk": {},
+    "vi-vn": {
+      "WebAscending": {
+        "source": "android",
+        "key": "lib_sort_ascending"
+      },
+      "WebDescending": {
+        "source": "android",
+        "key": "lib_sort_descending"
+      },
+      "WebPageOf": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      },
+      "WebReaderPage": {
+        "source": "apple",
+        "key": "Page {0} of {1}"
+      }
+    },
+    "zh-cn": {}
+  },
+  "outputSha256": {
+    "ar": "0cdba8b851a4f6a6f075a542e62af4f3c0d189438c095900555a2062b2d16d64",
+    "be": "665c06c7eaca0b1df68ed9b31f919552c734eb234b3266f64fd980d07db3a3b7",
+    "bg": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "bn": "2860d3f24c30bd55d979d3444ebc9e3cef5db637d4fa5f509d734a43db1479a3",
+    "ca": "6917b41c7444bb2c56f330087003a835879a74a8cd467031db29a6df88fdab27",
+    "cs": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "da": "b12055ce63fbed54ddd3a9ae4ac8c7b366e9c4ad135a42808d612cbedcaf1859",
+    "de": "b12055ce63fbed54ddd3a9ae4ac8c7b366e9c4ad135a42808d612cbedcaf1859",
+    "es": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "fi": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "fr": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "he": "427c25fe9d234772b054a807a8d27509de6d06743c59e57d28b1a0085f3f4996",
+    "hr": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "hu": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "it": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "ko": "c4d6d549c741dab46b94c00f2a949d8d8d6de27d8718e37c46e275a49c0d7840",
+    "lt": "3ad10e1b033f4bb296b89d031b6267d437f664f85c446b1bc2e962eac7012fff",
+    "nl": "b12055ce63fbed54ddd3a9ae4ac8c7b366e9c4ad135a42808d612cbedcaf1859",
+    "no": "b12055ce63fbed54ddd3a9ae4ac8c7b366e9c4ad135a42808d612cbedcaf1859",
+    "pl": "47c27f575ca9fc2ee17122e6cd358f9b33424b43719efd9fb4b45d8ab7157bee",
+    "pt-br": "35ea4d31ffcc0f3bde6262056a56028c33b2d35eebaaed75f15156565dd41056",
+    "ru": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "sk": "b12055ce63fbed54ddd3a9ae4ac8c7b366e9c4ad135a42808d612cbedcaf1859",
+    "sl": "b12055ce63fbed54ddd3a9ae4ac8c7b366e9c4ad135a42808d612cbedcaf1859",
+    "sv": "b12055ce63fbed54ddd3a9ae4ac8c7b366e9c4ad135a42808d612cbedcaf1859",
+    "tr": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "uk": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "vi-vn": "29a1bc4dcbebeef53f3473abbb91f40240fbc869432fee78edd633b14baa5187",
+    "zh-cn": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+  }
+}

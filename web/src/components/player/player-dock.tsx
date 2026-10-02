@@ -365,6 +365,12 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
       {bookmarksOpen ? (
         <BookmarksDialog
           itemId={media.itemId}
+          currentTime={currentTime}
+          defaultTitle={
+            chapter
+              ? `${chapter.title} ${formatClock(currentTime - chapter.start)}`
+              : formatClock(currentTime)
+          }
           onPick={(time) => {
             setBookmarksOpen(false);
             actions().seek(time);
