@@ -25,6 +25,15 @@ final class NativeStringsTests: XCTestCase {
         XCTAssertEqual(strings("fr")("Waiting for {0} episode(s) from your server", 3), "3 épisode(s) mis en file pour téléchargement")
     }
 
+    /// The podcast episode sort menu offers the legacy choices (`EpisodesTable.vue` `episodeSortItems`), so each keeps its
+    /// legacy translation, including "Episode number" for the legacy "Episode" ordering.
+    func testPodcastEpisodeSortChoicesShowTheLegacyTranslations() {
+        XCTAssertEqual(["Published date", "Title", "Season", "Episode number", "Filename"].map { strings("de")($0) },
+                       ["Veröffentlichungsdatum", "Titel", "Staffel", "Episode", "Dateiname"])
+        XCTAssertEqual(strings("fr")("Filename"), "Nom de fichier")
+        XCTAssertEqual(strings("ar")("Season"), "الموسم")
+    }
+
     /// Actions and states the legacy app named differently: Disconnect signed out (it cleared the active login and
     /// returned to the connection screen, as Sign out does), and the attempt to reach the server.
     func testSameActionUnderTheLegacyNameShowsTheLegacyTranslation() {
