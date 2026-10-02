@@ -102,25 +102,58 @@ Not a clean run: two cases failed.
 
 Not a clean run: `test4e` failed. Its server log (`fresh-run-97bac3e3-finish-window.txt`) shows the same pattern as the first attempts. The server had just started (08:39:38). The app's socket connected at 08:40:00.204, and its finished session was synced at 08:40:00.220: progress updated to 90.2 s ("previously 34.4") and marked finished. No later write to that row appears, yet every read in that process returned 34.4 s. The process started by the restart returned 90.2 s, finished.
 
-### The cause: a cold-cache race in the 2.30.0 server, reproduced without the app
+### The cause: a user-cache race in the 2.30.0 server
 
-`GET /api/me/progress` answers from the in-memory user object (`req.user.getOldMediaProgress`), and that object comes from the server's user cache (`server/models/User.js` in the pinned image). On a cache miss, `getUserById` and `getUserByIdOrOldId` each load their own copy of the user with its progress rows and store it, so the last copy stored wins. A progress update changes only the copy its own request holds, and `userCache.maybeInvalidate` deletes the cache entry only when that copy did not come from the cache. So when two requests for the same user miss the empty cache at once, and the copy loaded before the update is stored last, the server keeps returning the earlier progress until it restarts. Right after a server start, the app's socket authentication and its pending-session sync are two such requests.
+The stale value differs between runs and is always the row as it stood before the finish: 34.4 s at `97bac3e3`, left by the TV case, and 37.4 s in the first attempts, left by the phone's earlier streaming.
 
-Curl reproductions against the same server, with no app:
+**From the source** (`server/models/User.js` in the pinned image):
 
-- `repro-finish-transition.sh` (`repro-finish-transition.txt`): on a warm server, a second device leaves "The Long Tide" unfinished at 34 s, then a newer `local-all` session finishes it. Every read returns 90.2 s, finished, at once, again 3 s later, after a fresh login and after a restart. The transition itself works.
-- `repro-cold-cache-race.sh` (`repro-cold-cache-race.txt`): each try leaves the book unfinished, restarts the server, then sends a finishing `local-all` session and a plain `GET /api/me` at the same moment. On the first try the reads were right. On the second, the reads, and again 3 s later, returned the row as the PATCH before the restart had left it, while the process after a further restart returned 90.2 s, finished. The script stops at the first stale read and tries at most five times.
+- `GET /api/me/progress` answers from the in-memory user object (`req.user.getOldMediaProgress`), which comes from the server's user cache.
+- On a miss, `getUserById`, `getUserByIdOrOldId`, `getUserByUsername`, `getUserByEmail` and `getUserByOpenIDSub` each await their own database load and then store that object, marking it `fromCache`. Two requests that miss at once each get their own object, and the one stored last replaces the other in the cache.
+- A progress update changes the object its own request holds. `userCache.maybeInvalidate` evicts only objects without `fromCache`, so an object displaced from the cache is never evicted, and reads keep answering from the other one until the server restarts.
 
-The app sent the right session each time, and the server stored it. The first attempts' 07:52 finish fits the same race: the sync came 22 s after a server start. Those logs are gone, so whether the socket connected first in that run is not known.
+Right after a server start, the app's socket authentication and its pending-session sync are two such requests (`fresh-run-97bac3e3-finish-window.txt`: socket at 08:40:00.204, sync at .220).
+
+**Confirmed with instrumentation.** These checks ran in a separate owned container, `abs-apple-diag` on 127.0.0.1:19900, from the same pinned image and harness with its own volumes. Its `User.js` logs which user object each request stores, updates and reads (`server-usercache/instrumentation-*.patch`). `server-usercache/diag-race.sh` runs the cold-cache race: each try leaves "The Long Tide" unfinished, restarts the server, then sends a finishing `local-all` session and a plain `GET /api/me` at the same moment.
+
+On the pinned server, 8 of 10 tries returned the unfinished row (`server-usercache/race-10-pristine.txt`). Each stale try shows two `cache.set` lines for two objects, the finish applied to the first (`progress update on inst=ow9t1 … cached=zk6s1 progress=[[90.2,true]]`), and the reads answered by the second (`progress read on inst=zk6s1 progress=[[0,false]]`). In those tries the un-finishing PATCH had left the row at 0 s rather than the 34 s it sent; that handling was not examined further. After a restart the finished row was returned in every try.
+
+`server-usercache/concurrent-load-check.js` checks the same thing without a database. It runs in the pinned image with a stubbed loader, and two concurrent `getUserById` calls must get the object the cache keeps. On the pinned file it fails: the first request holds load 1, still marked `fromCache`, while the cache holds load 2 (`concurrent-load-check.txt`).
+
+The app sent the right session each time, and the server stored it. The first attempts' 07:52 finish also came 22 s after a server start. Those logs are gone, so whether the race happened there is not known.
+
+The earlier checks on the QA server itself, with no app and no instrumentation:
+
+- `repro-finish-transition.sh` (`repro-finish-transition.txt`): on a warm server, a second device leaves the book unfinished at 34 s, then a newer `local-all` session finishes it. Every read is right at once. A warm cache does not exclude the race; it only has no concurrent miss.
+- `repro-cold-cache-race.sh` (`repro-cold-cache-race.txt`): the same race without instrumentation, stale on the second try.
+
+### Candidate server fix, not promoted
+
+`server-usercache/usercache-candidate.patch` changes only `server/models/User.js` of the pinned 2.30.0 image:
+
+- all five lookups load through one `UserCache.load`; a load that finishes after another load for the same user was cached returns the cached object, so concurrent requests share one object
+- a load that started before an invalidation is returned without being cached
+- `maybeInvalidate` also evicts when the cached object is not the one that was updated
+
+It applies cleanly to the pinned file. It is not in the app, the owner's server or any image beyond the owned diagnostic container, and it needs review before anything is done with it.
+
+| Check | Pinned 2.30.0 | Candidate |
+| --- | --- | --- |
+| `concurrent-load-check.js` | exit 1, two objects | exit 0, one shared object |
+| `diag-race.sh`, 10 tries | 8 stale | 0 stale; every try shows the later load returning the cached object |
+| native run, same cases and order as `97bac3e3` (`server-usercache/run-candidate.sh`) | `test4e` failed at `97bac3e3` (1 of 2 fresh runs) | all 8 cases exit 0, `test4e` included: 90.2 s, finished, at once and after a restart |
+
+The native run used the app at `386fed27`, whose `apple/` and `tvos/` are identical to `97bac3e3`, and the probes from `97bac3e3`. The image was the pinned `ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53…` with only `models/User.js` replaced. The file in the container had SHA-256 `b1480234…`, which is the pinned file (`2174eec7…`) with the patch applied (`server-usercache/native-candidate-tested.txt`). It met the failing run's precondition: the server had just started, the row was unfinished at 34.4 s from the TV, and the app's sync and socket reached the server 10 ms apart. A single native pass does not show the race was hit in that run; the controlled checks above are the proof (`native-candidate-output.txt`, `native-candidate-results.txt`, `native-candidate-server-long-tide.txt`).
+
+A first, narrower candidate covered only the two id lookups (`first-candidate.diff`, `race-5-first-candidate.txt`: 0 stale of 5). It was replaced by the patch above, which covers every lookup, loads that span an invalidation, and displaced objects. `race-5-pristine-first.txt` is the first instrumented pristine run (3 stale of 5); its DIAG lines accumulate across tries.
 
 ### Finish sync gate: still open
 
-The matched production probe, unfinished to finished on the same item, failed at `97bac3e3` and passed at `386fed27`. The failure is the server returning stale progress after storing the finish, not a lost finish. No fix is confirmed, so the gate stays open. No app code changed. Possible next steps, for a decision and not attempted here:
+The matched production probe, unfinished to finished on the same item, failed at `97bac3e3` against the real 2.30.0 server and passed at `386fed27`. The failure is the server returning stale progress after storing the finish, not a lost finish. The real server does not pass this case. The cause is confirmed in the server. The candidate fix passes the controlled checks and the native run in the owned diagnostic container only; it is unreviewed and not deployed anywhere else, so the gate stays open. No app code changed.
 
-- report the race upstream; the fix belongs in the server's user cache
-- in the app, send pending sessions before opening the socket after launch or reconnect. That removes the app's own concurrent pair, but not other requests or other clients that miss the cache at the same moment.
+An app-side change, sending pending sessions before opening the socket, would remove only the app's own concurrent pair, not other requests or other clients that miss the cache at the same moment. It has not been made.
 
-Until then, a client reading progress from such a server process can resume from the earlier position. In the first attempts that happened: the next download resumed from 39 s, and its later offline session replaced the finish.
+Until a fixed server is in use, a client reading progress from an affected server process can resume from the earlier position. In the first attempts that happened: the next download resumed from 39 s, and its later offline session replaced the finish.
 
 ## Migration upload against the server
 
@@ -163,7 +196,7 @@ During offline playback with the server stopped, the player shows "Playback prog
   - TV resume from a server position left by another install, with chapter movement across files
   - TV search and podcast episode progress
   - migration session and position upload, including idempotence
-- **Open software gate: finish sync.** The finish reaches the server and is stored, but in that run the server went on returning the earlier unfinished progress until it restarted. A cold-cache race in the 2.30.0 server, reproduced with curl and no app, explains it. The gate stays open until a fix is confirmed and the matched probe (`test4d`, `test4e`) passes.
+- **Open software gate: finish sync.** The finish reaches the server and is stored, but in that run the server went on returning the earlier unfinished progress until it restarted. The cause is a user-cache race in the 2.30.0 server, confirmed with instrumentation. A candidate server patch is recorded but not reviewed or deployed, so the gate stays open.
 - **No product defect was found in the apps, so no app code changed.**
 - **Still open, physical or owner gates:**
   - devices, lock screen and routes
