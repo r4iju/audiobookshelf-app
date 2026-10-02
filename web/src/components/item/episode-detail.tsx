@@ -69,6 +69,7 @@ function EpisodeView({ item, episode }: { item: LibraryItem; episode: PodcastEpi
             title={podcastTitle}
             shape={shape}
             missingLabel={t("WebNoCover")}
+            compact
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-4">
@@ -103,11 +104,10 @@ function EpisodeView({ item, episode }: { item: LibraryItem; episode: PodcastEpi
           ) : null}
 
           <ProgressSummary progress={progress} duration={duration} />
-          <ProgressControls itemId={item.id} episodeId={episode.id} progress={progress} />
-
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="primary"
+              className="w-full sm:w-auto"
               onClick={() =>
                 playing
                   ? usePlayerStore.getState().pause()
@@ -131,6 +131,7 @@ function EpisodeView({ item, episode }: { item: LibraryItem; episode: PodcastEpi
               </Button>
             ) : null}
           </div>
+          <ProgressControls itemId={item.id} episodeId={episode.id} progress={progress} />
           <InlineError error={remove.error} />
         </div>
       </div>

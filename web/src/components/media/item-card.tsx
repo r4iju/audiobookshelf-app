@@ -81,8 +81,8 @@ export function MediaCard({
           missingLabel={missingCoverLabel}
           src={cover}
           title={title}
-          subtitle={subtitle}
           shape={shape}
+          compact
           className="transition-transform group-hover:-translate-y-0.5"
         />
         {badge ? (
@@ -136,7 +136,7 @@ export function CardGrid({
   return (
     <ul
       aria-label={label}
-      className={`grid gap-x-4 gap-y-6 ${shape === "book" ? "grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]" : "grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))]"}`}
+      className={`grid gap-x-4 gap-y-6 ${shape === "book" ? "grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]" : "grid-cols-[repeat(auto-fill,minmax(min(9rem,calc(50%_-_0.5rem)),1fr))] sm:grid-cols-[repeat(auto-fill,minmax(10rem,1fr))]"}`}
     >
       {children}
     </ul>

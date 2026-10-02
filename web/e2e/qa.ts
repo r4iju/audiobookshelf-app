@@ -13,6 +13,13 @@ export const qa = stateSchema.parse(
   JSON.parse(readFileSync(new URL("../qa/.runtime/state.json", import.meta.url), "utf8")),
 );
 
+// The variables and defaults qa/server.mjs and its fixtures start from, so specs reach the stack this run set up.
+export const stack = {
+  container: process.env.ABS_QA_CONTAINER ?? "abs-web-qa",
+  feedPort: Number(process.env.ABS_QA_FEED_PORT ?? 19885),
+  mailPort: Number(process.env.ABS_QA_MAIL_PORT ?? 19886),
+};
+
 export const accounts = {
   admin: { username: "qa-admin", password: "qa-admin-pass" },
   user: { username: "qa", password: "qa-pass" },

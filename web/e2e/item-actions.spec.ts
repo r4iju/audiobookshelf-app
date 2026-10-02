@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { accounts, itemIdByTitle, qa, serverApi, signIn } from "./qa";
+import { accounts, itemIdByTitle, qa, serverApi, signIn, stack } from "./qa";
 
 const mailDir = join(import.meta.dirname, "..", "qa", ".runtime", "mail");
 const sentMail = () =>
@@ -74,7 +74,7 @@ test("an ebook is sent to an e-reader the account may use, and a failed delivery
   // answers with the VM's host gateway, the route qa/server.mjs keeps fixture traffic off because it drops connections.
   await admin.call("/api/emails/settings", {
     method: "PATCH",
-    body: { host: "127.0.0.1", port: 19886, secure: false, fromAddress: "abs-qa@example.invalid" },
+    body: { host: "127.0.0.1", port: stack.mailPort, secure: false, fromAddress: "abs-qa@example.invalid" },
   });
   await admin.call("/api/emails/ereader-devices", {
     method: "POST",

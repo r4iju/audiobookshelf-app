@@ -51,13 +51,13 @@ export function AuthorDetail({ libraryId, authorId }: { libraryId: string; autho
         return (
           <div className="flex flex-col gap-8">
             <header className="flex flex-col gap-5 sm:flex-row sm:items-end">
-              <div className="w-36 shrink-0">
+              <div className="w-36 shrink-0 overflow-hidden rounded-full">
                 <Cover
                   src={authorImageUrl(client, data)}
                   title={data.name}
                   shape="square"
                   missingLabel={t("WebNoCover")}
-                  className="rounded-full"
+                  compact
                 />
               </div>
               <div className="flex flex-col gap-2">

@@ -63,7 +63,7 @@ function ShelfRow({ shelf, libraryId, shape }: { shelf: Shelf; libraryId: string
       <h2 id={headingId} className="text-lg font-semibold">
         {label}
       </h2>
-      <ul className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 lg:-mx-8 lg:px-8">
+      <ul className="-mx-4 flex snap-x scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 lg:-mx-8 lg:scroll-px-8 lg:px-8">
         {shelf.type === "series"
           ? shelf.entities.map((series) => (
               <li key={series.id} className={`shrink-0 snap-start ${width}`}>

@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { errorMessage } from "@/components/app/errors";
 import { CardGrid } from "@/components/media/item-card";
@@ -15,6 +14,7 @@ import { useSettings, useSettingsStore } from "@/lib/settings/store";
 import { ItemCard } from "./cards";
 import { ListViewToggle } from "./list-view-toggle";
 import { Pager } from "./pager";
+import { SortDirection } from "./sort-direction";
 import { useLibrary } from "./use-library";
 
 type FilterGroup = { label: string; options: Array<{ value: string; label: string }> };
@@ -88,69 +88,56 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
           <h1 className="text-2xl font-bold tracking-tight lg:text-3xl">
             {library?.name ?? t("ButtonLibrary")}
           </h1>
-          {items.data ? <p className="text-sm text-muted">{t("WebItemsCount", total)}</p> : null}
+          <div className="flex flex-wrap items-center gap-x-4">
+            {items.data ? <p className="text-sm text-muted">{t("WebItemsCount", total)}</p> : null}
+            {mediaType === "book" ? (
+              <InlineToggle
+                label={t("LabelCollapseSeries")}
+                checked={settings.collapseSeries}
+                onChange={(checked) => {
+                  updateSettings({ collapseSeries: checked });
+                  if (state.page > 1) go({});
+                }}
+              />
+            ) : null}
+          </div>
         </div>
-        <div className="flex flex-wrap items-end gap-3">
-          <SelectField
-            label={t("WebSortBy")}
-            value={state.sort}
-            onChange={(event) => go({ sort: event.target.value, desc: naturalDesc(event.target.value) })}
-          >
-            {sortsFor(mediaType).map(([value, label]) => (
-              <option key={value} value={value}>
-                {t(label)}
-              </option>
-            ))}
-          </SelectField>
-          <fieldset className="flex rounded-xl bg-surface-2 p-1">
-            <legend className="sr-only">{t("WebSortDirection")}</legend>
-            <Button
-              size="sm"
-              variant={state.desc ? "ghost" : "secondary"}
-              aria-pressed={!state.desc}
-              onClick={() => go({ desc: false })}
+        <div className="flex w-full flex-wrap items-end gap-3 sm:w-auto">
+          <div className="flex w-full items-end gap-2 sm:w-auto">
+            <SelectField
+              label={t("WebSortBy")}
+              value={state.sort}
+              onChange={(event) => go({ sort: event.target.value, desc: naturalDesc(event.target.value) })}
+              className="min-w-0 flex-1 sm:w-48 sm:flex-none"
             >
-              <ArrowUpNarrowWide aria-hidden className="size-4" />
-              {t("WebAscending")}
-            </Button>
-            <Button
-              size="sm"
-              variant={state.desc ? "secondary" : "ghost"}
-              aria-pressed={state.desc}
-              onClick={() => go({ desc: true })}
+              {sortsFor(mediaType).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {t(label)}
+                </option>
+              ))}
+            </SelectField>
+            <SortDirection desc={state.desc} onChange={(desc) => go({ desc })} />
+          </div>
+          <div className="flex w-full items-end gap-2 sm:w-auto">
+            <SelectField
+              label={t("WebFilterBy")}
+              value={state.filter ?? ""}
+              onChange={(event) => go({ filter: event.target.value || null })}
+              className="min-w-0 flex-1 sm:w-48 sm:flex-none"
             >
-              <ArrowDownWideNarrow aria-hidden className="size-4" />
-              {t("WebDescending")}
-            </Button>
-          </fieldset>
-          <SelectField
-            label={t("WebFilterBy")}
-            value={state.filter ?? ""}
-            onChange={(event) => go({ filter: event.target.value || null })}
-            className="max-w-64"
-          >
-            <option value="">{t("LabelAll")}</option>
-            {groups.map((group) => (
-              <optgroup key={group.label} label={group.label}>
-                {group.options.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </SelectField>
-          {mediaType === "book" ? (
-            <InlineToggle
-              label={t("LabelCollapseSeries")}
-              checked={settings.collapseSeries}
-              onChange={(checked) => {
-                updateSettings({ collapseSeries: checked });
-                if (state.page > 1) go({});
-              }}
-            />
-          ) : null}
-          <ListViewToggle />
+              <option value="">{t("LabelAll")}</option>
+              {groups.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </SelectField>
+            <ListViewToggle />
+          </div>
         </div>
       </header>
 

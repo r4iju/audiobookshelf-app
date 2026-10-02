@@ -23,7 +23,7 @@ export function MediaRow({
   return (
     <li className="flex items-center gap-3 px-3 py-3 sm:gap-4 sm:px-4">
       <Link href={href} tabIndex={-1} aria-hidden className="w-14 shrink-0 sm:w-16">
-        <Cover src={cover} title={title} shape="square" missingLabel={missingCoverLabel} />
+        <Cover src={cover} title={title} shape="square" missingLabel={missingCoverLabel} compact />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <h3 className="font-medium break-words">
