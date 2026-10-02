@@ -1,3 +1,80 @@
+# Current bounded web candidate, October 3, 2026
+
+This increment starts from merged PR #124, `32c8316fd21f8c4c164b9fd656c64174cd814d1f`.
+It finishes the two concrete software gaps recorded below: bookmark creation/current-time marking and missing
+in-use translation-table entries. Root posted its final source review on PR #126 and cleared exact source
+`36a7e5e280eebf9005ecf2123c13a88383e19dcb` with no blockers. It inspected loaders, source mappings,
+catalog/provenance, unchanged original tables and the 90 inherited holes. Runtime/journey blobs remain
+unchanged from checked `4e7d6900`; this follow-up changes documentation only. Root owns the sole consolidated client-only deployment.
+No deployment, image build or new delivery package is performed by this increment.
+
+## Bookmark main flow
+
+The list marks the bookmark at the current whole playback second with a visible check and `aria-current`.
+An inline Title field creates a named bookmark directly through the existing server mutation. Blank titles
+use the existing chapter/time default; the fast player creation button remains available. Pending and duplicate
+current-second creation are disabled. Failed writes retain the typed title and show the existing translated
+error; successful writes invalidate the account query, show confirmation and reset the form.
+
+Two production journeys reached playback and failed on the missing current marker and Title field before the
+fix. Setup-only failures are retained separately and do not count as RED. The affected four journeys cover
+current marking, typed creation/failure/retry with server observation, fast creation/persisted speed, and
+list selection/rename/removal. Initial GREEN passed three, then the typed case passed after using deterministic
+whole-second seeking (the displayed slider rounds while server bookmarks floor). No mirrored component tests
+were added. Fixtures use the existing isolated, unmodified Audiobookshelf 2.30.0 image.
+
+## Maintained translation fallback tables
+
+The catalog is the union of literal in-use `webStrings` and inherited `en-us` keys, including implicit `_one`
+variants: **347 entries**, comprising 180 web and 167 inherited entries. Inherited keys are appended so the
+web inventory order remains stable. The original 121-unmatched report below remains historical.
+
+Across 29 non-English languages (10,063 language/key slots), 6,271 usable carried values are preserved,
+50 exact source-gap values are copied, and 3,742 missing or placeholder-invalid values are machine-drafted.
+The inherited gaps total 90 across ca17/he6/ko6/lt34/tr8/vi-vn19. The 50 copies consist of 44 native-table
+values and 6 legacy equivalents, including English-identical usable source values. They are distinct from
+the existing 26-key native-equivalent allowlist and from the machine drafts. Nine new Apple-key mappings and
+seven Android-key mappings are allowlisted, but a mapping is not a copied translation in every language.
+No incorrect semantic mapping or distinct-translation count is inferred from coverage.
+
+`web/src/i18n/drafts` contains only actual remaining holes, not replacements for usable originals.
+Thirty-eight machine-drafted entries are English-identical (including the product name), reported separately;
+they are valid entries, not distinct translated wording. `source-fallbacks/provenance.json` records input/output
+SHA-256 hashes and each copy's source/key; `drafts/provenance.json` records the English snapshot and draft
+hashes plus per-language coverage. Runtime precedence is draft, exact source gap, then usable legacy/server/native.
+Empty or placeholder-invalid carried values cannot hide a usable fallback; originals themselves are unchanged.
+
+`python3 web/scripts/import-web-gap-sources.py` regenerates exact copies. `npm --prefix web run i18n:validate`
+checks source hashes, the reviewed English snapshot, exact needed/stale key sets, placeholder multisets and
+newline counts, then updates draft provenance. All 29 catalogs have no missing entries under these structural
+checks. This is machine-draft coverage, **not native-speaker approval or complete localization acceptance**.
+English connection/OIDC page titles, client error copy and initial server-rendered language remain explicit
+limitations; there is no SSR/i18n redesign in this increment.
+
+## Final evidence and remaining criteria
+
+Final verification is limited to the four affected Chromium bookmark journeys, translation integrity,
+Biome, TypeScript, the existing unit suite and one local `/web` static build. Results and their exact checked
+commit are reported on the PR. Logs and failure evidence remain private for root; no private artifacts or
+screenshots are published. PDF/control/reader/full-browser and multi-engine suites are not repeated.
+Frontend bars opened by grep: state (`useState` at bookmarks39/40 and player-dock78), types
+(`z.string` at bookmarks17), components (`"use client"` at both line1; exported components at20/53).
+No effect was added. Dialog/rename/remove are event-owned; time is derived, title is a DOM form draft,
+server bookmarks and mutation lifecycle remain query-owned.
+
+| Issue | Current software / criteria | Remaining gate |
+| --- | --- | --- |
+| #57 | Bookmark current-time and inline-title gaps implemented; existing playback evidence retained | Root deployment, explicit pending playback criteria, physical audio/Safari/Media Session and real-network/owner acceptance |
+| #59, #60, #63 | Root reconciled and closed against their own criteria | Do not reopen from blanket physical-readiness gates |
+| #61 | Reviewed rotation implementation merged in #124 | Root serves reviewed final rotation build, then root can reconcile/close |
+| #64 | All 347 in-use catalog entries covered in 29 non-English tables; usable originals preserved | English page/error/initial-render limitations, native-speaker quality, touch/AT/scalable-text/contrast acceptance and original pending criteria |
+| #65 | Bounded software increment ready for final checks/review | Root confirms this docs-only delta, consolidated internal deployment/acceptance and legacy retirement criteria |
+
+Original SPEC and ticket acceptance criteria remain unchanged. Hardware/native-speaker/owner limits are
+tracked separately from software gaps; closed feature tickets are not reopened. This pass stops at PR handoff.
+
+---
+
 # Bounded web finishing pass, October 2, 2026
 
 Candidate software was checked at `7b2a916c61c87a3533ca819d8b29c09bc7a7059e`, originally based on `d3152a5d`.
@@ -62,7 +139,7 @@ Logs, failure traces and the local standalone `/web` package are retained privat
 credentials, private hosts or package artifacts are committed to this public repository. Deployment acceptance
 of this candidate has not occurred.
 
-## Current remaining rows
+## Remaining rows at the prior pass (historical)
 
 | Issues | Main software flow | Remaining acceptance / limits |
 | --- | --- | --- |

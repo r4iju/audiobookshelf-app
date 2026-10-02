@@ -19,7 +19,8 @@
     "e2e": "playwright test",
     "qa:server": "node qa/server.mjs",
     "qa:oidc": "node qa/oidc.mjs",
-    "qa:deploy": "node qa/deploy.mjs"
+    "qa:deploy": "node qa/deploy.mjs",
+    "i18n:validate": "node scripts/validate-web-translations.mjs"
   },
   "dependencies": {
     "@radix-ui/react-context-menu": "2.3.7",
