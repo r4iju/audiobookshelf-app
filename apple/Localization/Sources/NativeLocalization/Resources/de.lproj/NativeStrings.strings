@@ -148,6 +148,8 @@
 "Tags" = "Schlagwörter";
 "Text weight" = "Schriftstärke";
 "The feed URL will be {0}" = "Feed-URL wird {0} sein";
+"The server returned HTTP {0}. Please try again." = "Der Server hat HTTP {0} zurückgegeben. Bitte versuche es erneut.";
+"The username or password was not accepted." = "Benutzername oder Passwort wurden nicht akzeptiert.";
 "Theme" = "Farbschema";
 "Title" = "Titel";
 "Total track" = "Gesamtanzahl Titel";

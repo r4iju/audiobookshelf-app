@@ -1,3 +1,5 @@
 {
-  "Diagnostics": "Diagnose"
+  "Diagnostics": "Diagnose",
+  "The server returned HTTP {0}. Please try again.": "Der Server hat HTTP {0} zurückgegeben. Bitte versuche es erneut.",
+  "The username or password was not accepted.": "Benutzername oder Passwort wurden nicht akzeptiert."
 }

@@ -39,6 +39,11 @@ public struct NativeStrings {
         Self.substitute(table[english] ?? english, arguments)
     }
 
+    /// The same lookup for arguments gathered elsewhere, such as the shared core's text.
+    public func callAsFunction(_ english: String, arguments: [CustomStringConvertible]) -> String {
+        Self.substitute(table[english] ?? english, arguments)
+    }
+
     /// Text whose English wording is shared by several meanings, translated for the one named. Without a translation
     /// for that meaning it stays English, never borrowing another meaning's translation.
     public func callAsFunction(_ english: String, context: NativeTextContext, _ arguments: CustomStringConvertible...) -> String {
