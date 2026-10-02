@@ -322,5 +322,47 @@
       "receiver/Android Auto"
     ],
     "artifactRoot": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts (outside the repository)"
+  },
+  "currentFinishingPass": {
+    "baseSha": "d3152a5d",
+    "implementationSha": "125634de7da2b00bc5d59c75f860d48e8c5260ca",
+    "productionInputs": {
+      "appMainTree": "4645c6acb9c6d6b1766d970e328e5cb0429c64fd",
+      "coreMainTree": "0470dba34361d773aef64f627d9861b0c91c2b1f",
+      "generatorBlob": "22fe94adffe6dc92c7612e47536823c1058a4c85"
+    },
+    "status": "implemented; root review and merged-head packaging pending; replacement acceptance open",
+    "scope": [
+      "retained legacy player settings mapping and native equivalents",
+      "explicit missing error resources and five legacy player labels"
+    ],
+    "checks": {
+      "offlineCompile": "passed",
+      "lint": {
+        "exit": 1,
+        "errors": 690,
+        "warnings": 116,
+        "hints": 3,
+        "previousErrors": 704,
+        "baselineErrors": 690,
+        "newErrMissingTranslation": 0
+      },
+      "resources": "40 resource sets preserve existing values; all 14 errors present; regeneration byte-identical; offered languages unchanged"
+    },
+    "tests": "none added or rerun; no current mapping/controls runtime acceptance claimed",
+    "package": "deferred to root-reviewed merged head; retained e5a904de candidate remains prior evidence",
+    "reusedEvidence": {
+      "source": "e5a904de81dd610ad9319aed8cc599cb3c5a1b02",
+      "androidTree": "7f2fee1458a231e7adf1ec6430ab94cb3fa9daaf",
+      "core": 63,
+      "app": 6,
+      "localization": 3,
+      "migration": 7,
+      "realServer": "4/4 at client 4bbbacde against session-only candidate cd703e87 (PR119); not rerun"
+    },
+    "readinessDocument": "docs/modernization/ANDROID-CURRENT-READINESS.md",
+    "unknownSignals": "bookmark, Chrome and SystemUI causes remain unresolved; diagnostic runs not repeated",
+    "localization": "582 groups; 151 legacy rows; offered-language translated coverage 578\u2013581/582; explicit English fallback excluded; machine drafts not native-reviewed; 33 non-English languages still offered",
+    "acceptance": "physical integrations/accessibility, native-speaker review, owner signing/install and real migration remain open; original criteria preserved"
   }
 }
