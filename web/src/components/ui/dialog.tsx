@@ -21,8 +21,18 @@ export function Dialog({
   // External system: the dialog element's modal state.
   useEffect(() => {
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
+    if (!open) {
+      if (dialog.open) dialog.close();
+      return;
+    }
+    if (dialog.open) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    dialog.showModal();
+    // Conditionally mounted dialogs can disappear before native close restores the opener.
+    return () => {
+      if (dialog.open) dialog.close();
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
+    };
   }, [open, dialog]);
 
   return (
