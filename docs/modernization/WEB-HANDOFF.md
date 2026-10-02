@@ -64,6 +64,10 @@ from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` u
 | `38fc37b3` | A list view of the bookshelf and a series' books, kept on this device; a missing cover too small for text shows its icon |
 | `de8958cd` | Each page's title names it after its main heading |
 | `5874f663` | QA only: the QA server's mail goes to the sink on its own loopback, not through the VM's gateway |
+| `154e2159` | Journey: a MOBI or AZW3 book's own contents links lead to their chapters, and page keys work after a click in its text |
+| `4ee4703b` | In WebKit, MOBI and AZW3 links point at fragments of their own section, which the frame watcher follows; a deaf frame holding focus with nothing inside it focused hands the keyboard back to the reader. The sandbox is unchanged |
+| `6ca78083` | Journey: Tab is never held in one place by a MOBI book |
+| `6164959b` | The keyboard goes back to the reader only when the frame gains the focus without a Tab, which `4ee4703b` had turned into a WebKit focus trap |
 
 ## Checks
 
@@ -164,6 +168,25 @@ Phase 2 readiness commits, checked by the journeys they affect (logs in `web/qa/
   (`mail-loopback-check.log`). No assertion or timeout changed. Full run on `5874f663` (`mail-loopback-full.log`):
   Biome and `tsc` clean, vitest 115 passed, Chromium 73 of 73 journeys passed, at a host load average of 8 to 32,
   lower than during the two failures.
+- Post-merge QA of #95 on `6f05bbef` (`web/` identical to `5874f663`), `postmerge-95.log`: Biome and `tsc` clean,
+  vitest 115 passed, the item-action (with e-reader) and deployment journeys 11 of 11, at a load average near 195
+  when it started. Deployed client-only as `audiobookshelf-web:6f05bbef`; rollback `:68842296`, then `:45149135`.
+- WebKit MOBI/AZW3 links and keys on `fork/web-reader-webkit-links`. The new journey (`154e2159`) failed in WebKit
+  on unchanged product code, both books staying on their contents page (`mobi:1:6:0`), and passed in Firefox and
+  Chromium (`webkit-links-red.log`; its first Chromium attempt did not launch, a wrong browser path, then passed).
+  After `4ee4703b` the 16 reader journeys passed in Chromium, Firefox and WebKit, including the sandbox's
+  "cannot run scripts" check (`webkit-links-green.log`; run before a formatting-only line wrap was folded into the
+  commit). Throwaway WebKit probes, not kept as tests (`webkit-links-tab-probe.log`): a link given the focus by
+  Playwright's `focus()` kept it and Enter followed it (place `mobi:1:1:0`). Real Tab presses never reached a link
+  inside the book, before or after the fix, because Playwright's WebKit, like Safari's default, does not Tab to links
+  or buttons; before the fix Tab alternated between the book and leaving the page. After `4ee4703b` Tab stayed on the
+  reader's area every time: the focus return undid each Tab into the book, a focus trap. The journey "Tab is never
+  held in one place by a MOBI book" (`6ca78083`) failed in WebKit on `4ee4703b` (`webkit-tab-trap-red.log`). After
+  `6164959b`, which returns the focus only when the frame gains it without a Tab, the 17 reader journeys passed in
+  Chromium, Firefox and WebKit (`webkit-tab-trap-green.log`) and vitest 115 passed. Known limit: after Tabbing into
+  the book, a click in its text leaves page keys with the book until Tab leaves it. Full Chromium run on `4ee4703b`
+  (`webkit-links-full.log`): 75 of 75, before the Tab fix. Not tested: web links inside a book in WebKit, touch, text
+  selection, assistive technology, real-world books, Safari.
 - Not rerun for these commits: the deployment, connect, statistics and OpenID journeys, whose code they do not touch.
 
 Every behaviour change since the first commit started from a failing test that was observed failing, then made to
@@ -206,8 +229,8 @@ server, or a physical device. The production container `audiobookshelf` (port 13
     probes: in WebKit the Contents dialog, Previous and Next across sections, page keys with the focus outside the
     book, scrolling and resuming all work. A link inside the book leaves the book where it is, and after a click into
     the text, PageDown moved one screen in 12 presses where Chromium reached chapter 3. The main contents and buttons
-    flow covers the baseline, so this is recorded as a Safari limitation, not fixed: reaching those events needs
-    scripts in the frame, which would loosen the sandbox that keeps a book's own scripts from running.
+    flow covers the baseline, so this was first recorded as a Safari limitation, on the belief that reaching those
+    events needs scripts in the frame. That belief was wrong: `6164959b` fixes both without scripts (below).
   The other journeys (deployment, lists, podcasts, settings, statistics) were not run in these engines.
   Playwright's WebKit is not Safari: Safari on a Mac and an iPhone, including Media Session, background audio and
   phone autoplay rules, still needs checking by hand.
@@ -235,9 +258,10 @@ controls, the bookshelf has a list view, and pages have titles. Gaps still open:
 - The bookmarks list does not mark the bookmark at the current time, and does not create a bookmark with a typed
   title, as the legacy list does; creating stays a player button.
 - The reader's arrows do not flip in right-to-left languages.
-- In WebKit, links inside a MOBI or AZW3 book and page keys with the focus inside it do nothing (see "Remaining
-  gates"). The spec's navigation and keyboard requirement is not met there; this stays open and is being
-  investigated without letting the book's own scripts run.
+- In WebKit, links inside a MOBI or AZW3 book and page keys after a click in its text did nothing. Fixed on
+  `fork/web-reader-webkit-links` (`6164959b`) without letting the book run scripts; not deployed until it is
+  reviewed, merged and passes post-merge QA. A link to a web page inside a book, in WebKit, is not tested: the
+  reader opens it from its frame watcher, outside a click, where the browser may block the new tab.
 - No journey covers a token refresh mid-session, a server under a subpath, or the message shown when the browser
   blocks autoplay.
 - `parity.json`: the browser rows' `replacementEvidence.browser` is filled on this branch from these journeys,
@@ -254,7 +278,7 @@ Readiness by issue. Every issue stays open: each still needs a physical or owner
 | #59 podcasts, collections, playlists | Done, with Continue Listening episodes | Owner feeds are not mutated by tests; checking them is the owner's |
 | #60 EPUB | Done in Chromium, Firefox and WebKit | Safari by hand |
 | #61 PDF | Done in Chromium, Firefox and WebKit | Safari by hand |
-| #62 MOBI | Done in Chromium and Firefox | WebKit: in-book links and keys with the focus in the book (open, under investigation); Safari by hand |
+| #62 MOBI | Done in Chromium and Firefox; WebKit fixed on `6164959b`, not yet merged or deployed | WebKit: web links inside a book; Safari by hand |
 | #63 comics | Done, with dialog keys | Safari by hand |
 | #64 preferences and browser capabilities | Done for the stored preferences, which all have controls now | About 200 web-only strings untranslated; reader arrows in right-to-left languages |
 | #65 internal deployment, retire legacy | Deployed internally, smoke checked read-only | Owner acceptance; the legacy client stays until then |
