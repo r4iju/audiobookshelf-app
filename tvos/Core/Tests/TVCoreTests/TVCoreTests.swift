@@ -9,6 +9,17 @@ final class TVCoreTests: XCTestCase {
         XCTAssertEqual(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first?.value, "A & B")
     }
 
+    func testQueryPlusSurvivesFormDecodingForFiltersAndSearch() throws {
+        let server = try ServerAddress("https://books.example/abs")
+        for value in ["genres.4KC+", "A+B C", "genres.4KC%2B"] {
+            let url = try server.url(path: "api/libraries/books/items", query: [URLQueryItem(name: "filter", value: value)])
+            let query = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedQuery)
+            let encodedValue = try XCTUnwrap(query.split(separator: "=", maxSplits: 1).last)
+            let formDecoded = String(encodedValue).replacingOccurrences(of: "+", with: " ").removingPercentEncoding
+            XCTAssertEqual(formDecoded, value, "Express query decoding must preserve the original filter/search value")
+        }
+    }
+
     func testServerRejectsCredentialsAndNonHTTPAddresses() {
         for value in ["file:///tmp/books", "https://user:secret@books.example", "https://books.example?token=secret", "books.example", "https://books.example/#fragment"] {
             XCTAssertThrowsError(try ServerAddress(value))

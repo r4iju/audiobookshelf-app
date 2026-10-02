@@ -21,20 +21,26 @@ import Combine
     static var file: URL { ListeningSync.file.deletingLastPathComponent().appendingPathComponent("reading.json") }
     @Published private(set) var error: String?
     @Published private(set) var waitingForListening = false
-    private let player: ApplePlayback
+    let player: ApplePlayback
     private var positions: [Position] = []
     private var writable = true
     private var transfer: Task<Void, Never>?
     private var syncRequested = false
-    init(player: ApplePlayback) {
+    /// Where this store keeps its document; `file` unless injected.
+    let file: URL
+    init(player: ApplePlayback, file: URL? = nil) {
         self.player = player
+        self.file = file ?? Self.file
         do {
-            if FileManager.default.fileExists(atPath: Self.file.path) {
-                let document = try JSONDecoder().decode(Document.self, from: Data(contentsOf: Self.file))
+            if FileManager.default.fileExists(atPath: self.file.path) {
+                let document = try JSONDecoder().decode(Document.self, from: Data(contentsOf: self.file))
                 guard document.version == 1, document.positions.allSatisfy({ $0.fraction.isFinite && $0.fraction >= 0 && $0.fraction <= 1 && $0.updatedAt.isFinite }) else { throw ListeningJournal.Failure.invalidData }
                 positions = document.positions
             }
         } catch { self.error = "Saved reading could not be restored: " + error.localizedDescription; writable = false }
+        player.registerProgressResetCleanup("reading") { [weak self] intent in
+            if intent.episodeID == nil { try self?.discardProgress(account: intent.account, itemID: intent.itemID, confirmedAt: intent.requestedAt) }
+        }
     }
     func position(account: AccountIdentity, itemID: String, format: String, fileID: String? = nil) -> Position? {
         positions.first { $0.account == account && $0.itemID == itemID && $0.format == format && $0.fileID == fileID }
@@ -45,6 +51,14 @@ import Combine
         else { next.append(position) }
         try save(next)
     }
+    /// Saves a position carried over from the legacy app unless this app already has one for the
+    /// same book; returns whether it was saved.
+    func adoptLegacy(_ position: Position) throws -> Bool {
+        guard writable else { throw ListeningJournal.Failure.invalidData }
+        guard self.position(account: position.account, itemID: position.itemID, format: position.format, fileID: position.fileID) == nil else { return false }
+        try remember(position)
+        return true
+    }
     func update(account: AccountIdentity, itemID: String, format: String, location: String, fraction: Double, rotation: Int, fileID: String? = nil) throws {
         let old = position(account: account, itemID: itemID, format: format, fileID: fileID)
         if old?.location == location && old?.rotation == rotation && old?.fraction == fraction { return }
@@ -54,6 +68,20 @@ import Combine
                               updatedAt: changed ? Date().timeIntervalSince1970 * 1000 : old!.updatedAt,
                               revision: changed || correctedFraction ? UUID().uuidString : old!.revision, pending: fileID == nil && (changed || correctedFraction || old?.pending == true),
                               rotation: rotation, serverLocation: old?.serverLocation, issuedLocation: old?.issuedLocation, issuedRevision: old?.issuedRevision))
+    }
+    // The server's progress row holds the ebook location too. An empty location dated at the reset's
+    // confirmation opens at the start and outranks older pending pages and snapshots. Pages read after
+    // the confirmation are kept; supplementary documents keep their own locations.
+    func discardProgress(account: AccountIdentity, itemID: String, confirmedAt: Double) throws {
+        var next = positions
+        for format in ["epub", "pdf"] {
+            let old = position(account: account, itemID: itemID, format: format)
+            if let old, old.updatedAt > confirmedAt { continue }
+            let reset = Position(account: account, itemID: itemID, format: format, location: "", fraction: 0, updatedAt: confirmedAt, revision: UUID().uuidString, pending: false, rotation: old?.rotation ?? 0)
+            if let index = next.firstIndex(where: { $0.account == account && $0.itemID == itemID && $0.format == format && $0.fileID == nil }) { next[index] = reset }
+            else { next.append(reset) }
+        }
+        try save(next)
     }
     func adopt(_ remote: MediaProgress, account: AccountIdentity, itemID: String, format: String) throws {
         guard writable else { return }
@@ -96,7 +124,8 @@ import Combine
             }
             do {
                 let account = try await api.currentAccount()
-                while let position = positions.first(where: { $0.account == account && $0.pending }) {
+                // A book whose reset has not finished keeps its pages until the reset discards them.
+                while let position = positions.first(where: { $0.account == account && $0.pending && !player.progressResetPending(account: account, itemID: $0.itemID, episodeID: nil) }) {
                     let user = try await api.me()
                     guard try await api.currentAccount() == account else { throw CancellationError() }
                     guard let current = self.position(account: account, itemID: position.itemID, format: position.format), current.revision == position.revision else { continue }
@@ -129,8 +158,8 @@ import Combine
     private func save(_ next: [Position]) throws {
         guard writable else { throw ListeningJournal.Failure.invalidData }
         guard next.allSatisfy({ $0.fraction.isFinite && $0.fraction >= 0 && $0.fraction <= 1 }) else { throw ListeningJournal.Failure.invalidData }
-        try FileManager.default.createDirectory(at: Self.file.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try JSONEncoder().encode(Document(version: 1, positions: next)).write(to: Self.file, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try JSONEncoder().encode(Document(version: 1, positions: next)).write(to: file, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
         positions = next
     }
 }

@@ -33,7 +33,7 @@ import XCTest
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
         if podcast {
-            app.buttons["account"].tap(); app.buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
+            app.buttons["account"].tap(); accountMenu(app).buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
         }
         let item = podcast ? "podcast" : "book-2"
         app.buttons["book-\(item)"].tap()
@@ -53,6 +53,7 @@ import XCTest
         let play = app.buttons[podcast ? "Play playlist" : "Play collection"]
         XCTAssertTrue(play.waitForExistence(timeout: 5))
         let initialRequests = try await fixtureRequests().count
+        addTeardownBlock { try await FixtureControl.configure("baseline") }
         try await FixtureControl.configure("offline-library")
         play.tap()
         XCTAssertTrue(app.buttons["mini-pause-playback"].waitForExistence(timeout: 5), "An available downloaded member must play while its server is unavailable")
@@ -70,7 +71,7 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap(); app.buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
+        app.buttons["account"].tap(); accountMenu(app).buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
         app.buttons["account"].tap(); app.buttons["Playlists"].tap()
         XCTAssertTrue(app.buttons["group-playlist-podcasts"].waitForExistence(timeout: 5))
         app.buttons["group-playlist-podcasts"].tap()

@@ -34,6 +34,12 @@ public struct AudioGroupMember: Decodable, Identifiable {
     }
 }
 
+/// A save that failed after some of its membership changes had already reached the server.
+public struct AudioGroupPartialSave: Error, LocalizedError {
+    public let underlying: Error
+    public var errorDescription: String? { underlying.localizedDescription }
+}
+
 public struct AudioGroupPage: Decodable {
     public let results: [AudioGroup]
     public let total: Int

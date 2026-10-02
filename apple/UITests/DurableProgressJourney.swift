@@ -29,7 +29,7 @@ import XCTest
         let listened = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 14
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [listened], timeout: 20)
         app.buttons["pause-playback"].tap()
         XCTAssertTrue(app.staticTexts["playback-error"].waitForExistence(timeout: 10))
@@ -91,17 +91,45 @@ import XCTest
         let listened = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 10
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [listened], timeout: 15)
         app.buttons["pause-playback"].tap()
         let cleared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: app.staticTexts["playback-error"])
         await fulfillment(of: [cleared], timeout: 5)
-        let observations = try await fixtureObservations()
+        let paused = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
+
+        // The save whose acknowledgment was lost reached the server and may still be applied, so later
+        // listening stays on this device until a restart asked for after it is confirmed.
+        try await Task.sleep(nanoseconds: 3_000_000_000)
+        let delivered = try await fixtureObservations().localSessions
+        XCTAssertEqual(delivered.count, 1, "Precondition: the server stored the save whose acknowledgment was lost")
+        let original = try XCTUnwrap(delivered.first)
+        XCTAssertLessThan(original.currentTime, Double(paused), "Later listening was sent while the unanswered save could still be applied")
+        app.buttons["Done"].tap()
+        let restart = app.buttons["restart-server"]
+        XCTAssertTrue(restart.waitForExistence(timeout: 10), "Open details should offer a server restart once a save got no answer")
+        restart.tap()
+        let confirm = app.alerts.buttons["Server restarted"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 10))
+        try await FixtureControl.restart()
+        confirm.tap()
+
+        var observations = try await fixtureObservations()
+        for _ in 0..<30 where !observations.localSessions.contains(where: { $0.currentTime >= 10 }) {
+            try await Task.sleep(nanoseconds: 500_000_000)
+            observations = try await fixtureObservations()
+        }
         let records = observations.localSessions.filter { $0.currentTime >= 10 && $0.timeListening > 0 }
         XCTAssertEqual(records.count, 1)
         let record = try XCTUnwrap(records.first)
+        XCTAssertEqual(record.id, original.id, "The retry replaces the delivered session instead of adding listening")
+        XCTAssertEqual(observations.localSessions.count, 1)
         XCTAssertEqual(record.timeListening, record.currentTime - 6, accuracy: 1)
         XCTAssertGreaterThanOrEqual(observations.reports.filter { $0.path == "/api/session/local-all" }.count, 2)
+        let discarded = observations.requests.filter { $0.method == "DELETE" && $0.path.hasPrefix("/api/me/progress") }.map(\.path)
+        XCTAssertEqual(discarded, [], "Recovering must not discard progress")
+        let gone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: restart)
+        await fulfillment(of: [gone], timeout: 10)
     }
 
     func testUnsentListeningSurvivesTerminationAndRestoresServerProgress() async throws {
@@ -112,7 +140,7 @@ import XCTest
         app.buttons["book-book-0"].tap()
         app.buttons["play-book"].tap()
         app.buttons["mini-player"].tap()
-        let elapsed = app.staticTexts["playback-elapsed"]
+        let elapsed = bookElapsed(app)
         let listened = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 14
@@ -132,7 +160,7 @@ import XCTest
         let resumed = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 14
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [resumed], timeout: 3)
         let reports = try await fixtureObservations().reports
         XCTAssertTrue(reports.contains { $0.currentTime >= 14 && $0.timeListened > 0 })

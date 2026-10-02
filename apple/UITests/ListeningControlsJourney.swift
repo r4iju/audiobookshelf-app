@@ -6,13 +6,15 @@ import XCTest
         app.buttons["Sleep timer"].tap()
         app.textFields["timer-seconds"].tap()
         app.textFields["timer-seconds"].typeText("3")
-        app.buttons["Start timer"].tap()
+        startTimer(app)
+        waitForPanelToClose(app, "Sleep")
         app.buttons["Sleep timer"].tap()
         let extend = app.buttons["Add 5 minutes"]
         XCTAssertTrue(extend.waitForExistence(timeout: 3))
         guard extend.exists else { return }
         extend.tap()
         app.navigationBars["Sleep"].buttons["Done"].tap()
+        waitForPanelToClose(app, "Sleep")
         app.buttons["resume-playback"].tap()
         try await Task.sleep(nanoseconds: 4_000_000_000)
         XCTAssertTrue(app.buttons["pause-playback"].exists)
@@ -24,11 +26,11 @@ import XCTest
 
     func testResumeRewindsAfterAPauseAndCanBeDisabledPersistently() async throws {
         let app = try await openPlayer()
-        let before = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        let before = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         try await Task.sleep(nanoseconds: 11_000_000_000)
         app.buttons["resume-playback"].tap()
         app.buttons["pause-playback"].tap()
-        let rewound = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        let rewound = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         XCTAssertLessThan(rewound, before)
         app.buttons["Playback settings"].tap()
         let rewind = app.switches["Rewind after a pause"]
@@ -78,7 +80,8 @@ import XCTest
         app.buttons["Sleep timer"].tap()
         app.textFields["timer-seconds"].tap()
         app.textFields["timer-seconds"].typeText("10")
-        app.buttons["Start timer"].tap()
+        startTimer(app)
+        waitForPanelToClose(app, "Sleep")
         app.buttons["resume-playback"].tap()
         app.buttons["Sleep timer"].tap()
         let volume = app.staticTexts["fade-volume"]
@@ -89,6 +92,16 @@ import XCTest
         XCTAssertEqual(fade.value as? String, "0")
         let restored = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Audio volume: 100%"), object: volume)
         await fulfillment(of: [restored], timeout: 3)
+    }
+    /// UI tests run with a hardware keyboard attached, so after typing, iPadOS minimizes the visible software keyboard on the
+    /// next touch and the Sleep sheet re-centres under it, losing the tap on Start. Return ends editing first, as it does for a
+    /// person typing on that keyboard, so Start is tapped where it is.
+    private func startTimer(_ app: XCUIApplication) {
+        app.textFields["timer-seconds"].typeText("\n")
+        let keyboard = app.keyboards.firstMatch
+        let hidden = expectation(for: NSPredicate { _, _ in !keyboard.exists || keyboard.frame.height == 0 }, evaluatedWith: keyboard)
+        XCTAssertEqual(XCTWaiter().wait(for: [hidden], timeout: 5), .completed, "Return hides the software keyboard")
+        app.buttons["Start timer"].tap()
     }
     private func openPlayer() async throws -> XCUIApplication {
         try await FixtureControl.configure("baseline")
@@ -104,20 +117,25 @@ import XCTest
 
     func testChapterSeekAndSpeedSurviveSessionRestoration() async throws {
         let app = try await openPlayer()
+        // Resuming after a pause of ten seconds or more rewinds, and the iPad steps to here take that long.
+        playerSettings(app, [("Rewind after a pause", false)])
         let chapters = app.buttons["Chapters"]
         XCTAssertTrue(chapters.waitForExistence(timeout: 3))
         guard chapters.exists else { return }
         chapters.tap()
         app.buttons["chapter-1"].tap()
+        waitForPanelToClose(app, "Chapters")
         XCTAssertTrue(app.staticTexts["File 2 of 2"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["playback-elapsed"].label, "8 sec")
+        XCTAssertEqual(bookElapsed(app).label, "8 sec")
         XCTAssertEqual(app.staticTexts["chapter-elapsed"].label, "0 sec of 12 sec")
         app.buttons["Playback speed"].tap()
         app.buttons["speed-2"].tap()
+        waitForPanelToClose(app, "Speed")
         app.buttons["resume-playback"].tap()
         try await Task.sleep(nanoseconds: 2_000_000_000)
         app.buttons["pause-playback"].tap()
-        let seconds = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        playerSettings(app, [("scale-elapsed-setting", false)])
+        let seconds = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         XCTAssertGreaterThanOrEqual(seconds, 12)
         app.terminate()
         app.launchArguments = []
@@ -140,10 +158,10 @@ import XCTest
         app.navigationBars["Settings"].buttons["Done"].tap()
         let forward = app.buttons["Forward 5 seconds"]
         XCTAssertTrue(forward.waitForExistence(timeout: 5))
-        let before = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        let before = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
         forward.tap()
         XCTAssertTrue(app.staticTexts["File 2 of 2"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["playback-elapsed"].label, "\(before + 5) sec")
+        XCTAssertEqual(bookElapsed(app).label, "\(before + 5) sec")
         app.terminate()
         app.launchArguments = []
         app.launch()
@@ -196,7 +214,7 @@ import XCTest
         let duration = app.textFields["timer-seconds"]
         duration.tap()
         duration.typeText("3")
-        app.buttons["Start timer"].tap()
+        startTimer(app)
         app.buttons["resume-playback"].tap()
         app.buttons["Done"].tap()
         XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 8))
