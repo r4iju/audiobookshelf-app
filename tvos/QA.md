@@ -83,3 +83,52 @@ On October 2, root generated the TV project in the clean final-integration check
 ### Combined Apple integration regression
 
 The root integration at `315183c1` passes the full local suite: 20 remote-driven TV journeys and 12 app unit tests, `/tmp/abs-root-final-tv-ui.log`. This includes catalog, author/series, playback, podcasts, media recovery and durable listening recovery. Tests use the owned synthetic HTTP/HTTPS fixtures on 20765/20767; no owner library was mutated. Physical remote/device acceptance remains open.
+
+### Issue #28 current narrow durability evidence (October 3, 2026)
+
+At client `9e8323fa`, only the existing
+`TVJourneyTests/RecoveryJourney/testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch`
+was run against `verification/fixture.py` plus `tvos/scripts/related_fixture.py`
+(`2.30.0-fixture`, synthetic loopback HTTP/HTTPS on 40765/40767). The app, shared
+playback/core/localization/diagnostics, journey and fixture inputs are blob-identical
+to packaged TV source `d3152a5d`. The generated project was retained separately.
+
+- Result: **1/1 passed, zero failures**, pooled Apple TV 4K (3rd generation), tvOS
+  27.0 (24J360), `9ACC6F5B-180D-44C3-823B-F8796813D69D`. The lease was released.
+- Production AVPlayer fetched synthetic WAV audio (HTTP 206), advanced from the
+  server's 6-second position, paused with a progress-save failure, and terminated.
+  A retained `NativeListeningJournal` snapshot has revision 5, acknowledgment 0,
+  position 8 s and 2.000214 s listening. This snapshot precedes the final pause.
+- After relaunch, that same record ID reached `/api/session/local-all` once:
+  position **10.979263 s**, listening **4.979467 s**. The TV details changed from
+  the old server position. A separately authenticated API client read the same
+  position through `/api/me`. A second TV relaunch added no report or listening.
+- The first narrow execution also passed, but its external observer missed the
+  pending snapshot and attempted the independent read with an expired fixture
+  token. Those errors are retained. One observer correction (refresh credentials
+  and more frequent journal capture) and one repeat of the same unchanged case
+  completed the evidence. No production defect or new test was introduced.
+- The earlier `green-switch` Recovery 4/4 predates the final bounded-storage
+  quarantine correction and localization integration; it remains historical.
+  TVCore 72/72 and broad remote/UI results were retained, not rerun.
+
+Reproduction: `ABS_TV_HTTP_PORT=40765 ABS_TV_HTTPS_PORT=40767
+ABS_TV_RESULT_BUNDLE=<private-result-path> ./tvos/scripts/verify-ui.sh
+-only-testing:TVJourneyTests/RecoveryJourney/testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch`.
+The script leases a pooled TV; this run supplied its explicitly acquired lease.
+XcodeGen 2.46.0, Python 3.14.8 and local Xcode were already installed; the native
+target has no external package dependency. An existing SSD derived cache was reused.
+
+Private evidence is retained at
+`/Volumes/ai-ssd/code/audiobookshelf-private-artifacts/2026-10-02/tv-progress-current/`:
+`TVRecoveryJourney.xcresult`, `journey.log`, `summary.json`, source/blob manifest,
+pending journal, fixture observations, independent API response, synthetic audio
+and the first execution/errors. The result retains a UIHostingController runtime
+warning. No microphone/audio-output recording was made.
+
+This establishes current simulator termination/relaunch durability and cross-client
+API visibility on the synthetic contract. Physical force-quit/network-loss recovery
+and actual resume on another device remain manual. Owner-confirmed c36f3c13
+switch/save-permission fixes and the d3152a5d signed installation without launch
+are separate evidence. Issue #28's broader recovery criteria, #30 physical
+remote/podcast/routes gates and owner server promotion remain open.
