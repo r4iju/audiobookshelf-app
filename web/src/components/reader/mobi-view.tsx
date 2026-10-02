@@ -261,6 +261,10 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
     };
     window.addEventListener("keydown", onTab, true);
     let frameFocused = document.activeElement === element;
+    // A click in the text of a book that already has the focus, as after Tabbing into it, shows only as its caret moving.
+    const selection = doc.getSelection();
+    const caret = () => [selection?.anchorNode, selection?.anchorOffset] as const;
+    let lastCaret = caret();
     let frameRequest = requestAnimationFrame(function watch() {
       frameRequest = requestAnimationFrame(watch);
       if (element?.contentDocument !== doc) return;
@@ -275,7 +279,10 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
       }
       const focused = document.activeElement === element;
       const inText = !doc.activeElement || doc.activeElement === doc.body;
-      if (!heard && focused && !frameFocused && !tabbing && inText)
+      const [node, offset] = caret();
+      const caretMoved = node !== lastCaret[0] || offset !== lastCaret[1];
+      lastCaret = [node, offset];
+      if (!heard && focused && (!frameFocused || caretMoved) && !tabbing && inText)
         area.current?.focus({ preventScroll: true });
       frameFocused = document.activeElement === element;
       tabbing = false;

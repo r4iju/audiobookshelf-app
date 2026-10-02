@@ -293,6 +293,30 @@ test("Tab is never held in one place by a MOBI book", async ({ page }) => {
   expect(reached.size).toBeGreaterThan(1);
 });
 
+test("after Tabbing into a MOBI book, a click in its text gives the page keys back to the reader", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Night Ferry");
+  await resetProgress(api, id);
+  // The contents page the book carries after its last chapter.
+  await api.call(`/api/me/progress/${id}`, { method: "PATCH", body: { ebookLocation: "mobi:1:6:0" } });
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(book(page).getByText("Table of Contents")).toBeInViewport();
+
+  // Tab reaches the book itself, or a link in it where the browser tabs to links.
+  const frame = page.locator("main iframe");
+  await page.getByRole("link", { name: "Back" }).focus();
+  for (let press = 0; press < 10 && !(await frame.evaluate((element) => element === document.activeElement)); press++)
+    await page.keyboard.press("Tab");
+  await expect(frame).toBeFocused();
+
+  await book(page).getByText("Table of Contents").click();
+  // Where the book sends no events, the reader takes the keyboard back on its next frame, as a person's next key would.
+  await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+  await page.keyboard.press("PageUp");
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toMatch(/^mobi:1:5:/);
+});
+
 test("MOBI books take the reader's display settings and cannot run scripts", async ({ page }) => {
   const api = await serverApi(accounts.user);
   const id = await bookId(api, "Night Ferry");
