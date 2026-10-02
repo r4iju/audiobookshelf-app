@@ -105,4 +105,24 @@ class ApiClientTest {
         assertTrue("The caller must learn that the answer was lost, got $outcome", outcome.isFailure)
         assertEquals("Sent once; the server may still apply it", 1, writes.get())
     }
+
+    @Test
+    fun closingASessionIsSentAgainWhenItsConnectionDrops() = runBlocking {
+        val closes = AtomicInteger()
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                if (request.method == "GET") return MockResponse().setBody("""{"libraries":[]}""")
+                // A pooled connection the server is closing as idle drops the first close.
+                return if (closes.incrementAndGet() == 1) MockResponse().setSocketPolicy(okhttp3.mockwebserver.SocketPolicy.DISCONNECT_AFTER_REQUEST)
+                else MockResponse().setResponseCode(404)
+            }
+        }
+        server.start()
+        val address = ServerAddress.parse(server.url("/abs").toString())
+        val client = ApiClient(OkHttpClient(), Credentials(address.canonical, "u1", "qa", "fresh", "refresh"), { _, _ -> }, DeviceInfo("device"))
+        client.libraries()
+        val outcome = runCatching { client.closeSession("s1") }
+        assertTrue("A dropped close is sent again, and a session the first attempt closed counts as closed, got $outcome", outcome.isSuccess)
+        assertEquals(2, closes.get())
+    }
 }

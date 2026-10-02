@@ -139,8 +139,15 @@ class ApiClient(
     }
 
     /** Ordinary stream sessions close with an empty body; listening is published separately through [syncLocal]. */
+    /**
+     * Closing is idempotent: a session the server already closed answers 404. So a close whose connection
+     * dropped, as a pooled connection the server is closing as idle does, is sent once more.
+     */
     suspend fun closeSession(sessionId: String) {
-        try { raw("api/session/$sessionId/close", "POST", JsonObject(emptyMap())) } catch (error: ApiError.Http) { if (error.status != 404) throw error }
+        suspend fun close() {
+            try { raw("api/session/$sessionId/close", "POST", JsonObject(emptyMap())) } catch (error: ApiError.Http) { if (error.status != 404) throw error }
+        }
+        try { close() } catch (_: ApiError.Offline) { close() }
     }
 
     /**
