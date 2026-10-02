@@ -168,6 +168,29 @@ test("an item's page shows its own library's sections", async ({ page }) => {
   ).toHaveAttribute("aria-current", "true");
 });
 
+test("an episode being listened to continues from the home page's Continue Listening", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const podcast = await eveningStories(api);
+  await resetEpisodes(api, podcast.id);
+  const third = podcast.episode("Episode 3: Evening 3");
+  await api.call(`/api/me/progress/${podcast.id}/${third}`, {
+    method: "PATCH",
+    body: { currentTime: 3, duration: 12, progress: 0.25 },
+  });
+
+  await signIn(page);
+  await page.goto(`/library/${qa.libraries.podcasts}`);
+  await page
+    .getByRole("region", { name: "Continue Listening" })
+    .getByRole("link", { name: /Episode 3: Evening 3/ })
+    .click();
+  await expect(page.getByRole("heading", { level: 1, name: "Episode 3: Evening 3" })).toBeVisible();
+  await expect(page.getByRole("main").getByRole("progressbar", { name: "Your Progress" })).toHaveAttribute(
+    "aria-valuenow",
+    "25",
+  );
+});
+
 test("an episode has its own page with progress, finishing and discarding", async ({ page }) => {
   const api = await serverApi(accounts.user);
   const podcast = await eveningStories(api);
