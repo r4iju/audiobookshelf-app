@@ -1,0 +1,18 @@
+412c412,417
+<     if (user) userCache.set(user)
+---
+>     if (user) {
+>       // candidate fix: a concurrent miss may have stored a copy meanwhile; share it so updates and reads see one object
+>       const stored = userCache.getById(user.id)
+>       if (stored) { Logger.info(`[DIAG] fix: returning stored inst=${diagTag(stored)} instead of new inst=${diagTag(user)}`); return stored }
+>       userCache.set(user)
+>     }
+437c442,447
+<     if (user) userCache.set(user)
+---
+>     if (user) {
+>       // candidate fix: a concurrent miss may have stored a copy meanwhile; share it so updates and reads see one object
+>       const stored = userCache.getById(user.id)
+>       if (stored) { Logger.info(`[DIAG] fix: returning stored inst=${diagTag(stored)} instead of new inst=${diagTag(user)}`); return stored }
+>       userCache.set(user)
+>     }

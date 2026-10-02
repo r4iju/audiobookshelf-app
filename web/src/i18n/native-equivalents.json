@@ -1,0 +1,106 @@
+{
+  "WebRestartTheServer": {
+    "source": "apple",
+    "key": "Restart the server"
+  },
+  "WebSignIn": {
+    "source": "apple",
+    "key": "Sign in"
+  },
+  "WebSignInWithOpenId": {
+    "source": "apple",
+    "key": "Sign in with OpenID"
+  },
+  "WebTryAgain": {
+    "source": "apple",
+    "key": "Try again"
+  },
+  "WebDiagnostics": {
+    "source": "apple",
+    "key": "Diagnostics"
+  },
+  "WebFilterBy": {
+    "source": "apple",
+    "key": "Filter"
+  },
+  "WebNextPage": {
+    "source": "apple",
+    "key": "Next page"
+  },
+  "WebPreviousPage": {
+    "source": "apple",
+    "key": "Previous page"
+  },
+  "WebResume": {
+    "source": "apple",
+    "key": "Resume"
+  },
+  "WebCopied": {
+    "source": "apple",
+    "key": "Copied"
+  },
+  "WebAddPodcast": {
+    "source": "apple",
+    "key": "Add podcast"
+  },
+  "WebGoToPage": {
+    "source": "apple",
+    "key": "Go to page"
+  },
+  "WebTopAuthors": {
+    "source": "apple",
+    "key": "Top authors"
+  },
+  "WebTopGenres": {
+    "source": "apple",
+    "key": "Top genres"
+  },
+  "WebTopNarrators": {
+    "source": "apple",
+    "key": "Top narrators"
+  },
+  "WebMostListenedMonth": {
+    "source": "apple",
+    "key": "Most listened month"
+  },
+  "WebDeletePlaylist": {
+    "source": "apple",
+    "key": "Delete playlist"
+  },
+  "WebDeleteCollection": {
+    "source": "apple",
+    "key": "Delete collection"
+  },
+  "WebRotatePage": {
+    "source": "apple",
+    "key": "Rotate page"
+  },
+  "WebChangeServer": {
+    "source": "android",
+    "key": "set_change_server"
+  },
+  "WebErrorGeneric": {
+    "source": "android",
+    "key": "item_something_went_wrong"
+  },
+  "WebRetry": {
+    "source": "android",
+    "key": "action_retry"
+  },
+  "WebCollapsePlayer": {
+    "source": "android",
+    "key": "pl_minimize_player"
+  },
+  "WebCopyAddress": {
+    "source": "android",
+    "key": "item_copy_address"
+  },
+  "WebKeepProgress": {
+    "source": "android",
+    "key": "item_keep_progress"
+  },
+  "WebDiscardAnyway": {
+    "source": "android",
+    "key": "item_discard_anyway"
+  }
+}

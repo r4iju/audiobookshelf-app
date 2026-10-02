@@ -1,0 +1,583 @@
+import { expect, test } from "@playwright/test";
+import { languages } from "../src/i18n/languages";
+import { accounts, choose, qa, serverApi, signIn } from "./qa";
+
+type Api = Awaited<ReturnType<typeof serverApi>>;
+
+async function bookId(api: Api, title: string) {
+  const { body } = await api.call(
+    `/api/libraries/${qa.libraries.books}/search?q=${encodeURIComponent(title)}`,
+  );
+  return body.book[0].libraryItem.id as string;
+}
+
+async function resetProgress(api: Api, itemId: string) {
+  const me = (await api.call("/api/me")).body;
+  for (const progress of me.mediaProgress) {
+    if (progress.libraryItemId === itemId && !progress.episodeId)
+      await api.call(`/api/me/progress/${progress.id}`, { method: "DELETE" });
+  }
+}
+
+const serverProgress = async (api: Api, itemId: string) =>
+  (await api.call(`/api/me/progress/${itemId}`)).body;
+
+test("PDF rotation retains its page and links through reload", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Field Guide to Quiet");
+  await resetProgress(api, id);
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  const canvas = page.locator("main canvas");
+  await expect(page.getByText("Field Guide to Quiet - Page 1", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Rotate page", exact: true }).click();
+  await expect
+    .poll(() => canvas.evaluate((node) => node instanceof HTMLCanvasElement && node.width > node.height))
+    .toBe(true);
+  const words = page.locator(".textLayer").getByText("Jump to page 3", { exact: true });
+  const link = page.getByRole("link", { name: "Jump to page 3", exact: true });
+  // A click on the printed words must hit the annotation after rotating, too.
+  const box = await words.boundingBox();
+  expect(box).not.toBeNull();
+  if (!box) throw new Error("PDF link text is missing");
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.getByText("Page 3 of 120")).toBeVisible();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toBe("3");
+  await page.reload();
+  await expect(page.getByText("Field Guide to Quiet - Page 3", { exact: true })).toBeVisible();
+  await expect
+    .poll(() => canvas.evaluate((node) => node instanceof HTMLCanvasElement && node.width > node.height))
+    .toBe(true);
+  await page.getByLabel("Go to page").fill("1");
+  await page.getByLabel("Go to page").press("Enter");
+  for (let turn = 0; turn < 3; turn++) {
+    await page.getByRole("button", { name: "Rotate page", exact: true }).click();
+    await expect
+      .poll(() => canvas.evaluate((node) => node instanceof HTMLCanvasElement && node.width > node.height))
+      .toBe(turn === 1);
+    await expect(link).toBeVisible();
+  }
+  await page.reload();
+  await expect
+    .poll(() => canvas.evaluate((node) => node instanceof HTMLCanvasElement && node.width < node.height))
+    .toBe(true);
+});
+
+test("a PDF turns pages and follows its links, and resumes where it was left here and on other clients", async ({
+  page,
+}) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Field Guide to Quiet");
+  await resetProgress(api, id);
+
+  await signIn(page);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("link", { name: "Read" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Field Guide to Quiet" })).toBeVisible();
+  await expect(page.getByText("Field Guide to Quiet - Page 1", { exact: true })).toBeVisible();
+  await expect(page.getByText("Page 1 of 120")).toBeVisible();
+
+  await page.getByRole("button", { name: "Next page" }).click();
+  await expect(page.getByText("Field Guide to Quiet - Page 2", { exact: true })).toBeVisible();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByText("Page 3 of 120")).toBeVisible();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toBe("3");
+  expect((await serverProgress(api, id)).ebookProgress).toBeCloseTo(2 / 120, 5);
+
+  await page.getByLabel("Go to page").fill("1");
+  await page.getByLabel("Go to page").press("Enter");
+  await expect(page.getByText("Field Guide to Quiet - Page 1", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Jump to page 3" }).click();
+  await expect(page.getByText("Field Guide to Quiet - Page 3", { exact: true })).toBeVisible();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toBe("3");
+
+  await page.reload();
+  await expect(page.getByText("Field Guide to Quiet - Page 3", { exact: true })).toBeVisible();
+
+  // Another client moved on; opening the book again follows it.
+  await api.call(`/api/me/progress/${id}`, {
+    method: "PATCH",
+    body: { ebookLocation: "40", ebookProgress: 39 / 120 },
+  });
+  await page.goto(`/item/${id}`);
+  await page.getByRole("link", { name: "Read" }).click();
+  await expect(page.getByText("Field Guide to Quiet - Page 40", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Back" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Field Guide to Quiet" })).toBeVisible();
+});
+
+test("reading a book's PDF while its audio plays keeps both positions", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "The Long Tide");
+  await resetProgress(api, id);
+
+  await signIn(page);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("main").getByRole("button", { name: "Play", exact: true }).click();
+  const player = page.getByRole("region", { name: "Player" });
+  await expect(player.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Read" }).click();
+  await expect(page.getByText("The Long Tide Companion - Page 1", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Rotate page", exact: true }).click();
+  await expect
+    .poll(() =>
+      page
+        .locator("main canvas")
+        .evaluate((node) => node instanceof HTMLCanvasElement && node.width > node.height),
+    )
+    .toBe(true);
+  await page.getByRole("button", { name: "Next page" }).click();
+  await expect(page.getByText("Page 2 of 12")).toBeVisible();
+  await expect(player.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
+
+  await expect
+    .poll(
+      async () => {
+        const progress = await serverProgress(api, id);
+        return progress?.ebookLocation === "2" && progress.currentTime > 2;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(true);
+  await player.getByRole("button", { name: "Pause", exact: true }).click();
+});
+
+test("a document the server cannot deliver is reported, with a way back", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Field Guide to Quiet");
+  await signIn(page);
+  await page.route(`**/api/items/${id}/ebook**`, (route) =>
+    route.fulfill({ status: 404, body: "Not Found" }),
+  );
+  await page.goto(`/read/${id}`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Not found");
+  await expect(page.getByRole("link", { name: "Back" })).toBeVisible();
+
+  await page.unroute(`**/api/items/${id}/ebook**`);
+  await page.route(`**/api/items/${id}/ebook**`, (route) =>
+    route.fulfill({ status: 200, contentType: "application/pdf", body: "this is not a pdf" }),
+  );
+  await page.reload();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
+});
+
+const book = (page: import("@playwright/test").Page) => page.locator("main iframe").first().contentFrame();
+
+test("an EPUB pages through, jumps by its contents, and resumes at the saved passage here and from other clients", async ({
+  page,
+}) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Paper Lanterns");
+  await resetProgress(api, id);
+
+  await signIn(page);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("link", { name: "Read" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Paper Lanterns" })).toBeVisible();
+  await page.getByRole("button", { name: "Next page" }).click();
+  await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeInViewport();
+  await page.keyboard.press("ArrowRight");
+  await expect(book(page).getByText("Chapter 1: Lantern 1")).not.toBeInViewport();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation ?? "").toMatch(/^epubcfi\(/);
+
+  await page.getByRole("button", { name: "Table of Contents" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Chapter 3: Lantern 3" }).click();
+  await expect(book(page).getByRole("heading", { name: "Chapter 3: Lantern 3" })).toBeInViewport();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookProgress ?? 0).toBeGreaterThan(0.2);
+  const chapterThree = (await serverProgress(api, id)).ebookLocation as string;
+
+  await page.reload();
+  await expect(book(page).getByRole("heading", { name: "Chapter 3: Lantern 3" })).toBeInViewport();
+
+  await page.getByRole("button", { name: "Table of Contents" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Chapter 5: Lantern 5" }).click();
+  await expect(book(page).getByRole("heading", { name: "Chapter 5: Lantern 5" })).toBeInViewport();
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).not.toBe(chapterThree);
+
+  // Another client saved its place in chapter 3; opening the book again follows it.
+  await api.call(`/api/me/progress/${id}`, { method: "PATCH", body: { ebookLocation: chapterThree } });
+  await page.getByRole("link", { name: "Back" }).click();
+  await page.getByRole("link", { name: "Read" }).click();
+  await expect(book(page).getByRole("heading", { name: "Chapter 3: Lantern 3" })).toBeInViewport();
+});
+
+test("EPUB display settings apply to the text and are kept in this browser", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Paper Lanterns");
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(book(page).locator("body")).toBeAttached();
+
+  await page.getByRole("button", { name: "Reader settings" }).click();
+  const settings = page.getByRole("dialog", { name: "Reader settings" });
+  await choose(settings, "Theme", "Light");
+  await choose(settings, "Font family", "Sans");
+  await settings.getByLabel("Font scale").fill("150");
+  await settings.getByRole("button", { name: "Close" }).click();
+
+  const paragraph = book(page).locator("p").first();
+  await expect(paragraph).toHaveCSS("color", "rgb(0, 0, 0)");
+  await expect(book(page).locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(paragraph).toHaveCSS("font-family", /sans-serif/);
+
+  await page.reload();
+  await expect(book(page).locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await page.getByRole("button", { name: "Reader settings" }).click();
+  await expect(settings.getByLabel("Font scale")).toHaveValue("150");
+  await choose(settings, "Theme", "Dark");
+  await choose(settings, "Font family", "Serif");
+  await settings.getByLabel("Font scale").fill("100");
+});
+
+test("a damaged EPUB is reported as unreadable", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Paper Lanterns");
+  await signIn(page);
+  await page.route(`**/api/items/${id}/ebook**`, (route) =>
+    route.fulfill({ status: 200, contentType: "application/epub+zip", body: "PK this is not a zip" }),
+  );
+  await page.goto(`/read/${id}`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
+});
+
+for (const { title, format } of [
+  { title: "Night Ferry", format: "MOBI" },
+  { title: "Glass Orchard", format: "AZW3" },
+]) {
+  test(`a ${format} book scrolls page by page, jumps by its contents, and resumes at the same passage here and from other clients`, async ({
+    page,
+  }) => {
+    const api = await serverApi(accounts.user);
+    const id = await bookId(api, title);
+    await resetProgress(api, id);
+
+    await signIn(page);
+    await page.goto(`/item/${id}`);
+    await page.getByRole("link", { name: "Read" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+    await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeInViewport();
+    await page.getByRole("button", { name: "Next page" }).click();
+    await expect(book(page).getByText("Chapter 1: Lantern 1")).not.toBeInViewport();
+    await page.getByRole("button", { name: "Previous page" }).click();
+    await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeInViewport();
+
+    await page.getByRole("button", { name: "Table of Contents" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Chapter 3: Lantern 3" }).click();
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).toBeInViewport();
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookProgress ?? 0).toBeGreaterThan(0.2);
+    const atChapterThree = (await serverProgress(api, id)).ebookLocation as string;
+    await page.keyboard.press("PageDown");
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).not.toBeInViewport();
+    await page.waitForTimeout(500);
+    const passage = await book(page)
+      .locator("p")
+      .filter({ visible: true })
+      .evaluateAll((paragraphs) => {
+        const top = paragraphs.find((p) => p.getBoundingClientRect().top >= 0);
+        return top?.textContent?.slice(0, 13) ?? "";
+      });
+    expect(passage).toMatch(/^Passage 3\.\d+\./);
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation ?? "").toMatch(/^mobi:/);
+    // The place a page further on, not the one the contents jump saved first.
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).not.toBe(atChapterThree);
+    const inChapterThree = (await serverProgress(api, id)).ebookLocation as string;
+
+    await page.reload();
+    await expect(book(page).getByText(passage)).toBeInViewport();
+
+    await page.getByRole("button", { name: "Table of Contents" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Chapter 5: Lantern 5" }).click();
+    await expect(book(page).getByText("Chapter 5: Lantern 5")).toBeInViewport();
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).not.toBe(inChapterThree);
+
+    // Another client saved its place in chapter 3; opening the book again follows it.
+    await api.call(`/api/me/progress/${id}`, { method: "PATCH", body: { ebookLocation: inChapterThree } });
+    await page.getByRole("link", { name: "Back" }).click();
+    await page.getByRole("link", { name: "Read" }).click();
+    await expect(book(page).getByText(passage)).toBeInViewport();
+  });
+}
+
+for (const { title, format } of [
+  { title: "Night Ferry", format: "MOBI" },
+  { title: "Glass Orchard", format: "AZW3" },
+]) {
+  test(`a ${format} book's own contents page links to its chapters, and page keys turn pages after a click in the text`, async ({
+    page,
+  }) => {
+    const api = await serverApi(accounts.user);
+    const id = await bookId(api, title);
+    await resetProgress(api, id);
+    // The contents page the book carries after its last chapter.
+    await api.call(`/api/me/progress/${id}`, { method: "PATCH", body: { ebookLocation: "mobi:1:6:0" } });
+
+    await signIn(page);
+    await page.goto(`/read/${id}`);
+    await expect(book(page).getByText("Table of Contents")).toBeInViewport();
+    await book(page).getByRole("link", { name: "Chapter 3: Lantern 3" }).click();
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).toBeInViewport();
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toMatch(/^mobi:1:2:/);
+
+    await book(page).getByText("Passage 3.2.").click();
+    await page.keyboard.press("PageDown");
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).not.toBeInViewport();
+    await page.keyboard.press("PageUp");
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).toBeInViewport();
+  });
+}
+
+test("Tab is never held in one place by a MOBI book", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Night Ferry");
+  await resetProgress(api, id);
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeInViewport();
+  await page.getByRole("link", { name: "Back" }).focus();
+  const reached = new Set<string>();
+  for (let press = 0; press < 6; press++) {
+    await page.keyboard.press("Tab");
+    await page.waitForTimeout(100);
+    reached.add(await page.evaluate(() => document.activeElement?.outerHTML.slice(0, 80) ?? ""));
+  }
+  expect(reached.size).toBeGreaterThan(1);
+});
+
+test("after Tabbing into a MOBI book, a click in its text gives the page keys back to the reader", async ({
+  page,
+}) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Night Ferry");
+  await resetProgress(api, id);
+  // The contents page the book carries after its last chapter.
+  await api.call(`/api/me/progress/${id}`, { method: "PATCH", body: { ebookLocation: "mobi:1:6:0" } });
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(book(page).getByText("Table of Contents")).toBeInViewport();
+
+  // Tab reaches the book itself, or a link in it where the browser tabs to links.
+  const frame = page.locator("main iframe");
+  await page.getByRole("link", { name: "Back" }).focus();
+  for (
+    let press = 0;
+    press < 10 && !(await frame.evaluate((element) => element === document.activeElement));
+    press++
+  )
+    await page.keyboard.press("Tab");
+  await expect(frame).toBeFocused();
+
+  await book(page).getByText("Table of Contents").click();
+  // Where the book sends no events, the reader takes the keyboard back on its next frame, as a person's next key would.
+  await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+  await page.keyboard.press("PageUp");
+  await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toMatch(/^mobi:1:5:/);
+});
+
+test("MOBI books take the reader's display settings and cannot run scripts", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Night Ferry");
+  await resetProgress(api, id);
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(book(page).getByText("Chapter 1: Lantern 1")).toBeVisible();
+  await expect(page.locator("main iframe")).toHaveAttribute("sandbox", "allow-same-origin");
+
+  await page.getByRole("button", { name: "Reader settings" }).click();
+  const settings = page.getByRole("dialog", { name: "Reader settings" });
+  await choose(settings, "Theme", "Light");
+  await settings.getByRole("button", { name: "Close" }).click();
+  await expect(book(page).locator("p").first()).toHaveCSS("color", "rgb(0, 0, 0)");
+  await expect(book(page).locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+
+  await page.getByRole("button", { name: "Reader settings" }).click();
+  await choose(settings, "Theme", "Dark");
+});
+
+test("a damaged MOBI is reported as unreadable", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Night Ferry");
+  await signIn(page);
+  await page.route(`**/api/items/${id}/ebook**`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/x-mobipocket-ebook",
+      body: "BOOKMOBI but not really",
+    }),
+  );
+  await page.goto(`/read/${id}`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
+});
+
+/** Each fixture page is its own colour with a white bar 60px tall per page number (qa/make-library.sh). */
+async function shownComicPage(page: import("@playwright/test").Page, number: number) {
+  return page
+    .getByRole("main")
+    .getByRole("img", { name: `Page ${number}`, exact: true })
+    .evaluate(async (image) => {
+      if (!(image instanceof HTMLImageElement)) return null;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const context = canvas.getContext("2d");
+      if (!context) return null;
+      context.drawImage(image, 0, 0);
+      const pixels = context.getImageData(300, 0, 1, image.naturalHeight).data;
+      let bar = 0;
+      for (let y = 40; y < image.naturalHeight && (pixels[y * 4 + 1] ?? 0) > 200; y++) bar++;
+      return { width: image.naturalWidth, height: image.naturalHeight, number: Math.round(bar / 60) };
+    });
+}
+
+for (const { issue, format } of [
+  { issue: 1, format: "CBZ" },
+  { issue: 2, format: "CBR" },
+]) {
+  test(`a ${format} comic shows its pages in order, and resumes at the saved page here and from other clients`, async ({
+    page,
+  }) => {
+    const api = await serverApi(accounts.user);
+    const id = await bookId(api, `Skyline ${issue}`);
+    await resetProgress(api, id);
+
+    await signIn(page);
+    await page.goto(`/item/${id}`);
+    await page.getByRole("link", { name: "Read" }).click();
+    await expect(page.getByText("Page 1 of 12")).toBeVisible();
+    expect(await shownComicPage(page, 1)).toEqual({ width: 600, height: 900, number: 1 });
+
+    await page.getByRole("button", { name: "Next page" }).click();
+    await page.keyboard.press("ArrowRight");
+    await expect(page.getByText("Page 3 of 12")).toBeVisible();
+    expect((await shownComicPage(page, 3))?.number).toBe(3);
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toBe("3");
+    expect((await serverProgress(api, id)).ebookProgress).toBeCloseTo(2 / 12, 5);
+
+    // Page 10 sorts after page 9 by its number, not between page 1 and page 2 by its name.
+    await page.getByRole("button", { name: "Pages" }).click();
+    const pages = page.getByRole("dialog", { name: "Pages" });
+    await expect(pages.getByRole("button")).toHaveText([
+      ...Array.from({ length: 12 }, (_, index) => `page ${index + 1}.png`),
+      "Close",
+    ]);
+    await expect(pages.getByRole("button", { name: "page 3.png" })).toHaveAttribute("aria-current", "page");
+    await pages.getByRole("button", { name: "page 10.png" }).click();
+    await expect(page.getByText("Page 10 of 12")).toBeVisible();
+    expect((await shownComicPage(page, 10))?.number).toBe(10);
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toBe("10");
+
+    await page.getByRole("button", { name: "Comic details" }).click();
+    const details = page.getByRole("dialog", { name: "Comic details" });
+    await expect(details.getByRole("definition")).toHaveText([
+      `Skyline Issue ${issue}`,
+      "Skyline",
+      String(issue),
+      "Rin Okada",
+    ]);
+    await expect(details.getByRole("term")).toHaveText(["Title", "Series", "Number", "Writer"]);
+    await details.getByRole("button", { name: "Close" }).click();
+
+    await page.reload();
+    await expect(page.getByText("Page 10 of 12")).toBeVisible();
+    expect((await shownComicPage(page, 10))?.number).toBe(10);
+
+    await api.call(`/api/me/progress/${id}`, {
+      method: "PATCH",
+      body: { ebookLocation: "6", ebookProgress: 5 / 12 },
+    });
+    await page.getByRole("link", { name: "Back" }).click();
+    await page.getByRole("link", { name: "Read" }).click();
+    await expect(page.getByText("Page 6 of 12")).toBeVisible();
+    expect((await shownComicPage(page, 6))?.number).toBe(6);
+  });
+}
+
+test("arrow keys move within an open reader dialog without turning the page behind it", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Skyline 1");
+  await resetProgress(api, id);
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(page.getByText("Page 1 of 12")).toBeVisible();
+
+  await page.getByRole("button", { name: "Pages" }).click();
+  await expect(page.getByRole("dialog", { name: "Pages" })).toBeVisible();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("PageDown");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Pages" })).toBeHidden();
+  await expect(page.getByText("Page 1 of 12")).toBeVisible();
+});
+
+async function chooseLanguage(page: import("@playwright/test").Page, code: "ar" | "he") {
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await choose(page, "Language", languages[code]);
+  await expect(page.locator("html")).toHaveAttribute("lang", code);
+}
+
+for (const code of ["ar", "he"] as const) {
+  test(`in a right-to-left language (${code}), the reader's arrows, arrow keys and swipes follow the mirrored layout`, async ({
+    page,
+  }) => {
+    const api = await serverApi(accounts.user);
+    const id = await bookId(api, "Skyline 1");
+    await resetProgress(api, id);
+    await signIn(page);
+    await chooseLanguage(page, code);
+    await page.goto(`/read/${id}`);
+    const pageNumber = page.locator("#reader-page");
+    await expect(pageNumber).toHaveValue("1");
+
+    // Next sits at the left end of the bar, pointing left, and Previous at the right end, pointing right.
+    const next = page.getByRole("button", { name: "Next page" });
+    const previous = page.getByRole("button", { name: "Previous page" });
+    expect((await next.boundingBox())?.x ?? 0).toBeLessThan((await previous.boundingBox())?.x ?? 0);
+    await expect(next.locator("svg.lucide-chevron-left")).toHaveCount(1);
+    await expect(previous.locator("svg.lucide-chevron-right")).toHaveCount(1);
+
+    await page.keyboard.press("ArrowLeft");
+    await expect(pageNumber).toHaveValue("2");
+    await page.keyboard.press("ArrowRight");
+    await expect(pageNumber).toHaveValue("1");
+    await page.keyboard.press("PageDown");
+    await expect(pageNumber).toHaveValue("2");
+
+    // A swipe towards the right brings the next page in from the left.
+    const image = page.getByRole("main").getByRole("img", { name: /^Page \d+$/ });
+    await image.dispatchEvent("pointerdown", { pointerType: "touch", clientX: 100, clientY: 300 });
+    await image.dispatchEvent("pointerup", { pointerType: "touch", clientX: 260, clientY: 310 });
+    await expect(pageNumber).toHaveValue("3");
+
+    // Keys in an open dialog stay with the dialog.
+    await page.getByRole("button", { name: "Pages" }).click();
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(pageNumber).toHaveValue("3");
+  });
+}
+
+test("the reader's settings are named in the chosen language, as in the legacy reader", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Paper Lanterns");
+  await signIn(page);
+  await chooseLanguage(page, "he");
+  await page.goto(`/read/${id}`);
+  await page.getByRole("button", { name: "הגדרות קורא אלקטרוני" }).click();
+  await expect(page.getByRole("dialog", { name: "הגדרות קורא אלקטרוני" })).toBeVisible();
+});
+
+test("a damaged comic is reported as unreadable", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Skyline 1");
+  await signIn(page);
+  await page.route(`**/api/items/${id}/ebook**`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/vnd.comicbook+zip",
+      body: "PK this is not a zip",
+    }),
+  );
+  await page.goto(`/read/${id}`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("could not be opened");
+});

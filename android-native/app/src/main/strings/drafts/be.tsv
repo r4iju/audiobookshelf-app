@@ -1,0 +1,479 @@
+# Belarusian drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Уліковыя запісы
+title_new_collection	Новая калекцыя
+action_retry	Паўтарыць
+action_read	Чытаць %1$s
+action_mark_finished	Пазначыць як завершанае
+choose_library	Выбраць бібліятэку
+all_titles	Усе элементы
+all_podcasts	Усе падкасты
+filter	Фільтр
+sort	Сартаванне
+theme_system	Сістэмная
+screen_orientation	Арыентацыя экрана
+jump_forward	Перамотка наперад
+jump_back	Перамотка назад
+set_settings_not_saved	Не ўдалося захаваць налады на гэтай прыладзе, таму нічога не змянілася. Вызваліце месца і паспрабуйце яшчэ раз.
+set_orientation_follow_device	Як на прыладзе
+set_orientation_portrait	Партрэтная
+set_orientation_landscape	Альбомная
+set_rewind_on_resume	Крыху перамотваць назад пры аднаўленні
+set_rewind_on_resume_detail	Перамотвае на некалькі секунд назад пасля паўзы і больш пасля доўгай паўзы.
+set_seek_system_controls	Перамотка з сістэмных элементаў кіравання
+set_seek_system_controls_detail	Дазваляе перамяшчаць паўзунок пазіцыі на экране блакіроўкі і ў апавяшчэнні.
+set_mp3_index_seeking	Дакладная перамотка MP3
+set_mp3_index_seeking_detail	Стварае індэкс перамоткі для файлаў MP3 з ненадзейнай працягласцю. Перамотка пачынаецца павольней.
+set_shake_to_reset	Устрасянуць для скіду
+set_shake_to_reset_detail	Устрэсванне тэлефона падчас працы таймера запускае яго нанова.
+set_sleep_fade_out	Змяншэнне гучнасці
+set_sleep_fade_out_detail	Зніжае гучнасць на працягу апошняй хвіліны.
+set_vibrate_on_reset	Вібрацыя пры скідзе
+set_auto_sleep_timer_detail	Запускае таймер пры прайграванні паміж %1$s і %2$s.
+set_heading_mobile_data	Мабільны інтэрнэт
+set_storage	Сховішча
+set_heading_support	Падтрымка
+set_diagnostics	Дыягностыка
+set_something_went_wrong	Нешта пайшло не так.
+set_statistics_unavailable	Статыстыка недаступная
+set_try_again	Паспрабаваць яшчэ раз
+set_minutes_listened:one	%1$d хвіліна праслухоўвання
+set_minutes_listened:few	%1$d хвіліны праслухоўвання
+set_minutes_listened:many	%1$d хвілін праслухоўвання
+set_minutes_listened:other	%1$d хвіліны праслухоўвання
+set_days_listened:one	%1$d дзень праслухоўвання
+set_days_listened:few	%1$d дні праслухоўвання
+set_days_listened:many	%1$d дзён праслухоўвання
+set_days_listened:other	%1$d дня праслухоўвання
+set_titles_finished:one	%1$d элемент завершаны
+set_titles_finished:few	%1$d элементы завершана
+set_titles_finished:many	%1$d элементаў завершана
+set_titles_finished:other	%1$d элемента завершана
+set_day_minutes_listened:one	%1$s, %2$d хвіліна праслухоўвання
+set_day_minutes_listened:few	%1$s, %2$d хвіліны праслухоўвання
+set_day_minutes_listened:many	%1$s, %2$d хвілін праслухоўвання
+set_day_minutes_listened:other	%1$s, %2$d хвіліны праслухоўвання
+set_set_aside_failed	Не ўдалося адкласці. Паспрабуйце яшчэ раз.
+set_connection	Падлучэнне
+set_diagnostics_area_media	Медыя
+set_diagnostics_area_sync	Сінхранізацыя
+set_unreadable_resets_title	Не ўдалося прачытаць захаваныя скіды прагрэсу
+set_unreadable_resets_detail	Сярод іх можа быць любы элемент, таму нічога не прайграецца і пазіцыя чытання не адпраўляецца, пакуль вы не вырашыце. Калі іх адкласці, файл застанецца на гэтай прыладзе, а прагрэс, які яны павінны былі скінуць, застанецца на серверы.
+set_set_them_aside	Адкласці іх
+set_listening_storage_title	Не ўдалося захаваць праслухоўванне да закрыцця праграмы
+set_listening_storage_detail	Сховішча на гэтай прыладзе недаступнае або запоўненае. Пакуль праслухоўванне не захавана, нічога не прайграецца і не адпраўляецца; да таго часу яно захоўваецца.
+set_unreadable_writes_title	Не ўдалося прачытаць запісы пра захаванні прагрэсу без адказу
+set_unreadable_writes_detail	Захаванне любога элемента яшчэ можа дайсці да сервера, таму праслухоўванне і чытанне не адпраўляюцца і прагрэс не скідваецца, пакуль вы не вырашыце. Калі іх адкласці, файл застанецца на гэтай прыладзе; позняе захаванне можа вярнуць скінуты прагрэс.
+set_diagnostics_server	Сервер %1$s
+set_diagnostics_signed_in_as	Уваход выкананы як %1$s
+set_diagnostics_app_version	Праграма %1$s
+set_recent_problems	Нядаўнія праблемы
+set_clear	Ачысціць
+set_no_problems	На гэтай прыладзе праблем не зафіксавана.
+set_unreadable_writes_confirm_title	Адкласці нечытэльныя запісы?
+set_unreadable_writes_confirm_detail	Пазіцыі праслухоўвання і чытання зноў будуць адпраўляцца, а скіды змогуць выканацца.
+set_set_aside	Адкласці
+set_unreadable_resets_confirm_title	Адкласці нечытэльныя скіды?
+set_unreadable_resets_confirm_detail	Элементы зноў будуць прайгравацца, а пазіцыі чытання адпраўляцца. Скіньце прагрэс яшчэ раз для элементаў, якія хочаце пачаць нанова.
+set_signed_in	Уваход выкананы
+set_other_accounts	Іншыя ўліковыя запісы
+set_server_sign_in_required	%1$s · патрабуецца ўваход
+set_remove_account	Выдаліць %1$s
+set_switch_to_account	Пераключыцца на гэты ўліковы запіс
+set_add_account	Дадаць уліковы запіс
+set_sign_out_of	Выйсці з %1$s
+set_sign_out_detail	Выдаляе гэты ўліковы запіс з прылады. Спампоўкі і неадпраўленае праслухоўванне захоўваюцца да паўторнага ўваходу.
+set_accounts_footer	Кожны ўліковы запіс мае свой прагрэс, спампоўкі і выбар бібліятэкі. Пры пераключэнні яны не змешваюцца.
+set_remove_account_confirm	Выдаліць %1$s?
+set_remove_account_detail	Уліковы запіс можна будзе дадаць пазней. Яго спампоўкі і неадпраўленае праслухоўванне застануцца на гэтай прыладзе.
+set_add_an_account	Дадаць уліковы запіс
+set_connect_intro	Падлучайцеся непасрэдна да ўласнага сервера. Нічога не перадаецца праз іншыя сэрвісы.
+set_change_server	Змяніць сервер
+set_sign_in	Увайсці
+set_sign_in_openid	Увайсці праз OpenID
+set_saved_accounts	Захаваныя ўліковыя запісы
+set_use_account	Выкарыстаць
+set_edit	Рэдагаваць
+set_add_podcast	Дадаць падкаст
+set_not_available_yet	Пакуль недаступна
+set_not_available_yet_detail	Гэтая частка папярэдняй версіі яшчэ ў распрацоўцы.
+set_import_previous_app	Імпарт з папярэдняй праграмы
+set_import_interrupted	Імпарт не завяршыўся. Выберыце той жа экспарт, каб працягнуць з месца спынення.
+set_import_already	Гэты экспарт ужо імпартаваны. Элементы, праслухоўванне і пазіцыі з яго ёсць на гэтай прыладзе.
+set_import_preflight	%1$s\nПапярэдняя праграма і гэты файл толькі чытаюцца, у іх нічога не змяняецца. Элементы, праслухоўванне і пазіцыі прывязваюцца да ўліковага запісу пасля ўваходу ў яго тут. Пароляў у экспарце няма, таму ў кожны ўліковы запіс трэба ўвайсці зноў.
+set_import_account_signed_in	%1$s · уваход выкананы
+set_import_account_sign_in_later	%1$s · увайдзіце пасля імпарту
+set_import_titles	Элементы
+set_import_title_partial	%1$s · астатняе спампуецца зноў
+set_not_imported	Не імпартавана
+set_import_space	Патрэбна %1$s; вольна %2$s.
+set_import_no_space	На гэтай прыладзе недастаткова вольнага месца. Вызваліце месца, а потым зноў выберыце экспарт.
+set_import_progress	Капіраванне файлаў: %1$d з %2$d. Калі праграма закрыецца, зноў выберыце той жа экспарт, каб працягнуць.
+set_import_done	Імпартавана элементаў: %1$d, сеансаў праслухоўвання: %2$d, пазіцый: %3$d. Налады з папярэдняй праграмы ўжыты.
+set_import_waiting	Увайдзіце на %1$s як %2$s, каб прывязаць яго элементы, праслухоўванне і пазіцыі.
+set_import	Імпартаваць
+set_continue	Працягнуць
+set_close	Закрыць
+set_import_file_unreadable	Не ўдалося прачытаць выбраны файл. Выберыце яго зноў або спачатку захавайце на гэту прыладу.
+set_import_stopped	Імпарт спыніўся, не завяршыўшыся. Нічога не страчана: зноў выберыце той жа экспарт, каб працягнуць з месца спынення.
+set_import_item_gone	Яго больш няма на серверы, таму ён не быў перанесены.
+set_import_file_changed	Файл змяніўся на гэтай прыладзе пасля імпарту, таму ён будзе зноў спампаваны з сервера.
+set_openid_not_enabled	Уваход праз OpenID не ўключаны на гэтым серверы. Выкарыстоўвайце імя карыстальніка і пароль.
+set_openid_canceled	Уваход праз браўзер скасаваны. Захаваныя ўліковыя запісы засталіся.
+set_openid_invalid	Не ўдалося праверыць адказ уваходу праз браўзер. Паўтарыце ўваход і праверце налады перанакіравання OpenID на серверы.
+set_vault_unreadable	Не ўдалося расшыфраваць захаваныя даныя ўваходу. Яны застаюцца на прыладзе; увайдзіце зноў, каб працягнуць.
+set_session_ended	Ваш сеанс на %1$s завяршыўся. Увайдзіце зноў; неадпраўленае праслухоўванне і спампоўкі захаваны.
+set_play_blocked_listening_storage	Праслухоўванне да закрыцця праграмы не ўдалося захаваць, бо сховішча недаступнае, таму нічога не прайграецца, пакуль гэта не атрымаецца. Вызваліце месца і паспрабуйце яшчэ раз.
+set_play_blocked_unreadable_resets	Не ўдалося прачытаць захаваныя скіды прагрэсу, таму нічога не прайграецца, пакуль яны не будуць вырашаны ў раздзеле «Дыягностыка».
+set_play_blocked_discarding	Прагрэс гэтага элемента яшчэ скідваецца. Пасля гэтага прайграванне пачнецца з пачатку.
+dl_not_saved	Не ўдалося захаваць спіс спамповак на гэтай прыладзе, таму нічога не змянілася. Вызваліце месца і паспрабуйце яшчэ раз.
+dl_not_allowed	Вашаму ўліковаму запісу не дазволена спампоўваць.
+dl_no_audio	У гэтага элемента няма аўдыя для спампоўвання.
+dl_no_space	Недастаткова вольнага месца на гэтай прыладзе для %1$s з улікам месца, патрэбнага сістэме.
+dl_folder_lost_nothing_downloaded	Доступ да %1$s быў адкліканы, таму нічога не спампавана. Зноў выберыце папку спамповак у наладах.
+dl_downloading_percent	Спампоўванне: %1$d%%
+dl_cancel_download	Скасаваць спампоўванне
+dl_downloaded_plays_offline	Спампавана · прайграецца па-за сеткай
+dl_failed	Не ўдалося спампаваць.
+dl_discard	Выдаліць
+dl_cellular_title	Спампоўваць праз мабільны інтэрнэт?
+dl_cellular_message	Вы выкарыстоўваеце лімітнае падлучэнне. Гэта можна змяніць у наладах.
+dl_not_now	Не цяпер
+dl_folder_cannot_be_kept	Гэту папку нельга выкарыстоўваць для спамповак. Выберыце іншую.
+dl_saved_in_folder	Спампоўкі захоўваюцца ў %1$s
+dl_saved_in_app_storage	Спампоўкі захоўваюцца ў сховішчы праграмы
+dl_folder_visible_to_other_apps	Іншыя праграмы на гэтай прыладзе бачаць гэтыя файлы. Спампоўкі, зробленыя да змены, застаюцца на месцы.
+dl_folder_private_to_app	Толькі гэтая праграма бачыць гэтыя файлы. Выберыце папку, каб спампоўкі былі даступныя іншым праграмам.
+dl_choose_folder	Выбраць папку
+dl_use_app_storage	Выкарыстоўваць сховішча праграмы
+dl_ebook_missing	Электроннай кнігі няма на гэтай прыладзе. Спампуйце яе зноў, каб адкрыць.
+dl_no_app_opens_format	На гэтай прыладзе няма праграмы, якая адкрывае файлы %1$s. Усталюйце такую праграму і паспрабуйце яшчэ раз.
+dl_no_app_opens_this_kind	На гэтай прыладзе няма праграмы, якая адкрывае файлы такога тыпу. Усталюйце такую праграму і паспрабуйце яшчэ раз.
+dl_folder_lost_choose_again_open	Гэта спампоўка знаходзіцца ў %1$s, а доступ да %1$s быў адкліканы. Зноў выберыце %1$s, каб адкрыць яе.
+dl_folder_lost_choose_again_play	Гэта спампоўка знаходзіцца ў %1$s, а доступ да %1$s быў адкліканы. Зноў выберыце %1$s, каб прайграць яе.
+dl_names_or	%1$s або %2$s
+dl_names_and	%1$s і %2$s
+dl_remove_title	Выдаліць спампоўку?
+dl_remove_message	«%1$s» будзе выдалена з гэтай прылады. Прагрэс праслухоўвання захаваецца.
+dl_keep	Пакінуць
+dl_not_that_folder	Гэта не %1$s. Выберыце папку, у якой знаходзяцца гэтыя спампоўкі.
+dl_folder_access_not_kept	Не ўдалося захаваць доступ да гэтай папкі. Паспрабуйце яшчэ раз.
+dl_no_downloads	Няма спамповак
+dl_no_downloads_message	Спампоўвайце кнігі або выпускі на іх старонцы, каб слухаць без падлучэння.
+dl_access_removed_title	Доступ да %1$s быў адкліканы
+dl_downloads_kept_there:one	Там захоўваецца %1$d спампоўка. Зноў выберыце %2$s, каб прайграваць і адкрываць яе.
+dl_downloads_kept_there:few	Там захоўваюцца %1$d спампоўкі. Зноў выберыце %2$s, каб прайграваць і адкрываць іх.
+dl_downloads_kept_there:many	Там захоўваецца %1$d спамповак. Зноў выберыце %2$s, каб прайграваць і адкрываць іх.
+dl_downloads_kept_there:other	Там захоўваецца %1$d спампоўкі. Зноў выберыце %2$s, каб прайграваць і адкрываць іх.
+dl_choose_again	Зноў выбраць %1$s
+dl_some_files_missing	Некаторых файлаў няма на гэтай прыладзе
+dl_size_in_folder	%1$s у %2$s
+dl_open_in_another_app	Адкрыць %1$s у іншай праграме
+dl_download_again_named	Спампаваць %1$s зноў
+dl_the_chosen_folder	выбранай папцы
+dl_files_missing_play	Некаторых файлаў гэтай спампоўкі няма на прыладзе. Спампуйце яе зноў, каб прайграць.
+dl_play_named	Прайграць %1$s
+dl_retry_named	Паўтарыць %1$s
+dl_cancel_named	Скасаваць %1$s
+dl_remove_named	Выдаліць %1$s
+dl_sign_in_again	Увайдзіце ў гэты ўліковы запіс зноў, каб спампоўваць.
+dl_folder_lost_choose_in_downloads	Доступ да %1$s быў адкліканы. Зноў выберыце папку ў раздзеле «Спампоўкі».
+dl_connection_interrupted	Злучэнне перарвана.
+dl_error_retrying	%1$s Паўторная спроба…
+dl_server_refused	Сервер адхіліў спампоўванне.
+dl_server_sent_type_not_audio	Сервер адправіў %1$s замест аўдыя, таму нічога не захавана. Праверце сервер або проксі і паспрабуйце яшчэ раз.
+dl_server_sent_unknown_not_audio	Сервер адправіў невядомы адказ замест аўдыя, таму нічога не захавана. Праверце сервер або проксі і паспрабуйце яшчэ раз.
+dl_size_mismatch	Памер спампаванага файла %1$d байтаў, а сервер указаў %2$d, таму файл выдалены. Паспрабуйце яшчэ раз, каб спампаваць яго зноў.
+dl_server_sent_not_pdf	Сервер адправіў не PDF, таму нічога не захавана. Праверце сервер або проксі і паспрабуйце яшчэ раз.
+rd_positions_not_restored	Не ўдалося аднавіць захаваныя пазіцыі чытання, таму старонкі не захоўваюцца. Зыходныя даныя захаваны.
+rd_positions_not_overwritten	Не ўдалося прачытаць захаваныя пазіцыі чытання, таму яны не перазапісваюцца.
+rd_not_a_pdf	Гэты файл не з'яўляецца PDF, які можа адкрыць гэта прылада.
+rd_document_not_opened	Не ўдалося адкрыць дакумент.
+rd_page_not_saved	Не ўдалося захаваць гэту старонку на гэтай прыладзе.
+rd_choice_not_saved	Не ўдалося захаваць ваш выбар на гэтай прыладзе.
+rd_conflict_title	Дзе працягнуць?
+rd_conflict_page	Іншая прылада дайшла да старонкі %1$d, пакуль старонка %2$d тут яшчэ не была захавана на серверы.
+rd_conflict_location	Іншая прылада захавала пазіцыю чытання, якую гэта чытанка не можа паказаць як старонку, пакуль старонка %1$d тут яшчэ не была захавана на серверы.
+rd_go_to_page_number	Перайсці на старонку %1$d
+rd_keep_other_position	Пакінуць іншую пазіцыю
+rd_stay_on_page	Застацца на старонцы %1$d
+rd_close_reader	Закрыць чытанку
+rd_rotate_pages	Павярнуць старонкі
+rd_continuous_scrolling	Бесперапынная пракрутка
+rd_document_error_title	Не ўдалося адкрыць гэты дакумент
+rd_try_again	Паспрабаваць яшчэ раз
+rd_go_to_page	Перайсці на старонку
+rd_previous_page	Папярэдняя старонка
+rd_next_page	Наступная старонка
+rd_page_of	Старонка %1$d з %2$d
+rd_page_number	Старонка %1$d
+rd_download_folder_lost	Гэта спампоўка знаходзіцца ў %1$s, а доступ да %1$s быў адкліканы. Зноў выберыце папку ў раздзеле «Спампоўкі».
+rd_downloaded_document_missing	Спампаванага дакумента няма на гэтай прыладзе. Спампуйце яго зноў.
+rd_document_not_stored	Не ўдалося захаваць дакумент для чытання.
+rd_supplementary_pdf	дадатковы PDF
+rd_format_not_available	Чытанне %1$s пакуль недаступнае ў гэтай папярэдняй версіі. Ваша пазіцыя чытання на серверы захавана.
+rd_ebook_not_available	Чытанне гэтай электроннай кнігі пакуль недаступнае ў гэтай папярэдняй версіі. Ваша пазіцыя чытання на серверы захавана.
+grp_unavailable_title	Недаступны элемент
+grp_could_not_load_collections	Не ўдалося загрузіць калекцыі.
+grp_could_not_load_playlists	Не ўдалося загрузіць плэй-лісты.
+grp_collections_unavailable	Калекцыі недаступныя
+grp_playlists_unavailable	Плэй-лісты недаступныя
+grp_no_collections_yet	Калекцый пакуль няма
+grp_no_playlists_yet	Плэй-лістоў пакуль няма
+grp_create_one_hint	Стварыце, каб сабраць элементы ва ўласным парадку.
+grp_title_count:one	%1$d элемент
+grp_title_count:few	%1$d элементы
+grp_title_count:many	%1$d элементаў
+grp_title_count:other	%1$d элемента
+grp_collection_deleted	Гэта калекцыя была выдалена.
+grp_playlist_deleted	Гэты плэй-ліст быў выдалены.
+grp_could_not_load	Не ўдалося загрузіць.
+grp_collection_unavailable	Калекцыя недаступная
+grp_playlist_unavailable	Плэй-ліст недаступны
+grp_nothing_in_collection_can_play	У гэтай калекцыі няма чаго прайграць.
+grp_nothing_in_playlist_can_play	У гэтым плэй-лісце няма чаго прайграць.
+grp_could_not_start_playback	Не ўдалося пачаць прайграванне.
+grp_resume	Працягнуць
+grp_play_collection	Прайграць калекцыю
+grp_play_playlist	Прайграць плэй-ліст
+grp_edit_collection	Рэдагаваць калекцыю
+grp_edit_playlist	Рэдагаваць плэй-ліст
+grp_delete_collection	Выдаліць калекцыю
+grp_delete_playlist	Выдаліць плэй-ліст
+grp_no_titles_yet	Элементаў пакуль няма
+grp_delete_collection_question	Выдаліць калекцыю?
+grp_delete_playlist_question	Выдаліць плэй-ліст?
+grp_delete_group_explanation	«%1$s» будзе выдалена з вашага сервера. Элементы ў ім захаваюцца.
+grp_not_deleted	Не выдалена: %1$s
+grp_not_deleted_try_again	Не выдалена: паспрабуйце яшчэ раз
+grp_not_allowed_to_change_collection	Вашаму ўліковаму запісу на серверы не дазволена змяняць гэту калекцыю.
+grp_not_allowed_to_change_playlist	Вашаму ўліковаму запісу на серверы не дазволена змяняць гэты плэй-ліст.
+grp_collection_no_longer_exists	Гэтай калекцыі больш не існуе.
+grp_playlist_no_longer_exists	Гэтага плэй-ліста больш не існуе.
+grp_not_saved	Не захавана: %1$s
+grp_not_saved_try_again	Не захавана: паспрабуйце яшчэ раз
+grp_saving	Захаванне…
+grp_create_collection	Стварыць калекцыю
+grp_create_playlist	Стварыць плэй-ліст
+grp_save_changes	Захаваць змены
+grp_choose_at_least_one_title	Выберыце хаця б адзін элемент.
+grp_order	Парадак
+grp_move_up	Перамясціць %1$s уверх
+grp_remove_member	Выдаліць %1$s
+grp_add_titles	Дадаць элементы
+grp_add_episodes_hint	Дадавайце выпускі на старонцы выпускаў падкаста.
+grp_add_to_playlist_or_collection	Дадаць у плэй-ліст або калекцыю
+grp_add_to	Дадаць у
+grp_nothing_to_add_to	Пакуль няма куды дадаць.
+grp_added_to	Дададзена ў %1$s
+grp_not_added	Не дададзена: %1$s
+grp_not_added_try_again	Не дададзена: паспрабуйце яшчэ раз
+grp_already_included	Ужо дададзена
+grp_close	Закрыць
+grp_titles_could_not_load	Не ўдалося загрузіць элементы
+grp_nothing_here	Тут нічога няма
+pod_feed_episodes	Выпускі стужкі
+pod_sort_newest_first	Спачатку новыя, націсніце, каб спачатку старыя
+pod_sort_oldest_first	Спачатку старыя, націсніце, каб спачатку новыя
+pod_episodes_queued:one	%1$d выпуск пастаўлены ў чаргу на вашым серверы: %2$s
+pod_episodes_queued:few	%1$d выпускі пастаўлены ў чаргу на вашым серверы: %2$s
+pod_episodes_queued:many	%1$d выпускаў пастаўлена ў чаргу на вашым серверы: %2$s
+pod_episodes_queued:other	%1$d выпуску пастаўлена ў чаргу на вашым серверы: %2$s
+pod_server_could_not_download	Ваш сервер не змог спампаваць «%1$s».
+pod_dismiss	Закрыць
+pod_no_episodes_yet	Выпускаў пакуль няма
+pod_no_episodes_match_filter	Няма выпускаў, якія адпавядаюць гэтаму фільтру
+pod_episode_details	Звесткі пра выпуск
+pod_untitled_episode	Выпуск без назвы
+pod_play_named	Прайграць %1$s
+pod_episode_not_available	Выпуск недаступны
+pod_episode_may_have_been_removed	Магчыма, ён быў выдалены з сервера.
+pod_percent_listened	Праслухана %1$d%%
+pod_feed_could_not_open	Не ўдалося адкрыць стужку.
+pod_retry_feed	Паўтарыць загрузку стужкі
+pod_no_feed_episodes	У стужцы не знойдзена выпускаў
+pod_already_on_server	Ужо на серверы
+pod_selected	Выбрана
+pod_not_selected	Не выбрана
+pod_no_audio_enclosure	Няма аўдыяўкладання
+pod_not_queued	Не пастаўлена ў чаргу: %1$s
+pod_not_queued_try_again	Не пастаўлена ў чаргу: паспрабуйце яшчэ раз
+pod_queueing_on_server	Пастаноўка ў чаргу на вашым серверы…
+pod_add_selected_episodes	Дадаць выбраныя выпускі на сервер
+pod_something_went_wrong	Нешта пайшло не так.
+pod_adding_not_available	Дадаванне падкастаў недаступнае
+pod_adding_needs_permission	Вашаму ўліковаму запісу на серверы патрэбны дазвол на кіраванне падкастамі ў бібліятэцы падкастаў.
+pod_search_podcasts	Пошук падкастаў
+pod_or_rss_feed_url	Або URL RSS-стужкі
+pod_enter_complete_feed_url	Увядзіце поўны URL стужкі HTTP або HTTPS.
+pod_preview_feed	Праглядзець стужку
+pod_create_podcast	Стварыць падкаст
+pod_choose_different_feed	Выбраць іншую стужку
+item_something_went_wrong	Нешта пайшло не так. Паспрабуйце яшчэ раз.
+item_feed_subscribe_at	Праграмы для падкастаў могуць падпісацца на гэты элемент па адрасе:
+item_copied	Скапіравана
+item_copy_address	Скапіраваць адрас
+item_hidden_from_directories	Схавана з каталогаў падкастаў
+item_feed_public_warning	Любы, у каго ёсць адрас, можа слухаць гэты элемент без уваходу.
+item_feed_name	Назва стужкі
+item_feed_name_rule	Толькі літары, лічбы, - і _
+item_hide_from_directories	Схаваць з каталогаў падкастаў
+item_done	Гатова
+item_sending	Адпраўка…
+item_sent_to	Адпраўлена на %1$s
+item_send_ebook_explanation	Ваш сервер адправіць электронную кнігу па пошце на выбраную прыладу.
+item_ereader_or_ebook_gone	%1$s або гэта электронная кніга больш недаступныя на серверы. Нічога не адпраўлена.
+item_not_sent_to	Не адпраўлена на %1$s. %2$s
+item_not_saved_try_again	Не захавана. Паспрабуйце яшчэ раз.
+item_mark_unfinished	Пазначыць як незавершанае
+item_discard_uncertain	Папярэдняе захаванне прагрэсу гэтага элемента засталося без адказу і яшчэ можа дайсці да сервера. Калі яно прыйдзе пасля скіду, прагрэс вернецца. Сервер не можа паведаміць праграме, ці адбудзецца гэта.
+item_discard_anyway	Усё роўна скінуць
+item_discard_under_way	Гэты скід ужо выконваецца, і яго нельга адмяніць.
+item_keep_progress	Пакінуць прагрэс
+item_discard_pending	Скід прагрэсу. Ён завершыцца, калі сервер стане даступны і праслухоўванне гэтага элемента будзе адпраўлена.
+item_discard_anyway_question	Усё роўна скінуць?
+item_discard_anyway_explanation	Прагрэс выдаляецца зараз. Калі папярэдняе захаванне дойдзе да сервера пазней, прагрэс гэтага элемента вернецца, і яго можна будзе скінуць зноў.
+item_discard	Скінуць
+item_discard_progress_question	Скінуць прагрэс?
+item_discard_progress_explanation	Ваша пазіцыя і адзнака пра завяршэнне для гэтага элемента будуць выдалены з сервера для ўсіх прылад.
+item_could_not_load	Не ўдалося загрузіць гэты элемент
+item_narrated_by	Чытае
+item_series	Серыя: %1$s
+item_series_with_sequence	Серыя: %1$s #%2$s
+item_episode_count:one	%1$d выпуск
+item_episode_count:few	%1$d выпускі
+item_episode_count:many	%1$d выпускаў
+item_episode_count:other	%1$d выпуску
+item_listened_and_left	Праслухана %1$d%% · засталося %2$s
+item_chapter_number	Раздзел %1$d
+pl_minimize_player	Згарнуць прайгравальнік
+pl_nothing_playing	Нічога не прайграецца
+pl_chapter_number	Раздзел %1$d
+pl_try_again	Паспрабаваць яшчэ раз
+pl_speed_value	Хуткасць %1$s
+pl_sleep	Сон
+pl_position_of_duration	%1$s з %2$s
+pl_buffering	Буферызацыя
+pl_previous_chapter	Папярэдні раздзел
+pl_next_chapter	Наступны раздзел
+pl_jump_forward_seconds:one	Наперад на %1$d секунду
+pl_jump_forward_seconds:few	Наперад на %1$d секунды
+pl_jump_forward_seconds:many	Наперад на %1$d секунд
+pl_jump_forward_seconds:other	Наперад на %1$d секунды
+pl_jump_back_seconds:one	Назад на %1$d секунду
+pl_jump_back_seconds:few	Назад на %1$d секунды
+pl_jump_back_seconds:many	Назад на %1$d секунд
+pl_jump_back_seconds:other	Назад на %1$d секунды
+pl_jump_forward_minutes:one	Наперад на %1$d хвіліну
+pl_jump_forward_minutes:few	Наперад на %1$d хвіліны
+pl_jump_forward_minutes:many	Наперад на %1$d хвілін
+pl_jump_forward_minutes:other	Наперад на %1$d хвіліны
+pl_jump_back_minutes:one	Назад на %1$d хвіліну
+pl_jump_back_minutes:few	Назад на %1$d хвіліны
+pl_jump_back_minutes:many	Назад на %1$d хвілін
+pl_jump_back_minutes:other	Назад на %1$d хвіліны
+pl_open_player	Адкрыць прайгравальнік
+pl_playback_stopped	Прайграванне спынена
+pl_listening_unsaved	Частка праслухоўвання яшчэ не захавана на гэтай прыладзе. Яна захоўваецца і будзе захавана, як толькі дазволіць сховішча.
+pl_playing	Прайграецца
+pl_resume	Працягнуць
+pl_streaming_cellular_refused	Трансляцыя праз мабільны інтэрнэт адключана ў наладах. Падлучыцеся да Wi-Fi або спачатку спампуйце гэты элемент.
+pl_stream_cellular_title	Трансліраваць праз мабільны інтэрнэт?
+pl_stream_cellular_message	Вы выкарыстоўваеце лімітнае падлучэнне. Гэта можна змяніць у наладах.
+pl_not_now	Не цяпер
+pl_sleep_stops_end_of_chapter	Спыненне ў канцы гэтага раздзела, праз %1$s
+pl_sleep_stops_in	Спыненне праз %1$s
+pl_sleep_minus_minutes	−%1$d хв
+pl_sleep_plus_minutes	+%1$d хв
+pl_sleep_minutes	%1$d хв
+pl_sleep_turn_off	Выключыць
+pl_bookmark_not_saved_reason	Закладка не захавана: %1$s
+pl_bookmark_not_saved	Закладка не захавана: паспрабуйце яшчэ раз
+pl_bookmark_add_at	Дадаць на %1$s
+pl_bookmark_go_to	Перайсці да закладкі
+pl_bookmark_default	Закладка
+pl_bookmark_rename_named	Перайменаваць %1$s
+pl_bookmark_delete_named	Выдаліць %1$s
+pl_bookmark_at	Закладка на %1$s
+pl_bookmark_rename	Перайменаваць закладку
+pl_bookmark_new	Новая закладка
+pl_untitled	Без назвы
+pl_playback_stopped_reason	Прайграванне спынена: %1$s. Ваша пазіцыя захавана.
+pl_playback_stopped_unknown	Прайграванне спынена: не ўдалося загрузіць аўдыя. Ваша пазіцыя захавана.
+pl_no_playable_audio	У гэтага элемента няма аўдыя для прайгравання.
+pl_could_not_start	Не ўдалося пачаць прайграванне.
+pl_listening_save_failed	Не ўдалося захаваць праслухоўванне на гэтай прыладзе, таму прайграванне прыпынена. Вызваліце месца і паспрабуйце яшчэ раз.
+cast_casting_to	Трансляцыя на %1$s
+cast_cast	Трансляцыя
+cast_playing_on	Прайграецца на %1$s
+cast_connecting_to	Падлучэнне да %1$s…
+cast_playing_on_phone	Прайграецца на гэтым тэлефоне
+cast_stop	Спыніць трансляцыю
+cast_looking	Пошук прылад для трансляцыі…
+cast_none_found	Прылады для трансляцыі не знойдзены. Пераканайцеся, што прыёмнік уключаны і падлучаны да той жа сеткі Wi-Fi, што і гэты тэлефон.
+cast_close	Закрыць
+cast_download_not_castable	Спампаваныя копіі прайграюцца толькі на гэтым тэлефоне. Спыніце трансляцыю, каб слухаць тут, або слухайце гэты элемент анлайн.
+cast_resumed_without_title	Трансляцыя спынена, бо праграма перазапусцілася падчас трансляцыі. Адкрыйце элемент зноў, каб працягнуць з месца, апошнім захаванага на гэтым тэлефоне.
+cast_needs_play_services	Для трансляцыі патрэбны сэрвісы Google Play, якіх няма на гэтай прыладзе або якія трэба абнавіць.
+cast_could_not_start	Не ўдалося пачаць трансляцыю на гэтай прыладзе: %1$s.
+cast_connect_failed_named	Не ўдалося падлучыцца да %1$s. Пераканайцеся, што прылада ўключана і падлучана да той жа сеткі Wi-Fi, што і гэты тэлефон.
+cast_connect_failed	Не ўдалося падлучыцца да прыёмніка. Пераканайцеся, што ён уключаны і падлучаны да той жа сеткі Wi-Fi, што і гэты тэлефон.
+cast_connection_lost_named	Злучэнне з %1$s страчана. Прайграванне працягваецца на гэтым тэлефоне.
+cast_connection_lost	Злучэнне з прыёмнікам страчана. Прайграванне працягваецца на гэтым тэлефоне.
+auto_continue	Працягнуць
+auto_recent	Нядаўнія
+auto_discovery	Знаходкі
+auto_authors_count:one	%1$d аўтар
+auto_authors_count:few	%1$d аўтары
+auto_authors_count:many	%1$d аўтараў
+auto_authors_count:other	%1$d аўтара
+auto_series_count:one	%1$d серыя
+auto_series_count:few	%1$d серыі
+auto_series_count:many	%1$d серый
+auto_series_count:other	%1$d серыі
+lib_books_count:one	%1$d кніга
+lib_books_count:few	%1$d кнігі
+lib_books_count:many	%1$d кніг
+lib_books_count:other	%1$d кнігі
+lib_items_count:one	%1$d элемент
+lib_items_count:few	%1$d элементы
+lib_items_count:many	%1$d элементаў
+lib_items_count:other	%1$d элемента
+lib_selected	Выбрана
+lib_all_filters	Усе фільтры
+lib_nothing_to_filter	Тут няма чаго фільтраваць.
+lib_sort_descending_switch	Па змяншэнні, пераключыць на павелічэнне
+lib_sort_ascending_switch	Па павелічэнні, пераключыць на змяншэнне
+lib_sort_descending	Па змяншэнні
+lib_sort_ascending	Па павелічэнні
+lib_unavailable	Бібліятэка недаступная
+lib_unavailable_message	%1$s Ваш уліковы запіс і неадпраўленае праслухоўванне захаваны.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Паказаць вокладкі
+lib_show_list	Паказаць спісам
+lib_filtered	Адфільтравана
+lib_empty_title	Тут пакуль нічога няма
+lib_empty_message	У гэтай бібліятэцы няма даступных вам элементаў.
+lib_page_error	Не ўдалося загрузіць больш элементаў
+lib_card_finished	%1$s, завершана
+lib_card_percent_listened	%1$s, праслухана %2$d працэнтаў
+lib_search_in	Пошук: %1$s
+lib_search_library	Пошук у бібліятэцы
+lib_clear_search	Ачысціць пошук
+lib_search_failed	Памылка пошуку
+lib_search_idle_title	Знайдзіце, што паслухаць
+lib_search_idle_message	Шукайце назвы, аўтараў, серыі, дыктараў і выпускі.
+lib_search_no_match	Па запыце «%1$s» нічога не знойдзена. Паспрабуйце менш слоў або іншае напісанне.
+err_invalid_server	Увядзіце адрас сервера, які пачынаецца з http:// або https://, напрыклад https://books.example.com/abs.
+err_unsafe_media_url	Сервер вярнуў адрас медыяфайла па-за гэтым серверам. Ён не быў адкрыты.
+err_sign_in_required	Ваш сеанс больш не прымаецца. Увайдзіце зноў; неадпраўленае праслухоўванне захавана.
+err_untrusted	Гэта прылада не давярае сертыфікату сервера. Усталюйце цэнтр сертыфікацыі вашага сервера ў раздзеле «Налады Android > Бяспека > Шыфраванне і ўліковыя даныя» і паспрабуйце яшчэ раз.
+err_offline	Не ўдалося звязацца з серверам. Праверце адрас або падлучэнне і паспрабуйце яшчэ раз.
+err_forbidden	Вашаму ўліковаму запісу не дазволена гэта дзеянне.
+err_not_found	Гэта змесціва больш недаступнае на серверы.
+err_server_problem	На серверы часовая праблема (HTTP %1$d). Паспрабуйце яшчэ раз.
+err_rejected	Сервер адхіліў запыт (HTTP %1$d).
+err_invalid_response	Сервер адправіў адказ, які гэта праграма не можа прачытаць.
+err_no_audio	У гэтага элемента няма аўдыя для прайгравання.
+err_login_rejected	Імя карыстальніка або пароль не прыняты.
+err_publications_unreadable	Не ўдалося прачытаць запісы пра захаванні прагрэсу без адказу. Спачатку вырашыце іх у раздзеле «Дыягностыка».
+err_discards_unreadable	Не ўдалося прачытаць захаваныя скіды прагрэсу. Спачатку вырашыце іх у раздзеле «Дыягностыка».

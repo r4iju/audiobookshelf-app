@@ -1,0 +1,11 @@
+before currentTime 90.2008167755102 isFinished True lastUpdate 1790930370648
+stream sync 200
+stream close 200
+after the second device currentTime 34 isFinished False lastUpdate 1790930572628
+{"results":[{"id":"77a72ca8-d03b-4920-99ed-9f6602209ebd","success":true,"progressSynced":true}]}
+after the finish, same token currentTime 90.200817 isFinished True lastUpdate 1790930574668
+3 s later currentTime 90.200817 isFinished True lastUpdate 1790930574668
+fresh login /api/me: [(90.200817, True)]
+server restarted 17:42:58
+after a restart currentTime 90.200817 isFinished True lastUpdate 1790930574668
+2026-10-02T08:42:55.330494115Z [2026-10-02 08:42:55.330] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (77a72ca8-d03b-4920-99ed-9f6602209ebd) (updatedAt: 1790930574668)

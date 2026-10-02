@@ -1,0 +1,13 @@
+{
+  "NativeAppearance.name": ["theme::System", "theme::Light", "theme::Dark", "theme::Black"],
+  "NativeHaptic.name": ["hapticStrength::Off", "hapticStrength::Light", "hapticStrength::Medium", "hapticStrength::Heavy"],
+  "AppleNetworkPolicy.title": ["Ask", "Always", "Never"],
+  "AudioGroupKind.title": ["Collections", "Playlists"],
+  "NativeDownloads.Entry.State": ["Queued", "Ready", "Failed", "Cancelled"],
+  "ListeningPanel.title": ["Chapters", "Speed", "Bookmarks", "Sleep", "Settings"],
+  "DiagnosticCategory.title": ["Connection", "Server", "Media", "Sync", "Downloads", "Reading", "Podcasts"],
+  "CatalogSort.name": ["Title", "Author, first name", "Author, last name", "Published year", "Date added", "File size", "Duration", "File created", "File modified", "Listening progress", "Date started", "Date finished", "Random", "Author", "Number of episodes"],
+  "LibrarySort.title (tvOS)": ["Title A–Z", "Title Z–A", "Author", "Recently added"],
+  "LibraryFilter.progress (tvOS)": ["Not started", "In progress", "Finished"],
+  "BookDetails.podcastEpisodes sort": ["Published date", "Season", "Episode number", "Filename"]
+}

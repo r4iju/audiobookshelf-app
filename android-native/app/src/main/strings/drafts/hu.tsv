@@ -1,0 +1,447 @@
+# Hungarian drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Fiókok
+title_new_collection	Új gyűjtemény
+action_retry	Újra
+action_read	%1$s olvasása
+action_mark_finished	Befejezettnek jelölés
+choose_library	Könyvtár kiválasztása
+all_titles	Összes cím
+all_podcasts	Összes podcast
+filter	Szűrés
+sort	Rendezés
+theme_system	Rendszer
+screen_orientation	Képernyő tájolása
+jump_forward	Előreugrás
+jump_back	Visszaugrás
+set_settings_not_saved	A beállításokat nem sikerült menteni ezen az eszközön, így semmi sem változott. Szabadítson fel tárhelyet, és próbálja újra.
+set_orientation_follow_device	Eszköz szerint
+set_orientation_portrait	Álló
+set_orientation_landscape	Fekvő
+set_rewind_on_resume	Kis visszatekerés folytatáskor
+set_rewind_on_resume_detail	Szünet után néhány másodpercet visszalép, hosszabb szünet után többet.
+set_seek_system_controls	Tekerés a rendszervezérlőkről
+set_seek_system_controls_detail	A zárolási képernyő és az értesítés is mozgathatja a pozíciósávot.
+set_mp3_index_seeking	Pontos MP3-tekerés
+set_mp3_index_seeking_detail	Keresési indexet készít a megbízhatatlan hosszúságú MP3-fájlokhoz. A tekerés lassabban indul.
+set_shake_to_reset	Rázás a visszaállításhoz
+set_shake_to_reset_detail	Ha az időzítő futása közben megrázza a telefont, az időzítő újraindul.
+set_sleep_fade_out	Elhalkítás
+set_sleep_fade_out_detail	Az utolsó percben fokozatosan csökkenti a hangerőt.
+set_vibrate_on_reset	Rezgés visszaállításkor
+set_auto_sleep_timer_detail	Elindítja az időzítőt, ha %1$s és %2$s között hallgat.
+set_heading_mobile_data	Mobilinternet
+set_storage	Tárhely
+set_heading_support	Támogatás
+set_diagnostics	Diagnosztika
+set_something_went_wrong	Hiba történt.
+set_statistics_unavailable	A statisztikák nem érhetők el
+set_try_again	Próbálja újra
+set_minutes_listened:one	%1$d perc hallgatás
+set_minutes_listened:other	%1$d perc hallgatás
+set_days_listened:one	%1$d nap hallgatás
+set_days_listened:other	%1$d nap hallgatás
+set_titles_finished:one	%1$d befejezett cím
+set_titles_finished:other	%1$d befejezett cím
+set_day_minutes_listened:one	%1$s, %2$d perc hallgatás
+set_day_minutes_listened:other	%1$s, %2$d perc hallgatás
+set_set_aside_failed	Nem sikerült félretenni. Próbálja újra.
+set_connection	Kapcsolat
+set_diagnostics_area_media	Média
+set_diagnostics_area_sync	Szinkronizálás
+set_unreadable_resets_title	A mentett haladás-elvetések nem olvashatók
+set_unreadable_resets_detail	Bármelyik cím érintett lehet, ezért semmi sem játszható le, és nem küld olvasási pozíciót, amíg nem dönt. Félretételükkor a fájl ezen az eszközön marad, és az általuk elvetendő haladás megmarad a szerveren.
+set_set_them_aside	Félretétel
+set_listening_storage_title	Az alkalmazás bezárása előtti hallgatást nem sikerült menteni
+set_listening_storage_detail	Az eszköz tárhelye nem érhető el vagy megtelt. Amíg nincs mentve, semmi sem játszható le, és nem küld hallgatási adatot; addig megőrzi.
+set_unreadable_writes_title	A megválaszolatlan haladásmentések nyilvántartása nem olvasható
+set_unreadable_writes_detail	Bármelyik cím mentése még elérheti a szervert, ezért nem küld hallgatási vagy olvasási adatot, és nem vet el haladást, amíg nem dönt. Félretételükkor a fájl ezen az eszközön marad; egy késve érkező mentés visszahozhatja az elvetett haladást.
+set_diagnostics_server	Szerver: %1$s
+set_diagnostics_signed_in_as	Bejelentkezve mint %1$s
+set_diagnostics_app_version	Alkalmazás: %1$s
+set_recent_problems	Legutóbbi problémák
+set_clear	Törlés
+set_no_problems	Ezen az eszközön nincs rögzített probléma.
+set_unreadable_writes_confirm_title	Félreteszi az olvashatatlan nyilvántartást?
+set_unreadable_writes_confirm_detail	A hallgatási és olvasási pozíciók küldése folytatódik, és az elvetések végrehajthatók.
+set_set_aside	Félretétel
+set_unreadable_resets_confirm_title	Félreteszi az olvashatatlan elvetéseket?
+set_unreadable_resets_confirm_detail	A címek ismét lejátszhatók, és az olvasási pozíciók küldése folytatódik. Vesse el újra a haladást minden olyan címnél, amelyet továbbra is elölről szeretne kezdeni.
+set_signed_in	Bejelentkezve
+set_other_accounts	Egyéb fiókok
+set_server_sign_in_required	%1$s · bejelentkezés szükséges
+set_remove_account	%1$s eltávolítása
+set_switch_to_account	Váltás erre a fiókra
+set_add_account	Fiók hozzáadása
+set_sign_out_of	Kijelentkezés: %1$s
+set_sign_out_detail	Eltávolítja ezt a fiókot az eszközről. A hozzá tartozó letöltések és el nem küldött hallgatás megmarad, amíg újra be nem jelentkezik.
+set_accounts_footer	Minden fiók saját haladást, letöltéseket és könyvtárválasztást tárol. A váltás soha nem keveri őket.
+set_remove_account_confirm	Eltávolítja: %1$s?
+set_remove_account_detail	A fiókot később újra hozzáadhatja. Letöltései és el nem küldött hallgatása ezen az eszközön marad.
+set_add_an_account	Fiók hozzáadása
+set_connect_intro	Csatlakozzon közvetlenül a saját szerveréhez. Semmi sem halad át más szolgáltatáson.
+set_change_server	Szerver módosítása
+set_sign_in	Bejelentkezés
+set_sign_in_openid	Bejelentkezés OpenID-vel
+set_saved_accounts	Mentett fiókok
+set_use_account	Használat
+set_edit	Szerkesztés
+set_add_podcast	Podcast hozzáadása
+set_not_available_yet	Még nem érhető el
+set_not_available_yet_detail	Az előzetes verzió ezen része még fejlesztés alatt áll.
+set_import_previous_app	Importálás az előző alkalmazásból
+set_import_interrupted	Egy importálás nem fejeződött be. Válassza ki ugyanazt az exportot, hogy ott folytassa, ahol abbamaradt.
+set_import_already	Ezt az exportot már importálta. A benne lévő címek, hallgatás és pozíciók ezen az eszközön vannak.
+set_import_preflight	%1$s\nAz előző alkalmazást és ezt a fájlt csak olvassa; semmi sem változik bennük. A címek, a hallgatás és a pozíciók akkor kapcsolódnak egy fiókhoz, amikor az itt bejelentkezik. A jelszavak nincsenek az exportban, ezért minden fióknak újra be kell jelentkeznie.
+set_import_account_signed_in	%1$s · bejelentkezve
+set_import_account_sign_in_later	%1$s · jelentkezzen be az importálás után
+set_import_titles	Címek
+set_import_title_partial	%1$s · a többi újra letöltődik
+set_not_imported	Nincs importálva
+set_import_space	Szükséges: %1$s; szabad: %2$s.
+set_import_no_space	Nincs elég szabad hely ezen az eszközön. Szabadítson fel helyet, majd válassza ki újra az exportot.
+set_import_progress	Fájlok másolása: %1$d / %2$d. Ha az alkalmazás bezárul, a folytatáshoz válassza ki újra ugyanazt az exportot.
+set_import_done	Importálva: %1$d cím, %2$d hallgatási munkamenet és %3$d pozíció. Az előző alkalmazás beállításai alkalmazva.
+set_import_waiting	Jelentkezzen be ide: %1$s, mint %2$s, hogy hozzákapcsolja a címeit, hallgatását és pozícióit.
+set_import	Importálás
+set_continue	Folytatás
+set_close	Bezárás
+set_import_file_unreadable	A kiválasztott fájl nem olvasható. Válassza ki újra, vagy előbb mentse erre az eszközre.
+set_import_stopped	Az importálás befejezés előtt leállt. Semmi sem veszett el: válassza ki újra ugyanazt az exportot, hogy ott folytassa, ahol abbamaradt.
+set_import_item_gone	Már nincs a szerveren, ezért nem lett átvéve.
+set_import_file_changed	Egy fájl megváltozott ezen az eszközön az importálás után, ezért újra letöltődik a szerverről.
+set_openid_not_enabled	Az OpenID-bejelentkezés nincs engedélyezve ezen a szerveren. Használja a felhasználónevét és a jelszavát.
+set_openid_canceled	A böngészős bejelentkezés megszakadt. A mentett fiókjai megmaradnak.
+set_openid_invalid	A böngészős bejelentkezés válasza nem ellenőrizhető. Próbálja újra a bejelentkezést, és ellenőrizze a szerver OpenID-átirányítási beállításait.
+set_vault_unreadable	A mentett bejelentkezéseket nem sikerült visszafejteni. Az eszközön megmaradnak; a folytatáshoz jelentkezzen be újra.
+set_session_ended	A munkamenete lejárt itt: %1$s. Jelentkezzen be újra; az el nem küldött hallgatás és a letöltések megmaradnak.
+set_play_blocked_listening_storage	Az alkalmazás bezárása előtti hallgatást nem sikerült menteni, mert a tárhely nem érhető el, ezért semmi sem játszható le, amíg ez nem lehetséges. Szabadítson fel helyet, majd próbálja újra.
+set_play_blocked_unreadable_resets	A mentett haladás-elvetések nem olvashatók, ezért semmi sem játszható le, amíg a Diagnosztikában meg nem oldja őket.
+set_play_blocked_discarding	Ennek a címnek a haladása még elvetés alatt áll. Ha ez kész, az elejéről indul.
+dl_not_saved	A letöltési listát nem sikerült menteni ezen az eszközön, így semmi sem változott. Szabadítson fel tárhelyet, és próbálja újra.
+dl_not_allowed	A fiókja nem tölthet le.
+dl_no_audio	Ennek az elemnek nincs letölthető hanganyaga.
+dl_no_space	Nincs elég szabad hely ezen az eszközön ehhez: %1$s, ha a rendszernek is szabad tárhelyet kell hagyni.
+dl_folder_lost_nothing_downloaded	A hozzáférés megszűnt ehhez: %1$s, ezért semmi sem töltődött le. Válassza ki újra a letöltési mappát a Beállításokban.
+dl_downloading_percent	Letöltés: %1$d%%
+dl_cancel_download	Letöltés megszakítása
+dl_downloaded_plays_offline	Letöltve · offline is lejátszható
+dl_failed	A letöltés sikertelen.
+dl_discard	Elvetés
+dl_cellular_title	Letöltés mobilinternettel?
+dl_cellular_message	Forgalomkorlátos kapcsolatot használ. Ezt a Beállításokban módosíthatja.
+dl_not_now	Most nem
+dl_folder_cannot_be_kept	Ez a mappa nem tartható meg a letöltésekhez. Válasszon másikat.
+dl_saved_in_folder	A letöltések helye: %1$s
+dl_saved_in_app_storage	A letöltések az alkalmazás tárhelyére kerülnek
+dl_folder_visible_to_other_apps	Az eszköz más alkalmazásai is látják ezeket a fájlokat. A módosítás előtti letöltések a helyükön maradnak.
+dl_folder_private_to_app	Csak ez az alkalmazás látja ezeket a fájlokat. Válasszon mappát, ha azt szeretné, hogy más alkalmazások is elérjék a letöltéseket.
+dl_choose_folder	Mappa kiválasztása
+dl_use_app_storage	Alkalmazástárhely használata
+dl_ebook_missing	Az e-könyv hiányzik erről az eszközről. A megnyitásához töltse le újra.
+dl_no_app_opens_format	Ezen az eszközön egyetlen alkalmazás sem nyitja meg a(z) %1$s fájlokat. Telepítsen egy ilyet, és próbálja újra.
+dl_no_app_opens_this_kind	Ezen az eszközön egyetlen alkalmazás sem nyitja meg az ilyen típusú fájlokat. Telepítsen egy ilyet, és próbálja újra.
+dl_folder_lost_choose_again_open	Ez a letöltés itt található: %1$s, de a(z) %1$s hozzáférése megszűnt. A megnyitáshoz válassza ki újra: %1$s.
+dl_folder_lost_choose_again_play	Ez a letöltés itt található: %1$s, de a(z) %1$s hozzáférése megszűnt. A lejátszáshoz válassza ki újra: %1$s.
+dl_names_or	%1$s vagy %2$s
+dl_names_and	%1$s és %2$s
+dl_remove_title	Eltávolítja a letöltést?
+dl_remove_message	„%1$s” törlődik erről az eszközről. A hallgatási haladása megmarad.
+dl_keep	Megtartás
+dl_not_that_folder	Ez nem a(z) %1$s. Válassza ki azt a mappát, amelyben ezek a letöltések vannak.
+dl_folder_access_not_kept	A mappához való hozzáférést nem sikerült megtartani. Próbálja újra.
+dl_no_downloads	Nincsenek letöltések
+dl_no_downloads_message	Töltsön le könyveket vagy epizódokat az oldalukról, hogy kapcsolat nélkül is hallgathassa őket.
+dl_access_removed_title	A hozzáférés megszűnt: %1$s
+dl_downloads_kept_there:one	%1$d letöltés található ott. A lejátszáshoz és megnyitáshoz válassza ki újra: %2$s.
+dl_downloads_kept_there:other	%1$d letöltés található ott. A lejátszásukhoz és megnyitásukhoz válassza ki újra: %2$s.
+dl_choose_again	%1$s újbóli kiválasztása
+dl_some_files_missing	Néhány fájl hiányzik erről az eszközről
+dl_size_in_folder	%1$s, helye: %2$s
+dl_open_in_another_app	%1$s megnyitása másik alkalmazásban
+dl_download_again_named	%1$s újbóli letöltése
+dl_the_chosen_folder	a kiválasztott mappa
+dl_files_missing_play	A letöltés néhány fájlja hiányzik erről az eszközről. A lejátszáshoz töltse le újra.
+dl_play_named	%1$s lejátszása
+dl_retry_named	%1$s újrapróbálása
+dl_cancel_named	%1$s megszakítása
+dl_remove_named	%1$s eltávolítása
+dl_sign_in_again	A letöltéshez jelentkezzen be újra ebbe a fiókba.
+dl_folder_lost_choose_in_downloads	A hozzáférés megszűnt: %1$s. Válassza ki újra a mappát a Letöltések között.
+dl_connection_interrupted	A kapcsolat megszakadt.
+dl_error_retrying	%1$s Újrapróbálás…
+dl_server_refused	A szerver elutasította a letöltést.
+dl_server_sent_type_not_audio	A szerver hanganyag helyett ezt küldte: %1$s, ezért semmi sem lett mentve. Ellenőrizze a szervert vagy a proxyt, és próbálja újra.
+dl_server_sent_unknown_not_audio	A szerver hanganyag helyett ismeretlen választ küldött, ezért semmi sem lett mentve. Ellenőrizze a szervert vagy a proxyt, és próbálja újra.
+dl_size_mismatch	A letöltött fájl %1$d bájt volt, de a szerver %2$d bájtot jelzett, ezért elvetésre került. Próbálja újra a letöltést.
+dl_server_sent_not_pdf	A szerver nem a PDF-et küldte, ezért semmi sem lett mentve. Ellenőrizze a szervert vagy a proxyt, és próbálja újra.
+rd_positions_not_restored	A mentett olvasási pozíciókat nem sikerült visszaállítani, ezért az oldalak nem mentődnek. Az eredeti adatok megmaradnak.
+rd_positions_not_overwritten	A mentett olvasási pozíciók nem olvashatók, ezért nem lesznek felülírva.
+rd_not_a_pdf	Ez a fájl nem olyan PDF, amelyet ez az eszköz meg tud nyitni.
+rd_document_not_opened	A dokumentumot nem sikerült megnyitni.
+rd_page_not_saved	Ezt az oldalt nem sikerült menteni ezen az eszközön.
+rd_choice_not_saved	A választását nem sikerült menteni ezen az eszközön.
+rd_conflict_title	Hol folytatja?
+rd_conflict_page	Egy másik eszköz a(z) %1$d. oldalig jutott, miközben az itteni %2$d. oldal még nem lett mentve a szerverre.
+rd_conflict_location	Egy másik eszköz olyan olvasási pozíciót mentett, amelyet ez az olvasó nem tud oldalként megjeleníteni, miközben az itteni %1$d. oldal még nem lett mentve a szerverre.
+rd_go_to_page_number	Ugrás a(z) %1$d. oldalra
+rd_keep_other_position	A másik pozíció megtartása
+rd_stay_on_page	Maradás a(z) %1$d. oldalon
+rd_close_reader	Olvasó bezárása
+rd_rotate_pages	Oldalak elforgatása
+rd_continuous_scrolling	Folyamatos görgetés
+rd_document_error_title	Ezt a dokumentumot nem sikerült megnyitni
+rd_try_again	Próbálja újra
+rd_go_to_page	Ugrás oldalra
+rd_previous_page	Előző oldal
+rd_next_page	Következő oldal
+rd_page_of	%1$d. oldal / %2$d
+rd_page_number	%1$d. oldal
+rd_download_folder_lost	Ez a letöltés itt található: %1$s, de a(z) %1$s hozzáférése megszűnt. Válassza ki újra a mappát a Letöltések között.
+rd_downloaded_document_missing	A letöltött dokumentum hiányzik erről az eszközről. Töltse le újra.
+rd_document_not_stored	A dokumentumot nem sikerült tárolni az olvasáshoz.
+rd_supplementary_pdf	kiegészítő PDF
+rd_format_not_available	A(z) %1$s olvasása ebben az előzetes verzióban még nem érhető el. A szerveren lévő olvasási pozíciója megmarad.
+rd_ebook_not_available	Ennek az e-könyvnek az olvasása ebben az előzetes verzióban még nem érhető el. A szerveren lévő olvasási pozíciója megmarad.
+grp_unavailable_title	Nem elérhető cím
+grp_could_not_load_collections	A gyűjtemények nem tölthetők be.
+grp_could_not_load_playlists	A lejátszási listák nem tölthetők be.
+grp_collections_unavailable	A gyűjtemények nem érhetők el
+grp_playlists_unavailable	A lejátszási listák nem érhetők el
+grp_no_collections_yet	Még nincsenek gyűjtemények
+grp_no_playlists_yet	Még nincsenek lejátszási listák
+grp_create_one_hint	Hozzon létre egyet, hogy a címeket a saját sorrendjében tartsa együtt.
+grp_title_count:one	%1$d cím
+grp_title_count:other	%1$d cím
+grp_collection_deleted	Ez a gyűjtemény törölve lett.
+grp_playlist_deleted	Ez a lejátszási lista törölve lett.
+grp_could_not_load	Nem sikerült betölteni.
+grp_collection_unavailable	A gyűjtemény nem érhető el
+grp_playlist_unavailable	A lejátszási lista nem érhető el
+grp_nothing_in_collection_can_play	Ebben a gyűjteményben semmi sem játszható le.
+grp_nothing_in_playlist_can_play	Ebben a lejátszási listában semmi sem játszható le.
+grp_could_not_start_playback	Nem sikerült elindítani a lejátszást.
+grp_resume	Folytatás
+grp_play_collection	Gyűjtemény lejátszása
+grp_play_playlist	Lejátszási lista lejátszása
+grp_edit_collection	Gyűjtemény szerkesztése
+grp_edit_playlist	Lejátszási lista szerkesztése
+grp_delete_collection	Gyűjtemény törlése
+grp_delete_playlist	Lejátszási lista törlése
+grp_no_titles_yet	Még nincsenek címek
+grp_delete_collection_question	Törli a gyűjteményt?
+grp_delete_playlist_question	Törli a lejátszási listát?
+grp_delete_group_explanation	„%1$s” törlődik a szerveréről. A benne lévő címek megmaradnak.
+grp_not_deleted	Nincs törölve: %1$s
+grp_not_deleted_try_again	Nincs törölve: próbálja újra
+grp_not_allowed_to_change_collection	A szerverfiókja nem módosíthatja ezt a gyűjteményt.
+grp_not_allowed_to_change_playlist	A szerverfiókja nem módosíthatja ezt a lejátszási listát.
+grp_collection_no_longer_exists	Ez a gyűjtemény már nem létezik.
+grp_playlist_no_longer_exists	Ez a lejátszási lista már nem létezik.
+grp_not_saved	Nincs mentve: %1$s
+grp_not_saved_try_again	Nincs mentve: próbálja újra
+grp_saving	Mentés…
+grp_create_collection	Gyűjtemény létrehozása
+grp_create_playlist	Lejátszási lista létrehozása
+grp_save_changes	Módosítások mentése
+grp_choose_at_least_one_title	Válasszon legalább egy címet.
+grp_order	Sorrend
+grp_move_up	%1$s feljebb mozgatása
+grp_remove_member	%1$s eltávolítása
+grp_add_titles	Címek hozzáadása
+grp_add_episodes_hint	Epizódokat egy podcast epizódoldaláról adhat hozzá.
+grp_add_to_playlist_or_collection	Hozzáadás lejátszási listához vagy gyűjteményhez
+grp_add_to	Hozzáadás ehhez
+grp_nothing_to_add_to	Itt még nincs semmi, amihez hozzáadhatna.
+grp_added_to	Hozzáadva: %1$s
+grp_not_added	Nincs hozzáadva: %1$s
+grp_not_added_try_again	Nincs hozzáadva: próbálja újra
+grp_already_included	Már szerepel benne
+grp_close	Bezárás
+grp_titles_could_not_load	A címek nem tölthetők be
+grp_nothing_here	Itt nincs semmi
+pod_feed_episodes	A hírcsatorna epizódjai
+pod_sort_newest_first	Legújabb elöl, koppintson a legrégebbi elöl sorrendhez
+pod_sort_oldest_first	Legrégebbi elöl, koppintson a legújabb elöl sorrendhez
+pod_episodes_queued:one	%1$d epizód sorba állítva a szerverén: %2$s
+pod_episodes_queued:other	%1$d epizód sorba állítva a szerverén: %2$s
+pod_server_could_not_download	A szervere nem tudta letölteni: „%1$s”.
+pod_dismiss	Elrejtés
+pod_no_episodes_yet	Még nincsenek epizódok
+pod_no_episodes_match_filter	Egy epizód sem felel meg ennek a szűrőnek
+pod_episode_details	Epizód részletei
+pod_untitled_episode	Cím nélküli epizód
+pod_play_named	%1$s lejátszása
+pod_episode_not_available	Az epizód nem érhető el
+pod_episode_may_have_been_removed	Lehet, hogy eltávolították a szerverről.
+pod_percent_listened	%1$d%% meghallgatva
+pod_feed_could_not_open	A hírcsatornát nem sikerült megnyitni.
+pod_retry_feed	Hírcsatorna újrapróbálása
+pod_no_feed_episodes	Nem található epizód a hírcsatornában
+pod_already_on_server	Már a szerveren van
+pod_selected	Kijelölve
+pod_not_selected	Nincs kijelölve
+pod_no_audio_enclosure	Nincs hangmelléklet
+pod_not_queued	Nincs sorba állítva: %1$s
+pod_not_queued_try_again	Nincs sorba állítva: próbálja újra
+pod_queueing_on_server	Sorba állítás a szerverén…
+pod_add_selected_episodes	Kijelölt epizódok hozzáadása a szerverhez
+pod_something_went_wrong	Hiba történt.
+pod_adding_not_available	Podcastok hozzáadása nem érhető el
+pod_adding_needs_permission	A szerverfiókjának podcastkezelési jogosultságra van szüksége egy podcastkönyvtárban.
+pod_search_podcasts	Podcastok keresése
+pod_or_rss_feed_url	Vagy RSS hírcsatorna URL
+pod_enter_complete_feed_url	Adjon meg egy teljes HTTP vagy HTTPS hírcsatorna-URL-t.
+pod_preview_feed	Hírcsatorna előnézete
+pod_create_podcast	Podcast létrehozása
+pod_choose_different_feed	Másik hírcsatorna választása
+item_something_went_wrong	Hiba történt. Próbálja újra.
+item_feed_subscribe_at	A podcastalkalmazások ezen a webcímen iratkozhatnak fel erre a címre:
+item_copied	Másolva
+item_copy_address	Webcím másolása
+item_hidden_from_directories	Elrejtve a podcastkönyvtárak elől
+item_feed_public_warning	Bárki, aki ismeri a webcímet, bejelentkezés nélkül meghallgathatja ezt a címet.
+item_feed_name	Hírcsatorna neve
+item_feed_name_rule	Csak betűk, számok, - és _
+item_hide_from_directories	Elrejtés a podcastkönyvtárak elől
+item_done	Kész
+item_sending	Küldés…
+item_sent_to	Elküldve ide: %1$s
+item_send_ebook_explanation	A szerver e-mailben elküldi az e-könyvet a kiválasztott eszközre.
+item_ereader_or_ebook_gone	%1$s vagy ez az e-könyv már nem érhető el a szerveren. Semmi sem lett elküldve.
+item_not_sent_to	Nincs elküldve ide: %1$s. %2$s
+item_not_saved_try_again	Nincs mentve. Próbálja újra.
+item_mark_unfinished	Befejezetlennek jelölés
+item_discard_uncertain	A cím haladásának egy korábbi mentésére nem érkezett válasz, és az még elérheti a szervert. Ha az elvetés után érkezik meg, visszahozza a haladást. A szerver nem tudja jelezni az alkalmazásnak, hogy ez megtörténik-e.
+item_discard_anyway	Elvetés mindenképp
+item_discard_under_way	Ez az elvetés már folyamatban van, és nem vonható vissza.
+item_keep_progress	Haladás megtartása
+item_discard_pending	Haladás elvetése folyamatban. Akkor fejeződik be, amikor a szerver elérhető, és a cím hallgatási adatai el lettek küldve.
+item_discard_anyway_question	Mégis elveti?
+item_discard_anyway_explanation	A haladás most törlődik. Ha a korábbi mentés ezután éri el a szervert, a cím haladása visszatér, és újra elvetheti.
+item_discard	Elvetés
+item_discard_progress_question	Elveti a haladást?
+item_discard_progress_explanation	A cím pozíciója és befejezett állapota minden eszközre vonatkozóan törlődik a szerverről.
+item_could_not_load	Ezt a címet nem sikerült betölteni
+item_narrated_by	Előadja
+item_series	Sorozat: %1$s
+item_series_with_sequence	Sorozat: %1$s #%2$s
+item_episode_count:one	%1$d epizód
+item_episode_count:other	%1$d epizód
+item_listened_and_left	%1$d%% meghallgatva · %2$s van hátra
+item_chapter_number	%1$d. fejezet
+pl_minimize_player	Lejátszó kis méretre
+pl_nothing_playing	Nincs lejátszás
+pl_chapter_number	%1$d. fejezet
+pl_try_again	Próbálja újra
+pl_speed_value	Sebesség: %1$s
+pl_sleep	Alvás
+pl_position_of_duration	%1$s / %2$s
+pl_buffering	Pufferelés
+pl_previous_chapter	Előző fejezet
+pl_next_chapter	Következő fejezet
+pl_jump_forward_seconds:one	Előreugrás %1$d másodperccel
+pl_jump_forward_seconds:other	Előreugrás %1$d másodperccel
+pl_jump_back_seconds:one	Visszaugrás %1$d másodperccel
+pl_jump_back_seconds:other	Visszaugrás %1$d másodperccel
+pl_jump_forward_minutes:one	Előreugrás %1$d perccel
+pl_jump_forward_minutes:other	Előreugrás %1$d perccel
+pl_jump_back_minutes:one	Visszaugrás %1$d perccel
+pl_jump_back_minutes:other	Visszaugrás %1$d perccel
+pl_open_player	Lejátszó megnyitása
+pl_playback_stopped	A lejátszás leállt
+pl_listening_unsaved	Néhány hallgatás még nincs mentve ezen az eszközön. Megmarad, és amint a tárhely engedi, mentésre kerül.
+pl_playing	Lejátszás folyamatban
+pl_resume	Folytatás
+pl_streaming_cellular_refused	A streamelés mobilinternettel ki van kapcsolva a Beállításokban. Csatlakozzon Wi-Fi-hez, vagy előbb töltse le ezt a címet.
+pl_stream_cellular_title	Streamelés mobilinternettel?
+pl_stream_cellular_message	Forgalomkorlátos kapcsolatot használ. Ezt a Beállításokban módosíthatja.
+pl_not_now	Most nem
+pl_sleep_stops_end_of_chapter	A fejezet végén áll le, %1$s múlva
+pl_sleep_stops_in	Leáll %1$s múlva
+pl_sleep_minus_minutes	−%1$d perc
+pl_sleep_plus_minutes	+%1$d perc
+pl_sleep_minutes	%1$d perc
+pl_sleep_turn_off	Kikapcsolás
+pl_bookmark_not_saved_reason	A könyvjelző nincs mentve: %1$s
+pl_bookmark_not_saved	A könyvjelző nincs mentve: próbálja újra
+pl_bookmark_add_at	Hozzáadás itt: %1$s
+pl_bookmark_go_to	Ugrás a könyvjelzőhöz
+pl_bookmark_default	Könyvjelző
+pl_bookmark_rename_named	%1$s átnevezése
+pl_bookmark_delete_named	%1$s törlése
+pl_bookmark_at	Könyvjelző itt: %1$s
+pl_bookmark_rename	Könyvjelző átnevezése
+pl_bookmark_new	Új könyvjelző
+pl_untitled	Cím nélküli
+pl_playback_stopped_reason	A lejátszás leállt: %1$s. A pozíciója megmarad.
+pl_playback_stopped_unknown	A lejátszás leállt: a hanganyagot nem sikerült betölteni. A pozíciója megmarad.
+pl_no_playable_audio	Ennek az elemnek nincs lejátszható hanganyaga.
+pl_could_not_start	A lejátszás nem indult el.
+pl_listening_save_failed	A hallgatást nem sikerült menteni ezen az eszközön, ezért a lejátszás szünetel. Szabadítson fel tárhelyet, és próbálja újra.
+cast_casting_to	Átküldés ide: %1$s
+cast_cast	Átküldés
+cast_playing_on	Lejátszás itt: %1$s
+cast_connecting_to	Csatlakozás ehhez: %1$s…
+cast_playing_on_phone	Lejátszás ezen a telefonon
+cast_stop	Átküldés leállítása
+cast_looking	Átküldési eszközök keresése…
+cast_none_found	Nem található átküldési eszköz. Ellenőrizze, hogy a vevő be van-e kapcsolva, és ugyanazon a Wi-Fi-hálózaton van-e, mint ez a telefon.
+cast_close	Bezárás
+cast_download_not_castable	A letöltött példányok csak ezen a telefonon játszhatók le. Állítsa le az átküldést, hogy itt hallgassa, vagy inkább streamelje a címet.
+cast_resumed_without_title	Az átküldés leállt, mert az alkalmazás közben újraindult. Nyissa meg újra a címet, hogy onnan folytassa, ahol ez a telefon utoljára mentette.
+cast_needs_play_services	Az átküldéshez Google Play-szolgáltatások szükségesek, amelyek ezen az eszközön nincsenek meg, vagy frissíteni kell őket.
+cast_could_not_start	Az átküldés nem indítható el ezen az eszközön: %1$s.
+cast_connect_failed_named	Nem sikerült csatlakozni ehhez: %1$s. Ellenőrizze, hogy be van-e kapcsolva, és ugyanazon a Wi-Fi-hálózaton van-e, mint ez a telefon.
+cast_connect_failed	Nem sikerült csatlakozni a vevőhöz. Ellenőrizze, hogy be van-e kapcsolva, és ugyanazon a Wi-Fi-hálózaton van-e, mint ez a telefon.
+cast_connection_lost_named	Megszakadt a kapcsolat ezzel: %1$s. A lejátszás ezen a telefonon folytatódik.
+cast_connection_lost	Megszakadt a kapcsolat a vevővel. A lejátszás ezen a telefonon folytatódik.
+auto_continue	Folytatás
+auto_recent	Legutóbbiak
+auto_discovery	Felfedezés
+auto_authors_count:one	%1$d szerző
+auto_authors_count:other	%1$d szerző
+auto_series_count:one	%1$d sorozat
+auto_series_count:other	%1$d sorozat
+lib_books_count:one	%1$d könyv
+lib_books_count:other	%1$d könyv
+lib_items_count:one	%1$d elem
+lib_items_count:other	%1$d elem
+lib_selected	Kijelölve
+lib_all_filters	Összes szűrő
+lib_nothing_to_filter	Itt nincs mi szerint szűrni.
+lib_sort_descending_switch	Csökkenő, váltás növekvőre
+lib_sort_ascending_switch	Növekvő, váltás csökkenőre
+lib_sort_descending	Csökkenő
+lib_sort_ascending	Növekvő
+lib_unavailable	A könyvtár nem érhető el
+lib_unavailable_message	%1$s A fiókja és az el nem küldött hallgatás megmarad.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Borítók megjelenítése
+lib_show_list	Lista megjelenítése
+lib_filtered	Szűrve
+lib_empty_title	Itt még nincs semmi
+lib_empty_message	Ebben a könyvtárban nincs Ön számára elérhető elem.
+lib_page_error	További címeket nem sikerült betölteni
+lib_card_finished	%1$s, befejezve
+lib_card_percent_listened	%1$s, %2$d százalék meghallgatva
+lib_search_in	Keresés itt: %1$s
+lib_search_library	Keresés a könyvtárban
+lib_clear_search	Keresés törlése
+lib_search_failed	A keresés sikertelen
+lib_search_idle_title	Találjon valamit, amit meghallgatna
+lib_search_idle_message	Keressen címekre, szerzőkre, sorozatokra, előadókra és epizódokra.
+lib_search_no_match	Nincs találat erre: „%1$s”. Próbáljon kevesebb szót vagy más írásmódot.
+err_invalid_server	Adjon meg egy http:// vagy https:// kezdetű szervercímet, például https://books.example.com/abs.
+err_unsafe_media_url	A szerver ezen a szerveren kívüli médiacímet adott vissza. Nem lett megnyitva.
+err_sign_in_required	A munkamenete már nem érvényes. Jelentkezzen be újra; az el nem küldött hallgatás megmarad.
+err_untrusted	Ez az eszköz nem bízik meg a szerver tanúsítványában. Telepítse a szerver hitelesítésszolgáltatójának tanúsítványát az Android Beállítások > Biztonság > Titkosítás és hitelesítési adatok menüpontban, majd próbálja újra.
+err_offline	A szerver nem érhető el. Ellenőrizze a címet vagy a kapcsolatot, és próbálja újra.
+err_forbidden	A fiókja ezt nem teheti meg.
+err_not_found	Ez a tartalom már nem érhető el a szerveren.
+err_server_problem	A szervernél átmeneti hiba történt (HTTP %1$d). Próbálja újra.
+err_rejected	A szerver elutasította a kérést (HTTP %1$d).
+err_invalid_response	A szerver olyan választ küldött, amelyet ez az alkalmazás nem tud olvasni.
+err_no_audio	Ennek az elemnek nincs lejátszható hanganyaga.
+err_login_rejected	A felhasználónevet vagy a jelszót nem fogadta el a szerver.
+err_publications_unreadable	A megválaszolatlan haladásmentések nyilvántartása nem olvasható. Előbb oldja meg a Diagnosztikában.
+err_discards_unreadable	A mentett haladás-elvetések nem olvashatók. Előbb oldja meg őket a Diagnosztikában.

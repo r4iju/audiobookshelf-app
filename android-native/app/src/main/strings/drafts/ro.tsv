@@ -1,0 +1,465 @@
+# Romanian drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Conturi
+title_new_collection	Colecție nouă
+action_retry	Reîncearcă
+action_read	Citește %1$s
+action_mark_finished	Marchează ca finalizat
+choose_library	Alege biblioteca
+all_titles	Toate titlurile
+all_podcasts	Toate podcasturile
+filter	Filtrează
+sort	Sortează
+theme_system	Sistem
+screen_orientation	Orientarea ecranului
+jump_forward	Salt înainte
+jump_back	Salt înapoi
+set_settings_not_saved	Setările nu au putut fi salvate pe acest dispozitiv, așa că nu s-a schimbat nimic. Eliberează spațiu și încearcă din nou.
+set_orientation_follow_device	Urmează dispozitivul
+set_orientation_portrait	Portret
+set_orientation_landscape	Peisaj
+set_haptic_light	Ușoară
+set_rewind_on_resume	Derulează puțin înapoi la reluare
+set_rewind_on_resume_detail	Revine câteva secunde după o pauză, mai mult după una mai lungă.
+set_seek_system_controls	Derulare din comenzile sistemului
+set_seek_system_controls_detail	Permite ecranului de blocare și notificării să miște bara de poziție.
+set_mp3_index_seeking	Derulare precisă în MP3
+set_mp3_index_seeking_detail	Creează un index de derulare pentru fișierele MP3 cu durată nesigură. Derularea pornește mai lent.
+set_shake_to_reset	Scutură pentru resetare
+set_shake_to_reset_detail	Dacă scuturi telefonul cât timp timerul rulează, acesta repornește.
+set_sleep_fade_out	Estompare
+set_sleep_fade_out_detail	Reduce volumul în ultimul minut.
+set_vibrate_on_reset	Vibrează la resetare
+set_auto_sleep_timer_detail	Pornește timerul când redai între %1$s și %2$s.
+set_heading_mobile_data	Date mobile
+set_storage	Stocare
+set_heading_support	Asistență
+set_diagnostics	Diagnosticare
+set_something_went_wrong	Ceva nu a mers bine.
+set_statistics_unavailable	Statistici indisponibile
+set_try_again	Încearcă din nou
+set_minutes_listened:one	%1$d minut ascultat
+set_minutes_listened:few	%1$d minute ascultate
+set_minutes_listened:other	%1$d de minute ascultate
+set_days_listened:one	%1$d zi de ascultare
+set_days_listened:few	%1$d zile de ascultare
+set_days_listened:other	%1$d de zile de ascultare
+set_titles_finished:one	%1$d titlu finalizat
+set_titles_finished:few	%1$d titluri finalizate
+set_titles_finished:other	%1$d de titluri finalizate
+set_day_minutes_listened:one	%1$s, %2$d minut ascultat
+set_day_minutes_listened:few	%1$s, %2$d minute ascultate
+set_day_minutes_listened:other	%1$s, %2$d de minute ascultate
+set_set_aside_failed	Nu au putut fi puse deoparte. Încearcă din nou.
+set_connection	Conexiune
+set_diagnostics_area_media	Media
+set_diagnostics_area_sync	Sincronizare
+set_unreadable_resets_title	Ștergerile de progres salvate nu au putut fi citite
+set_unreadable_resets_detail	Orice titlu poate fi printre ele, așa că nu se redă nimic și nu se trimite nicio poziție de citire până nu decizi. Dacă le pui deoparte, fișierul rămâne pe acest dispozitiv, iar progresul pe care urmau să-l șteargă rămâne pe serverul tău.
+set_set_them_aside	Pune-le deoparte
+set_listening_storage_title	Ascultarea de dinainte de închiderea aplicației nu a putut fi salvată
+set_listening_storage_detail	Stocarea de pe acest dispozitiv este indisponibilă sau plină. Nu se redă nimic și nu se trimite nicio ascultare până nu este salvată; până atunci este păstrată.
+set_unreadable_writes_title	Înregistrările salvărilor de progres fără răspuns nu au putut fi citite
+set_unreadable_writes_detail	O salvare a oricărui titlu poate ajunge încă la serverul tău, așa că nu se trimite nicio ascultare sau citire și nu se șterge niciun progres până nu decizi. Dacă le pui deoparte, fișierul rămâne pe acest dispozitiv; o salvare întârziată poate apoi readuce progresul pe care îl ștergi.
+set_diagnostics_server	Server %1$s
+set_diagnostics_signed_in_as	Conectat ca %1$s
+set_diagnostics_app_version	Aplicație %1$s
+set_recent_problems	Probleme recente
+set_clear	Golește
+set_no_problems	Nicio problemă înregistrată pe acest dispozitiv.
+set_unreadable_writes_confirm_title	Pui deoparte înregistrările ilizibile?
+set_unreadable_writes_confirm_detail	Pozițiile de ascultare și citire sunt trimise din nou, iar ștergerile pot continua.
+set_set_aside	Pune deoparte
+set_unreadable_resets_confirm_title	Pui deoparte ștergerile ilizibile?
+set_unreadable_resets_confirm_detail	Titlurile se redau și pozițiile de citire sunt trimise din nou. Șterge din nou progresul pentru orice titlu pe care vrei în continuare să-l iei de la capăt.
+set_signed_in	Conectat
+set_other_accounts	Alte conturi
+set_server_sign_in_required	%1$s · autentificare necesară
+set_remove_account	Elimină %1$s
+set_switch_to_account	Comută la acest cont
+set_add_account	Adaugă cont
+set_sign_out_of	Deconectează-te de la %1$s
+set_sign_out_detail	Elimină acest cont de pe dispozitiv. Descărcările și ascultarea netrimisă ale acestuia rămân până când se autentifică din nou.
+set_accounts_footer	Fiecare cont își păstrează propriul progres, propriile descărcări și biblioteca aleasă. Comutarea nu le amestecă niciodată.
+set_remove_account_confirm	Elimini %1$s?
+set_remove_account_detail	Poți adăuga contul din nou mai târziu. Descărcările și ascultarea netrimisă ale acestuia rămân pe acest dispozitiv.
+set_add_an_account	Adaugă un cont
+set_connect_intro	Conectează-te direct la propriul tău server. Nimic nu trece printr-un alt serviciu.
+set_change_server	Schimbă serverul
+set_sign_in	Autentificare
+set_sign_in_openid	Autentificare cu OpenID
+set_saved_accounts	Conturi salvate
+set_use_account	Folosește
+set_edit	Editează
+set_add_podcast	Adaugă podcast
+set_not_available_yet	Încă indisponibil
+set_not_available_yet_detail	Această parte a versiunii de previzualizare este încă în lucru.
+set_import_previous_app	Importă din aplicația anterioară
+set_import_interrupted	Un import nu s-a terminat. Alege același export pentru a continua de unde s-a oprit.
+set_import_already	Acest export a fost deja importat. Titlurile, ascultarea și pozițiile din el sunt pe acest dispozitiv.
+set_import_preflight	%1$s\nAplicația anterioară și acest fișier sunt doar citite; nimic din ele nu se schimbă. Titlurile, ascultarea și pozițiile se atașează unui cont după ce acesta se autentifică aici. Parolele nu sunt în export, așa că fiecare cont trebuie să se autentifice din nou.
+set_import_account_signed_in	%1$s · autentificat
+set_import_account_sign_in_later	%1$s · autentifică-te după import
+set_import_titles	Titluri
+set_import_title_partial	%1$s · restul se descarcă din nou
+set_not_imported	Neimportat
+set_import_space	Necesită %1$s; %2$s liber.
+set_import_no_space	Nu există suficient spațiu liber pe acest dispozitiv. Eliberează spațiu, apoi alege din nou exportul.
+set_import_progress	Se copiază fișierele: %1$d din %2$d. Dacă aplicația se închide, alege din nou același export pentru a continua.
+set_import_done	Au fost importate %1$d titluri, %2$d sesiuni de ascultare și %3$d poziții. Setările din aplicația anterioară au fost aplicate.
+set_import_waiting	Autentifică-te la %1$s ca %2$s pentru a atașa titlurile, ascultarea și pozițiile sale.
+set_import	Importă
+set_continue	Continuă
+set_close	Închide
+set_import_file_unreadable	Fișierul ales nu a putut fi citit. Alege-l din nou sau salvează-l mai întâi pe acest dispozitiv.
+set_import_stopped	Importul s-a oprit înainte să se termine. Nu s-a pierdut nimic: alege din nou același export pentru a continua de unde s-a oprit.
+set_import_item_gone	Nu mai este pe server, așa că nu a fost preluat.
+set_import_file_changed	Un fișier s-a modificat pe acest dispozitiv după ce a fost importat, așa că este descărcat din nou de pe server.
+set_openid_not_enabled	Autentificarea OpenID nu este activată pe acest server. Folosește numele de utilizator și parola.
+set_openid_canceled	Autentificarea în browser a fost anulată. Conturile tale salvate sunt păstrate.
+set_openid_invalid	Răspunsul autentificării din browser nu a putut fi verificat. Reîncearcă autentificarea și verifică setările de redirecționare OpenID ale serverului.
+set_vault_unreadable	Autentificările salvate nu au putut fi decriptate. Sunt păstrate pe dispozitiv; autentifică-te din nou pentru a continua.
+set_session_ended	Sesiunea ta pentru %1$s s-a încheiat. Autentifică-te din nou; ascultarea netrimisă și descărcările sunt păstrate.
+set_play_blocked_listening_storage	Ascultarea de dinainte de închiderea aplicației nu a putut fi salvată deoarece stocarea este indisponibilă, așa că nu se redă nimic până când nu se poate. Eliberează spațiu, apoi încearcă din nou.
+set_play_blocked_unreadable_resets	Ștergerile de progres salvate nu au putut fi citite, așa că nu se redă nimic până când nu sunt rezolvate în Diagnosticare.
+set_play_blocked_discarding	Progresul acestui titlu este încă în curs de ștergere. Se va reda de la început după ce se termină.
+dl_not_saved	Lista de descărcări nu a putut fi salvată pe acest dispozitiv, așa că nu s-a schimbat nimic. Eliberează spațiu și încearcă din nou.
+dl_not_allowed	Contul tău nu are permisiunea de a descărca.
+dl_no_audio	Acest element nu are audio de descărcat.
+dl_no_space	Nu există suficient spațiu liber pe acest dispozitiv pentru %1$s, păstrând spațiu liber pentru sistem.
+dl_folder_lost_nothing_downloaded	Accesul la %1$s a fost eliminat, așa că nu s-a descărcat nimic. Alege din nou dosarul de descărcări în Setări.
+dl_downloading_percent	Se descarcă %1$d%%
+dl_cancel_download	Anulează descărcarea
+dl_downloaded_plays_offline	Descărcat · se redă offline
+dl_failed	Descărcarea a eșuat.
+dl_discard	Renunță
+dl_cellular_title	Descarci prin date mobile?
+dl_cellular_message	Ești pe o conexiune contorizată. Poți schimba asta în Setări.
+dl_not_now	Nu acum
+dl_folder_cannot_be_kept	Acel dosar nu poate fi păstrat pentru descărcări. Alege altul.
+dl_saved_in_folder	Descărcările sunt salvate în %1$s
+dl_saved_in_app_storage	Descărcările sunt salvate în stocarea aplicației
+dl_folder_visible_to_other_apps	Alte aplicații de pe acest dispozitiv pot vedea aceste fișiere. Descărcările făcute înainte de o schimbare rămân unde sunt.
+dl_folder_private_to_app	Doar această aplicație poate vedea aceste fișiere. Alege un dosar pentru a păstra descărcările acolo unde alte aplicații le pot accesa.
+dl_choose_folder	Alege dosarul
+dl_use_app_storage	Folosește stocarea aplicației
+dl_ebook_missing	Cartea electronică lipsește de pe acest dispozitiv. Descarc-o din nou pentru a o deschide.
+dl_no_app_opens_format	Nicio aplicație de pe acest dispozitiv nu deschide fișiere %1$s. Instalează una care le deschide și încearcă din nou.
+dl_no_app_opens_this_kind	Nicio aplicație de pe acest dispozitiv nu deschide acest tip de fișiere. Instalează una care le deschide și încearcă din nou.
+dl_folder_lost_choose_again_open	Această descărcare este în %1$s, iar accesul la %1$s a fost eliminat. Alege din nou %1$s pentru a o deschide.
+dl_folder_lost_choose_again_play	Această descărcare este în %1$s, iar accesul la %1$s a fost eliminat. Alege din nou %1$s pentru a o reda.
+dl_names_or	%1$s sau %2$s
+dl_names_and	%1$s și %2$s
+dl_remove_title	Elimini descărcarea?
+dl_remove_message	„%1$s” va fi eliminat de pe acest dispozitiv. Progresul tău de ascultare este păstrat.
+dl_keep	Păstrează
+dl_not_that_folder	Acesta nu este %1$s. Alege dosarul în care se află aceste descărcări.
+dl_folder_access_not_kept	Accesul la acel dosar nu a putut fi păstrat. Încearcă din nou.
+dl_no_downloads	Nicio descărcare
+dl_no_downloads_message	Descarcă cărți sau episoade de pe pagina lor pentru a le asculta fără conexiune.
+dl_access_removed_title	Accesul la %1$s a fost eliminat
+dl_downloads_kept_there:one	%1$d descărcare este păstrată acolo. Alege din nou %2$s pentru a o reda și deschide.
+dl_downloads_kept_there:few	%1$d descărcări sunt păstrate acolo. Alege din nou %2$s pentru a le reda și deschide.
+dl_downloads_kept_there:other	%1$d de descărcări sunt păstrate acolo. Alege din nou %2$s pentru a le reda și deschide.
+dl_choose_again	Alege din nou %1$s
+dl_some_files_missing	Unele fișiere lipsesc de pe acest dispozitiv
+dl_size_in_folder	%1$s în %2$s
+dl_open_in_another_app	Deschide %1$s în altă aplicație
+dl_download_again_named	Descarcă din nou %1$s
+dl_the_chosen_folder	dosarul ales
+dl_files_missing_play	Unele fișiere ale acestei descărcări lipsesc de pe acest dispozitiv. Descarc-o din nou pentru a o reda.
+dl_play_named	Redă %1$s
+dl_retry_named	Reîncearcă %1$s
+dl_cancel_named	Anulează %1$s
+dl_remove_named	Elimină %1$s
+dl_sign_in_again	Autentifică-te din nou în acest cont pentru a descărca.
+dl_folder_lost_choose_in_downloads	Accesul la %1$s a fost eliminat. Alege din nou dosarul în Descărcări.
+dl_connection_interrupted	Conexiunea a fost întreruptă.
+dl_error_retrying	%1$s Se reîncearcă…
+dl_server_refused	Serverul a refuzat descărcarea.
+dl_server_sent_type_not_audio	Serverul a trimis %1$s în loc de audio, așa că nu s-a salvat nimic. Verifică serverul sau proxy-ul și reîncearcă.
+dl_server_sent_unknown_not_audio	Serverul a trimis un răspuns necunoscut în loc de audio, așa că nu s-a salvat nimic. Verifică serverul sau proxy-ul și reîncearcă.
+dl_size_mismatch	Fișierul descărcat avea %1$d octeți, dar serverul indica %2$d, așa că a fost înlăturat. Reîncearcă pentru a-l descărca din nou.
+dl_server_sent_not_pdf	Serverul a trimis altceva decât PDF-ul, așa că nu s-a salvat nimic. Verifică serverul sau proxy-ul și reîncearcă.
+dl_notification_downloading	Se descarcă %1$s
+rd_positions_not_restored	Pozițiile de citire salvate nu au putut fi restaurate, așa că paginile nu sunt salvate. Datele originale sunt păstrate.
+rd_positions_not_overwritten	Pozițiile de citire salvate nu au putut fi citite, așa că nu sunt suprascrise.
+rd_not_a_pdf	Acest fișier nu este un PDF pe care acest dispozitiv îl poate deschide.
+rd_document_not_opened	Documentul nu a putut fi deschis.
+rd_page_not_saved	Această pagină nu a putut fi salvată pe acest dispozitiv.
+rd_choice_not_saved	Alegerea ta nu a putut fi salvată pe acest dispozitiv.
+rd_conflict_title	Unde continui?
+rd_conflict_page	Alt dispozitiv a ajuns la pagina %1$d în timp ce pagina %2$d de aici nu fusese încă salvată pe server.
+rd_conflict_location	Alt dispozitiv a salvat o poziție de citire pe care acest cititor nu o poate afișa ca pagină, în timp ce pagina %1$d de aici nu fusese încă salvată pe server.
+rd_go_to_page_number	Mergi la pagina %1$d
+rd_keep_other_position	Păstrează cealaltă poziție
+rd_stay_on_page	Rămâi la pagina %1$d
+rd_close_reader	Închide cititorul
+rd_rotate_pages	Rotește paginile
+rd_continuous_scrolling	Derulare continuă
+rd_document_error_title	Acest document nu a putut fi deschis
+rd_try_again	Încearcă din nou
+rd_go_to_page	Mergi la pagina
+rd_previous_page	Pagina anterioară
+rd_next_page	Pagina următoare
+rd_page_of	Pagina %1$d din %2$d
+rd_page_number	Pagina %1$d
+rd_download_folder_lost	Această descărcare este în %1$s, iar accesul la %1$s a fost eliminat. Alege din nou dosarul în Descărcări.
+rd_downloaded_document_missing	Documentul descărcat lipsește de pe acest dispozitiv. Descarcă-l din nou.
+rd_document_not_stored	Documentul nu a putut fi stocat pentru citire.
+rd_supplementary_pdf	PDF suplimentar
+rd_format_not_available	Citirea %1$s nu este încă disponibilă în această versiune de previzualizare. Poziția ta de citire de pe server este păstrată.
+rd_ebook_not_available	Citirea acestei cărți electronice nu este încă disponibilă în această versiune de previzualizare. Poziția ta de citire de pe server este păstrată.
+grp_unavailable_title	Titlu indisponibil
+grp_could_not_load_collections	Colecțiile nu au putut fi încărcate.
+grp_could_not_load_playlists	Listele de redare nu au putut fi încărcate.
+grp_collections_unavailable	Colecții indisponibile
+grp_playlists_unavailable	Liste de redare indisponibile
+grp_no_collections_yet	Nicio colecție încă
+grp_no_playlists_yet	Nicio listă de redare încă
+grp_create_one_hint	Creează una pentru a ține titlurile împreună, în ordinea ta.
+grp_title_count:one	%1$d titlu
+grp_title_count:few	%1$d titluri
+grp_title_count:other	%1$d de titluri
+grp_collection_deleted	Această colecție a fost ștearsă.
+grp_playlist_deleted	Această listă de redare a fost ștearsă.
+grp_could_not_load	Nu s-a putut încărca.
+grp_collection_unavailable	Colecție indisponibilă
+grp_playlist_unavailable	Listă de redare indisponibilă
+grp_nothing_in_collection_can_play	Nimic din această colecție nu poate fi redat.
+grp_nothing_in_playlist_can_play	Nimic din această listă de redare nu poate fi redat.
+grp_could_not_start_playback	Redarea nu a putut porni.
+grp_resume	Reia
+grp_play_collection	Redă colecția
+grp_play_playlist	Redă lista
+grp_edit_collection	Editează colecția
+grp_edit_playlist	Editează lista de redare
+grp_delete_collection	Șterge colecția
+grp_delete_playlist	Șterge lista de redare
+grp_no_titles_yet	Niciun titlu încă
+grp_delete_collection_question	Ștergi colecția?
+grp_delete_playlist_question	Ștergi lista de redare?
+grp_delete_group_explanation	„%1$s” este eliminată de pe serverul tău. Titlurile din ea sunt păstrate.
+grp_not_deleted	Neștearsă: %1$s
+grp_not_deleted_try_again	Neștearsă: încearcă din nou
+grp_not_allowed_to_change_collection	Contul tău de pe server nu are permisiunea de a modifica această colecție.
+grp_not_allowed_to_change_playlist	Contul tău de pe server nu are permisiunea de a modifica această listă de redare.
+grp_collection_no_longer_exists	Această colecție nu mai există.
+grp_playlist_no_longer_exists	Această listă de redare nu mai există.
+grp_not_saved	Nesalvat: %1$s
+grp_not_saved_try_again	Nesalvat: încearcă din nou
+grp_saving	Se salvează…
+grp_create_collection	Creează colecția
+grp_create_playlist	Creează lista de redare
+grp_save_changes	Salvează modificările
+grp_choose_at_least_one_title	Alege cel puțin un titlu.
+grp_order	Ordine
+grp_move_up	Mută %1$s în sus
+grp_remove_member	Elimină %1$s
+grp_add_titles	Adaugă titluri
+grp_add_episodes_hint	Adaugă episoade de pe pagina de episoade a unui podcast.
+grp_add_to_playlist_or_collection	Adaugă în listă de redare sau colecție
+grp_add_to	Adaugă în
+grp_nothing_to_add_to	Încă nu există nimic aici în care să poți adăuga.
+grp_added_to	Adăugat în %1$s
+grp_not_added	Neadăugat: %1$s
+grp_not_added_try_again	Neadăugat: încearcă din nou
+grp_already_included	Deja inclus
+grp_close	Închide
+grp_titles_could_not_load	Titlurile nu au putut fi încărcate
+grp_nothing_here	Nimic aici
+pod_feed_episodes	Episoadele din flux
+pod_sort_newest_first	Cele mai noi întâi, atinge pentru cele mai vechi întâi
+pod_sort_oldest_first	Cele mai vechi întâi, atinge pentru cele mai noi întâi
+pod_episodes_queued:one	%1$d episod pus în coadă pe serverul tău: %2$s
+pod_episodes_queued:few	%1$d episoade puse în coadă pe serverul tău: %2$s
+pod_episodes_queued:other	%1$d de episoade puse în coadă pe serverul tău: %2$s
+pod_server_could_not_download	Serverul tău nu a putut descărca „%1$s”.
+pod_dismiss	Închide
+pod_no_episodes_yet	Niciun episod încă
+pod_no_episodes_match_filter	Niciun episod nu corespunde acestui filtru
+pod_episode_details	Detaliile episodului
+pod_untitled_episode	Episod fără titlu
+pod_play_named	Redă %1$s
+pod_episode_not_available	Episod indisponibil
+pod_episode_may_have_been_removed	Este posibil să fi fost eliminat de pe server.
+pod_percent_listened	%1$d%% ascultat
+pod_feed_could_not_open	Fluxul nu a putut fi deschis.
+pod_retry_feed	Reîncearcă fluxul
+pod_no_feed_episodes	Nu s-au găsit episoade în flux
+pod_already_on_server	Deja pe server
+pod_selected	Selectat
+pod_not_selected	Neselectat
+pod_no_audio_enclosure	Fără fișier audio atașat
+pod_not_queued	Nepus în coadă: %1$s
+pod_not_queued_try_again	Nepus în coadă: încearcă din nou
+pod_queueing_on_server	Se pune în coadă pe serverul tău…
+pod_add_selected_episodes	Adaugă episoadele selectate pe server
+pod_something_went_wrong	Ceva nu a mers bine.
+pod_adding_not_available	Adăugarea de podcasturi nu este disponibilă
+pod_adding_needs_permission	Contul tău de pe server are nevoie de permisiunea de gestionare a podcasturilor într-o bibliotecă de podcasturi.
+pod_search_podcasts	Caută podcasturi
+pod_or_rss_feed_url	Sau URL-ul fluxului RSS
+pod_enter_complete_feed_url	Introdu un URL complet de flux HTTP sau HTTPS.
+pod_preview_feed	Previzualizează fluxul
+pod_create_podcast	Creează podcastul
+pod_choose_different_feed	Alege alt flux
+item_something_went_wrong	Ceva nu a mers bine. Încearcă din nou.
+item_feed_subscribe_at	Aplicațiile de podcast se pot abona la acest titlu la:
+item_copied	Copiat
+item_copy_address	Copiază adresa
+item_hidden_from_directories	Ascuns din directoarele de podcasturi
+item_feed_public_warning	Oricine are adresa poate asculta acest titlu fără să se autentifice.
+item_feed_name	Numele fluxului
+item_feed_name_rule	Doar litere, cifre, - și _
+item_hide_from_directories	Ascunde din directoarele de podcasturi
+item_done	Gata
+item_sending	Se trimite…
+item_sent_to	Trimis către %1$s
+item_send_ebook_explanation	Serverul tău trimite prin e-mail cartea electronică pe dispozitivul pe care îl alegi.
+item_ereader_or_ebook_gone	%1$s sau această carte electronică nu mai este disponibilă pe server. Nu s-a trimis nimic.
+item_not_sent_to	Netrimis către %1$s. %2$s
+item_not_saved_try_again	Nesalvat. Încearcă din nou.
+item_mark_unfinished	Marchează ca nefinalizat
+item_discard_uncertain	O salvare anterioară a progresului acestui titlu nu a primit răspuns și poate ajunge încă la serverul tău. Dacă ajunge după ștergere, readuce progresul. Serverul tău nu poate spune acestei aplicații dacă se va întâmpla asta.
+item_discard_anyway	Șterge oricum
+item_discard_under_way	Această ștergere este deja în curs și nu poate fi retrasă.
+item_keep_progress	Păstrează progresul
+item_discard_pending	Se șterge progresul. Se termină după ce serverul tău poate fi accesat și ascultarea acestui titlu este trimisă.
+item_discard_anyway_question	Ștergi oricum?
+item_discard_anyway_explanation	Progresul este eliminat acum. Dacă salvarea anterioară ajunge mai târziu la serverul tău, progresul acestui titlu revine și îl poți șterge din nou.
+item_discard	Șterge
+item_discard_progress_question	Resetezi progresul?
+item_discard_progress_explanation	Poziția ta și starea de finalizare pentru acest titlu sunt eliminate de pe server pentru toate dispozitivele.
+item_could_not_load	Acest titlu nu a putut fi încărcat
+item_narrated_by	Narat de
+item_series	Serie: %1$s
+item_series_with_sequence	Serie: %1$s #%2$s
+item_episode_count:one	%1$d episod
+item_episode_count:few	%1$d episoade
+item_episode_count:other	%1$d de episoade
+item_listened_and_left	%1$d%% ascultat · %2$s rămase
+item_chapter_number	Capitolul %1$d
+pl_minimize_player	Minimizează playerul
+pl_nothing_playing	Nu se redă nimic
+pl_chapter_number	Capitolul %1$d
+pl_try_again	Încearcă din nou
+pl_speed_value	Viteză %1$s
+pl_sleep	Timer
+pl_position_of_duration	%1$s din %2$s
+pl_buffering	Se încarcă
+pl_previous_chapter	Capitolul anterior
+pl_next_chapter	Capitolul următor
+pl_jump_forward_seconds:one	Salt înainte %1$d secundă
+pl_jump_forward_seconds:few	Salt înainte %1$d secunde
+pl_jump_forward_seconds:other	Salt înainte %1$d de secunde
+pl_jump_back_seconds:one	Salt înapoi %1$d secundă
+pl_jump_back_seconds:few	Salt înapoi %1$d secunde
+pl_jump_back_seconds:other	Salt înapoi %1$d de secunde
+pl_jump_forward_minutes:one	Salt înainte %1$d minut
+pl_jump_forward_minutes:few	Salt înainte %1$d minute
+pl_jump_forward_minutes:other	Salt înainte %1$d de minute
+pl_jump_back_minutes:one	Salt înapoi %1$d minut
+pl_jump_back_minutes:few	Salt înapoi %1$d minute
+pl_jump_back_minutes:other	Salt înapoi %1$d de minute
+pl_open_player	Deschide playerul
+pl_playback_stopped	Redare oprită
+pl_listening_unsaved	O parte din ascultare nu este încă salvată pe acest dispozitiv. Este păstrată și salvată imediat ce stocarea permite.
+pl_playing	Se redă
+pl_resume	Reia
+pl_streaming_cellular_refused	Streamingul prin date mobile este dezactivat în Setări. Conectează-te la Wi-Fi sau descarcă mai întâi acest titlu.
+pl_stream_cellular_title	Redai în streaming prin date mobile?
+pl_stream_cellular_message	Ești pe o conexiune contorizată. Poți schimba asta în Setări.
+pl_not_now	Nu acum
+pl_sleep_stops_end_of_chapter	Se oprește la finalul acestui capitol, peste %1$s
+pl_sleep_stops_in	Se oprește peste %1$s
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Dezactivează
+pl_bookmark_not_saved_reason	Semnul de carte nu a fost salvat: %1$s
+pl_bookmark_not_saved	Semnul de carte nu a fost salvat: încearcă din nou
+pl_bookmark_add_at	Adaugă la %1$s
+pl_bookmark_go_to	Mergi la semnul de carte
+pl_bookmark_default	Semn de carte
+pl_bookmark_rename_named	Redenumește %1$s
+pl_bookmark_delete_named	Șterge %1$s
+pl_bookmark_at	Semn de carte la %1$s
+pl_bookmark_rename	Redenumește semnul de carte
+pl_bookmark_new	Semn de carte nou
+pl_untitled	Fără titlu
+pl_playback_stopped_reason	Redare oprită: %1$s. Poziția ta este păstrată.
+pl_playback_stopped_unknown	Redare oprită: sunetul nu a putut fi încărcat. Poziția ta este păstrată.
+pl_no_playable_audio	Acest element nu are audio care poate fi redat.
+pl_could_not_start	Redarea nu a putut porni.
+pl_listening_save_failed	Ascultarea nu a putut fi salvată pe acest dispozitiv, așa că redarea a fost întreruptă. Eliberează spațiu și încearcă din nou.
+cast_casting_to	Se proiectează pe %1$s
+cast_cast	Proiectează
+cast_playing_on	Se redă pe %1$s
+cast_connecting_to	Se conectează la %1$s…
+cast_playing_on_phone	Se redă pe acest telefon
+cast_stop	Oprește proiectarea
+cast_looking	Se caută dispozitive de proiectare…
+cast_none_found	Nu s-au găsit dispozitive de proiectare. Verifică dacă receptorul este pornit și în aceeași rețea Wi-Fi ca acest telefon.
+cast_close	Închide
+cast_download_not_castable	Copiile descărcate se redau doar pe acest telefon. Oprește proiectarea pentru a asculta aici sau redă titlul în streaming.
+cast_resumed_without_title	Proiectarea s-a oprit deoarece aplicația a repornit în timpul proiectării. Deschide din nou titlul pentru a continua ascultarea de la ultimul punct salvat de acest telefon.
+cast_needs_play_services	Proiectarea necesită Google Play Services, pe care acest dispozitiv nu le are sau trebuie să le actualizeze.
+cast_could_not_start	Proiectarea nu a putut porni pe acest dispozitiv: %1$s.
+cast_connect_failed_named	Nu s-a putut conecta la %1$s. Verifică dacă este pornit și în aceeași rețea Wi-Fi ca acest telefon.
+cast_connect_failed	Nu s-a putut conecta la receptor. Verifică dacă este pornit și în aceeași rețea Wi-Fi ca acest telefon.
+cast_connection_lost_named	Conexiunea cu %1$s s-a pierdut. Redarea continuă pe acest telefon.
+cast_connection_lost	Conexiunea cu receptorul s-a pierdut. Redarea continuă pe acest telefon.
+auto_continue	Continuă
+auto_recent	Recente
+auto_discovery	Descoperă
+auto_authors_count:one	%1$d autor
+auto_authors_count:few	%1$d autori
+auto_authors_count:other	%1$d de autori
+auto_series_count:one	%1$d serie
+auto_series_count:few	%1$d serii
+auto_series_count:other	%1$d de serii
+lib_books_count:one	%1$d carte
+lib_books_count:few	%1$d cărți
+lib_books_count:other	%1$d de cărți
+lib_items_count:one	%1$d element
+lib_items_count:few	%1$d elemente
+lib_items_count:other	%1$d de elemente
+lib_selected	Selectat
+lib_all_filters	Toate filtrele
+lib_nothing_to_filter	Nimic de filtrat aici.
+lib_sort_descending_switch	Descrescător, comută la crescător
+lib_sort_ascending_switch	Crescător, comută la descrescător
+lib_sort_descending	Descrescător
+lib_sort_ascending	Crescător
+lib_unavailable	Bibliotecă indisponibilă
+lib_unavailable_message	%1$s Contul tău și ascultarea netrimisă sunt păstrate.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Arată copertele
+lib_show_list	Arată lista
+lib_filtered	Filtrat
+lib_empty_title	Încă nimic aici
+lib_empty_message	Această bibliotecă nu are elemente pe care le poți accesa.
+lib_page_error	Nu s-au putut încărca mai multe titluri
+lib_card_finished	%1$s, finalizat
+lib_card_percent_listened	%1$s, %2$d la sută ascultat
+lib_search_in	Caută în %1$s
+lib_search_library	Caută în bibliotecă
+lib_clear_search	Șterge căutarea
+lib_search_failed	Căutarea a eșuat
+lib_search_idle_title	Găsește ceva de ascultat
+lib_search_idle_message	Caută titluri, autori, serii, naratori și episoade.
+lib_search_no_match	Nimic nu corespunde cu „%1$s”. Încearcă mai puține cuvinte sau altă ortografie.
+err_invalid_server	Introdu o adresă de server care începe cu http:// sau https://, de exemplu https://books.example.com/abs.
+err_unsafe_media_url	Serverul a returnat o adresă media din afara acestui server. Nu a fost deschisă.
+err_sign_in_required	Sesiunea ta nu mai este acceptată. Autentifică-te din nou; ascultarea netrimisă este păstrată.
+err_untrusted	Certificatul serverului nu este de încredere pentru acest dispozitiv. Instalează autoritatea de certificare a serverului tău în Setări Android > Securitate > Criptare și date de conectare, apoi încearcă din nou.
+err_offline	Serverul nu a putut fi accesat. Verifică adresa sau conexiunea și încearcă din nou.
+err_forbidden	Contul tău nu are permisiunea de a face asta.
+err_not_found	Acest conținut nu mai este disponibil pe server.
+err_server_problem	Serverul a avut o problemă temporară (HTTP %1$d). Încearcă din nou.
+err_rejected	Serverul a respins cererea (HTTP %1$d).
+err_invalid_response	Serverul a trimis un răspuns pe care această aplicație nu l-a putut citi.
+err_no_audio	Acest element nu are audio care poate fi redat.
+err_login_rejected	Numele de utilizator sau parola nu au fost acceptate.
+err_publications_unreadable	Înregistrările salvărilor de progres fără răspuns nu au putut fi citite. Rezolvă-le mai întâi în Diagnosticare.
+err_discards_unreadable	Ștergerile de progres salvate nu au putut fi citite. Rezolvă-le mai întâi în Diagnosticare.

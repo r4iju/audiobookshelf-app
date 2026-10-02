@@ -1,0 +1,6 @@
+__pycache__/
+outputs/
+ClientJourney/.build/
+ClientJourney/.swiftpm/
+
+realtime/node_modules/

@@ -1,0 +1,23 @@
+Tested source and image:
+app source: worktree audiobookshelf-real-server-repro at 386fed27 (apple/ and tvos/ identical to 97bac3e3); probes from 97bac3e3's evidence folder, before the test1 poll correction
+image: ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03
+models/User.js copied into abs-apple-diag (RS_CANDIDATE): 3ef586094cc848fbd5abebd8cf1401ab8806a5334646af431d033e0cc09b9840; sha256sum in the container after the run began 3ef586094cc848fb
+
+test1's progress writes for "The Long Tide" (from the saved container log; LocalAuth lines left out):
+[2026-10-02 09:25:21.313] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (a0b4597e-228b-4992-b950-e135fe85e413) (updatedAt: 1790933121264.1248)
+[2026-10-02 09:25:21.324] INFO: [PlaybackSessionManager] Creating new media progress for media item "The Long Tide"
+[2026-10-02 09:25:23.719] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (a0b4597e-228b-4992-b950-e135fe85e413) (updatedAt: 1790933123684.175)
+[2026-10-02 09:25:23.725] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 12.000100545 (previously 0)
+[2026-10-02 09:25:23.728] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:25:23.684 +00:00' (media item 49b8c0bf-ace2-4853-b399-b405f4791fa8)
+[2026-10-02 09:25:24.124] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (a0b4597e-228b-4992-b950-e135fe85e413) (updatedAt: 1790933124078.987)
+[2026-10-02 09:25:24.135] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 22 (previously 12.000100545)
+[2026-10-02 09:25:24.140] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:25:24.078 +00:00' (media item 49b8c0bf-ace2-4853-b399-b405f4791fa8)
+[2026-10-02 09:25:24.552] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (a0b4597e-228b-4992-b950-e135fe85e413) (updatedAt: 1790933124512.028)
+[2026-10-02 09:25:24.558] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 32 (previously 22)
+[2026-10-02 09:25:24.562] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:25:24.512 +00:00' (media item 49b8c0bf-ace2-4853-b399-b405f4791fa8)
+[2026-10-02 09:25:31.230] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (a0b4597e-228b-4992-b950-e135fe85e413) (updatedAt: 1790933130013.5242)
+[2026-10-02 09:25:31.239] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 37.419063222 (previously 32)
+[2026-10-02 09:25:31.241] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:25:30.013 +00:00' (media item 49b8c0bf-ace2-4853-b399-b405f4791fa8)
+[2026-10-02 09:25:31.254] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (a0b4597e-228b-4992-b950-e135fe85e413) (updatedAt: 1790933130327.6729)
+[2026-10-02 09:25:31.274] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 37.420610181 (previously 37.419063222)
+[2026-10-02 09:25:31.280] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:25:30.327 +00:00' (media item 49b8c0bf-ace2-4853-b399-b405f4791fa8)

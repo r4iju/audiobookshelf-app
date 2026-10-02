@@ -1,0 +1,464 @@
+# Greek drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Λογαριασμοί
+title_new_collection	Νέα συλλογή
+action_retry	Επανάληψη
+action_read	Ανάγνωση %1$s
+action_mark_finished	Σήμανση ως ολοκληρωμένο
+action_discard_progress	Απόρριψη προόδου
+choose_library	Επιλογή βιβλιοθήκης
+all_titles	Όλοι οι τίτλοι
+all_podcasts	Όλα τα πόντκαστ
+filter	Φίλτρο
+sort	Ταξινόμηση
+bookmarks	Σελιδοδείκτες
+no_bookmarks	Δεν υπάρχουν ακόμη σελιδοδείκτες
+search_tags	Ετικέτες
+theme_system	Σύστημα
+screen_orientation	Προσανατολισμός οθόνης
+jump_forward	Μετάβαση μπροστά
+jump_back	Μετάβαση πίσω
+shake_sensitivity	Ευαισθησία κουνήματος
+streaming_on_mobile_data	Μετάδοση με δεδομένα κινητής
+set_settings_not_saved	Δεν ήταν δυνατή η αποθήκευση των ρυθμίσεων σε αυτήν τη συσκευή, οπότε δεν άλλαξε τίποτα. Ελευθερώστε χώρο αποθήκευσης και δοκιμάστε ξανά.
+set_orientation_follow_device	Όπως η συσκευή
+set_orientation_portrait	Κατακόρυφος
+set_orientation_landscape	Οριζόντιος
+set_haptic_light	Ελαφριά
+set_rewind_on_resume	Μικρή επιστροφή κατά τη συνέχιση
+set_rewind_on_resume_detail	Γυρίζει λίγα δευτερόλεπτα πίσω μετά από παύση, περισσότερα μετά από μεγαλύτερη παύση.
+set_seek_system_controls	Μετακίνηση θέσης από τα χειριστήρια συστήματος
+set_seek_system_controls_detail	Επιτρέπει στην οθόνη κλειδώματος και στην ειδοποίηση να μετακινούν τη γραμμή θέσης.
+set_mp3_index_seeking	Ακριβής μετακίνηση σε MP3
+set_mp3_index_seeking_detail	Δημιουργεί ευρετήριο αναζήτησης για αρχεία MP3 με αναξιόπιστη διάρκεια. Η μετακίνηση ξεκινά πιο αργά.
+set_shake_to_reset	Κούνημα για επαναφορά
+set_shake_to_reset_detail	Αν κουνήσετε το τηλέφωνο ενώ τρέχει ο χρονοδιακόπτης, αυτός ξεκινά από την αρχή.
+set_sleep_fade_out	Σταδιακή μείωση ήχου
+set_sleep_fade_out_detail	Χαμηλώνει την ένταση κατά το τελευταίο λεπτό.
+set_vibrate_on_reset	Δόνηση κατά την επαναφορά
+set_sleep_chime	Ηχητικό σήμα όταν πλησιάζει το τέλος
+set_auto_sleep_timer_detail	Ξεκινά τον χρονοδιακόπτη όταν η αναπαραγωγή γίνεται μεταξύ %1$s και %2$s.
+set_auto_sleep_starts_at	Έναρξη στις
+set_heading_mobile_data	Δεδομένα κινητής
+set_storage	Αποθηκευτικός χώρος
+set_series_first_to_last	Από το πρώτο στο τελευταίο
+set_series_last_to_first	Από το τελευταίο στο πρώτο
+set_heading_support	Υποστήριξη
+set_diagnostics	Διαγνωστικά
+set_something_went_wrong	Κάτι πήγε στραβά.
+set_statistics_unavailable	Τα στατιστικά δεν είναι διαθέσιμα
+set_try_again	Δοκιμάστε ξανά
+set_minutes_listened:one	%1$d λεπτό ακρόασης
+set_minutes_listened:other	%1$d λεπτά ακρόασης
+set_days_listened:one	%1$d ημέρα ακρόασης
+set_days_listened:other	%1$d ημέρες ακρόασης
+set_titles_finished:one	%1$d τίτλος ολοκληρώθηκε
+set_titles_finished:other	%1$d τίτλοι ολοκληρώθηκαν
+set_day_minutes_listened:one	%1$s, %2$d λεπτό ακρόασης
+set_day_minutes_listened:other	%1$s, %2$d λεπτά ακρόασης
+set_set_aside_failed	Δεν ήταν δυνατή η παράβλεψη. Δοκιμάστε ξανά.
+set_connection	Σύνδεση
+set_diagnostics_area_media	Πολυμέσα
+set_diagnostics_area_sync	Συγχρονισμός
+set_unreadable_resets_title	Δεν ήταν δυνατή η ανάγνωση των αποθηκευμένων απορρίψεων προόδου
+set_unreadable_resets_detail	Οποιοσδήποτε τίτλος μπορεί να περιλαμβάνεται, οπότε δεν αναπαράγεται τίποτα και δεν αποστέλλεται θέση ανάγνωσης μέχρι να αποφασίσετε. Αν τις παραμερίσετε, το αρχείο παραμένει σε αυτήν τη συσκευή και η πρόοδος που επρόκειτο να απορριφθεί παραμένει στον διακομιστή σας.
+set_set_them_aside	Παραμερισμός
+set_listening_storage_title	Η ακρόαση πριν κλείσει η εφαρμογή δεν ήταν δυνατό να αποθηκευτεί
+set_listening_storage_detail	Ο αποθηκευτικός χώρος αυτής της συσκευής δεν είναι διαθέσιμος ή είναι πλήρης. Δεν αναπαράγεται τίποτα και δεν αποστέλλεται ακρόαση μέχρι να αποθηκευτεί· ως τότε διατηρείται.
+set_unreadable_writes_title	Δεν ήταν δυνατή η ανάγνωση των εγγραφών αναπάντητων αποθηκεύσεων προόδου
+set_unreadable_writes_detail	Μια αποθήκευση οποιουδήποτε τίτλου μπορεί ακόμη να φτάσει στον διακομιστή σας, οπότε δεν αποστέλλεται ακρόαση ή ανάγνωση και δεν απορρίπτεται πρόοδος μέχρι να αποφασίσετε. Αν τις παραμερίσετε, το αρχείο παραμένει σε αυτήν τη συσκευή· μια καθυστερημένη αποθήκευση μπορεί τότε να επαναφέρει πρόοδο που απορρίπτετε.
+set_diagnostics_server	Διακομιστής %1$s
+set_diagnostics_signed_in_as	Συνδεδεμένος ως %1$s
+set_diagnostics_app_version	Εφαρμογή %1$s
+set_recent_problems	Πρόσφατα προβλήματα
+set_clear	Εκκαθάριση
+set_no_problems	Δεν έχουν καταγραφεί προβλήματα σε αυτήν τη συσκευή.
+set_unreadable_writes_confirm_title	Παραμερισμός των μη αναγνώσιμων εγγραφών;
+set_unreadable_writes_confirm_detail	Οι θέσεις ακρόασης και ανάγνωσης αποστέλλονται ξανά και οι απορρίψεις μπορούν να προχωρήσουν.
+set_set_aside	Παραμερισμός
+set_unreadable_resets_confirm_title	Παραμερισμός των μη αναγνώσιμων απορρίψεων;
+set_unreadable_resets_confirm_detail	Οι τίτλοι αναπαράγονται και οι θέσεις ανάγνωσης αποστέλλονται ξανά. Απορρίψτε ξανά την πρόοδο για όποιον τίτλο θέλετε ακόμη να ξεκινήσετε από την αρχή.
+set_signed_in	Συνδεδεμένος
+set_other_accounts	Άλλοι λογαριασμοί
+set_server_sign_in_required	%1$s · απαιτείται σύνδεση
+set_remove_account	Αφαίρεση %1$s
+set_switch_to_account	Μετάβαση σε αυτόν τον λογαριασμό
+set_add_account	Προσθήκη λογαριασμού
+set_sign_out_of	Αποσύνδεση από %1$s
+set_sign_out_detail	Αφαιρεί αυτόν τον λογαριασμό από τη συσκευή. Οι λήψεις και η μη απεσταλμένη ακρόασή του παραμένουν μέχρι να συνδεθεί ξανά.
+set_accounts_footer	Κάθε λογαριασμός διατηρεί τη δική του πρόοδο, λήψεις και επιλογή βιβλιοθήκης. Η εναλλαγή δεν τα αναμειγνύει ποτέ.
+set_remove_account_confirm	Αφαίρεση %1$s;
+set_remove_account_detail	Μπορείτε να προσθέσετε ξανά τον λογαριασμό αργότερα. Οι λήψεις και η μη απεσταλμένη ακρόασή του παραμένουν σε αυτήν τη συσκευή.
+set_add_an_account	Προσθήκη λογαριασμού
+set_connect_intro	Συνδεθείτε απευθείας στον δικό σας διακομιστή. Τίποτα δεν περνά μέσω άλλης υπηρεσίας.
+set_change_server	Αλλαγή διακομιστή
+set_sign_in	Σύνδεση
+set_sign_in_openid	Σύνδεση με OpenID
+set_saved_accounts	Αποθηκευμένοι λογαριασμοί
+set_use_account	Χρήση
+set_edit	Επεξεργασία
+set_add_podcast	Προσθήκη πόντκαστ
+set_not_available_yet	Δεν είναι ακόμη διαθέσιμο
+set_not_available_yet_detail	Αυτό το τμήμα της προεπισκόπησης βρίσκεται ακόμη υπό κατασκευή.
+set_import_previous_app	Εισαγωγή από την προηγούμενη εφαρμογή
+set_import_interrupted	Μια εισαγωγή δεν ολοκληρώθηκε. Επιλέξτε την ίδια εξαγωγή για να συνεχίσετε από εκεί που σταμάτησε.
+set_import_already	Αυτή η εξαγωγή έχει ήδη εισαχθεί. Οι τίτλοι, η ακρόαση και οι θέσεις της βρίσκονται σε αυτήν τη συσκευή.
+set_import_preflight	%1$s\nΗ προηγούμενη εφαρμογή και αυτό το αρχείο μόνο διαβάζονται· τίποτα σε αυτά δεν αλλάζει. Οι τίτλοι, η ακρόαση και οι θέσεις συνδέονται με έναν λογαριασμό μόλις αυτός συνδεθεί εδώ. Οι κωδικοί πρόσβασης δεν περιλαμβάνονται στην εξαγωγή, οπότε κάθε λογαριασμός συνδέεται ξανά.
+set_import_account_signed_in	%1$s · συνδεδεμένος
+set_import_account_sign_in_later	%1$s · σύνδεση μετά την εισαγωγή
+set_import_titles	Τίτλοι
+set_import_title_partial	%1$s · τα υπόλοιπα θα ληφθούν ξανά
+set_not_imported	Δεν εισήχθη
+set_import_space	Απαιτούνται %1$s· ελεύθερα %2$s.
+set_import_no_space	Δεν υπάρχει αρκετός ελεύθερος χώρος σε αυτήν τη συσκευή. Ελευθερώστε χώρο και επιλέξτε ξανά την εξαγωγή.
+set_import_progress	Αντιγραφή αρχείων: %1$d από %2$d. Αν η εφαρμογή κλείσει, επιλέξτε ξανά την ίδια εξαγωγή για να συνεχίσετε.
+set_import_done	Εισήχθησαν %1$d τίτλοι, %2$d συνεδρίες ακρόασης και %3$d θέσεις. Εφαρμόστηκαν οι ρυθμίσεις της προηγούμενης εφαρμογής.
+set_import_waiting	Συνδεθείτε στο %1$s ως %2$s για να συνδέσετε τους τίτλους, την ακρόαση και τις θέσεις του.
+set_import	Εισαγωγή
+set_continue	Συνέχεια
+set_close	Κλείσιμο
+set_import_file_unreadable	Δεν ήταν δυνατή η ανάγνωση του επιλεγμένου αρχείου. Επιλέξτε το ξανά ή αποθηκεύστε το πρώτα σε αυτήν τη συσκευή.
+set_import_stopped	Η εισαγωγή σταμάτησε πριν ολοκληρωθεί. Δεν χάθηκε τίποτα: επιλέξτε ξανά την ίδια εξαγωγή για να συνεχίσετε από εκεί που σταμάτησε.
+set_import_item_gone	Δεν υπάρχει πλέον στον διακομιστή, οπότε δεν υιοθετήθηκε.
+set_import_file_changed	Ένα αρχείο άλλαξε σε αυτήν τη συσκευή μετά την εισαγωγή του, οπότε λαμβάνεται ξανά από τον διακομιστή.
+set_openid_not_enabled	Η σύνδεση με OpenID δεν είναι ενεργοποιημένη σε αυτόν τον διακομιστή. Χρησιμοποιήστε το όνομα χρήστη και τον κωδικό πρόσβασής σας.
+set_openid_canceled	Η σύνδεση μέσω προγράμματος περιήγησης ακυρώθηκε. Οι αποθηκευμένοι λογαριασμοί σας διατηρούνται.
+set_openid_invalid	Δεν ήταν δυνατή η επαλήθευση της απάντησης σύνδεσης από το πρόγραμμα περιήγησης. Δοκιμάστε ξανά τη σύνδεση και ελέγξτε τις ρυθμίσεις ανακατεύθυνσης OpenID του διακομιστή.
+set_vault_unreadable	Δεν ήταν δυνατή η αποκρυπτογράφηση των αποθηκευμένων συνδέσεων. Διατηρούνται στη συσκευή· συνδεθείτε ξανά για να συνεχίσετε.
+set_session_ended	Η συνεδρία σας για το %1$s έληξε. Συνδεθείτε ξανά· η μη απεσταλμένη ακρόαση και οι λήψεις διατηρούνται.
+set_play_blocked_listening_storage	Η ακρόαση πριν κλείσει η εφαρμογή δεν ήταν δυνατό να αποθηκευτεί επειδή ο αποθηκευτικός χώρος δεν είναι διαθέσιμος, οπότε δεν αναπαράγεται τίποτα μέχρι να γίνει δυνατό. Ελευθερώστε χώρο και δοκιμάστε ξανά.
+set_play_blocked_unreadable_resets	Δεν ήταν δυνατή η ανάγνωση των αποθηκευμένων απορρίψεων προόδου, οπότε δεν αναπαράγεται τίποτα μέχρι να επιλυθούν στα Διαγνωστικά.
+set_play_blocked_discarding	Η πρόοδος αυτού του τίτλου απορρίπτεται ακόμη. Θα αναπαραχθεί από την αρχή μόλις ολοκληρωθεί.
+dl_not_saved	Δεν ήταν δυνατή η αποθήκευση της λίστας λήψεων σε αυτήν τη συσκευή, οπότε δεν άλλαξε τίποτα. Ελευθερώστε χώρο αποθήκευσης και δοκιμάστε ξανά.
+dl_not_allowed	Ο λογαριασμός σας δεν επιτρέπεται να κάνει λήψεις.
+dl_no_audio	Αυτό το αντικείμενο δεν έχει ήχο για λήψη.
+dl_no_space	Δεν υπάρχει αρκετός ελεύθερος χώρος σε αυτήν τη συσκευή για %1$s, αφήνοντας ελεύθερο χώρο για το σύστημα.
+dl_folder_lost_nothing_downloaded	Η πρόσβαση στο %1$s αφαιρέθηκε, οπότε δεν έγινε λήψη. Επιλέξτε ξανά τον φάκελο λήψεων στις Ρυθμίσεις.
+dl_downloading_percent	Λήψη %1$d%%
+dl_cancel_download	Ακύρωση λήψης
+dl_downloaded_plays_offline	Ληφθέν · παίζει εκτός σύνδεσης
+dl_failed	Η λήψη απέτυχε.
+dl_discard	Απόρριψη
+dl_cellular_title	Λήψη με δεδομένα κινητής;
+dl_cellular_message	Βρίσκεστε σε σύνδεση με χρέωση δεδομένων. Μπορείτε να το αλλάξετε στις Ρυθμίσεις.
+dl_not_now	Όχι τώρα
+dl_folder_cannot_be_kept	Αυτός ο φάκελος δεν μπορεί να διατηρηθεί για λήψεις. Επιλέξτε άλλον.
+dl_saved_in_folder	Οι λήψεις αποθηκεύονται στο %1$s
+dl_saved_in_app_storage	Οι λήψεις αποθηκεύονται στον χώρο της εφαρμογής
+dl_folder_visible_to_other_apps	Άλλες εφαρμογές σε αυτήν τη συσκευή μπορούν να δουν αυτά τα αρχεία. Οι λήψεις που έγιναν πριν από μια αλλαγή παραμένουν εκεί που βρίσκονται.
+dl_folder_private_to_app	Μόνο αυτή η εφαρμογή μπορεί να δει αυτά τα αρχεία. Επιλέξτε έναν φάκελο για να διατηρείτε τις λήψεις εκεί όπου έχουν πρόσβαση άλλες εφαρμογές.
+dl_choose_folder	Επιλογή φακέλου
+dl_use_app_storage	Χρήση χώρου της εφαρμογής
+dl_ebook_missing	Το ηλεκτρονικό βιβλίο λείπει από αυτήν τη συσκευή. Κάντε ξανά λήψη για να το ανοίξετε.
+dl_no_app_opens_format	Καμία εφαρμογή σε αυτήν τη συσκευή δεν ανοίγει αρχεία %1$s. Εγκαταστήστε μία που τα ανοίγει και δοκιμάστε ξανά.
+dl_no_app_opens_this_kind	Καμία εφαρμογή σε αυτήν τη συσκευή δεν ανοίγει αυτόν τον τύπο αρχείων. Εγκαταστήστε μία που τα ανοίγει και δοκιμάστε ξανά.
+dl_folder_lost_choose_again_open	Αυτή η λήψη βρίσκεται στο %1$s και η πρόσβαση στο %1$s αφαιρέθηκε. Επιλέξτε ξανά το %1$s για να την ανοίξετε.
+dl_folder_lost_choose_again_play	Αυτή η λήψη βρίσκεται στο %1$s και η πρόσβαση στο %1$s αφαιρέθηκε. Επιλέξτε ξανά το %1$s για να την αναπαραγάγετε.
+dl_names_or	%1$s ή %2$s
+dl_names_and	%1$s και %2$s
+dl_remove_title	Αφαίρεση λήψης;
+dl_remove_message	Το «%1$s» θα αφαιρεθεί από αυτήν τη συσκευή. Η πρόοδος ακρόασής σας διατηρείται.
+dl_keep	Διατήρηση
+dl_not_that_folder	Αυτό δεν είναι το %1$s. Επιλέξτε τον φάκελο στον οποίο βρίσκονται αυτές οι λήψεις.
+dl_folder_access_not_kept	Δεν ήταν δυνατή η διατήρηση της πρόσβασης σε αυτόν τον φάκελο. Δοκιμάστε ξανά.
+dl_no_downloads	Δεν υπάρχουν λήψεις
+dl_no_downloads_message	Κάντε λήψη βιβλίων ή επεισοδίων από τη σελίδα τους για να τα ακούτε χωρίς σύνδεση.
+dl_access_removed_title	Η πρόσβαση στο %1$s αφαιρέθηκε
+dl_downloads_kept_there:one	%1$d λήψη βρίσκεται εκεί. Επιλέξτε ξανά το %2$s για να την αναπαραγάγετε και να την ανοίξετε.
+dl_downloads_kept_there:other	%1$d λήψεις βρίσκονται εκεί. Επιλέξτε ξανά το %2$s για να τις αναπαραγάγετε και να τις ανοίξετε.
+dl_choose_again	Επιλέξτε ξανά το %1$s
+dl_some_files_missing	Ορισμένα αρχεία λείπουν από αυτήν τη συσκευή
+dl_size_in_folder	%1$s στο %2$s
+dl_open_in_another_app	Άνοιγμα %1$s σε άλλη εφαρμογή
+dl_download_again_named	Νέα λήψη %1$s
+dl_the_chosen_folder	επιλεγμένο σημείο αποθήκευσης
+dl_files_missing_play	Ορισμένα αρχεία αυτής της λήψης λείπουν από αυτήν τη συσκευή. Κάντε ξανά λήψη για να την αναπαραγάγετε.
+dl_play_named	Αναπαραγωγή %1$s
+dl_retry_named	Επανάληψη %1$s
+dl_cancel_named	Ακύρωση %1$s
+dl_remove_named	Αφαίρεση %1$s
+dl_sign_in_again	Συνδεθείτε ξανά σε αυτόν τον λογαριασμό για να κάνετε λήψη.
+dl_folder_lost_choose_in_downloads	Η πρόσβαση στο %1$s αφαιρέθηκε. Επιλέξτε ξανά τον φάκελο στις Λήψεις.
+dl_connection_interrupted	Η σύνδεση διακόπηκε.
+dl_error_retrying	%1$s Νέα προσπάθεια…
+dl_server_refused	Ο διακομιστής αρνήθηκε τη λήψη.
+dl_server_sent_type_not_audio	Ο διακομιστής έστειλε %1$s αντί για ήχο, οπότε δεν αποθηκεύτηκε τίποτα. Ελέγξτε τον διακομιστή ή τον διακομιστή μεσολάβησης και δοκιμάστε ξανά.
+dl_server_sent_unknown_not_audio	Ο διακομιστής έστειλε άγνωστη απάντηση αντί για ήχο, οπότε δεν αποθηκεύτηκε τίποτα. Ελέγξτε τον διακομιστή ή τον διακομιστή μεσολάβησης και δοκιμάστε ξανά.
+dl_size_mismatch	Το ληφθέν αρχείο ήταν %1$d byte, αλλά ο διακομιστής ανέφερε %2$d, οπότε απορρίφθηκε. Δοκιμάστε ξανά για να γίνει νέα λήψη.
+dl_server_sent_not_pdf	Ο διακομιστής έστειλε κάτι διαφορετικό από το PDF, οπότε δεν αποθηκεύτηκε τίποτα. Ελέγξτε τον διακομιστή ή τον διακομιστή μεσολάβησης και δοκιμάστε ξανά.
+dl_notification_downloading	Λήψη %1$s
+rd_positions_not_restored	Δεν ήταν δυνατή η επαναφορά των αποθηκευμένων θέσεων ανάγνωσης, οπότε οι σελίδες δεν αποθηκεύονται. Τα αρχικά δεδομένα διατηρούνται.
+rd_positions_not_overwritten	Δεν ήταν δυνατή η ανάγνωση των αποθηκευμένων θέσεων ανάγνωσης, οπότε δεν αντικαθίστανται.
+rd_not_a_pdf	Αυτό το αρχείο δεν είναι PDF που μπορεί να ανοίξει αυτή η συσκευή.
+rd_document_not_opened	Δεν ήταν δυνατό το άνοιγμα του εγγράφου.
+rd_page_not_saved	Δεν ήταν δυνατή η αποθήκευση αυτής της σελίδας σε αυτήν τη συσκευή.
+rd_choice_not_saved	Δεν ήταν δυνατή η αποθήκευση της επιλογής σας σε αυτήν τη συσκευή.
+rd_conflict_title	Συνέχεια από πού;
+rd_conflict_page	Μια άλλη συσκευή έφτασε στη σελίδα %1$d ενώ η σελίδα %2$d εδώ δεν είχε ακόμη αποθηκευτεί στον διακομιστή.
+rd_conflict_location	Μια άλλη συσκευή αποθήκευσε μια θέση ανάγνωσης που αυτό το πρόγραμμα ανάγνωσης δεν μπορεί να εμφανίσει ως σελίδα, ενώ η σελίδα %1$d εδώ δεν είχε ακόμη αποθηκευτεί στον διακομιστή.
+rd_go_to_page_number	Μετάβαση στη σελίδα %1$d
+rd_keep_other_position	Διατήρηση της άλλης θέσης
+rd_stay_on_page	Παραμονή στη σελίδα %1$d
+rd_close_reader	Κλείσιμο προγράμματος ανάγνωσης
+rd_rotate_pages	Περιστροφή σελίδων
+rd_continuous_scrolling	Συνεχής κύλιση
+rd_document_error_title	Δεν ήταν δυνατό το άνοιγμα αυτού του εγγράφου
+rd_try_again	Δοκιμάστε ξανά
+rd_go_to_page	Μετάβαση σε σελίδα
+rd_previous_page	Προηγούμενη σελίδα
+rd_next_page	Επόμενη σελίδα
+rd_page_of	Σελίδα %1$d από %2$d
+rd_page_number	Σελίδα %1$d
+rd_download_folder_lost	Αυτή η λήψη βρίσκεται στο %1$s και η πρόσβαση στο %1$s αφαιρέθηκε. Επιλέξτε ξανά τον φάκελο στις Λήψεις.
+rd_downloaded_document_missing	Το ληφθέν έγγραφο λείπει από αυτήν τη συσκευή. Κάντε ξανά λήψη.
+rd_document_not_stored	Δεν ήταν δυνατή η αποθήκευση του εγγράφου για ανάγνωση.
+rd_supplementary_pdf	συμπληρωματικό PDF
+rd_format_not_available	Η ανάγνωση %1$s δεν είναι ακόμη διαθέσιμη σε αυτήν την προεπισκόπηση. Η θέση ανάγνωσής σας στον διακομιστή διατηρείται.
+rd_ebook_not_available	Η ανάγνωση αυτού του ηλεκτρονικού βιβλίου δεν είναι ακόμη διαθέσιμη σε αυτήν την προεπισκόπηση. Η θέση ανάγνωσής σας στον διακομιστή διατηρείται.
+grp_unavailable_title	Μη διαθέσιμος τίτλος
+grp_could_not_load_collections	Δεν ήταν δυνατή η φόρτωση των συλλογών.
+grp_could_not_load_playlists	Δεν ήταν δυνατή η φόρτωση των λιστών αναπαραγωγής.
+grp_collections_unavailable	Οι συλλογές δεν είναι διαθέσιμες
+grp_playlists_unavailable	Οι λίστες αναπαραγωγής δεν είναι διαθέσιμες
+grp_no_collections_yet	Δεν υπάρχουν ακόμη συλλογές
+grp_no_playlists_yet	Δεν υπάρχουν ακόμη λίστες αναπαραγωγής
+grp_create_one_hint	Δημιουργήστε μία για να κρατάτε τίτλους μαζί με τη δική σας σειρά.
+grp_title_count:one	%1$d τίτλος
+grp_title_count:other	%1$d τίτλοι
+grp_collection_deleted	Αυτή η συλλογή διαγράφηκε.
+grp_playlist_deleted	Αυτή η λίστα αναπαραγωγής διαγράφηκε.
+grp_could_not_load	Δεν ήταν δυνατή η φόρτωση.
+grp_collection_unavailable	Η συλλογή δεν είναι διαθέσιμη
+grp_playlist_unavailable	Η λίστα αναπαραγωγής δεν είναι διαθέσιμη
+grp_nothing_in_collection_can_play	Τίποτα σε αυτήν τη συλλογή δεν μπορεί να αναπαραχθεί.
+grp_nothing_in_playlist_can_play	Τίποτα σε αυτήν τη λίστα αναπαραγωγής δεν μπορεί να αναπαραχθεί.
+grp_could_not_start_playback	Δεν ήταν δυνατή η έναρξη της αναπαραγωγής.
+grp_resume	Συνέχιση
+grp_play_collection	Αναπαραγωγή συλλογής
+grp_play_playlist	Αναπαραγωγή λίστας
+grp_edit_collection	Επεξεργασία συλλογής
+grp_edit_playlist	Επεξεργασία λίστας αναπαραγωγής
+grp_delete_collection	Διαγραφή συλλογής
+grp_delete_playlist	Διαγραφή λίστας αναπαραγωγής
+grp_no_titles_yet	Δεν υπάρχουν ακόμη τίτλοι
+grp_delete_collection_question	Διαγραφή συλλογής;
+grp_delete_playlist_question	Διαγραφή λίστας αναπαραγωγής;
+grp_delete_group_explanation	Το «%1$s» αφαιρείται από τον διακομιστή σας. Οι τίτλοι που περιέχει διατηρούνται.
+grp_not_deleted	Δεν διαγράφηκε: %1$s
+grp_not_deleted_try_again	Δεν διαγράφηκε: δοκιμάστε ξανά
+grp_not_allowed_to_change_collection	Ο λογαριασμός σας στον διακομιστή δεν επιτρέπεται να αλλάξει αυτήν τη συλλογή.
+grp_not_allowed_to_change_playlist	Ο λογαριασμός σας στον διακομιστή δεν επιτρέπεται να αλλάξει αυτήν τη λίστα αναπαραγωγής.
+grp_collection_no_longer_exists	Αυτή η συλλογή δεν υπάρχει πλέον.
+grp_playlist_no_longer_exists	Αυτή η λίστα αναπαραγωγής δεν υπάρχει πλέον.
+grp_not_saved	Δεν αποθηκεύτηκε: %1$s
+grp_not_saved_try_again	Δεν αποθηκεύτηκε: δοκιμάστε ξανά
+grp_saving	Αποθήκευση…
+grp_create_collection	Δημιουργία συλλογής
+grp_create_playlist	Δημιουργία λίστας αναπαραγωγής
+grp_save_changes	Αποθήκευση αλλαγών
+grp_choose_at_least_one_title	Επιλέξτε τουλάχιστον έναν τίτλο.
+grp_order	Σειρά
+grp_move_up	Μετακίνηση του %1$s προς τα πάνω
+grp_remove_member	Αφαίρεση %1$s
+grp_add_titles	Προσθήκη τίτλων
+grp_add_episodes_hint	Προσθέστε επεισόδια από τη σελίδα επεισοδίου ενός πόντκαστ.
+grp_add_to_playlist_or_collection	Προσθήκη σε λίστα αναπαραγωγής ή συλλογή
+grp_add_to	Προσθήκη σε
+grp_nothing_to_add_to	Δεν υπάρχει ακόμη κάτι εδώ στο οποίο να μπορείτε να προσθέσετε.
+grp_added_to	Προστέθηκε σε %1$s
+grp_not_added	Δεν προστέθηκε: %1$s
+grp_not_added_try_again	Δεν προστέθηκε: δοκιμάστε ξανά
+grp_already_included	Περιλαμβάνεται ήδη
+grp_close	Κλείσιμο
+grp_titles_could_not_load	Δεν ήταν δυνατή η φόρτωση των τίτλων
+grp_nothing_here	Δεν υπάρχει τίποτα εδώ
+pod_feed_episodes	Επεισόδια τροφοδοσίας
+pod_sort_newest_first	Νεότερα πρώτα, πατήστε για παλαιότερα πρώτα
+pod_sort_oldest_first	Παλαιότερα πρώτα, πατήστε για νεότερα πρώτα
+pod_episodes_queued:one	%1$d επεισόδιο στην ουρά του διακομιστή σας: %2$s
+pod_episodes_queued:other	%1$d επεισόδια στην ουρά του διακομιστή σας: %2$s
+pod_server_could_not_download	Ο διακομιστής σας δεν μπόρεσε να κατεβάσει το «%1$s».
+pod_dismiss	Παράβλεψη
+pod_no_episodes_yet	Δεν υπάρχουν ακόμη επεισόδια
+pod_no_episodes_match_filter	Κανένα επεισόδιο δεν ταιριάζει με αυτό το φίλτρο
+pod_episode_details	Λεπτομέρειες επεισοδίου
+pod_untitled_episode	Επεισόδιο χωρίς τίτλο
+pod_play_named	Αναπαραγωγή %1$s
+pod_episode_not_available	Το επεισόδιο δεν είναι διαθέσιμο
+pod_episode_may_have_been_removed	Ίσως έχει αφαιρεθεί από τον διακομιστή.
+pod_percent_listened	%1$d%% ακούστηκε
+pod_feed_could_not_open	Δεν ήταν δυνατό το άνοιγμα της τροφοδοσίας.
+pod_retry_feed	Νέα προσπάθεια τροφοδοσίας
+pod_no_feed_episodes	Δεν βρέθηκαν επεισόδια στην τροφοδοσία
+pod_already_on_server	Υπάρχει ήδη στον διακομιστή
+pod_selected	Επιλεγμένο
+pod_not_selected	Μη επιλεγμένο
+pod_no_audio_enclosure	Χωρίς συνημμένο ήχο
+pod_not_queued	Δεν μπήκε στην ουρά: %1$s
+pod_not_queued_try_again	Δεν μπήκε στην ουρά: δοκιμάστε ξανά
+pod_queueing_on_server	Προσθήκη στην ουρά του διακομιστή σας…
+pod_add_selected_episodes	Προσθήκη επιλεγμένων επεισοδίων στον διακομιστή
+pod_something_went_wrong	Κάτι πήγε στραβά.
+pod_adding_not_available	Η προσθήκη πόντκαστ δεν είναι διαθέσιμη
+pod_adding_needs_permission	Ο λογαριασμός σας στον διακομιστή χρειάζεται δικαίωμα διαχείρισης πόντκαστ σε μια βιβλιοθήκη πόντκαστ.
+pod_search_podcasts	Αναζήτηση πόντκαστ
+pod_no_podcasts_found	Δεν βρέθηκαν πόντκαστ
+pod_or_rss_feed_url	Ή URL τροφοδοσίας RSS
+pod_enter_complete_feed_url	Εισαγάγετε ένα πλήρες URL τροφοδοσίας HTTP ή HTTPS.
+pod_preview_feed	Προεπισκόπηση τροφοδοσίας
+pod_create_podcast	Δημιουργία πόντκαστ
+pod_choose_different_feed	Επιλογή άλλης τροφοδοσίας
+item_something_went_wrong	Κάτι πήγε στραβά. Δοκιμάστε ξανά.
+item_feed_subscribe_at	Οι εφαρμογές πόντκαστ μπορούν να εγγραφούν σε αυτόν τον τίτλο στη διεύθυνση:
+item_copied	Αντιγράφηκε
+item_copy_address	Αντιγραφή διεύθυνσης
+item_hidden_from_directories	Κρυφό από τους καταλόγους πόντκαστ
+item_feed_public_warning	Όποιος έχει τη διεύθυνση μπορεί να ακούσει αυτόν τον τίτλο χωρίς σύνδεση στον λογαριασμό.
+item_feed_name	Όνομα τροφοδοσίας
+item_feed_name_rule	Μόνο γράμματα, αριθμοί, - και _
+item_hide_from_directories	Απόκρυψη από τους καταλόγους πόντκαστ
+item_owner_name	Όνομα ιδιοκτήτη
+item_owner_email	Email ιδιοκτήτη
+item_done	Τέλος
+item_sending	Αποστολή…
+item_sent_to	Στάλθηκε σε %1$s
+item_send_ebook_explanation	Ο διακομιστής σας στέλνει με email το ηλεκτρονικό βιβλίο στη συσκευή που επιλέγετε.
+item_ereader_or_ebook_gone	Το %1$s ή αυτό το ηλεκτρονικό βιβλίο δεν είναι πλέον διαθέσιμο στον διακομιστή. Δεν στάλθηκε τίποτα.
+item_not_sent_to	Δεν στάλθηκε σε %1$s. %2$s
+item_not_saved_try_again	Δεν αποθηκεύτηκε. Δοκιμάστε ξανά.
+item_mark_unfinished	Σήμανση ως μη ολοκληρωμένο
+item_discard_uncertain	Μια προηγούμενη αποθήκευση της προόδου αυτού του τίτλου δεν έλαβε απάντηση και μπορεί ακόμη να φτάσει στον διακομιστή σας. Αν φτάσει μετά την απόρριψη, επαναφέρει την πρόοδο. Ο διακομιστής σας δεν μπορεί να πει σε αυτήν την εφαρμογή αν θα συμβεί αυτό.
+item_discard_anyway	Απόρριψη ούτως ή άλλως
+item_discard_under_way	Αυτή η απόρριψη βρίσκεται ήδη σε εξέλιξη και δεν μπορεί να ανακληθεί.
+item_keep_progress	Διατήρηση προόδου
+item_discard_pending	Απόρριψη προόδου. Ολοκληρώνεται μόλις ο διακομιστής σας γίνει προσβάσιμος και σταλεί η ακρόαση αυτού του τίτλου.
+item_discard_anyway_question	Απόρριψη ούτως ή άλλως;
+item_discard_anyway_explanation	Η πρόοδος αφαιρείται τώρα. Αν η προηγούμενη αποθήκευση φτάσει αργότερα στον διακομιστή σας, η πρόοδος αυτού του τίτλου επανέρχεται και μπορείτε να την απορρίψετε ξανά.
+item_discard	Απόρριψη
+item_discard_progress_question	Απόρριψη προόδου;
+item_discard_progress_explanation	Η θέση σας και η κατάσταση ολοκλήρωσης για αυτόν τον τίτλο αφαιρούνται από τον διακομιστή για κάθε συσκευή.
+item_could_not_load	Δεν ήταν δυνατή η φόρτωση αυτού του τίτλου
+item_narrated_by	Αφήγηση
+item_series	Σειρά: %1$s
+item_series_with_sequence	Σειρά: %1$s #%2$s
+item_episode_count:one	%1$d επεισόδιο
+item_episode_count:other	%1$d επεισόδια
+item_listened_and_left	%1$d%% ακούστηκε · απομένουν %2$s
+item_chapter_number	Κεφάλαιο %1$d
+pl_minimize_player	Ελαχιστοποίηση αναπαραγωγής
+pl_nothing_playing	Δεν αναπαράγεται τίποτα
+pl_chapter_number	Κεφάλαιο %1$d
+pl_try_again	Δοκιμάστε ξανά
+pl_speed_value	Ταχύτητα %1$s
+pl_sleep	Ύπνος
+pl_position_of_duration	%1$s από %2$s
+pl_buffering	Προσωρινή αποθήκευση
+pl_previous_chapter	Προηγούμενο κεφάλαιο
+pl_next_chapter	Επόμενο κεφάλαιο
+pl_jump_forward_seconds:one	Μετάβαση %1$d δευτερόλεπτο μπροστά
+pl_jump_forward_seconds:other	Μετάβαση %1$d δευτερόλεπτα μπροστά
+pl_jump_back_seconds:one	Μετάβαση %1$d δευτερόλεπτο πίσω
+pl_jump_back_seconds:other	Μετάβαση %1$d δευτερόλεπτα πίσω
+pl_jump_forward_minutes:one	Μετάβαση %1$d λεπτό μπροστά
+pl_jump_forward_minutes:other	Μετάβαση %1$d λεπτά μπροστά
+pl_jump_back_minutes:one	Μετάβαση %1$d λεπτό πίσω
+pl_jump_back_minutes:other	Μετάβαση %1$d λεπτά πίσω
+pl_open_player	Άνοιγμα αναπαραγωγής
+pl_playback_stopped	Η αναπαραγωγή σταμάτησε
+pl_listening_unsaved	Μέρος της ακρόασης δεν έχει ακόμη αποθηκευτεί σε αυτήν τη συσκευή. Διατηρείται και θα αποθηκευτεί μόλις το επιτρέψει ο αποθηκευτικός χώρος.
+pl_playing	Αναπαράγεται
+pl_resume	Συνέχιση
+pl_streaming_cellular_refused	Η μετάδοση με δεδομένα κινητής είναι απενεργοποιημένη στις Ρυθμίσεις. Συνδεθείτε σε Wi-Fi ή κάντε πρώτα λήψη αυτού του τίτλου.
+pl_stream_cellular_title	Μετάδοση με δεδομένα κινητής;
+pl_stream_cellular_message	Βρίσκεστε σε σύνδεση με χρέωση δεδομένων. Μπορείτε να το αλλάξετε στις Ρυθμίσεις.
+pl_not_now	Όχι τώρα
+pl_sleep_stops_end_of_chapter	Σταματά στο τέλος αυτού του κεφαλαίου, σε %1$s
+pl_sleep_stops_in	Σταματά σε %1$s
+pl_sleep_minus_minutes	−%1$d λεπ.
+pl_sleep_plus_minutes	+%1$d λεπ.
+pl_sleep_minutes	%1$d λεπ.
+pl_sleep_turn_off	Απενεργοποίηση
+pl_bookmark_not_saved_reason	Ο σελιδοδείκτης δεν αποθηκεύτηκε: %1$s
+pl_bookmark_not_saved	Ο σελιδοδείκτης δεν αποθηκεύτηκε: δοκιμάστε ξανά
+pl_bookmark_add_at	Προσθήκη στο %1$s
+pl_bookmark_go_to	Μετάβαση στον σελιδοδείκτη
+pl_bookmark_default	Σελιδοδείκτης
+pl_bookmark_rename_named	Μετονομασία %1$s
+pl_bookmark_delete_named	Διαγραφή %1$s
+pl_bookmark_at	Σελιδοδείκτης στο %1$s
+pl_bookmark_rename	Μετονομασία σελιδοδείκτη
+pl_bookmark_new	Νέος σελιδοδείκτης
+pl_untitled	Χωρίς τίτλο
+pl_playback_stopped_reason	Η αναπαραγωγή σταμάτησε: %1$s. Η θέση σας διατηρείται.
+pl_playback_stopped_unknown	Η αναπαραγωγή σταμάτησε: δεν ήταν δυνατή η φόρτωση του ήχου. Η θέση σας διατηρείται.
+pl_no_playable_audio	Αυτό το αντικείμενο δεν έχει ήχο που μπορεί να αναπαραχθεί.
+pl_could_not_start	Δεν ήταν δυνατή η έναρξη της αναπαραγωγής.
+pl_listening_save_failed	Δεν ήταν δυνατή η αποθήκευση της ακρόασης σε αυτήν τη συσκευή, οπότε η αναπαραγωγή τέθηκε σε παύση. Ελευθερώστε χώρο αποθήκευσης και δοκιμάστε ξανά.
+cast_casting_to	Μετάδοση σε %1$s
+cast_cast	Μετάδοση
+cast_playing_on	Αναπαραγωγή σε %1$s
+cast_connecting_to	Σύνδεση σε %1$s…
+cast_playing_on_phone	Αναπαραγωγή σε αυτό το τηλέφωνο
+cast_stop	Διακοπή μετάδοσης
+cast_looking	Αναζήτηση συσκευών μετάδοσης…
+cast_none_found	Δεν βρέθηκαν συσκευές μετάδοσης. Βεβαιωθείτε ότι ο δέκτης είναι ενεργοποιημένος και στο ίδιο δίκτυο Wi-Fi με αυτό το τηλέφωνο.
+cast_close	Κλείσιμο
+cast_download_not_castable	Τα ληφθέντα αντίγραφα αναπαράγονται μόνο σε αυτό το τηλέφωνο. Διακόψτε τη μετάδοση για να ακούσετε εδώ ή κάντε μετάδοση ροής του τίτλου.
+cast_resumed_without_title	Η μετάδοση σταμάτησε επειδή η εφαρμογή επανεκκινήθηκε κατά τη μετάδοση. Ανοίξτε ξανά τον τίτλο για να συνεχίσετε την ακρόαση από το τελευταίο σημείο που αποθήκευσε αυτό το τηλέφωνο.
+cast_needs_play_services	Η μετάδοση απαιτεί τις υπηρεσίες Google Play, τις οποίες αυτή η συσκευή δεν διαθέτει ή πρέπει να ενημερώσει.
+cast_could_not_start	Δεν ήταν δυνατή η έναρξη μετάδοσης σε αυτήν τη συσκευή: %1$s.
+cast_connect_failed_named	Δεν ήταν δυνατή η σύνδεση σε %1$s. Βεβαιωθείτε ότι είναι ενεργοποιημένο και στο ίδιο δίκτυο Wi-Fi με αυτό το τηλέφωνο.
+cast_connect_failed	Δεν ήταν δυνατή η σύνδεση στον δέκτη. Βεβαιωθείτε ότι είναι ενεργοποιημένος και στο ίδιο δίκτυο Wi-Fi με αυτό το τηλέφωνο.
+cast_connection_lost_named	Η σύνδεση με %1$s χάθηκε. Η αναπαραγωγή συνεχίζεται σε αυτό το τηλέφωνο.
+cast_connection_lost	Η σύνδεση με τον δέκτη χάθηκε. Η αναπαραγωγή συνεχίζεται σε αυτό το τηλέφωνο.
+auto_continue	Συνέχεια
+auto_recent	Πρόσφατα
+auto_discovery	Ανακάλυψη
+auto_authors_count:one	%1$d συγγραφέας
+auto_authors_count:other	%1$d συγγραφείς
+auto_series_count:one	%1$d σειρά
+auto_series_count:other	%1$d σειρές
+lib_books_count:one	%1$d βιβλίο
+lib_books_count:other	%1$d βιβλία
+lib_items_count:one	%1$d αντικείμενο
+lib_items_count:other	%1$d αντικείμενα
+lib_filter_tag	Ετικέτα
+lib_filter_no_series	Χωρίς σειρά
+lib_selected	Επιλεγμένο
+lib_all_filters	Όλα τα φίλτρα
+lib_nothing_to_filter	Δεν υπάρχει τίποτα για φιλτράρισμα εδώ.
+lib_sort_descending_switch	Φθίνουσα, αλλαγή σε αύξουσα
+lib_sort_ascending_switch	Αύξουσα, αλλαγή σε φθίνουσα
+lib_sort_descending	Φθίνουσα
+lib_sort_ascending	Αύξουσα
+lib_unavailable	Η βιβλιοθήκη δεν είναι διαθέσιμη
+lib_unavailable_message	%1$s Ο λογαριασμός σας και η μη απεσταλμένη ακρόαση διατηρούνται.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Εμφάνιση εξωφύλλων
+lib_show_list	Εμφάνιση λίστας
+lib_filtered	Φιλτραρισμένο
+lib_empty_title	Δεν υπάρχει τίποτα εδώ ακόμη
+lib_empty_message	Αυτή η βιβλιοθήκη δεν έχει αντικείμενα στα οποία έχετε πρόσβαση.
+lib_page_error	Δεν ήταν δυνατή η φόρτωση περισσότερων τίτλων
+lib_card_finished	%1$s, ολοκληρώθηκε
+lib_card_percent_listened	%1$s, ακούστηκε κατά %2$d τοις εκατό
+lib_search_in	Αναζήτηση σε %1$s
+lib_search_library	Αναζήτηση στη βιβλιοθήκη
+lib_clear_search	Εκκαθάριση αναζήτησης
+lib_search_failed	Η αναζήτηση απέτυχε
+lib_search_idle_title	Βρείτε κάτι να ακούσετε
+lib_search_idle_message	Αναζητήστε τίτλους, συγγραφείς, σειρές, αφηγητές και επεισόδια.
+lib_search_no_match	Τίποτα δεν ταιριάζει με «%1$s». Δοκιμάστε λιγότερες λέξεις ή άλλη ορθογραφία.
+err_invalid_server	Εισαγάγετε μια διεύθυνση διακομιστή που ξεκινά με http:// ή https://, για παράδειγμα https://books.example.com/abs.
+err_unsafe_media_url	Ο διακομιστής επέστρεψε διεύθυνση πολυμέσων εκτός αυτού του διακομιστή. Δεν άνοιξε.
+err_sign_in_required	Η συνεδρία σας δεν γίνεται πλέον δεκτή. Συνδεθείτε ξανά· η μη απεσταλμένη ακρόαση διατηρείται.
+err_untrusted	Το πιστοποιητικό του διακομιστή δεν είναι αξιόπιστο για αυτήν τη συσκευή. Εγκαταστήστε την αρχή έκδοσης πιστοποιητικών του διακομιστή σας από Ρυθμίσεις Android > Ασφάλεια > Κρυπτογράφηση και διαπιστευτήρια και δοκιμάστε ξανά.
+err_offline	Δεν ήταν δυνατή η πρόσβαση στον διακομιστή. Ελέγξτε τη διεύθυνση ή τη σύνδεσή σας και δοκιμάστε ξανά.
+err_forbidden	Ο λογαριασμός σας δεν επιτρέπεται να το κάνει αυτό.
+err_not_found	Αυτό το περιεχόμενο δεν είναι πλέον διαθέσιμο στον διακομιστή.
+err_server_problem	Ο διακομιστής είχε ένα προσωρινό πρόβλημα (HTTP %1$d). Δοκιμάστε ξανά.
+err_rejected	Ο διακομιστής απέρριψε το αίτημα (HTTP %1$d).
+err_invalid_response	Ο διακομιστής έστειλε μια απάντηση που αυτή η εφαρμογή δεν μπορεί να διαβάσει.
+err_no_audio	Αυτό το αντικείμενο δεν έχει ήχο που μπορεί να αναπαραχθεί.
+err_login_rejected	Το όνομα χρήστη ή ο κωδικός πρόσβασης δεν έγινε δεκτός.
+err_publications_unreadable	Δεν ήταν δυνατή η ανάγνωση των εγγραφών αναπάντητων αποθηκεύσεων προόδου. Επιλύστε τες πρώτα στα Διαγνωστικά.
+err_discards_unreadable	Δεν ήταν δυνατή η ανάγνωση των αποθηκευμένων απορρίψεων προόδου. Επιλύστε τες πρώτα στα Διαγνωστικά.

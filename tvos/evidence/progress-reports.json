@@ -1,0 +1,50 @@
+[
+  {
+    "path": "/abs/api/session/session/sync",
+    "currentTime": 6,
+    "timeListened": 0,
+    "duration": 20
+  },
+  {
+    "path": "/abs/api/session/session/sync",
+    "timeListened": 2.109049081802368,
+    "duration": 20,
+    "currentTime": 8
+  },
+  {
+    "path": "/abs/api/session/session/sync",
+    "duration": 20,
+    "timeListened": 6.972902059555054,
+    "currentTime": 4.000156208
+  },
+  {
+    "path": "/abs/api/session/session/sync",
+    "timeListened": 2.068743944168091,
+    "duration": 20,
+    "currentTime": 6.000162125
+  },
+  {
+    "path": "/abs/api/session/session/close",
+    "currentTime": 6.000862375,
+    "timeListened": 0,
+    "duration": 20
+  },
+  {
+    "path": "/abs/api/session/session/sync",
+    "duration": 20,
+    "timeListened": 0,
+    "currentTime": 6
+  },
+  {
+    "path": "/abs/api/session/session/sync",
+    "timeListened": 1.3892080783843994,
+    "currentTime": 8,
+    "duration": 20
+  },
+  {
+    "path": "/abs/api/session/session/close",
+    "duration": 20,
+    "currentTime": 8.87348869,
+    "timeListened": 0.6411819458007812
+  }
+]

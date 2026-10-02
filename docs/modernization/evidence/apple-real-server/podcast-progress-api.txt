@@ -1,0 +1,9 @@
+GET /api/me/progress/d9e7cd92-91e4-449a-8ca0-6e66f60fe35a (podcast id, no episode):
+{"id":"38df5c46-6a17-484a-97ed-b829e8e0ee0e","userId":"a8cc33de-2e45-4519-9062-1b30f36cb67f","libraryItemId":"d9e7cd92-91e4-449a-8ca0-6e66f60fe35a","episodeId":"8de975ab-0ad1-4df0-984a-a7fd0345f60f","mediaItemId":"8de975ab-0ad1-4df0-984a-a7fd0345f60f","mediaItemType":"podcastEpisode","duration":25.077551,"progress":0.7638189930507967,"currentTime":19.154709753,"isFinished":true,"hideFromContinueListening":false,"ebookLocation":null,"ebookProgress":0,"lastUpdate":1790928147212,"startedAt":1790927368543,"finishedAt":1790928147243}
+GET /api/me mediaProgress (libraryItemId, episodeId, currentTime, isFinished):
+262f4900-6cbf-4dc0-a751-109bf5a13939 None 75.327409166 False
+f6fefe50-3fc3-4afd-ba73-1f85c6086729 None 0 False
+d9e7cd92-91e4-449a-8ca0-6e66f60fe35a 8de975ab-0ad1-4df0-984a-a7fd0345f60f 19.154709753 True
+fe3e135c-afb7-4f1a-8cb0-b40d86c452cb None 4.075102 True
+d9e7cd92-91e4-449a-8ca0-6e66f60fe35a e7859f80-3e80-4c52-aeb6-9b463da04a19 6.825110253 False
+636e9611-c7a6-490a-8cfa-d2a27766f8ca None 4.075102 True

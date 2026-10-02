@@ -1,0 +1,481 @@
+# Russian drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Учетные записи
+title_new_collection	Новая коллекция
+action_retry	Повторить
+action_read	Читать %1$s
+action_mark_finished	Отметить как завершенное
+choose_library	Выбрать библиотеку
+all_titles	Все элементы
+all_podcasts	Все подкасты
+filter	Фильтр
+sort	Сортировка
+theme_system	Системная
+screen_orientation	Ориентация экрана
+jump_forward	Перемотать вперед
+jump_back	Перемотать назад
+set_settings_not_saved	Не удалось сохранить настройки на этом устройстве, поэтому ничего не изменилось. Освободите место и повторите попытку.
+set_orientation_follow_device	Как на устройстве
+set_orientation_portrait	Книжная
+set_orientation_landscape	Альбомная
+set_haptic_light	Слабая
+set_rewind_on_resume	Немного отматывать назад при возобновлении
+set_rewind_on_resume_detail	Отматывает на несколько секунд назад после паузы и больше после долгой паузы.
+set_seek_system_controls	Перемотка из системных элементов управления
+set_seek_system_controls_detail	Позволяет перемещать ползунок позиции на экране блокировки и в уведомлении.
+set_mp3_index_seeking	Точная перемотка MP3
+set_mp3_index_seeking_detail	Создает индекс перемотки для файлов MP3 с ненадежной длительностью. Перемотка начинается медленнее.
+set_shake_to_reset	Встряхнуть для сброса
+set_shake_to_reset_detail	Встряхивание телефона во время работы таймера запускает его заново.
+set_sleep_fade_out	Затухание звука
+set_sleep_fade_out_detail	Снижает громкость в течение последней минуты.
+set_vibrate_on_reset	Вибрация при сбросе
+set_auto_sleep_timer_detail	Запускает таймер при воспроизведении между %1$s и %2$s.
+set_heading_mobile_data	Мобильный интернет
+set_storage	Хранилище
+set_heading_support	Поддержка
+set_diagnostics	Диагностика
+set_something_went_wrong	Что-то пошло не так.
+set_statistics_unavailable	Статистика недоступна
+set_try_again	Повторить попытку
+set_minutes_listened:one	%1$d минута прослушивания
+set_minutes_listened:few	%1$d минуты прослушивания
+set_minutes_listened:many	%1$d минут прослушивания
+set_minutes_listened:other	%1$d минуты прослушивания
+set_days_listened:one	%1$d день прослушивания
+set_days_listened:few	%1$d дня прослушивания
+set_days_listened:many	%1$d дней прослушивания
+set_days_listened:other	%1$d дня прослушивания
+set_titles_finished:one	%1$d элемент завершен
+set_titles_finished:few	%1$d элемента завершено
+set_titles_finished:many	%1$d элементов завершено
+set_titles_finished:other	%1$d элемента завершено
+set_day_minutes_listened:one	%1$s, %2$d минута прослушивания
+set_day_minutes_listened:few	%1$s, %2$d минуты прослушивания
+set_day_minutes_listened:many	%1$s, %2$d минут прослушивания
+set_day_minutes_listened:other	%1$s, %2$d минуты прослушивания
+set_set_aside_failed	Не удалось отложить. Повторите попытку.
+set_connection	Подключение
+set_diagnostics_area_media	Медиа
+set_diagnostics_area_sync	Синхронизация
+set_unreadable_resets_title	Не удалось прочитать сохраненные сбросы прогресса
+set_unreadable_resets_detail	Среди них может быть любой элемент, поэтому ничего не воспроизводится и позиция чтения не отправляется, пока вы не примете решение. Если их отложить, файл останется на этом устройстве, а прогресс, который они должны были сбросить, останется на сервере.
+set_set_them_aside	Отложить их
+set_listening_storage_title	Не удалось сохранить прослушивание до закрытия приложения
+set_listening_storage_detail	Хранилище на этом устройстве недоступно или заполнено. Пока прослушивание не сохранено, ничего не воспроизводится и не отправляется; до тех пор оно хранится.
+set_unreadable_writes_title	Не удалось прочитать записи о сохранениях прогресса без ответа
+set_unreadable_writes_detail	Сохранение любого элемента еще может дойти до сервера, поэтому прослушивание и чтение не отправляются и прогресс не сбрасывается, пока вы не примете решение. Если их отложить, файл останется на этом устройстве; запоздавшее сохранение может вернуть сброшенный прогресс.
+set_diagnostics_server	Сервер %1$s
+set_diagnostics_signed_in_as	Вход выполнен как %1$s
+set_diagnostics_app_version	Приложение %1$s
+set_recent_problems	Недавние проблемы
+set_clear	Очистить
+set_no_problems	На этом устройстве проблем не зафиксировано.
+set_unreadable_writes_confirm_title	Отложить нечитаемые записи?
+set_unreadable_writes_confirm_detail	Позиции прослушивания и чтения снова будут отправляться, а сбросы смогут выполниться.
+set_set_aside	Отложить
+set_unreadable_resets_confirm_title	Отложить нечитаемые сбросы?
+set_unreadable_resets_confirm_detail	Элементы снова будут воспроизводиться, а позиции чтения отправляться. Сбросьте прогресс еще раз для тех элементов, которые хотите начать заново.
+set_signed_in	Вход выполнен
+set_other_accounts	Другие учетные записи
+set_server_sign_in_required	%1$s · требуется вход
+set_remove_account	Удалить %1$s
+set_switch_to_account	Переключиться на эту учетную запись
+set_add_account	Добавить учетную запись
+set_sign_out_of	Выйти из %1$s
+set_sign_out_detail	Удаляет эту учетную запись с устройства. Загрузки и неотправленное прослушивание сохранятся до повторного входа.
+set_accounts_footer	У каждой учетной записи свой прогресс, загрузки и выбор библиотеки. При переключении они не смешиваются.
+set_remove_account_confirm	Удалить %1$s?
+set_remove_account_detail	Учетную запись можно будет добавить позже. Ее загрузки и неотправленное прослушивание останутся на этом устройстве.
+set_add_an_account	Добавить учетную запись
+set_connect_intro	Подключайтесь напрямую к своему серверу. Ничего не передается через сторонние сервисы.
+set_change_server	Сменить сервер
+set_sign_in	Войти
+set_sign_in_openid	Войти через OpenID
+set_saved_accounts	Сохраненные учетные записи
+set_use_account	Использовать
+set_edit	Изменить
+set_add_podcast	Добавить подкаст
+set_not_available_yet	Пока недоступно
+set_not_available_yet_detail	Эта часть предварительной версии еще в разработке.
+set_import_previous_app	Импорт из предыдущего приложения
+set_import_interrupted	Импорт не завершился. Выберите тот же экспорт, чтобы продолжить с места остановки.
+set_import_already	Этот экспорт уже импортирован. Элементы, прослушивание и позиции из него есть на этом устройстве.
+set_import_preflight	%1$s\nПредыдущее приложение и этот файл только читаются, в них ничего не меняется. Элементы, прослушивание и позиции привязываются к учетной записи после входа в нее здесь. Паролей в экспорте нет, поэтому в каждую учетную запись нужно войти заново.
+set_import_account_signed_in	%1$s · вход выполнен
+set_import_account_sign_in_later	%1$s · войдите после импорта
+set_import_titles	Элементы
+set_import_title_partial	%1$s · остальное будет загружено заново
+set_not_imported	Не импортировано
+set_import_space	Нужно %1$s; свободно %2$s.
+set_import_no_space	На этом устройстве недостаточно свободного места. Освободите место и снова выберите экспорт.
+set_import_progress	Копирование файлов: %1$d из %2$d. Если приложение закроется, снова выберите тот же экспорт, чтобы продолжить.
+set_import_done	Импортировано элементов: %1$d, сеансов прослушивания: %2$d, позиций: %3$d. Настройки из предыдущего приложения применены.
+set_import_waiting	Войдите на %1$s как %2$s, чтобы привязать его элементы, прослушивание и позиции.
+set_import	Импорт
+set_continue	Продолжить
+set_close	Закрыть
+set_import_file_unreadable	Не удалось прочитать выбранный файл. Выберите его снова или сначала сохраните на это устройство.
+set_import_stopped	Импорт остановился, не завершившись. Ничего не потеряно: снова выберите тот же экспорт, чтобы продолжить с места остановки.
+set_import_item_gone	Его больше нет на сервере, поэтому он не был перенесен.
+set_import_file_changed	Файл изменился на этом устройстве после импорта, поэтому он будет загружен с сервера заново.
+set_openid_not_enabled	Вход через OpenID не включен на этом сервере. Используйте имя пользователя и пароль.
+set_openid_canceled	Вход через браузер отменен. Сохраненные учетные записи не затронуты.
+set_openid_invalid	Не удалось проверить ответ входа через браузер. Повторите вход и проверьте настройки перенаправления OpenID на сервере.
+set_vault_unreadable	Не удалось расшифровать сохраненные данные входа. Они остаются на устройстве; войдите снова, чтобы продолжить.
+set_session_ended	Ваш сеанс на %1$s завершен. Войдите снова; неотправленное прослушивание и загрузки сохранены.
+set_play_blocked_listening_storage	Прослушивание до закрытия приложения не удалось сохранить, так как хранилище недоступно, поэтому воспроизведение невозможно, пока это не получится. Освободите место и повторите попытку.
+set_play_blocked_unreadable_resets	Не удалось прочитать сохраненные сбросы прогресса, поэтому воспроизведение невозможно, пока они не будут разрешены в разделе «Диагностика».
+set_play_blocked_discarding	Прогресс этого элемента еще сбрасывается. После этого воспроизведение начнется с начала.
+dl_not_saved	Не удалось сохранить список загрузок на этом устройстве, поэтому ничего не изменилось. Освободите место и повторите попытку.
+dl_not_allowed	Вашей учетной записи не разрешено скачивать.
+dl_no_audio	У этого элемента нет аудио для скачивания.
+dl_no_space	Недостаточно свободного места на этом устройстве для %1$s с учетом места, необходимого системе.
+dl_folder_lost_nothing_downloaded	Доступ к %1$s был отозван, поэтому ничего не скачано. Снова выберите папку загрузок в настройках.
+dl_downloading_percent	Скачивание: %1$d%%
+dl_cancel_download	Отменить скачивание
+dl_downloaded_plays_offline	Скачано · воспроизводится офлайн
+dl_failed	Скачивание не удалось.
+dl_discard	Удалить
+dl_cellular_title	Скачивать через мобильный интернет?
+dl_cellular_message	Вы используете лимитное подключение. Это можно изменить в настройках.
+dl_not_now	Не сейчас
+dl_folder_cannot_be_kept	Эту папку нельзя использовать для загрузок. Выберите другую.
+dl_saved_in_folder	Загрузки сохраняются в %1$s
+dl_saved_in_app_storage	Загрузки сохраняются в хранилище приложения
+dl_folder_visible_to_other_apps	Другие приложения на этом устройстве видят эти файлы. Загрузки, сделанные до изменения, остаются на месте.
+dl_folder_private_to_app	Только это приложение видит эти файлы. Выберите папку, чтобы загрузки были доступны другим приложениям.
+dl_choose_folder	Выбрать папку
+dl_use_app_storage	Использовать хранилище приложения
+dl_ebook_missing	Электронной книги нет на этом устройстве. Скачайте ее снова, чтобы открыть.
+dl_no_app_opens_format	На этом устройстве нет приложения, открывающего файлы %1$s. Установите такое приложение и повторите попытку.
+dl_no_app_opens_this_kind	На этом устройстве нет приложения, открывающего файлы такого типа. Установите такое приложение и повторите попытку.
+dl_folder_lost_choose_again_open	Эта загрузка находится в %1$s, а доступ к %1$s был отозван. Снова выберите %1$s, чтобы открыть ее.
+dl_folder_lost_choose_again_play	Эта загрузка находится в %1$s, а доступ к %1$s был отозван. Снова выберите %1$s, чтобы воспроизвести ее.
+dl_names_or	%1$s или %2$s
+dl_names_and	%1$s и %2$s
+dl_remove_title	Удалить загрузку?
+dl_remove_message	«%1$s» будет удален с этого устройства. Прогресс прослушивания сохранится.
+dl_keep	Оставить
+dl_not_that_folder	Это не %1$s. Выберите папку, в которой находятся эти загрузки.
+dl_folder_access_not_kept	Не удалось сохранить доступ к этой папке. Повторите попытку.
+dl_no_downloads	Нет загрузок
+dl_no_downloads_message	Скачивайте книги или выпуски на их странице, чтобы слушать без подключения.
+dl_access_removed_title	Доступ к %1$s был отозван
+dl_downloads_kept_there:one	Там хранится %1$d загрузка. Снова выберите %2$s, чтобы воспроизводить и открывать ее.
+dl_downloads_kept_there:few	Там хранятся %1$d загрузки. Снова выберите %2$s, чтобы воспроизводить и открывать их.
+dl_downloads_kept_there:many	Там хранится %1$d загрузок. Снова выберите %2$s, чтобы воспроизводить и открывать их.
+dl_downloads_kept_there:other	Там хранится %1$d загрузки. Снова выберите %2$s, чтобы воспроизводить и открывать их.
+dl_choose_again	Снова выбрать %1$s
+dl_some_files_missing	Некоторых файлов нет на этом устройстве
+dl_size_in_folder	%1$s в %2$s
+dl_open_in_another_app	Открыть %1$s в другом приложении
+dl_download_again_named	Скачать %1$s снова
+dl_the_chosen_folder	выбранной папке
+dl_files_missing_play	Некоторых файлов этой загрузки нет на устройстве. Скачайте ее снова, чтобы воспроизвести.
+dl_play_named	Воспроизвести %1$s
+dl_retry_named	Повторить %1$s
+dl_cancel_named	Отменить %1$s
+dl_remove_named	Удалить %1$s
+dl_sign_in_again	Войдите в эту учетную запись снова, чтобы скачивать.
+dl_folder_lost_choose_in_downloads	Доступ к %1$s был отозван. Снова выберите папку в разделе «Загрузки».
+dl_connection_interrupted	Подключение прервано.
+dl_error_retrying	%1$s Повторная попытка…
+dl_server_refused	Сервер отклонил скачивание.
+dl_server_sent_type_not_audio	Сервер отправил %1$s вместо аудио, поэтому ничего не сохранено. Проверьте сервер или прокси и повторите попытку.
+dl_server_sent_unknown_not_audio	Сервер отправил неизвестный ответ вместо аудио, поэтому ничего не сохранено. Проверьте сервер или прокси и повторите попытку.
+dl_size_mismatch	Размер скачанного файла %1$d байт, а сервер указал %2$d, поэтому файл удален. Повторите попытку, чтобы скачать его снова.
+dl_server_sent_not_pdf	Сервер отправил не PDF, поэтому ничего не сохранено. Проверьте сервер или прокси и повторите попытку.
+rd_positions_not_restored	Не удалось восстановить сохраненные позиции чтения, поэтому страницы не сохраняются. Исходные данные сохранены.
+rd_positions_not_overwritten	Не удалось прочитать сохраненные позиции чтения, поэтому они не перезаписываются.
+rd_not_a_pdf	Этот файл не является PDF, который может открыть это устройство.
+rd_document_not_opened	Не удалось открыть документ.
+rd_page_not_saved	Не удалось сохранить эту страницу на этом устройстве.
+rd_choice_not_saved	Не удалось сохранить ваш выбор на этом устройстве.
+rd_conflict_title	Где продолжить?
+rd_conflict_page	Другое устройство дошло до страницы %1$d, пока страница %2$d здесь еще не была сохранена на сервере.
+rd_conflict_location	Другое устройство сохранило позицию чтения, которую эта читалка не может показать как страницу, пока страница %1$d здесь еще не была сохранена на сервере.
+rd_go_to_page_number	Перейти на страницу %1$d
+rd_keep_other_position	Оставить другую позицию
+rd_stay_on_page	Остаться на странице %1$d
+rd_close_reader	Закрыть читалку
+rd_rotate_pages	Повернуть страницы
+rd_continuous_scrolling	Непрерывная прокрутка
+rd_document_error_title	Не удалось открыть этот документ
+rd_try_again	Повторить попытку
+rd_go_to_page	Перейти на страницу
+rd_previous_page	Предыдущая страница
+rd_next_page	Следующая страница
+rd_page_of	Страница %1$d из %2$d
+rd_page_number	Страница %1$d
+rd_download_folder_lost	Эта загрузка находится в %1$s, а доступ к %1$s был отозван. Снова выберите папку в разделе «Загрузки».
+rd_downloaded_document_missing	Скачанного документа нет на этом устройстве. Скачайте его снова.
+rd_document_not_stored	Не удалось сохранить документ для чтения.
+rd_supplementary_pdf	дополнительный PDF
+rd_format_not_available	Чтение %1$s пока недоступно в этой предварительной версии. Ваша позиция чтения на сервере сохранена.
+rd_ebook_not_available	Чтение этой электронной книги пока недоступно в этой предварительной версии. Ваша позиция чтения на сервере сохранена.
+grp_unavailable_title	Недоступный элемент
+grp_could_not_load_collections	Не удалось загрузить коллекции.
+grp_could_not_load_playlists	Не удалось загрузить плейлисты.
+grp_collections_unavailable	Коллекции недоступны
+grp_playlists_unavailable	Плейлисты недоступны
+grp_no_collections_yet	Коллекций пока нет
+grp_no_playlists_yet	Плейлистов пока нет
+grp_create_one_hint	Создайте коллекцию, чтобы собрать элементы в нужном вам порядке.
+grp_title_count:one	%1$d элемент
+grp_title_count:few	%1$d элемента
+grp_title_count:many	%1$d элементов
+grp_title_count:other	%1$d элемента
+grp_collection_deleted	Эта коллекция была удалена.
+grp_playlist_deleted	Этот плейлист был удален.
+grp_could_not_load	Не удалось загрузить.
+grp_collection_unavailable	Коллекция недоступна
+grp_playlist_unavailable	Плейлист недоступен
+grp_nothing_in_collection_can_play	В этой коллекции нечего воспроизвести.
+grp_nothing_in_playlist_can_play	В этом плейлисте нечего воспроизвести.
+grp_could_not_start_playback	Не удалось начать воспроизведение.
+grp_resume	Продолжить
+grp_play_collection	Воспроизвести коллекцию
+grp_play_playlist	Воспроизвести плейлист
+grp_edit_collection	Изменить коллекцию
+grp_edit_playlist	Изменить плейлист
+grp_delete_collection	Удалить коллекцию
+grp_delete_playlist	Удалить плейлист
+grp_no_titles_yet	Элементов пока нет
+grp_delete_collection_question	Удалить коллекцию?
+grp_delete_playlist_question	Удалить плейлист?
+grp_delete_group_explanation	«%1$s» будет удален с вашего сервера. Элементы в нем сохранятся.
+grp_not_deleted	Не удалено: %1$s
+grp_not_deleted_try_again	Не удалено: повторите попытку
+grp_not_allowed_to_change_collection	Вашей учетной записи на сервере не разрешено изменять эту коллекцию.
+grp_not_allowed_to_change_playlist	Вашей учетной записи на сервере не разрешено изменять этот плейлист.
+grp_collection_no_longer_exists	Этой коллекции больше не существует.
+grp_playlist_no_longer_exists	Этого плейлиста больше не существует.
+grp_not_saved	Не сохранено: %1$s
+grp_not_saved_try_again	Не сохранено: повторите попытку
+grp_name	Название
+grp_saving	Сохранение…
+grp_create_collection	Создать коллекцию
+grp_create_playlist	Создать плейлист
+grp_save_changes	Сохранить изменения
+grp_choose_at_least_one_title	Выберите хотя бы один элемент.
+grp_order	Порядок
+grp_move_up	Переместить %1$s вверх
+grp_remove_member	Удалить %1$s
+grp_add_titles	Добавить элементы
+grp_add_episodes_hint	Добавляйте выпуски на странице выпусков подкаста.
+grp_add_to_playlist_or_collection	Добавить в плейлист или коллекцию
+grp_add_to	Добавить в
+grp_nothing_to_add_to	Пока некуда добавить.
+grp_added_to	Добавлено в %1$s
+grp_not_added	Не добавлено: %1$s
+grp_not_added_try_again	Не добавлено: повторите попытку
+grp_already_included	Уже добавлено
+grp_close	Закрыть
+grp_titles_could_not_load	Не удалось загрузить элементы
+grp_nothing_here	Здесь ничего нет
+pod_feed_episodes	Выпуски ленты
+pod_sort_newest_first	Сначала новые, нажмите, чтобы сначала старые
+pod_sort_oldest_first	Сначала старые, нажмите, чтобы сначала новые
+pod_episodes_queued:one	%1$d выпуск поставлен в очередь на сервере: %2$s
+pod_episodes_queued:few	%1$d выпуска поставлены в очередь на сервере: %2$s
+pod_episodes_queued:many	%1$d выпусков поставлено в очередь на сервере: %2$s
+pod_episodes_queued:other	%1$d выпуска поставлено в очередь на сервере: %2$s
+pod_server_could_not_download	Ваш сервер не смог скачать «%1$s».
+pod_dismiss	Закрыть
+pod_no_episodes_yet	Выпусков пока нет
+pod_no_episodes_match_filter	Нет выпусков, подходящих под этот фильтр
+pod_episode_details	Сведения о выпуске
+pod_untitled_episode	Выпуск без названия
+pod_play_named	Воспроизвести %1$s
+pod_episode_not_available	Выпуск недоступен
+pod_episode_may_have_been_removed	Возможно, он был удален с сервера.
+pod_percent_listened	Прослушано %1$d%%
+pod_feed_could_not_open	Не удалось открыть ленту.
+pod_retry_feed	Повторить загрузку ленты
+pod_no_feed_episodes	В ленте не найдено выпусков
+pod_already_on_server	Уже на сервере
+pod_selected	Выбрано
+pod_not_selected	Не выбрано
+pod_no_audio_enclosure	Нет аудиовложения
+pod_not_queued	Не поставлено в очередь: %1$s
+pod_not_queued_try_again	Не поставлено в очередь: повторите попытку
+pod_queueing_on_server	Постановка в очередь на сервере…
+pod_add_selected_episodes	Добавить выбранные выпуски на сервер
+pod_something_went_wrong	Что-то пошло не так.
+pod_adding_not_available	Добавление подкастов недоступно
+pod_adding_needs_permission	Вашей учетной записи на сервере нужно право на управление подкастами в библиотеке подкастов.
+pod_search_podcasts	Поиск подкастов
+pod_or_rss_feed_url	Или URL-адрес RSS-ленты
+pod_enter_complete_feed_url	Введите полный URL-адрес ленты HTTP или HTTPS.
+pod_preview_feed	Просмотреть ленту
+pod_create_podcast	Создать подкаст
+pod_choose_different_feed	Выбрать другую ленту
+item_something_went_wrong	Что-то пошло не так. Повторите попытку.
+item_feed_subscribe_at	Приложения для подкастов могут подписаться на этот элемент по адресу:
+item_copied	Скопировано
+item_copy_address	Копировать адрес
+item_hidden_from_directories	Скрыто из каталогов подкастов
+item_feed_public_warning	Любой, у кого есть адрес, может слушать этот элемент без входа.
+item_feed_name	Название ленты
+item_feed_name_rule	Только буквы, цифры, - и _
+item_hide_from_directories	Скрыть из каталогов подкастов
+item_done	Готово
+item_sending	Отправка…
+item_sent_to	Отправлено на %1$s
+item_send_ebook_explanation	Ваш сервер отправит электронную книгу по почте на выбранное устройство.
+item_ereader_or_ebook_gone	%1$s или эта электронная книга больше недоступны на сервере. Ничего не отправлено.
+item_not_sent_to	Не отправлено на %1$s. %2$s
+item_not_saved_try_again	Не сохранено. Повторите попытку.
+item_mark_unfinished	Отметить как незавершенное
+item_discard_uncertain	Предыдущее сохранение прогресса этого элемента осталось без ответа и еще может дойти до сервера. Если оно придет после сброса, прогресс вернется. Сервер не может сообщить приложению, произойдет ли это.
+item_discard_anyway	Все равно сбросить
+item_discard_under_way	Этот сброс уже выполняется, и его нельзя отменить.
+item_keep_progress	Сохранить прогресс
+item_discard_pending	Сброс прогресса. Он завершится, когда сервер станет доступен и прослушивание этого элемента будет отправлено.
+item_discard_anyway_question	Все равно сбросить?
+item_discard_anyway_explanation	Прогресс удаляется сейчас. Если предыдущее сохранение дойдет до сервера позже, прогресс этого элемента вернется, и его можно будет сбросить снова.
+item_discard	Сбросить
+item_discard_progress_question	Сбросить прогресс?
+item_discard_progress_explanation	Ваша позиция и отметка о завершении для этого элемента будут удалены с сервера для всех устройств.
+item_could_not_load	Не удалось загрузить этот элемент
+item_narrated_by	Читает
+item_series	Серия: %1$s
+item_series_with_sequence	Серия: %1$s #%2$s
+item_episode_count:one	%1$d выпуск
+item_episode_count:few	%1$d выпуска
+item_episode_count:many	%1$d выпусков
+item_episode_count:other	%1$d выпуска
+item_listened_and_left	Прослушано %1$d%% · осталось %2$s
+item_chapter_number	Глава %1$d
+pl_minimize_player	Свернуть проигрыватель
+pl_nothing_playing	Ничего не воспроизводится
+pl_chapter_number	Глава %1$d
+pl_try_again	Повторить попытку
+pl_speed_value	Скорость %1$s
+pl_sleep	Сон
+pl_position_of_duration	%1$s из %2$s
+pl_buffering	Буферизация
+pl_previous_chapter	Предыдущая глава
+pl_next_chapter	Следующая глава
+pl_jump_forward_seconds:one	Вперед на %1$d секунду
+pl_jump_forward_seconds:few	Вперед на %1$d секунды
+pl_jump_forward_seconds:many	Вперед на %1$d секунд
+pl_jump_forward_seconds:other	Вперед на %1$d секунды
+pl_jump_back_seconds:one	Назад на %1$d секунду
+pl_jump_back_seconds:few	Назад на %1$d секунды
+pl_jump_back_seconds:many	Назад на %1$d секунд
+pl_jump_back_seconds:other	Назад на %1$d секунды
+pl_jump_forward_minutes:one	Вперед на %1$d минуту
+pl_jump_forward_minutes:few	Вперед на %1$d минуты
+pl_jump_forward_minutes:many	Вперед на %1$d минут
+pl_jump_forward_minutes:other	Вперед на %1$d минуты
+pl_jump_back_minutes:one	Назад на %1$d минуту
+pl_jump_back_minutes:few	Назад на %1$d минуты
+pl_jump_back_minutes:many	Назад на %1$d минут
+pl_jump_back_minutes:other	Назад на %1$d минуты
+pl_open_player	Открыть проигрыватель
+pl_playback_stopped	Воспроизведение остановлено
+pl_listening_unsaved	Часть прослушивания еще не сохранена на этом устройстве. Она хранится и будет сохранена, как только позволит хранилище.
+pl_playing	Воспроизводится
+pl_resume	Продолжить
+pl_streaming_cellular_refused	Потоковое воспроизведение через мобильный интернет отключено в настройках. Подключитесь к Wi-Fi или сначала скачайте этот элемент.
+pl_stream_cellular_title	Слушать онлайн через мобильный интернет?
+pl_stream_cellular_message	Вы используете лимитное подключение. Это можно изменить в настройках.
+pl_not_now	Не сейчас
+pl_sleep_stops_end_of_chapter	Остановка в конце этой главы, через %1$s
+pl_sleep_stops_in	Остановка через %1$s
+pl_sleep_minus_minutes	−%1$d мин
+pl_sleep_plus_minutes	+%1$d мин
+pl_sleep_minutes	%1$d мин
+pl_sleep_turn_off	Выключить
+pl_bookmark_not_saved_reason	Закладка не сохранена: %1$s
+pl_bookmark_not_saved	Закладка не сохранена: повторите попытку
+pl_bookmark_add_at	Добавить на %1$s
+pl_bookmark_go_to	Перейти к закладке
+pl_bookmark_default	Закладка
+pl_bookmark_rename_named	Переименовать %1$s
+pl_bookmark_delete_named	Удалить %1$s
+pl_bookmark_at	Закладка на %1$s
+pl_bookmark_rename	Переименовать закладку
+pl_bookmark_new	Новая закладка
+pl_untitled	Без названия
+pl_playback_stopped_reason	Воспроизведение остановлено: %1$s. Ваша позиция сохранена.
+pl_playback_stopped_unknown	Воспроизведение остановлено: не удалось загрузить аудио. Ваша позиция сохранена.
+pl_no_playable_audio	У этого элемента нет аудио для воспроизведения.
+pl_could_not_start	Не удалось начать воспроизведение.
+pl_listening_save_failed	Не удалось сохранить прослушивание на этом устройстве, поэтому воспроизведение приостановлено. Освободите место и повторите попытку.
+cast_casting_to	Трансляция на %1$s
+cast_cast	Трансляция
+cast_playing_on	Воспроизводится на %1$s
+cast_connecting_to	Подключение к %1$s…
+cast_playing_on_phone	Воспроизводится на этом телефоне
+cast_stop	Остановить трансляцию
+cast_looking	Поиск устройств для трансляции…
+cast_none_found	Устройства для трансляции не найдены. Убедитесь, что приемник включен и подключен к той же сети Wi-Fi, что и этот телефон.
+cast_close	Закрыть
+cast_download_not_castable	Скачанные копии воспроизводятся только на этом телефоне. Остановите трансляцию, чтобы слушать здесь, или слушайте этот элемент онлайн.
+cast_resumed_without_title	Трансляция остановлена, так как приложение перезапустилось во время трансляции. Откройте элемент снова, чтобы продолжить с места, последним сохраненного на этом телефоне.
+cast_needs_play_services	Для трансляции нужны сервисы Google Play, которых нет на этом устройстве или которые нужно обновить.
+cast_could_not_start	Не удалось начать трансляцию на этом устройстве: %1$s.
+cast_connect_failed_named	Не удалось подключиться к %1$s. Убедитесь, что устройство включено и подключено к той же сети Wi-Fi, что и этот телефон.
+cast_connect_failed	Не удалось подключиться к приемнику. Убедитесь, что он включен и подключен к той же сети Wi-Fi, что и этот телефон.
+cast_connection_lost_named	Подключение к %1$s потеряно. Воспроизведение продолжается на этом телефоне.
+cast_connection_lost	Подключение к приемнику потеряно. Воспроизведение продолжается на этом телефоне.
+auto_continue	Продолжить
+auto_recent	Недавние
+auto_discovery	Обзор
+auto_authors_count:one	%1$d автор
+auto_authors_count:few	%1$d автора
+auto_authors_count:many	%1$d авторов
+auto_authors_count:other	%1$d автора
+auto_series_count:one	%1$d серия
+auto_series_count:few	%1$d серии
+auto_series_count:many	%1$d серий
+auto_series_count:other	%1$d серии
+lib_books_count:one	%1$d книга
+lib_books_count:few	%1$d книги
+lib_books_count:many	%1$d книг
+lib_books_count:other	%1$d книги
+lib_items_count:one	%1$d элемент
+lib_items_count:few	%1$d элемента
+lib_items_count:many	%1$d элементов
+lib_items_count:other	%1$d элемента
+lib_selected	Выбрано
+lib_all_filters	Все фильтры
+lib_nothing_to_filter	Здесь нечего фильтровать.
+lib_sort_descending_switch	По убыванию, переключить на возрастание
+lib_sort_ascending_switch	По возрастанию, переключить на убывание
+lib_sort_descending	По убыванию
+lib_sort_ascending	По возрастанию
+lib_unavailable	Библиотека недоступна
+lib_unavailable_message	%1$s Ваша учетная запись и неотправленное прослушивание сохранены.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Показать обложки
+lib_show_list	Показать списком
+lib_filtered	С фильтром
+lib_empty_title	Здесь пока ничего нет
+lib_empty_message	В этой библиотеке нет доступных вам элементов.
+lib_page_error	Не удалось загрузить больше элементов
+lib_card_finished	%1$s, завершено
+lib_card_percent_listened	%1$s, прослушано %2$d процентов
+lib_search_in	Поиск: %1$s
+lib_search_library	Поиск в библиотеке
+lib_clear_search	Очистить поиск
+lib_search_failed	Ошибка поиска
+lib_search_idle_title	Найдите, что послушать
+lib_search_idle_message	Ищите названия, авторов, серии, чтецов и выпуски.
+lib_search_no_match	Ничего не найдено по запросу «%1$s». Попробуйте меньше слов или другое написание.
+err_invalid_server	Введите адрес сервера, начинающийся с http:// или https://, например https://books.example.com/abs.
+err_unsafe_media_url	Сервер вернул адрес медиафайла вне этого сервера. Он не был открыт.
+err_sign_in_required	Ваш сеанс больше не принимается. Войдите снова; неотправленное прослушивание сохранено.
+err_untrusted	Сертификат сервера не является доверенным для этого устройства. Установите центр сертификации вашего сервера в разделе «Настройки Android > Безопасность > Шифрование и учетные данные» и повторите попытку.
+err_offline	Не удалось связаться с сервером. Проверьте адрес или подключение и повторите попытку.
+err_forbidden	Вашей учетной записи не разрешено это действие.
+err_not_found	Этот контент больше недоступен на сервере.
+err_server_problem	На сервере временная проблема (HTTP %1$d). Повторите попытку.
+err_rejected	Сервер отклонил запрос (HTTP %1$d).
+err_invalid_response	Сервер отправил ответ, который это приложение не может прочитать.
+err_no_audio	У этого элемента нет аудио для воспроизведения.
+err_login_rejected	Имя пользователя или пароль не приняты.
+err_publications_unreadable	Не удалось прочитать записи о сохранениях прогресса без ответа. Сначала разрешите их в разделе «Диагностика».
+err_discards_unreadable	Не удалось прочитать сохраненные сбросы прогресса. Сначала разрешите их в разделе «Диагностика».

@@ -1,0 +1,10 @@
+patch 200
+progress 1 True 1790928076798
+restarted 17:01:17
+{"results":[{"id":"be971a2f-0729-4e70-bcb3-83555c68ee1c","success":true,"progressSynced":true}]}
+progress 4.075102 True 1790928078776
+progress 4.075102 True 1790928078776
+[2026-10-02 08:01:18.841] INFO: [PlaybackSessionManager] Syncing local session "Catalog Volume 02" (be971a2f-0729-4e70-bcb3-83555c68ee1c) (updatedAt: 1790928078776)
+[2026-10-02 08:01:18.855] INFO: [PlaybackSessionManager] Updating progress for "Catalog Volume 02" with current time 4.075102 (previously 1)
+[2026-10-02 08:01:18.858] INFO: [MediaProgress] Marking media progress as finished because time remaining (0) is less than 10 seconds (media item 7c1ed377-6a0f-4258-9ee7-a08ad6bf85fb)
+[2026-10-02 08:01:18.861] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 08:01:18.776 +00:00' (media item 7c1ed377-6a0f-4258-9ee7-a08ad6bf85fb)

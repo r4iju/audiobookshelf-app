@@ -1,0 +1,448 @@
+# Finnish drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Tilit
+title_new_collection	Uusi kokoelma
+action_retry	Yritä uudelleen
+action_read	Lue %1$s
+action_mark_finished	Merkitse valmiiksi
+choose_library	Valitse kirjasto
+all_titles	Kaikki nimikkeet
+all_podcasts	Kaikki podcastit
+filter	Suodata
+sort	Lajittele
+theme_system	Järjestelmä
+screen_orientation	Näytön suunta
+jump_forward	Hyppää eteenpäin
+jump_back	Hyppää taaksepäin
+set_settings_not_saved	Asetuksia ei voitu tallentaa tähän laitteeseen, joten mitään ei muutettu. Vapauta tallennustilaa ja yritä uudelleen.
+set_orientation_follow_device	Seuraa laitetta
+set_orientation_portrait	Pysty
+set_orientation_landscape	Vaaka
+set_haptic_light	Kevyt
+set_rewind_on_resume	Kelaa hieman taaksepäin jatkettaessa
+set_rewind_on_resume_detail	Palaa muutaman sekunnin taaksepäin tauon jälkeen, pidemmän tauon jälkeen enemmän.
+set_seek_system_controls	Kelaus järjestelmän säätimistä
+set_seek_system_controls_detail	Lukitusnäyttö ja ilmoitus voivat siirtää sijaintipalkkia.
+set_mp3_index_seeking	Tarkka MP3-kelaus
+set_mp3_index_seeking_detail	Luo kelaushakemiston MP3-tiedostoille, joiden pituus on epäluotettava. Kelaus alkaa hitaammin.
+set_shake_to_reset	Nollaa ravistamalla
+set_shake_to_reset_detail	Puhelimen ravistaminen ajastimen käydessä käynnistää sen alusta.
+set_sleep_fade_out	Häivytys
+set_sleep_fade_out_detail	Laskee äänenvoimakkuutta viimeisen minuutin aikana.
+set_vibrate_on_reset	Värinä nollattaessa
+set_auto_sleep_timer_detail	Käynnistää ajastimen, kun toistetaan klo %1$s–%2$s.
+set_heading_mobile_data	Mobiilidata
+set_storage	Tallennustila
+set_heading_support	Tuki
+set_diagnostics	Diagnostiikka
+set_something_went_wrong	Jokin meni pieleen.
+set_statistics_unavailable	Tilastot eivät ole saatavilla
+set_try_again	Yritä uudelleen
+set_minutes_listened:one	%1$d minuutti kuunneltu
+set_minutes_listened:other	%1$d minuuttia kuunneltu
+set_days_listened:one	%1$d kuuntelupäivä
+set_days_listened:other	%1$d kuuntelupäivää
+set_titles_finished:one	%1$d nimike valmiina
+set_titles_finished:other	%1$d nimikettä valmiina
+set_day_minutes_listened:one	%1$s, %2$d minuutti kuunneltu
+set_day_minutes_listened:other	%1$s, %2$d minuuttia kuunneltu
+set_set_aside_failed	Siirtäminen sivuun epäonnistui. Yritä uudelleen.
+set_connection	Yhteys
+set_diagnostics_area_media	Media
+set_diagnostics_area_sync	Synkronointi
+set_unreadable_resets_title	Tallennettuja edistymisen hylkäyksiä ei voitu lukea
+set_unreadable_resets_detail	Mikä tahansa nimike voi olla niiden joukossa, joten mitään ei toisteta eikä lukukohtaa lähetetä ennen kuin päätät. Jos siirrät ne sivuun, tiedosto säilyy tässä laitteessa ja edistyminen, jonka ne hylkäisivät, säilyy palvelimellasi.
+set_set_them_aside	Siirrä ne sivuun
+set_listening_storage_title	Ennen sovelluksen sulkeutumista tapahtunutta kuuntelua ei voitu tallentaa
+set_listening_storage_detail	Tämän laitteen tallennustila ei ole käytettävissä tai se on täynnä. Mitään ei toisteta eikä kuuntelua lähetetä ennen kuin se on tallennettu; se säilytetään siihen asti.
+set_unreadable_writes_title	Tietoja vastaamatta jääneistä edistymisen tallennuksista ei voitu lukea
+set_unreadable_writes_detail	Minkä tahansa nimikkeen tallennus voi vielä saapua palvelimellesi, joten kuuntelua tai lukemista ei lähetetä eikä edistymistä hylätä ennen kuin päätät. Jos siirrät ne sivuun, tiedosto säilyy tässä laitteessa; myöhässä saapuva tallennus voi silloin palauttaa hylkäämäsi edistymisen.
+set_diagnostics_server	Palvelin %1$s
+set_diagnostics_signed_in_as	Kirjautunut käyttäjänä %1$s
+set_diagnostics_app_version	Sovellus %1$s
+set_recent_problems	Viimeaikaiset ongelmat
+set_clear	Tyhjennä
+set_no_problems	Tässä laitteessa ei ole kirjattu ongelmia.
+set_unreadable_writes_confirm_title	Siirretäänkö lukukelvottomat tiedot sivuun?
+set_unreadable_writes_confirm_detail	Kuuntelu ja lukukohdat lähetetään taas, ja hylkäykset voidaan tehdä.
+set_set_aside	Siirrä sivuun
+set_unreadable_resets_confirm_title	Siirretäänkö lukukelvottomat hylkäykset sivuun?
+set_unreadable_resets_confirm_detail	Nimikkeet toistuvat ja lukukohdat lähetetään taas. Hylkää edistyminen uudelleen niistä nimikkeistä, jotka haluat yhä aloittaa alusta.
+set_signed_in	Kirjautunut
+set_other_accounts	Muut tilit
+set_server_sign_in_required	%1$s · kirjautuminen vaaditaan
+set_remove_account	Poista %1$s
+set_switch_to_account	Vaihda tähän tiliin
+set_add_account	Lisää tili
+set_sign_out_of	Kirjaudu ulos: %1$s
+set_sign_out_detail	Poistaa tämän tilin laitteesta. Sen lataukset ja lähettämätön kuuntelu säilyvät, kunnes se kirjautuu uudelleen.
+set_accounts_footer	Jokaisella tilillä on oma edistymisensä, omat latauksensa ja oma kirjastovalintansa. Vaihtaminen ei koskaan sekoita niitä.
+set_remove_account_confirm	Poistetaanko %1$s?
+set_remove_account_detail	Voit lisätä tilin myöhemmin uudelleen. Sen lataukset ja lähettämätön kuuntelu säilyvät tässä laitteessa.
+set_add_an_account	Lisää tili
+set_connect_intro	Yhdistä suoraan omaan palvelimeesi. Mitään ei ohjata muun palvelun kautta.
+set_change_server	Vaihda palvelinta
+set_sign_in	Kirjaudu sisään
+set_sign_in_openid	Kirjaudu OpenID:llä
+set_saved_accounts	Tallennetut tilit
+set_use_account	Käytä
+set_edit	Muokkaa
+set_add_podcast	Lisää podcast
+set_not_available_yet	Ei vielä saatavilla
+set_not_available_yet_detail	Tätä esiversion osaa rakennetaan vielä.
+set_import_previous_app	Tuo edellisestä sovelluksesta
+set_import_interrupted	Tuonti jäi kesken. Valitse sama vienti jatkaaksesi siitä, mihin se pysähtyi.
+set_import_already	Tämä vienti on jo tuotu. Sen nimikkeet, kuuntelu ja sijainnit ovat tässä laitteessa.
+set_import_preflight	%1$s\nEdellistä sovellusta ja tätä tiedostoa vain luetaan; niihin ei muuteta mitään. Nimikkeet, kuuntelu ja sijainnit liitetään tiliin, kun se kirjautuu tänne. Salasanat eivät sisälly vientiin, joten jokainen tili kirjautuu uudelleen.
+set_import_account_signed_in	%1$s · kirjautunut
+set_import_account_sign_in_later	%1$s · kirjaudu tuonnin jälkeen
+set_import_titles	Nimikkeet
+set_import_title_partial	%1$s · loput ladataan uudelleen
+set_not_imported	Ei tuotu
+set_import_space	Tarvitaan %1$s; vapaana %2$s.
+set_import_no_space	Tässä laitteessa ei ole tarpeeksi vapaata tilaa. Vapauta tilaa ja valitse sitten vienti uudelleen.
+set_import_progress	Kopioidaan tiedostoja: %1$d/%2$d. Jos sovellus sulkeutuu, valitse sama vienti uudelleen jatkaaksesi.
+set_import_done	Tuotiin %1$d nimikettä, %2$d kuunteluistuntoa ja %3$d sijaintia. Edellisen sovelluksen asetukset otettiin käyttöön.
+set_import_waiting	Kirjaudu palvelimelle %1$s käyttäjänä %2$s liittääksesi sen nimikkeet, kuuntelun ja sijainnit.
+set_import	Tuo
+set_continue	Jatka
+set_close	Sulje
+set_import_file_unreadable	Valittua tiedostoa ei voitu lukea. Valitse se uudelleen tai tallenna se ensin tähän laitteeseen.
+set_import_stopped	Tuonti pysähtyi ennen kuin se valmistui. Mitään ei menetetty: valitse sama vienti uudelleen jatkaaksesi siitä, mihin se pysähtyi.
+set_import_item_gone	Sitä ei ole enää palvelimella, joten sitä ei otettu käyttöön.
+set_import_file_changed	Tiedosto muuttui tässä laitteessa tuonnin jälkeen, joten se ladataan uudelleen palvelimelta.
+set_openid_not_enabled	OpenID-kirjautuminen ei ole käytössä tällä palvelimella. Käytä käyttäjätunnustasi ja salasanaasi.
+set_openid_canceled	Kirjautuminen selaimessa peruttiin. Tallennetut tilisi säilyvät.
+set_openid_invalid	Selainkirjautumisen vastausta ei voitu vahvistaa. Yritä kirjautua uudelleen ja tarkista palvelimen OpenID-uudelleenohjausasetukset.
+set_vault_unreadable	Tallennettujen kirjautumisten salausta ei voitu purkaa. Ne säilyvät laitteessa; kirjaudu uudelleen jatkaaksesi.
+set_session_ended	Istuntosi palvelimella %1$s päättyi. Kirjaudu uudelleen; lähettämätön kuuntelu ja lataukset säilyvät.
+set_play_blocked_listening_storage	Ennen sovelluksen sulkeutumista tapahtunutta kuuntelua ei voitu tallentaa, koska tallennustila ei ole käytettävissä, joten mitään ei toisteta ennen kuin se onnistuu. Vapauta tilaa ja yritä sitten uudelleen.
+set_play_blocked_unreadable_resets	Tallennettuja edistymisen hylkäyksiä ei voitu lukea, joten mitään ei toisteta ennen kuin ne on ratkaistu Diagnostiikassa.
+set_play_blocked_discarding	Tämän nimikkeen edistymistä hylätään vielä. Se toistetaan alusta, kun se on valmis.
+dl_not_saved	Latauslistaa ei voitu tallentaa tähän laitteeseen, joten mitään ei muutettu. Vapauta tallennustilaa ja yritä uudelleen.
+dl_not_allowed	Tilisi ei saa ladata.
+dl_no_audio	Tässä kohteessa ei ole ladattavaa ääntä.
+dl_no_space	Tässä laitteessa ei ole tarpeeksi vapaata tilaa (%1$s), kun järjestelmälle jätetään vapaata tallennustilaa.
+dl_folder_lost_nothing_downloaded	Käyttöoikeus kohteeseen %1$s poistettiin, joten mitään ei ladattu. Valitse latauskansio uudelleen Asetuksissa.
+dl_downloading_percent	Ladataan %1$d %%
+dl_cancel_download	Peruuta lataus
+dl_downloaded_plays_offline	Ladattu · toistuu ilman yhteyttä
+dl_failed	Lataus epäonnistui.
+dl_discard	Hylkää
+dl_cellular_title	Ladataanko mobiilidatalla?
+dl_cellular_message	Käytät käytön mukaan laskutettavaa yhteyttä. Voit muuttaa tätä Asetuksissa.
+dl_not_now	Ei nyt
+dl_folder_cannot_be_kept	Tätä kansiota ei voi käyttää latauksille. Valitse toinen.
+dl_saved_in_folder	Lataukset tallennetaan kohteeseen %1$s
+dl_saved_in_app_storage	Lataukset tallennetaan sovelluksen tallennustilaan
+dl_folder_visible_to_other_apps	Muut tämän laitteen sovellukset näkevät nämä tiedostot. Ennen muutosta tehdyt lataukset pysyvät paikallaan.
+dl_folder_private_to_app	Vain tämä sovellus näkee nämä tiedostot. Valitse kansio, jos haluat lataukset paikkaan, josta muut sovellukset löytävät ne.
+dl_choose_folder	Valitse kansio
+dl_use_app_storage	Käytä sovelluksen tallennustilaa
+dl_ebook_missing	S-kirja puuttuu tästä laitteesta. Lataa se uudelleen avataksesi sen.
+dl_no_app_opens_format	Mikään tämän laitteen sovellus ei avaa %1$s-tiedostoja. Asenna sellainen ja yritä uudelleen.
+dl_no_app_opens_this_kind	Mikään tämän laitteen sovellus ei avaa tämäntyyppisiä tiedostoja. Asenna sellainen ja yritä uudelleen.
+dl_folder_lost_choose_again_open	Tämä lataus on kohteessa %1$s, ja käyttöoikeus kohteeseen %1$s poistettiin. Valitse %1$s uudelleen avataksesi sen.
+dl_folder_lost_choose_again_play	Tämä lataus on kohteessa %1$s, ja käyttöoikeus kohteeseen %1$s poistettiin. Valitse %1$s uudelleen toistaaksesi sen.
+dl_names_or	%1$s tai %2$s
+dl_names_and	%1$s ja %2$s
+dl_remove_title	Poistetaanko lataus?
+dl_remove_message	”%1$s” poistetaan tästä laitteesta. Kuunteluedistymisesi säilyy.
+dl_keep	Säilytä
+dl_not_that_folder	Tämä ei ole %1$s. Valitse kansio, jossa nämä lataukset ovat.
+dl_folder_access_not_kept	Kansion käyttöoikeutta ei voitu säilyttää. Yritä uudelleen.
+dl_no_downloads	Ei latauksia
+dl_no_downloads_message	Lataa kirjoja tai jaksoja niiden sivulta kuunnellaksesi ilman yhteyttä.
+dl_access_removed_title	Käyttöoikeus kohteeseen %1$s poistettiin
+dl_downloads_kept_there:one	Siellä on %1$d lataus. Valitse %2$s uudelleen toistaaksesi ja avataksesi sen.
+dl_downloads_kept_there:other	Siellä on %1$d latausta. Valitse %2$s uudelleen toistaaksesi ja avataksesi ne.
+dl_choose_again	Valitse %1$s uudelleen
+dl_some_files_missing	Joitakin tiedostoja puuttuu tästä laitteesta
+dl_size_in_folder	%1$s kohteessa %2$s
+dl_open_in_another_app	Avaa %1$s toisessa sovelluksessa
+dl_download_again_named	Lataa %1$s uudelleen
+dl_the_chosen_folder	valittu kansio
+dl_files_missing_play	Joitakin tämän latauksen tiedostoja puuttuu tästä laitteesta. Lataa se uudelleen toistaaksesi sen.
+dl_play_named	Toista %1$s
+dl_retry_named	Yritä uudelleen: %1$s
+dl_cancel_named	Peruuta %1$s
+dl_remove_named	Poista %1$s
+dl_sign_in_again	Kirjaudu tälle tilille uudelleen ladataksesi.
+dl_folder_lost_choose_in_downloads	Käyttöoikeus kohteeseen %1$s poistettiin. Valitse kansio uudelleen Latauksissa.
+dl_connection_interrupted	Yhteys katkesi.
+dl_error_retrying	%1$s Yritetään uudelleen…
+dl_server_refused	Palvelin hylkäsi latauksen.
+dl_server_sent_type_not_audio	Palvelin lähetti äänen sijaan tyyppiä %1$s, joten mitään ei tallennettu. Tarkista palvelimesi tai välityspalvelimesi ja yritä uudelleen.
+dl_server_sent_unknown_not_audio	Palvelin lähetti äänen sijaan tuntemattoman vastauksen, joten mitään ei tallennettu. Tarkista palvelimesi tai välityspalvelimesi ja yritä uudelleen.
+dl_size_mismatch	Ladatun tiedoston koko oli %1$d tavua, mutta palvelin ilmoitti %2$d, joten se hylättiin. Yritä uudelleen ladataksesi sen uudestaan.
+dl_server_sent_not_pdf	Palvelin lähetti jotain muuta kuin PDF-tiedoston, joten mitään ei tallennettu. Tarkista palvelimesi tai välityspalvelimesi ja yritä uudelleen.
+rd_positions_not_restored	Tallennettuja lukukohtia ei voitu palauttaa, joten sivuja ei tallenneta. Alkuperäiset tiedot säilytetään.
+rd_positions_not_overwritten	Tallennettuja lukukohtia ei voitu lukea, joten niitä ei korvata.
+rd_not_a_pdf	Tämä tiedosto ei ole PDF, jonka tämä laite voi avata.
+rd_document_not_opened	Asiakirjaa ei voitu avata.
+rd_page_not_saved	Tätä sivua ei voitu tallentaa tähän laitteeseen.
+rd_choice_not_saved	Valintaasi ei voitu tallentaa tähän laitteeseen.
+rd_conflict_title	Mistä jatketaan?
+rd_conflict_page	Toinen laite eteni sivulle %1$d, kun tämän laitteen sivua %2$d ei ollut vielä tallennettu palvelimelle.
+rd_conflict_location	Toinen laite tallensi lukukohdan, jota tämä lukuohjelma ei voi näyttää sivuna, kun tämän laitteen sivua %1$d ei ollut vielä tallennettu palvelimelle.
+rd_go_to_page_number	Siirry sivulle %1$d
+rd_keep_other_position	Säilytä toinen kohta
+rd_stay_on_page	Pysy sivulla %1$d
+rd_close_reader	Sulje lukuohjelma
+rd_rotate_pages	Kierrä sivuja
+rd_continuous_scrolling	Jatkuva vieritys
+rd_document_error_title	Tätä asiakirjaa ei voitu avata
+rd_try_again	Yritä uudelleen
+rd_go_to_page	Siirry sivulle
+rd_previous_page	Edellinen sivu
+rd_next_page	Seuraava sivu
+rd_page_of	Sivu %1$d/%2$d
+rd_page_number	Sivu %1$d
+rd_download_folder_lost	Tämä lataus on kohteessa %1$s, ja käyttöoikeus kohteeseen %1$s poistettiin. Valitse kansio uudelleen Latauksissa.
+rd_downloaded_document_missing	Ladattu asiakirja puuttuu tästä laitteesta. Lataa se uudelleen.
+rd_document_not_stored	Asiakirjaa ei voitu tallentaa luettavaksi.
+rd_supplementary_pdf	täydentävä PDF
+rd_format_not_available	Muodon %1$s lukeminen ei ole vielä saatavilla tässä esiversiossa. Lukukohtasi palvelimella säilyy.
+rd_ebook_not_available	Tämän s-kirjan lukeminen ei ole vielä saatavilla tässä esiversiossa. Lukukohtasi palvelimella säilyy.
+grp_unavailable_title	Nimike ei saatavilla
+grp_could_not_load_collections	Kokoelmia ei voitu ladata.
+grp_could_not_load_playlists	Soittolistoja ei voitu ladata.
+grp_collections_unavailable	Kokoelmat eivät ole saatavilla
+grp_playlists_unavailable	Soittolistat eivät ole saatavilla
+grp_no_collections_yet	Ei vielä kokoelmia
+grp_no_playlists_yet	Ei vielä soittolistoja
+grp_create_one_hint	Luo sellainen pitääksesi nimikkeet yhdessä omassa järjestyksessäsi.
+grp_title_count:one	%1$d nimike
+grp_title_count:other	%1$d nimikettä
+grp_collection_deleted	Tämä kokoelma poistettiin.
+grp_playlist_deleted	Tämä soittolista poistettiin.
+grp_could_not_load	Lataus epäonnistui.
+grp_collection_unavailable	Kokoelma ei ole saatavilla
+grp_playlist_unavailable	Soittolista ei ole saatavilla
+grp_nothing_in_collection_can_play	Mitään tämän kokoelman sisällöstä ei voi toistaa.
+grp_nothing_in_playlist_can_play	Mitään tämän soittolistan sisällöstä ei voi toistaa.
+grp_could_not_start_playback	Toistoa ei voitu aloittaa.
+grp_resume	Jatka
+grp_play_collection	Toista kokoelma
+grp_play_playlist	Toista soittolista
+grp_edit_collection	Muokkaa kokoelmaa
+grp_edit_playlist	Muokkaa soittolistaa
+grp_delete_collection	Poista kokoelma
+grp_delete_playlist	Poista soittolista
+grp_no_titles_yet	Ei vielä nimikkeitä
+grp_delete_collection_question	Poistetaanko kokoelma?
+grp_delete_playlist_question	Poistetaanko soittolista?
+grp_delete_group_explanation	”%1$s” poistetaan palvelimeltasi. Sen nimikkeet säilyvät.
+grp_not_deleted	Ei poistettu: %1$s
+grp_not_deleted_try_again	Ei poistettu: yritä uudelleen
+grp_not_allowed_to_change_collection	Palvelintilisi ei saa muuttaa tätä kokoelmaa.
+grp_not_allowed_to_change_playlist	Palvelintilisi ei saa muuttaa tätä soittolistaa.
+grp_collection_no_longer_exists	Tätä kokoelmaa ei ole enää olemassa.
+grp_playlist_no_longer_exists	Tätä soittolistaa ei ole enää olemassa.
+grp_not_saved	Ei tallennettu: %1$s
+grp_not_saved_try_again	Ei tallennettu: yritä uudelleen
+grp_saving	Tallennetaan…
+grp_create_collection	Luo kokoelma
+grp_create_playlist	Luo soittolista
+grp_save_changes	Tallenna muutokset
+grp_choose_at_least_one_title	Valitse vähintään yksi nimike.
+grp_order	Järjestys
+grp_move_up	Siirrä %1$s ylös
+grp_remove_member	Poista %1$s
+grp_add_titles	Lisää nimikkeitä
+grp_add_episodes_hint	Lisää jaksoja podcastin jaksosivulta.
+grp_add_to_playlist_or_collection	Lisää soittolistaan tai kokoelmaan
+grp_add_to	Lisää kohteeseen
+grp_nothing_to_add_to	Täällä ei ole vielä mitään, mihin voisit lisätä.
+grp_added_to	Lisätty: %1$s
+grp_not_added	Ei lisätty: %1$s
+grp_not_added_try_again	Ei lisätty: yritä uudelleen
+grp_already_included	Jo mukana
+grp_close	Sulje
+grp_titles_could_not_load	Nimikkeitä ei voitu ladata
+grp_nothing_here	Täällä ei ole mitään
+pod_feed_episodes	Syötteen jaksot
+pod_sort_newest_first	Uusin ensin, napauta niin vanhin ensin
+pod_sort_oldest_first	Vanhin ensin, napauta niin uusin ensin
+pod_episodes_queued:one	%1$d jakso jonossa palvelimellasi: %2$s
+pod_episodes_queued:other	%1$d jaksoa jonossa palvelimellasi: %2$s
+pod_server_could_not_download	Palvelimesi ei voinut ladata jaksoa ”%1$s”.
+pod_dismiss	Ohita
+pod_no_episodes_yet	Ei vielä jaksoja
+pod_no_episodes_match_filter	Mikään jakso ei vastaa tätä suodatinta
+pod_episode_details	Jakson tiedot
+pod_untitled_episode	Nimetön jakso
+pod_play_named	Toista %1$s
+pod_episode_not_available	Jakso ei ole saatavilla
+pod_episode_may_have_been_removed	Se on ehkä poistettu palvelimelta.
+pod_percent_listened	%1$d %% kuunneltu
+pod_feed_could_not_open	Syötettä ei voitu avata.
+pod_retry_feed	Yritä syötettä uudelleen
+pod_no_feed_episodes	Syötteestä ei löytynyt jaksoja
+pod_already_on_server	Jo palvelimella
+pod_selected	Valittu
+pod_not_selected	Ei valittu
+pod_no_audio_enclosure	Ei äänitiedostoa
+pod_not_queued	Ei lisätty jonoon: %1$s
+pod_not_queued_try_again	Ei lisätty jonoon: yritä uudelleen
+pod_queueing_on_server	Lisätään jonoon palvelimellasi…
+pod_add_selected_episodes	Lisää valitut jaksot palvelimelle
+pod_something_went_wrong	Jokin meni pieleen.
+pod_adding_not_available	Podcastien lisääminen ei ole käytettävissä
+pod_adding_needs_permission	Palvelintilisi tarvitsee podcastien hallintaoikeuden podcast-kirjastossa.
+pod_search_podcasts	Hae podcasteja
+pod_or_rss_feed_url	Tai RSS-syötteen URL
+pod_enter_complete_feed_url	Anna syötteen täydellinen HTTP- tai HTTPS-URL.
+pod_preview_feed	Esikatsele syötettä
+pod_create_podcast	Luo podcast
+pod_choose_different_feed	Valitse toinen syöte
+item_something_went_wrong	Jokin meni pieleen. Yritä uudelleen.
+item_feed_subscribe_at	Podcast-sovellukset voivat tilata tämän nimikkeen osoitteesta:
+item_copied	Kopioitu
+item_copy_address	Kopioi osoite
+item_hidden_from_directories	Piilotettu podcast-hakemistoilta
+item_feed_public_warning	Kuka tahansa, jolla on osoite, voi kuunnella tätä nimikettä kirjautumatta.
+item_feed_name	Syötteen nimi
+item_feed_name_rule	Vain kirjaimia, numeroita, - ja _
+item_hide_from_directories	Piilota podcast-hakemistoilta
+item_done	Valmis
+item_sending	Lähetetään…
+item_sent_to	Lähetetty: %1$s
+item_send_ebook_explanation	Palvelimesi lähettää s-kirjan sähköpostilla valitsemaasi laitteeseen.
+item_ereader_or_ebook_gone	%1$s tai tämä s-kirja ei ole enää saatavilla palvelimella. Mitään ei lähetetty.
+item_not_sent_to	Ei lähetetty (%1$s). %2$s
+item_not_saved_try_again	Ei tallennettu. Yritä uudelleen.
+item_mark_unfinished	Merkitse keskeneräiseksi
+item_discard_uncertain	Aiempi tämän nimikkeen edistymisen tallennus ei saanut vastausta ja voi vielä saapua palvelimellesi. Jos se saapuu hylkäyksen jälkeen, se palauttaa edistymisen. Palvelimesi ei voi kertoa tälle sovellukselle, käykö niin.
+item_discard_anyway	Hylkää silti
+item_discard_under_way	Tämä hylkäys on jo käynnissä, eikä sitä voi perua.
+item_keep_progress	Säilytä edistyminen
+item_discard_pending	Edistymistä hylätään. Tämä valmistuu, kun palvelimesi on tavoitettavissa ja tämän nimikkeen kuuntelu on lähetetty.
+item_discard_anyway_question	Hylätäänkö silti?
+item_discard_anyway_explanation	Edistyminen poistetaan nyt. Jos aiempi tallennus saapuu palvelimellesi myöhemmin, tämän nimikkeen edistyminen palaa ja voit hylätä sen uudelleen.
+item_discard	Hylkää
+item_discard_progress_question	Hylätäänkö edistyminen?
+item_discard_progress_explanation	Tämän nimikkeen sijaintisi ja valmis-tila poistetaan palvelimelta kaikista laitteista.
+item_could_not_load	Tätä nimikettä ei voitu ladata
+item_narrated_by	Lukija
+item_series	Sarja: %1$s
+item_series_with_sequence	Sarja: %1$s #%2$s
+item_episode_count:one	%1$d jakso
+item_episode_count:other	%1$d jaksoa
+item_listened_and_left	%1$d %% kuunneltu · %2$s jäljellä
+item_chapter_number	Luku %1$d
+pl_minimize_player	Pienennä soitin
+pl_nothing_playing	Mitään ei toisteta
+pl_chapter_number	Luku %1$d
+pl_try_again	Yritä uudelleen
+pl_speed_value	Nopeus %1$s
+pl_sleep	Uniajastin
+pl_position_of_duration	%1$s / %2$s
+pl_buffering	Puskuroidaan
+pl_previous_chapter	Edellinen luku
+pl_next_chapter	Seuraava luku
+pl_jump_forward_seconds:one	Hyppää %1$d sekunti eteenpäin
+pl_jump_forward_seconds:other	Hyppää %1$d sekuntia eteenpäin
+pl_jump_back_seconds:one	Hyppää %1$d sekunti taaksepäin
+pl_jump_back_seconds:other	Hyppää %1$d sekuntia taaksepäin
+pl_jump_forward_minutes:one	Hyppää %1$d minuutti eteenpäin
+pl_jump_forward_minutes:other	Hyppää %1$d minuuttia eteenpäin
+pl_jump_back_minutes:one	Hyppää %1$d minuutti taaksepäin
+pl_jump_back_minutes:other	Hyppää %1$d minuuttia taaksepäin
+pl_open_player	Avaa soitin
+pl_playback_stopped	Toisto pysähtyi
+pl_listening_unsaved	Osaa kuuntelusta ei ole vielä tallennettu tähän laitteeseen. Se säilytetään ja tallennetaan heti, kun tallennustila sallii.
+pl_playing	Toistetaan
+pl_resume	Jatka
+pl_streaming_cellular_refused	Suoratoisto mobiilidatalla on poistettu käytöstä Asetuksissa. Yhdistä Wi-Fi-verkkoon tai lataa tämä nimike ensin.
+pl_stream_cellular_title	Suoratoistetaanko mobiilidatalla?
+pl_stream_cellular_message	Käytät käytön mukaan laskutettavaa yhteyttä. Voit muuttaa tätä Asetuksissa.
+pl_not_now	Ei nyt
+pl_sleep_stops_end_of_chapter	Pysähtyy tämän luvun lopussa, %1$s kuluttua
+pl_sleep_stops_in	Pysähtyy %1$s kuluttua
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Poista käytöstä
+pl_bookmark_not_saved_reason	Kirjanmerkkiä ei tallennettu: %1$s
+pl_bookmark_not_saved	Kirjanmerkkiä ei tallennettu: yritä uudelleen
+pl_bookmark_add_at	Lisää kohtaan %1$s
+pl_bookmark_go_to	Siirry kirjanmerkkiin
+pl_bookmark_default	Kirjanmerkki
+pl_bookmark_rename_named	Nimeä %1$s uudelleen
+pl_bookmark_delete_named	Poista %1$s
+pl_bookmark_at	Kirjanmerkki kohdassa %1$s
+pl_bookmark_rename	Nimeä kirjanmerkki uudelleen
+pl_bookmark_new	Uusi kirjanmerkki
+pl_untitled	Nimetön
+pl_playback_stopped_reason	Toisto pysähtyi: %1$s. Sijaintisi säilyy.
+pl_playback_stopped_unknown	Toisto pysähtyi: ääntä ei voitu ladata. Sijaintisi säilyy.
+pl_no_playable_audio	Tässä kohteessa ei ole toistettavaa ääntä.
+pl_could_not_start	Toistoa ei voitu aloittaa.
+pl_listening_save_failed	Kuuntelua ei voitu tallentaa tähän laitteeseen, joten toisto keskeytettiin. Vapauta tallennustilaa ja yritä uudelleen.
+cast_casting_to	Striimataan laitteeseen %1$s
+cast_cast	Striimaa
+cast_playing_on	Toistetaan laitteella %1$s
+cast_connecting_to	Yhdistetään laitteeseen %1$s…
+cast_playing_on_phone	Toistetaan tällä puhelimella
+cast_stop	Lopeta striimaus
+cast_looking	Etsitään striimauslaitteita…
+cast_none_found	Striimauslaitteita ei löytynyt. Tarkista, että vastaanotin on päällä ja samassa Wi-Fi-verkossa kuin tämä puhelin.
+cast_close	Sulje
+cast_download_not_castable	Ladatut kopiot toistuvat vain tällä puhelimella. Lopeta striimaus kuunnellaksesi täällä tai suoratoista nimike sen sijaan.
+cast_resumed_without_title	Striimaus pysähtyi, koska sovellus käynnistyi uudelleen striimauksen aikana. Avaa nimike uudelleen jatkaaksesi kuuntelua kohdasta, jonka tämä puhelin tallensi viimeksi.
+cast_needs_play_services	Striimaus vaatii Google Play -palvelut, joita tässä laitteessa ei ole tai jotka on päivitettävä.
+cast_could_not_start	Striimausta ei voitu aloittaa tällä laitteella: %1$s.
+cast_connect_failed_named	Yhteyttä laitteeseen %1$s ei voitu muodostaa. Tarkista, että se on päällä ja samassa Wi-Fi-verkossa kuin tämä puhelin.
+cast_connect_failed	Yhteyttä vastaanottimeen ei voitu muodostaa. Tarkista, että se on päällä ja samassa Wi-Fi-verkossa kuin tämä puhelin.
+cast_connection_lost_named	Yhteys laitteeseen %1$s katkesi. Toisto jatkuu tällä puhelimella.
+cast_connection_lost	Yhteys vastaanottimeen katkesi. Toisto jatkuu tällä puhelimella.
+auto_continue	Jatka
+auto_recent	Viimeaikaiset
+auto_discovery	Löydä
+auto_authors_count:one	%1$d tekijä
+auto_authors_count:other	%1$d tekijää
+auto_series_count:one	%1$d sarja
+auto_series_count:other	%1$d sarjaa
+lib_books_count:one	%1$d kirja
+lib_books_count:other	%1$d kirjaa
+lib_items_count:one	%1$d kohde
+lib_items_count:other	%1$d kohdetta
+lib_selected	Valittu
+lib_all_filters	Kaikki suodattimet
+lib_nothing_to_filter	Täällä ei ole mitään suodatettavaa.
+lib_sort_descending_switch	Laskeva, vaihda nousevaan
+lib_sort_ascending_switch	Nouseva, vaihda laskevaan
+lib_sort_descending	Laskeva
+lib_sort_ascending	Nouseva
+lib_unavailable	Kirjasto ei ole saatavilla
+lib_unavailable_message	%1$s Tilisi ja lähettämätön kuuntelu säilyvät.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Näytä kannet
+lib_show_list	Näytä luettelo
+lib_filtered	Suodatettu
+lib_empty_title	Täällä ei ole vielä mitään
+lib_empty_message	Tässä kirjastossa ei ole kohteita, joihin sinulla on pääsy.
+lib_page_error	Lisää nimikkeitä ei voitu ladata
+lib_card_finished	%1$s, valmis
+lib_card_percent_listened	%1$s, %2$d prosenttia kuunneltu
+lib_search_in	Hae: %1$s
+lib_search_library	Hae kirjastosta
+lib_clear_search	Tyhjennä haku
+lib_search_failed	Haku epäonnistui
+lib_search_idle_title	Löydä kuunneltavaa
+lib_search_idle_message	Hae nimikkeitä, tekijöitä, sarjoja, lukijoita ja jaksoja.
+lib_search_no_match	Mikään ei vastaa hakua "%1$s". Kokeile vähemmillä sanoilla tai eri kirjoitusasulla.
+err_invalid_server	Anna palvelimen osoite, joka alkaa http:// tai https://, esimerkiksi https://books.example.com/abs.
+err_unsafe_media_url	Palvelin palautti media-osoitteen tämän palvelimen ulkopuolelta. Sitä ei avattu.
+err_sign_in_required	Istuntoasi ei enää hyväksytä. Kirjaudu uudelleen; lähettämätön kuuntelu säilyy.
+err_untrusted	Tämä laite ei luota palvelimen varmenteeseen. Asenna palvelimesi varmenteen myöntäjä kohdassa Androidin asetukset > Tietoturva > Salaus ja kirjautumistiedot ja yritä sitten uudelleen.
+err_offline	Palvelimeen ei saatu yhteyttä. Tarkista osoite tai yhteytesi ja yritä uudelleen.
+err_forbidden	Tilisi ei saa tehdä tätä.
+err_not_found	Tämä sisältö ei ole enää saatavilla palvelimella.
+err_server_problem	Palvelimella oli tilapäinen ongelma (HTTP %1$d). Yritä uudelleen.
+err_rejected	Palvelin hylkäsi pyynnön (HTTP %1$d).
+err_invalid_response	Palvelin lähetti vastauksen, jota tämä sovellus ei voinut lukea.
+err_no_audio	Tässä kohteessa ei ole toistettavaa ääntä.
+err_login_rejected	Käyttäjätunnusta tai salasanaa ei hyväksytty.
+err_publications_unreadable	Tietoja vastaamatta jääneistä edistymisen tallennuksista ei voitu lukea. Ratkaise ne ensin Diagnostiikassa.
+err_discards_unreadable	Tallennettuja edistymisen hylkäyksiä ei voitu lukea. Ratkaise ne ensin Diagnostiikassa.

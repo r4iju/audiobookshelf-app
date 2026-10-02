@@ -1,0 +1,59 @@
+ABS_RS_BOOKS=b911dc97-cd66-481a-aa64-0404220b5c69
+ABS_RS_EVENING_STORIES=d7e05801-bf1d-40ef-8167-41420d082bf0
+ABS_RS_FIELD_GUIDE=8cea4821-58a6-4338-8d42-6ad7808d0a9a
+ABS_RS_LONG_STORY=9d115819-bd44-4258-9436-6cb182c7ba1c
+ABS_RS_LONG_TIDE=8dd83ba1-f024-4aac-a9cf-73ac30c223bc
+ABS_RS_OTHER_USER=37dec5ed-ec8b-4a10-962f-3e91268a8108
+ABS_RS_PODCASTS=696fac26-e5ca-449b-866d-e1a142179af2
+ABS_RS_SALT=8197b048-55f3-4757-a989-fed3abdea530
+ABS_RS_SERVER=http://127.0.0.1:19890
+ABS_RS_VOLUME1=0ab0cd6c-c2d6-42b4-bffa-7c913fc0cdd4
+ABS_RS_VOLUME2=b9f1107b-e362-47a4-83c6-a4b51f1a0d16
+ABS_RS_VOLUME3=6a817b4a-ee49-439b-9fe0-76d8bf6ede63
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+phone lease=75FA9768-B15C-40B6-ACC7-790D7FCAD29C
+phone-online exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test1SignInBrowseAndStreamAcrossFiles]' passed (107.167 seconds).
+Test Case '-[NativeJourneyTests.RealServerProbe test2PDFPageSavedToServerAndRestored]' passed (103.502 seconds).
+Test Case '-[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress]' passed (28.593 seconds).
+phone-download exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test4aDownloadForOffline]' passed (64.408 seconds).
+server stopped 17:25:04
+phone-offline exit=0
+OFFLINE_START=39
+OFFLINE_POSITION=60
+Test Case '-[NativeJourneyTests.RealServerProbe test4bPlayOfflineWithServerStopped]' passed (19.582 seconds).
+server started 17:25:42
+phone-reconnect exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test4cReconnectPublishesOfflineListening]' passed (9.658 seconds).
+after offline reconnect currentTime 74.80956103700001 isFinished False lastUpdate 1790929536795
+tv-all exit=65
+/Volumes/ai-ssd/code/audiobookshelf-real-server-repro/tvos/UITests/RealServerProbe.swift:50: error: -[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles] : failed - Could not move focus to "username" TextField; focused Attributes: Keyboard, 0x1060622b0, {{0.0, 462.0}, {1920.0, 226.0}}, label: 'Keyboard', Focused
+Test Case '-[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles]' failed (21.140 seconds).
+TV_EPISODE episode=5648e1dc-9767-4063-b08d-e88c2c5498ca before=0.0 saved=7.779066772
+Test Case '-[TVJourneyTests.RealServerProbe test2SearchAndPodcastEpisode]' passed (44.282 seconds).
+after TV currentTime 74.80956103700001 isFinished False lastUpdate 1790929536795
+server stopped 17:27:45
+phone-finish-offline exit=65
+FINISH_START=1 min File 3 of 3
+/Volumes/ai-ssd/code/audiobookshelf-real-server-repro/apple/UITests/RealServerProbe.swift:253: error: -[NativeJourneyTests.RealServerProbe test4dFinishOfflineWithServerStopped] : Failed to get matching snapshot: No matches found for Elements matching predicate '"total-elapsed" IN identifiers' from input {(
+Test Case '-[NativeJourneyTests.RealServerProbe test4dFinishOfflineWithServerStopped]' failed (16.969 seconds).
+server started 17:28:26
+phone-finish-reconnect exit=0
+FINISH_SERVER=["libraryItemId": 8dd83ba1-f024-4aac-a9cf-73ac30c223bc, "episodeId": <null>, "lastUpdate": 1790929693513, "mediaItemId": fc934eeb-cc16-4588-873e-4295010dc05c, "finishedAt": 1790929725717, "hideFromContinueListening": 0, "currentTime": 90.20081677551021, "ebookLocation": <null>, "mediaItemType": book, "id": d942c72f-3c13-4693-a882-5c0bcfb73895, "ebookProgress": 0, "userId": 0f7e5cbb-9b6c-4167-b4dc-68ea41bb2ecb, "progress": 1, "isFinished": 1, "duration": 90.200817, "startedAt": 1790929245396]
+Test Case '-[NativeJourneyTests.RealServerProbe test4eReconnectPublishesTheFinish]' passed (6.506 seconds).
+after finish reconnect currentTime 90.2008167755102 isFinished True lastUpdate 1790929693513
+server restarted 17:28:52
+after a further restart currentTime 90.2008167755102 isFinished True lastUpdate 1790929693513
+sync 0db3e51e-14a9-4df1-b018-414b8904a6c0 200
+server restarted 17:28:55
+sync bbfda2d6-e346-425d-9a9f-2e23fabb589f 200
+volume3 200
+open=bbfda2d6-e346-425d-9a9f-2e23fabb589f restarted=0db3e51e-14a9-4df1-b018-414b8904a6c0
+migration exit=0
+ADOPTION_REPORT 3 downloads are ready once their accounts are signed in. 3 listening sessions are waiting to be sent to the server. 2 listening positions are waiting to be compared with the server. Sign in to 1 account to use the rest of its data. issues=["Listening for http://127.0.0.1:19890 is waiting to be sent (3 sessions, 2 positions).", "Sign in to http://127.0.0.1:19890 as qa-other again. Downloads, progress and unsent listening for this account are kept and become available after sign-in."]
+SYNC_1 acknowledged=3 pending=0 unconfirmed=0 failures=[]
+SYNC_2 acknowledged=0 pending=0 unconfirmed=0 failures=[]
+SERVER open=25/25 restarted=11/11 local=3/3.5 volume2=2.0 volume3=3.0 (before 3.0)
+Test Case '-[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce]' passed (1.485 seconds).
+run-all exit=0

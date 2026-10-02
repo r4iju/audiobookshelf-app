@@ -1,0 +1,603 @@
+# name	legacy key in /strings (- when the legacy app has no equivalent)	English	languages whose legacy wording means something else
+app_name	-	Audiobookshelf Preview
+tab_library	ButtonLibrary	Library
+tab_search	ButtonSearch	Search
+tab_downloads	HeaderDownloads	Downloads
+title_accounts	-	Accounts
+title_settings	HeaderSettings	Settings
+title_collections	ButtonCollections	Collections
+title_playlists	ButtonPlaylists	Playlists
+title_statistics	HeaderYourStats	Statistics
+title_new_playlist	HeaderNewPlaylist	New playlist
+title_new_collection	-	New collection
+menu_more	LabelMore	More	ja
+action_retry	-	Retry
+action_cancel	ButtonCancel	Cancel
+action_save	ButtonSave	Save
+action_play	ButtonPlay	Play
+action_pause	ButtonPause	Pause
+action_stream	ButtonStream	Stream
+action_download	LabelDownload	Download
+action_read	-	Read %1$s
+action_mark_finished	-	Mark finished
+action_discard_progress	MessageDiscardProgress	Discard progress
+action_clear_filter	ButtonClearFilter	Clear filter
+action_show_more	ButtonReadMore	Show more
+action_show_less	ButtonReadLess	Show less
+action_close_player	LabelClosePlayer	Stop and close player
+choose_library	-	Choose library
+all_titles	-	All titles
+all_podcasts	-	All podcasts
+filter	-	Filter
+sort	-	Sort
+shelf_continue_listening	LabelContinueListening	Continue Listening
+shelf_continue_reading	LabelContinueReading	Continue Reading
+shelf_continue_series	LabelContinueSeries	Continue Series
+shelf_recently_added	LabelRecentlyAdded	Recently Added
+shelf_recent_series	LabelRecentSeries	Recent Series
+shelf_listen_again	LabelListenAgain	Listen Again
+shelf_discover	LabelDiscover	Discover
+shelf_newest_episodes	LabelNewestEpisodes	Newest Episodes
+shelf_newest_authors	LabelNewestAuthors	Newest Authors
+chapters	HeaderChapters	Chapters
+finished	LabelFinished	Finished
+sleep_timer	LabelSleepTimer	Sleep timer
+bookmarks	LabelYourBookmarks	Bookmarks
+no_bookmarks	MessageNoBookmarks	No bookmarks yet
+playback_speed	LabelPlaybackSpeed	Playback speed
+end_of_chapter	LabelEndOfChapter	End of chapter
+search_books	LabelBooks	Books
+search_podcasts	LabelPodcasts	Podcasts
+search_episodes	HeaderEpisodes	Episodes
+search_authors	LabelAuthors	Authors
+search_series	LabelSeries	Series
+search_narrators	LabelNarrators	Narrators
+search_tags	LabelTags	Tags
+search_no_results	MessageNoItemsFound	No results
+server_address	LabelServerAddress	Server address
+username	LabelUsername	Username
+password	LabelPassword	Password
+connect	ButtonConnect	Connect
+settings_appearance	HeaderUserInterfaceSettings	Appearance
+settings_playback	HeaderPlaybackSettings	Playback
+settings_sleep_timer	HeaderSleepTimer	Sleep timer
+settings_android_auto	HeaderAndroidAutoSettings	Android Auto
+theme	LabelTheme	Theme
+theme_system	-	System
+theme_light	LabelThemeLight	Light
+theme_dark	LabelThemeDark	Dark
+theme_black	LabelThemeBlack	Black
+screen_orientation	-	Screen orientation
+haptic_feedback	LabelHapticFeedback	Haptic feedback
+jump_forward	-	Jump forward
+jump_back	-	Jump back
+jump_forward_time	LabelJumpForwardsTime	Jump forward
+jump_back_time	LabelJumpBackwardsTime	Jump back
+shake_sensitivity	LabelShakeSensitivity	Shake sensitivity
+level_very_low	LabelVeryLow	Very low
+level_low	LabelLow	Low	de
+level_medium	LabelMedium	Medium
+level_high	LabelHigh	High
+level_very_high	LabelVeryHigh	Very high
+auto_sleep_timer	LabelAutoSleepTimer	Automatic sleep timer
+downloads_on_mobile_data	LabelDownloadUsingCellular	Downloads on mobile data
+streaming_on_mobile_data	LabelStreamingUsingCellular	Streaming on mobile data
+policy_ask	LabelAskConfirmation	Ask
+policy_always	LabelAlways	Always
+policy_never	LabelNever	Never
+series_books_order	LabelAndroidAutoBrowseSeriesSequenceOrder	Series books order
+# settings, accounts, sign-in, migration
+set_settings_not_saved	-	Settings could not be saved on this device, so nothing changed. Free some storage and try again.
+set_orientation_follow_device	-	Follow device
+set_orientation_portrait	-	Portrait
+set_orientation_landscape	-	Landscape
+set_haptic_off	LabelOff	Off
+set_haptic_light	LabelLight	Light	ar bg bn ca da el es et fi fr he pl ro ru sk sl ta zh_Hant
+set_haptic_heavy	LabelHeavy	Heavy	ja es
+set_unit_seconds_short	UnitSecondsShort	%1$ds
+set_unit_minutes_short	UnitMinutesShort	%1$dm
+set_rewind_on_resume	-	Rewind a little when resuming
+set_rewind_on_resume_detail	-	Steps back a few seconds after a pause, more after a longer one.
+set_seek_system_controls	-	Seek from system controls
+set_seek_system_controls_detail	-	Lets the lock screen and notification move the position bar.
+set_mp3_index_seeking	-	Accurate MP3 seeking
+set_mp3_index_seeking_detail	-	Builds a seek index for MP3 files with unreliable lengths. Seeking starts more slowly.
+set_shake_to_reset	-	Shake to reset
+set_shake_to_reset_detail	-	Shaking the phone while the timer runs restarts it.
+set_sleep_fade_out	-	Fade out
+set_sleep_fade_out_detail	-	Lowers the volume during the last minute.
+set_vibrate_on_reset	-	Vibrate on reset
+set_sleep_chime	LabelSleepTimerAlmostDoneChime	Chime when almost done
+set_auto_sleep_timer_detail	-	Starts the timer when playing between %1$s and %2$s.
+set_auto_sleep_starts_at	LabelStartTime	Starts at
+set_auto_sleep_ends_at	LabelEndTime	Ends at
+set_heading_mobile_data	-	Mobile data
+set_storage	-	Storage
+set_car_grouping	LabelAndroidAutoBrowseLimitForGrouping	Group authors and series in letters above
+set_series_first_to_last	LabelSequenceAscending	First to last
+set_series_last_to_first	LabelSequenceDescending	Last to first
+set_heading_support	-	Support
+set_diagnostics	-	Diagnostics
+set_something_went_wrong	-	Something went wrong.
+set_statistics_unavailable	-	Statistics not available
+set_try_again	-	Try again
+set_minutes_listened:one	-	%1$d minute listened
+set_minutes_listened:other	-	%1$d minutes listened
+set_days_listened:one	-	%1$d day listened
+set_days_listened:other	-	%1$d days listened
+set_titles_finished:one	-	%1$d title finished
+set_titles_finished:other	-	%1$d titles finished
+set_day_minutes_listened:one	-	%1$s, %2$d minute listened
+set_day_minutes_listened:other	-	%1$s, %2$d minutes listened
+set_recent_sessions	HeaderStatsRecentSessions	Recent sessions	de
+set_week_chart_title	HeaderStatsMinutesListeningChart	Minutes listened in the last 7 days
+set_set_aside_failed	-	Could not be set aside. Try again.
+set_connection	-	Connection
+set_diagnostics_area_media	-	Media
+set_diagnostics_area_sync	-	Sync
+set_unreadable_resets_title	-	Saved progress discards could not be read
+set_unreadable_resets_detail	-	Any title may be among them, so nothing plays and no reading position is sent until you decide. Setting them aside keeps the file on this device, and any progress they were to discard stays on your server.
+set_set_them_aside	-	Set them aside
+set_listening_storage_title	-	Listening from before the app closed could not be saved
+set_listening_storage_detail	-	Storage on this device is unavailable or full. Nothing plays and no listening is sent until it is saved; it is kept until then.
+set_unreadable_writes_title	-	Records of unanswered progress saves could not be read
+set_unreadable_writes_detail	-	A save of any title may still reach your server, so no listening or reading is sent and no progress is discarded until you decide. Setting them aside keeps the file on this device; a late save may then bring back progress you discard.
+set_diagnostics_server	-	Server %1$s
+set_diagnostics_signed_in_as	-	Signed in as %1$s
+set_diagnostics_app_version	-	App %1$s
+set_recent_problems	-	Recent problems
+set_clear	-	Clear
+set_no_problems	-	No problems recorded on this device.
+set_unreadable_writes_confirm_title	-	Set unreadable records aside?
+set_unreadable_writes_confirm_detail	-	Listening and reading positions are sent again and discards can go ahead.
+set_set_aside	-	Set aside
+set_unreadable_resets_confirm_title	-	Set unreadable discards aside?
+set_unreadable_resets_confirm_detail	-	Titles play and reading positions are sent again. Discard progress again for any title you still want to start over.
+set_signed_in	-	Signed in
+set_other_accounts	-	Other accounts
+set_server_sign_in_required	-	%1$s · sign in required
+set_remove_account	-	Remove %1$s
+set_switch_to_account	-	Switch to this account
+set_add_account	-	Add account
+set_sign_out_of	-	Sign out of %1$s
+set_sign_out_detail	-	Removes this account from the device. Downloads and unsent listening for it stay until it signs in again.
+set_accounts_footer	-	Each account keeps its own progress, downloads and library choice. Switching never mixes them.
+set_remove_account_confirm	-	Remove %1$s?
+set_remove_account_detail	-	You can add the account again later. Its downloads and unsent listening stay on this device.
+set_remove	ButtonRemove	Remove
+set_add_an_account	-	Add an account
+set_connect_intro	-	Connect directly to your own server. Nothing is routed through another service.
+set_change_server	-	Change server
+set_sign_in	-	Sign in
+set_sign_in_openid	-	Sign in with OpenID
+set_saved_accounts	-	Saved accounts
+set_use_account	-	Use
+set_edit	-	Edit
+set_add_podcast	-	Add podcast
+set_not_available_yet	-	Not available yet
+set_not_available_yet_detail	-	This part of the preview is still being built.
+set_import_previous_app	-	Import from the previous app
+set_import_interrupted	-	An import did not finish. Choose the same export to continue where it stopped.
+set_import_already	-	This export was already imported. Titles, listening and positions from it are on this device.
+set_import_preflight	-	%1$s\nThe previous app and this file are only read; nothing in them changes. Titles, listening and positions attach to an account once it signs in here. Passwords are not in the export, so each account signs in again.
+set_import_account_signed_in	-	%1$s · signed in
+set_import_account_sign_in_later	-	%1$s · sign in after importing
+set_import_titles	-	Titles
+set_import_title_partial	-	%1$s · the rest downloads again
+set_not_imported	-	Not imported
+set_import_space	-	Needs %1$s; %2$s free.
+set_import_no_space	-	There is not enough free space on this device. Free some space, then choose the export again.
+set_import_progress	-	Copying files: %1$d of %2$d. If the app closes, choose the same export again to continue.
+set_import_done	-	Imported %1$d titles, %2$d listening sessions and %3$d positions. Settings from the previous app were applied.
+set_import_waiting	-	Sign in to %1$s as %2$s to attach its titles, listening and positions.
+set_import	-	Import
+set_continue	-	Continue
+set_close	-	Close
+set_import_issue_account	HeaderAccount	Account
+set_import_file_unreadable	-	The chosen file could not be read. Choose it again, or save it to this device first.
+set_import_stopped	-	The import stopped before it finished. Nothing was lost: choose the same export again to continue where it stopped.
+set_import_item_gone	-	It is no longer on the server, so it was not adopted.
+set_import_file_changed	-	A file changed on this device after it was imported, so it is downloaded again from the server.
+set_openid_not_enabled	-	OpenID sign-in is not enabled on this server. Use your username and password.
+set_openid_canceled	-	Browser sign-in was canceled. Your saved accounts are retained.
+set_openid_invalid	-	The browser sign-in response could not be verified. Retry sign-in and check the server's OpenID redirect settings.
+set_vault_unreadable	-	Saved sign-ins could not be decrypted. They are kept on the device; sign in again to continue.
+set_session_ended	-	Your session for %1$s ended. Sign in again; unsent listening and downloads are kept.
+set_play_blocked_listening_storage	-	Listening from before the app closed could not be saved because storage is unavailable, so nothing plays until it can be. Free some space, then try again.
+set_play_blocked_unreadable_resets	-	Saved progress discards could not be read, so nothing plays until they are resolved in Diagnostics.
+set_play_blocked_discarding	-	Progress for this title is still being discarded. It plays from the beginning once that is done.
+# downloads and the PDF reader
+dl_not_saved	-	The download list could not be saved on this device, so nothing changed. Free some storage and try again.
+dl_not_allowed	-	Your account is not allowed to download.
+dl_no_audio	-	This item has no audio to download.
+dl_no_space	-	Not enough free space on this device for %1$s while keeping storage free for the system.
+dl_folder_lost_nothing_downloaded	-	Access to %1$s was removed, so nothing was downloaded. Choose the download folder again in Settings.
+dl_downloading_percent	-	Downloading %1$d%%
+dl_downloading	MessageDownloading	Downloading…
+dl_cancel_download	-	Cancel download
+dl_downloaded_plays_offline	-	Downloaded · plays offline
+dl_remove	ButtonRemove	Remove
+dl_failed	-	The download failed.
+dl_discard	-	Discard
+dl_cellular_title	-	Download on mobile data?
+dl_cellular_message	-	You are on a metered connection. You can change this in Settings.
+dl_not_now	-	Not now
+dl_folder_cannot_be_kept	-	That folder cannot be kept for downloads. Choose another one.
+dl_saved_in_folder	-	Downloads are saved in %1$s
+dl_saved_in_app_storage	-	Downloads are saved in app storage
+dl_folder_visible_to_other_apps	-	Other apps on this device can see these files. Downloads made before a change stay where they are.
+dl_folder_private_to_app	-	Only this app can see these files. Choose a folder to keep downloads where other apps can reach them.
+dl_choose_folder	-	Choose folder
+dl_use_app_storage	-	Use app storage
+dl_ebook_missing	-	The ebook is missing from this device. Download it again to open it.
+dl_no_app_opens_format	-	No app on this device opens %1$s files. Install one that does and try again.
+dl_no_app_opens_this_kind	-	No app on this device opens this kind of files. Install one that does and try again.
+dl_folder_lost_choose_again_open	-	This download is in %1$s, and access to %1$s was removed. Choose %1$s again to open it.
+dl_folder_lost_choose_again_play	-	This download is in %1$s, and access to %1$s was removed. Choose %1$s again to play it.
+dl_names_or	-	%1$s or %2$s
+dl_names_and	-	%1$s and %2$s
+dl_remove_title	-	Remove download?
+dl_remove_message	-	"%1$s" will be removed from this device. Your listening progress is kept.
+dl_keep	-	Keep
+dl_not_that_folder	-	That is not %1$s. Choose the folder these downloads are in.
+dl_folder_access_not_kept	-	Access to that folder could not be kept. Try again.
+dl_no_downloads	-	No downloads
+dl_no_downloads_message	-	Download books or episodes from their page to listen without a connection.
+dl_access_removed_title	-	Access to %1$s was removed
+dl_downloads_kept_there:one	-	%1$d download is kept there. Choose %2$s again to play and open it.
+dl_downloads_kept_there:other	-	%1$d downloads are kept there. Choose %2$s again to play and open them.
+dl_choose_again	-	Choose %1$s again
+dl_some_files_missing	-	Some files are missing from this device
+dl_size_in_folder	-	%1$s in %2$s
+dl_open_in_another_app	-	Open %1$s in another app
+dl_download_again_named	-	Download %1$s again
+dl_the_chosen_folder	-	the chosen folder
+dl_files_missing_play	-	Some files of this download are missing from this device. Download it again to play it.
+dl_play_named	-	Play %1$s
+dl_retry_named	-	Retry %1$s
+dl_cancel_named	-	Cancel %1$s
+dl_remove_named	-	Remove %1$s
+dl_sign_in_again	-	Sign in to this account again to download.
+dl_folder_lost_choose_in_downloads	-	Access to %1$s was removed. Choose the folder again in Downloads.
+dl_connection_interrupted	-	The connection was interrupted.
+dl_error_retrying	-	%1$s Retrying…
+dl_server_refused	-	The server refused the download.
+dl_server_sent_type_not_audio	-	The server sent %1$s instead of audio, so nothing was saved. Check your server or proxy and retry.
+dl_server_sent_unknown_not_audio	-	The server sent an unknown response instead of audio, so nothing was saved. Check your server or proxy and retry.
+dl_size_mismatch	-	The downloaded file was %1$d bytes but the server listed %2$d, so it was discarded. Retry to download it again.
+dl_server_sent_not_pdf	-	The server sent something other than the PDF, so nothing was saved. Check your server or proxy and retry.
+dl_notification_downloading	MessageDownloadingFile	Downloading %1$s	de
+rd_positions_not_restored	-	Saved reading positions could not be restored, so pages are not being saved. The original data is kept.
+rd_positions_not_overwritten	-	Saved reading positions could not be read, so they are not overwritten.
+rd_not_a_pdf	-	This file is not a PDF this device can open.
+rd_document_not_opened	-	The document could not be opened.
+rd_page_not_saved	-	This page could not be saved on this device.
+rd_choice_not_saved	-	Your choice could not be saved on this device.
+rd_conflict_title	-	Continue where?
+rd_conflict_page	-	Another device reached page %1$d while page %2$d here was not yet saved to the server.
+rd_conflict_location	-	Another device saved a reading position this reader cannot show as a page while page %1$d here was not yet saved to the server.
+rd_go_to_page_number	-	Go to page %1$d
+rd_keep_other_position	-	Keep the other position
+rd_stay_on_page	-	Stay on page %1$d
+rd_close_reader	-	Close reader
+rd_rotate_pages	-	Rotate pages
+rd_continuous_scrolling	-	Continuous scrolling
+rd_document_error_title	-	This document could not be opened
+rd_try_again	-	Try again
+rd_go_to_page	-	Go to page
+rd_previous_page	-	Previous page
+rd_next_page	-	Next page
+rd_page_of	-	Page %1$d of %2$d
+rd_page_number	-	Page %1$d
+rd_download_folder_lost	-	This download is in %1$s, and access to %1$s was removed. Choose the folder again in Downloads.
+rd_downloaded_document_missing	-	The downloaded document is missing from this device. Download it again.
+rd_document_not_stored	-	The document could not be stored for reading.
+rd_supplementary_pdf	-	supplementary PDF
+rd_format_not_available	-	Reading %1$s is not available in this preview yet. Your reading position on the server is kept.
+rd_ebook_not_available	-	Reading this ebook is not available in this preview yet. Your reading position on the server is kept.
+# collections, playlists, podcasts and item actions
+grp_unavailable_title	-	Unavailable title
+grp_collection	HeaderCollection	Collection
+grp_playlist	HeaderPlaylist	Playlist
+grp_could_not_load_collections	-	Could not load collections.
+grp_could_not_load_playlists	-	Could not load playlists.
+grp_collections_unavailable	-	Collections unavailable
+grp_playlists_unavailable	-	Playlists unavailable
+grp_no_collections_yet	-	No collections yet
+grp_no_playlists_yet	-	No playlists yet
+grp_create_one_hint	-	Create one to keep titles together in your own order.
+grp_title_count:one	-	%1$d title
+grp_title_count:other	-	%1$d titles
+grp_collection_deleted	-	This collection was deleted.
+grp_playlist_deleted	-	This playlist was deleted.
+grp_could_not_load	-	Could not load.
+grp_collection_unavailable	-	Collection unavailable
+grp_playlist_unavailable	-	Playlist unavailable
+grp_nothing_in_collection_can_play	-	Nothing in this collection can play.
+grp_nothing_in_playlist_can_play	-	Nothing in this playlist can play.
+grp_could_not_start_playback	-	Could not start playback.
+grp_resume	-	Resume
+grp_play_collection	-	Play collection
+grp_play_playlist	-	Play playlist
+grp_edit_collection	-	Edit collection
+grp_edit_playlist	-	Edit playlist
+grp_delete_collection	-	Delete collection
+grp_delete_playlist	-	Delete playlist
+grp_no_titles_yet	-	No titles yet
+grp_delete_collection_question	-	Delete collection?
+grp_delete_playlist_question	-	Delete playlist?
+grp_delete_group_explanation	-	“%1$s” is removed from your server. The titles in it are kept.
+grp_not_deleted	-	Not deleted: %1$s
+grp_not_deleted_try_again	-	Not deleted: try again
+grp_delete	ButtonDelete	Delete
+grp_not_allowed_to_change_collection	-	Your server account is not allowed to change this collection.
+grp_not_allowed_to_change_playlist	-	Your server account is not allowed to change this playlist.
+grp_collection_no_longer_exists	-	This collection no longer exists.
+grp_playlist_no_longer_exists	-	This playlist no longer exists.
+grp_not_saved	-	Not saved: %1$s
+grp_not_saved_try_again	-	Not saved: try again
+grp_name	LabelName	Name	ru
+grp_description	LabelDescription	Description
+grp_saving	-	Saving…
+grp_create_collection	-	Create collection
+grp_create_playlist	-	Create playlist
+grp_save_changes	-	Save changes
+grp_choose_at_least_one_title	-	Choose at least one title.
+grp_order	-	Order
+grp_move_up	-	Move %1$s up
+grp_remove_member	-	Remove %1$s
+grp_add_titles	-	Add titles
+grp_add_episodes_hint	-	Add episodes from a podcast's episode page.
+grp_add_to_playlist_or_collection	-	Add to playlist or collection
+grp_add_to_playlist	LabelAddToPlaylist	Add to playlist	ja
+grp_add_to	-	Add to
+grp_nothing_to_add_to	-	Nothing you can add to here yet.
+grp_added_to	-	Added to %1$s
+grp_not_added	-	Not added: %1$s
+grp_not_added_try_again	-	Not added: try again
+grp_already_included	-	Already included
+grp_close	-	Close
+grp_loading	MessageLoading	Loading…
+grp_titles_could_not_load	-	Titles could not load
+grp_nothing_here	-	Nothing here
+grp_back	ButtonBack	Back
+pod_filter_all	LabelAll	All
+pod_filter_incomplete	LabelIncomplete	Incomplete
+pod_filter_in_progress	LabelInProgress	In progress	de ar bg
+pod_feed_episodes	-	Feed episodes
+pod_sort_newest_first	-	Newest first, tap for oldest first
+pod_sort_oldest_first	-	Oldest first, tap for newest first
+pod_episodes_queued:one	-	%1$d episode queued on your server: %2$s
+pod_episodes_queued:other	-	%1$d episodes queued on your server: %2$s
+pod_server_could_not_download	-	Your server could not download “%1$s”.
+pod_dismiss	-	Dismiss
+pod_no_episodes_yet	-	No episodes yet
+pod_no_episodes_match_filter	-	No episodes match this filter
+pod_episode_details	-	Episode details
+pod_untitled_episode	-	Untitled episode
+pod_time_left	LabelTimeRemaining	%1$s left
+pod_play_named	-	Play %1$s
+pod_episode_not_available	-	Episode not available
+pod_episode_may_have_been_removed	-	It may have been removed from the server.
+pod_percent_listened	-	%1$d%% listened
+pod_feed_could_not_open	-	The feed could not be opened.
+pod_retry_feed	-	Retry feed
+pod_no_feed_episodes	-	No feed episodes found
+pod_already_on_server	-	Already on server
+pod_selected	-	Selected
+pod_not_selected	-	Not selected
+pod_no_audio_enclosure	-	No audio enclosure
+pod_not_queued	-	Not queued: %1$s
+pod_not_queued_try_again	-	Not queued: try again
+pod_queueing_on_server	-	Queueing on your server…
+pod_add_selected_episodes	-	Add selected episodes to server
+pod_something_went_wrong	-	Something went wrong.
+pod_adding_not_available	-	Adding podcasts is not available
+pod_adding_needs_permission	-	Your server account needs podcast management permission in a podcast library.
+pod_search_podcasts	-	Search podcasts
+pod_no_podcasts_found	MessageNoPodcastsFound	No podcasts found
+pod_or_rss_feed_url	-	Or RSS feed URL
+pod_enter_complete_feed_url	-	Enter a complete HTTP or HTTPS feed URL.
+pod_preview_feed	-	Preview feed
+pod_title	LabelTitle	Title
+pod_author	LabelAuthor	Author
+pod_folder	LabelFolder	Folder
+pod_auto_download_episodes	LabelAutoDownloadEpisodes	Download new episodes automatically
+pod_create_podcast	-	Create podcast
+pod_choose_different_feed	-	Choose a different feed
+item_something_went_wrong	-	Something went wrong. Try again.
+item_rss_feed_is_open	HeaderRSSFeedIsOpen	RSS feed is open
+item_open_rss_feed	HeaderOpenRSSFeed	Open RSS feed
+item_rss_feed	HeaderRSSFeed	RSS feed
+item_feed_subscribe_at	-	Podcast apps can subscribe to this title at:
+item_copied	-	Copied
+item_copy_address	-	Copy address
+item_hidden_from_directories	-	Hidden from podcast directories
+item_feed_public_warning	-	Anyone with the address can listen to this title without signing in.
+item_feed_name	-	Feed name
+item_feed_name_rule	-	Letters, numbers, - and _ only
+item_hide_from_directories	-	Hide from podcast directories
+item_owner_name	LabelRSSFeedCustomOwnerName	Owner name
+item_owner_email	LabelRSSFeedCustomOwnerEmail	Owner email
+item_open_feed	ButtonOpenFeed	Open feed
+item_close_feed	ButtonCloseFeed	Close feed
+item_done	-	Done
+item_sending	-	Sending…
+item_send_to_ereader	ButtonSendEbookToDevice	Send to e-reader
+item_sent_to	-	Sent to %1$s
+item_send_ebook_explanation	-	Your server emails the ebook to the device you choose.
+item_ereader_or_ebook_gone	-	%1$s or this ebook is no longer available on the server. Nothing was sent.
+item_not_sent_to	-	Not sent to %1$s. %2$s
+item_not_saved_try_again	-	Not saved. Try again.
+item_mark_unfinished	-	Mark unfinished
+item_discard_uncertain	-	An earlier save of this title's progress got no answer and may still reach your server. If it arrives after the discard, it brings the progress back. Your server cannot tell this app whether it will.
+item_discard_anyway	-	Discard anyway
+item_discard_under_way	-	This discard is already under way and cannot be withdrawn.
+item_keep_progress	-	Keep progress
+item_discard_pending	-	Discarding progress. This finishes once your server can be reached and this title's listening is sent.
+item_discard_anyway_question	-	Discard anyway?
+item_discard_anyway_explanation	-	The progress is removed now. If the earlier save reaches your server afterwards, this title's progress comes back and you can discard it again.
+item_discard	-	Discard
+item_discard_progress_question	-	Discard progress?
+item_discard_progress_explanation	-	Your position and finished state for this title are removed from the server for every device.
+item_could_not_load	-	This title could not load
+item_narrated_by	-	Narrated by
+item_series	-	Series: %1$s
+item_series_with_sequence	-	Series: %1$s #%2$s
+item_episode_count:one	-	%1$d episode
+item_episode_count:other	-	%1$d episodes
+item_listened_and_left	-	%1$d%% listened · %2$s left
+item_chapter_number	-	Chapter %1$d
+# player, casting, library, search and Android Auto
+pl_minimize_player	-	Minimize player
+pl_nothing_playing	-	Nothing is playing
+pl_chapter_number	-	Chapter %1$d
+pl_try_again	-	Try again
+pl_speed_value	-	Speed %1$s
+pl_sleep	-	Sleep
+pl_position_of_duration	-	%1$s of %2$s
+pl_buffering	-	Buffering
+pl_previous_chapter	-	Previous chapter
+pl_next_chapter	-	Next chapter
+pl_jump_forward_seconds:one	-	Jump forward %1$d second
+pl_jump_forward_seconds:other	-	Jump forward %1$d seconds
+pl_jump_back_seconds:one	-	Jump back %1$d second
+pl_jump_back_seconds:other	-	Jump back %1$d seconds
+pl_jump_forward_minutes:one	-	Jump forward %1$d minute
+pl_jump_forward_minutes:other	-	Jump forward %1$d minutes
+pl_jump_back_minutes:one	-	Jump back %1$d minute
+pl_jump_back_minutes:other	-	Jump back %1$d minutes
+pl_open_player	-	Open player
+pl_playback_stopped	-	Playback stopped
+pl_listening_unsaved	-	Some listening is not saved on this device yet. It is kept and saved as soon as storage allows.
+pl_playing	-	Playing
+pl_resume	-	Resume
+pl_streaming_cellular_refused	-	Streaming on mobile data is turned off in Settings. Connect to Wi-Fi or download this title first.
+pl_stream_cellular_title	-	Stream on mobile data?
+pl_stream_cellular_message	-	You are on a metered connection. You can change this in Settings.
+pl_not_now	-	Not now
+pl_sleep_stops_end_of_chapter	-	Stops at the end of this chapter, %1$s from now
+pl_sleep_stops_in	-	Stops in %1$s
+pl_sleep_minus_minutes	-	−%1$d min
+pl_sleep_plus_minutes	-	+%1$d min
+pl_sleep_minutes	-	%1$d min
+pl_sleep_turn_off	-	Turn off
+pl_bookmark_not_saved_reason	-	Bookmark not saved: %1$s
+pl_bookmark_not_saved	-	Bookmark not saved: try again
+pl_bookmark_add_at	-	Add at %1$s
+pl_bookmark_go_to	-	Go to bookmark
+pl_bookmark_default	-	Bookmark
+pl_bookmark_rename_named	-	Rename %1$s
+pl_bookmark_delete_named	-	Delete %1$s
+pl_bookmark_at	-	Bookmark at %1$s
+pl_bookmark_rename	-	Rename bookmark
+pl_bookmark_new	-	New bookmark
+pl_bookmark_title_field	LabelTitle	Title
+pl_untitled	-	Untitled
+pl_playback_stopped_reason	-	Playback stopped: %1$s. Your position is kept.
+pl_playback_stopped_unknown	-	Playback stopped: the audio could not be loaded. Your position is kept.
+pl_no_playable_audio	-	This item has no playable audio.
+pl_could_not_start	-	Playback could not start.
+pl_listening_save_failed	-	Listening could not be saved on this device, so playback paused. Free some storage and try again.
+cast_casting_to	-	Casting to %1$s
+cast_cast	-	Cast
+cast_playing_on	-	Playing on %1$s
+cast_connecting_to	-	Connecting to %1$s…
+cast_playing_on_phone	-	Playing on this phone
+cast_stop	-	Stop casting
+cast_looking	-	Looking for cast devices…
+cast_none_found	-	No cast devices found. Check that the receiver is switched on and on the same Wi-Fi network as this phone.
+cast_close	-	Close
+cast_download_not_castable	-	Downloaded copies play on this phone only. Stop casting to listen here, or stream the title instead.
+cast_resumed_without_title	-	Casting stopped because the app restarted while casting. Open the title again to keep listening from the last place this phone saved.
+cast_needs_play_services	-	Casting needs Google Play services, which this device does not have or needs to update.
+cast_could_not_start	-	Casting could not start on this device: %1$s.
+cast_connect_failed_named	-	Could not connect to %1$s. Check that it is on and on the same Wi-Fi network as this phone.
+cast_connect_failed	-	Could not connect to the receiver. Check that it is on and on the same Wi-Fi network as this phone.
+cast_connection_lost_named	-	The connection to %1$s was lost. Playback continues on this phone.
+cast_connection_lost	-	The connection to the receiver was lost. Playback continues on this phone.
+auto_continue	-	Continue
+auto_recent	-	Recent
+auto_libraries	HeaderLibraries	Libraries
+auto_discovery	-	Discovery
+auto_authors_count:one	-	%1$d author
+auto_authors_count:other	-	%1$d authors
+auto_series_count:one	-	%1$d series
+auto_series_count:other	-	%1$d series
+lib_books_count:one	-	%1$d book
+lib_books_count:other	-	%1$d books
+lib_items_count:one	-	%1$d item
+lib_items_count:other	-	%1$d items
+lib_filter_genre	LabelGenre	Genre
+lib_filter_tag	LabelTag	Tag
+lib_author	LabelAuthor	Author
+lib_filter_narrator	LabelNarrator	Narrator
+lib_filter_language	LabelLanguage	Language
+lib_filter_progress	LabelProgress	Progress
+lib_filter_ebooks	LabelEbooks	Ebooks
+lib_filter_no_series	MessageNoSeries	No series
+lib_filter_in_progress	LabelInProgress	In progress	de ar bg
+lib_filter_not_started	LabelNotStarted	Not started
+lib_filter_not_finished	LabelNotFinished	Not finished
+lib_filter_has_ebook	LabelHasEbook	Has ebook
+lib_filter_has_supplementary_ebook	LabelHasSupplementaryEbook	Has supplementary ebook
+lib_filter_all	LabelAll	All
+lib_selected	-	Selected
+lib_all_filters	-	All filters
+lib_loading	MessageLoading	Loading…
+lib_nothing_to_filter	-	Nothing to filter by here.
+lib_sort_title	LabelTitle	Title
+lib_sort_date_added	LabelAddedAt	Date added
+lib_sort_size	LabelSize	Size
+lib_sort_number_of_episodes	LabelNumberOfEpisodes	Number of episodes
+lib_sort_file_created	LabelFileBirthtime	File created
+lib_sort_file_modified	LabelFileModified	File modified
+lib_sort_random	LabelRandomly	Random
+lib_sort_author_first_last	LabelAuthorFirstLast	Author (first last)
+lib_sort_author_last_first	LabelAuthorLastFirst	Author (last, first)
+lib_sort_published_year	LabelPublishYear	Published year
+lib_sort_duration	LabelDuration	Duration
+lib_sort_progress_updated	LabelLibrarySortByProgress	Progress: last updated
+lib_sort_progress_started	LabelLibrarySortByProgressStarted	Progress: started
+lib_sort_progress_finished	LabelLibrarySortByProgressFinished	Progress: finished
+lib_sort_descending_switch	-	Descending, switch to ascending
+lib_sort_ascending_switch	-	Ascending, switch to descending
+lib_sort_descending	-	Descending
+lib_sort_ascending	-	Ascending
+lib_unavailable	-	Library unavailable
+lib_unavailable_message	-	%1$s Your account and unsent listening are kept.
+lib_heading_with_total	-	%1$s · %2$d
+lib_show_covers	-	Show covers
+lib_show_list	-	Show list
+lib_filtered	-	Filtered
+lib_empty_title	-	Nothing here yet
+lib_empty_message	-	This library has no items you can access.
+lib_page_error	-	More titles could not load
+lib_card_finished	-	%1$s, finished
+lib_card_percent_listened	-	%1$s, %2$d percent listened
+lib_search_in	-	Search %1$s
+lib_search_library	-	Search library
+lib_clear_search	-	Clear search
+lib_search_failed	-	Search failed
+lib_search_idle_title	-	Find something to listen to
+lib_search_idle_message	-	Search titles, authors, series, narrators and episodes.
+lib_search_no_match	-	Nothing matches "%1$s". Try fewer words or another spelling.
+err_invalid_server	-	Enter a server address starting with http:// or https://, for example https://books.example.com/abs.
+err_unsafe_media_url	-	The server returned a media address outside this server. It was not opened.
+err_sign_in_required	-	Your session is no longer accepted. Sign in again; unsent listening is kept.
+err_untrusted	-	The server's certificate is not trusted by this device. Install your server's certificate authority in Android Settings > Security > Encryption & credentials, then try again.
+err_offline	-	The server could not be reached. Check the address or your connection and try again.
+err_forbidden	-	Your account is not allowed to do this.
+err_not_found	-	This content is no longer available on the server.
+err_server_problem	-	The server had a temporary problem (HTTP %1$d). Try again.
+err_rejected	-	The server rejected the request (HTTP %1$d).
+err_invalid_response	-	The server sent a response this app could not read.
+err_no_audio	-	This item has no playable audio.
+err_login_rejected	-	The username or password was not accepted.
+err_publications_unreadable	-	Records of unanswered progress writes could not be read. Resolve them in Diagnostics first.
+err_discards_unreadable	-	Saved progress discards could not be read. Resolve them in Diagnostics first.
+pl_total_track	LabelTotalTrack	Total track
+pl_chapter_track	LabelChapterTrack	Chapter track
+pl_scale_elapsed	LabelScaleElapsedTimeBySpeed	Scale elapsed time by speed
+pl_lock	LabelLockPlayer	Lock player
+pl_unlock	LabelUnlockPlayer	Unlock player

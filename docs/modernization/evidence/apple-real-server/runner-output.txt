@@ -1,0 +1,81 @@
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+lease=75FA9768-B15C-40B6-ACC7-790D7FCAD29C
+online exit=65
+Test Case '-[NativeJourneyTests.RealServerProbe test1SignInBrowseAndStreamAcrossFiles]' passed (106.836 seconds).
+Test Case '-[NativeJourneyTests.RealServerProbe test2PDFPageSavedToServerAndRestored]' passed (106.003 seconds).
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/UITests/RealServerProbe.swift:77: error: -[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress] : Failed to get matching snapshot: No matches found for Elements matching predicate '"total-elapsed" IN identifiers' from input {(
+Test Case '-[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress]' failed (30.974 seconds).
+download exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test4aDownloadForOffline]' passed (65.139 seconds).
+server stopped 16:51:08
+offline exit=65
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/UITests/RealServerProbe.swift:208: error: -[NativeJourneyTests.RealServerProbe test4bPlayOfflineWithServerStopped] : Failed to tap "pause-playback" Button: No matches found for Elements matching predicate '"pause-playback" IN identifiers' from input {(
+Test Case '-[NativeJourneyTests.RealServerProbe test4bPlayOfflineWithServerStopped]' failed (22.408 seconds).
+server started 16:51:56
+reconnect exit=65
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/UITests/RealServerProbe.swift:43: error: -[NativeJourneyTests.RealServerProbe test4cReconnectPublishesOfflineListening] : failed - Server progress for 262f4900-6cbf-4dc0-a751-109bf5a13939 never satisfied the check; last: ["ebookProgress": 0, "progress": 0.4147948413593637, "isFinished": 0, "mediaItemType": book, "id": 72444065-611e-42e5-a1b3-4a533f8d7783, "libraryItemId": 262f4900-6cbf-4dc0-a751-109bf5a13939, "ebookLocation": <null>, "finishedAt": <null>, "startedAt": 1790927199678, "mediaItemId": ecba2576-78e2-483f-9a5f-4a4a4317ae6d, "lastUpdate": 1790927209351, "currentTime": 37.414833578, "duration": 90.200817, "hideFromContinueListening": 0, "userId": a8cc33de-2e45-4519-9062-1b30f36cb67f, "episodeId": <null>]
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/UITests/RealServerProbe.swift:224: error: -[NativeJourneyTests.RealServerProbe test4cReconnectPublishesOfflineListening] : XCTAssertGreaterThanOrEqual failed: ("37.414833578") is less than ("60.0") - The offline position must reach the server
+Test Case '-[NativeJourneyTests.RealServerProbe test4cReconnectPublishesOfflineListening]' failed (67.195 seconds).
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+download-rerun exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test4aDownloadForOffline]' passed (66.054 seconds).
+server stopped 16:56:04
+offline-rerun exit=65
+OFFLINE_START=39
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/UITests/RealServerProbe.swift:213: error: -[NativeJourneyTests.RealServerProbe test4bPlayOfflineWithServerStopped] : XCTAssertGreaterThanOrEqual failed: ("1") is less than ("60")
+OFFLINE_POSITION=1
+Test Case '-[NativeJourneyTests.RealServerProbe test4bPlayOfflineWithServerStopped]' failed (19.920 seconds).
+server started 16:56:49
+reconnect-rerun exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test4cReconnectPublishesOfflineListening]' passed (6.708 seconds).
+podcast-rerun exit=65
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/UITests/RealServerProbe.swift:77: error: -[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress] : Failed to get matching snapshot: No matches found for Elements matching predicate '"chapter-elapsed" IN identifiers' from input {(
+Test Case '-[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress]' failed (33.778 seconds).
+tv exit=65
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/tvos/UITests/RealServerProbe.swift:48: error: -[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles] : failed - Could not move focus to "username" TextField; focused Attributes: Keyboard, 0x10635e840, {{0.0, 462.0}, {1920.0, 226.0}}, label: 'Keyboard', Focused
+Test Case '-[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles]' failed (21.994 seconds).
+TV_EPISODE episode=e7859f80-3e80-4c52-aeb6-9b463da04a19 before=0.0 saved=6.825110253
+Test Case '-[TVJourneyTests.RealServerProbe test2SearchAndPodcastEpisode]' passed (42.216 seconds).
+sync d203419c-c6c2-4eec-a3a4-4d9647474f26 200
+restarted 16:59:59
+sync 2e8ac478-8e96-4e49-b8d2-ac9fa3118acc 200
+volume3 200
+open=2e8ac478-8e96-4e49-b8d2-ac9fa3118acc restarted=d203419c-c6c2-4eec-a3a4-4d9647474f26
+migration exit=65
+ADOPTION_REPORT 3 downloads are ready once their accounts are signed in. 3 listening sessions are waiting to be sent to the server. 2 listening positions are waiting to be compared with the server. Sign in to 1 account to use the rest of its data. issues=["Listening for http://127.0.0.1:19890 is waiting to be sent (3 sessions, 2 positions).", "Sign in to http://127.0.0.1:19890 as qa-other again. Downloads, progress and unsent listening for this account are kept and become available after sign-in."]
+SYNC_1 acknowledged=2 pending=0 unconfirmed=1 failures=["Listening in \"Title\" is kept on this device: The server\'s row for this session was written after the legacy app\'s last update, so it was not replaced."]
+SYNC_2 acknowledged=0 pending=0 unconfirmed=1 failures=[]
+SERVER open=25/10 restarted=5/5 local=3/3.5 volume2=2.0 volume3=3.0 (before 3.0)
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/NativeTests/RealServerAdoptionProbe.swift:138: error: -[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce] : XCTAssertEqual failed: ("2") is not equal to ("3") - All three pending sessions must be accepted: ["Listening in \"Title\" is kept on this device: The server\'s row for this session was written after the legacy app\'s last update, so it was not replaced."]
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/NativeTests/RealServerAdoptionProbe.swift:139: error: -[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce] : XCTAssertEqual failed: ("1") is not equal to ("0")
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/NativeTests/RealServerAdoptionProbe.swift:142: error: -[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce] : XCTAssertEqual failed: ("Optional(5.0)") is not equal to ("Optional(11.0)") - Restarted session: the stored 5 s plus the unsent 6 s
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/NativeTests/RealServerAdoptionProbe.swift:143: error: -[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce] : XCTAssertEqual failed: ("Optional(5.0)") is not equal to ("Optional(11.0)")
+Test Case '-[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce]' failed (2.879 seconds).
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+podcast-rerun2 exit=65
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/apple/UITests/RealServerProbe.swift:174: error: -[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress] : XCTAssertNotEqual failed: ("200") is equal to ("200") - Episode progress must not be saved as podcast-level progress
+Test Case '-[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress]' failed (32.245 seconds).
+tv-resume-rerun exit=65
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/tvos/UITests/RealServerProbe.swift:72: error: -[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles] : failed - Could not move focus to "next-chapter" Button; focused Attributes: Button, 0x1181b3180, {{669.5, 728.5}, {135.5, 111.5}}, identifier: 'skip-forward', label: 'Forward 10 seconds', Focused
+Test Case '-[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles]' failed (35.064 seconds).
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+sync ef40ace0-302b-4e18-b90e-6bed15fa7c20 200
+restarted 17:03:24
+sync c9b57a53-3a2e-4a4c-9a7c-a229549a2934 200
+volume3 200
+open=c9b57a53-3a2e-4a4c-9a7c-a229549a2934 restarted=ef40ace0-302b-4e18-b90e-6bed15fa7c20
+migration-rerun exit=0
+ADOPTION_REPORT 3 downloads are ready once their accounts are signed in. 3 listening sessions are waiting to be sent to the server. 2 listening positions are waiting to be compared with the server. Sign in to 1 account to use the rest of its data. issues=["Listening for http://127.0.0.1:19890 is waiting to be sent (3 sessions, 2 positions).", "Sign in to http://127.0.0.1:19890 as qa-other again. Downloads, progress and unsent listening for this account are kept and become available after sign-in."]
+SYNC_1 acknowledged=3 pending=0 unconfirmed=0 failures=[]
+SYNC_2 acknowledged=0 pending=0 unconfirmed=0 failures=[]
+SERVER open=25/25 restarted=11/11 local=3/3.5 volume2=2.0 volume3=3.0 (before 3.0)
+Test Case '-[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce]' passed (0.843 seconds).
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+podcast-rerun3 exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress]' passed (30.322 seconds).
+tv-resume-rerun2 exit=65
+/Volumes/ai-ssd/code/audiobookshelf-final-mobile-qa/tvos/UITests/RealServerProbe.swift:88: error: -[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles] : Failed to get matching snapshot: No matches found for Elements matching predicate '"now-playing-chapter" IN identifiers' from input {(
+Test Case '-[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles]' failed (75.155 seconds).
+tv-resume-rerun3 exit=0
+TV_RESUME before=63.703180337000006 resumedAt=64 resumedChapter=Landfall · Chapter 3 of 3 chapter=Crossing · Chapter 2 of 3 reachedSecond=true saved=34.322588489
+Test Case '-[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles]' passed (39.536 seconds).

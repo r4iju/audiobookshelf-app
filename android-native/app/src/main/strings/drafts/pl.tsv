@@ -1,0 +1,480 @@
+# Polish drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Konta
+title_new_collection	Nowa kolekcja
+action_retry	Ponów
+action_read	Czytaj %1$s
+action_mark_finished	Oznacz jako ukończone
+choose_library	Wybierz bibliotekę
+all_titles	Wszystkie tytuły
+all_podcasts	Wszystkie podcasty
+filter	Filtr
+sort	Sortuj
+theme_system	Systemowy
+screen_orientation	Orientacja ekranu
+jump_forward	Przeskok w przód
+jump_back	Przeskok wstecz
+set_settings_not_saved	Nie udało się zapisać ustawień na tym urządzeniu, więc nic się nie zmieniło. Zwolnij trochę miejsca i spróbuj ponownie.
+set_orientation_follow_device	Jak urządzenie
+set_orientation_portrait	Pionowa
+set_orientation_landscape	Pozioma
+set_haptic_light	Lekkie
+set_rewind_on_resume	Cofnij trochę przy wznawianiu
+set_rewind_on_resume_detail	Cofa o kilka sekund po pauzie, a więcej po dłuższej.
+set_seek_system_controls	Przewijanie w sterowaniu systemowym
+set_seek_system_controls_detail	Pozwala przesuwać pasek pozycji z ekranu blokady i powiadomienia.
+set_mp3_index_seeking	Dokładne przewijanie MP3
+set_mp3_index_seeking_detail	Tworzy indeks przewijania dla plików MP3 o niepewnej długości. Przewijanie startuje wolniej.
+set_shake_to_reset	Potrząśnij, aby zresetować
+set_shake_to_reset_detail	Potrząśnięcie telefonem podczas działania wyłącznika uruchamia go od nowa.
+set_sleep_fade_out	Wyciszanie
+set_sleep_fade_out_detail	Ścisza dźwięk w ostatniej minucie.
+set_vibrate_on_reset	Wibracja przy resetowaniu
+set_auto_sleep_timer_detail	Włącza wyłącznik, gdy odtwarzasz między %1$s a %2$s.
+set_heading_mobile_data	Dane komórkowe
+set_storage	Pamięć
+set_heading_support	Wsparcie
+set_diagnostics	Diagnostyka
+set_something_went_wrong	Coś poszło nie tak.
+set_statistics_unavailable	Statystyki niedostępne
+set_try_again	Spróbuj ponownie
+set_minutes_listened:one	%1$d minuta słuchania
+set_minutes_listened:few	%1$d minuty słuchania
+set_minutes_listened:many	%1$d minut słuchania
+set_minutes_listened:other	%1$d minuty słuchania
+set_days_listened:one	%1$d dzień słuchania
+set_days_listened:few	%1$d dni słuchania
+set_days_listened:many	%1$d dni słuchania
+set_days_listened:other	%1$d dnia słuchania
+set_titles_finished:one	%1$d ukończony tytuł
+set_titles_finished:few	%1$d ukończone tytuły
+set_titles_finished:many	%1$d ukończonych tytułów
+set_titles_finished:other	%1$d ukończonego tytułu
+set_day_minutes_listened:one	%1$s, %2$d minuta słuchania
+set_day_minutes_listened:few	%1$s, %2$d minuty słuchania
+set_day_minutes_listened:many	%1$s, %2$d minut słuchania
+set_day_minutes_listened:other	%1$s, %2$d minuty słuchania
+set_set_aside_failed	Nie udało się odłożyć na bok. Spróbuj ponownie.
+set_connection	Połączenie
+set_diagnostics_area_media	Multimedia
+set_diagnostics_area_sync	Synchronizacja
+set_unreadable_resets_title	Nie udało się odczytać zapisanych resetów postępu
+set_unreadable_resets_detail	Może dotyczyć to dowolnego tytułu, więc nic nie jest odtwarzane i żadna pozycja czytania nie jest wysyłana, dopóki nie zdecydujesz. Odłożenie ich na bok zachowuje plik na tym urządzeniu, a postęp, który miały zresetować, pozostaje na serwerze.
+set_set_them_aside	Odłóż je na bok
+set_listening_storage_title	Nie udało się zapisać słuchania sprzed zamknięcia aplikacji
+set_listening_storage_detail	Pamięć tego urządzenia jest niedostępna lub pełna. Nic nie jest odtwarzane ani wysyłane, dopóki słuchanie nie zostanie zapisane; do tego czasu jest przechowywane.
+set_unreadable_writes_title	Nie udało się odczytać rejestru zapisów postępu bez odpowiedzi
+set_unreadable_writes_detail	Zapis postępu dowolnego tytułu może jeszcze dotrzeć na serwer, więc słuchanie i czytanie nie są wysyłane, a postęp nie jest resetowany, dopóki nie zdecydujesz. Odłożenie ich na bok zachowuje plik na tym urządzeniu; spóźniony zapis może wtedy przywrócić zresetowany postęp.
+set_diagnostics_server	Serwer %1$s
+set_diagnostics_signed_in_as	Zalogowano jako %1$s
+set_diagnostics_app_version	Aplikacja %1$s
+set_recent_problems	Ostatnie problemy
+set_clear	Wyczyść
+set_no_problems	Na tym urządzeniu nie zarejestrowano problemów.
+set_unreadable_writes_confirm_title	Odłożyć nieczytelne zapisy na bok?
+set_unreadable_writes_confirm_detail	Słuchanie i pozycje czytania będą znowu wysyłane, a resety postępu mogą zostać wykonane.
+set_set_aside	Odłóż na bok
+set_unreadable_resets_confirm_title	Odłożyć nieczytelne resety na bok?
+set_unreadable_resets_confirm_detail	Tytuły znowu się odtwarzają, a pozycje czytania są wysyłane. Zresetuj ponownie postęp każdego tytułu, który nadal chcesz zacząć od nowa.
+set_signed_in	Zalogowano
+set_other_accounts	Inne konta
+set_server_sign_in_required	%1$s · wymagane logowanie
+set_remove_account	Usuń %1$s
+set_switch_to_account	Przełącz na to konto
+set_add_account	Dodaj konto
+set_sign_out_of	Wyloguj z %1$s
+set_sign_out_detail	Usuwa to konto z urządzenia. Pobrane pliki i niewysłane słuchanie pozostają, dopóki konto znów się nie zaloguje.
+set_accounts_footer	Każde konto ma własny postęp, pobrane pliki i wybór biblioteki. Przełączanie nigdy ich nie miesza.
+set_remove_account_confirm	Usunąć %1$s?
+set_remove_account_detail	Możesz później ponownie dodać to konto. Jego pobrane pliki i niewysłane słuchanie pozostają na tym urządzeniu.
+set_add_an_account	Dodaj konto
+set_connect_intro	Połącz się bezpośrednio z własnym serwerem. Nic nie przechodzi przez inną usługę.
+set_change_server	Zmień serwer
+set_sign_in	Zaloguj się
+set_sign_in_openid	Zaloguj się przez OpenID
+set_saved_accounts	Zapisane konta
+set_use_account	Użyj
+set_edit	Edytuj
+set_add_podcast	Dodaj podcast
+set_not_available_yet	Jeszcze niedostępne
+set_not_available_yet_detail	Ta część wersji podglądowej jest wciąż w budowie.
+set_import_previous_app	Importuj z poprzedniej aplikacji
+set_import_interrupted	Import nie został ukończony. Wybierz ten sam eksport, aby kontynuować od miejsca przerwania.
+set_import_already	Ten eksport został już zaimportowany. Jego tytuły, słuchanie i pozycje są na tym urządzeniu.
+set_import_preflight	%1$s\nPoprzednia aplikacja i ten plik są tylko odczytywane; nic się w nich nie zmienia. Tytuły, słuchanie i pozycje zostaną przypisane do konta, gdy zaloguje się ono tutaj. Hasła nie są częścią eksportu, więc każde konto musi zalogować się ponownie.
+set_import_account_signed_in	%1$s · zalogowano
+set_import_account_sign_in_later	%1$s · zaloguj się po imporcie
+set_import_titles	Tytuły
+set_import_title_partial	%1$s · reszta zostanie pobrana ponownie
+set_not_imported	Nie zaimportowano
+set_import_space	Wymaga %1$s; wolne %2$s.
+set_import_no_space	Na tym urządzeniu brakuje wolnego miejsca. Zwolnij trochę miejsca, a potem wybierz eksport ponownie.
+set_import_progress	Kopiowanie plików: %1$d z %2$d. Jeśli aplikacja się zamknie, wybierz ten sam eksport ponownie, aby kontynuować.
+set_import_done	Zaimportowano tytuły: %1$d, sesje słuchania: %2$d i pozycje: %3$d. Zastosowano ustawienia z poprzedniej aplikacji.
+set_import_waiting	Zaloguj się do %1$s jako %2$s, aby przypisać jego tytuły, słuchanie i pozycje.
+set_import	Importuj
+set_continue	Kontynuuj
+set_close	Zamknij
+set_import_file_unreadable	Nie udało się odczytać wybranego pliku. Wybierz go ponownie lub najpierw zapisz go na tym urządzeniu.
+set_import_stopped	Import zatrzymał się przed ukończeniem. Nic nie zostało utracone: wybierz ten sam eksport ponownie, aby kontynuować od miejsca przerwania.
+set_import_item_gone	Tego elementu nie ma już na serwerze, więc nie został przejęty.
+set_import_file_changed	Plik zmienił się na tym urządzeniu po imporcie, więc zostanie ponownie pobrany z serwera.
+set_openid_not_enabled	Logowanie przez OpenID nie jest włączone na tym serwerze. Użyj nazwy użytkownika i hasła.
+set_openid_canceled	Logowanie w przeglądarce zostało anulowane. Zapisane konta pozostają bez zmian.
+set_openid_invalid	Nie udało się zweryfikować odpowiedzi logowania z przeglądarki. Spróbuj zalogować się ponownie i sprawdź ustawienia przekierowania OpenID na serwerze.
+set_vault_unreadable	Nie udało się odszyfrować zapisanych logowań. Pozostają na urządzeniu; zaloguj się ponownie, aby kontynuować.
+set_session_ended	Twoja sesja na %1$s wygasła. Zaloguj się ponownie; niewysłane słuchanie i pobrane pliki są zachowane.
+set_play_blocked_listening_storage	Nie udało się zapisać słuchania sprzed zamknięcia aplikacji, bo pamięć jest niedostępna, więc nic nie będzie odtwarzane, dopóki nie będzie to możliwe. Zwolnij trochę miejsca i spróbuj ponownie.
+set_play_blocked_unreadable_resets	Nie udało się odczytać zapisanych resetów postępu, więc nic nie będzie odtwarzane, dopóki nie zostaną rozwiązane w Diagnostyce.
+set_play_blocked_discarding	Postęp tego tytułu jest wciąż resetowany. Po zakończeniu tytuł odtworzy się od początku.
+dl_not_saved	Nie udało się zapisać listy pobranych na tym urządzeniu, więc nic się nie zmieniło. Zwolnij trochę miejsca i spróbuj ponownie.
+dl_not_allowed	Twoje konto nie ma uprawnień do pobierania.
+dl_no_audio	Ten element nie ma dźwięku do pobrania.
+dl_no_space	Za mało wolnego miejsca na tym urządzeniu na %1$s przy zachowaniu wolnej pamięci dla systemu.
+dl_folder_lost_nothing_downloaded	Dostęp do %1$s został odebrany, więc nic nie zostało pobrane. Wybierz ponownie folder pobierania w Ustawieniach.
+dl_downloading_percent	Pobieranie %1$d%%
+dl_cancel_download	Anuluj pobieranie
+dl_downloaded_plays_offline	Pobrane · działa offline
+dl_failed	Pobieranie nie powiodło się.
+dl_discard	Odrzuć
+dl_cellular_title	Pobrać przez dane komórkowe?
+dl_cellular_message	Używasz połączenia z limitem danych. Możesz to zmienić w Ustawieniach.
+dl_not_now	Nie teraz
+dl_folder_cannot_be_kept	Tego folderu nie można zachować dla pobranych plików. Wybierz inny.
+dl_saved_in_folder	Pobrane pliki są zapisywane w %1$s
+dl_saved_in_app_storage	Pobrane pliki są zapisywane w pamięci aplikacji
+dl_folder_visible_to_other_apps	Inne aplikacje na tym urządzeniu widzą te pliki. Pliki pobrane przed zmianą pozostają tam, gdzie są.
+dl_folder_private_to_app	Tylko ta aplikacja widzi te pliki. Wybierz folder, aby pobrane pliki były dostępne dla innych aplikacji.
+dl_choose_folder	Wybierz folder
+dl_use_app_storage	Użyj pamięci aplikacji
+dl_ebook_missing	Brak ebooka na tym urządzeniu. Pobierz go ponownie, aby go otworzyć.
+dl_no_app_opens_format	Żadna aplikacja na tym urządzeniu nie otwiera plików %1$s. Zainstaluj taką aplikację i spróbuj ponownie.
+dl_no_app_opens_this_kind	Żadna aplikacja na tym urządzeniu nie otwiera plików tego rodzaju. Zainstaluj taką aplikację i spróbuj ponownie.
+dl_folder_lost_choose_again_open	To pobranie znajduje się w %1$s, a dostęp do %1$s został odebrany. Wybierz ponownie %1$s, aby je otworzyć.
+dl_folder_lost_choose_again_play	To pobranie znajduje się w %1$s, a dostęp do %1$s został odebrany. Wybierz ponownie %1$s, aby je odtworzyć.
+dl_names_or	%1$s lub %2$s
+dl_names_and	%1$s i %2$s
+dl_remove_title	Usunąć pobrany plik?
+dl_remove_message	„%1$s” zostanie usunięte z tego urządzenia. Twój postęp słuchania zostanie zachowany.
+dl_keep	Zachowaj
+dl_not_that_folder	To nie jest %1$s. Wybierz folder, w którym są te pobrane pliki.
+dl_folder_access_not_kept	Nie udało się zachować dostępu do tego folderu. Spróbuj ponownie.
+dl_no_downloads	Brak pobranych
+dl_no_downloads_message	Pobieraj książki lub odcinki z ich strony, aby słuchać bez połączenia.
+dl_access_removed_title	Dostęp do %1$s został odebrany
+dl_downloads_kept_there:one	Jest tam %1$d pobrany plik. Wybierz ponownie %2$s, aby go odtwarzać i otwierać.
+dl_downloads_kept_there:few	Są tam %1$d pobrane pliki. Wybierz ponownie %2$s, aby je odtwarzać i otwierać.
+dl_downloads_kept_there:many	Jest tam %1$d pobranych plików. Wybierz ponownie %2$s, aby je odtwarzać i otwierać.
+dl_downloads_kept_there:other	Jest tam %1$d pobranego pliku. Wybierz ponownie %2$s, aby je odtwarzać i otwierać.
+dl_choose_again	Wybierz ponownie %1$s
+dl_some_files_missing	Brak niektórych plików na tym urządzeniu
+dl_size_in_folder	%1$s w %2$s
+dl_open_in_another_app	Otwórz %1$s w innej aplikacji
+dl_download_again_named	Pobierz ponownie %1$s
+dl_the_chosen_folder	wybrany folder
+dl_files_missing_play	Brak niektórych plików tego pobrania na tym urządzeniu. Pobierz je ponownie, aby je odtworzyć.
+dl_play_named	Odtwórz %1$s
+dl_retry_named	Ponów %1$s
+dl_cancel_named	Anuluj %1$s
+dl_remove_named	Usuń %1$s
+dl_sign_in_again	Zaloguj się ponownie na to konto, aby pobierać.
+dl_folder_lost_choose_in_downloads	Dostęp do %1$s został odebrany. Wybierz folder ponownie w Pobranych.
+dl_connection_interrupted	Połączenie zostało przerwane.
+dl_error_retrying	%1$s Ponawianie…
+dl_server_refused	Serwer odmówił pobrania.
+dl_server_sent_type_not_audio	Serwer wysłał %1$s zamiast dźwięku, więc nic nie zostało zapisane. Sprawdź serwer lub proxy i spróbuj ponownie.
+dl_server_sent_unknown_not_audio	Serwer wysłał nieznaną odpowiedź zamiast dźwięku, więc nic nie zostało zapisane. Sprawdź serwer lub proxy i spróbuj ponownie.
+dl_size_mismatch	Pobrany plik miał %1$d bajtów, ale serwer podał %2$d, więc został odrzucony. Spróbuj ponownie, aby pobrać go jeszcze raz.
+dl_server_sent_not_pdf	Serwer wysłał coś innego niż PDF, więc nic nie zostało zapisane. Sprawdź serwer lub proxy i spróbuj ponownie.
+rd_positions_not_restored	Nie udało się przywrócić zapisanych pozycji czytania, więc strony nie są zapisywane. Oryginalne dane są zachowane.
+rd_positions_not_overwritten	Nie udało się odczytać zapisanych pozycji czytania, więc nie zostaną nadpisane.
+rd_not_a_pdf	Ten plik nie jest plikiem PDF, który to urządzenie może otworzyć.
+rd_document_not_opened	Nie udało się otworzyć dokumentu.
+rd_page_not_saved	Nie udało się zapisać tej strony na tym urządzeniu.
+rd_choice_not_saved	Nie udało się zapisać Twojego wyboru na tym urządzeniu.
+rd_conflict_title	Gdzie kontynuować?
+rd_conflict_page	Inne urządzenie dotarło do strony %1$d, gdy strona %2$d z tego urządzenia nie była jeszcze zapisana na serwerze.
+rd_conflict_location	Inne urządzenie zapisało pozycję czytania, której ten czytnik nie może pokazać jako strony, gdy strona %1$d z tego urządzenia nie była jeszcze zapisana na serwerze.
+rd_go_to_page_number	Przejdź do strony %1$d
+rd_keep_other_position	Zachowaj drugą pozycję
+rd_stay_on_page	Zostań na stronie %1$d
+rd_close_reader	Zamknij czytnik
+rd_rotate_pages	Obróć strony
+rd_continuous_scrolling	Ciągłe przewijanie
+rd_document_error_title	Nie udało się otworzyć tego dokumentu
+rd_try_again	Spróbuj ponownie
+rd_go_to_page	Przejdź do strony
+rd_previous_page	Poprzednia strona
+rd_next_page	Następna strona
+rd_page_of	Strona %1$d z %2$d
+rd_page_number	Strona %1$d
+rd_download_folder_lost	To pobranie znajduje się w %1$s, a dostęp do %1$s został odebrany. Wybierz folder ponownie w Pobranych.
+rd_downloaded_document_missing	Brak pobranego dokumentu na tym urządzeniu. Pobierz go ponownie.
+rd_document_not_stored	Nie udało się zapisać dokumentu do czytania.
+rd_supplementary_pdf	dodatkowy PDF
+rd_format_not_available	Czytanie %1$s nie jest jeszcze dostępne w tej wersji podglądowej. Twoja pozycja czytania na serwerze zostaje zachowana.
+rd_ebook_not_available	Czytanie tego ebooka nie jest jeszcze dostępne w tej wersji podglądowej. Twoja pozycja czytania na serwerze zostaje zachowana.
+grp_unavailable_title	Niedostępny tytuł
+grp_could_not_load_collections	Nie udało się wczytać kolekcji.
+grp_could_not_load_playlists	Nie udało się wczytać playlist.
+grp_collections_unavailable	Kolekcje niedostępne
+grp_playlists_unavailable	Playlisty niedostępne
+grp_no_collections_yet	Brak kolekcji
+grp_no_playlists_yet	Brak playlist
+grp_create_one_hint	Utwórz ją, aby trzymać tytuły razem we własnej kolejności.
+grp_title_count:one	%1$d tytuł
+grp_title_count:few	%1$d tytuły
+grp_title_count:many	%1$d tytułów
+grp_title_count:other	%1$d tytułu
+grp_collection_deleted	Ta kolekcja została usunięta.
+grp_playlist_deleted	Ta playlista została usunięta.
+grp_could_not_load	Nie udało się wczytać.
+grp_collection_unavailable	Kolekcja niedostępna
+grp_playlist_unavailable	Playlista niedostępna
+grp_nothing_in_collection_can_play	Nic w tej kolekcji nie może zostać odtworzone.
+grp_nothing_in_playlist_can_play	Nic na tej playliście nie może zostać odtworzone.
+grp_could_not_start_playback	Nie udało się rozpocząć odtwarzania.
+grp_resume	Wznów
+grp_play_collection	Odtwórz kolekcję
+grp_play_playlist	Odtwórz playlistę
+grp_edit_collection	Edytuj kolekcję
+grp_edit_playlist	Edytuj playlistę
+grp_delete_collection	Usuń kolekcję
+grp_delete_playlist	Usuń playlistę
+grp_no_titles_yet	Brak tytułów
+grp_delete_collection_question	Usunąć kolekcję?
+grp_delete_playlist_question	Usunąć playlistę?
+grp_delete_group_explanation	„%1$s” zostanie usunięte z serwera. Tytuły w środku zostaną zachowane.
+grp_not_deleted	Nie usunięto: %1$s
+grp_not_deleted_try_again	Nie usunięto: spróbuj ponownie
+grp_not_allowed_to_change_collection	Twoje konto na serwerze nie ma uprawnień do zmiany tej kolekcji.
+grp_not_allowed_to_change_playlist	Twoje konto na serwerze nie ma uprawnień do zmiany tej playlisty.
+grp_collection_no_longer_exists	Ta kolekcja już nie istnieje.
+grp_playlist_no_longer_exists	Ta playlista już nie istnieje.
+grp_not_saved	Nie zapisano: %1$s
+grp_not_saved_try_again	Nie zapisano: spróbuj ponownie
+grp_saving	Zapisywanie…
+grp_create_collection	Utwórz kolekcję
+grp_create_playlist	Utwórz playlistę
+grp_save_changes	Zapisz zmiany
+grp_choose_at_least_one_title	Wybierz co najmniej jeden tytuł.
+grp_order	Kolejność
+grp_move_up	Przenieś %1$s w górę
+grp_remove_member	Usuń %1$s
+grp_add_titles	Dodaj tytuły
+grp_add_episodes_hint	Dodawaj odcinki ze strony odcinków podcastu.
+grp_add_to_playlist_or_collection	Dodaj do playlisty lub kolekcji
+grp_add_to	Dodaj do
+grp_nothing_to_add_to	Nie ma jeszcze nic, do czego można dodać.
+grp_added_to	Dodano do %1$s
+grp_not_added	Nie dodano: %1$s
+grp_not_added_try_again	Nie dodano: spróbuj ponownie
+grp_already_included	Już dodano
+grp_close	Zamknij
+grp_titles_could_not_load	Nie udało się wczytać tytułów
+grp_nothing_here	Nic tu nie ma
+pod_feed_episodes	Odcinki z kanału
+pod_sort_newest_first	Najnowsze najpierw, dotknij, aby najstarsze najpierw
+pod_sort_oldest_first	Najstarsze najpierw, dotknij, aby najnowsze najpierw
+pod_episodes_queued:one	%1$d odcinek w kolejce na serwerze: %2$s
+pod_episodes_queued:few	%1$d odcinki w kolejce na serwerze: %2$s
+pod_episodes_queued:many	%1$d odcinków w kolejce na serwerze: %2$s
+pod_episodes_queued:other	%1$d odcinka w kolejce na serwerze: %2$s
+pod_server_could_not_download	Serwer nie mógł pobrać „%1$s”.
+pod_dismiss	Odrzuć
+pod_no_episodes_yet	Brak odcinków
+pod_no_episodes_match_filter	Żaden odcinek nie pasuje do tego filtra
+pod_episode_details	Szczegóły odcinka
+pod_untitled_episode	Odcinek bez tytułu
+pod_play_named	Odtwórz %1$s
+pod_episode_not_available	Odcinek niedostępny
+pod_episode_may_have_been_removed	Mógł zostać usunięty z serwera.
+pod_percent_listened	Wysłuchano %1$d%%
+pod_feed_could_not_open	Nie udało się otworzyć kanału.
+pod_retry_feed	Ponów kanał
+pod_no_feed_episodes	Nie znaleziono odcinków w kanale
+pod_already_on_server	Już na serwerze
+pod_selected	Zaznaczony
+pod_not_selected	Niezaznaczony
+pod_no_audio_enclosure	Brak załącznika audio
+pod_not_queued	Nie dodano do kolejki: %1$s
+pod_not_queued_try_again	Nie dodano do kolejki: spróbuj ponownie
+pod_queueing_on_server	Dodawanie do kolejki na serwerze…
+pod_add_selected_episodes	Dodaj zaznaczone odcinki na serwer
+pod_something_went_wrong	Coś poszło nie tak.
+pod_adding_not_available	Dodawanie podcastów jest niedostępne
+pod_adding_needs_permission	Twoje konto na serwerze potrzebuje uprawnień do zarządzania podcastami w bibliotece podcastów.
+pod_search_podcasts	Szukaj podcastów
+pod_or_rss_feed_url	Lub URL kanału RSS
+pod_enter_complete_feed_url	Wprowadź pełny URL kanału HTTP lub HTTPS.
+pod_preview_feed	Podgląd kanału
+pod_create_podcast	Utwórz podcast
+pod_choose_different_feed	Wybierz inny kanał
+item_something_went_wrong	Coś poszło nie tak. Spróbuj ponownie.
+item_feed_subscribe_at	Aplikacje do podcastów mogą subskrybować ten tytuł pod adresem:
+item_copied	Skopiowano
+item_copy_address	Kopiuj adres
+item_hidden_from_directories	Ukryty w katalogach podcastów
+item_feed_public_warning	Każdy, kto zna adres, może słuchać tego tytułu bez logowania.
+item_feed_name	Nazwa kanału
+item_feed_name_rule	Tylko litery, cyfry, - i _
+item_hide_from_directories	Ukryj w katalogach podcastów
+item_done	Gotowe
+item_sending	Wysyłanie…
+item_sent_to	Wysłano do %1$s
+item_send_ebook_explanation	Serwer wyśle ebooka e-mailem na wybrane urządzenie.
+item_ereader_or_ebook_gone	%1$s lub ten ebook nie jest już dostępny na serwerze. Nic nie zostało wysłane.
+item_not_sent_to	Nie wysłano do %1$s. %2$s
+item_not_saved_try_again	Nie zapisano. Spróbuj ponownie.
+item_mark_unfinished	Oznacz jako nieukończone
+item_discard_uncertain	Wcześniejszy zapis postępu tego tytułu nie otrzymał odpowiedzi i może jeszcze dotrzeć na serwer. Jeśli dotrze po resecie, przywróci postęp. Serwer nie może powiedzieć tej aplikacji, czy tak się stanie.
+item_discard_anyway	Zresetuj mimo to
+item_discard_under_way	Ten reset jest już w toku i nie można go wycofać.
+item_keep_progress	Zachowaj postęp
+item_discard_pending	Resetowanie postępu. Zakończy się, gdy serwer będzie osiągalny, a słuchanie tego tytułu zostanie wysłane.
+item_discard_anyway_question	Zresetować mimo to?
+item_discard_anyway_explanation	Postęp zostanie usunięty teraz. Jeśli wcześniejszy zapis dotrze później na serwer, postęp tego tytułu wróci i będzie można go zresetować ponownie.
+item_discard	Zresetuj
+item_discard_progress_question	Zresetować postęp?
+item_discard_progress_explanation	Twoja pozycja i stan ukończenia tego tytułu zostaną usunięte z serwera dla wszystkich urządzeń.
+item_could_not_load	Nie udało się wczytać tego tytułu
+item_narrated_by	Czyta
+item_series	Seria: %1$s
+item_series_with_sequence	Seria: %1$s #%2$s
+item_episode_count:one	%1$d odcinek
+item_episode_count:few	%1$d odcinki
+item_episode_count:many	%1$d odcinków
+item_episode_count:other	%1$d odcinka
+item_listened_and_left	Wysłuchano %1$d%% · pozostało %2$s
+item_chapter_number	Rozdział %1$d
+pl_minimize_player	Zminimalizuj odtwarzacz
+pl_nothing_playing	Nic nie jest odtwarzane
+pl_chapter_number	Rozdział %1$d
+pl_try_again	Spróbuj ponownie
+pl_speed_value	Prędkość %1$s
+pl_sleep	Wyłącznik
+pl_position_of_duration	%1$s z %2$s
+pl_buffering	Buforowanie
+pl_previous_chapter	Poprzedni rozdział
+pl_next_chapter	Następny rozdział
+pl_jump_forward_seconds:one	Przeskocz do przodu o %1$d sekundę
+pl_jump_forward_seconds:few	Przeskocz do przodu o %1$d sekundy
+pl_jump_forward_seconds:many	Przeskocz do przodu o %1$d sekund
+pl_jump_forward_seconds:other	Przeskocz do przodu o %1$d sekundy
+pl_jump_back_seconds:one	Przeskocz wstecz o %1$d sekundę
+pl_jump_back_seconds:few	Przeskocz wstecz o %1$d sekundy
+pl_jump_back_seconds:many	Przeskocz wstecz o %1$d sekund
+pl_jump_back_seconds:other	Przeskocz wstecz o %1$d sekundy
+pl_jump_forward_minutes:one	Przeskocz do przodu o %1$d minutę
+pl_jump_forward_minutes:few	Przeskocz do przodu o %1$d minuty
+pl_jump_forward_minutes:many	Przeskocz do przodu o %1$d minut
+pl_jump_forward_minutes:other	Przeskocz do przodu o %1$d minuty
+pl_jump_back_minutes:one	Przeskocz wstecz o %1$d minutę
+pl_jump_back_minutes:few	Przeskocz wstecz o %1$d minuty
+pl_jump_back_minutes:many	Przeskocz wstecz o %1$d minut
+pl_jump_back_minutes:other	Przeskocz wstecz o %1$d minuty
+pl_open_player	Otwórz odtwarzacz
+pl_playback_stopped	Odtwarzanie zatrzymane
+pl_listening_unsaved	Część słuchania nie jest jeszcze zapisana na tym urządzeniu. Jest przechowywana i zostanie zapisana, gdy tylko pozwoli na to pamięć.
+pl_playing	Odtwarzanie
+pl_resume	Wznów
+pl_streaming_cellular_refused	Strumieniowanie przez dane komórkowe jest wyłączone w Ustawieniach. Połącz się z Wi-Fi lub najpierw pobierz ten tytuł.
+pl_stream_cellular_title	Strumieniować przez dane komórkowe?
+pl_stream_cellular_message	Używasz połączenia z limitem danych. Możesz to zmienić w Ustawieniach.
+pl_not_now	Nie teraz
+pl_sleep_stops_end_of_chapter	Zatrzyma się na końcu tego rozdziału, za %1$s
+pl_sleep_stops_in	Zatrzyma się za %1$s
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Wyłącz
+pl_bookmark_not_saved_reason	Nie zapisano zakładki: %1$s
+pl_bookmark_not_saved	Nie zapisano zakładki: spróbuj ponownie
+pl_bookmark_add_at	Dodaj w %1$s
+pl_bookmark_go_to	Przejdź do zakładki
+pl_bookmark_default	Zakładka
+pl_bookmark_rename_named	Zmień nazwę %1$s
+pl_bookmark_delete_named	Usuń %1$s
+pl_bookmark_at	Zakładka w %1$s
+pl_bookmark_rename	Zmień nazwę zakładki
+pl_bookmark_new	Nowa zakładka
+pl_untitled	Bez tytułu
+pl_playback_stopped_reason	Odtwarzanie zatrzymane: %1$s. Twoja pozycja jest zachowana.
+pl_playback_stopped_unknown	Odtwarzanie zatrzymane: nie udało się wczytać dźwięku. Twoja pozycja jest zachowana.
+pl_no_playable_audio	Ten element nie ma dźwięku do odtworzenia.
+pl_could_not_start	Nie udało się rozpocząć odtwarzania.
+pl_listening_save_failed	Nie udało się zapisać słuchania na tym urządzeniu, więc odtwarzanie zostało wstrzymane. Zwolnij trochę miejsca i spróbuj ponownie.
+cast_casting_to	Przesyłanie do %1$s
+cast_cast	Przesyłaj
+cast_playing_on	Odtwarzanie na %1$s
+cast_connecting_to	Łączenie z %1$s…
+cast_playing_on_phone	Odtwarzanie na tym telefonie
+cast_stop	Zatrzymaj przesyłanie
+cast_looking	Szukanie urządzeń do przesyłania…
+cast_none_found	Nie znaleziono urządzeń do przesyłania. Sprawdź, czy odbiornik jest włączony i w tej samej sieci Wi-Fi co ten telefon.
+cast_close	Zamknij
+cast_download_not_castable	Pobrane kopie odtwarzają się tylko na tym telefonie. Zatrzymaj przesyłanie, aby słuchać tutaj, lub zamiast tego strumieniuj tytuł.
+cast_resumed_without_title	Przesyłanie zatrzymało się, bo aplikacja uruchomiła się ponownie podczas przesyłania. Otwórz tytuł ponownie, aby słuchać od miejsca ostatnio zapisanego przez ten telefon.
+cast_needs_play_services	Przesyłanie wymaga Usług Google Play, których to urządzenie nie ma lub które trzeba zaktualizować.
+cast_could_not_start	Nie udało się rozpocząć przesyłania na tym urządzeniu: %1$s.
+cast_connect_failed_named	Nie udało się połączyć z %1$s. Sprawdź, czy jest włączone i w tej samej sieci Wi-Fi co ten telefon.
+cast_connect_failed	Nie udało się połączyć z odbiornikiem. Sprawdź, czy jest włączony i w tej samej sieci Wi-Fi co ten telefon.
+cast_connection_lost_named	Utracono połączenie z %1$s. Odtwarzanie jest kontynuowane na tym telefonie.
+cast_connection_lost	Utracono połączenie z odbiornikiem. Odtwarzanie jest kontynuowane na tym telefonie.
+auto_continue	Kontynuuj
+auto_recent	Ostatnie
+auto_discovery	Odkrywaj
+auto_authors_count:one	%1$d autor
+auto_authors_count:few	%1$d autorów
+auto_authors_count:many	%1$d autorów
+auto_authors_count:other	%1$d autora
+auto_series_count:one	%1$d seria
+auto_series_count:few	%1$d serie
+auto_series_count:many	%1$d serii
+auto_series_count:other	%1$d serii
+lib_books_count:one	%1$d książka
+lib_books_count:few	%1$d książki
+lib_books_count:many	%1$d książek
+lib_books_count:other	%1$d książki
+lib_items_count:one	%1$d element
+lib_items_count:few	%1$d elementy
+lib_items_count:many	%1$d elementów
+lib_items_count:other	%1$d elementu
+lib_selected	Wybrano
+lib_all_filters	Wszystkie filtry
+lib_nothing_to_filter	Nie ma tu nic do filtrowania.
+lib_sort_descending_switch	Malejąco, przełącz na rosnąco
+lib_sort_ascending_switch	Rosnąco, przełącz na malejąco
+lib_sort_descending	Malejąco
+lib_sort_ascending	Rosnąco
+lib_unavailable	Biblioteka niedostępna
+lib_unavailable_message	%1$s Twoje konto i niewysłane słuchanie są zachowane.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Pokaż okładki
+lib_show_list	Pokaż listę
+lib_filtered	Przefiltrowane
+lib_empty_title	Nic tu jeszcze nie ma
+lib_empty_message	Ta biblioteka nie ma elementów, do których masz dostęp.
+lib_page_error	Nie udało się wczytać kolejnych tytułów
+lib_card_finished	%1$s, ukończone
+lib_card_percent_listened	%1$s, wysłuchano %2$d procent
+lib_search_in	Szukaj w %1$s
+lib_search_library	Szukaj w bibliotece
+lib_clear_search	Wyczyść wyszukiwanie
+lib_search_failed	Wyszukiwanie nie powiodło się
+lib_search_idle_title	Znajdź coś do posłuchania
+lib_search_idle_message	Szukaj tytułów, autorów, serii, lektorów i odcinków.
+lib_search_no_match	Nic nie pasuje do „%1$s”. Spróbuj użyć mniej słów lub innej pisowni.
+err_invalid_server	Wprowadź adres serwera zaczynający się od http:// lub https://, na przykład https://books.example.com/abs.
+err_unsafe_media_url	Serwer zwrócił adres multimediów spoza tego serwera. Nie został otwarty.
+err_sign_in_required	Twoja sesja nie jest już akceptowana. Zaloguj się ponownie; niewysłane słuchanie jest zachowane.
+err_untrusted	Certyfikat serwera nie jest zaufany na tym urządzeniu. Zainstaluj urząd certyfikacji swojego serwera w Ustawieniach Androida > Bezpieczeństwo > Szyfrowanie i dane logowania, a potem spróbuj ponownie.
+err_offline	Nie udało się połączyć z serwerem. Sprawdź adres lub połączenie i spróbuj ponownie.
+err_forbidden	Twoje konto nie ma uprawnień do tej czynności.
+err_not_found	Ta zawartość nie jest już dostępna na serwerze.
+err_server_problem	Serwer miał chwilowy problem (HTTP %1$d). Spróbuj ponownie.
+err_rejected	Serwer odrzucił żądanie (HTTP %1$d).
+err_invalid_response	Serwer wysłał odpowiedź, której ta aplikacja nie może odczytać.
+err_no_audio	Ten element nie ma dźwięku do odtworzenia.
+err_login_rejected	Nazwa użytkownika lub hasło nie zostały zaakceptowane.
+err_publications_unreadable	Nie udało się odczytać rejestru zapisów postępu bez odpowiedzi. Najpierw rozwiąż je w Diagnostyce.
+err_discards_unreadable	Nie udało się odczytać zapisanych resetów postępu. Najpierw rozwiąż je w Diagnostyce.
