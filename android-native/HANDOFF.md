@@ -72,7 +72,7 @@ Previous source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full 
 - Known draft limits, reported by the drafting passes: in Russian, Ukrainian, Belarusian and Slovak, `dl_the_chosen_folder` is inserted into sentences that need different grammatical cases, so one of them reads awkwardly. "Discard progress" and "set aside" have no settled term and vary by language. These need a native reader.
 - The table's `\n` is now a line break. Before, the migration preflight showed a literal `\n` after the file name.
 - RED: with Arabic, `LocalizationJourney.libraryControlsReadRightToLeftInArabic` found the mirrored top bar but timed out waiting for the Arabic sort option (`artifacts/red-l10n-392b95e2/`). GREEN: Localization and Migration journeys 9 of 9 at 28cde313.
-- RED: with German, `LocalizationJourney.connectionAndSignInErrorsFollowTheAppLanguage` timed out waiting for the German invalid-address message, line 57 (`artifacts/red-l10n-core-errors/`). GREEN: Localization 3 of 3 at 1c53e7ba (`artifacts/green-l10n-core-errors/`).
+- RED: with German, `LocalizationJourney.connectionAndSignInErrorsFollowTheAppLanguage` timed out waiting for the German invalid-address message, line 57 (`artifacts/red-l10n-core-errors/`). GREEN: Localization 3 of 3 on the source of 04bab19d (`artifacts/green-l10n-core-errors/`); with all drafts, Localization 3 of 3 and Migration 7 of 7, unit tests passing (`artifacts/l10n-drafts/check/`).
 
 ## Legacy app language (#52) in 28cde313
 
