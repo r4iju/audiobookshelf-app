@@ -24,11 +24,12 @@ LOCALIZATION = pathlib.Path(__file__).resolve().parent
 APPLE = LOCALIZATION.parent
 REPOSITORY = APPLE.parent
 SOURCES = [APPLE / 'App', APPLE / 'Playback', APPLE / 'Diagnostics' / 'Sources', LOCALIZATION / 'Sources', APPLE / 'Export' / 'Sources',
-           REPOSITORY / 'tvos' / 'App']
+           REPOSITORY / 'tvos' / 'App', REPOSITORY / 'tvos' / 'Core' / 'Sources', APPLE / 'Adoption']
 RESOURCES = LOCALIZATION / 'Sources' / 'NativeLocalization' / 'Resources'
 TABLE = 'NativeStrings.strings'
 # `copy("…")` marks English templates in renderers that receive `NativeStrings.copy` instead of looking text up.
-CALL = re.compile(r'(?<![\w.])(?:l10n|strings|copy|NativeStrings\.current)\(')
+# `CoreText.text("…")` marks the shared core's English text, which the apps look up the same way.
+CALL = re.compile(r'(?<![\w.])(?:l10n|strings|copy|NativeStrings\.current|CoreText\.text)\(')
 PLACEHOLDER = re.compile(r'\{\d+\}')
 SEPARATOR = '::'
 

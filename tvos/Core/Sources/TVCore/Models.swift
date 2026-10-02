@@ -4,14 +4,14 @@ public enum APIError: Error, LocalizedError, Equatable {
     case invalidServer, unsafeMediaURL, signInRequired, http(Int), noAudio, invalidPodcastTitle, podcastRequestTooLarge
     public var errorDescription: String? {
         switch self {
-        case .invalidServer: return "Enter an http:// or https:// server address, without credentials, a query, or a fragment."
-        case .unsafeMediaURL: return "The server returned a media URL outside this server."
-        case .signInRequired: return "Your session expired. Please sign in again."
-        case .http(401): return "The username or password was not accepted."
-        case .http(let code): return "The server returned HTTP \(code). Please try again."
-        case .noAudio: return "This item has no playable audio."
-        case .invalidPodcastTitle: return "Enter a podcast title that can name a folder on your server."
-        case .podcastRequestTooLarge: return "Select fewer feed episodes and try again. The server accepts requests smaller than 5 MB."
+        case .invalidServer: return CoreText.text("Enter an http:// or https:// server address, without credentials, a query, or a fragment.")
+        case .unsafeMediaURL: return CoreText.text("The server returned a media URL outside this server.")
+        case .signInRequired: return CoreText.text("Your session expired. Please sign in again.")
+        case .http(401): return CoreText.text("The username or password was not accepted.")
+        case .http(let code): return CoreText.text("The server returned HTTP {0}. Please try again.", code)
+        case .noAudio: return CoreText.text("This item has no playable audio.")
+        case .invalidPodcastTitle: return CoreText.text("Enter a podcast title that can name a folder on your server.")
+        case .podcastRequestTooLarge: return CoreText.text("Select fewer feed episodes and try again. The server accepts requests smaller than 5 MB.")
         }
     }
 }

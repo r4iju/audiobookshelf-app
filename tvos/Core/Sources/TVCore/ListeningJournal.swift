@@ -80,8 +80,8 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
         case invalidData, storageFull
         public var errorDescription: String? {
             switch self {
-            case .invalidData: return "Saved listening data could not be read or updated. Keep the app's data for recovery and try again."
-            case .storageFull: return "Saved listening storage is full. Connect to the server to save pending listening before continuing."
+            case .invalidData: return CoreText.text("Saved listening data could not be read or updated. Keep the app's data for recovery and try again.")
+            case .storageFull: return CoreText.text("Saved listening storage is full. Connect to the server to save pending listening before continuing.")
             }
         }
     }

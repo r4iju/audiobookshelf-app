@@ -6,6 +6,7 @@ import SwiftUI
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        NativeStrings.installCoreText()
         #if DEBUG
         // Debug-only isolation for remote UI journeys; signed device builds use Release.
         if ProcessInfo.processInfo.arguments.contains("--reset-tv-state") {
