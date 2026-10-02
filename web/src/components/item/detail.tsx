@@ -2,7 +2,7 @@
 
 import { BookOpen, FolderPlus, ListPlus, Pause, Play } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLibrary } from "@/components/library/use-library";
 import { AddToCollectionDialog, AddToPlaylistDialog } from "@/components/lists/add-to-list";
 import { Cover } from "@/components/media/cover";
@@ -37,7 +37,6 @@ function ItemView({ item }: { item: LibraryItem }) {
   const player = usePlayer();
   const me = useMe().data;
   const canUpdate = can(me, "update");
-  const [showAll, setShowAll] = useState(false);
   const [adding, setAdding] = useState<"playlist" | "collection" | null>(null);
   const [notice, setNotice] = useState<SendResult | null>(null);
   const isBook = item.mediaType === "book";
@@ -179,22 +178,7 @@ function ItemView({ item }: { item: LibraryItem }) {
           </div>
           {notice ? <Alert tone={notice.tone}>{notice.text}</Alert> : null}
 
-          {description ? (
-            <div className="max-w-prose">
-              <p className={`whitespace-pre-line text-sm leading-relaxed ${showAll ? "" : "line-clamp-6"}`}>
-                {description}
-              </p>
-              {description.length > 400 ? (
-                <button
-                  type="button"
-                  onClick={() => setShowAll(!showAll)}
-                  className="mt-1 rounded text-sm font-medium text-accent focus-ring"
-                >
-                  {showAll ? t("ButtonReadLess") : t("ButtonReadMore")}
-                </button>
-              ) : null}
-            </div>
-          ) : null}
+          {description ? <Description text={description} /> : null}
         </div>
       </div>
 
@@ -254,5 +238,44 @@ function ItemView({ item }: { item: LibraryItem }) {
         </section>
       ) : null}
     </article>
+  );
+}
+
+function Description({ text }: { text: string }) {
+  const { t } = useI18n();
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [clamped, setClamped] = useState(false);
+  // The browser's line clamp decides whether text is hidden, so watch the rendered paragraph.
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || expanded) return;
+    const measure = () => setClamped(node.scrollHeight > node.clientHeight);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [expanded]);
+  return (
+    <div className="max-w-prose">
+      <p
+        ref={ref}
+        id="item-description"
+        className={`whitespace-pre-line text-sm leading-relaxed ${expanded ? "" : "line-clamp-6"}`}
+      >
+        {text}
+      </p>
+      {expanded || clamped ? (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls="item-description"
+          onClick={() => setExpanded(!expanded)}
+          className="mt-1 rounded text-sm font-medium text-accent focus-ring"
+        >
+          {expanded ? t("ButtonReadLess") : t("ButtonReadMore")}
+        </button>
+      ) : null}
+    </div>
   );
 }
