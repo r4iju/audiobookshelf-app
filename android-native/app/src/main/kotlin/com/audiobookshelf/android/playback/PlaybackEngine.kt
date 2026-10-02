@@ -154,6 +154,7 @@ class PlaybackEngine(
 
     // Read off the main thread by the reading gate.
     @Volatile private var loaded: Loaded? = null
+    private var handover: CastHandover? = null
     private val readingPublication = Mutex()
     private val ended = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     /** Emitted when listening stops, so reading held back by it can be published. */
@@ -275,6 +276,7 @@ class PlaybackEngine(
     }
 
     fun pause() {
+        handover?.pause()
         player.pause()
     }
 
@@ -478,7 +480,8 @@ class PlaybackEngine(
             .setSeekBackIncrementMs(settings.current.jumpBackwardsTime * 1000L)
             .setSeekForwardIncrementMs(settings.current.jumpForwardTime * 1000L)
             .build()
-        val handover = CastHandover(exo, endSession = { main.post { casting?.disconnect() } }, explain = { main.post { casting?.explain(it) } }, hasTitle = { loaded != null })
+        val handover = CastHandover(exo, endSession = { main.post { casting?.disconnect() } }, explain = { main.post { casting?.explain(it) } }, title = { loaded })
+        this.handover = handover
         return CastPlayer.Builder(context).setLocalPlayer(exo).setRemotePlayer(remote).setTransferCallback(handover::transfer).build()
     }
 

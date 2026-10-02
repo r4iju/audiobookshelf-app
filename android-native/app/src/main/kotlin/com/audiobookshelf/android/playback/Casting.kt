@@ -106,29 +106,45 @@ internal class CastHandover(
     private val phone: Player,
     private val endSession: () -> Unit,
     private val explain: (String) -> Unit,
-    /** True while the engine holds an opened title, bound to its account and listening record. */
-    private val hasTitle: () -> Boolean,
+    /** The title the engine holds open, bound to its account and listening record, or null. */
+    private val title: () -> Any?,
 ) {
 
-    private var keptOnPhone = false
+    /** The title kept on the phone while the receiver session ends, and whether it was playing. */
+    private var kept: Any? = null
     private var resume = false
 
     fun transfer(from: Player, to: Player) {
         when {
             to !== phone && (0 until from.mediaItemCount).any { !CastExtras.castable(from.getMediaItemAt(it)) } -> {
-                keptOnPhone = true
+                kept = title()
                 resume = from.playWhenReady
                 explain(DOWNLOAD_NOT_CASTABLE)
                 endSession()
             }
-            to === phone && keptOnPhone -> {
-                keptOnPhone = false
+            // Media3 prepares the phone only when the receiver was not idle, and a receiver given nothing is idle.
+            to === phone && kept != null && kept === title() -> {
+                kept = null
                 phone.playWhenReady = resume
+                phone.prepare()
+            }
+            // Closed or replaced, such as by an account switch, while the session was ending: drop the old parts.
+            to === phone && kept != null -> {
+                kept = null
+                phone.playWhenReady = false
+                phone.stop()
+                phone.clearMediaItems()
+                if (title() != null) CastPlayer.TransferCallback.DEFAULT.transferState(from, to)
             }
             // A receiver queue no open title accounts for, such as one left by a process that died, stays off the phone.
-            to === phone && !hasTitle() -> Unit
+            to === phone && title() == null -> Unit
             else -> CastPlayer.TransferCallback.DEFAULT.transferState(from, to)
         }
+    }
+
+    /** The listener paused while a kept title waits for the receiver session to end. */
+    fun pause() {
+        resume = false
     }
 
     companion object {
