@@ -249,7 +249,6 @@
 "Narrated by {0}" = "Narrated by {0}";
 "Narrator" = "Narrator";
 "Narrators" = "Narrators";
-"Native screens show these translations where the earlier app had an equivalent. Text without one, and system controls, stay in English or follow the device language." = "Native screens show these translations where the earlier app had an equivalent. Text without one, and system controls, stay in English or follow the device language.";
 "Needs attention" = "Needs attention";
 "Network preferences" = "Network preferences";
 "Never" = "Never";
@@ -474,6 +473,7 @@
 "Some additions include" = "Some additions include";
 "Some books finished this year" = "Some books finished this year";
 "Some imported files need repair. Choose the original export again. Your saved data is retained." = "Some imported files need repair. Choose the original export again. Your saved data is retained.";
+"Some text appears in English when a translation is unavailable. System screens and controls follow your device language." = "Some text appears in English when a translation is unavailable. System screens and controls follow your device language.";
 "Some text appears in English when a translation is unavailable. System screens follow your Apple TV language." = "Some text appears in English when a translation is unavailable. System screens follow your Apple TV language.";
 "Something else wrote where this download goes; it is tried again later." = "Something else wrote where this download goes; it is tried again later.";
 "Sort episodes" = "Sort episodes";
