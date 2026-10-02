@@ -1,12 +1,16 @@
 "use client";
 
 import "pdfjs-dist/web/pdf_viewer.css";
+import { RotateCw } from "lucide-react";
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 import * as pdfjs from "pdfjs-dist";
 import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import { Alert, Spinner } from "@/components/ui/status";
 import { useI18n } from "@/i18n/i18n";
 import { pageFromLocation, pageProgress } from "@/lib/abs/ebooks";
+import { readStored, writeStored } from "@/lib/storage/local";
 import { PageControls, usePageKeys, useSwipe } from "./paging";
 import type { ReaderViewProps } from "./reader";
 
@@ -25,7 +29,7 @@ interface PageLink {
   target: { page: number } | { url: string };
 }
 
-export function PdfView({ file, start, onPlace }: ReaderViewProps) {
+export function PdfView({ file, start, onPlace, cacheKey }: ReaderViewProps) {
   const { t } = useI18n();
   const [loaded, setLoaded] = useState<Loaded>({ phase: "loading" });
 
@@ -49,18 +53,40 @@ export function PdfView({ file, start, onPlace }: ReaderViewProps) {
 
   if (loaded.phase === "loading") return <Spinner label={t("MessageLoading")} />;
   if (loaded.phase === "failed") return <Alert>{t("WebDocumentUnreadable")}</Alert>;
-  return <PdfPages doc={loaded.doc} start={start} onPlace={onPlace} />;
+  return <PdfPages doc={loaded.doc} start={start} onPlace={onPlace} cacheKey={cacheKey} />;
 }
+
+const rotationSchema = z.number().int().min(0).max(270).multipleOf(90);
 
 function PdfPages({
   doc,
   start,
   onPlace,
+  cacheKey,
 }: {
   doc: PDFDocumentProxy;
   start: string | null;
   onPlace: ReaderViewProps["onPlace"];
+  cacheKey: ReaderViewProps["cacheKey"];
 }) {
+  const { t } = useI18n();
+  const rotationKey = `abs:pdf-rotation:${cacheKey}`;
+  const [rotation, setRotation] = useState(() => {
+    try {
+      return readStored(rotationKey, rotationSchema) ?? 0;
+    } catch {
+      return 0;
+    }
+  });
+  const rotate = () => {
+    const next = (rotation + 90) % 360;
+    setRotation(next);
+    try {
+      writeStored(rotationKey, next);
+    } catch {
+      // Storage can be refused; rotating still works for this opening.
+    }
+  };
   const pages = doc.numPages;
   const [chosen, setChosen] = useState<number | null>(null);
   const page = chosen ?? pageFromLocation(start, pages);
@@ -77,7 +103,13 @@ function PdfPages({
   return (
     <>
       <div className="min-h-0 flex-1 overflow-auto bg-surface-2" {...swipe}>
-        <PdfPage doc={doc} number={page} onLink={go} />
+        <PdfPage doc={doc} number={page} rotation={rotation} onLink={go} />
+      </div>
+      <div className="flex justify-center border-t border-line">
+        <Button variant="ghost" size="sm" onClick={rotate} aria-label={t("WebRotatePage")}>
+          <RotateCw aria-hidden className="size-4" />
+          {t("WebRotatePage")}
+        </Button>
       </div>
       <PageControls page={page} pages={pages} onGo={go} />
     </>
@@ -87,10 +119,12 @@ function PdfPages({
 function PdfPage({
   doc,
   number,
+  rotation,
   onLink,
 }: {
   doc: PDFDocumentProxy;
   number: number;
+  rotation: number;
   onLink: (page: number) => void;
 }) {
   const { t } = useI18n();
@@ -124,8 +158,9 @@ function PdfPage({
       .getPage(number)
       .then(async (pdfPage) => {
         if (!current) return;
-        const base = pdfPage.getViewport({ scale: 1 });
-        const viewport = pdfPage.getViewport({ scale: width / base.width });
+        const angle = (pdfPage.rotate + rotation) % 360;
+        const base = pdfPage.getViewport({ scale: 1, rotation: angle });
+        const viewport = pdfPage.getViewport({ scale: width / base.width, rotation: angle });
         setRatio(base.height / base.width);
         const outputScale = window.devicePixelRatio || 1;
         target.width = Math.floor(viewport.width * outputScale);
@@ -137,12 +172,14 @@ function PdfPage({
         });
         textLayer.replaceChildren();
         textLayer.style.setProperty("--total-scale-factor", String(viewport.scale));
+        textLayer.style.setProperty("--scale-round-x", "1px");
+        textLayer.style.setProperty("--scale-round-y", "1px");
         layer = new pdfjs.TextLayer({
           textContentSource: pdfPage.streamTextContent(),
           container: textLayer,
           viewport,
         });
-        const found = await pageLinks(doc, pdfPage);
+        const found = await pageLinks(doc, pdfPage, viewport);
         await Promise.all([render.promise, layer.render()]);
         if (current) setLinks(found);
       })
@@ -154,7 +191,7 @@ function PdfPage({
       render?.cancel();
       layer?.cancel();
     };
-  }, [doc, number, width]);
+  }, [doc, number, width, rotation]);
 
   return (
     <div ref={frame} className="mx-auto w-full max-w-[960px] px-2 py-4 sm:px-4">
@@ -204,10 +241,12 @@ function PdfPage({
 }
 
 /** Link annotations with the words printed under them as their accessible names. */
-async function pageLinks(doc: PDFDocumentProxy, page: PDFPageProxy): Promise<PageLink[]> {
+async function pageLinks(
+  doc: PDFDocumentProxy,
+  page: PDFPageProxy,
+  viewport: ReturnType<PDFPageProxy["getViewport"]>,
+): Promise<PageLink[]> {
   const [annotations, content] = await Promise.all([page.getAnnotations(), page.getTextContent()]);
-  const [left = 0, bottom = 0, right = 0, top = 0] = page.view;
-  const [pageWidth, pageHeight] = [right - left, top - bottom];
   const links: PageLink[] = [];
   for (const annotation of annotations) {
     if (annotation.subtype !== "Link") continue;
@@ -220,11 +259,13 @@ async function pageLinks(doc: PDFDocumentProxy, page: PDFPageProxy): Promise<Pag
       })
       .join(" ")
       .trim();
+    const [left, top] = viewport.convertToViewportPoint(x1, y1);
+    const [right, bottom] = viewport.convertToViewportPoint(x2, y2);
     const box = {
-      left: ((Math.min(x1, x2) - left) / pageWidth) * 100,
-      top: ((top - Math.max(y1, y2)) / pageHeight) * 100,
-      width: (Math.abs(x2 - x1) / pageWidth) * 100,
-      height: (Math.abs(y2 - y1) / pageHeight) * 100,
+      left: (Math.min(left, right) / viewport.width) * 100,
+      top: (Math.min(top, bottom) / viewport.height) * 100,
+      width: (Math.abs(right - left) / viewport.width) * 100,
+      height: (Math.abs(bottom - top) / viewport.height) * 100,
     };
     if (typeof annotation.url === "string") {
       links.push({

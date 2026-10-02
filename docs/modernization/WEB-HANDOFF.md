@@ -1,5 +1,8 @@
 # Next.js browser client handoff
 
+Current bounded finishing results and remaining rows: [WEB-CURRENT-READINESS.md](WEB-CURRENT-READINESS.md).
+The historical source/check/deployment reports below remain preserved.
+
 Branch `fork/nextjs-client`, based on `origin/fork/native-tv` at `39ad6af65715957c585e7b0f0d20238ebe60ee8f`. The
 client is the isolated `web/` package. It does not touch the legacy Nuxt app, the native apps, the server, or the
 shared modernization documents. Issues #55 to #65. Phase 2 readiness work continues on `fork/web-phase2-readiness`,

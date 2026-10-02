@@ -1,0 +1,21 @@
+{
+  "WebRestartTheServer": "Paleisti serverį iš naujo",
+  "WebSignIn": "Prisijungti",
+  "WebSignInWithOpenId": "Prisijungti per OpenID",
+  "WebTryAgain": "Bandyti dar kartą",
+  "WebDiagnostics": "Diagnostika",
+  "WebFilterBy": "Filtras",
+  "WebNextPage": "Kitas puslapis",
+  "WebPreviousPage": "Ankstesnis puslapis",
+  "WebResume": "Tęsti",
+  "WebCopied": "Nukopijuota",
+  "WebAddPodcast": "Pridėti tinklalaidę",
+  "WebGoToPage": "Eiti į puslapį",
+  "WebTopAuthors": "Populiariausi autoriai",
+  "WebTopGenres": "Populiariausi žanrai",
+  "WebTopNarrators": "Populiariausi skaitytojai",
+  "WebMostListenedMonth": "Daugiausiai klausytas mėnuo",
+  "WebDeletePlaylist": "Ištrinti grojaraštį",
+  "WebDeleteCollection": "Ištrinti kolekciją",
+  "WebRotatePage": "Pasukti puslapį"
+}
