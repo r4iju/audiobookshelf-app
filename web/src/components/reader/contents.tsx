@@ -94,7 +94,7 @@ export function BookControls({
       <output aria-live="polite" className="min-w-32 text-center text-sm text-muted tabular-nums">
         {status}
       </output>
-      <Button variant="ghost" size="icon" aria-label={t("WebReaderSettings")} onClick={onSettings}>
+      <Button variant="ghost" size="icon" aria-label={t("HeaderEreaderSettings")} onClick={onSettings}>
         <Settings2 aria-hidden className="size-5" />
       </Button>
     </div>
