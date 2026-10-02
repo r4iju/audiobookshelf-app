@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.navigationBarsPadding
 import android.os.ParcelFileDescriptor
 import androidx.compose.foundation.Image
@@ -374,7 +376,7 @@ fun ReadButtons(item: com.audiobookshelf.core.LibraryItem, onRead: (Route) -> Un
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (ebook != null && ebook.format == "pdf") {
             androidx.compose.material3.OutlinedButton(onClick = { onRead(Route.Reader(item.id, ebook.ino, supplementary = false, title = item.title)) }, modifier = Modifier.fillMaxWidth().testTag("read-ebook")) {
-                Icon(Icons.AutoMirrored.Outlined.MenuBook, null); Text("Read PDF", Modifier.padding(start = 6.dp))
+                Icon(Icons.AutoMirrored.Outlined.MenuBook, null); Text(stringResource(R.string.action_read, "PDF"), Modifier.padding(start = 6.dp))
             }
         } else if (ebook != null) {
             Text("Reading ${ebook.format?.uppercase() ?: "this ebook"} is not available in this preview yet. Your reading position on the server is kept.",

@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.outlined.DownloadForOffline
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -93,7 +95,7 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         when (record?.state) {
             null -> if (canDownload) OutlinedButton(onClick = { start(false) }, modifier = Modifier.fillMaxWidth().testTag("download")) {
-                Icon(Icons.Outlined.Download, null); Text("Download", Modifier.padding(start = 6.dp))
+                Icon(Icons.Outlined.Download, null); Text(stringResource(R.string.action_download), Modifier.padding(start = 6.dp))
             }
             DownloadStore.State.QUEUED, DownloadStore.State.RUNNING -> Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.testTag("download-progress")) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -123,7 +125,7 @@ fun DownloadButton(item: LibraryItem, episode: Episode?, active: SessionState.Ac
         onDismissRequest = { askCellular = false },
         title = { Text("Download on mobile data?") },
         text = { Text("You are on a metered connection. You can change this in Settings.") },
-        confirmButton = { TextButton(onClick = { askCellular = false; start(true) }, modifier = Modifier.testTag("download-cellular-allow")) { Text("Download") } },
+        confirmButton = { TextButton(onClick = { askCellular = false; start(true) }, modifier = Modifier.testTag("download-cellular-allow")) { Text(stringResource(R.string.action_download)) } },
         dismissButton = { TextButton(onClick = { askCellular = false }) { Text("Not now") } },
     )
     if (confirmRemove && record != null) RemoveDialog(record.title, onDismiss = { confirmRemove = false }) { confirmRemove = false; if (!remove(graph, record)) message = NOT_SAVED }

@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -86,6 +88,9 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
     val graph = LocalContext.current.graph
     val settings by graph.settings.settings.collectAsState()
     var error by remember { mutableStateOf<String?>(null) }
+    val themes = mapOf(Appearance.SYSTEM to stringResource(R.string.theme_system), Appearance.LIGHT to stringResource(R.string.theme_light), Appearance.DARK to stringResource(R.string.theme_dark), Appearance.BLACK to stringResource(R.string.theme_black))
+    val levels = mapOf(ShakeSensitivity.VERY_LOW to stringResource(R.string.level_very_low), ShakeSensitivity.LOW to stringResource(R.string.level_low), ShakeSensitivity.MEDIUM to stringResource(R.string.level_medium), ShakeSensitivity.HIGH to stringResource(R.string.level_high), ShakeSensitivity.VERY_HIGH to stringResource(R.string.level_very_high))
+    val policies = mapOf(CellularPolicy.ASK to stringResource(R.string.policy_ask), CellularPolicy.ALWAYS to stringResource(R.string.policy_always), CellularPolicy.NEVER to stringResource(R.string.policy_never))
     val change: ((DeviceSettings) -> DeviceSettings) -> Unit = { transform ->
         error = try { graph.settings.update(transform); null } catch (_: java.io.IOException) {
             "Settings could not be saved on this device, so nothing changed. Free some storage and try again."
@@ -97,22 +102,22 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         error?.let { message -> item { Text(message, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("settings-error")) } }
-        item { SettingsHeading("Appearance") }
+        item { SettingsHeading(stringResource(R.string.settings_appearance)) }
         item {
-            Choices("Theme", Appearance.entries, settings.appearance, "theme", label = { it.name.lowercase().replaceFirstChar(Char::titlecase) }) { value -> change { it.copy(appearance = value) } }
+            Choices(stringResource(R.string.theme), Appearance.entries, settings.appearance, "theme", label = { themes.getValue(it) }) { value -> change { it.copy(appearance = value) } }
         }
         item {
-            Choices("Screen orientation", Orientation.entries, settings.lockOrientation, "orientation", label = {
+            Choices(stringResource(R.string.screen_orientation), Orientation.entries, settings.lockOrientation, "orientation", label = {
                 when (it) { Orientation.NONE -> "Follow device"; Orientation.PORTRAIT -> "Portrait"; Orientation.LANDSCAPE -> "Landscape" }
             }) { value -> change { it.copy(lockOrientation = value) } }
         }
         item {
-            Choices("Haptic feedback", Haptics.entries, settings.hapticFeedback, "haptic", label = { it.name.lowercase().replaceFirstChar(Char::titlecase) }) { value -> change { it.copy(hapticFeedback = value) } }
+            Choices(stringResource(R.string.haptic_feedback), Haptics.entries, settings.hapticFeedback, "haptic", label = { it.name.lowercase().replaceFirstChar(Char::titlecase) }) { value -> change { it.copy(hapticFeedback = value) } }
         }
 
-        item { SettingsHeading("Playback") }
-        item { Choices("Jump forward", JUMP_SECONDS, settings.jumpForwardTime, "jump-forward", label = ::jumpLabel) { value -> change { it.copy(jumpForwardTime = value) } } }
-        item { Choices("Jump back", JUMP_SECONDS, settings.jumpBackwardsTime, "jump-back", label = ::jumpLabel) { value -> change { it.copy(jumpBackwardsTime = value) } } }
+        item { SettingsHeading(stringResource(R.string.settings_playback)) }
+        item { Choices(stringResource(R.string.jump_forward_time), JUMP_SECONDS, settings.jumpForwardTime, "jump-forward", label = ::jumpLabel) { value -> change { it.copy(jumpForwardTime = value) } } }
+        item { Choices(stringResource(R.string.jump_back_time), JUMP_SECONDS, settings.jumpBackwardsTime, "jump-back", label = ::jumpLabel) { value -> change { it.copy(jumpBackwardsTime = value) } } }
         item {
             Toggle("Rewind a little when resuming", "Steps back a few seconds after a pause, more after a longer one.", !settings.disableAutoRewind, "auto-rewind") { on -> change { it.copy(disableAutoRewind = !on) } }
         }
@@ -123,18 +128,18 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
             Toggle("Accurate MP3 seeking", "Builds a seek index for MP3 files with unreliable lengths. Seeking starts more slowly.", settings.enableMp3IndexSeeking, "mp3-index-seeking") { on -> change { it.copy(enableMp3IndexSeeking = on) } }
         }
 
-        item { SettingsHeading("Sleep timer") }
+        item { SettingsHeading(stringResource(R.string.settings_sleep_timer)) }
         item {
             Toggle("Shake to reset", "Shaking the phone while the timer runs restarts it.", !settings.disableShakeToResetSleepTimer, "sleep-shake") { on -> change { it.copy(disableShakeToResetSleepTimer = !on) } }
         }
         if (!settings.disableShakeToResetSleepTimer) item {
-            Choices("Shake sensitivity", ShakeSensitivity.entries, settings.shakeSensitivity, "shake", label = { it.name.lowercase().replace('_', ' ').replaceFirstChar(Char::titlecase) }) { value -> change { it.copy(shakeSensitivity = value) } }
+            Choices(stringResource(R.string.shake_sensitivity), ShakeSensitivity.entries, settings.shakeSensitivity, "shake", label = { levels.getValue(it) }) { value -> change { it.copy(shakeSensitivity = value) } }
         }
         item { Toggle("Fade out", "Lowers the volume during the last minute.", !settings.disableSleepTimerFadeOut, "sleep-fade") { on -> change { it.copy(disableSleepTimerFadeOut = !on) } } }
         item { Toggle("Vibrate on reset", null, !settings.disableSleepTimerResetFeedback, "sleep-reset-feedback") { on -> change { it.copy(disableSleepTimerResetFeedback = !on) } } }
         item { Toggle("Chime when almost done", null, settings.enableSleepTimerAlmostDoneChime, "sleep-chime") { on -> change { it.copy(enableSleepTimerAlmostDoneChime = on) } } }
         item {
-            Toggle("Automatic sleep timer", "Starts the timer when playing between ${settings.autoSleepTimerStartTime} and ${settings.autoSleepTimerEndTime}.", settings.autoSleepTimer, "auto-sleep") { on -> change { it.copy(autoSleepTimer = on) } }
+            Toggle(stringResource(R.string.auto_sleep_timer), "Starts the timer when playing between ${settings.autoSleepTimerStartTime} and ${settings.autoSleepTimerEndTime}.", settings.autoSleepTimer, "auto-sleep") { on -> change { it.copy(autoSleepTimer = on) } }
         }
         if (settings.autoSleepTimer) {
             item { Choices("Starts at", AUTO_SLEEP_HOURS, settings.autoSleepTimerStartTime, "auto-sleep-start", label = { it }) { value -> change { it.copy(autoSleepTimerStartTime = value) } } }
@@ -142,19 +147,19 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         }
 
         item { SettingsHeading("Mobile data") }
-        item { Choices("Downloads on mobile data", CellularPolicy.entries, settings.downloadUsingCellular, "download-cellular", label = ::policyLabel) { value -> change { it.copy(downloadUsingCellular = value) } } }
-        item { Choices("Streaming on mobile data", CellularPolicy.entries, settings.streamingUsingCellular, "stream-cellular", label = ::policyLabel) { value -> change { it.copy(streamingUsingCellular = value) } } }
+        item { Choices(stringResource(R.string.downloads_on_mobile_data), CellularPolicy.entries, settings.downloadUsingCellular, "download-cellular", label = { policies.getValue(it) }) { value -> change { it.copy(downloadUsingCellular = value) } } }
+        item { Choices(stringResource(R.string.streaming_on_mobile_data), CellularPolicy.entries, settings.streamingUsingCellular, "stream-cellular", label = { policies.getValue(it) }) { value -> change { it.copy(streamingUsingCellular = value) } } }
 
         item { SettingsHeading("Storage") }
         item { DownloadLocation(settings, change) }
 
         item { ImportLegacyButton() }
-        item { SettingsHeading("Android Auto") }
+        item { SettingsHeading(stringResource(R.string.settings_android_auto)) }
         item {
             Choices("Group authors and series in letters above", (CAR_GROUPING + settings.androidAutoBrowseLimitForGrouping).distinct().sorted(), settings.androidAutoBrowseLimitForGrouping, "car-grouping", label = { it.toString() }) { value -> change { it.copy(androidAutoBrowseLimitForGrouping = value) } }
         }
         item {
-            Choices("Series books order", SeriesOrder.entries, settings.androidAutoBrowseSeriesSequenceOrder, "car-series-order", label = { if (it == SeriesOrder.ASC) "First to last" else "Last to first" }) { value -> change { it.copy(androidAutoBrowseSeriesSequenceOrder = value) } }
+            Choices(stringResource(R.string.series_books_order), SeriesOrder.entries, settings.androidAutoBrowseSeriesSequenceOrder, "car-series-order", label = { if (it == SeriesOrder.ASC) "First to last" else "Last to first" }) { value -> change { it.copy(androidAutoBrowseSeriesSequenceOrder = value) } }
         }
 
         item { SettingsHeading("Support") }
@@ -169,8 +174,6 @@ private val CAR_GROUPING = listOf(25, 50, 100, 200, 500)
 private val AUTO_SLEEP_HOURS = listOf("20:00", "21:00", "22:00", "23:00", "00:00", "05:00", "06:00", "07:00", "08:00")
 
 private fun jumpLabel(seconds: Int) = if (seconds < 60) "${seconds}s" else "${seconds / 60}m"
-
-private fun policyLabel(policy: CellularPolicy) = when (policy) { CellularPolicy.ASK -> "Ask"; CellularPolicy.ALWAYS -> "Always"; CellularPolicy.NEVER -> "Never" }
 
 @Composable
 private fun SettingsHeading(text: String) {

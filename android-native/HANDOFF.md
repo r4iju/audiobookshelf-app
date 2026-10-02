@@ -30,8 +30,17 @@ Source `87984807`: the full suite at `ecba6a5a` (79 of 79, see "Final acceptance
 | #51 preferences, statistics, diagnostics | Done (emulator) | SettingsJourney | |
 | #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `ereaderSettings` and some preferences preserved but not applied; listening history and logs not exported |
 | #53 migrate downloads and reading locations | Done for audio and PDF (emulator) | MigrationJourney c, d, f | EPUB and other locations preserved, applied when #45/#47/#48 exist; a file damaged after commit is fetched from the server, not the archive; legacy downloads in user-chosen (SAF) folders not exercised on a device |
-| #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization not met** (English only; legacy has 38 locales); TalkBack by a person; owner signing key; install on the owner's phone |
+| #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization partial**: main screens carry legacy translations in 32 languages; about 350 UI lines are still English only (see Localization); TalkBack by a person; owner signing key; install on the owner's phone |
 | #45, #47, #48 | Deferred (after #65) | | Files and locations are preserved by migration |
+
+
+## Localization (#54, partial)
+
+- `app/src/main/strings/strings.tsv` lists the app's extracted strings. Each row names the legacy key in `/strings` whose meaning matches, or `-`. `scripts/import-legacy-strings.py` writes `res/values*/strings.xml` and `res/xml/locales_config.xml` from it. Only the legacy app's own translations are used; no service is involved.
+- 90 strings are extracted: navigation, library shelves, item actions, player, search sections, sign-in fields and the main settings. 80 of them have a legacy translation. 32 languages translate at least 80% of those, and they are offered in the system's per-app language setting (Android 13 and later). `et`, `fa`, `gu`, `hi`, `is` and `lt` have partial files and fall back to English; `lv` and `uz` have no translations.
+- Rows were left unmapped where the legacy wording means something else: the notification's jump buttons (legacy text is the setting "Jump forwards time"), screen orientation (legacy "Lock orientation"), and "Add to playlist or collection".
+- **Not yet extracted:** about 350 lines of English text remain in the UI, most of them error and explanation messages, plus dialogs, downloads, PDF reader, podcasts, groups, migration, diagnostics, statistics and accessibility descriptions. They show in English in every language.
+- RED: `LocalizationJourney` with the app language set to German did not find "Verbinden" on the sign-in screen. GREEN: Localization, Accessibility, Settings, PlayerTools and Browse journeys pass 12 of 12.
 
 
 ## Review blockers at 25f5116e, fixed in 2b3227dc

@@ -1,0 +1,93 @@
+# name	legacy key in /strings (- when the legacy app has no equivalent)	English
+app_name	-	Audiobookshelf Preview
+tab_library	ButtonLibrary	Library
+tab_search	ButtonSearch	Search
+tab_downloads	HeaderDownloads	Downloads
+title_accounts	-	Accounts
+title_settings	HeaderSettings	Settings
+title_collections	ButtonCollections	Collections
+title_playlists	ButtonPlaylists	Playlists
+title_statistics	HeaderYourStats	Statistics
+title_new_playlist	HeaderNewPlaylist	New playlist
+title_new_collection	-	New collection
+menu_more	LabelMore	More
+action_back	ButtonBack	Back
+action_retry	-	Retry
+action_cancel	ButtonCancel	Cancel
+action_save	ButtonSave	Save
+action_remove	ButtonRemove	Remove
+action_delete	ButtonDelete	Delete
+action_play	ButtonPlay	Play
+action_pause	ButtonPause	Pause
+action_stream	ButtonStream	Stream
+action_download	LabelDownload	Download
+action_read	ButtonRead	Read %1$s
+action_mark_finished	MessageMarkAsFinished	Mark finished
+action_discard_progress	MessageDiscardProgress	Discard progress
+action_add_to_group	-	Add to playlist or collection
+action_clear_filter	ButtonClearFilter	Clear filter
+action_show_more	ButtonReadMore	Show more
+action_show_less	ButtonReadLess	Show less
+action_close_player	LabelClosePlayer	Stop and close player
+choose_library	-	Choose library
+all_titles	-	All titles
+all_podcasts	-	All podcasts
+filter	-	Filter
+sort	-	Sort
+shelf_continue_listening	LabelContinueListening	Continue Listening
+shelf_continue_reading	LabelContinueReading	Continue Reading
+shelf_continue_series	LabelContinueSeries	Continue Series
+shelf_recently_added	LabelRecentlyAdded	Recently Added
+shelf_recent_series	LabelRecentSeries	Recent Series
+shelf_listen_again	LabelListenAgain	Listen Again
+shelf_discover	LabelDiscover	Discover
+shelf_newest_episodes	LabelNewestEpisodes	Newest Episodes
+shelf_newest_authors	LabelNewestAuthors	Newest Authors
+chapters	HeaderChapters	Chapters
+finished	LabelFinished	Finished
+sleep_timer	LabelSleepTimer	Sleep timer
+bookmarks	LabelYourBookmarks	Bookmarks
+no_bookmarks	MessageNoBookmarks	No bookmarks yet
+playback_speed	LabelPlaybackSpeed	Playback speed
+end_of_chapter	LabelEndOfChapter	End of chapter
+search_books	LabelBooks	Books
+search_podcasts	LabelPodcasts	Podcasts
+search_episodes	HeaderEpisodes	Episodes
+search_authors	LabelAuthors	Authors
+search_series	LabelSeries	Series
+search_narrators	LabelNarrators	Narrators
+search_tags	LabelTags	Tags
+search_no_results	MessageNoItemsFound	No results
+server_address	LabelServerAddress	Server address
+username	LabelUsername	Username
+password	LabelPassword	Password
+connect	ButtonConnect	Connect
+settings_appearance	HeaderUserInterfaceSettings	Appearance
+settings_playback	HeaderPlaybackSettings	Playback
+settings_sleep_timer	HeaderSleepTimer	Sleep timer
+settings_android_auto	HeaderAndroidAutoSettings	Android Auto
+theme	LabelTheme	Theme
+theme_system	-	System
+theme_light	LabelThemeLight	Light
+theme_dark	LabelThemeDark	Dark
+theme_black	LabelThemeBlack	Black
+screen_orientation	-	Screen orientation
+haptic_feedback	LabelHapticFeedback	Haptic feedback
+jump_forward	-	Jump forward
+jump_back	-	Jump back
+jump_forward_time	LabelJumpForwardsTime	Jump forward
+jump_back_time	LabelJumpBackwardsTime	Jump back
+shake_sensitivity	LabelShakeSensitivity	Shake sensitivity
+level_very_low	LabelVeryLow	Very low
+level_low	LabelLow	Low
+level_medium	LabelMedium	Medium
+level_high	LabelHigh	High
+level_very_high	LabelVeryHigh	Very high
+level_off	LabelOff	Off
+auto_sleep_timer	LabelAutoSleepTimer	Automatic sleep timer
+downloads_on_mobile_data	LabelDownloadUsingCellular	Downloads on mobile data
+streaming_on_mobile_data	LabelStreamingUsingCellular	Streaming on mobile data
+policy_ask	LabelAskConfirmation	Ask
+policy_always	LabelAlways	Always
+policy_never	LabelNever	Never
+series_books_order	LabelAndroidAutoBrowseSeriesSequenceOrder	Series books order

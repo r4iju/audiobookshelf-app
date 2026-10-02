@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -106,7 +108,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                 if (connected == null) {
                     OutlinedTextField(
                         value = address, onValueChange = { address = it; connectionError = null },
-                        label = { Text("Server address") }, placeholder = { Text("https://books.example.com/abs") },
+                        label = { Text(stringResource(R.string.server_address)) }, placeholder = { Text("https://books.example.com/abs") },
                         singleLine = true, modifier = Modifier.fillMaxWidth().testTag("server-address"),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go, autoCorrectEnabled = false),
                         keyboardActions = KeyboardActions(onGo = { connect() }),
@@ -114,7 +116,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                     )
                     connectionError?.let { ErrorText(it, "connection-error") }
                     Button(onClick = ::connect, enabled = !busy && address.isNotBlank(), modifier = Modifier.fillMaxWidth().height(52.dp).testTag("connect")) {
-                        if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp) else Text("Continue")
+                        if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp) else Text(stringResource(R.string.connect))
                     }
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -122,10 +124,10 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                         Text(connected.first.canonical, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if ("local" in connected.second.authMethods) {
-                        OutlinedTextField(username, { username = it; signInError = null }, label = { Text("Username") }, singleLine = true,
+                        OutlinedTextField(username, { username = it; signInError = null }, label = { Text(stringResource(R.string.username)) }, singleLine = true,
                             modifier = Modifier.fillMaxWidth().testTag("username"),
                             keyboardOptions = KeyboardOptions(autoCorrectEnabled = false, imeAction = ImeAction.Next))
-                        OutlinedTextField(password, { password = it; signInError = null }, label = { Text("Password") }, singleLine = true,
+                        OutlinedTextField(password, { password = it; signInError = null }, label = { Text(stringResource(R.string.password)) }, singleLine = true,
                             visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth().testTag("password"),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done))
                         signInError?.let { ErrorText(it, "sign-in-error") }

@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -55,7 +57,7 @@ private val sleepPresets = listOf(5, 10, 15, 30, 45, 60, 90)
 fun SleepSheet(engine: PlaybackEngine, state: PlayerState, onDismiss: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Sleep timer", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+            Text(stringResource(R.string.sleep_timer), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
             val remaining = state.sleepRemaining
             if (remaining != null) {
                 Text(if (state.sleepEndOfChapter) "Stops at the end of this chapter, ${formatClock(remaining)} from now" else "Stops in ${formatClock(remaining)}",
@@ -71,7 +73,7 @@ fun SleepSheet(engine: PlaybackEngine, state: PlayerState, onDismiss: () -> Unit
                     FilledTonalButton(onClick = { engine.startSleep(SleepTimer.Mode.Duration(minutes * 60.0)); onDismiss() }, modifier = Modifier.testTag("sleep-$minutes")) { Text("$minutes min") }
                 }
                 if (state.now?.chapters?.isNotEmpty() == true) {
-                    FilledTonalButton(onClick = { engine.startSleep(SleepTimer.Mode.EndOfChapter); onDismiss() }, modifier = Modifier.testTag("sleep-end-of-chapter")) { Text("End of chapter") }
+                    FilledTonalButton(onClick = { engine.startSleep(SleepTimer.Mode.EndOfChapter); onDismiss() }, modifier = Modifier.testTag("sleep-end-of-chapter")) { Text(stringResource(R.string.end_of_chapter)) }
                 }
             }
         }
@@ -100,14 +102,14 @@ fun BookmarksSheet(client: ApiClient, itemId: String, position: Double, onSeek: 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Bookmarks", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).semantics { heading() })
+                Text(stringResource(R.string.bookmarks), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).semantics { heading() })
                 Button(onClick = { adding = true }, modifier = Modifier.testTag("add-bookmark")) { Text("Add at ${formatClock(position)}") }
             }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("bookmark-error")) }
             val list = bookmarks
             when {
                 list == null && error == null -> CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
-                list.isNullOrEmpty() -> Text("No bookmarks yet", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("bookmarks-empty"))
+                list.isNullOrEmpty() -> Text(stringResource(R.string.no_bookmarks), color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("bookmarks-empty"))
                 else -> LazyColumn(Modifier.heightIn(max = 360.dp)) {
                     itemsIndexed(list) { index, mark ->
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -140,9 +142,9 @@ fun BookmarksSheet(client: ApiClient, itemId: String, position: Double, onSeek: 
                     if (target != null) mutate { val saved = client.saveBookmark(itemId, target.time, name, editing = true); current.map { if (it.time == target.time) saved else it } }
                     else { val time = position; mutate { current + client.saveBookmark(itemId, time, name, editing = false) } }
                     adding = false; editing = null
-                }, modifier = Modifier.testTag("save-bookmark")) { Text("Save") }
+                }, modifier = Modifier.testTag("save-bookmark")) { Text(stringResource(R.string.action_save)) }
             },
-            dismissButton = { TextButton(onClick = { adding = false; editing = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { adding = false; editing = null }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
 }

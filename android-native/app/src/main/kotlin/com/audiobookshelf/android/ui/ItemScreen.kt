@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,7 +58,7 @@ fun LoadItem(client: ApiClient, id: String, padding: PaddingValues, onFailure: (
     when {
         loaded != null -> content(loaded) { attempt++ }
         error != null -> Box(Modifier.padding(padding)) {
-            MessageState("This title could not load", error, tag = "item-error", action = "Retry", actionTag = "item-retry") { attempt++ }
+            MessageState("This title could not load", error, tag = "item-error", action = stringResource(R.string.action_retry), actionTag = "item-retry") { attempt++ }
         }
         else -> Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
     }
@@ -125,7 +127,7 @@ fun ItemDetail(
                         )
                         if (facts.isNotEmpty()) Text(facts.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (progress != null && (progress.progress > 0 || progress.isFinished)) {
-                            val text = if (progress.isFinished) "Finished" else "${(progress.progress * 100).toInt()}% listened · ${formatDuration((progress.duration - progress.currentTime).coerceAtLeast(0.0))} left"
+                            val text = if (progress.isFinished) stringResource(R.string.finished) else "${(progress.progress * 100).toInt()}% listened · ${formatDuration((progress.duration - progress.currentTime).coerceAtLeast(0.0))} left"
                             Column(Modifier.semantics(mergeDescendants = true) {}.testTag("item-progress"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(text, style = MaterialTheme.typography.labelLarge)
                                 ProgressLine(if (progress.isFinished) 1.0 else progress.progress)
@@ -156,7 +158,7 @@ fun ItemDetail(
             more()
             val chapters = item.media.chapters
             if (chapters.isNotEmpty()) {
-                item { Text("Chapters", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) }
+                item { Text(stringResource(R.string.chapters), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) }
                 itemsIndexed(chapters) { index, chapter ->
                     Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.testTag("chapter-$index"), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(chapter.title.ifBlank { "Chapter ${index + 1}" }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
@@ -173,6 +175,6 @@ fun ExpandableText(text: String) {
     var expanded by remember { mutableStateOf(false) }
     Column {
         Text(text, style = MaterialTheme.typography.bodyMedium, maxLines = if (expanded) Int.MAX_VALUE else 6, modifier = Modifier.testTag("item-description"))
-        if (text.length > 280) TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "Show less" else "Show more") }
+        if (text.length > 280) TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) stringResource(R.string.action_show_less) else stringResource(R.string.action_show_more)) }
     }
 }

@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -69,7 +71,7 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
             },
             enabled = !saving && !discarding,
             modifier = Modifier.fillMaxWidth().testTag(if (finished) "$tagPrefix-unfinish" else "$tagPrefix-finish"),
-        ) { Text(if (finished) "Mark unfinished" else "Mark finished") }
+        ) { Text(if (finished) "Mark unfinished" else stringResource(R.string.action_mark_finished)) }
         if (uncertain) {
             Text("An earlier save of this title's progress got no answer and may still reach your server. If it arrives after the discard, it brings the progress back. Your server cannot tell this app whether it will.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("discard-uncertain"))
@@ -81,7 +83,7 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
             Text("Discarding progress. This finishes once your server can be reached and this title's listening is sent.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("discard-pending"))
         } else if (progress != null) {
-            TextButton(onClick = { confirming = true }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("discard-progress")) { Text("Discard progress") }
+            TextButton(onClick = { confirming = true }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("discard-progress")) { Text(stringResource(R.string.action_discard_progress)) }
         }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
     }

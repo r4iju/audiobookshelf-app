@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import com.audiobookshelf.android.data.CellularPolicy
 import androidx.compose.material3.AlertDialog
 import android.net.ConnectivityManager
@@ -99,7 +101,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onCollapse, modifier = Modifier.testTag("player-collapse")) { Icon(Icons.Outlined.KeyboardArrowDown, "Minimize player") }
                 Spacer(Modifier.weight(1f))
-                IconButton(onClick = { engine.close(); onClosed() }, modifier = Modifier.testTag("player-close")) { Icon(Icons.Outlined.Close, "Stop and close player") }
+                IconButton(onClick = { engine.close(); onClosed() }, modifier = Modifier.testTag("player-close")) { Icon(Icons.Outlined.Close, stringResource(R.string.action_close_player)) }
             }
             if (now == null) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -140,19 +142,19 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                         TextButton(onClick = { speedSheet = true }, modifier = Modifier.testTag("player-speed")) { Text("Speed ${formatSpeed(state.speed)}") }
                         val remaining = state.sleepRemaining
                         TextButton(onClick = { tool = "sleep" }, modifier = Modifier.testTag("player-sleep")) {
-                            Icon(Icons.Outlined.Bedtime, if (remaining != null) "Sleep timer" else null, Modifier.size(18.dp))
+                            Icon(Icons.Outlined.Bedtime, if (remaining != null) stringResource(R.string.sleep_timer) else null, Modifier.size(18.dp))
                             if (remaining == null) Text("Sleep", Modifier.padding(start = 6.dp))
                         }
                         if (remaining != null) Text(formatClock(remaining), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.semantics { stateDescription = "Sleep timer" }.testTag("sleep-remaining"))
                         if (client != null) TextButton(onClick = { tool = "bookmarks" }, modifier = Modifier.testTag("player-bookmarks")) {
                             Icon(Icons.Outlined.BookmarkBorder, null, Modifier.size(18.dp))
-                            Text("Bookmarks", Modifier.padding(start = 6.dp))
+                            Text(stringResource(R.string.bookmarks), Modifier.padding(start = 6.dp))
                         }
                     }
                 }
                 if (now.chapters.isNotEmpty()) {
-                    item { Text("Chapters", style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth().semantics { heading() }) }
+                    item { Text(stringResource(R.string.chapters), style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth().semantics { heading() }) }
                     itemsIndexed(now.chapters) { index, item -> ChapterRow(index, item, current = index == chapterIndex) { engine.seekChapter(index) } }
                 }
             }
@@ -165,7 +167,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
     if (speedSheet) {
         ModalBottomSheet(onDismissRequest = { speedSheet = false }) {
             Column(Modifier.padding(horizontal = 24.dp, vertical = 8.dp).padding(bottom = 24.dp)) {
-                Text("Playback speed", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+                Text(stringResource(R.string.playback_speed), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
                 Text(formatSpeed(state.speed), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(vertical = 8.dp))
                 Slider(value = state.speed, onValueChange = { engine.setSpeed((it * 20).toInt() / 20f) }, valueRange = 0.5f..3f, modifier = Modifier.testTag("speed-slider"))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
@@ -212,7 +214,7 @@ private fun Controls(state: PlayerState, onPrevious: () -> Unit, onBack: () -> U
         Box(Modifier.testTag(if (state.playing) "player-playing" else "player-paused")) {
             FilledIconButton(onClick = { haptic(); onToggle() }, modifier = Modifier.size(72.dp).testTag("play-pause"), colors = IconButtonDefaults.filledIconButtonColors()) {
                 if (state.loading) CircularProgressIndicator(Modifier.size(28.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 3.dp)
-                else Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) "Pause" else "Play", Modifier.size(40.dp))
+                else Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) stringResource(R.string.action_pause) else stringResource(R.string.action_play), Modifier.size(40.dp))
             }
         }
         IconButton(onClick = { haptic(); onForward() }, modifier = Modifier.size(56.dp).testTag("jump-forward")) { Icon(jumpIcon(true, settings.jumpForwardTime), jumpDescription(true, settings.jumpForwardTime), Modifier.size(32.dp)) }
@@ -328,7 +330,7 @@ fun PlayButton(source: () -> PlaySource, itemId: String, episodeId: String?, onO
             if (waiting) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
             else {
                 Icon(Icons.Filled.PlayArrow, null)
-                Text(if (loadedHere && state.playing) "Playing" else if (loadedHere) "Resume" else "Play", Modifier.padding(start = 6.dp))
+                Text(if (loadedHere && state.playing) "Playing" else if (loadedHere) "Resume" else stringResource(R.string.action_play), Modifier.padding(start = 6.dp))
             }
         }
         if (refused) Text("Streaming on mobile data is turned off in Settings. Connect to Wi-Fi or download this title first.",
@@ -342,7 +344,7 @@ fun PlayButton(source: () -> PlaySource, itemId: String, episodeId: String?, onO
             onDismissRequest = { askCellular = null },
             title = { Text("Stream on mobile data?") },
             text = { Text("You are on a metered connection. You can change this in Settings.") },
-            confirmButton = { TextButton(onClick = { askCellular = null; start(pending) }, modifier = Modifier.testTag("play-cellular-allow")) { Text("Stream") } },
+            confirmButton = { TextButton(onClick = { askCellular = null; start(pending) }, modifier = Modifier.testTag("play-cellular-allow")) { Text(stringResource(R.string.action_stream)) } },
             dismissButton = { TextButton(onClick = { askCellular = null }) { Text("Not now") } },
         )
     }

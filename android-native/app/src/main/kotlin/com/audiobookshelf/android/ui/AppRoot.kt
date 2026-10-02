@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,7 +101,7 @@ private fun SignedIn(active: SessionState.Active) {
             when (route) {
                 null -> Home(model, active, open, openFiltered)
                 Route.Player -> PlayerScreen(onCollapse = pop, onClosed = pop)
-                Route.Accounts -> RouteScaffold("Accounts", pop) { AccountsScreen(active, it) }
+                Route.Accounts -> RouteScaffold(stringResource(R.string.title_accounts), pop) { AccountsScreen(active, it) }
                 is Route.Item -> RouteScaffold("", pop) { padding ->
                     LoadItem(active.client, route.id, padding, graph.accounts::handle) { item, reload ->
                         if (item.isPodcast) {
@@ -130,9 +132,9 @@ private fun SignedIn(active: SessionState.Active) {
                         EpisodeScreen(item, route.episodeId, active, catalog, padding, onPlayer = { model.push(Route.Player) })
                     }
                 }
-                is Route.Groups -> RouteScaffold(if (route.kind == COLLECTIONS) "Collections" else "Playlists", pop, actions = {
+                is Route.Groups -> RouteScaffold(if (route.kind == COLLECTIONS) stringResource(R.string.title_collections) else stringResource(R.string.title_playlists), pop, actions = {
                     if (canCreateGroup(route.kind, catalog)) IconButton(onClick = { model.push(Route.GroupEditor(route.kind, null)) }, modifier = Modifier.testTag("new-group")) {
-                        Icon(Icons.Outlined.Add, if (route.kind == COLLECTIONS) "New collection" else "New playlist")
+                        Icon(Icons.Outlined.Add, if (route.kind == COLLECTIONS) stringResource(R.string.title_new_collection) else stringResource(R.string.title_new_playlist))
                     }
                 }) { padding -> GroupsScreen(route.kind, active, catalog, padding, onOpen = { model.push(Route.Group(route.kind, it)) }) }
                 is Route.Group -> RouteScaffold("", pop) { padding ->
@@ -141,7 +143,7 @@ private fun SignedIn(active: SessionState.Active) {
                         onEdit = { model.push(Route.GroupEditor(route.kind, route.id)) },
                         onDeleted = pop)
                 }
-                is Route.GroupEditor -> RouteScaffold(if (route.id == null) (if (route.kind == COLLECTIONS) "New collection" else "New playlist") else "Edit", pop) { padding ->
+                is Route.GroupEditor -> RouteScaffold(if (route.id == null) (if (route.kind == COLLECTIONS) stringResource(R.string.title_new_collection) else stringResource(R.string.title_new_playlist)) else "Edit", pop) { padding ->
                     GroupEditorScreen(route.kind, route.id, active, catalog, padding, onSaved = { id ->
                         model.pop()
                         if (route.id == null) model.push(Route.Group(route.kind, id))
@@ -153,9 +155,9 @@ private fun SignedIn(active: SessionState.Active) {
                     val libraryId = catalog.library?.id
                     if (libraryId != null) FilteredScreen(model.filtered(active, libraryId, route), padding, { catalog.progressFor(it) }, open)
                 }
-                Route.Settings -> RouteScaffold("Settings", pop) { padding -> SettingsScreen(padding, onDiagnostics = { model.push(Route.Diagnostics) }) }
+                Route.Settings -> RouteScaffold(stringResource(R.string.title_settings), pop) { padding -> SettingsScreen(padding, onDiagnostics = { model.push(Route.Diagnostics) }) }
                 Route.Diagnostics -> RouteScaffold("Diagnostics", pop) { padding -> DiagnosticsScreen(active, padding) }
-                Route.Statistics -> RouteScaffold("Statistics", pop) { padding -> StatisticsScreen(active, catalog, padding) }
+                Route.Statistics -> RouteScaffold(stringResource(R.string.title_statistics), pop) { padding -> StatisticsScreen(active, catalog, padding) }
                 else -> RouteScaffold("", pop) { padding ->
                     Box(Modifier.padding(padding)) { MessageState("Not available yet", "This part of the preview is still being built.", tag = "unavailable") }
                 }
@@ -177,17 +179,17 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
                     IconButton(onClick = { model.push(Route.AddPodcast) }, modifier = Modifier.testTag("add-podcast")) { Icon(Icons.Outlined.Add, "Add podcast") }
                 }
                 LibraryMenu(catalog, onRoute = model::push)
-                IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, "Accounts") }
-                IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, "Settings") }
+                IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, stringResource(R.string.title_accounts)) }
+                IconButton(onClick = { model.push(Route.Settings) }, modifier = Modifier.testTag("open-settings")) { Icon(Icons.Outlined.Settings, stringResource(R.string.title_settings)) }
             }
         },
         bottomBar = {
             Column {
             LocalBottomAccessory.current()
             NavigationBar {
-                NavigationBarItem(selected = tab == Tab.Library, onClick = { model.tab.value = Tab.Library }, icon = { Icon(Icons.Outlined.LibraryBooks, null) }, label = { Text("Library") }, modifier = Modifier.testTag("tab-library"))
-                NavigationBarItem(selected = tab == Tab.Search, onClick = { model.tab.value = Tab.Search }, icon = { Icon(Icons.Outlined.Search, null) }, label = { Text("Search") }, modifier = Modifier.testTag("tab-search"))
-                NavigationBarItem(selected = tab == Tab.Downloads, onClick = { model.tab.value = Tab.Downloads }, icon = { Icon(Icons.Outlined.DownloadForOffline, null) }, label = { Text("Downloads") }, modifier = Modifier.testTag("tab-downloads"))
+                NavigationBarItem(selected = tab == Tab.Library, onClick = { model.tab.value = Tab.Library }, icon = { Icon(Icons.Outlined.LibraryBooks, null) }, label = { Text(stringResource(R.string.tab_library)) }, modifier = Modifier.testTag("tab-library"))
+                NavigationBarItem(selected = tab == Tab.Search, onClick = { model.tab.value = Tab.Search }, icon = { Icon(Icons.Outlined.Search, null) }, label = { Text(stringResource(R.string.tab_search)) }, modifier = Modifier.testTag("tab-search"))
+                NavigationBarItem(selected = tab == Tab.Downloads, onClick = { model.tab.value = Tab.Downloads }, icon = { Icon(Icons.Outlined.DownloadForOffline, null) }, label = { Text(stringResource(R.string.tab_downloads)) }, modifier = Modifier.testTag("tab-downloads"))
             }
             }
         },
@@ -211,11 +213,11 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
 private fun LibraryMenu(catalog: com.audiobookshelf.android.data.CatalogModel, onRoute: (Route) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
-        IconButton(onClick = { open = true }, modifier = Modifier.testTag("library-menu")) { Icon(Icons.Outlined.MoreVert, "More") }
+        IconButton(onClick = { open = true }, modifier = Modifier.testTag("library-menu")) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.menu_more)) }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            if (catalog.library?.isPodcast == false) DropdownMenuItem(text = { Text("Collections") }, onClick = { open = false; onRoute(Route.Groups(COLLECTIONS)) }, modifier = Modifier.testTag("menu-collections"))
-            DropdownMenuItem(text = { Text("Playlists") }, onClick = { open = false; onRoute(Route.Groups(PLAYLISTS)) }, modifier = Modifier.testTag("menu-playlists"))
-            DropdownMenuItem(text = { Text("Statistics") }, onClick = { open = false; onRoute(Route.Statistics) }, modifier = Modifier.testTag("menu-statistics"))
+            if (catalog.library?.isPodcast == false) DropdownMenuItem(text = { Text(stringResource(R.string.title_collections)) }, onClick = { open = false; onRoute(Route.Groups(COLLECTIONS)) }, modifier = Modifier.testTag("menu-collections"))
+            DropdownMenuItem(text = { Text(stringResource(R.string.title_playlists)) }, onClick = { open = false; onRoute(Route.Groups(PLAYLISTS)) }, modifier = Modifier.testTag("menu-playlists"))
+            DropdownMenuItem(text = { Text(stringResource(R.string.title_statistics)) }, onClick = { open = false; onRoute(Route.Statistics) }, modifier = Modifier.testTag("menu-statistics"))
         }
     }
 }

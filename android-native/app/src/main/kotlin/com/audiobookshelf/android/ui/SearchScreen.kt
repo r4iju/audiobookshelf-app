@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -46,6 +48,13 @@ fun SearchScreen(search: SearchModel, catalog: CatalogModel, padding: PaddingVal
     val focus = remember { FocusRequester() }
     val client = LocalContext.current.graph.accounts.activeClient
     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+    val booksHeading = stringResource(R.string.search_books)
+    val podcastsHeading = stringResource(R.string.search_podcasts)
+    val episodesHeading = stringResource(R.string.search_episodes)
+    val authorsHeading = stringResource(R.string.search_authors)
+    val seriesHeading = stringResource(R.string.search_series)
+    val narratorsHeading = stringResource(R.string.search_narrators)
+    val tagsHeading = stringResource(R.string.search_tags)
     LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("search-results"), contentPadding = PaddingValues(bottom = 24.dp)) {
         item {
             OutlinedTextField(
@@ -64,21 +73,21 @@ fun SearchScreen(search: SearchModel, catalog: CatalogModel, padding: PaddingVal
             error != null -> item { MessageState("Search failed", error, tag = "search-error", action = "Retry", actionTag = "search-retry") { search.retry() } }
             search.query.isBlank() -> item { MessageState("Find something to listen to", "Search titles, authors, series, narrators and episodes.", icon = Icons.Outlined.Search, tag = "search-idle") }
             results == null -> Unit
-            results.isEmpty -> item { MessageState("No results", "Nothing matches \"${search.query}\". Try fewer words or another spelling.", icon = Icons.Outlined.Search, tag = "search-empty") }
+            results.isEmpty -> item { MessageState(stringResource(R.string.search_no_results), "Nothing matches \"${search.query}\". Try fewer words or another spelling.", icon = Icons.Outlined.Search, tag = "search-empty") }
             else -> {
-                section("Books", results.book.map { it.libraryItem }) { ResultRow(it, client, "search-item-${it.id}") { open(it) } }
-                section("Podcasts", results.podcast.map { it.libraryItem }) { ResultRow(it, client, "search-item-${it.id}") { open(it) } }
-                section("Episodes", results.episodes.map { it.libraryItem }) { ResultRow(it, client, "search-episode-${it.recentEpisode?.id ?: it.id}") { open(it) } }
-                section("Authors", results.authors) { author ->
+                section(booksHeading, results.book.map { it.libraryItem }) { ResultRow(it, client, "search-item-${it.id}") { open(it) } }
+                section(podcastsHeading, results.podcast.map { it.libraryItem }) { ResultRow(it, client, "search-item-${it.id}") { open(it) } }
+                section(episodesHeading, results.episodes.map { it.libraryItem }) { ResultRow(it, client, "search-episode-${it.recentEpisode?.id ?: it.id}") { open(it) } }
+                section(authorsHeading, results.authors) { author ->
                     LinkRow(author.name, author.numBooks?.let { "$it books" }, Icons.Outlined.Person, "search-author-${author.id}") { openFiltered(ApiClient.filter("authors", author.id), author.name) }
                 }
-                section("Series", results.series) { series ->
+                section(seriesHeading, results.series) { series ->
                     LinkRow(series.series.name, "${series.books.size} books", Icons.AutoMirrored.Outlined.LibraryBooks, "search-series-${series.series.id}") { openFiltered(ApiClient.filter("series", series.series.id), series.series.name) }
                 }
-                section("Narrators", results.narrators) { narrator ->
+                section(narratorsHeading, results.narrators) { narrator ->
                     LinkRow(narrator.name, "${narrator.numBooks} books", Icons.Outlined.RecordVoiceOver, "search-narrator-${narrator.name}") { openFiltered(ApiClient.filter("narrators", narrator.name), narrator.name) }
                 }
-                section("Tags", results.tags) { tag ->
+                section(tagsHeading, results.tags) { tag ->
                     LinkRow(tag.name, "${tag.numItems} items", Icons.Outlined.Sell, "search-tag-${tag.name}") { openFiltered(ApiClient.filter("tags", tag.name), tag.name) }
                 }
             }

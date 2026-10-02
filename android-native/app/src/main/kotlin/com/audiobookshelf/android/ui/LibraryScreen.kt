@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,6 +61,24 @@ import com.audiobookshelf.android.graph
 import com.audiobookshelf.core.LibraryItem
 import com.audiobookshelf.core.MediaProgress
 
+/** Server shelves carry the legacy app's translation key; their ids are the fallback for older servers. */
+@Composable
+private fun shelfLabel(shelf: com.audiobookshelf.core.PersonalizedShelf): String {
+    val resource = when (shelf.labelStringKey ?: shelf.id) {
+        "LabelContinueListening", "continue-listening" -> R.string.shelf_continue_listening
+        "LabelContinueReading", "continue-reading" -> R.string.shelf_continue_reading
+        "LabelContinueSeries", "continue-series" -> R.string.shelf_continue_series
+        "LabelRecentlyAdded", "recently-added" -> R.string.shelf_recently_added
+        "LabelRecentSeries", "recent-series" -> R.string.shelf_recent_series
+        "LabelListenAgain", "listen-again" -> R.string.shelf_listen_again
+        "LabelDiscover", "discover" -> R.string.shelf_discover
+        "LabelNewestEpisodes", "newest-episodes" -> R.string.shelf_newest_episodes
+        "LabelNewestAuthors", "newest-authors" -> R.string.shelf_newest_authors
+        else -> return shelf.label
+    }
+    return stringResource(resource)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryTopBar(catalog: CatalogModel, actions: @Composable () -> Unit) {
@@ -67,8 +87,8 @@ fun LibraryTopBar(catalog: CatalogModel, actions: @Composable () -> Unit) {
         title = {
             Box {
                 TextButton(onClick = { open = true }, modifier = Modifier.testTag("library-picker")) {
-                    Text(catalog.library?.name ?: "Library", style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Icon(Icons.Outlined.ArrowDropDown, "Choose library")
+                    Text(catalog.library?.name ?: stringResource(R.string.tab_library), style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Icon(Icons.Outlined.ArrowDropDown, stringResource(R.string.choose_library))
                 }
                 DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
                     catalog.libraries.forEach { library ->
@@ -104,7 +124,7 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
             val error = catalog.error
             when {
                 error != null -> item(span = { GridItemSpan(maxLineSpan) }) {
-                    MessageState("Library unavailable", "$error Your account and unsent listening are kept.", tag = "catalog-error", action = "Retry", actionTag = "catalog-retry") { catalog.reload() }
+                    MessageState("Library unavailable", "$error Your account and unsent listening are kept.", tag = "catalog-error", action = stringResource(R.string.action_retry), actionTag = "catalog-retry") { catalog.reload() }
                 }
                 catalog.loading -> item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
@@ -113,7 +133,7 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
                     catalog.shelves.forEach { shelf ->
                         item(span = { GridItemSpan(maxLineSpan) }, key = "shelf-${shelf.id}") {
                             Column(Modifier.padding(top = 8.dp)) {
-                                Text(shelf.label, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(vertical = 8.dp))
+                                Text(shelfLabel(shelf), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(vertical = 8.dp))
                                 LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.testTag("shelf-${shelf.id}")) {
                                     items(shelf.items(), key = { it.id + (it.recentEpisode?.id ?: "") }) { item ->
                                         ItemCard(item, catalog.progressFor(item.id, item.recentEpisode?.id), Modifier.width(if (shelf.id == "continue-listening") 168.dp else 132.dp), tagPrefix = "shelf-item") { open(item) }
@@ -125,11 +145,11 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                (catalog.query.filterLabel ?: if (catalog.library?.isPodcast == true) "All podcasts" else "All titles") + " · ${catalog.total}",
+                                (catalog.query.filterLabel ?: if (catalog.library?.isPodcast == true) stringResource(R.string.all_podcasts) else stringResource(R.string.all_titles)) + " · ${catalog.total}",
                                 style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f),
                             )
-                            IconButton(onClick = onFilter, modifier = Modifier.testTag("open-filter")) { Icon(Icons.Outlined.FilterList, "Filter") }
-                            IconButton(onClick = onSort, modifier = Modifier.testTag("open-sort")) { Icon(Icons.AutoMirrored.Outlined.Sort, "Sort") }
+                            IconButton(onClick = onFilter, modifier = Modifier.testTag("open-filter")) { Icon(Icons.Outlined.FilterList, stringResource(R.string.filter)) }
+                            IconButton(onClick = onSort, modifier = Modifier.testTag("open-sort")) { Icon(Icons.AutoMirrored.Outlined.Sort, stringResource(R.string.sort)) }
                             IconButton(onClick = { graph.settings.update { it.copy(listLayout = !it.listLayout) } }, modifier = Modifier.testTag("toggle-layout")) {
                                 Icon(if (list) Icons.Outlined.GridView else Icons.AutoMirrored.Outlined.ViewList, if (list) "Show covers" else "Show list")
                             }
@@ -137,7 +157,7 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
                     }
                     if (catalog.query.filter != null) item(span = { GridItemSpan(maxLineSpan) }) {
                         Row { InputChip(selected = true, onClick = { catalog.apply(catalog.query.copy(filter = null, filterLabel = null)) },
-                            label = { Text(catalog.query.filterLabel ?: "Filtered") }, trailingIcon = { Icon(Icons.Outlined.Close, "Clear filter") },
+                            label = { Text(catalog.query.filterLabel ?: "Filtered") }, trailingIcon = { Icon(Icons.Outlined.Close, stringResource(R.string.action_clear_filter)) },
                             modifier = Modifier.testTag("clear-filter")) }
                     }
                     if (catalog.items.isEmpty()) item(span = { GridItemSpan(maxLineSpan) }) {
@@ -152,7 +172,7 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
                     }
                     catalog.pageError?.let { failure ->
                         item(span = { GridItemSpan(maxLineSpan) }) {
-                            MessageState("More titles could not load", failure, tag = "page-error", action = "Retry", actionTag = "page-retry") { catalog.retryPage() }
+                            MessageState("More titles could not load", failure, tag = "page-error", action = stringResource(R.string.action_retry), actionTag = "page-retry") { catalog.retryPage() }
                         }
                     }
                 }
