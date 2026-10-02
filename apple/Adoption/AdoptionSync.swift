@@ -10,9 +10,9 @@ extension NativeMigrationAdoption {
         case accountChanged
         var errorDescription: String? {
             switch self {
-            case .http(let code): return "The server returned HTTP \(code)."
+            case .http(let code): return NativeStrings.current("The server returned HTTP {0}.", code)
             case .rejected(let reason): return reason
-            case .accountChanged: return "The signed-in account changed; the rest waits for its own account."
+            case .accountChanged: return NativeStrings.current("The signed-in account changed; the rest waits for its own account.")
             }
         }
     }
@@ -26,7 +26,7 @@ extension NativeMigrationAdoption {
         let owed = try AdoptionLedger.load(ledgerURL).sessions.values.contains {
             !$0.acknowledged && $0.unconfirmed == nil && identity($0.account) == account && $0.session.libraryItemId == itemID && $0.session.episodeId == episodeID
         }
-        if owed { throw SyncFailure.rejected("Carried-over listening for this title is still waiting to be sent, so its progress was kept. Try again when the server is reachable.") }
+        if owed { throw SyncFailure.rejected(NativeStrings.current("Carried-over listening for this title is still waiting to be sent, so its progress was kept. Try again when the server is reachable.")) }
     }
 
     /// Retires the reset media's carried-over positions unsent; a reset's cleanup.
@@ -157,7 +157,7 @@ extension NativeMigrationAdoption {
         request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
         if let body {
             // Non-finite numbers would raise an Objective-C exception in JSONSerialization.
-            guard JSONSerialization.isValidJSONObject(body) else { throw SyncFailure.rejected("The saved values are not valid numbers and are kept on this device.") }
+            guard JSONSerialization.isValidJSONObject(body) else { throw SyncFailure.rejected(NativeStrings.current("The saved values are not valid numbers and are kept on this device.")) }
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
@@ -200,7 +200,7 @@ extension NativeMigrationAdoption {
     /// (`objects/PlaybackSession.js` in 2.30), so no client calendar or time zone is involved.
     private func payload(_ session: LegacySession, account: AccountIdentity, total: Double) throws -> [String: Any] {
         guard let updated = Self.plausibleTime(session.updatedAt) ?? Self.plausibleTime(session.startedAt) else {
-            throw SyncFailure.rejected("The session has no usable time and is kept on this device.")
+            throw SyncFailure.rejected(NativeStrings.current("The session has no usable time and is kept on this device."))
         }
         return [
             "id": session.id, "userId": account.userID, "libraryItemId": session.libraryItemId ?? NSNull(), "episodeId": session.episodeId ?? NSNull(),
@@ -219,13 +219,13 @@ extension NativeMigrationAdoption {
         let (status, data) = try await send("POST", "api/session/local-all", body: body, as: identity, writing: session.libraryItemId.map { ($0, session.episodeId) })
         guard status == 200 else { throw SyncFailure.http(status) }
         let results = json(data)["results"] as? [[String: Any]] ?? []
-        guard let result = results.first(where: { $0["id"] as? String == session.id }) else { throw SyncFailure.rejected("The server did not confirm this session.") }
-        guard result["success"] as? Bool == true else { throw SyncFailure.rejected((result["error"] as? String) ?? "The server did not accept this session.") }
+        guard let result = results.first(where: { $0["id"] as? String == session.id }) else { throw SyncFailure.rejected(NativeStrings.current("The server did not confirm this session.")) }
+        guard result["success"] as? Bool == true else { throw SyncFailure.rejected((result["error"] as? String) ?? NativeStrings.current("The server did not accept this session.")) }
     }
 
     /// Pages through the server's sessions of the session's item until `stop` returns true.
     private func scanStored(_ session: LegacySession, identity: AccountIdentity, stop: ([String: Any]) -> Bool) async throws {
-        guard let item = session.libraryItemId else { throw SyncFailure.rejected("The session names no item.") }
+        guard let item = session.libraryItemId else { throw SyncFailure.rejected(NativeStrings.current("The session names no item.")) }
         let path = "api/me/item/listening-sessions/\(item)" + (session.episodeId.map { "/" + $0 } ?? "")
         var page = 0
         while true {
@@ -265,7 +265,7 @@ extension NativeMigrationAdoption {
             return false
         }
         if let own { return own }
-        guard candidates.count <= 1 else { throw SyncFailure.rejected("The server has more than one session that could be this one, so it is kept on this device.") }
+        guard candidates.count <= 1 else { throw SyncFailure.rejected(NativeStrings.current("The server has more than one session that could be this one, so it is kept on this device.")) }
         return candidates.first
     }
 
@@ -384,7 +384,7 @@ extension NativeMigrationAdoption {
         // An unfinished reset retires this position when it finishes.
         guard !reading.player.progressResetPending(account: identity, itemID: item, episodeID: record.progress.episodeID) else { return false }
         let local = record.progress
-        guard Self.plausibleTime(local.lastUpdate) != nil else { throw SyncFailure.rejected("The position has no usable time and is kept on this device.") }
+        guard Self.plausibleTime(local.lastUpdate) != nil else { throw SyncFailure.rejected(NativeStrings.current("The position has no usable time and is kept on this device.")) }
         let path = Self.progressPath(item, episode: local.episodeID)
         func superseded(_ remote: RemoteProgress?) throws -> Bool {
             guard let remote, remote.lastUpdate >= local.lastUpdate else { return false }
@@ -432,23 +432,23 @@ extension NativeMigrationAdoption {
             guard let file = record.files.first,
                   let library = item.supplementaryEbooks.first(where: { $0.metadata?.filename == file.filename }),
                   let ebook = library.ebook, ["pdf", "epub"].contains(ebook.format)
-            else { throw SyncFailure.rejected("The server no longer lists this file for the item.") }
+            else { throw SyncFailure.rejected(NativeStrings.current("The server no longer lists this file for the item.")) }
             let media = ListeningMedia(itemID: item.id, episodeID: nil, title: file.filename, author: item.author, mediaType: item.mediaType, duration: 0, startTime: 0)
             entry = NativeDownloads.Entry(id: record.entryID, account: identity, media: media, tracks: [], chapters: [], ebook: ebook, supplementaryID: library.ino,
                                           serverPosition: 0, serverUpdatedAt: 0, generation: UUID().uuidString, finished: [], state: .failed, error: nil)
             sources = [(0, file)]
         case .interrupted:
             let episode = record.episodeID.flatMap { id in item.media.episodes?.first { $0.id == id } }
-            guard record.episodeID == nil || episode != nil else { throw SyncFailure.rejected("The server no longer has this episode.") }
+            guard record.episodeID == nil || episode != nil else { throw SyncFailure.rejected(NativeStrings.current("The server no longer has this episode.")) }
             let tracks = episode.map { $0.audioTrack.map { [$0] } ?? [] } ?? item.media.tracks ?? []
-            guard tracks.allSatisfy({ $0.duration.isFinite && $0.duration > 0 && $0.startOffset.isFinite && $0.startOffset >= 0 }) else { throw SyncFailure.rejected("The server's copy has no playable audio.") }
+            guard tracks.allSatisfy({ $0.duration.isFinite && $0.duration > 0 && $0.startOffset.isFinite && $0.startOffset >= 0 }) else { throw SyncFailure.rejected(NativeStrings.current("The server's copy has no playable audio.")) }
             let ebookFile = record.files.first { $0.role == .ebook }
             let ebook = episode == nil ? item.media.ebookFile.flatMap { ["pdf", "epub"].contains($0.format) && $0.metadata?.filename == ebookFile?.filename ? $0 : nil } : nil
             for file in record.files where file.role != .ebook {
                 if let index = tracks.firstIndex(where: { $0.metadata?.filename == file.filename }), !sources.contains(where: { $0.part == index }) { sources.append((index, file)) }
             }
             if let ebook, let ebookFile, ebook.metadata?.filename == ebookFile.filename { sources.append((tracks.count, ebookFile)) }
-            guard !sources.isEmpty else { throw SyncFailure.rejected("The server's copy no longer has the parts that had finished.") }
+            guard !sources.isEmpty else { throw SyncFailure.rejected(NativeStrings.current("The server's copy no longer has the parts that had finished.")) }
             let length = episode?.duration ?? item.media.duration ?? tracks.map { $0.startOffset + $0.duration }.max() ?? 0
             let media = ListeningMedia(itemID: item.id, episodeID: record.episodeID, title: episode?.title ?? item.title, author: item.author, mediaType: item.mediaType,
                                        duration: length.isFinite && length >= 0 ? length : 0, startTime: record.serverPosition)
@@ -497,7 +497,7 @@ extension NativeMigrationAdoption {
             try resolve(reason)
             return false
         }
-        guard moves.allSatisfy(\.targetUnchanged) else { throw SyncFailure.rejected("Something else wrote where this download goes; it is tried again later.") }
+        guard moves.allSatisfy(\.targetUnchanged) else { throw SyncFailure.rejected(NativeStrings.current("Something else wrote where this download goes; it is tried again later.")) }
         do {
             for move in moves { try move.finish() }
             try downloads.publishAdopted([(entry, nil)])

@@ -13,7 +13,7 @@ public enum NativeTextContext: String, CaseIterable, Sendable {
 }
 
 /// Looks up native text by its English wording. `apple/Localization/generate.py` writes the tables, carrying a legacy
-/// translation only where its meaning matches; anything else stays in English. The table name keeps SwiftUI's own
+/// translation where its meaning matches, then a maintained native translation, with English as the fallback. The table name keeps SwiftUI's own
 /// `Text` lookup from translating literals that were never reviewed.
 public struct NativeStrings {
     public let language: NativeLanguage
@@ -36,6 +36,11 @@ public struct NativeStrings {
     }
 
     public func callAsFunction(_ english: String, _ arguments: CustomStringConvertible...) -> String {
+        Self.substitute(table[english] ?? english, arguments)
+    }
+
+    /// The same lookup for arguments gathered elsewhere, such as the shared core's text.
+    public func callAsFunction(_ english: String, arguments: [CustomStringConvertible]) -> String {
         Self.substitute(table[english] ?? english, arguments)
     }
 
@@ -70,12 +75,16 @@ public struct NativeStrings {
         return english.reduce(into: [:]) { copy, key in if let value = table[key] { copy[key] = value } }
     }
 
-    /// The share of native text carrying a legacy translation, so the language list can disclose partial coverage.
-    public var translatedFraction: Double {
-        guard language != .english else { return 1 }
-        let english = Self.table(NativeLanguage.english.localization, bundle: bundle).count
-        guard english > 0 else { return 0 }
-        return Double(table.count) / Double(english)
+    /// The share as whole percent for display, rounded down so only a complete language reads 100%.
+    public static func translatedPercent(translated: Int, of total: Int) -> Int {
+        guard total > 0 else { return 0 }
+        return translated * 100 / total
+    }
+
+    /// The share of native text this language translates, so the language list can disclose partial coverage.
+    public var translatedPercent: Int {
+        guard language != .english else { return 100 }
+        return Self.translatedPercent(translated: table.count, of: Self.table(NativeLanguage.english.localization, bundle: bundle).count)
     }
 
     public static func placeholders(in text: String) -> Set<String> {

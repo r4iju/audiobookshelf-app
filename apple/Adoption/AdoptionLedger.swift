@@ -114,7 +114,7 @@ struct AdoptionLedger: Codable {
 enum AdoptionFiles {
     enum Failure: LocalizedError {
         case changed
-        var errorDescription: String? { "A migrated file changed while it was carried over. It was not used." }
+        var errorDescription: String? { NativeStrings.current("A migrated file changed while it was carried over. It was not used.") }
     }
 
     /// A version 5 style UUID derived from `parts`, so the same migrated artifact always maps to

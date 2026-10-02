@@ -72,7 +72,7 @@ struct NativeLanguageSettings: View {
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
         ShelfList {
-            Section(footer: Text(l10n("Native screens show these translations where the earlier app had an equivalent. Text without one, and system controls, stay in English or follow the device language.")).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("language-coverage-note")) {
+            Section(footer: Text(l10n("Some text appears in English when a translation is unavailable. System screens and controls follow your device language.")).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("language-coverage-note")) {
                 row(l10n("System default"), detail: NativeLanguage.resolve(saved: nil, preferred: Locale.preferredLanguages).name, selected: setting.saved == nil, id: "language-system") { setting.choose(nil) }
             }
             Section {
@@ -84,7 +84,7 @@ struct NativeLanguageSettings: View {
     }
     private func coverage(_ language: NativeLanguage) -> String? {
         guard language != .english else { return nil }
-        return l10n("{0}% translated", Int((NativeStrings(language: language).translatedFraction * 100).rounded()))
+        return l10n("{0}% translated", NativeStrings(language: language).translatedPercent)
     }
     private func row(_ title: String, detail: String?, selected: Bool, id: String, action: @escaping () -> Void) -> some View {
         Button { NativeHaptic.impact("settings"); action() } label: {

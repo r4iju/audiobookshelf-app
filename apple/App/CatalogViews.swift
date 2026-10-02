@@ -141,7 +141,7 @@ struct CatalogShelf: View {
                         Button(l10n("Change library")) { NativeHaptic.impact("library"); Task { await connection.openLibrariesForSelection() } }
                         Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
                         Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }.accessibilityIdentifier("account-signout")
-                    } label: { Image(systemName: "person.crop.circle") }.accessibilityIdentifier("account")
+                    } label: { Image(systemName: "person.crop.circle") }.accessibilityLabel(l10n("Account")).accessibilityIdentifier("account")
                 }
             }.onAppear { Task { if case .loading = catalog.state { await catalog.reload() } else { await catalog.refreshProgressIfNeeded() } } }
             .onReceive(realtime.events) { event in catalog.receive(event) }

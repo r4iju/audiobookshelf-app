@@ -105,7 +105,7 @@ import UniformTypeIdentifiers
             let root = Self.root
             let value = try await Task.detached {
                 let source = try LegacyArchive.open(url)
-                guard try source.fingerprint == fingerprint else { throw LegacyMigrationError.archiveUnreadable("The export changed. Choose it again before importing.") }
+                guard try source.fingerprint == fingerprint else { throw LegacyMigrationError.archiveUnreadable(NativeStrings.current("The export changed. Choose it again before importing.")) }
                 return try LegacyMigrator(root: root).migrate(source)
             }.value
             outcome = value

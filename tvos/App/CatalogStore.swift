@@ -205,16 +205,9 @@ struct HomeShelf: Identifiable {
             default: break
             }
         }
-        // The same wording as the shared core's descriptions, so each can be translated.
-        switch failure as? APIError {
-        case .http(404): return strings("No Audiobookshelf server answered at this address. Include any reverse-proxy path, such as https://example.com/audiobookshelf.")
-        case .invalidServer: return strings("Enter an http:// or https:// server address, without credentials, a query, or a fragment.")
-        case .signInRequired: return strings("Your session expired. Please sign in again.")
-        case .http(401): return strings("The username or password was not accepted.")
-        case .http(let code): return strings("The server returned HTTP {0}. Please try again.", code)
-        case .noAudio: return strings("This item has no playable audio.")
-        case .unsafeMediaURL: return strings("The server returned a media URL outside this server.")
-        default: return failure.localizedDescription
+        if failure as? APIError == .http(404) {
+            return strings("No Audiobookshelf server answered at this address. Include any reverse-proxy path, such as https://example.com/audiobookshelf.")
         }
+        return failure.localizedDescription
     }
 }

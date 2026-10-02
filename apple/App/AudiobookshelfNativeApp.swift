@@ -13,6 +13,7 @@ import SwiftUI
     @StateObject private var migration: NativeMigrationStore
 
     init() {
+        NativeStrings.installCoreText()
         UITableView.appearance().backgroundColor = .clear
         let vault = KeychainCredentials()
         #if DEBUG && targetEnvironment(simulator)

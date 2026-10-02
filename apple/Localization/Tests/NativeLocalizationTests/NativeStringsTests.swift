@@ -57,36 +57,50 @@ final class NativeStringsTests: XCTestCase {
         XCTAssertEqual(strings("en-us")("Continue listening"), "Continue listening")
     }
 
-    func testTextWithoutALegacyEquivalentFallsBackToEnglish() {
-        XCTAssertEqual(strings("de")("Diagnostics"), "Diagnostics")
+    func testTextWithoutATranslationFallsBackToEnglish() {
+        XCTAssertEqual(strings("de")("Not a native text"), "Not a native text")
     }
 
     /// Renderers outside the app, such as the year export, receive an immutable copy of only the translated texts, so
     /// anything untranslated keeps their own English default and nothing reads app resources while drawing.
     func testCopyForAnotherRendererCarriesOnlyTranslatedText() {
-        XCTAssertEqual(strings("de").copy(["Settings", "Diagnostics", "Not a native text"]), ["Settings": "Einstellungen"])
+        XCTAssertEqual(strings("de").copy(["Settings", "Not a native text"]), ["Settings": "Einstellungen"])
         XCTAssertEqual(strings("en-us").copy(["Settings"]), [:])
+    }
+
+    /// The Language screen shows each language's share in whole percent. A language missing any text must not read 100%,
+    /// and one with every text translated reads 100%.
+    func testTranslatedPercentNeverRoundsAPartialLanguageUpToComplete() {
+        XCTAssertEqual(NativeStrings.translatedPercent(translated: 698, of: 699), 99)
+        XCTAssertEqual(NativeStrings.translatedPercent(translated: 699, of: 699), 100)
+        XCTAssertEqual(NativeStrings.translatedPercent(translated: 171, of: 678), 25)
+        XCTAssertEqual(NativeStrings.translatedPercent(translated: 0, of: 0), 0)
     }
 
     func testPlaceholdersAreSubstitutedInOrder() {
         XCTAssertEqual(strings("en-us")("File {0} of {1}", 1, 2), "File 1 of 2")
     }
 
-    /// Every shipped translation must be the real legacy value for its mapped key, and anything the legacy app
-    /// left untranslated, empty, marked up, or with different placeholders must fall back to English.
-    func testShippedTranslationsAreExactlyTheUsableLegacyTranslations() throws {
+    /// Every shipped translation must be the real legacy value for its mapped key. Where the legacy app had no usable
+    /// value (none, empty, marked up, or with different placeholders), the translation maintained here for this app
+    /// (`translations/<code>.json`) is shown instead, and anything without either falls back to English.
+    func testShippedTranslationsAreTheUsableLegacyOrMaintainedTranslations() throws {
         let mapping = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: Self.localization.appendingPathComponent("legacy-equivalents.json")))
         XCTAssertFalse(mapping.isEmpty)
+        let keys = try XCTUnwrap(NSDictionary(contentsOf: try XCTUnwrap(Bundle.module.url(forResource: NativeStrings.tableName, withExtension: "strings", subdirectory: nil, localization: "en"))) as? [String: String]).keys
         for language in NativeLanguage.all where language.code != "en-us" {
             let legacy = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: Self.repository.appendingPathComponent("strings/\(language.code).json")))
+            let maintainedFile = Self.localization.appendingPathComponent("translations/\(language.code).json")
+            let maintained = FileManager.default.fileExists(atPath: maintainedFile.path)
+                ? try JSONDecoder().decode([String: String].self, from: Data(contentsOf: maintainedFile)) : [:]
             let native = strings(language.code)
-            for (english, key) in mapping {
-                let candidate = legacy[key] ?? ""
+            for english in keys {
+                let candidate = mapping[english].flatMap { legacy[$0] } ?? ""
                 let usable = !candidate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !candidate.contains("<")
                     && NativeStrings.placeholders(in: candidate) == NativeStrings.placeholders(in: english)
                 let parts = english.components(separatedBy: "::")
                 let shown = parts.count == 2 ? native(parts[1], context: try XCTUnwrap(NativeTextContext(rawValue: parts[0]))) : native(english)
-                XCTAssertEqual(shown, usable ? candidate : parts.last!, "\(language.code): \(english)")
+                XCTAssertEqual(shown, usable ? candidate : maintained[english] ?? parts.last!, "\(language.code): \(english)")
             }
         }
     }

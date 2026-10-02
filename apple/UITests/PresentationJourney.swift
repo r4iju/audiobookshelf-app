@@ -55,7 +55,7 @@ import XCTest
         XCTAssertEqual(app.buttons["language-system"].value as? String, "Selected")
         XCTAssertTrue(app.staticTexts["language-coverage-note"].exists, "Partial translations must be disclosed")
         app.buttons["language-de"].tap()
-        XCTAssertEqual(app.buttons["language-de"].value as? String, "Selected")
+        XCTAssertEqual(app.buttons["language-de"].value as? String, "Ausgewählt", "The selection state reads in the chosen language")
         XCTAssertTrue(app.navigationBars["Sprache"].waitForExistence(timeout: 3), "The open screen must switch without relaunch")
         let lastLegacyLanguage = app.buttons["language-zh-cn"]
         for _ in 0..<4 where !lastLegacyLanguage.exists { app.swipeUp() }
@@ -64,6 +64,7 @@ import XCTest
 
         app.terminate(); app.launchArguments = Self.english; app.launch()
         XCTAssertTrue(app.buttons["account"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.buttons["account"].label, "Konto", "Icon-only controls must follow the chosen language, not the device")
         open("Einstellungen", in: app)
         XCTAssertTrue(app.navigationBars["Einstellungen"].waitForExistence(timeout: 3), "The choice must survive relaunch")
         XCTAssertTrue(app.staticTexts["Haptische Rückmeldung"].exists)
@@ -83,7 +84,7 @@ import XCTest
         open("Paramètres", in: app)
         guard app.buttons["language-settings"].waitForExistence(timeout: 3) else { return XCTFail("Language settings are missing") }
         app.buttons["language-settings"].tap()
-        XCTAssertEqual(app.buttons["language-system"].value as? String, "Selected")
+        XCTAssertEqual(app.buttons["language-system"].value as? String, "Sélectionné", "The selection state reads in the device language")
         app.buttons["language-en-us"].tap()
         XCTAssertTrue(app.navigationBars["Language"].waitForExistence(timeout: 3))
         app.terminate(); app.launchArguments = french; app.launch()
