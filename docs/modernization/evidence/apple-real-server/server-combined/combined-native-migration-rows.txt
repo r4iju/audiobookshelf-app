@@ -1,0 +1,19 @@
+qa-other progress rows after the migration case, read from the server before teardown:
+qa-other VOLUME1 {'currentTime': 3.5, 'duration': 4.075102, 'progress': 1, 'isFinished': True, 'finishedAt': 1790934567926, 'lastUpdate': 1790934565377}
+qa-other VOLUME2 {'currentTime': 2, 'duration': 4, 'progress': 1, 'isFinished': True, 'finishedAt': 1790934567954, 'lastUpdate': 1790934537377}
+qa-other VOLUME3 {'currentTime': 3, 'duration': 4, 'progress': 1, 'isFinished': True, 'finishedAt': 1790934559631, 'lastUpdate': 1790934559631}
+qa-other LONG_STORY {'currentTime': 11, 'duration': 20.062041, 'progress': 1, 'isFinished': True, 'finishedAt': 1790934567884, 'lastUpdate': 1790934565377}
+qa-other SALT {'currentTime': 25, 'duration': 60, 'progress': 0.4166666666666667, 'isFinished': False, 'finishedAt': None, 'lastUpdate': 1790934567763}
+
+The migration's progress writes (from the saved container log; LocalAuth lines left out):
+[2026-10-02 09:49:19.631] INFO: [MediaProgress] Marking media progress as finished because time remaining (1) is less than 10 seconds (media item 62f3df73-dc6c-4b2c-92b5-13e20bfa8be0)
+[2026-10-02 09:49:27.869] INFO: [PlaybackSessionManager] Syncing local session "Title" (a23b2c45-f992-4248-9735-82b421c453f3) (updatedAt: 1790934565377.359)
+[2026-10-02 09:49:27.882] INFO: [PlaybackSessionManager] Updating progress for "A Very Long Story Title" with current time 11 (previously 5)
+[2026-10-02 09:49:27.884] INFO: [MediaProgress] Marking media progress as finished because time remaining (9.062041) is less than 10 seconds (media item 39d3aa90-caec-44da-9d71-66dd208a24b0)
+[2026-10-02 09:49:27.887] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:49:25.377 +00:00' (media item 39d3aa90-caec-44da-9d71-66dd208a24b0)
+[2026-10-02 09:49:27.897] INFO: [PlaybackSessionManager] Syncing local session "Title" (legacy-local-3aa75671) (updatedAt: 1790934565377.359)
+[2026-10-02 09:49:27.906] INFO: [PlaybackSessionManager] Creating new media progress for media item "Title"
+[2026-10-02 09:49:27.926] INFO: [MediaProgress] Marking media progress as finished because time remaining (0.5751020000000002) is less than 10 seconds (media item d36e806d-eb81-4844-b6fa-17c9baeeeef1)
+[2026-10-02 09:49:27.933] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:49:25.377 +00:00' (media item d36e806d-eb81-4844-b6fa-17c9baeeeef1)
+[2026-10-02 09:49:27.954] INFO: [MediaProgress] Marking media progress as finished because time remaining (2) is less than 10 seconds (media item 43ee7897-08b9-415a-b218-bd90269c32b1)
+[2026-10-02 09:49:27.956] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:48:57.377 +00:00' (media item 43ee7897-08b9-415a-b218-bd90269c32b1)

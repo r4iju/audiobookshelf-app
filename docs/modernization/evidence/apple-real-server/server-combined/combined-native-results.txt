@@ -1,0 +1,5 @@
+phone-stream 0
+phone-download 0
+phone-finish-offline 0
+phone-finish-reconnect 0
+migration 0
