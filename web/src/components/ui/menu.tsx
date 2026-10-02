@@ -3,12 +3,41 @@
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { type LucideIcon, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 import type { KeyboardEvent, ReactElement } from "react";
 import { popupItem, popupPanel, useDirection, usePopupLayer } from "./popup";
 
-export type MenuAction = { key: string; label: string; icon: LucideIcon; onSelect: () => void };
+/** Something to do now, or a page to open in a new tab as a real link so the client's base path and the browser's link handling apply. */
+export type MenuAction = { key: string; label: string; icon: LucideIcon } & (
+  | { kind: "run"; onSelect: () => void; disabled?: boolean }
+  | { kind: "new-tab"; href: string }
+);
 
 const iconClass = "absolute start-2.5 size-4 text-muted";
+
+// Radix gives both menus the same item part; a link becomes the item itself so its click is the browser's own.
+function items(Item: typeof ContextMenu.Item | typeof DropdownMenu.Item, actions: MenuAction[]) {
+  return actions.map((action) => {
+    const Icon = action.icon;
+    const body = (
+      <>
+        <Icon aria-hidden className={iconClass} />
+        {action.label}
+      </>
+    );
+    return action.kind === "new-tab" ? (
+      <Item key={action.key} asChild className={popupItem}>
+        <Link href={action.href} target="_blank" rel="noopener">
+          {body}
+        </Link>
+      </Item>
+    ) : (
+      <Item key={action.key} onSelect={action.onSelect} disabled={action.disabled} className={popupItem}>
+        {body}
+      </Item>
+    );
+  });
+}
 
 /**
  * The app's menu for what `children` stands for, opened by right-click, a long press, Shift+F10 or the Menu key.
@@ -24,12 +53,7 @@ export function ContextActions({ actions, children }: { actions: MenuAction[]; c
       </ContextMenu.Trigger>
       <ContextMenu.Portal container={layer}>
         <ContextMenu.Content collisionPadding={8} className={popupPanel}>
-          {actions.map(({ key, label, icon: Icon, onSelect }) => (
-            <ContextMenu.Item key={key} onSelect={onSelect} className={popupItem}>
-              <Icon aria-hidden className={iconClass} />
-              {label}
-            </ContextMenu.Item>
-          ))}
+          {items(ContextMenu.Item, actions)}
         </ContextMenu.Content>
       </ContextMenu.Portal>
     </ContextMenu.Root>
@@ -74,12 +98,7 @@ export function ActionsButton({
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal container={layer}>
         <DropdownMenu.Content align="end" sideOffset={4} collisionPadding={8} className={popupPanel}>
-          {actions.map(({ key, label, icon: Icon, onSelect }) => (
-            <DropdownMenu.Item key={key} onSelect={onSelect} className={popupItem}>
-              <Icon aria-hidden className={iconClass} />
-              {label}
-            </DropdownMenu.Item>
-          ))}
+          {items(DropdownMenu.Item, actions)}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>

@@ -1,8 +1,19 @@
 "use client";
 
-import { BookOpen, CheckCircle2, ExternalLink, FolderPlus, Info, ListPlus, Play, Undo2 } from "lucide-react";
+import {
+  BookOpen,
+  CheckCircle2,
+  ExternalLink,
+  FolderPlus,
+  Info,
+  ListPlus,
+  type LucideIcon,
+  Play,
+  Undo2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { InlineError } from "@/components/app/inline-error";
 import { playerMediaFor } from "@/components/item/play-media";
 import { AddToCollectionDialog, AddToPlaylistDialog } from "@/components/lists/add-to-list";
 import { type CardLayout, MediaCard } from "@/components/media/item-card";
@@ -78,66 +89,42 @@ function PlayableCard({
     : (item.media.numTracks ?? item.media.tracks?.length ?? 0) > 0;
   const finished = progress?.isFinished ?? false;
   const started = !!progress && !finished && progress.currentTime > 0;
+  const run = (
+    key: string,
+    label: string,
+    icon: LucideIcon,
+    onSelect: () => void,
+    disabled = false,
+  ): MenuAction => ({ kind: "run", key, label, icon, onSelect, disabled });
   const actions: MenuAction[] = [
     ...(playable
       ? [
-          {
-            key: "play",
-            label: started ? t("WebResume") : t("ButtonPlay"),
-            icon: Play,
-            onSelect: () =>
-              void usePlayerStore
-                .getState()
-                .play({ media: playerMediaFor(client, item, episode ?? undefined) }),
-          },
+          run("play", started ? t("WebResume") : t("ButtonPlay"), Play, () =>
+            usePlayerStore.getState().play({ media: playerMediaFor(client, item, episode ?? undefined) }),
+          ),
         ]
       : []),
     ...(isBook && item.media.ebookFile
-      ? [
-          {
-            key: "read",
-            label: t("ButtonRead"),
-            icon: BookOpen,
-            onSelect: () => router.push(`/read/${item.id}`),
-          },
-        ]
+      ? [run("read", t("ButtonRead"), BookOpen, () => router.push(`/read/${item.id}`))]
       : []),
-    { key: "details", label: t("HeaderDetails"), icon: Info, onSelect: () => router.push(href) },
-    {
-      key: "tab",
-      label: t("WebOpenInNewTab"),
-      icon: ExternalLink,
-      onSelect: () => window.open(href, "_blank", "noopener"),
-    },
+    run("details", t("HeaderDetails"), Info, () => router.push(href)),
+    { kind: "new-tab", key: "tab", label: t("WebOpenInNewTab"), icon: ExternalLink, href },
     ...(isBook || episode
-      ? [
-          {
-            key: "playlist",
-            label: t("LabelAddToPlaylist"),
-            icon: ListPlus,
-            onSelect: () => setAdding("playlist"),
-          },
-        ]
+      ? [run("playlist", t("LabelAddToPlaylist"), ListPlus, () => setAdding("playlist"))]
       : []),
     ...(isBook && can(me, "update")
-      ? [
-          {
-            key: "collection",
-            label: t("WebAddToCollection"),
-            icon: FolderPlus,
-            onSelect: () => setAdding("collection"),
-          },
-        ]
+      ? [run("collection", t("WebAddToCollection"), FolderPlus, () => setAdding("collection"))]
       : []),
     ...(isBook || episode
       ? [
-          {
-            key: "finished",
-            label: finished ? t("WebMarkNotFinished") : t("WebMarkFinished"),
-            icon: finished ? Undo2 : CheckCircle2,
-            onSelect: () =>
+          run(
+            "finished",
+            finished ? t("WebMarkNotFinished") : t("WebMarkFinished"),
+            finished ? Undo2 : CheckCircle2,
+            () =>
               setFinished.mutate({ itemId: item.id, episodeId: episode?.id ?? null, finished: !finished }),
-          },
+            setFinished.isPending,
+          ),
         ]
       : []),
   ];
@@ -177,6 +164,7 @@ function PlayableCard({
         finishedLabel={t("LabelFinished")}
         missingCoverLabel={t("WebNoCover")}
       />
+      <InlineError error={setFinished.error} />
       {adding === "playlist" ? (
         <AddToPlaylistDialog
           libraryId={item.libraryId}

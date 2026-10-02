@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
-import { accounts, clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
+import { accounts, clearProgress, clientPath, itemIdByTitle, qa, serverApi, signIn } from "./qa";
 
 const player = (page: Page) => page.getByRole("region", { name: "Player" });
 const position = (page: Page) => player(page).getByRole("slider", { name: "Seek" }).inputValue().then(Number);
@@ -125,6 +125,53 @@ test("a book card's own menu plays it or opens its details, by pointer, keyboard
   await grid(page).getByRole("button", { name: "Actions for The Long Tide" }).click();
   await page.getByRole("menuitem", { name: "Details" }).click();
   await expect(page).toHaveURL(new RegExp(`/item/${id}$`));
+});
+
+test("a card's menu opens the book in a new tab under the client's own path", async ({ page, context }) => {
+  const id = await itemIdByTitle("The Long Tide");
+  await signIn(page);
+  await page.goto(`${clientPath}/library/${qa.libraries.books}/items`);
+  await grid(page).getByRole("button", { name: "Actions for The Long Tide" }).click();
+  const [tab] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByRole("menuitem", { name: "Open in new tab" }).click(),
+  ]);
+  await tab.waitForLoadState();
+  expect(new URL(tab.url()).pathname).toBe(`${clientPath}/item/${id}`);
+  await expect(tab.getByRole("heading", { level: 1, name: "The Long Tide" })).toBeVisible();
+  expect(await tab.evaluate(() => window.opener)).toBeNull();
+  await expect(page).toHaveURL(new RegExp(`${clientPath}/library/`));
+});
+
+test("marking a book finished from its card waits for the server and says when it fails", async ({
+  page,
+}) => {
+  const id = await itemIdByTitle("Night Ferry");
+  await clearProgress(await serverApi(accounts.user), id);
+  let answer: (status: number) => void = () => {};
+  await page.route(`**/api/me/progress/${id}`, async (route) => {
+    if (route.request().method() !== "PATCH") return route.continue();
+    const status = await new Promise<number>((resolve) => {
+      answer = resolve;
+    });
+    await route.fulfill({ status, body: "Server error" });
+  });
+  await signIn(page);
+  await page.goto(`${clientPath}/library/${qa.libraries.books}/items`);
+  const actions = grid(page).getByRole("button", { name: "Actions for Night Ferry" });
+
+  await actions.click();
+  await page.getByRole("menuitem", { name: "Mark as finished" }).click();
+  await actions.click();
+  await expect(page.getByRole("menuitem", { name: "Mark as finished" })).toHaveAttribute(
+    "aria-disabled",
+    "true",
+  );
+  await page.keyboard.press("Escape");
+
+  answer(500);
+  const card = grid(page).getByRole("listitem").filter({ hasText: "Night Ferry" });
+  await expect(card.getByRole("alert")).toBeVisible();
 });
 
 test("the player closes from its header whether minimized or open, keeping the place listened to", async ({

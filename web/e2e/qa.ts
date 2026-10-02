@@ -56,8 +56,14 @@ export async function serverApi(account: Account) {
   return { token, call };
 }
 
+/** The path the client is mounted under, such as /web behind a proxy; empty when it serves from the root. */
+export const clientPath = new URL(process.env.ABS_WEB_URL ?? "http://127.0.0.1:19881").pathname.replace(
+  /\/+$/,
+  "",
+);
+
 export async function signIn(page: Page, account: Account = accounts.user, serverUrl = qa.origin) {
-  await page.goto("/connect");
+  await page.goto(`${clientPath}/connect`);
   await page.getByLabel("Server address").fill(serverUrl);
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByLabel("Username").fill(account.username);
