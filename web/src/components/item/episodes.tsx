@@ -1,20 +1,10 @@
 "use client";
 
-import {
-  ArrowDownWideNarrow,
-  ArrowUpNarrowWide,
-  CheckCircle2,
-  ListPlus,
-  Loader2,
-  Pause,
-  Play,
-  RefreshCw,
-  Undo2,
-  X,
-} from "lucide-react";
+import { CheckCircle2, ListPlus, Loader2, Pause, Play, RefreshCw, Undo2, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { InlineError } from "@/components/app/inline-error";
+import { SortDirection } from "@/components/library/sort-direction";
 import { AddToPlaylistDialog } from "@/components/lists/add-to-list";
 import { ProgressBar } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
@@ -65,42 +55,28 @@ export function EpisodeList({ item }: { item: LibraryItem }) {
         <h2 id="episodes" className="text-lg font-semibold">
           {t("HeaderEpisodes")}
         </h2>
-        <div className="flex flex-wrap items-end gap-2">
-          <SelectField
-            label={t("WebSortBy")}
-            value={state.sort}
-            onChange={(event) => {
-              const sort = episodeSorts.find(([key]) => key === event.target.value)?.[0];
-              if (sort) saveChoice({ podcastEpisodesOrderBy: sort });
-            }}
-          >
-            {episodeSorts.map(([value, label]) => (
-              <option key={value} value={value}>
-                {t(label)}
-              </option>
-            ))}
-          </SelectField>
-          <fieldset className="flex rounded-xl bg-surface-2 p-1">
-            <legend className="sr-only">{t("WebSortDirection")}</legend>
-            <Button
-              size="sm"
-              variant={state.desc ? "ghost" : "secondary"}
-              aria-pressed={!state.desc}
-              onClick={() => saveChoice({ podcastEpisodesOrderDesc: false })}
+        <div className="flex w-full flex-wrap items-end gap-3 sm:w-auto">
+          <div className="flex w-full items-end gap-2 sm:w-auto">
+            <SelectField
+              label={t("WebSortBy")}
+              value={state.sort}
+              onChange={(event) => {
+                const sort = episodeSorts.find(([key]) => key === event.target.value)?.[0];
+                if (sort) saveChoice({ podcastEpisodesOrderBy: sort });
+              }}
+              className="min-w-0 flex-1 sm:w-44 sm:flex-none"
             >
-              <ArrowUpNarrowWide aria-hidden className="size-4" />
-              {t("WebAscending")}
-            </Button>
-            <Button
-              size="sm"
-              variant={state.desc ? "secondary" : "ghost"}
-              aria-pressed={state.desc}
-              onClick={() => saveChoice({ podcastEpisodesOrderDesc: true })}
-            >
-              <ArrowDownWideNarrow aria-hidden className="size-4" />
-              {t("WebDescending")}
-            </Button>
-          </fieldset>
+              {episodeSorts.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {t(label)}
+                </option>
+              ))}
+            </SelectField>
+            <SortDirection
+              desc={state.desc}
+              onChange={(desc) => saveChoice({ podcastEpisodesOrderDesc: desc })}
+            />
+          </div>
           <SelectField
             label={t("WebFilterBy")}
             value={state.filter}
@@ -108,6 +84,7 @@ export function EpisodeList({ item }: { item: LibraryItem }) {
               const filter = episodeFilters.find(([key]) => key === event.target.value)?.[0];
               if (filter) saveChoice({ podcastEpisodesFilterBy: filter });
             }}
+            className="w-full sm:w-44"
           >
             {episodeFilters.map(([value, label]) => (
               <option key={value} value={value}>
