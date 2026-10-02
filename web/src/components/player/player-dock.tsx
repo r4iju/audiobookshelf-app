@@ -92,7 +92,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
   const rateOptions = (ratePresets as readonly number[]).includes(speed)
     ? ratePresets
     : [...ratePresets, speed].sort((a, b) => a - b);
-  const phoneSecondary = expanded ? undefined : "max-sm:hidden";
+  const phoneSecondary = expanded ? undefined : "max-[30rem]:hidden";
   const sleepRemaining =
     sleep.kind === "until" ? Math.max(0, Math.round((sleep.endsAt - Date.now()) / 1000)) : 0;
 
@@ -126,9 +126,9 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
                 : media.author}
             </p>
           </div>
-          {/* On phones the collapsed bar keeps only play and pause beside the title; expanded, all of them get a row. */}
+          {/* On narrow phones the collapsed bar keeps only play and pause beside the title; expanded, all get a row. */}
           <div
-            className={`flex items-center gap-1 ${expanded ? "max-sm:order-last max-sm:w-full max-sm:justify-center max-sm:gap-3" : ""}`}
+            className={`flex items-center gap-1 ${expanded ? "max-[30rem]:order-last max-[30rem]:w-full max-[30rem]:justify-center max-[30rem]:gap-3" : ""}`}
           >
             <Button
               size="icon"
