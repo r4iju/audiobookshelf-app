@@ -135,7 +135,12 @@ import XCTest
         app.buttons["Group actions"].tap(); app.buttons["Delete playlist"].tap()
         let deletion = app.alerts["Delete playlist?"]
         XCTAssertTrue(deletion.waitForExistence(timeout: 3))
-        deletion.buttons["Delete"].tap()
+        // The alert exists before its buttons have a frame. Tapping then makes XCTest treat the alert as an
+        // interruption and dismiss it with Cancel, so wait until Delete can be tapped.
+        let confirm = deletion.buttons["Delete"]
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: confirm)
+        await fulfillment(of: [ready], timeout: 5)
+        confirm.tap()
         for _ in 0..<30 {
             if try await !observedPlaylists().contains(where: { $0.id == created.id }) { break }
             try await Task.sleep(nanoseconds: 100_000_000)
