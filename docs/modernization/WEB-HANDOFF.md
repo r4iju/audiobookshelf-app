@@ -71,6 +71,7 @@ from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` u
 | `1ccd4ca8` | Journeys: in Arabic or Hebrew the reader's arrows, keys and swipes follow the mirrored layout; the reader's settings carry the legacy reader's name |
 | `c99840ad` | In right-to-left languages Next's chevron points left, ArrowLeft and a rightward swipe turn to the next page; PageDown and PageUp keep their meaning |
 | `9a9252df` | The reader's settings use the legacy reader's key (`HeaderEreaderSettings`, the heading of its settings), so every translated language has them |
+| `4dbe35b7` | 29 web strings that mean the same as a string of the server's own web interface use its translations, copied unchanged from the 2.30.0 server (`web/src/i18n/server-equivalents.json`, `web/scripts/import-server-strings.mjs`) |
 
 ## Checks
 
@@ -264,13 +265,16 @@ pages behind reader dialogs (`67192033`), and the localization and accessibility
 Closed on `fork/web-remaining-gaps`: the chapter-track, speed-scaled time and collapsed-series preferences have
 controls, the bookshelf has a list view, and pages have titles. Gaps still open:
 
-- About 200 web-only strings (`web/src/i18n/web-strings.ts`) are English in every language, since no legacy string
-  means the same. Page titles on the connect and OpenID return pages and client error messages
+- Web-only strings (`web/src/i18n/web-strings.ts`): 172 are in use. 29 of them (navigation, sorting, paging, search,
+  player, item, list and statistics labels) mean the same as a string of the server's own web interface and carry its
+  translations (`4dbe35b7`): 20 to 29 of them in each of 28 languages, depending on what the server's table
+  translates, and none in Korean, which the server does not ship. The other 143 have no legacy or server string that
+  means the same and stay English in every language; they are translation debt, not fabricated. Page titles on the connect and OpenID return pages and client error messages
   (`src/lib/abs/client.ts`) are English too. The server-rendered `lang="en"` shows until the chosen language loads.
 - The bookmarks list does not mark the bookmark at the current time, and does not create a bookmark with a typed
   title, as the legacy list does; creating stays a player button.
-- The reader's arrows, arrow keys and swipes now follow right-to-left languages (`c99840ad`, on
-  `fork/web-reader-rtl`, not yet merged or deployed). Swipes are checked only with synthetic touch pointer events, not
+- The reader's arrows, arrow keys and swipes follow right-to-left languages (`c99840ad`, merged in #100 and deployed
+  from `704387cb`). Swipes are checked only with synthetic touch pointer events, not
   on a touch screen.
 - In WebKit, links inside a MOBI or AZW3 book and page keys after a click in its text did nothing. Fixed on
   `fork/web-reader-webkit-links` (`6164959b`) without letting the book run scripts; merged in #97 and deployed from
@@ -296,7 +300,7 @@ Readiness by issue. Every issue stays open: each still needs a physical or owner
 | #61 PDF | Done in Chromium, Firefox and WebKit | Safari by hand |
 | #62 MOBI | Done in Chromium, Firefox and WebKit (deployed from `13385800`) | WebKit: web links inside a book, keys after Tab then a click; touch, text selection, assistive technology; Safari by hand |
 | #63 comics | Done, with dialog keys | Safari by hand |
-| #64 preferences and browser capabilities | Done for the stored preferences, which all have controls now | About 200 web-only strings untranslated; right-to-left reader controls on `fork/web-reader-rtl`, not yet merged; swipes not checked on a touch screen |
+| #64 preferences and browser capabilities | Done for the stored preferences, which all have controls now | 143 web-only strings in use stay English (29 carry the server interface's translations, `4dbe35b7`); full translation; swipes not checked on a touch screen |
 | #65 internal deployment, retire legacy | Deployed internally, smoke checked read-only | Owner acceptance; the legacy client stays until then |
 
 ## Internal deployment
