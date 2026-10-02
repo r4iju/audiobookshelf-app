@@ -21,7 +21,7 @@ export function LibraryHome({ libraryId }: { libraryId: string }) {
   return (
     <div className="flex flex-col gap-8">
       <header className="flex items-end justify-between gap-4">
-        <h1 className="text-2xl font-bold tracking-tight lg:text-3xl">{library?.name ?? t("WebHome")}</h1>
+        <h1 className="text-2xl font-bold tracking-tight lg:text-3xl">{library?.name ?? t("ButtonHome")}</h1>
         <Link
           href={`/library/${libraryId}/items`}
           className="inline-flex items-center gap-1 rounded-lg text-sm font-medium text-accent focus-ring"
@@ -31,7 +31,7 @@ export function LibraryHome({ libraryId }: { libraryId: string }) {
         </Link>
       </header>
       {shelves.isPending ? (
-        <Spinner label={t("WebLoading")} />
+        <Spinner label={t("MessageLoading")} />
       ) : shelves.isError ? (
         <Alert
           action={

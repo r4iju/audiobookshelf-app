@@ -156,7 +156,7 @@ function EpisodeView({ item, episode }: { item: LibraryItem; episode: PodcastEpi
         title={t("HeaderConfirm")}
         body={t("MessageConfirmDeleteServerEpisode", episode.title)}
         confirmLabel={t("ButtonRemoveFromServer")}
-        cancelLabel={t("WebCancel")}
+        cancelLabel={t("ButtonCancel")}
         busy={remove.isPending}
         onClose={() => setDialog(null)}
         onConfirm={() =>

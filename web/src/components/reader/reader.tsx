@@ -76,7 +76,7 @@ function ReaderBody({
 
   // The place is read fresh on every opening, so a book follows wherever another device left it.
   if (file.isPending || (ebook.keepsProgress && !progress.isFetchedAfterMount))
-    return <Spinner label={t("WebLoading")} />;
+    return <Spinner label={t("MessageLoading")} />;
   if (file.isError) return <Alert>{errorMessage(t, file.error)}</Alert>;
   return (
     <>

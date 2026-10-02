@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { QueryState } from "@/components/ui/query-state";
 import { Section } from "@/components/ui/section";
 import { EmptyState } from "@/components/ui/status";
-import { useI18n } from "@/i18n/i18n";
+import { formatUnit, useI18n } from "@/i18n/i18n";
 import { formatDuration } from "@/lib/abs/media";
 import { isAdmin } from "@/lib/abs/permissions";
 import { useListeningStats, useMe, useServerYearStats, useYearStats } from "@/lib/abs/queries";
@@ -40,7 +40,7 @@ function useFormats() {
     duration: (seconds: number) => formatDuration(seconds) || number(0),
     bytes: (bytes: number) => {
       const { value, unit } = byteSize(bytes);
-      return new Intl.NumberFormat(locale, { style: "unit", unit, unitDisplay: "short" }).format(value);
+      return formatUnit(locale, value, unit);
     },
   };
 }

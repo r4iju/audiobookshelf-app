@@ -36,7 +36,7 @@ export function LibrarySearch({ libraryId, q }: { libraryId: string; q: string }
       <search className="relative">
         <SearchIcon
           aria-hidden
-          className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted"
+          className="pointer-events-none absolute top-1/2 start-4 size-5 -translate-y-1/2 text-muted"
         />
         <input
           type="search"

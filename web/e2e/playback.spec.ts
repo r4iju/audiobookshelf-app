@@ -102,6 +102,46 @@ test("speed and bookmarks are kept", async ({ page }) => {
   await expect(player(page).getByLabel("Playback Speed", { exact: true })).toHaveValue("1.5");
 });
 
+test("bookmarks are listed, take the player to their place, and can be renamed and removed", async ({
+  page,
+}) => {
+  const { api, id, account } = await fresh();
+  const bookmarks = async () =>
+    (await api.call("/api/me")).body.bookmarks as { time: number; title: string }[];
+  await signIn(page, account);
+  await page.goto(`/item/${id}`);
+  await page.getByRole("button", { name: /^Play/ }).click();
+  await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(3);
+  await player(page).getByRole("button", { name: "Pause", exact: true }).click();
+  await player(page).getByRole("button", { name: "Create Bookmark" }).click();
+  await expect.poll(async () => (await bookmarks()).length).toBe(1);
+  const [created] = await bookmarks();
+  if (!created) throw new Error("The bookmark was not created");
+  const { time, title } = created;
+  await player(page).getByRole("slider", { name: "Seek" }).fill("60");
+  await expect.poll(() => position(page)).toBeGreaterThan(55);
+
+  await player(page).getByRole("button", { name: "Your Bookmarks" }).click();
+  const dialog = page.getByRole("dialog", { name: "Your Bookmarks" });
+  await dialog.getByRole("button", { name: `Rename ${title}` }).click();
+  await dialog.getByLabel("Title").fill("The opening line");
+  await dialog.getByRole("button", { name: "Save" }).click();
+  await expect
+    .poll(async () => (await bookmarks()).map((bookmark) => bookmark.title))
+    .toEqual(["The opening line"]);
+
+  await dialog.getByRole("button", { name: /^The opening line/ }).click();
+  await expect(dialog).toBeHidden();
+  await expect.poll(() => position(page)).toBeLessThan(time + 2);
+  expect(await position(page)).toBeGreaterThanOrEqual(time);
+
+  await player(page).getByRole("button", { name: "Your Bookmarks" }).click();
+  await dialog.getByRole("button", { name: "Remove The opening line" }).click();
+  await page.getByRole("dialog", { name: "Remove" }).getByRole("button", { name: "Remove" }).click();
+  await expect.poll(async () => (await bookmarks()).length).toBe(0);
+  await expect(dialog).toContainText("No Bookmarks");
+});
+
 test("listening held by a delete that may still be running is sent once a restart the user was asked for is confirmed", async ({
   page,
 }) => {

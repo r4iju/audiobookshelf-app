@@ -59,7 +59,7 @@ export function SendEbookButton({
         </ul>
         <div className="flex justify-end">
           <Button variant="ghost" onClick={() => setChoosing(false)}>
-            {t("WebCancel")}
+            {t("ButtonCancel")}
           </Button>
         </div>
       </Dialog>

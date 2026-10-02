@@ -1,19 +1,28 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { buttonClass } from "@/components/ui/button";
+import { useI18n } from "@/i18n/i18n";
 
 export function Pager({
   page,
   pages,
   hrefFor,
-  labels,
+  pageLabel,
 }: {
   page: number;
   pages: number;
   hrefFor: (page: number) => string;
-  labels: { nav: string; previous: string; next: string; pageOf: string };
+  /** In place of "Page 2 of 5", where the number of pages is not known. */
+  pageLabel?: string;
 }) {
+  const { t } = useI18n();
   if (pages <= 1) return null;
+  const labels = {
+    nav: t("WebPagination"),
+    previous: t("WebPrevious"),
+    next: t("WebNext"),
+    pageOf: pageLabel ?? t("WebPageOf", page, pages),
+  };
   return (
     <nav aria-label={labels.nav} className="flex items-center justify-center gap-3">
       {page > 1 ? (

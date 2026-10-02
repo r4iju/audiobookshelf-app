@@ -61,7 +61,7 @@ export function ProgressControls({
         {progress ? (
           <Button size="sm" variant="danger" onClick={() => setConfirming(true)}>
             <RotateCcw aria-hidden className="size-4" />
-            {t("WebDiscardProgress")}
+            {t("MessageDiscardProgress")}
           </Button>
         ) : null}
       </div>
@@ -93,10 +93,10 @@ export function ProgressControls({
       <InlineError error={error} />
       <ConfirmDialog
         open={confirming}
-        title={t("WebDiscardProgress")}
-        body={t("WebConfirm")}
-        confirmLabel={t("WebDiscardProgress")}
-        cancelLabel={t("WebCancel")}
+        title={t("MessageDiscardProgress")}
+        body={t("MessageConfirmDiscardProgress")}
+        confirmLabel={t("MessageDiscardProgress")}
+        cancelLabel={t("ButtonCancel")}
         busy={discard.isPending}
         onClose={() => setConfirming(false)}
         onConfirm={() => {

@@ -39,27 +39,31 @@ export function SeriesList({ libraryId, page }: { libraryId: string; page: numbe
         page={page}
         pages={pages}
         hrefFor={(next) => (next > 1 ? `${pathname}?page=${next}` : pathname)}
-        labels={{
-          nav: t("WebPagination"),
-          previous: t("WebPrevious"),
-          next: t("WebNext"),
-          pageOf: t("WebPageOf", page, pages),
-        }}
       />
     </div>
   );
 }
 
-export function SeriesDetail({ libraryId, seriesId }: { libraryId: string; seriesId: string }) {
+export function SeriesDetail({
+  libraryId,
+  seriesId,
+  page,
+}: {
+  libraryId: string;
+  seriesId: string;
+  page: number;
+}) {
   const { t } = useI18n();
+  const pathname = usePathname();
   const { shape } = useLibrary(libraryId);
   const series = useSeries(libraryId, seriesId);
   // The server orders a series filter by sequence when asked for the "sequence" sort.
   const books = useItems(
     libraryId,
-    { sort: "sequence", desc: false, filter: encodeFilter("series", seriesId), page: 1 },
+    { sort: "sequence", desc: false, filter: encodeFilter("series", seriesId), page },
     false,
   );
+  const pages = Math.max(1, Math.ceil((books.data?.total ?? 0) / PAGE_SIZE));
   return (
     <div className="flex flex-col gap-6">
       <QueryState query={series}>
@@ -81,6 +85,11 @@ export function SeriesDetail({ libraryId, seriesId }: { libraryId: string; serie
           </CardGrid>
         )}
       </QueryState>
+      <Pager
+        page={page}
+        pages={pages}
+        hrefFor={(next) => (next > 1 ? `${pathname}?page=${next}` : pathname)}
+      />
     </div>
   );
 }

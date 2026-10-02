@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { qa, signIn } from "./qa";
+import { accounts, qa, serverApi, signIn } from "./qa";
 
 const grid = (page: Page) => page.getByRole("list", { name: "Library items" });
 
@@ -65,6 +65,40 @@ test("search leads to a book, its series and its author", async ({ page }) => {
   await page.getByRole("link", { name: "Mira Vale" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Mira Vale" })).toBeVisible();
   await expect(page.getByRole("main")).toContainText("Salt and Signal");
+});
+
+test("a series longer than one page shows all its books, page by page in order", async ({ page }) => {
+  const admin = await serverApi(accounts.admin);
+  const { body } = await admin.call(`/api/libraries/${qa.libraries.books}/items?limit=100`);
+  const volumes = (body.results as { id: string; media: { metadata: { title: string } } }[])
+    .filter((item) => /^Catalog Volume \d+$/.test(item.media.metadata.title))
+    .sort((a, b) => a.media.metadata.title.localeCompare(b.media.metadata.title))
+    .slice(0, 26);
+  const shelve = (series: (index: number) => { name: string; sequence: string }[]) =>
+    admin.call("/api/items/batch/update", {
+      method: "POST",
+      body: volumes.map((volume, index) => ({
+        id: volume.id,
+        mediaPayload: { metadata: { series: series(index) } },
+      })),
+    });
+  try {
+    await shelve((index) => [{ name: "Catalog Shelf", sequence: String(index + 1) }]);
+    const list = await admin.call(`/api/libraries/${qa.libraries.books}/series?limit=100`);
+    const shelf = (list.body.results as { id: string; name: string }[]).find(
+      (series) => series.name === "Catalog Shelf",
+    );
+
+    await signIn(page);
+    await page.goto(`/library/${qa.libraries.books}/series/${shelf?.id}`);
+    await expect(grid(page).getByRole("listitem")).toHaveCount(24);
+    await expect(grid(page).getByRole("listitem").first()).toContainText("Catalog Volume 01");
+    await page.getByRole("link", { name: "Next" }).click();
+    await expect(grid(page).getByRole("listitem")).toHaveCount(2);
+    await expect(grid(page).getByRole("listitem").last()).toContainText("Catalog Volume 26");
+  } finally {
+    await shelve(() => []);
+  }
 });
 
 test("an item that does not exist says so instead of a blank page", async ({ page }) => {

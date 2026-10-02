@@ -47,7 +47,7 @@ export function PdfView({ file, start, onPlace }: ReaderViewProps) {
     };
   }, [file]);
 
-  if (loaded.phase === "loading") return <Spinner label={t("WebLoading")} />;
+  if (loaded.phase === "loading") return <Spinner label={t("MessageLoading")} />;
   if (loaded.phase === "failed") return <Alert>{t("WebDocumentUnreadable")}</Alert>;
   return <PdfPages doc={loaded.doc} start={start} onPlace={onPlace} />;
 }

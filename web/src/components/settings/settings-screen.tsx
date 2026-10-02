@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { SelectField, TextField, Toggle } from "@/components/ui/field";
 import { Section } from "@/components/ui/section";
-import { useI18n } from "@/i18n/i18n";
+import { formatUnit, useI18n } from "@/i18n/i18n";
 import { isLanguageCode, languages } from "@/i18n/languages";
 import { clientVersion } from "@/lib/device";
 import { useSession, useSessionStore } from "@/lib/session/store";
@@ -16,7 +16,7 @@ import { jumpTimes, settingsSchema, useSettings, useSettingsStore } from "@/lib/
 const jumpChoice = z.coerce.number().pipe(settingsSchema.shape.jumpForwardTime.unwrap());
 
 export function SettingsScreen() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const settings = useSettings();
   const update = useSettingsStore((state) => state.update);
 
@@ -67,7 +67,7 @@ export function SettingsScreen() {
           >
             {jumpTimes.map((seconds) => (
               <option key={seconds} value={seconds}>
-                {seconds} s
+                {formatUnit(locale, seconds, "second")}
               </option>
             ))}
           </SelectField>
@@ -78,7 +78,7 @@ export function SettingsScreen() {
           >
             {jumpTimes.map((seconds) => (
               <option key={seconds} value={seconds}>
-                {seconds} s
+                {formatUnit(locale, seconds, "second")}
               </option>
             ))}
           </SelectField>

@@ -3,16 +3,18 @@
 import { MediaCard } from "@/components/media/item-card";
 import { useI18n } from "@/i18n/i18n";
 import { authorImageUrl, authorLine, type CoverShape, coverUrl } from "@/lib/abs/media";
-import { useItemProgress } from "@/lib/abs/queries";
+import { useEpisodeProgress, useItemProgress } from "@/lib/abs/queries";
 import type { Author, LibraryItem, Series } from "@/lib/abs/schemas";
 import { useAbs } from "@/lib/session/store";
 
 export function ItemCard({ item, shape }: { item: LibraryItem; shape: CoverShape }) {
   const { t } = useI18n();
   const { client } = useAbs();
-  const progress = useItemProgress().data?.get(item.id);
-  const collapsed = item.collapsedSeries;
   const episode = item.recentEpisode;
+  const bookProgress = useItemProgress().data?.get(item.id);
+  const episodeProgress = useEpisodeProgress(item.id).data?.get(episode?.id ?? "");
+  const progress = episode ? episodeProgress : bookProgress;
+  const collapsed = item.collapsedSeries;
   if (collapsed) {
     return (
       <MediaCard
@@ -30,7 +32,7 @@ export function ItemCard({ item, shape }: { item: LibraryItem; shape: CoverShape
   }
   return (
     <MediaCard
-      href={`/item/${item.id}`}
+      href={episode ? `/item/${item.id}/episode/${episode.id}` : `/item/${item.id}`}
       title={episode ? episode.title : item.media.metadata.title}
       subtitle={episode ? item.media.metadata.title : authorLine(item)}
       cover={coverUrl(client, item)}
@@ -41,7 +43,7 @@ export function ItemCard({ item, shape }: { item: LibraryItem; shape: CoverShape
           : undefined
       }
       progress={
-        progress && !episode
+        progress
           ? {
               value:
                 progress.ebookProgress && !progress.duration ? progress.ebookProgress : progress.progress,

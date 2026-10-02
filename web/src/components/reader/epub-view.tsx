@@ -150,7 +150,7 @@ export function EpubView({ file, start, onPlace, cacheKey }: ReaderViewProps) {
         <div ref={stage} className="absolute inset-0 px-2 py-4 sm:px-8" {...swipe} />
         {opened.phase === "loading" ? (
           <div className="absolute inset-0 bg-bg">
-            <Spinner label={t("WebLoading")} />
+            <Spinner label={t("MessageLoading")} />
           </div>
         ) : opened.phase === "failed" ? (
           <div className="absolute inset-0 bg-bg">

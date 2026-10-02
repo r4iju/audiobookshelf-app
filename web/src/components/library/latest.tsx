@@ -87,12 +87,7 @@ export function LatestEpisodes({ libraryId, page }: { libraryId: string; page: n
         page={page}
         pages={pages}
         hrefFor={(next) => (next > 1 ? `${pathname}?page=${next}` : pathname)}
-        labels={{
-          nav: t("WebPagination"),
-          previous: t("WebPrevious"),
-          next: t("WebNext"),
-          pageOf: t("WebPage", page),
-        }}
+        pageLabel={t("WebPage", page)}
       />
     </div>
   );

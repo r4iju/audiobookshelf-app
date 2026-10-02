@@ -296,7 +296,7 @@ function DownloadQueue({ item, admin }: { item: LibraryItem; admin: boolean }) {
         title={t("HeaderConfirm")}
         body={t("MessageConfirmDeleteEpisodeDownloadQueue")}
         confirmLabel={t("WebClearDownloadQueue")}
-        cancelLabel={t("WebCancel")}
+        cancelLabel={t("ButtonCancel")}
         busy={clear.isPending}
         onClose={() => setConfirming(false)}
         onConfirm={() => clear.mutate(item.id, { onSettled: () => setConfirming(false) })}
@@ -366,7 +366,7 @@ function FindEpisodesDialog({
               <InlineError error={download.error} />
               <div className="flex justify-end gap-2">
                 <Button variant="ghost" onClick={onClose}>
-                  {t("WebCancel")}
+                  {t("ButtonCancel")}
                 </Button>
                 <Button type="submit" variant="primary" disabled={!selected || download.isPending}>
                   {t("WebDownloadEpisodes", selected)}

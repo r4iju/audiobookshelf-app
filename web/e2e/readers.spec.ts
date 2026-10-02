@@ -367,6 +367,23 @@ for (const { issue, format } of [
   });
 }
 
+test("arrow keys move within an open reader dialog without turning the page behind it", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Skyline 1");
+  await resetProgress(api, id);
+  await signIn(page);
+  await page.goto(`/read/${id}`);
+  await expect(page.getByText("Page 1 of 12")).toBeVisible();
+
+  await page.getByRole("button", { name: "Pages" }).click();
+  await expect(page.getByRole("dialog", { name: "Pages" })).toBeVisible();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("PageDown");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Pages" })).toBeHidden();
+  await expect(page.getByText("Page 1 of 12")).toBeVisible();
+});
+
 test("a damaged comic is reported as unreadable", async ({ page }) => {
   const api = await serverApi(accounts.user);
   const id = await bookId(api, "Skyline 1");

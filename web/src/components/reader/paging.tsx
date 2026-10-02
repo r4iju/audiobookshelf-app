@@ -14,10 +14,20 @@ export interface Turns {
 const typing = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+/** A key pressed in an open dialog belongs to the dialog, not to the page behind it. */
+const inDialog = (target: EventTarget | null) =>
+  target instanceof Element && target.closest("dialog[open]") !== null;
 
 /** Turns the page for an arrow or page key, and reports whether it did. */
 export function turnForKey(event: KeyboardEvent, turns: Turns) {
-  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || typing(event.target))
+  if (
+    event.defaultPrevented ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    typing(event.target) ||
+    inDialog(event.target)
+  )
     return false;
   if (event.key === "ArrowRight" || event.key === "PageDown") turns.next();
   else if (event.key === "ArrowLeft" || event.key === "PageUp") turns.previous();
