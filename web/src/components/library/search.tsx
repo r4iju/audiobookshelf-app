@@ -13,12 +13,13 @@ import { useSearch } from "@/lib/abs/queries";
 import { AuthorCard, ItemCard, SeriesCard } from "./cards";
 import { useLibrary } from "./use-library";
 
-export function LibrarySearch({ libraryId, q }: { libraryId: string; q: string }) {
+/** Searches the library for `q`, showing up to `limit` matches of each kind and a link to more when there are. */
+export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: string; limit: number }) {
   const { t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
   const { library, shape } = useLibrary(libraryId);
-  const results = useSearch(libraryId, q);
+  const results = useSearch(libraryId, q, limit);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const onChange = (value: string) => {
@@ -125,6 +126,16 @@ export function LibrarySearch({ libraryId, q }: { libraryId: string; q: string }
                     </ResultSection>
                   ) : null,
                 )}
+                {data.more ? (
+                  <Link
+                    href={`${pathname}?${new URLSearchParams({ q, limit: String(data.limit * 4) })}`}
+                    replace
+                    scroll={false}
+                    className="inline-flex min-h-11 items-center self-center rounded-full bg-surface-2 px-5 text-sm font-medium hover:bg-surface-3 focus-ring"
+                  >
+                    {t("LabelMore")}
+                  </Link>
+                ) : null}
               </div>
             );
           }}
