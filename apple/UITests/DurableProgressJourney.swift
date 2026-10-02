@@ -91,12 +91,12 @@ import XCTest
         let listened = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 10
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [listened], timeout: 15)
         app.buttons["pause-playback"].tap()
         let cleared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: app.staticTexts["playback-error"])
         await fulfillment(of: [cleared], timeout: 5)
-        let paused = try XCTUnwrap(Int(app.staticTexts["playback-elapsed"].label.split(separator: " ").first ?? ""))
+        let paused = try XCTUnwrap(Int(bookElapsed(app).label.split(separator: " ").first ?? ""))
 
         // The save whose acknowledgment was lost reached the server and may still be applied, so later
         // listening stays on this device until a restart asked for after it is confirmed.

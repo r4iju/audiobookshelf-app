@@ -127,7 +127,7 @@ enum FixtureControl {
     }
     /// Ends whatever the server was still handling, as a restart of the server does.
     static func restart() async throws {
-        var request = URLRequest(url: URL(string: "http://127.0.0.1:59765/abs/__fixture__/restart")!)
+        var request = URLRequest(url: URL(string: "http://127.0.0.1:19765/abs/__fixture__/restart")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = Data("{}".utf8)
