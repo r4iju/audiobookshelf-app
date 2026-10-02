@@ -72,6 +72,7 @@ from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` u
 | `c99840ad` | In right-to-left languages Next's chevron points left, ArrowLeft and a rightward swipe turn to the next page; PageDown and PageUp keep their meaning |
 | `9a9252df` | The reader's settings use the legacy reader's key (`HeaderEreaderSettings`, the heading of its settings), so every translated language has them |
 | `4dbe35b7` | 29 web strings that mean the same as a string of the server's own web interface use its translations, copied unchanged from the 2.30.0 server (`web/src/i18n/server-equivalents.json`, `web/scripts/import-server-strings.mjs`) |
+| `ce799de8` | In WebKit, after Tabbing into a MOBI or AZW3 book, a click in its text gives the page keys back to the reader: the book already had the focus, so its caret moving counts as the click. The sandbox is unchanged |
 
 ## Checks
 
@@ -187,8 +188,8 @@ Phase 2 readiness commits, checked by the journeys they affect (logs in `web/qa/
   reader's area every time: the focus return undid each Tab into the book, a focus trap. The journey "Tab is never
   held in one place by a MOBI book" (`6ca78083`) failed in WebKit on `4ee4703b` (`webkit-tab-trap-red.log`). After
   `6164959b`, which returns the focus only when the frame gains it without a Tab, the 17 reader journeys passed in
-  Chromium, Firefox and WebKit (`webkit-tab-trap-green.log`) and vitest 115 passed. Known limit: after Tabbing into
-  the book, a click in its text leaves page keys with the book until Tab leaves it. Full Chromium run on `4ee4703b`
+  Chromium, Firefox and WebKit (`webkit-tab-trap-green.log`) and vitest 115 passed. A later limit, that after Tabbing
+  into the book a click in its text left page keys with the book, is fixed by `ce799de8` (below). Full Chromium run on `4ee4703b`
   (`webkit-links-full.log`): 75 of 75, before the Tab fix. Not tested: web links inside a book in WebKit, touch, text
   selection, assistive technology, real-world books, Safari.
 - Right-to-left reader controls on `fork/web-reader-rtl` (`reader-rtl-red.log`). On unchanged product code the
@@ -280,7 +281,13 @@ controls, the bookshelf has a list view, and pages have titles. Gaps still open:
   `fork/web-reader-webkit-links` (`6164959b`) without letting the book run scripts; merged in #97 and deployed from
   `13385800` after post-merge QA (`postmerge-97.log`). A link to a web page inside a book, in WebKit, is not tested:
   the reader opens it from its frame watcher, outside a click, where the browser may block the new tab. After Tabbing
-  into a book, a click in its text leaves page keys with the book until Tab leaves it. Touch, text selection and
+  into a book (in WebKit, as in Safari, Tab reaches the book's frame rather than its links), a click in its text left
+  page keys with the book. `ce799de8` hands them back when the book's caret moves. The journey "after Tabbing into a
+  MOBI book, a click in its text gives the page keys back to the reader" failed 3 of 3 in WebKit on the previous
+  reader (`red4-tabclick-webkit.log`, the place stayed `mobi:1:6:0`) and passes 3 of 3 in each engine after it
+  (`green4-tabclick-ffwk.log`, `green4-tabclick-chromium.log`). Chromium and Firefox hear the book's own keys, so
+  they passed before as well. The reader journeys then passed in all three engines on the same reader and journey code before its rebase onto #111
+  (`tabclick-readers-ab37.log`: Firefox and WebKit 42 of 42, Chromium 21 of 21). Touch, text selection and
   assistive technology are not checked.
 - No journey covers a token refresh mid-session, a server under a subpath, or the message shown when the browser
   blocks autoplay.
@@ -298,7 +305,7 @@ Readiness by issue. Every issue stays open: each still needs a physical or owner
 | #59 podcasts, collections, playlists | Done, with Continue Listening episodes | Owner feeds are not mutated by tests; checking them is the owner's |
 | #60 EPUB | Done in Chromium, Firefox and WebKit | Safari by hand |
 | #61 PDF | Done in Chromium, Firefox and WebKit | Safari by hand |
-| #62 MOBI | Done in Chromium, Firefox and WebKit (deployed from `13385800`) | WebKit: web links inside a book, keys after Tab then a click; touch, text selection, assistive technology; Safari by hand |
+| #62 MOBI | Done in Chromium, Firefox and WebKit (deployed from `13385800`) | WebKit: web links inside a book; touch, text selection, assistive technology; Safari by hand |
 | #63 comics | Done, with dialog keys | Safari by hand |
 | #64 preferences and browser capabilities | Done for the stored preferences, which all have controls now | 143 web-only strings in use stay English (29 carry the server interface's translations, `4dbe35b7`); full translation; swipes not checked on a touch screen |
 | #65 internal deployment, retire legacy | Deployed internally, smoke checked read-only | Owner acceptance; the legacy client stays until then |
