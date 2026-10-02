@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { accounts, clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
+import { accounts, choose, clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
 
 const root = (page: Page) => page.locator("html");
 const player = (page: Page) => page.getByRole("region", { name: "Player" });
@@ -14,26 +14,26 @@ test("display preferences apply at once and are kept after a reload", async ({ p
   await signIn(page);
   await openSettings(page);
 
-  await page.getByLabel("Theme").selectOption("light");
+  await choose(page, "Theme", "Light");
   await expect(root(page)).toHaveAttribute("data-theme", "light");
   await page.getByLabel("Reduce motion").check();
   await expect(root(page)).toHaveAttribute("data-reduce-motion", "true");
 
-  await page.getByLabel("Language").selectOption("de");
+  await choose(page, "Language", "Deutsch");
   await expect(page.getByRole("heading", { level: 1, name: "Einstellungen" })).toBeVisible();
   await expect(root(page)).toHaveAttribute("lang", "de");
 
   await page.reload();
   await expect(page.getByRole("heading", { level: 1, name: "Einstellungen" })).toBeVisible();
   await expect(root(page)).toHaveAttribute("data-theme", "light");
-  await expect(page.getByLabel("Farbschema")).toHaveValue("light");
+  await expect(page.getByRole("combobox", { name: "Farbschema" })).toHaveText("Hell");
 
-  await page.getByLabel("Sprache").selectOption("ar");
+  await choose(page, "Sprache", "عربي");
   await expect(root(page)).toHaveAttribute("dir", "rtl");
-  await page.getByLabel("اللغة").selectOption("");
+  await choose(page, "اللغة", "لغة الخادم الافتراضية");
   await expect(page.getByRole("heading", { level: 1, name: "Settings" })).toBeVisible();
   await expect(root(page)).toHaveAttribute("dir", "ltr");
-  await page.getByLabel("Theme").selectOption("dark");
+  await choose(page, "Theme", "Dark");
   await page.getByLabel("Reduce motion").uncheck();
 });
 
@@ -44,7 +44,7 @@ test("jump times and auto rewind change how the player moves", async ({ page }) 
   await page.clock.install();
   await signIn(page, accounts.other);
   await openSettings(page);
-  await page.getByLabel("Jump forwards time").selectOption("15");
+  await choose(page, "Jump forwards time", "15 sec");
   await page.getByLabel("Disable auto rewind").uncheck();
 
   await page.goto(`/item/${id}`);
@@ -81,7 +81,7 @@ test("jump times and auto rewind change how the player moves", async ({ page }) 
   await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(again + 1);
   await player(page).getByRole("button", { name: "Pause", exact: true }).click();
   await page.getByLabel("Disable auto rewind").uncheck();
-  await page.getByLabel("Jump forwards time").selectOption("10");
+  await choose(page, "Jump forwards time", "10 sec");
 });
 
 test("seeking from the system media controls can be turned off", async ({ page }) => {

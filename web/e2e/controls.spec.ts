@@ -93,7 +93,7 @@ test("the selected sort direction is shown in words and in the accent colour", a
   await other.click();
   await expect(page).toHaveURL(/desc=/);
   const now = direction.getByRole("button", { pressed: true });
-  expect((await shown(now)).accentFill).toBe(true);
+  await expect.poll(async () => (await shown(now)).accentFill).toBe(true);
   expect((await shown(now)).wordsWidth).toBeGreaterThan(20);
 });
 
@@ -110,7 +110,7 @@ test("a book card's own menu plays it or opens its details, by pointer, keyboard
   const menu = page.getByRole("menu");
   await expect(menu).toBeVisible();
   await expect(menu.getByRole("menuitem", { name: "Open in new tab" })).toBeVisible();
-  await menu.getByRole("menuitem", { name: "Play" }).click();
+  await menu.getByRole("menuitem", { name: "Play", exact: true }).click();
   await expect(player(page)).toContainText("The Long Tide");
   await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(0.5);
 

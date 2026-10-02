@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { accounts, qa, serverApi, signIn } from "./qa";
+import { accounts, choose, qa, serverApi, signIn } from "./qa";
 
 const grid = (page: Page) => page.getByRole("list", { name: "Library items" });
 
@@ -8,7 +8,7 @@ test("sort, filter and page live in the address and survive a reload", async ({ 
   await page.goto(`/library/${qa.libraries.books}/items`);
   await expect(page.getByRole("heading", { level: 1, name: "Audiobooks" })).toBeVisible();
 
-  await page.getByLabel("Sort by").selectOption({ label: "Title" });
+  await choose(page, "Sort by", "Title");
   await expect(page).toHaveURL(/sort=media\.metadata\.title/);
   await expect(grid(page).getByRole("link").first()).toContainText("A Very Long Story Title");
 
@@ -20,10 +20,10 @@ test("sort, filter and page live in the address and survive a reload", async ({ 
   await expect(page).toHaveURL(/page=2/);
   await page.reload();
   await expect(page.getByText(/Page 2 of \d+/)).toBeVisible();
-  await expect(page.getByLabel("Sort by")).toHaveValue("media.metadata.title");
+  await expect(page.getByRole("combobox", { name: "Sort by" })).toHaveText("Title");
   await expect(grid(page).getByRole("link").first()).not.toContainText("The Long Tide");
 
-  await page.getByLabel("Filter").selectOption({ label: "Harbor Lights" });
+  await choose(page, "Filter", "Harbor Lights");
   await expect(page).toHaveURL(/filter=series\./);
   await expect(page).not.toHaveURL(/page=2/);
   await expect(grid(page).getByRole("link")).toHaveCount(2);
@@ -47,9 +47,11 @@ test("in a translated language, navigation, sorting, paging and search use the s
 }) => {
   await signIn(page);
   await page.getByRole("link", { name: "Settings", exact: true }).click();
-  await page.getByLabel("Language").selectOption("de");
+  await choose(page, "Language", "Deutsch");
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
-  await expect(page.getByLabel("Sprache").locator('option[value=""]')).toHaveText("Standard-Server-Sprache");
+  await page.getByRole("combobox", { name: "Sprache" }).click();
+  await expect(page.getByRole("listbox").getByRole("option").first()).toHaveText("Standard-Server-Sprache");
+  await page.keyboard.press("Escape");
   await expect(page.getByRole("navigation", { name: "Bibliothek" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Statistiken" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Abmelden" })).toBeVisible();
