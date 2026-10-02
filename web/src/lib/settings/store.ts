@@ -49,6 +49,7 @@ export const settingsSchema = z.object({
   disableSleepTimerFadeOut: z.boolean().catch(false),
   useChapterTrack: z.boolean().catch(false),
   scaleElapsedTimeBySpeed: z.boolean().catch(true),
+  playerExpanded: z.boolean().catch(false),
   collapseSeries: z.boolean().catch(false),
   bookshelfListView: z.boolean().catch(false),
   podcastEpisodesOrderBy: z

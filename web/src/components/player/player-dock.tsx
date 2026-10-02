@@ -48,19 +48,19 @@ function sleepValue(sleep: Sleep) {
   return sleep.kind === "off" ? "off" : sleep.kind === "chapter-end" ? "chapter" : "running";
 }
 
-/** `fullWindow` when no navigation surrounds it, as while reading, where it sits under the page instead of over it. */
+/** Sits in the page's flow under its scrolling box; `fullWindow` when nothing follows it, as while reading. */
 export function PlayerDock({ fullWindow = false }: { fullWindow?: boolean }) {
   const player = usePlayer();
   const pending = useProgressSync();
   const { t } = useI18n();
   if (player.phase !== "active") {
+    // Floats over the end of the page, just above whatever follows the dock's place.
     return pending > 0 ? (
-      <p
-        role="status"
-        className={`fixed right-4 z-30 rounded-full bg-surface-2 px-3 py-1 text-xs ${fullWindow ? "bottom-4" : "bottom-20 lg:bottom-4"}`}
-      >
-        {t("WebPendingProgress", pending)}
-      </p>
+      <div className="relative">
+        <p role="status" className="absolute end-4 bottom-3 z-30 rounded-full bg-surface-2 px-3 py-1 text-xs">
+          {t("WebPendingProgress", pending)}
+        </p>
+      </div>
     ) : null;
   }
   return <Dock player={player} pending={pending} fullWindow={fullWindow} />;
@@ -73,7 +73,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
   const sleep = usePlayerStore((state) => state.sleep);
   const actions = usePlayerStore.getState;
   const createBookmark = useCreateBookmark();
-  const [expanded, setExpanded] = useState(false);
+  const expanded = settings.playerExpanded;
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const ids = useId();
   const { media, currentTime, status } = player;
@@ -92,17 +92,18 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
   const rateOptions = (ratePresets as readonly number[]).includes(speed)
     ? ratePresets
     : [...ratePresets, speed].sort((a, b) => a - b);
+  const phoneSecondary = expanded ? undefined : "max-[30rem]:hidden";
   const sleepRemaining =
     sleep.kind === "until" ? Math.max(0, Math.round((sleep.endsAt - Date.now()) / 1000)) : 0;
 
   return (
     <section
       aria-label={t("WebPlayer")}
-      className={`z-40 border-t border-line bg-surface/95 shadow-[0_-8px_24px_rgb(0_0_0/0.25)] backdrop-blur ${fullWindow ? "pb-[env(safe-area-inset-bottom)]" : "fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] lg:bottom-0 lg:left-60"}`}
+      className={`relative z-10 border-t border-line bg-surface shadow-[0_-8px_24px_rgb(0_0_0/0.25)] ${fullWindow ? "pb-[env(safe-area-inset-bottom)]" : "lg:pb-[env(safe-area-inset-bottom)]"}`}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 lg:px-6">
         {error ? <Alert>{error}</Alert> : null}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <Link
             href={`/item/${media.itemId}`}
             aria-label={media.title}
@@ -125,11 +126,14 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
                 : media.author}
             </p>
           </div>
-          <div className="flex items-center gap-1">
+          {/* On narrow phones the collapsed bar keeps only play and pause beside the title; expanded, all get a row. */}
+          <div
+            className={`flex items-center gap-1 ${expanded ? "max-[30rem]:order-last max-[30rem]:w-full max-[30rem]:justify-center max-[30rem]:gap-3" : ""}`}
+          >
             <Button
               size="icon"
               variant="ghost"
-              className="max-sm:hidden"
+              className={phoneSecondary}
               aria-label={t("WebPreviousChapter")}
               disabled={!chapters.length}
               onClick={() => actions().seek(previousChapterStart(chapters, currentTime))}
@@ -139,6 +143,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
             <Button
               size="icon"
               variant="ghost"
+              className={phoneSecondary}
               aria-label={t("WebJumpBack", formatUnit(locale, settings.jumpBackwardsTime, "second"))}
               onClick={() => actions().jump(-settings.jumpBackwardsTime)}
             >
@@ -161,6 +166,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
             <Button
               size="icon"
               variant="ghost"
+              className={phoneSecondary}
               aria-label={t("WebJumpForward", formatUnit(locale, settings.jumpForwardTime, "second"))}
               onClick={() => actions().jump(settings.jumpForwardTime)}
             >
@@ -169,7 +175,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
             <Button
               size="icon"
               variant="ghost"
-              className="max-sm:hidden"
+              className={phoneSecondary}
               aria-label={t("WebNextChapter")}
               disabled={nextChapterStart(chapters, currentTime) === null}
               onClick={() => {
@@ -185,7 +191,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
             variant="ghost"
             aria-expanded={expanded}
             aria-label={expanded ? t("WebCollapsePlayer") : t("WebExpandPlayer")}
-            onClick={() => setExpanded(!expanded)}
+            onClick={() => updateSettings({ playerExpanded: !expanded })}
           >
             {expanded ? (
               <ChevronDown aria-hidden className="size-5" />
@@ -222,7 +228,9 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
           </p>
         ) : null}
 
-        <div className={`${expanded ? "flex" : "hidden lg:flex"} flex-wrap items-end gap-3`}>
+        <div
+          className={`${expanded ? "flex" : "hidden"} max-h-[min(24rem,30dvh)] flex-wrap items-end gap-3 overflow-y-auto p-1 -m-1`}
+        >
           <div className="flex flex-col gap-1 text-xs font-medium">
             <label htmlFor={`${ids}-speed`}>{t("LabelPlaybackSpeed")}</label>
             <select

@@ -79,6 +79,7 @@ test("the sleep timer can stop at the end of the chapter", async ({ page }) => {
   await page.getByRole("button", { name: /^Play/ }).click();
   await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(0.5);
   await player(page).getByRole("slider", { name: "Seek" }).fill("26");
+  await player(page).getByRole("button", { name: "Open full player" }).click();
   await player(page).getByLabel("Sleep timer").selectOption({ label: "End of Chapter" });
   await expect(player(page).getByRole("button", { name: "Play", exact: true })).toBeVisible({
     timeout: 15_000,
@@ -94,6 +95,7 @@ test("speed and bookmarks are kept", async ({ page }) => {
   await page.goto(`/item/${id}`);
   await page.getByRole("button", { name: /^Play/ }).click();
   await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(1);
+  await player(page).getByRole("button", { name: "Open full player" }).click();
   await player(page).getByLabel("Playback Speed", { exact: true }).selectOption("1.5");
   await player(page).getByRole("button", { name: "Create Bookmark" }).click();
   await expect.poll(async () => (await api.call("/api/me")).body.bookmarks.length).toBe(1);
@@ -113,6 +115,7 @@ test("bookmarks are listed, take the player to their place, and can be renamed a
   await page.getByRole("button", { name: /^Play/ }).click();
   await expect.poll(() => position(page), { timeout: 15_000 }).toBeGreaterThan(3);
   await player(page).getByRole("button", { name: "Pause", exact: true }).click();
+  await player(page).getByRole("button", { name: "Open full player" }).click();
   await player(page).getByRole("button", { name: "Create Bookmark" }).click();
   await expect.poll(async () => (await bookmarks()).length).toBe(1);
   const [created] = await bookmarks();
@@ -156,6 +159,7 @@ test("the time shown can follow the chapter, and elapsed time can ignore the spe
   const seek = player(page).getByRole("slider", { name: "Seek" });
   await seek.fill("40");
   await expect.poll(() => position(page)).toBe(40);
+  await player(page).getByRole("button", { name: "Open full player" }).click();
   await player(page).getByLabel("Playback Speed", { exact: true }).selectOption("2");
 
   // The second of three chapters: the seek bar covers only it, and the times count within it.

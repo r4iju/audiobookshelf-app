@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { HeldDeliveries } from "@/components/app/held-deliveries";
 import { AudioEngine } from "@/components/player/audio-engine";
 import { PlayerDock } from "@/components/player/player-dock";
@@ -28,12 +28,12 @@ import { type StringKey, useI18n } from "@/i18n/i18n";
 import { isAdmin } from "@/lib/abs/permissions";
 import { useLibraries, useMe } from "@/lib/abs/queries";
 import type { Library } from "@/lib/abs/schemas";
-import { usePlayer } from "@/lib/player/store";
 import { useCurrentLibrary } from "@/lib/session/current-library";
 import * as registry from "@/lib/session/registry";
 import { useSession, useSessionStore } from "@/lib/session/store";
 import { errorMessage } from "./errors";
 import { useOnline } from "./online";
+import { useKeyboardScrolling, useScrollRestoration } from "./page-scroller";
 import { useHeadingTitle } from "./page-title";
 import { useRealtime } from "./realtime";
 
@@ -135,6 +135,13 @@ function navClass(active: boolean) {
   return `flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium focus-ring ${active ? "bg-surface-2 text-fg" : "text-muted hover:bg-surface-2 hover:text-fg"}`;
 }
 
+function chipClass(active: boolean) {
+  return `flex min-h-10 items-center gap-2 rounded-full border px-3 text-sm font-medium focus-ring ${active ? "border-accent bg-surface-2 text-fg" : "border-line text-muted hover:bg-surface-2 hover:text-fg"}`;
+}
+
+/** A phone row that scrolls to the screen's edges while its first and last chips line up with the page. */
+const chipRow = "flex gap-2 overflow-x-auto scroll-px-4 px-4 pb-1";
+
 function Shell({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const session = useSession();
@@ -148,7 +155,9 @@ function Shell({ children }: { children: ReactNode }) {
   const shownLibrary = useCurrentLibrary((state) => state.libraryId);
   const online = useOnline();
   useRealtime();
-  const playerActive = usePlayer().phase === "active";
+  const scroller = useRef<HTMLDivElement>(null);
+  useScrollRestoration(scroller, !pathname.startsWith("/read/"));
+  useKeyboardScrolling(scroller, !pathname.startsWith("/read/"));
 
   if (session.phase !== "signed-in") return null;
   const { connection } = session;
@@ -172,151 +181,155 @@ function Shell({ children }: { children: ReactNode }) {
 
   const reading = pathname.startsWith("/read/");
 
-  // The audio engine and dock keep one place in the tree so playback carries on into and out of the reader.
-  return (
-    <div className={reading ? "flex h-dvh flex-col" : undefined}>
-      {reading ? (
-        <main id="main" tabIndex={-1} className="min-h-0 flex-1 outline-none">
-          {children}
-        </main>
-      ) : (
-        <div className="min-h-dvh lg:grid lg:grid-cols-[15rem_1fr]">
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2"
-          >
-            {t("WebSkipToContent")}
-          </a>
-          <aside className="border-line lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:gap-6 lg:overflow-y-auto lg:border-r lg:px-3 lg:py-5">
-            <div className="flex items-center justify-between gap-3 px-4 pt-4 lg:px-3 lg:pt-0">
-              <Link href="/" className="flex items-center gap-2 rounded-lg font-bold focus-ring">
-                <span
-                  aria-hidden
-                  className="grid size-8 place-items-center rounded-lg bg-accent-strong text-accent-fg"
-                >
-                  <Headphones className="size-4" />
-                </span>
-                {t("WebAppName")}
-              </Link>
-              <div className="flex items-center gap-1 lg:hidden">
-                <ButtonLink href="/stats" variant="ghost" size="icon" aria-label={t("WebStats")}>
-                  <BarChart3 aria-hidden className="size-5" />
-                </ButtonLink>
-                <ButtonLink href="/settings" variant="ghost" size="icon" aria-label={t("HeaderSettings")}>
-                  <Settings aria-hidden className="size-5" />
-                </ButtonLink>
-              </div>
-            </div>
-
-            <nav aria-label={t("WebNavLibrary")} className="px-4 pt-3 lg:px-0 lg:pt-0">
-              {libraries.isPending ? (
-                <p className="px-3 text-sm text-muted">{t("MessageLoading")}</p>
-              ) : libraries.isError ? (
-                <p className="px-3 text-sm text-danger">{errorMessage(t, libraries.error)}</p>
-              ) : (
-                <ul className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-0.5 lg:overflow-visible">
-                  {list.map((library) => {
-                    const Icon = library.mediaType === "podcast" ? Mic : BookOpen;
-                    const active = library.id === current?.id;
-                    return (
-                      <li key={library.id} className="shrink-0">
-                        <Link
-                          href={`/library/${library.id}`}
-                          aria-current={active ? "true" : undefined}
-                          className={`${navClass(active)} max-lg:rounded-full max-lg:border max-lg:border-line ${active ? "max-lg:border-accent" : ""}`}
-                        >
-                          <Icon aria-hidden className="size-4 shrink-0" />
-                          <span className="truncate">{library.name}</span>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </nav>
-
-            {current ? (
-              <nav
-                aria-label={t("WebNavPrimary")}
-                className="max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 max-lg:border-t max-lg:border-line max-lg:bg-surface/95 max-lg:pb-[env(safe-area-inset-bottom)] max-lg:backdrop-blur"
+  const libraryLinks = (chips: boolean) =>
+    libraries.isPending ? (
+      <p className="px-3 text-sm text-muted">{t("MessageLoading")}</p>
+    ) : libraries.isError ? (
+      <p className="px-3 text-sm text-danger">{errorMessage(t, libraries.error)}</p>
+    ) : (
+      <ul className={chips ? chipRow : "flex flex-col gap-0.5"}>
+        {list.map((library) => {
+          const Icon = library.mediaType === "podcast" ? Mic : BookOpen;
+          const active = library.id === current?.id;
+          return (
+            <li key={library.id} className="shrink-0">
+              <Link
+                href={`/library/${library.id}`}
+                aria-current={active ? "true" : undefined}
+                className={chips ? chipClass(active) : navClass(active)}
               >
-                <ul className="flex justify-around lg:flex-col lg:gap-0.5">
-                  {visible.map((section) => {
-                    const href = section.href(current.id);
-                    const Icon = section.icon;
-                    return (
-                      <li
-                        key={section.key}
-                        className={section.phone === "more" ? "max-lg:hidden" : undefined}
+                <Icon aria-hidden className="size-4 shrink-0" />
+                <span className="truncate">{library.name}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  const brand = (
+    <Link href="/" className="flex items-center gap-2 rounded-lg font-bold focus-ring">
+      <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-accent-strong text-accent-fg">
+        <Headphones className="size-4" />
+      </span>
+      {t("WebAppName")}
+    </Link>
+  );
+
+  // The audio engine and dock keep one place in the tree so playback carries on into and out of the reader. The
+  // page scrolls in its own box above the dock and the phone's bar, so neither covers the page or its scrollbar.
+  return (
+    <div
+      className={reading ? "flex h-dvh flex-col" : "flex h-dvh lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]"}
+    >
+      {reading ? null : (
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2"
+        >
+          {t("WebSkipToContent")}
+        </a>
+      )}
+      {reading ? null : (
+        <aside className="hidden border-line lg:flex lg:flex-col lg:gap-6 lg:overflow-y-auto lg:border-r lg:px-3 lg:py-5">
+          <div className="px-3">{brand}</div>
+          <nav aria-label={t("WebNavLibrary")}>{libraryLinks(false)}</nav>
+          {current ? (
+            <nav aria-label={t("WebNavPrimary")}>
+              <ul className="flex flex-col gap-0.5">
+                {visible.map((section) => {
+                  const href = section.href(current.id);
+                  const Icon = section.icon;
+                  return (
+                    <li key={section.key}>
+                      <Link
+                        href={href}
+                        aria-current={isActive(section, href) ? "page" : undefined}
+                        className={navClass(isActive(section, href))}
                       >
-                        <Link
-                          href={href}
-                          aria-current={isActive(section, href) ? "page" : undefined}
-                          className={`${navClass(isActive(section, href))} max-lg:min-h-14 max-lg:flex-col max-lg:justify-center max-lg:gap-0.5 max-lg:bg-transparent max-lg:px-2 max-lg:text-[0.7rem] ${isActive(section, href) ? "max-lg:text-accent" : ""}`}
-                        >
-                          <Icon aria-hidden className="size-5 shrink-0 lg:size-4" />
-                          {t(section.label)}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
-            ) : null}
-            {current && phoneMore.length ? (
-              // The phone's bottom bar has room for four sections; the rest sit in a scrolling row under the libraries.
-              <nav aria-label={t("WebMore")} className="px-4 pt-2 lg:hidden">
-                <ul className="flex gap-2 overflow-x-auto pb-1">
-                  {phoneMore.map((section) => {
-                    const href = section.href(current.id);
-                    const Icon = section.icon;
-                    return (
-                      <li key={section.key} className="shrink-0">
-                        <Link
-                          href={href}
-                          aria-current={isActive(section, href) ? "page" : undefined}
-                          className={`${navClass(isActive(section, href))} rounded-full border ${isActive(section, href) ? "border-accent" : "border-line"}`}
-                        >
-                          <Icon aria-hidden className="size-4 shrink-0" />
-                          {t(section.label)}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
-            ) : null}
-
-            <div className="mt-auto hidden flex-col gap-0.5 lg:flex">
-              <Link href="/stats" className={navClass(pathname === "/stats")}>
-                <BarChart3 aria-hidden className="size-4" />
-                {t("WebStats")}
-              </Link>
-              <Link href="/settings" className={navClass(pathname.startsWith("/settings"))}>
-                <Settings aria-hidden className="size-4" />
-                {t("HeaderSettings")}
-              </Link>
-              <div className="mt-2 flex items-center gap-2 rounded-lg bg-surface px-3 py-2">
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">{connection.username}</p>
-                  <p className="truncate text-xs text-muted">{new URL(connection.serverUrl).host}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    signOut();
-                    router.replace("/connect");
-                  }}
-                  aria-label={t("WebSignOut")}
-                  className="grid size-9 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-fg focus-ring"
-                >
-                  <LogOut aria-hidden className="size-4" />
-                </button>
+                        <Icon aria-hidden className="size-4 shrink-0" />
+                        {t(section.label)}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          ) : null}
+          <div className="mt-auto flex flex-col gap-0.5">
+            <Link href="/stats" className={navClass(pathname === "/stats")}>
+              <BarChart3 aria-hidden className="size-4" />
+              {t("WebStats")}
+            </Link>
+            <Link href="/settings" className={navClass(pathname.startsWith("/settings"))}>
+              <Settings aria-hidden className="size-4" />
+              {t("HeaderSettings")}
+            </Link>
+            <div className="mt-2 flex items-center gap-2 rounded-lg bg-surface px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{connection.username}</p>
+                <p className="truncate text-xs text-muted">{new URL(connection.serverUrl).host}</p>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  signOut();
+                  router.replace("/connect");
+                }}
+                aria-label={t("WebSignOut")}
+                className="grid size-9 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-fg focus-ring"
+              >
+                <LogOut aria-hidden className="size-4" />
+              </button>
             </div>
-          </aside>
-
-          <div className={`flex min-w-0 flex-col ${playerActive ? "pb-56 lg:pb-44" : "pb-24 lg:pb-8"}`}>
+          </div>
+        </aside>
+      )}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        {reading ? (
+          <main id="main" tabIndex={-1} className="min-h-0 flex-1 outline-none">
+            {children}
+          </main>
+        ) : (
+          <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
+            <header className="flex flex-col gap-2 pt-4 lg:hidden">
+              <div className="flex items-center justify-between gap-3 px-4">
+                {brand}
+                <div className="flex items-center gap-1">
+                  <ButtonLink href="/stats" variant="ghost" size="icon" aria-label={t("WebStats")}>
+                    <BarChart3 aria-hidden className="size-5" />
+                  </ButtonLink>
+                  <ButtonLink href="/settings" variant="ghost" size="icon" aria-label={t("HeaderSettings")}>
+                    <Settings aria-hidden className="size-5" />
+                  </ButtonLink>
+                </div>
+              </div>
+              <nav aria-label={t("WebNavLibrary")} className="pt-1">
+                {libraryLinks(true)}
+              </nav>
+              {current && phoneMore.length ? (
+                // The phone's bottom bar has room for four sections; the rest scroll in a row under the libraries.
+                <nav aria-label={t("WebMore")}>
+                  <ul className={chipRow}>
+                    {phoneMore.map((section) => {
+                      const href = section.href(current.id);
+                      const Icon = section.icon;
+                      return (
+                        <li key={section.key} className="shrink-0">
+                          <Link
+                            href={href}
+                            aria-current={isActive(section, href) ? "page" : undefined}
+                            className={chipClass(isActive(section, href))}
+                          >
+                            <Icon aria-hidden className="size-4 shrink-0" />
+                            {t(section.label)}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </nav>
+              ) : null}
+            </header>
             <div className="flex flex-col gap-2 px-4 pt-4 empty:hidden lg:px-8">
               {session.reauthRequired ? (
                 <Alert
@@ -339,14 +352,42 @@ function Shell({ children }: { children: ReactNode }) {
                 </Alert>
               )}
             </div>
-            <main id="main" tabIndex={-1} className="flex-1 px-4 py-5 outline-none lg:px-8 lg:py-8">
+            <main id="main" tabIndex={-1} className="px-4 py-5 outline-none lg:px-8 lg:py-8">
               {children}
             </main>
           </div>
-        </div>
-      )}
+        )}
+        <PlayerDock fullWindow={reading} />
+        {reading || !current ? null : (
+          <nav
+            aria-label={t("WebNavPrimary")}
+            className="border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
+          >
+            <ul className="flex justify-around">
+              {visible
+                .filter((section) => section.phone === "bar")
+                .map((section) => {
+                  const href = section.href(current.id);
+                  const Icon = section.icon;
+                  const active = isActive(section, href);
+                  return (
+                    <li key={section.key}>
+                      <Link
+                        href={href}
+                        aria-current={active ? "page" : undefined}
+                        className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-[0.7rem] font-medium focus-ring ${active ? "text-accent" : "text-muted hover:text-fg"}`}
+                      >
+                        <Icon aria-hidden className="size-5 shrink-0" />
+                        {t(section.label)}
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+          </nav>
+        )}
+      </div>
       <AudioEngine />
-      <PlayerDock fullWindow={reading} />
     </div>
   );
 }
