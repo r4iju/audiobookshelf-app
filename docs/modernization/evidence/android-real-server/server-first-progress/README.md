@@ -17,30 +17,35 @@ The Android, Apple/tvOS and legacy Android clients all send this same session sh
 
 ## Candidate
 
-`first-progress-candidate.patch` (SHA-256 `6313948fcce74d83ad7b320da1db0b587bb81557892cabdaad1207237cdf7367`). After creating the row, the create branch runs the same `applyProgressUpdate` used for existing progress. New progress therefore gets the same finished rule, the library's thresholds and the payload's `lastUpdate`. Patched `User.js` SHA-256: `e3cfa99a946b1c61c039407f50f9d6e1ba81c196d01e01bac732439a6bfbff10`.
+`first-progress-candidate.patch` (SHA-256 `6313948fcce74d83ad7b320da1db0b587bb81557892cabdaad1207237cdf7367`). After creating the row, the create branch runs the same `applyProgressUpdate` used for existing progress. New progress therefore gets the same finished rule and the payload's `lastUpdate`. Session syncs also pass the library's thresholds. Patched `User.js` SHA-256: `e3cfa99a946b1c61c039407f50f9d6e1ba81c196d01e01bac732439a6bfbff10`.
 
 The patch also changes progress first created through the other callers of the same function. These are `PATCH /api/me/progress` (and its batch form) and the sync of a streamed session (`syncSession`). Such progress now follows the rules an update already follows:
 - A position within 10 s of the end is finished.
 - A supplied `lastUpdate` is kept.
 - With no `lastUpdate`, the row is stamped with the server's time, as before. A streamed session sends no `lastUpdate`.
 - As for an update, an item shorter than the 10 s threshold is finished by its first progress.
+- As for an update, a PATCH that creates progress within 10 s of the end is finished even if it sends `isFinished: false`. PATCH payloads carry no library thresholds, so 10 s applies there; the library's thresholds apply only to session syncs.
+- `applyProgressUpdate` sets the payload's raw values on the row, as an update does. A `null` or string `currentTime` that create would have cleaned up can now be stored.
+- First progress now carries the session's time. A device whose clock runs ahead future-dates the row, and older-looking session syncs from other devices are then skipped until that time, as already happens for existing progress.
+- `createdAt` and `finishedAt` are still the server's time of the sync, not of the listening, so `finishedAt` of a book finished offline is its sync date.
+- The insert and the update are separate writes without a transaction, as elsewhere in this function. If the update fails, the row exists without the in-memory list holding it.
 - Reading-only progress has no duration and is never finished by the rule.
 
-It applies cleanly after the Apple user-cache candidate (`apple-real-server/server-usercache/usercache-candidate-569a673a.patch`, SHA-256 `1c541a0b…8507`), which changes other parts of the same file. The combined file passes `node --check`. The combination has not been run against a server.
+Applying it after the earlier Apple user-cache candidate `usercache-candidate-569a673a.patch` (SHA-256 `1c541a0b…8507`) was tried: both apply and the combined file passes `node --check`. The combination with Apple's final patch (`b59ea8c8`) has not been tried, and no combination has run against a server.
 
 ## Checks
 
-`run-check.sh baseline|candidate|down` runs `first-progress-check.mjs` in this lane's own throwaway container (`abs-android-qa`, 127.0.0.1:28870). The container is freshly seeded with the synthetic library and the synthetic `qa` account by the unmodified `web/qa/server.mjs`. For the candidate, the patch is applied to the container's `User.js` before a restart.
+`run-check.sh baseline|candidate|down` runs `first-progress-check.mjs` in this lane's own throwaway container (`abs-android-qa`, 127.0.0.1:28870). The container is freshly seeded with the synthetic library and the synthetic `qa` account by the unmodified `web/qa/server.mjs`. For the candidate, the patch is applied to the container's `User.js` before a restart. Before starting anything, `android-native/scripts/require-local-image.sh` stops unless the exact pinned image is already cached and `server.mjs` still runs that same reference, because `server.mjs`'s `docker run` would pull a missing image. `android-native/scripts/verify-real-server.sh` uses the same guard.
 
 The check covers eight cases:
-- a first session at its end is finished;
-- a first session part way through is not finished;
+- a first session at its end is finished and keeps its own time;
 - the same session sent again changes nothing;
+- a first session part way through is not finished and keeps its own time;
+- a first session from another device keeps its own time;
 - an older offline session does not replace newer listening from another device;
 - a newer offline session that reached the end finishes the title;
-- a podcast episode is finished at its own duration;
-- reading progress created through PATCH is not finished;
-- each row keeps its session's own `lastUpdate`.
+- a podcast episode's first session at its end is finished, at the episode's own duration;
+- reading progress created through PATCH is not finished. This passes on both servers: it sends no duration, so it only guards against a regression.
 
 | Server | `first-progress-check.mjs` | Android `RealServerJourney` (client at f583677a) |
 | --- | --- | --- |
@@ -54,4 +59,4 @@ The evidence is outside the repository, under `/Volumes/ai-ssd/developer-caches/
 Not covered:
 - an actual owner server or library;
 - the combination with the Apple user-cache candidate on a running server;
-- streamed sessions and PATCH-created audio progress are not covered by `first-progress-check.mjs`. Streaming is exercised only by `RealServerJourney` a, whose first sync is far from the end.
+- `markAsFinishedPercentComplete`, invalid or future `lastUpdate` values, streamed sessions and PATCH-created audio progress are not covered by `first-progress-check.mjs`. Streaming is exercised only by `RealServerJourney` a, whose first sync is far from the end.
