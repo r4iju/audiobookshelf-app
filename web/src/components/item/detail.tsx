@@ -61,9 +61,9 @@ function ItemView({ item }: { item: LibraryItem }) {
           <Cover
             src={coverUrl(client, item)}
             title={metadata.title}
-            subtitle={metadata.authorName ?? undefined}
             shape={coverShapeOf(library)}
             missingLabel={t("WebNoCover")}
+            compact
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-4">

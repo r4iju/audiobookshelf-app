@@ -9,7 +9,8 @@ const shapes: Record<CoverShape, string> = { book: "aspect-[1/1.6]", square: "as
 /**
  * Every cover sits in a box of the library's shape so grids and shelves stay aligned whatever the image's own
  * proportions; mismatched art is contained over a blurred copy of itself. Missing or unloadable art becomes a
- * typographic placeholder of the same size, or just its icon when `compact` leaves no room for text.
+ * typographic placeholder of the same size, or just its icon when `compact` leaves no room for text or the
+ * title is already printed beside the cover.
  */
 export function Cover({
   src,
@@ -54,8 +55,8 @@ export function Cover({
           />
         </>
       ) : compact ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-surface-3 to-surface-2">
-          <BookOpen aria-hidden className="size-5 text-muted" />
+        <div className="@container absolute inset-0 flex items-center justify-center bg-gradient-to-br from-surface-3 to-surface-2">
+          <BookOpen aria-hidden className="size-5 text-muted @[6rem]:size-10" />
           <span className="sr-only">{missingLabel}</span>
         </div>
       ) : (

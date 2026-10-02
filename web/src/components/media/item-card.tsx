@@ -81,8 +81,8 @@ export function MediaCard({
           missingLabel={missingCoverLabel}
           src={cover}
           title={title}
-          subtitle={subtitle}
           shape={shape}
+          compact
           className="transition-transform group-hover:-translate-y-0.5"
         />
         {badge ? (

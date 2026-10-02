@@ -69,6 +69,7 @@ function EpisodeView({ item, episode }: { item: LibraryItem; episode: PodcastEpi
             title={podcastTitle}
             shape={shape}
             missingLabel={t("WebNoCover")}
+            compact
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-4">
