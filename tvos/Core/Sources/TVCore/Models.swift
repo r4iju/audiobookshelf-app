@@ -34,6 +34,8 @@ public struct ServerAddress: Sendable {
         let suffix = path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         parts.path = "/" + [prefix, suffix].filter { !$0.isEmpty }.joined(separator: "/")
         parts.queryItems = query.isEmpty ? nil : query
+        // Express treats a literal plus as a space when it parses the query.
+        parts.percentEncodedQuery = parts.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
         guard let url = parts.url else { throw APIError.invalidServer }
         return url
     }
@@ -102,6 +104,7 @@ public struct ItemsResponse: Decodable {
 }
 public struct LibraryItem: Decodable, Identifiable, Hashable {
     public let id: String
+    public let libraryId: String?
     public let isMissing: Bool?
     public let isInvalid: Bool?
     public let mediaType: String
@@ -148,8 +151,10 @@ public struct Metadata: Decodable {
     public let narrators: [String]?
     public let genres: [String]?
     public let feedUrl: String?
+    public let seriesName: String?
+    let series: SeriesReferences?
 }
-public struct Author: Decodable { public let name: String }
+public struct Author: Decodable { public let id: String?; public let name: String }
 public struct Episode: Decodable, Identifiable {
     public let id: String
     public let title: String
@@ -179,7 +184,12 @@ public struct AudioTrack: Codable, Sendable {
     public let contentUrl: String
     public var mimeType: String? = nil
     public let metadata: TrackMetadata?
-    public struct TrackMetadata: Codable, Sendable { public let filename: String?; public let ext: String? }
+    public struct TrackMetadata: Codable, Sendable {
+        public let filename: String?
+        public let ext: String?
+        /// The file's size on the server in bytes, when the server lists it (2.30 does for audio and ebook files).
+        public var size: Int64? = nil
+    }
     public let startOffset: Double
     public let duration: Double
 }

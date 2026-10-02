@@ -26,7 +26,7 @@ import XCTest
         let listened = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 10
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [listened], timeout: 15)
         app.buttons["pause-playback"].tap()
         app.buttons["Done"].tap()
@@ -54,7 +54,7 @@ import XCTest
         let otherPosition = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 2 && seconds < 5
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [otherPosition], timeout: 10)
         app.buttons["Done"].tap()
         app.navigationBars.buttons["Audiobooks"].tap()
@@ -70,7 +70,7 @@ import XCTest
         let restoredPosition = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 10 && seconds < 14
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [restoredPosition], timeout: 10)
         let reports = try await fixtureObservations().reports
         XCTAssertTrue(reports.contains { $0.userId == "00000000-0000-4000-8000-000000000001" && $0.currentTime >= 10 && $0.timeListened > 0 })
@@ -88,7 +88,7 @@ import XCTest
         let listened = XCTNSPredicateExpectation(predicate: NSPredicate { value, _ in
             guard let element = value as? XCUIElement, let seconds = Int(element.label.split(separator: " ").first ?? "") else { return false }
             return seconds >= 10
-        }, object: app.staticTexts["playback-elapsed"])
+        }, object: bookElapsed(app))
         await fulfillment(of: [listened], timeout: 15)
         app.buttons["pause-playback"].tap()
         app.buttons["Done"].tap()

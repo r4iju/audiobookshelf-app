@@ -1,0 +1,322 @@
+diff --git a/apple/App/AudiobookshelfNativeApp.swift b/apple/App/AudiobookshelfNativeApp.swift
+index f0db172..7cb290f 100644
+--- a/apple/App/AudiobookshelfNativeApp.swift
++++ b/apple/App/AudiobookshelfNativeApp.swift
+@@ -22,6 +22,8 @@ import SwiftUI
+             try? FileManager.default.removeItem(at: NativeDownloads.directory)
+             UserDefaults.standard.removeObject(forKey: "previewTheme")
+             UserDefaults.standard.removeObject(forKey: "previewHaptic")
++            UserDefaults.standard.removeObject(forKey: NativeStrings.savedKey)
++            try? FileManager.default.removeItem(at: NativeDiagnostics.file)
+             UserDefaults.standard.removeObject(forKey: AppleNetworkPolicy.streamingKey)
+             UserDefaults.standard.removeObject(forKey: AppleNetworkPolicy.downloadsKey)
+             UserDefaults.standard.removeObject(forKey: "previewDownloadCellular")
+@@ -70,6 +72,7 @@ import SwiftUI
+                 .onChange(of: player.canPublishReading) { available in if available { reading.sync(api: connection.api) } }
+                 .onChange(of: connection.activeAccount) { _ in serverQueue.connect(); reading.sync(api: connection.api) }
+                 .sheet(isPresented: $downloads.presented) { DownloadsView().environmentObject(downloads).environmentObject(player).environmentObject(reading) }
++                .nativeLocalization()
+                 .environment(\.shelfAppearance, NativeAppearance(rawValue: theme) ?? .system)
+                 .preferredColorScheme((NativeAppearance(rawValue: theme) ?? .system).scheme)
+         }
+diff --git a/apple/App/ConnectionViews.swift b/apple/App/ConnectionViews.swift
+index 8d3b82e..9da7f00 100644
+--- a/apple/App/ConnectionViews.swift
++++ b/apple/App/ConnectionViews.swift
+@@ -5,6 +5,7 @@ enum ShelfStyle {
+ }
+ 
+ struct ConnectionRoot: View {
++    @Environment(\.nativeStrings) private var l10n
+     @Environment(\.shelfAppearance) private var appearance
+     @EnvironmentObject private var downloads: NativeDownloads
+     @EnvironmentObject private var connection: ConnectionStore
+@@ -13,7 +14,7 @@ struct ConnectionRoot: View {
+             switch connection.screen {
+             case .connection(let error): ConnectionForm(error: error)
+             case .loading:
+-                VStack(spacing: 18) { ProgressView(); Text("Opening your library…").font(.headline); Button("Open downloads") { downloads.presented = true } }
++                VStack(spacing: 18) { ProgressView(); Text(l10n("Opening your library…")).font(.headline); Button(l10n("Open downloads")) { downloads.presented = true } }
+                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+             case .libraries(let libraries): LibraryChooser(libraries: libraries)
+             case .shelf(let library): ConnectedLibrary(library: library)
+@@ -24,7 +25,7 @@ struct ConnectionRoot: View {
+                 if let error = connection.managementError {
+                     HStack {
+                         Text(error).font(.callout)
+-                        Button("Dismiss") { connection.managementError = nil }
++                        Button(l10n("Dismiss")) { connection.managementError = nil }
+                     }.padding().background(appearance.card).cornerRadius(16).padding()
+                 }
+             }, alignment: .top)
+@@ -32,11 +33,13 @@ struct ConnectionRoot: View {
+ }
+ 
+ struct ConnectionForm: View {
++    @Environment(\.nativeStrings) private var l10n
+     @Environment(\.shelfAppearance) private var appearance
+     @EnvironmentObject private var downloads: NativeDownloads
+     @EnvironmentObject private var connection: ConnectionStore
+     let error: String?
+     @State private var password = ""
++    @State private var diagnostics = false
+ 
+     var body: some View {
+         ScrollView {
+@@ -45,52 +48,58 @@ struct ConnectionForm: View {
+                     .foregroundColor(.white).frame(width: 64, height: 64)
+                     .background(ShelfStyle.accent).cornerRadius(20)
+                 VStack(alignment: .leading, spacing: 12) {
+-                    Text("Make room for\na good story.").font(.system(size: 40, weight: .bold, design: .serif))
++                    Text(l10n("Make room for\na good story.")).font(.system(size: 40, weight: .bold, design: .serif))
+                         .fixedSize(horizontal: false, vertical: true)
+-                    Text("Your books. Your server.\nListen wherever the day takes you.").font(.body).foregroundColor(.secondary)
++                    Text(l10n("Your books. Your server.\nListen wherever the day takes you.")).font(.body).foregroundColor(.secondary)
+                 }
+                 VStack(alignment: .leading, spacing: 20) {
+-                    field("Server address") {
++                    field(l10n("Server address")) {
+                         TextField("https://audiobookshelf.nginx.lan", text: $connection.server)
+                             .keyboardType(.URL).textContentType(.URL).autocapitalization(.none).disableAutocorrection(true)
+                             .accessibilityIdentifier("server")
+                     }
+-                    field("Username") {
+-                        TextField("Username", text: $connection.username).textContentType(.username)
++                    field(l10n("Username")) {
++                        TextField(l10n("Username"), text: $connection.username).textContentType(.username)
+                             .autocapitalization(.none).disableAutocorrection(true).accessibilityIdentifier("username")
+                     }
+-                    field("Password") {
+-                        SecureField("Password", text: $password).textContentType(.password).accessibilityIdentifier("password")
++                    field(l10n("Password")) {
++                        SecureField(l10n("Password"), text: $password).textContentType(.password).accessibilityIdentifier("password")
+                     }
+                     if let error {
+                         Text(error).font(.callout).foregroundColor(.red).fixedSize(horizontal: false, vertical: true)
+                             .accessibilityIdentifier("connection-error")
+                     }
+                     Button {
++                        NativeHaptic.impact("connect")
+                         let secret = password
+                         password = ""
+                         Task { await connection.connect(server: connection.server, username: connection.username, password: secret) }
+                     } label: {
+-                        HStack { Text("Connect to your library").fontWeight(.semibold); Spacer(); Image(systemName: "arrow.right") }
++                        HStack { Text(l10n("Connect to your library")).fontWeight(.semibold); Spacer(); Image(systemName: "arrow.right") }
+                             .padding(18).foregroundColor(.white).background(ShelfStyle.accent).cornerRadius(16)
+                     }.disabled(connection.server.isEmpty || connection.username.isEmpty).accessibilityIdentifier("connect")
+-                    if !downloads.visible.isEmpty { Button("Open downloads") { downloads.presented = true } }
+-                    Button("Sign in with OpenID") {
++                    if !downloads.visible.isEmpty { Button(l10n("Open downloads")) { downloads.presented = true } }
++                    Button(l10n("Sign in with OpenID")) {
+                         password = ""
+                         Task { await connection.connectWithOpenID() }
+                     }.disabled(connection.server.isEmpty).accessibilityIdentifier("openid-sign-in")
+                 }.padding(24).background(appearance.card).cornerRadius(26)
+-                Text("Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported.")
++                Text(l10n("Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported."))
+                     .font(.footnote).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
+                 if connection.api.credentials != nil {
+-                    Button("Cancel") { Task { await connection.cancelConnection() } }
++                    Button(l10n("Cancel")) { Task { await connection.cancelConnection() } }
+                 }
++                Button(l10n("Diagnostics")) { diagnostics = true }.accessibilityIdentifier("connection-diagnostics")
+                 if !connection.savedConnections.isEmpty {
+-                    Button("Downloads") { downloads.presented = true }
+-                        Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
++                    Button(l10n("Downloads")) { downloads.presented = true }
++                        Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+                 }
+             }.frame(maxWidth: 480).padding(24).frame(maxWidth: .infinity)
+         }.accessibilityIdentifier("connection-screen")
++            .sheet(isPresented: $diagnostics) {
++                NavigationView { NativeDiagnosticsView().toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Done")) { diagnostics = false } } } }
++                    .navigationViewStyle(StackNavigationViewStyle()).nativeLocalization()
++            }
+     }
+ 
+     private func field<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+@@ -102,6 +111,7 @@ struct ConnectionForm: View {
+ }
+ 
+ struct LibraryChooser: View {
++    @Environment(\.nativeStrings) private var l10n
+     @Environment(\.shelfAppearance) private var appearance
+     @EnvironmentObject private var downloads: NativeDownloads
+     @EnvironmentObject private var connection: ConnectionStore
+@@ -110,29 +120,29 @@ struct LibraryChooser: View {
+         NavigationView {
+             ScrollView {
+                 VStack(alignment: .leading, spacing: 22) {
+-                    Text("Find your next chapter.").font(.largeTitle.bold())
+-                    Text("Choose a library to get started.").foregroundColor(.secondary)
++                    Text(l10n("Find your next chapter.")).font(.largeTitle.bold())
++                    Text(l10n("Choose a library to get started.")).foregroundColor(.secondary)
+                     ForEach(libraries) { library in
+-                        Button { connection.select(library) } label: {
++                        Button { NativeHaptic.impact("library"); connection.select(library) } label: {
+                             HStack(spacing: 18) {
+                                 Image(systemName: library.mediaType == "podcast" ? "mic.fill" : "books.vertical.fill")
+                                     .font(.title2).foregroundColor(ShelfStyle.accent).frame(width: 38)
+                                 VStack(alignment: .leading, spacing: 4) {
+                                     Text(library.name).font(.headline).foregroundColor(.primary)
+-                                    Text(library.mediaType == "podcast" ? "Podcasts" : "Audiobooks & reading").font(.caption).foregroundColor(.secondary)
++                                    Text(l10n(library.mediaType == "podcast" ? "Podcasts" : "Audiobooks & reading")).font(.caption).foregroundColor(.secondary)
+                                 }
+                                 Spacer(); Image(systemName: "chevron.right").foregroundColor(.secondary)
+                             }.padding(22).background(appearance.card).cornerRadius(20)
+                         }.accessibilityIdentifier("library-\(library.id)")
+                     }
+-                    if libraries.isEmpty { Text("No libraries are available to this account. Ask your server administrator for access.").foregroundColor(.secondary) }
++                    if libraries.isEmpty { Text(l10n("No libraries are available to this account. Ask your server administrator for access.")).foregroundColor(.secondary) }
+                 }.padding(24).frame(maxWidth: 640).frame(maxWidth: .infinity)
+-            }.navigationTitle("Your libraries")
++            }.navigationTitle(l10n("Your libraries"))
+                 .toolbar { ToolbarItem(placement: .navigationBarTrailing) {
+                     Menu {
+-                        Button("Downloads") { downloads.presented = true }
+-                        Button("Saved connections") { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+-                        Button("Sign out") { connection.signOut() }
++                        Button(l10n("Downloads")) { downloads.presented = true }
++                        Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
++                        Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }
+                     } label: { Image(systemName: "person.crop.circle") }.accessibilityIdentifier("account")
+                 } }
+         }.navigationViewStyle(StackNavigationViewStyle())
+@@ -140,24 +150,25 @@ struct LibraryChooser: View {
+ }
+ 
+ struct SavedConnectionsView: View {
++    @Environment(\.nativeStrings) private var l10n
+     @EnvironmentObject private var downloads: NativeDownloads
+     @EnvironmentObject private var connection: ConnectionStore
+     var body: some View {
+         NavigationView {
+             ShelfList {
+                 ForEach(connection.savedConnections) { saved in
+-                    Button { Task { await connection.switchConnection(saved.id) } } label: {
++                    Button { NativeHaptic.impact("connect"); Task { await connection.switchConnection(saved.id) } } label: {
+                         VStack(alignment: .leading, spacing: 6) {
+                             Text(saved.username).font(.headline).foregroundColor(.primary)
+                             Text(saved.server).font(.caption).foregroundColor(.secondary)
+                         }.padding(.vertical, 8)
+                     }.accessibilityIdentifier("connection-" + saved.server)
+-                        .accessibilityLabel(saved.username + " on " + saved.server)
++                        .accessibilityLabel(l10n("{0} on {1}", saved.username, saved.server))
+                 }
+-                Button("Add server") { connection.addServer() }
+-            }.navigationTitle("Saved connections")
++                Button(l10n("Add server")) { NativeHaptic.impact("add-server"); connection.addServer() }
++            }.navigationTitle(l10n("Saved connections"))
+                 .toolbar { ToolbarItem(placement: .navigationBarLeading) {
+-                    Button("Done") { connection.savedConnectionsPresented = false }
++                    Button(l10n("Done")) { connection.savedConnectionsPresented = false }
+                 } }
+         }.navigationViewStyle(StackNavigationViewStyle())
+     }
+diff --git a/apple/App/YearReviewView.swift b/apple/App/YearReviewView.swift
+index a6f1b98..ca756ff 100644
+--- a/apple/App/YearReviewView.swift
++++ b/apple/App/YearReviewView.swift
+@@ -26,70 +26,72 @@ import UIKit
+ struct YearReviewView: View {
+     @StateObject private var store: YearReviewStore
+     @State private var share = false
++    @Environment(\.nativeStrings) private var l10n
+     init(api: APIClient) { _store = StateObject(wrappedValue: YearReviewStore(api: api)) }
+     private func minutes(_ value: Double) -> String {
+         let formatter = NumberFormatter(); formatter.numberStyle = .decimal; formatter.maximumFractionDigits = 0
+         return formatter.string(from: NSNumber(value: max(value, 0) / 60)) ?? "0"
+     }
+     private func month(_ value: Int) -> String {
+-        guard (0..<12).contains(value) else { return "Unknown month" }
++        guard (0..<12).contains(value) else { return l10n("Unknown month") }
+         let formatter = DateFormatter()
+         formatter.calendar = Calendar(identifier: .gregorian)
+-        formatter.locale = .current
++        formatter.locale = l10n.language.locale
+         return formatter.monthSymbols[value]
+     }
+     private var shareText: String {
+         guard let stats = store.stats else { return "" }
+-        return "Audiobookshelf • \(store.year)\n\(minutes(stats.totalListeningTime)) minutes listened\n\(stats.numBooksFinished) books finished\n\(stats.numBooksListened) books listened to\n\(stats.totalListeningSessions) listening sessions"
++        return ["Audiobookshelf • \(store.year)", l10n("{0} minutes listened", minutes(stats.totalListeningTime)), l10n("{0} books finished", stats.numBooksFinished),
++                l10n("{0} books listened to", stats.numBooksListened), l10n("{0} listening sessions", stats.totalListeningSessions)].joined(separator: "\n")
+     }
+     var body: some View {
+         ShelfList {
+             HStack {
+                 Button { Task { await store.load(year: store.year - 1) } } label: { Image(systemName: "chevron.left") }
+-                    .accessibilityLabel("Previous year").disabled(store.year <= 2000)
++                    .accessibilityLabel(l10n("Previous year")).disabled(store.year <= 2000)
+                 Spacer()
+                 Text(String(store.year)).font(.title2.monospacedDigit().weight(.bold))
+                 Spacer()
+                 Button { Task { await store.load(year: store.year + 1) } } label: { Image(systemName: "chevron.right") }
+-                    .accessibilityLabel("Next year").disabled(store.year >= Calendar(identifier: .gregorian).component(.year, from: Date()))
++                    .accessibilityLabel(l10n("Next year")).disabled(store.year >= Calendar(identifier: .gregorian).component(.year, from: Date()))
+             }
+-            if store.loading { ProgressView("Opening your year…") }
++            if store.loading { ProgressView(l10n("Opening your year…")) }
+             if let error = store.error { RecoveryCard(message: error) { Task { await store.load(year: store.year) } } }
+             if let stats = store.stats {
+-                Section(header: Text("Your year of listening")) {
+-                    Text("\(minutes(stats.totalListeningTime)) minutes listened").font(.title2.bold())
+-                    Text("\(stats.numBooksFinished) books finished")
+-                    Text("\(stats.numBooksListened) books listened to")
+-                    Text("\(stats.totalListeningSessions) listening sessions")
+-                    Label("\(minutes(stats.totalBookListeningTime)) audiobook minutes", systemImage: "book")
+-                    Label("\(minutes(stats.totalPodcastListeningTime)) podcast minutes", systemImage: "mic")
++                Section(header: Text(l10n("Your year of listening"))) {
++                    Text(l10n("{0} minutes listened", minutes(stats.totalListeningTime))).font(.title2.bold())
++                    Text(l10n("{0} books finished", stats.numBooksFinished))
++                    Text(l10n("{0} books listened to", stats.numBooksListened))
++                    Text(l10n("{0} listening sessions", stats.totalListeningSessions))
++                    Label(l10n("{0} audiobook minutes", minutes(stats.totalBookListeningTime)), systemImage: "book")
++                    Label(l10n("{0} podcast minutes", minutes(stats.totalPodcastListeningTime)), systemImage: "mic")
+                 }
+                 if !stats.topAuthors.isEmpty {
+-                    Section(header: Text("Top authors")) {
++                    Section(header: Text(l10n("Top authors"))) {
+                         ForEach(stats.topAuthors.indices, id: \.self) { index in
+                             ranked(stats.topAuthors[index].name, time: stats.topAuthors[index].time)
+                         }
+                     }
+                 }
+                 if let narrator = stats.mostListenedNarrator {
+-                    Section(header: Text("Top narrator")) { ranked(narrator.name, time: narrator.time) }
++                    Section(header: Text(l10n("Top narrator"))) { ranked(narrator.name, time: narrator.time) }
+                 }
+                 if !stats.topGenres.isEmpty {
+-                    Section(header: Text("Top genres")) {
++                    Section(header: Text(l10n("Top genres"))) {
+                         ForEach(stats.topGenres.indices, id: \.self) { index in
+                             ranked(stats.topGenres[index].genre, time: stats.topGenres[index].time)
+                         }
+                     }
+                 }
+                 if let topMonth = stats.mostListenedMonth {
+-                    Section(header: Text("Most listened month")) { ranked(month(topMonth.month), time: topMonth.time) }
++                    Section(header: Text(l10n("Most listened month"))) { ranked(month(topMonth.month), time: topMonth.time) }
+                 }
+                 if let book = stats.longestAudiobookFinished {
+-                    Section(header: Text("Longest audiobook finished")) { ranked(book.title, time: book.duration) }
++                    Section(header: Text(l10n("Longest audiobook finished"))) { ranked(book.title, time: book.duration) }
+                 }
+             }
+-        }.listStyle(InsetGroupedListStyle()).navigationTitle("Year in review")
+-            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button { share = true } label: { Image(systemName: "square.and.arrow.up") }.accessibilityLabel("Share year in review").disabled(store.stats == nil) } }
++        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Year in review"))
++            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button { share = true } label: { Image(systemName: "square.and.arrow.up") }.accessibilityLabel(l10n("Share year in review")).disabled(store.stats == nil) } }
+             .sheet(isPresented: $share) { YearReviewShare(text: shareText) }
+             .onAppear { Task { await store.load(year: store.year) } }
+             .onDisappear { store.invalidate() }
+@@ -97,7 +99,7 @@ struct YearReviewView: View {
+     private func ranked(_ name: String, time: Double) -> some View {
+         VStack(alignment: .leading, spacing: 6) {
+             Text(name).font(.headline)
+-            Text("\(minutes(time)) minutes").font(.caption).foregroundColor(.secondary)
++            Text(l10n("{0} minutes", minutes(time))).font(.caption).foregroundColor(.secondary)
+         }.padding(.vertical, 4)
+     }
+ }

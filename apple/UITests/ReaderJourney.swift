@@ -240,6 +240,25 @@ import XCTest
         guard issued else { return }
         app.buttons["Next page"].tap()
         XCTAssertTrue(app.staticTexts["Page 3 of 4"].exists)
+        if mode != "pdf-delayed" {
+            // The older page reached the server with its answer lost and may still be applied, so the newer page
+            // stays on this device until a restart asked for after it is confirmed.
+            try await Task.sleep(nanoseconds: 3_000_000_000)
+            let sent = try await fixtureRequests().dropFirst(initialRequestCount)
+            XCTAssertFalse(sent.contains { $0.ebookLocation == "3" }, "The newer page was sent while the older one could still be applied")
+            let applied = try await fixtureObservations().readingProgress.first?.ebookLocation
+            XCTAssertEqual(applied, "2", "Precondition: the server applied the older page")
+            app.buttons["Close reader"].tap()
+            let restart = app.buttons["restart-server"]
+            XCTAssertTrue(restart.waitForExistence(timeout: 10), "Open details should offer a server restart once a save got no answer")
+            restart.tap()
+            let confirm = app.alerts.buttons["Server restarted"]
+            XCTAssertTrue(confirm.waitForExistence(timeout: 10))
+            try await FixtureControl.restart()
+            confirm.tap()
+            app.buttons["Read PDF"].tap()
+            XCTAssertTrue(app.staticTexts["Page 3 of 4"].waitForExistence(timeout: 10))
+        }
         if mode == "pdf-double-failure" {
             var rejected = false
             for _ in 0..<60 {

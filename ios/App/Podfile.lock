@@ -25,6 +25,10 @@ PODS:
     - Capacitor
   - CordovaPlugins (6.2.1):
     - CapacitorCordova
+  - LegacyMigration (1.0.0)
+  - LegacyRealmExport (1.0.0):
+    - LegacyMigration
+    - RealmSwift (~> 10.54)
   - Realm (10.54.6):
     - Realm/Headers (= 10.54.6)
   - Realm/Headers (10.54.6)
@@ -48,6 +52,8 @@ DEPENDENCIES:
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - CordovaPlugins (from `../capacitor-cordova-ios-plugins`)
+  - LegacyMigration (from `../../apple/Migration`)
+  - LegacyRealmExport (from `../../apple/Migration`)
   - RealmSwift (~> 10)
   - "WebnativellcCapacitorFilesharer (from `../../node_modules/@webnativellc/capacitor-filesharer`)"
 
@@ -84,6 +90,10 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/status-bar"
   CordovaPlugins:
     :path: "../capacitor-cordova-ios-plugins"
+  LegacyMigration:
+    :path: "../../apple/Migration"
+  LegacyRealmExport:
+    :path: "../../apple/Migration"
   WebnativellcCapacitorFilesharer:
     :path: "../../node_modules/@webnativellc/capacitor-filesharer"
 
@@ -102,10 +112,12 @@ SPEC CHECKSUMS:
   CapacitorPreferences: 6c98117d4d7508034a4af9db64d6b26fc75d7b94
   CapacitorStatusBar: 416e9e53fd6397e668d4a181cd2131617d949bd6
   CordovaPlugins: 2ecbba09775516c41764dbf78ade612427311b7e
+  LegacyMigration: 9a716e336119c9e6f81bc813f1267c5c1e68e0c4
+  LegacyRealmExport: 92943f353acbb138aff94fe065efe9276906ac6b
   Realm: b1b3bc68162fa242132eb7eefbf91d7c40f36a85
   RealmSwift: 456cfd82a4f23dff8e3456980999331ab69bbf3e
   WebnativellcCapacitorFilesharer: e3a5930240633db3335040251d66aac6762ff111
 
-PODFILE CHECKSUM: 498821c0cfa2508609567fa95d7244c01cbef538
+PODFILE CHECKSUM: c635909380a1a5ec3f74461410fe4ffdaf8ecbad
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.17.0

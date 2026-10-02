@@ -14,6 +14,8 @@ import Combine
     @Published var savedConnectionsPresented = false
     @Published private(set) var savedConnections: [KeychainCredentials.Summary] = []
     @Published private(set) var activeAccount: AccountIdentity?
+    /// `api.authorizationRevision` of the opened account; changes on a new sign-in even when the account is the same.
+    @Published private(set) var signInRevision: UUID?
     @Published var managementError: String?
     let api: APIClient
     private let vault: KeychainCredentials
@@ -100,6 +102,7 @@ import Combine
             let account = try await api.currentAccount()
             guard request == generation else { return }
             activeAccount = account
+            signInRevision = api.authorizationRevision
             let libraries = try await api.libraries()
             guard request == generation else { return }
             if let id = try vault.activeConnection()?.libraryID, let library = libraries.first(where: { $0.id == id }) {
@@ -130,6 +133,14 @@ import Combine
 
     func cancelConnection() async { await restore() }
 
+    /// Opens sign-in for this server and username after the server stopped accepting the login. Playback stays
+    /// paused until a sign-in closes it, and its unsent listening stays with this account until that account signs in.
+    func reauthenticate() {
+        generation = UUID()
+        savedConnectionsPresented = false
+        screen = .connection(Self.recovery(for: APIError.signInRequired))
+    }
+
     func switchConnection(_ id: String) async {
         let request = UUID()
         let previousScreen = screen
@@ -159,6 +170,7 @@ import Combine
                 try await playback.suspendForConnectionChange()
                 try api.signOut()
                 activeAccount = nil
+                signInRevision = nil
                 generation = UUID()
                 defaults.removeObject(forKey: "previewLibrary")
                 refreshSavedConnections()
@@ -167,21 +179,30 @@ import Combine
         }
     }
 
+    /// The message shown for a failure. Its technical cause is kept in diagnostics, redacted, for later recovery.
     static func recovery(for error: Error) -> String {
+        let message = recoveryMessage(for: error)
+        let category: DiagnosticCategory = error is URLError ? .connection : .server
+        NativeDiagnostics.shared.record(category, message, detail: DiagnosticRedactor.describe(error))
+        return message
+    }
+
+    private static func recoveryMessage(for error: Error) -> String {
+        let l10n = NativeStrings.current
         if let failure = error as? URLError {
             switch failure.code {
             case .serverCertificateUntrusted, .serverCertificateHasBadDate, .serverCertificateHasUnknownRoot, .serverCertificateNotYetValid:
-                return "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry."
+                return l10n("This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry.")
             case .secureConnectionFailed:
-                return "A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry."
+                return l10n("A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry.")
             case .appTransportSecurityRequiresSecureConnection:
-                return "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server."
+                return l10n("This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server.")
             case .notConnectedToInternet, .cannotConnectToHost, .cannotFindHost, .timedOut, .networkConnectionLost:
-                return "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained."
-            default: return "The connection failed. Check the server address and network, then retry."
+                return l10n("The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained.")
+            default: return l10n("The connection failed. Check the server address and network, then retry.")
             }
         }
-        if error as? APIError == .signInRequired { return "The server no longer accepts this login. Sign in again to continue." }
+        if error as? APIError == .signInRequired { return l10n("The server no longer accepts this login. Sign in again to continue.") }
         return error.localizedDescription
     }
 }

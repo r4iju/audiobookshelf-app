@@ -1,0 +1,33 @@
+# UI test runner for the legacy export journey. It drives the installed legacy app by bundle
+# identifier; the host app only exists because a UI test bundle needs one. Generate with
+# `xcodegen --spec project.yml --project <build directory>` (see run.sh); nothing generated is kept.
+name: LegacyExportJourney
+options:
+  bundleIdPrefix: org.audiobookshelf.legacy-journey
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+    SWIFT_VERSION: "5.9"
+targets:
+  JourneyHost:
+    type: application
+    platform: iOS
+    sources: [Host]
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+  LegacyExportJourneyUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: JourneyHost
+    settings:
+      base:
+        TEST_TARGET_NAME: JourneyHost
+        GENERATE_INFOPLIST_FILE: YES

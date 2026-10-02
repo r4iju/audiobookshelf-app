@@ -123,11 +123,11 @@ struct ReadingSource: Identifiable {
         do {
             try store.update(account: source.account, itemID: source.itemID, format: "pdf", location: String(page), fraction: Double(page - 1) / Double(max(count, 1)), rotation: rotation, fileID: source.fileID)
             store.sync(api: api)
-        } catch { self.error = "Reading could not be saved on this device: " + error.localizedDescription }
+        } catch { self.error = NativeStrings.current("Reading could not be saved on this device: {0}", error.localizedDescription) }
     }
     enum ReaderFailure: LocalizedError {
         case invalidPDF
-        var errorDescription: String? { "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." }
+        var errorDescription: String? { NativeStrings.current("This PDF could not be opened. It may be damaged or require a password. Check the original file and retry.") }
     }
 }
 
@@ -150,6 +150,7 @@ struct PDFReader: View {
     @State private var requestedPage = ""
     @ObservedObject private var store: ReadingStore
     @Environment(\.presentationMode) private var presentation
+    @Environment(\.nativeStrings) private var l10n
     init(source: ReadingSource, api: APIClient, store: ReadingStore) {
         self.store = store
         _reading = StateObject(wrappedValue: PDFReading(source: source, api: api, store: store))
@@ -160,17 +161,17 @@ struct PDFReader: View {
                 if reading.document != nil {
                     NativePDFCanvas(reading: reading)
                     HStack {
-                        Button { reading.move(-1) } label: { Image(systemName: "chevron.left") }.accessibilityLabel("Previous page").disabled(reading.page <= 1)
+                        Button { reading.move(-1) } label: { Image(systemName: "chevron.left") }.accessibilityLabel(l10n("Previous page")).disabled(reading.page <= 1)
                         Spacer()
-                        Text("Page \(reading.page) of \(reading.count)").font(.callout.monospacedDigit())
+                        Text(l10n("Page {0} of {1}", reading.page, reading.count)).font(.callout.monospacedDigit())
                         Spacer()
-                        Button { reading.move(1) } label: { Image(systemName: "chevron.right") }.accessibilityLabel("Next page").disabled(reading.page >= reading.count)
+                        Button { reading.move(1) } label: { Image(systemName: "chevron.right") }.accessibilityLabel(l10n("Next page")).disabled(reading.page >= reading.count)
                     }.padding()
                     HStack {
-                        TextField("Page", text: $requestedPage).keyboardType(.numberPad)
+                        TextField(l10n("Page"), text: $requestedPage).keyboardType(.numberPad)
                             .textFieldStyle(RoundedBorderTextFieldStyle()).frame(width: 72)
                             .accessibilityIdentifier("reader-page")
-                        Button("Go to page") {
+                        Button(l10n("Go to page")) {
                             if let page = Int(requestedPage) { reading.go(to: page) }
                             requestedPage = ""
                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -178,11 +179,11 @@ struct PDFReader: View {
                         Spacer()
                     }.padding(.horizontal).padding(.bottom, 8)
                     HStack {
-                        Button("Rotate page") { reading.rotate() }
-                        Text("Rotation \(reading.displayedRotation)°").font(.caption).foregroundColor(.secondary)
+                        Button(l10n("Rotate page")) { reading.rotate() }
+                        Text(l10n("Rotation {0}°", reading.displayedRotation)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         Spacer()
-                        Text("Continuous").font(.caption)
-                        Toggle("Continuous", isOn: $reading.continuous).labelsHidden().accessibilityLabel("Continuous").fixedSize()
+                        Text(l10n("Continuous")).font(.caption)
+                        Toggle(l10n("Continuous"), isOn: $reading.continuous).labelsHidden().accessibilityLabel(l10n("Continuous")).fixedSize()
                     }.padding(.horizontal).padding(.bottom)
                     if player.session != nil {
                         HStack {
@@ -191,15 +192,15 @@ struct PDFReader: View {
                             Spacer()
                             playbackToggle(player, prefix: "reader-")
                             Button { Task { do { try await player.stop() } catch { player.error = ConnectionStore.recovery(for: error) } } } label: { Image(systemName: "stop.circle") }
-                                .accessibilityLabel("Stop listening")
+                                .accessibilityLabel(l10n("Stop listening"))
                         }.padding(.horizontal).padding(.bottom, 8)
                     }
                     if let error = reading.error ?? store.error ?? player.error { Text(error).font(.caption).foregroundColor(.red).padding(.horizontal) }
-                    else if store.waitingForListening { Text("Page saved on this device. Sync follows when listening closes.").font(.caption).foregroundColor(.secondary).padding(.horizontal) }
+                    else if store.waitingForListening { Text(l10n("Page saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding(.horizontal) }
                 } else if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding() }
-                else { ProgressView("Opening PDF…").frame(maxWidth: .infinity, maxHeight: .infinity) }
+                else { ProgressView(l10n("Opening PDF…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
             }.background(appearance.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button("Close reader") { presentation.wrappedValue.dismiss() } } }
+                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } } }
         }.navigationViewStyle(StackNavigationViewStyle())
             .onAppear { reading.open() }
             .onDisappear { reading.cancelOpen(); reading.detach() }

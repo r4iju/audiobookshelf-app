@@ -1,6 +1,12 @@
 import XCTest
 
 @MainActor final class ConnectionJourney: NativeJourney {
+    /// The fixture is shared across the run, so a journey that ran earlier may have left it refusing requests.
+    override func setUp() async throws {
+        try await super.setUp()
+        try await FixtureControl.configure("baseline")
+    }
+
     func testConnectSelectLibraryAndRestoreAccountAfterRelaunch() {
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs")
     }

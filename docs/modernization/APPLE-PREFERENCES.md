@@ -28,6 +28,31 @@ A new three-launch production UI journey first failed because Settings was absen
 
 ![Native Light appearance settings](evidence/apple-settings-light-iphone.png)
 
+## Annual listening statistics
+
+Statistics now opens a native Year in review against the existing `/api/me/stats/year/:year` endpoint. It shows listening minutes, finished/listened books, session count, audiobook/podcast time, leading authors/genres/narrator, most listened month and the longest finished audiobook. Previous/next year navigation clears old results while loading; request-generation and canonical-account checks guard publication. A native share action offers a text summary. Image-card variants, permitted server-wide annual review and physical sharing acceptance remain outstanding.
+
+The field names and seconds-based totals were checked against the installed 2.30 server's query source, not against private production data. Protocol years and zero-based month indexes remain Gregorian even when the device uses another calendar; names retain the locale.
+
+A new production UI journey genuinely failed because Year in review was absent, then passed with synthetic annual totals and a different previous-year response. Review identified a device-calendar defect: a Buddhist-locale production launch genuinely requested the wrong year and failed its totals/route assertions before the Gregorian correction. Both that case and the existing statistics journey passed afterward. The latter now scrolls to its recent session after the added navigation row shifted it below the viewport. The prior eight-case phone selection passed seven cases and failed only that offscreen assertion. All three final affected iPad statistics/annual/calendar journeys passed.
+
+Minimum-iOS-14 source typing, the 15-case shared core suite and eight Python fixture/compatibility checks passed. The TV simulator target and strict local signed app/IPA packaging also passed after the shared API addition. The captured annual screen was visually inspected. Synthetic journeys do not establish complete annual parity or live/physical acceptance.
+
+![Native annual listening statistics, synthetic data](evidence/apple-year-review-iphone.png)
+
 ## Remaining work
 
-Full theme/modal/large-text acceptance, localization, remaining haptic action coverage and physical vibration, applicable network policy options, statistics year-in-review, history and permitted progress management, preference migration, full accessibility/localization acceptance, and live/device acceptance remain under their current Apple tickets. iOS orientation locking is absent from the baseline settings presentation; the source inventory's stored key must still be preserved during migration. This slice does not close #22.
+Full theme/modal/large-text acceptance, localization, remaining haptic action coverage and physical vibration, physical cellular/transition acceptance, annual image/server-wide review, applicable diagnostics and permitted progress management, preference migration, full accessibility/localization acceptance, and live/device acceptance remain under their current Apple tickets. iOS orientation locking is absent from the baseline settings presentation; the source inventory's stored key must still be preserved during migration. This slice does not close #22.
+
+
+## Streaming and download network choices
+
+Network preferences offers independent Ask, Always and Never choices for streaming and downloads. The existing preview download-cellular boolean is retained as the initial download choice; streaming retains its previous Always default. Ask requests explicit cellular permission for each new listening session or download, including a later Wi-Fi disconnect. Wi-Fi only still starts the operation with cellular access disabled. Streaming uses `AVURLAssetAllowsCellularAccessKey`; download requests use `allowsCellularAccess`. Offline file playback does not ask or depend on these choices.
+
+A streaming permission lasts for the current session and its track changes. Changing the streaming choice pauses and unloads remote audio; resuming rebuilds the asset under the new choice at the saved position. Download consent is account/item scoped in the existing durable manifest and survives relaunch. Changing the download choice cancels previous transfers, rotates their generations and clears grants before recreating requests. Manifest failures block pumping after cancellation. Startup reconciles saved policy and retained background-task permissions before attaching tasks, so a crash around a settings change cannot silently restore an earlier cellular request. Finished local parts remain available.
+
+The three-launch production settings journey first failed because Network preferences was absent, then passed with independent persisted choices. Review found and corrected cancellation-before-save, queued consent replacement, token-refresh reentrancy, and background task restoration gaps. Simulator UI and synthetic audio/download fixtures do not prove radio switching, actual metered transfer, background daemon behavior under device storage failure, or physical consent interactions. Those device gates remain open under #15, #16 and #22.
+
+The first phone regression selection passed all 11 journeys (eight playback, two offline and the new settings case). After the final startup restoration corrections, the three affected iPad journeys passed, followed by a final two-case phone settings/offline selection. Minimum-iOS-14 source typechecking, the shared TV simulator build and strict local signed packaging passed. The captured settings screen was inspected. The signed build was installed on both physical devices. The first iPad install disconnected in CoreDevice; the retry succeeded. Installation alone does not establish radio/physical acceptance.
+
+![Native network preferences, synthetic QA](evidence/apple-network-preferences-iphone.png)
