@@ -1,7 +1,11 @@
 package com.audiobookshelf.android.migration
 
+import android.app.LocaleConfig
+import android.app.LocaleManager
 import android.content.Context
 import android.net.Uri
+import android.os.Build
+import android.os.LocaleList
 import android.provider.OpenableColumns
 import com.audiobookshelf.android.R
 import com.audiobookshelf.android.data.AccountStore
@@ -264,7 +268,18 @@ class Migration(
     private fun applySettings(outcome: Outcome): Outcome {
         if (outcome.settingsApplied) return outcome
         settings.update { current -> legacySettings(current, outcome) }
+        outcome.preferences["lang"]?.let(::legacyLanguage)
         return outcome.copy(settingsApplied = true).also(import::save)
+    }
+
+    /** The language picked in the legacy app, when this app offers it and the person has not chosen one here. */
+    private fun legacyLanguage(code: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val locales = context.getSystemService(LocaleManager::class.java)
+        if (!locales.applicationLocales.isEmpty) return
+        val tag = LEGACY_LANGUAGES[code] ?: code
+        val offered = LocaleConfig(context).supportedLocales ?: return
+        if ((0 until offered.size()).any { offered[it].toLanguageTag() == tag }) locales.applicationLocales = LocaleList.forLanguageTags(tag)
     }
 
     private fun legacySettings(current: DeviceSettings, outcome: Outcome): DeviceSettings {
@@ -284,5 +299,10 @@ class Migration(
         preferences["bookshelfListView"]?.let { merged = merged.copy(listLayout = it == "1") }
         preferences["theme"]?.let { theme -> Appearance.entries.firstOrNull { it.name.equals(theme, ignoreCase = true) }?.let { merged = merged.copy(appearance = it) } }
         return merged
+    }
+
+    private companion object {
+        /** Legacy codes that differ from this app's language tags, as in scripts/import-legacy-strings.py. */
+        val LEGACY_LANGUAGES = mapOf("no" to "nb", "pt-br" to "pt-BR", "vi-vn" to "vi", "zh-cn" to "zh-CN")
     }
 }
