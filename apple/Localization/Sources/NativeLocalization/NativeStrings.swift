@@ -83,6 +83,12 @@ public struct NativeStrings {
         return Double(table.count) / Double(english)
     }
 
+    /// The share as whole percent for display.
+    public static func translatedPercent(translated: Int, of total: Int) -> Int {
+        guard total > 0 else { return 0 }
+        return Int((Double(translated) / Double(total) * 100).rounded())
+    }
+
     public static func placeholders(in text: String) -> Set<String> {
         var found = Set<String>()
         var remaining = text[...]

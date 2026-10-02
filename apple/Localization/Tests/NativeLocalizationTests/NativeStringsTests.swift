@@ -68,6 +68,15 @@ final class NativeStringsTests: XCTestCase {
         XCTAssertEqual(strings("en-us").copy(["Settings"]), [:])
     }
 
+    /// The Language screen shows each language's share in whole percent. A language missing any text must not read 100%,
+    /// and one with every text translated reads 100%.
+    func testTranslatedPercentNeverRoundsAPartialLanguageUpToComplete() {
+        XCTAssertEqual(NativeStrings.translatedPercent(translated: 698, of: 699), 99)
+        XCTAssertEqual(NativeStrings.translatedPercent(translated: 699, of: 699), 100)
+        XCTAssertEqual(NativeStrings.translatedPercent(translated: 171, of: 678), 25)
+        XCTAssertEqual(NativeStrings.translatedPercent(translated: 0, of: 0), 0)
+    }
+
     func testPlaceholdersAreSubstitutedInOrder() {
         XCTAssertEqual(strings("en-us")("File {0} of {1}", 1, 2), "File 1 of 2")
     }
