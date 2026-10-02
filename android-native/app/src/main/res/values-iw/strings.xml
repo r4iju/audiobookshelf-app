@@ -561,6 +561,11 @@
     <string name="err_login_rejected">שם המשתמש או הסיסמה לא התקבלו.</string>
     <string name="err_publications_unreadable">לא ניתן היה לקרוא רשומות של כתיבות התקדמות שלא נענו. טפל בהן קודם באבחון.</string>
     <string name="err_discards_unreadable">לא ניתן היה לקרוא את איפוסי ההתקדמות השמורים. טפל בהם קודם באבחון.</string>
+    <string name="pl_total_track">סה״כ רצועות</string>
+    <string name="pl_chapter_track">רצועת פרק</string>
+    <string name="pl_scale_elapsed">שנה קנה מידה של זמן שחלף לפי מהירות ההשמעה</string>
+    <string name="pl_lock">נעילת נגן</string>
+    <string name="pl_unlock">בטל נעילת נגן</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d דקת האזנה</item>
         <item quantity="two">%1$d דקות האזנה</item>

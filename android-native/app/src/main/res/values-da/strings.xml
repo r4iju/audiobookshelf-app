@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Brugernavnet eller adgangskoden blev ikke accepteret.</string>
     <string name="err_publications_unreadable">Registreringer af ubesvarede gemninger af fremgang kunne ikke læses. Løs dem først under Diagnosticering.</string>
     <string name="err_discards_unreadable">Gemte anmodninger om at kassere fremgang kunne ikke læses. Løs dem først under Diagnosticering.</string>
+    <string name="pl_total_track">Total Antal Spor</string>
+    <string name="pl_chapter_track">Kapitel spor</string>
+    <string name="pl_scale_elapsed">Skalér Forløbet Tid med Hastighed</string>
+    <string name="pl_lock">Lås afspiller</string>
+    <string name="pl_unlock">Lås Spiller Op</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minut lyttet</item>
         <item quantity="other">%1$d minutter lyttet</item>

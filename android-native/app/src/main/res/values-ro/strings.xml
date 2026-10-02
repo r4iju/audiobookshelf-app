@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Numele de utilizator sau parola nu au fost acceptate.</string>
     <string name="err_publications_unreadable">Înregistrările salvărilor de progres fără răspuns nu au putut fi citite. Rezolvă-le mai întâi în Diagnosticare.</string>
     <string name="err_discards_unreadable">Ștergerile de progres salvate nu au putut fi citite. Rezolvă-le mai întâi în Diagnosticare.</string>
+    <string name="pl_total_track">Total audio</string>
+    <string name="pl_chapter_track">Marcaje capitole</string>
+    <string name="pl_scale_elapsed">Ajustează timpul scurs după viteză</string>
+    <string name="pl_lock">Blochează playerul</string>
+    <string name="pl_unlock">Deblochează playerul</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minut ascultat</item>
         <item quantity="few">%1$d minute ascultate</item>

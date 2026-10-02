@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Uporabniško ime ali geslo ni bilo sprejeto.</string>
     <string name="err_publications_unreadable">Zapisov neodgovorjenih shranjevanj napredka ni bilo mogoče prebrati. Najprej jih razrešite v Diagnostiki.</string>
     <string name="err_discards_unreadable">Shranjenih zavrženj napredka ni bilo mogoče prebrati. Najprej jih razrešite v Diagnostiki.</string>
+    <string name="pl_total_track">Skupaj posnetkov</string>
+    <string name="pl_chapter_track">Posnetek poglavja</string>
+    <string name="pl_scale_elapsed">Meri pretečeni čas glede na hitrost</string>
+    <string name="pl_lock">Zakleni predvajalnik</string>
+    <string name="pl_unlock">Odkleni predvajalnik</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minuta poslušanja</item>
         <item quantity="two">%1$d minuti poslušanja</item>

@@ -561,6 +561,11 @@
     <string name="err_login_rejected">De gebruikersnaam of het wachtwoord werd niet geaccepteerd.</string>
     <string name="err_publications_unreadable">Gegevens over onbeantwoorde voortgangsopslag konden niet worden gelezen. Los dit eerst op in Diagnose.</string>
     <string name="err_discards_unreadable">Opgeslagen verzoeken om voortgang te wissen konden niet worden gelezen. Los dit eerst op in Diagnose.</string>
+    <string name="pl_total_track">Totaal audiospoor</string>
+    <string name="pl_chapter_track">Hoofdstuk Track</string>
+    <string name="pl_scale_elapsed">Schaal verstreken tijd per snelheid</string>
+    <string name="pl_lock">Speler vergrendelen</string>
+    <string name="pl_unlock">Speler Ontgrendelen</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minuut geluisterd</item>
         <item quantity="other">%1$d minuten geluisterd</item>

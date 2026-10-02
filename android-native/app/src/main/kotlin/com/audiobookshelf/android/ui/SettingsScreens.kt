@@ -121,6 +121,10 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         }
 
         item { SettingsHeading(stringResource(R.string.settings_playback)) }
+        item { Toggle(stringResource(R.string.pl_chapter_track), null, settings.useChapterTrack, "chapter-track") { on -> change { it.copy(useChapterTrack = on, useTotalTrack = it.useTotalTrack || !on) } } }
+        item { Toggle(stringResource(R.string.pl_total_track), null, settings.useTotalTrack, "total-track") { on -> change { it.copy(useTotalTrack = on, useChapterTrack = it.useChapterTrack || !on) } } }
+        item { Toggle(stringResource(R.string.pl_scale_elapsed), null, settings.scaleElapsedTimeBySpeed, "scale-elapsed") { on -> change { it.copy(scaleElapsedTimeBySpeed = on) } } }
+        item { Toggle(stringResource(R.string.pl_lock), null, settings.lockUi, "lock-player") { on -> change { it.copy(lockUi = on) } } }
         item { Choices(stringResource(R.string.jump_forward_time), JUMP_SECONDS, settings.jumpForwardTime, "jump-forward", label = { jumpLabel(context, it) }) { value -> change { it.copy(jumpForwardTime = value) } } }
         item { Choices(stringResource(R.string.jump_back_time), JUMP_SECONDS, settings.jumpBackwardsTime, "jump-back", label = { jumpLabel(context, it) }) { value -> change { it.copy(jumpBackwardsTime = value) } } }
         item {

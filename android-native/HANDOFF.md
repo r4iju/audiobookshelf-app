@@ -1,11 +1,14 @@
 # Native Android handoff
 
-`fork/native-android` was merged into `fork/native-tv` through #87 (79b31196). This work is on
-`fork/android-l10n-bookmarks`, branched from there. The app installs as the preview identity
+`fork/native-android` was merged into `fork/native-tv` through #87 (79b31196). Current finishing work is on `fork/android-finish-gpt`, based on `d3152a5d`. The app installs as the preview identity
 `com.audiobookshelf.app.nativepreview` beside the legacy `com.audiobookshelf.app`, which it never touches.
 
 Evidence paths written as `artifacts/...` are outside the repository, under
 `/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/`. The worktree's `artifacts` link to it has been removed.
+
+## Current finishing status
+
+See [Android current readiness](../docs/modernization/ANDROID-CURRENT-READINESS.md) for source hashes, scoped compile/resource evidence, the restored player preferences and separate physical/owner/native-speaker gates. Historical runs below retain their original source and limits. The finishing lane does not package; root packages the reviewed merged head.
 
 ## Issue mapping (for ticket maintenance)
 
@@ -33,7 +36,7 @@ Previous source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full 
 | #49 casting | Implemented; receiver acceptance pending | `CastMediaTest` (3), `CastHandoverTest` (5), CastJourney (no receiver on the emulator network) | **Physical receiver journey not run**: connecting, remote controls, transfer back on receiver loss and progress while casting are untested on a real Chromecast/Google TV |
 | #50 Android Auto | Partial | CarJourney | Car or Desktop Head Unit |
 | #51 preferences, statistics, diagnostics | Done (emulator) | SettingsJourney | |
-| #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `ereaderSettings`, `playerSettings` and `lastLibraryId` preserved but not applied (the legacy app language is applied since 28cde313); listening history and logs not exported |
+| #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `playerSettings` now applied once (compile/static evidence; affected runtime acceptance pending); `ereaderSettings` and `lastLibraryId` preserved but not applied (the legacy app language is applied since 28cde313); listening history and logs not exported |
 | #53 migrate downloads and reading locations | Done for audio and PDF (emulator) | MigrationJourney c, d, f | EPUB and other locations preserved, applied when #45/#47/#48 exist; a file damaged after commit is fetched from the server, not the archive; legacy downloads in user-chosen (SAF) folders not exercised on a device |
 | #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization partial**: all UI text and core error messages are in resources (577 strings and plurals) in 33 languages besides English: legacy translations where they match, the rest machine-drafted and not reviewed by native speakers; right-to-left checked in Arabic (LocalizationJourney); native review open (see Localization); TalkBack by a person; owner signing key; install on the owner's phone |
 | #45, #47, #48 | Deferred (after #65) | | Files and locations are preserved by migration |
@@ -58,7 +61,7 @@ Previous source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full 
 - RED: `CastMediaTest` failed 2 of 3 against a stub that returned the phone URL. `CastJourney` failed because the player had no cast button.
 - **Pending, physical only:** a real receiver journey, covering discovery, connecting, play/pause/seek/speed on the receiver, receiver loss, and progress reaching the server while casting.
 
-## Localization (#54, partial) in 9756f68e, drafts and core errors on `fork/android-l10n-coverage`
+## Historical localization snapshot (#54, partial) in 9756f68e, drafts and core errors on `fork/android-l10n-coverage`
 
 - `app/src/main/strings/strings.tsv` lists every UI string. Each row names the legacy key in `/strings` whose meaning matches, or `-`. `scripts/import-legacy-strings.py` writes `res/values*/strings.xml` and `res/xml/locales_config.xml` from it. No translation service is involved.
 - 577 strings and plurals (a plural counts once): navigation, library, filters and sort, item, player and its tools, cast sheet, search, sign-in and accounts, settings, downloads, PDF reader, podcasts, collections and playlists, migration, Android Auto browsing, accessibility descriptions and the core error messages.
@@ -333,8 +336,9 @@ The import works in these stages:
 - downloads are fetched again;
 - anything the upstream app never sent to the server stays in that app. Open it online once first so it sends what it holds.
 
+**Player preferences:** `playerSettings` is now applied once: chapter/total timeline choices, elapsed-time scaling and player UI lock. A separate persisted marker also completes this step for older committed imports on matching account attachment without replaying previously applied device/display preferences. See current readiness for evidence limits.
+
 **Exported but not applied:**
-- `playerSettings`.
 - `lastLibraryId`: the preview picks the library per account at sign-in.
 - EPUB and other non-page locations.
 - Reader settings.

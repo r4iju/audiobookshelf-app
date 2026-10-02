@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Ім\'я користувача або пароль не прийнято.</string>
     <string name="err_publications_unreadable">Не вдалося прочитати записи про збереження прогресу без відповіді. Спершу розв\'яжіть їх у розділі «Діагностика».</string>
     <string name="err_discards_unreadable">Не вдалося прочитати збережені скидання прогресу. Спершу розв\'яжіть їх у розділі «Діагностика».</string>
+    <string name="pl_total_track">Загальний прогрес</string>
+    <string name="pl_chapter_track">Прогрес глави</string>
+    <string name="pl_scale_elapsed">Час відповідно швидкості</string>
+    <string name="pl_lock">Заблокувати програвач</string>
+    <string name="pl_unlock">Розблокувати програвач</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d хвилина прослуховування</item>
         <item quantity="few">%1$d хвилини прослуховування</item>

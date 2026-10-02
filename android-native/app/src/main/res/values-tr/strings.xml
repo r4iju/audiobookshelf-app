@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Kullanıcı adı veya şifre kabul edilmedi.</string>
     <string name="err_publications_unreadable">Yanıt alınamayan ilerleme yazma işlemlerinin kayıtları okunamadı. Önce bunları Tanılama\'da çözün.</string>
     <string name="err_discards_unreadable">Kaydedilmiş ilerleme sıfırlamaları okunamadı. Önce bunları Tanılama\'da çözün.</string>
+    <string name="pl_total_track">Toplam Parça</string>
+    <string name="pl_chapter_track">Bölüm Parçası</string>
+    <string name="pl_scale_elapsed">Geçen Süreyi Hıza Göre Ölçekle</string>
+    <string name="pl_lock">Oynatıcıyı Kilitle</string>
+    <string name="pl_unlock">Oynatıcının Kilidini Aç</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d dakika dinlendi</item>
         <item quantity="other">%1$d dakika dinlendi</item>

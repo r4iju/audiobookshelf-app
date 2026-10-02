@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Le nom d’utilisateur ou le mot de passe n’a pas été accepté.</string>
     <string name="err_publications_unreadable">Les enregistrements de progression restés sans réponse n’ont pas pu être lus. Résolvez-les d’abord dans Diagnostics.</string>
     <string name="err_discards_unreadable">Les suppressions de progression enregistrées n’ont pas pu être lues. Résolvez-les d’abord dans Diagnostics.</string>
+    <string name="pl_total_track">Pistes totale</string>
+    <string name="pl_chapter_track">Piste des chapitres</string>
+    <string name="pl_scale_elapsed">Traduire le temps restant en fonction de la vitesse de lecture</string>
+    <string name="pl_lock">Verrouiller le lecteur</string>
+    <string name="pl_unlock">Déverrouiller le lecteur</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minute d’écoute</item>
         <item quantity="many">%1$d minutes d’écoute</item>

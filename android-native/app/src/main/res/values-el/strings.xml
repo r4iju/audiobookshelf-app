@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Το όνομα χρήστη ή ο κωδικός πρόσβασης δεν έγινε δεκτός.</string>
     <string name="err_publications_unreadable">Δεν ήταν δυνατή η ανάγνωση των εγγραφών αναπάντητων αποθηκεύσεων προόδου. Επιλύστε τες πρώτα στα Διαγνωστικά.</string>
     <string name="err_discards_unreadable">Δεν ήταν δυνατή η ανάγνωση των αποθηκευμένων απορρίψεων προόδου. Επιλύστε τες πρώτα στα Διαγνωστικά.</string>
+    <string name="pl_total_track">Total track</string>
+    <string name="pl_chapter_track">Κομμάτι Κεφαλαίου</string>
+    <string name="pl_scale_elapsed">Scale elapsed time by speed</string>
+    <string name="pl_lock">Κλείδωμα Αναπαραγωγής</string>
+    <string name="pl_unlock">Unlock player</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d λεπτό ακρόασης</item>
         <item quantity="other">%1$d λεπτά ακρόασης</item>

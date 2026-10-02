@@ -561,6 +561,11 @@
     <string name="err_login_rejected">No se aceptó el nombre de usuario o la contraseña.</string>
     <string name="err_publications_unreadable">No se pudieron leer los registros de escrituras de progreso sin respuesta. Resuélvalos primero en Diagnóstico.</string>
     <string name="err_discards_unreadable">No se pudieron leer los descartes de progreso guardados. Resuélvalos primero en Diagnóstico.</string>
+    <string name="pl_total_track">Pista Total</string>
+    <string name="pl_chapter_track">Seguimiento de Capítulo</string>
+    <string name="pl_scale_elapsed">Escala el tiempo transcurrido según la velocidad</string>
+    <string name="pl_lock">Bloquear reproductor</string>
+    <string name="pl_unlock">Desbloquear reproductor</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minuto escuchado</item>
         <item quantity="many">%1$d minutos escuchados</item>

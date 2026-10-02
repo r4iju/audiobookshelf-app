@@ -561,6 +561,11 @@
     <string name="err_login_rejected">لم يُقبَل اسم المستخدم أو كلمة المرور.</string>
     <string name="err_publications_unreadable">تعذّرت قراءة سجلات عمليات كتابة التقدم التي لم يصلها رد. عالجها في التشخيص أولًا.</string>
     <string name="err_discards_unreadable">تعذّرت قراءة عمليات إلغاء التقدم المحفوظة. عالجها في التشخيص أولًا.</string>
+    <string name="pl_total_track">إجمالي المسارات</string>
+    <string name="pl_chapter_track">مسار الفصل</string>
+    <string name="pl_scale_elapsed">تعديل الوقت المنصرم حسب السرعة</string>
+    <string name="pl_lock">قفل المشغل</string>
+    <string name="pl_unlock">تفعيل المشغل</string>
     <plurals name="set_minutes_listened">
         <item quantity="zero">%1$d دقيقة استماع</item>
         <item quantity="one">%1$d دقيقة استماع</item>

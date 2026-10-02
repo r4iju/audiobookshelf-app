@@ -561,6 +561,11 @@
     <string name="err_login_rejected">ব্যবহারকারীর নাম বা পাসওয়ার্ড গ্রহণ করা হয়নি।</string>
     <string name="err_publications_unreadable">উত্তর না পাওয়া অগ্রগতি লেখার রেকর্ড পড়া যায়নি। আগে ডায়াগনস্টিকসে সেগুলোর সমাধান করুন।</string>
     <string name="err_discards_unreadable">সংরক্ষিত অগ্রগতি বাতিলের তথ্য পড়া যায়নি। আগে ডায়াগনস্টিকসে সেগুলোর সমাধান করুন।</string>
+    <string name="pl_total_track">মোট ট্র্যাক</string>
+    <string name="pl_chapter_track">অধ্যায় ট্র্যাক</string>
+    <string name="pl_scale_elapsed">অতিবাহিত সময় গতি দ্বারা স্কেল করুন</string>
+    <string name="pl_lock">প্লেয়ার লক করুন</string>
+    <string name="pl_unlock">প্লেয়ার আনলক করুন</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d মিনিট শোনা হয়েছে</item>
         <item quantity="other">%1$d মিনিট শোনা হয়েছে</item>

@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Användarnamnet eller lösenordet godtogs inte.</string>
     <string name="err_publications_unreadable">Poster om obesvarade sparningar av förlopp kunde inte läsas. Lös dem i Diagnostik först.</string>
     <string name="err_discards_unreadable">Sparade rensningar av förlopp kunde inte läsas. Lös dem i Diagnostik först.</string>
+    <string name="pl_total_track">Totalt antal spår</string>
+    <string name="pl_chapter_track">Kapitelspår</string>
+    <string name="pl_scale_elapsed">Justera den visade uppspelningstiden efter uppspelningshastigheten.</string>
+    <string name="pl_lock">Lås spelaren</string>
+    <string name="pl_unlock">Lås upp spelare</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minut lyssnad</item>
         <item quantity="other">%1$d minuter lyssnade</item>

@@ -46,6 +46,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.floatOrNull
+import kotlinx.serialization.json.booleanOrNull
 import java.io.File
 import java.util.UUID
 
@@ -209,7 +210,7 @@ class Migration(
     }
 
     private suspend fun attachNow(client: ApiClient) {
-        val outcome = import.outcome() ?: return
+        val outcome = import.outcome()?.let(::applySettings) ?: return
         val account = client.account
         val issues = mutableListOf<Issue>()
         val titles = outcome.titles.map { title ->
@@ -266,10 +267,28 @@ class Migration(
 
     /** The previous app's device settings and display preferences, applied once. */
     private fun applySettings(outcome: Outcome): Outcome {
-        if (outcome.settingsApplied) return outcome
-        settings.update { current -> legacySettings(current, outcome) }
-        outcome.preferences["lang"]?.let(::legacyLanguage)
-        return outcome.copy(settingsApplied = true).also(import::save)
+        if (outcome.settingsApplied && outcome.playerSettingsApplied) return outcome
+        settings.update { current ->
+            val migrated = if (outcome.settingsApplied) current else legacySettings(current, outcome)
+            if (outcome.playerSettingsApplied) migrated else legacyPlayerSettings(migrated, outcome)
+        }
+        if (!outcome.settingsApplied) outcome.preferences["lang"]?.let(::legacyLanguage)
+        return outcome.copy(settingsApplied = true, playerSettingsApplied = true).also(import::save)
+    }
+
+    private fun legacyPlayerSettings(current: DeviceSettings, outcome: Outcome): DeviceSettings {
+        val player = outcome.preferences["playerSettings"]?.let { text ->
+            runCatching { AbsJson.parseToJsonElement(text).jsonObject }.getOrNull()
+        } ?: return current
+        fun value(name: String, fallback: Boolean) = runCatching { player[name]?.jsonPrimitive?.booleanOrNull }.getOrNull() ?: fallback
+        val chapter = value("useChapterTrack", current.useChapterTrack)
+        val total = value("useTotalTrack", current.useTotalTrack)
+        return current.copy(
+            useChapterTrack = chapter,
+            useTotalTrack = total || !chapter,
+            scaleElapsedTimeBySpeed = value("scaleElapsedTimeBySpeed", current.scaleElapsedTimeBySpeed),
+            lockUi = value("lockUi", current.lockUi),
+        )
     }
 
     /** The language picked in the legacy app, when this app offers it and the person has not chosen one here. */
