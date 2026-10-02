@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { ConnectScreen } from "@/components/connect/connect-screen";
+import { initialLanguage } from "@/i18n/server";
 
-export const metadata: Metadata = { title: "Connect" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { strings } = await initialLanguage();
+  return { title: strings.ButtonConnectToServer };
+}
 
 export default async function ConnectPage({
   searchParams,

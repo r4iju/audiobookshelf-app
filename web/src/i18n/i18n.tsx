@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, type ReactNode, use, useEffect, useMemo, useState } from "react";
+import { LANGUAGE_COOKIE } from "./language-cookie";
 import { type LanguageCode, localeTag, rtlLanguages } from "./languages";
 import { loaders } from "./loaders";
 import enUs from "./strings/en-us.json";
@@ -55,8 +56,18 @@ export function formatUnit(locale: string, value: number, unit: string) {
   return new Intl.NumberFormat(locale, { style: "unit", unit, unitDisplay: "short" }).format(value);
 }
 
-export function I18nProvider({ code, children }: { code: LanguageCode; children: ReactNode }) {
-  const [loaded, setLoaded] = useState<{ code: LanguageCode; strings: Record<string, string> } | null>(null);
+export function I18nProvider({
+  code,
+  children,
+  initialLanguage,
+}: {
+  code: LanguageCode;
+  children: ReactNode;
+  initialLanguage: { code: LanguageCode; strings: Record<string, string> };
+}) {
+  const [loaded, setLoaded] = useState<{ code: LanguageCode; strings: Record<string, string> } | null>(
+    initialLanguage,
+  );
 
   // External system: the translation bundle for the chosen language is code-split and fetched on demand.
   useEffect(() => {
@@ -74,6 +85,10 @@ export function I18nProvider({ code, children }: { code: LanguageCode; children:
   useEffect(() => {
     document.documentElement.lang = localeTag(code);
     document.documentElement.dir = rtlLanguages.has(code) ? "rtl" : "ltr";
+    // Only the presentation language is mirrored, scoped to this client rather than the neighboring server UI.
+    const path = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/`;
+    // biome-ignore lint/suspicious/noDocumentCookie: Safari versions supported by this client lack Cookie Store API.
+    document.cookie = `${LANGUAGE_COOKIE}=${code}; Path=${path}; Max-Age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
   }, [code]);
 
   const value = useMemo<I18n>(() => {

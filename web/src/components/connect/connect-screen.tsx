@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Server, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useState } from "react";
+import { useHeadingTitle } from "@/components/app/page-title";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
 import { Alert } from "@/components/ui/status";
@@ -76,6 +77,7 @@ export function ConnectScreen({
   configuredServer?: string;
 }) {
   const { t } = useI18n();
+  useHeadingTitle();
   const router = useRouter();
   const queryClient = useQueryClient();
   const signIn = useSessionStore((state) => state.signIn);

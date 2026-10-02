@@ -15,6 +15,6 @@ export function errorMessage(t: Translate, error: unknown) {
     case "http":
       return error.detail ?? t("WebErrorServer", error.status ?? "?");
     case "invalid-response":
-      return error.message;
+      return t("WebErrorGeneric");
   }
 }

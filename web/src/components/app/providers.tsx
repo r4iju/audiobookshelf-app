@@ -3,7 +3,7 @@
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useEffect, useState } from "react";
 import { I18nProvider } from "@/i18n/i18n";
-import { isLanguageCode } from "@/i18n/languages";
+import { isLanguageCode, type LanguageCode } from "@/i18n/languages";
 import { AbsError } from "@/lib/abs/client";
 import { useSession, useSessionStore } from "@/lib/session/store";
 import { SETTINGS_STORAGE_KEY, useSettingsStore } from "@/lib/settings/store";
@@ -27,9 +27,16 @@ function makeQueryClient() {
   });
 }
 
-export function AppProviders({ children }: { children: ReactNode }) {
+export function AppProviders({
+  children,
+  initialLanguage,
+}: {
+  children: ReactNode;
+  initialLanguage: { code: LanguageCode; strings: Record<string, string> };
+}) {
   const [queryClient] = useState(makeQueryClient);
   const settings = useSettingsStore((state) => state.settings);
+  const hydrated = useSettingsStore((state) => state.hydrated);
   const session = useSession();
 
   // External system: localStorage holds settings and saved servers; other tabs change them too.
@@ -58,11 +65,15 @@ export function AppProviders({ children }: { children: ReactNode }) {
   }, [settings.theme, settings.reduceMotion]);
 
   const serverLanguage = session.phase === "signed-in" ? session.connection.serverLanguage : undefined;
-  const language = settings.language ?? (isLanguageCode(serverLanguage) ? serverLanguage : "en-us");
+  const language = hydrated
+    ? (settings.language ?? (isLanguageCode(serverLanguage) ? serverLanguage : "en-us"))
+    : initialLanguage.code;
 
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nProvider code={language}>{children}</I18nProvider>
+      <I18nProvider code={language} initialLanguage={initialLanguage}>
+        {children}
+      </I18nProvider>
     </QueryClientProvider>
   );
 }

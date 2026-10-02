@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useHeadingTitle } from "@/components/app/page-title";
 import { buttonClass } from "@/components/ui/button";
 import { Alert, Spinner } from "@/components/ui/status";
 import { type Translate, useI18n } from "@/i18n/i18n";
@@ -55,6 +56,7 @@ function reason(t: Translate, failure: Failure) {
 
 export function OpenIdReturn() {
   const { t } = useI18n();
+  useHeadingTitle();
   const router = useRouter();
   const queryClient = useQueryClient();
   const signIn = useSessionStore((state) => state.signIn);
@@ -84,6 +86,7 @@ export function OpenIdReturn() {
       id="main"
       className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-4 px-5 py-10"
     >
+      <h1 className="text-2xl font-bold">{t("WebSignInWithOpenId")}</h1>
       {failed ? (
         <>
           <Alert>{t("WebOpenIdFailed", reason(t, failed.failure))}</Alert>
