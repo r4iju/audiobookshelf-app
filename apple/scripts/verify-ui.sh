@@ -5,7 +5,16 @@ repo_root="$(cd "$apple_root/.." && pwd)"
 fixture_dir="$(mktemp -d)"
 fixture_pids=()
 fixture_count=0
+# ABS_QA_SIMULATOR takes a UDID or a device name; without it the run leases a pooled iPhone.
+simulator="${ABS_QA_SIMULATOR:-}"
+leased_simulator=""
+if [[ -z "$simulator" ]]; then
+    simulator="$(sim acquire iphone --no-boot --for "audiobookshelf apple verify-ui")"
+    leased_simulator="$simulator"
+fi
+if [[ "$simulator" =~ ^[0-9A-F-]{36}$ ]]; then destination="id=$simulator"; else destination="platform=iOS Simulator,name=$simulator"; fi
 cleanup() {
+    if [[ -n "$leased_simulator" ]]; then sim release "$leased_simulator" || true; fi
     if (( fixture_count > 0 )); then
     for fixture_pid in "${fixture_pids[@]}"; do kill "$fixture_pid" 2>/dev/null || true; done
     for fixture_pid in "${fixture_pids[@]}"; do wait "$fixture_pid" 2>/dev/null || true; done
@@ -61,6 +70,6 @@ for fixture_pid in "${fixture_pids[@]}"; do
 done
 xcodegen generate --spec "$apple_root/project.yml"
 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative \
-    -destination "platform=iOS Simulator,name=${ABS_QA_SIMULATOR:-Audiobookshelf Native QA}" \
+    -destination "$destination" \
     -derivedDataPath "$apple_root/build" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
     IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never "$@" test
