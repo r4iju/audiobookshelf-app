@@ -1,4 +1,4 @@
-// A loopback mail sink for the QA server's "send ebook to device" (which reaches it as host.docker.internal), so
+// A loopback mail sink for the QA server's "send ebook to device" (which reaches it on its own loopback), so
 // sending is exercised without any real mail. Each accepted message is written to qa/.runtime/mail; recipients at
 // bounce.invalid are refused, which is how a failed delivery is exercised.
 //   node qa/mail.mjs

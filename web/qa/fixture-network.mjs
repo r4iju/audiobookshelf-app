@@ -24,14 +24,14 @@ const http = (path) => `GET ${path} HTTP/1.1\r\nHost: ${host}\r\nConnection: clo
 const fixtures = [
   { name: "oidc", port: ports.oidc, send: http("/.well-known/openid-configuration"), expect: "HTTP/1.1 200" },
   { name: "feed", port: ports.feed, send: http("/feed.xml"), expect: "HTTP/1.1 200" },
-  { name: "mail", port: ports.mail, send: null, expect: "220" },
+  { name: "mail", host: "127.0.0.1", port: ports.mail, send: null, expect: "220" },
 ];
 
-function attempt({ port, send, expect }) {
+function attempt({ host: address = host, port, send, expect }) {
   const started = performance.now();
   return new Promise((resolve) => {
     let received = "";
-    const socket = connect({ host, port });
+    const socket = connect({ host: address, port });
     const finish = (error) => {
       socket.destroy();
       resolve({ ms: performance.now() - started, error });
@@ -74,7 +74,7 @@ async function probe(seconds) {
       kinds[kind] = (kinds[kind] ?? 0) + 1;
     }
     console.log(
-      `${name} ${host}:${ports[name]} attempts ${runs.length} median ${Math.round(sorted[sorted.length >> 1] ?? 0)} ms` +
+      `${name} ${fixtures.find((fixture) => fixture.name === name)?.host ?? host}:${ports[name]} attempts ${runs.length} median ${Math.round(sorted[sorted.length >> 1] ?? 0)} ms` +
         ` max ${Math.round(sorted.at(-1) ?? 0)} ms failed ${bad.length} ${JSON.stringify(kinds)}`,
     );
   }

@@ -70,9 +70,11 @@ test("an ebook is sent to an e-reader the account may use, and a failed delivery
   page,
 }) => {
   const admin = await serverApi(accounts.admin);
+  // The sink shares the server's loopback. Not by the fixtures' name: the server's mailer looks names up in DNS, which
+  // answers with the VM's host gateway, the route qa/server.mjs keeps fixture traffic off because it drops connections.
   await admin.call("/api/emails/settings", {
     method: "PATCH",
-    body: { host: "host.docker.internal", port: 19886, secure: false, fromAddress: "abs-qa@example.invalid" },
+    body: { host: "127.0.0.1", port: 19886, secure: false, fromAddress: "abs-qa@example.invalid" },
   });
   await admin.call("/api/emails/ereader-devices", {
     method: "POST",

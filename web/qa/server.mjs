@@ -161,6 +161,7 @@ async function up({ fresh }) {
       "-e",
       "RATE_LIMIT_AUTH_MAX=0",
       // The server reaches its fixtures by the name they publish (host.docker.internal), resolved to its own loopback.
+      // Its mailer queries DNS instead of this hosts entry, so the mail settings name the loopback address itself.
       // Through the host gateway, the VM's user-mode network drops connection attempts whenever ten of its outbound
       // connections from any container are still being set up, which stalled journeys for 10-68 s
       // (node qa/fixture-network.mjs). Only this name is exempt from the server's SSRF filter.
