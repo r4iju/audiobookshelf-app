@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Brukernavnet eller passordet ble ikke godtatt.</string>
     <string name="err_publications_unreadable">Oppføringer om ubesvarte lagringer av fremdrift kunne ikke leses. Løs dem i Diagnostikk først.</string>
     <string name="err_discards_unreadable">Lagrede forkastinger av fremdrift kunne ikke leses. Løs dem i Diagnostikk først.</string>
+    <string name="pl_total_track">Totalt antall spor</string>
+    <string name="pl_chapter_track">Kapittelspor</string>
+    <string name="pl_scale_elapsed">Skaler forløpt tid etter hastighet</string>
+    <string name="pl_lock">Lås avspiller</string>
+    <string name="pl_unlock">Lås opp avspiller</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minutt lyttet</item>
         <item quantity="other">%1$d minutter lyttet</item>

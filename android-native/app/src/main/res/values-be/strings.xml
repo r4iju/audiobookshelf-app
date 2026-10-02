@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Імя карыстальніка або пароль не прыняты.</string>
     <string name="err_publications_unreadable">Не ўдалося прачытаць запісы пра захаванні прагрэсу без адказу. Спачатку вырашыце іх у раздзеле «Дыягностыка».</string>
     <string name="err_discards_unreadable">Не ўдалося прачытаць захаваныя скіды прагрэсу. Спачатку вырашыце іх у раздзеле «Дыягностыка».</string>
+    <string name="pl_total_track">Усяго трэкаў</string>
+    <string name="pl_chapter_track">Трэк раздзела</string>
+    <string name="pl_scale_elapsed">Маштабаваць мінулы час па хуткасці</string>
+    <string name="pl_lock">Заблакіраваць прайгравальнік</string>
+    <string name="pl_unlock">Разблакіраваць прайгравальнік</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d хвіліна праслухоўвання</item>
         <item quantity="few">%1$d хвіліны праслухоўвання</item>

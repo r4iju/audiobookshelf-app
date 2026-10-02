@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Používateľské meno alebo heslo nebolo prijaté.</string>
     <string name="err_publications_unreadable">Záznamy o nepotvrdených zápisoch priebehu sa nepodarilo prečítať. Najprv ich vyriešte v Diagnostike.</string>
     <string name="err_discards_unreadable">Uložené zahodenia priebehu sa nepodarilo prečítať. Najprv ich vyriešte v Diagnostike.</string>
+    <string name="pl_total_track">Celková stopa</string>
+    <string name="pl_chapter_track">Zvuková stopa kapitoly</string>
+    <string name="pl_scale_elapsed">Zmeniť ubehnutý čas podľa rýchlosti</string>
+    <string name="pl_lock">Uzamknúť prehrávač</string>
+    <string name="pl_unlock">Odomknúť prehrávač</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d vypočutá minúta</item>
         <item quantity="few">%1$d vypočuté minúty</item>

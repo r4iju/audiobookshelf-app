@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Tên người dùng hoặc mật khẩu không được chấp nhận.</string>
     <string name="err_publications_unreadable">Không đọc được bản ghi các lần ghi tiến độ chưa có phản hồi. Hãy xử lý chúng trong Chẩn đoán trước.</string>
     <string name="err_discards_unreadable">Không đọc được các lệnh hủy tiến độ đã lưu. Hãy xử lý chúng trong Chẩn đoán trước.</string>
+    <string name="pl_total_track">Tổng Số Đường Dẫn</string>
+    <string name="pl_chapter_track">Theo Dõi Chương</string>
+    <string name="pl_scale_elapsed">Tỷ Lệ Thời Gian Đã Trôi Theo Tốc Độ</string>
+    <string name="pl_lock">Khóa Trình Phát</string>
+    <string name="pl_unlock">Mở Khóa Trình Phát</string>
     <plurals name="set_minutes_listened">
         <item quantity="other">Đã nghe %1$d phút</item>
     </plurals>

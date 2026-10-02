@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Benutzername oder Passwort wurden nicht akzeptiert.</string>
     <string name="err_publications_unreadable">Aufzeichnungen unbeantworteter Fortschrittsänderungen konnten nicht gelesen werden. Klär sie zuerst unter Diagnose.</string>
     <string name="err_discards_unreadable">Gespeicherte verworfene Fortschritte konnten nicht gelesen werden. Klär sie zuerst unter Diagnose.</string>
+    <string name="pl_total_track">Gesamtanzahl Titel</string>
+    <string name="pl_chapter_track">Kapitelspur</string>
+    <string name="pl_scale_elapsed">Vergangene Zeit anhand der Geschwindigkeit skalieren</string>
+    <string name="pl_lock">Mediaplayer sperren</string>
+    <string name="pl_unlock">Mediaplayer entsperren</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d Minute gehört</item>
         <item quantity="other">%1$d Minuten gehört</item>

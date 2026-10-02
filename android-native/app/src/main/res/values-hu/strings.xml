@@ -561,6 +561,11 @@
     <string name="err_login_rejected">A felhasználónevet vagy a jelszót nem fogadta el a szerver.</string>
     <string name="err_publications_unreadable">A megválaszolatlan haladásmentések nyilvántartása nem olvasható. Előbb oldja meg a Diagnosztikában.</string>
     <string name="err_discards_unreadable">A mentett haladás-elvetések nem olvashatók. Előbb oldja meg őket a Diagnosztikában.</string>
+    <string name="pl_total_track">Összes szám</string>
+    <string name="pl_chapter_track">Fejezet sáv</string>
+    <string name="pl_scale_elapsed">Eltelt idő skálázása sebesség szerint</string>
+    <string name="pl_lock">Lejátszó zárolása</string>
+    <string name="pl_unlock">Lejátszó feloldása</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d perc hallgatás</item>
         <item quantity="other">%1$d perc hallgatás</item>

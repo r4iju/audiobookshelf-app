@@ -561,6 +561,11 @@
     <string name="err_login_rejected">ユーザー名またはパスワードが受け付けられませんでした。</string>
     <string name="err_publications_unreadable">応答のない進捗書き込みの記録を読み込めませんでした。先に「診断」で解決してください。</string>
     <string name="err_discards_unreadable">保存された進捗の破棄を読み込めませんでした。先に「診断」で解決してください。</string>
+    <string name="pl_total_track">Total track</string>
+    <string name="pl_chapter_track">チャプタートラック</string>
+    <string name="pl_scale_elapsed">Scale elapsed time by speed</string>
+    <string name="pl_lock">プレイヤーのロック</string>
+    <string name="pl_unlock">Unlock player</string>
     <plurals name="set_minutes_listened">
         <item quantity="other">%1$d分聴取</item>
     </plurals>

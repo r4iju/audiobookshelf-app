@@ -61,6 +61,7 @@ import java.security.MessageDigest
     val deviceSettings: JsonObject?,
     val issues: List<Issue>,
     val settingsApplied: Boolean = false,
+    val playerSettingsApplied: Boolean = false,
 )
 
 data class PlannedAccount(val identity: AccountIdentity, val name: String, val username: String, val signedIn: Boolean)

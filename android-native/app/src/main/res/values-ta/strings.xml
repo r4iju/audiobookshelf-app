@@ -561,6 +561,11 @@
     <string name="err_login_rejected">பயனர் பெயர் அல்லது கடவுச்சொல் ஏற்கப்படவில்லை.</string>
     <string name="err_publications_unreadable">பதில் கிடைக்காத முன்னேற்ற எழுதல்களின் பதிவுகளைப் படிக்க முடியவில்லை. முதலில் கண்டறிதலில் அவற்றைத் தீர்க்கவும்.</string>
     <string name="err_discards_unreadable">சேமிக்கப்பட்ட முன்னேற்ற நிராகரிப்புகளைப் படிக்க முடியவில்லை. முதலில் கண்டறிதலில் அவற்றைத் தீர்க்கவும்.</string>
+    <string name="pl_total_track">மொத்த ட்ராக்</string>
+    <string name="pl_chapter_track">அத்தியாயம் ட்ராக்</string>
+    <string name="pl_scale_elapsed">வேகத்தின் மூலம் கடந்த நேரத்தை அளவிடவும்</string>
+    <string name="pl_lock">லாக் பிளேயர்</string>
+    <string name="pl_unlock">பிளேயரைத் திறக்கவும்</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d நிமிடம் கேட்கப்பட்டது</item>
         <item quantity="other">%1$d நிமிடங்கள் கேட்கப்பட்டன</item>

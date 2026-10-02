@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Nazwa użytkownika lub hasło nie zostały zaakceptowane.</string>
     <string name="err_publications_unreadable">Nie udało się odczytać rejestru zapisów postępu bez odpowiedzi. Najpierw rozwiąż je w Diagnostyce.</string>
     <string name="err_discards_unreadable">Nie udało się odczytać zapisanych resetów postępu. Najpierw rozwiąż je w Diagnostyce.</string>
+    <string name="pl_total_track">Postęp całkowity</string>
+    <string name="pl_chapter_track">Postęp rozdziału</string>
+    <string name="pl_scale_elapsed">Skaluj czas, który upłynął według prędkości</string>
+    <string name="pl_lock">Zablokuj odtwarzacz</string>
+    <string name="pl_unlock">Odblokuj odtwarzacz</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minuta słuchania</item>
         <item quantity="few">%1$d minuty słuchania</item>

@@ -596,3 +596,8 @@ err_no_audio	-	This item has no playable audio.
 err_login_rejected	-	The username or password was not accepted.
 err_publications_unreadable	-	Records of unanswered progress writes could not be read. Resolve them in Diagnostics first.
 err_discards_unreadable	-	Saved progress discards could not be read. Resolve them in Diagnostics first.
+pl_total_track	LabelTotalTrack	Total track
+pl_chapter_track	LabelChapterTrack	Chapter track
+pl_scale_elapsed	LabelScaleElapsedTimeBySpeed	Scale elapsed time by speed
+pl_lock	LabelLockPlayer	Lock player
+pl_unlock	LabelUnlockPlayer	Unlock player

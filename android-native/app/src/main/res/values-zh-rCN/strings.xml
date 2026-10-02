@@ -561,6 +561,11 @@
     <string name="err_login_rejected">用户名或密码未被接受。</string>
     <string name="err_publications_unreadable">无法读取未获响应的进度写入记录。请先在“诊断”中解决。</string>
     <string name="err_discards_unreadable">无法读取已保存的进度放弃记录。请先在“诊断”中解决。</string>
+    <string name="pl_total_track">音轨总数</string>
+    <string name="pl_chapter_track">章节音轨</string>
+    <string name="pl_scale_elapsed">按速度缩放播放时间</string>
+    <string name="pl_lock">锁定播放器</string>
+    <string name="pl_unlock">解锁播放器</string>
     <plurals name="set_minutes_listened">
         <item quantity="other">已收听 %1$d 分钟</item>
     </plurals>

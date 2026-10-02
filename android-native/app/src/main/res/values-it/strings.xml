@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Nome utente o password non accettati.</string>
     <string name="err_publications_unreadable">Impossibile leggere i registri dei salvataggi dei progressi senza risposta. Risolvili prima in Diagnostica.</string>
     <string name="err_discards_unreadable">Impossibile leggere le eliminazioni dei progressi salvate. Risolvile prima in Diagnostica.</string>
+    <string name="pl_total_track">Traccia totale</string>
+    <string name="pl_chapter_track">Traccia capitolo</string>
+    <string name="pl_scale_elapsed">Scala il tempo trascorso in base alla velocità</string>
+    <string name="pl_lock">Blocca Player</string>
+    <string name="pl_unlock">Sblocca il player</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minuto ascoltato</item>
         <item quantity="many">%1$d minuti ascoltati</item>

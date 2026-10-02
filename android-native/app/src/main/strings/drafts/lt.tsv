@@ -1,0 +1,4 @@
+# Existing machine-drafted Apple translations, not reviewed by a native speaker.
+# Exact matching source text in apple/Localization/translations/lt.json.
+err_no_audio	Šiame elemente nėra grojamo garso.
+err_login_rejected	Vartotojo vardas arba slaptažodis nepriimtas.

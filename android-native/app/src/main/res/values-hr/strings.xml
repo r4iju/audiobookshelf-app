@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Korisničko ime ili zaporka nisu prihvaćeni.</string>
     <string name="err_publications_unreadable">Zapise o neodgovorenim spremanjima napretka nije bilo moguće pročitati. Najprije ih riješite u Dijagnostici.</string>
     <string name="err_discards_unreadable">Spremljena odbacivanja napretka nije bilo moguće pročitati. Najprije ih riješite u Dijagnostici.</string>
+    <string name="pl_total_track">Ukupno zapisa</string>
+    <string name="pl_chapter_track">Zapis poglavlja</string>
+    <string name="pl_scale_elapsed">Prilagodi preostalo vrijeme brzini izvođenja</string>
+    <string name="pl_lock">Zaključaj upravljanje</string>
+    <string name="pl_unlock">Otključaj izvođač</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minuta slušanja</item>
         <item quantity="few">%1$d minute slušanja</item>

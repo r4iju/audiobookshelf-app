@@ -561,6 +561,11 @@
     <string name="err_login_rejected">O nome de usuário ou a senha não foi aceito.</string>
     <string name="err_publications_unreadable">Não foi possível ler os registros de salvamentos de progresso sem resposta. Resolva-os primeiro em Diagnóstico.</string>
     <string name="err_discards_unreadable">Não foi possível ler os descartes de progresso salvos. Resolva-os primeiro em Diagnóstico.</string>
+    <string name="pl_total_track">Total da Trilha</string>
+    <string name="pl_chapter_track">Trilha do Capítulo</string>
+    <string name="pl_scale_elapsed">Proporcionalizar Tempo Decorrido com a Velocidade</string>
+    <string name="pl_lock">Travar Reprodutor</string>
+    <string name="pl_unlock">Destravar Reprodutor</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minuto ouvido</item>
         <item quantity="many">%1$d minutos ouvidos</item>

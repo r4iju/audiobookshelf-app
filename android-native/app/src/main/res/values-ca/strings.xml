@@ -561,6 +561,11 @@
     <string name="err_login_rejected">No s\'ha acceptat el nom d\'usuari o la contrasenya.</string>
     <string name="err_publications_unreadable">No s\'han pogut llegir els registres de desaments de progrés sense resposta. Resoleu-los primer a Diagnòstic.</string>
     <string name="err_discards_unreadable">No s\'han pogut llegir els descarts de progrés desats. Resoleu-los primer a Diagnòstic.</string>
+    <string name="pl_total_track">Total track</string>
+    <string name="pl_chapter_track">Seguiment de capítol</string>
+    <string name="pl_scale_elapsed">Scale elapsed time by speed</string>
+    <string name="pl_lock">Bloca el reproductor</string>
+    <string name="pl_unlock">Desbloquejar reproductor</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minut escoltat</item>
         <item quantity="many">%1$d minuts escoltats</item>

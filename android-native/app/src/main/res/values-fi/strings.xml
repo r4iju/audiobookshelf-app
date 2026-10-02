@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Käyttäjätunnusta tai salasanaa ei hyväksytty.</string>
     <string name="err_publications_unreadable">Tietoja vastaamatta jääneistä edistymisen tallennuksista ei voitu lukea. Ratkaise ne ensin Diagnostiikassa.</string>
     <string name="err_discards_unreadable">Tallennettuja edistymisen hylkäyksiä ei voitu lukea. Ratkaise ne ensin Diagnostiikassa.</string>
+    <string name="pl_total_track">Raita yhteensä</string>
+    <string name="pl_chapter_track">Luvun raita</string>
+    <string name="pl_scale_elapsed">Skaalaa kulunut aika nopeuden mukaan</string>
+    <string name="pl_lock">Lukitse soitin</string>
+    <string name="pl_unlock">Avaa soittimen lukitus</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d minuutti kuunneltu</item>
         <item quantity="other">%1$d minuuttia kuunneltu</item>

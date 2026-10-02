@@ -561,6 +561,11 @@
     <string name="err_login_rejected">Потребителското име или паролата не бяха приети.</string>
     <string name="err_publications_unreadable">Записите за запазвания на прогреса без отговор не можаха да бъдат прочетени. Първо ги решете в Диагностика.</string>
     <string name="err_discards_unreadable">Запазените нулирания на прогреса не можаха да бъдат прочетени. Първо ги решете в Диагностика.</string>
+    <string name="pl_total_track">Общо тракове</string>
+    <string name="pl_chapter_track">Трак на глава</string>
+    <string name="pl_scale_elapsed">Скалируй изминалото време спрямо скоростта</string>
+    <string name="pl_lock">Заключване на плейъра</string>
+    <string name="pl_unlock">Отключи плейъра</string>
     <plurals name="set_minutes_listened">
         <item quantity="one">%1$d слушана минута</item>
         <item quantity="other">%1$d слушани минути</item>
