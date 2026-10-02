@@ -245,19 +245,23 @@ object Device {
     fun tapNotificationControl(description: String, timeoutMs: Long = 15_000) {
         device.openNotification()
         val deadline = android.os.SystemClock.uptimeMillis() + timeoutMs
-        // The media notification redraws as the position advances, which can stale a found control.
-        while (true) {
-            val control = device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.desc(description)), 1_000)
-            val clicked = control != null && runCatching { control.click() }.isSuccess
-            if (clicked) break
-            if (android.os.SystemClock.uptimeMillis() > deadline) {
-                device.executeShellCommand("screencap -p /data/local/tmp/abs-notification.png")
-                val out = java.io.ByteArrayOutputStream().also { device.dumpWindowHierarchy(it) }
-                Regex("content-desc=\"[^\"]+\"").findAll(out.toString()).forEach { android.util.Log.e("AbsJourney", it.value) }
-                throw AssertionError("Media notification control \"$description\" not found")
+        // A failed lookup closes the shade too, so it cannot cover the screens of the journeys that follow.
+        try {
+            // The media notification redraws as the position advances, which can stale a found control.
+            while (true) {
+                val control = device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.desc(description)), 1_000)
+                val clicked = control != null && runCatching { control.click() }.isSuccess
+                if (clicked) break
+                if (android.os.SystemClock.uptimeMillis() > deadline) {
+                    device.executeShellCommand("screencap -p /data/local/tmp/abs-notification.png")
+                    val out = java.io.ByteArrayOutputStream().also { device.dumpWindowHierarchy(it) }
+                    Regex("content-desc=\"[^\"]+\"").findAll(out.toString()).forEach { android.util.Log.e("AbsJourney", it.value) }
+                    throw AssertionError("Media notification control \"$description\" not found")
+                }
             }
+        } finally {
+            device.pressBack()
         }
-        device.pressBack()
     }
 
     fun mediaKey(code: Int) { device.pressKeyCode(code) }
