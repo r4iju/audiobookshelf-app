@@ -4,6 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -131,9 +134,9 @@ fun GroupsScreen(kind: String, active: SessionState.Active, catalog: CatalogMode
                         horizontalArrangement = Arrangement.spacedBy(14.dp),
                     ) {
                         val first = group.members.firstOrNull()
-                        Cover(first?.let { active.client.coverUrl(it.itemId).toString() }, group.name, Modifier.size(56.dp), podcast = first?.episodeId != null)
+                        Cover(first?.let { active.client.coverUrl(it.itemId).toString() }, group.name, Modifier.size(64.dp), podcast = first?.episodeId != null)
                         Column(Modifier.weight(1f)) {
-                            Text(group.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(group.name, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             Text(pluralStringResource(R.plurals.grp_title_count, group.members.size, group.members.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
@@ -144,6 +147,7 @@ fun GroupsScreen(kind: String, active: SessionState.Active, catalog: CatalogMode
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues, onMember: (GroupMember) -> Unit, onEdit: () -> Unit, onDeleted: () -> Unit) {
     val context = LocalContext.current
@@ -174,13 +178,13 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
     }
     val playingThis = player.queueId == loaded.id && player.now != null
     val user = catalog.user
-    LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("group-detail-${loaded.id}"), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("group-detail-${loaded.id}"), contentPadding = PaddingValues(start = ShelfSpacing.page, end = ShelfSpacing.page, top = 8.dp, bottom = ShelfSpacing.section), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(label(kind)), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 Text(loaded.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() })
                 if (loaded.description.isNotBlank()) Text(loaded.description, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
                         onClick = {
                             if (playingThis) { graph.playback.toggle(); return@Button }
@@ -203,7 +207,7 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
                             }
                         },
                         enabled = !busy && loaded.members.isNotEmpty(),
-                        modifier = Modifier.testTag("group-play"),
+                        modifier = Modifier.heightIn(min = 48.dp).testTag("group-play"),
                     ) {
                         val pause = playingThis && player.playing
                         Icon(if (pause) Icons.Filled.Pause else Icons.Filled.PlayArrow, null)
@@ -226,11 +230,11 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Cover(active.client.coverUrl(member.itemId).toString(), member.displayTitle(), Modifier.size(52.dp), podcast = member.episodeId != null)
+                Cover(active.client.coverUrl(member.itemId).toString(), member.displayTitle(), Modifier.size(64.dp), podcast = member.episodeId != null)
                 Column(Modifier.weight(1f)) {
-                    Text(member.displayTitle(), style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(member.displayTitle(), style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     val subtitle = if (member.episode != null) member.item?.title else member.item?.author
-                    subtitle?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1) }
+                    subtitle?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis) }
                     if (progress?.isFinished == true) Text(stringResource(R.string.finished), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     else if (progress != null && progress.progress > 0) ProgressLine(progress.progress, Modifier.padding(top = 4.dp))
                 }

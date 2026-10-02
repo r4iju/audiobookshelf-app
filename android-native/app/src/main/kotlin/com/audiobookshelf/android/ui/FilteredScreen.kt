@@ -30,14 +30,15 @@ import com.audiobookshelf.core.MediaProgress
 
 @Composable
 fun FilteredScreen(list: PagedItems, padding: PaddingValues, progressFor: (String) -> MediaProgress?, open: (LibraryItem) -> Unit) {
+    val coverWidth = catalogCoverWidth()
     val state = rememberLazyGridState()
     LaunchedEffect(state, list) {
         snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index to state.layoutInfo.totalItemsCount }
             .collect { (last, count) -> if (last != null && last >= count - 4) list.loadMore() }
     }
     LazyVerticalGrid(
-        GridCells.Adaptive(140.dp), Modifier.fillMaxSize().padding(padding).testTag("filtered-items"), state,
-        contentPadding = PaddingValues(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(18.dp),
+        GridCells.Adaptive(coverWidth), Modifier.fillMaxSize().padding(padding).testTag("filtered-items"), state,
+        contentPadding = PaddingValues(ShelfSpacing.page), horizontalArrangement = Arrangement.spacedBy(ShelfSpacing.gap), verticalArrangement = Arrangement.spacedBy(ShelfSpacing.section),
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             Text(if (list.loading && list.items.isEmpty()) stringResource(R.string.grp_loading) else pluralStringResource(R.plurals.grp_title_count, list.total, list.total), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)

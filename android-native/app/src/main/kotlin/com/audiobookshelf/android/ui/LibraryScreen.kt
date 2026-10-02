@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -87,7 +90,7 @@ fun LibraryTopBar(catalog: CatalogModel, actions: @Composable () -> Unit) {
         title = {
             Box {
                 TextButton(onClick = { open = true }, modifier = Modifier.testTag("library-picker")) {
-                    Text(catalog.library?.name ?: stringResource(R.string.tab_library), style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(catalog.library?.name ?: stringResource(R.string.tab_library), color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                     Icon(Icons.Outlined.ArrowDropDown, stringResource(R.string.choose_library))
                 }
                 DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
@@ -110,15 +113,17 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
     val graph = LocalContext.current.graph
     val settings by graph.settings.settings.collectAsState()
     val list = settings.listLayout
+    val coverWidth = catalogCoverWidth()
+    val continueWidth = catalogCoverWidth(prominent = true)
     val state = rememberLazyGridState()
     LoadMoreWhenNearEnd(state, catalog)
     Box(Modifier.fillMaxSize().padding(padding).testTag("library-home")) {
         LazyVerticalGrid(
-            columns = if (list) GridCells.Fixed(1) else GridCells.Adaptive(140.dp),
+            columns = if (list) GridCells.Fixed(1) else GridCells.Adaptive(coverWidth),
             state = state,
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-            verticalArrangement = Arrangement.spacedBy(if (list) 4.dp else 18.dp),
+            contentPadding = PaddingValues(start = ShelfSpacing.page, end = ShelfSpacing.page, bottom = ShelfSpacing.section),
+            horizontalArrangement = Arrangement.spacedBy(ShelfSpacing.gap),
+            verticalArrangement = Arrangement.spacedBy(if (list) 4.dp else ShelfSpacing.section),
             modifier = Modifier.fillMaxSize().testTag("catalog-grid"),
         ) {
             val error = catalog.error
@@ -132,26 +137,28 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
                 else -> {
                     catalog.shelves.forEach { shelf ->
                         item(span = { GridItemSpan(maxLineSpan) }, key = "shelf-${shelf.id}") {
-                            Column(Modifier.padding(top = 8.dp)) {
-                                Text(shelfLabel(shelf), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(vertical = 8.dp))
-                                LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.testTag("shelf-${shelf.id}")) {
+                            Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Text(shelfLabel(shelf), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+                                LazyRow(horizontalArrangement = Arrangement.spacedBy(ShelfSpacing.gap), modifier = Modifier.testTag("shelf-${shelf.id}")) {
                                     items(shelf.items(), key = { it.id + (it.recentEpisode?.id ?: "") }) { item ->
-                                        ItemCard(item, catalog.progressFor(item.id, item.recentEpisode?.id), Modifier.width(if (shelf.id == "continue-listening") 168.dp else 132.dp), tagPrefix = "shelf-item") { open(item) }
+                                        ItemCard(item, catalog.progressFor(item.id, item.recentEpisode?.id), Modifier.width(if (shelf.id == "continue-listening") continueWidth else coverWidth), tagPrefix = "shelf-item") { open(item) }
                                     }
                                 }
                             }
                         }
                     }
                     item(span = { GridItemSpan(maxLineSpan) }) {
-                        Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
                                 stringResource(R.string.lib_heading_with_total, catalog.query.filterLabel ?: if (catalog.library?.isPodcast == true) stringResource(R.string.all_podcasts) else stringResource(R.string.all_titles), catalog.total),
-                                style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() },
                             )
-                            IconButton(onClick = onFilter, modifier = Modifier.testTag("open-filter")) { Icon(Icons.Outlined.FilterList, stringResource(R.string.filter)) }
-                            IconButton(onClick = onSort, modifier = Modifier.testTag("open-sort")) { Icon(Icons.AutoMirrored.Outlined.Sort, stringResource(R.string.sort)) }
-                            IconButton(onClick = { graph.settings.update { it.copy(listLayout = !it.listLayout) } }, modifier = Modifier.testTag("toggle-layout")) {
-                                Icon(if (list) Icons.Outlined.GridView else Icons.AutoMirrored.Outlined.ViewList, if (list) stringResource(R.string.lib_show_covers) else stringResource(R.string.lib_show_list))
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(onClick = onFilter, modifier = Modifier.testTag("open-filter")) { Icon(Icons.Outlined.FilterList, stringResource(R.string.filter)) }
+                                IconButton(onClick = onSort, modifier = Modifier.testTag("open-sort")) { Icon(Icons.AutoMirrored.Outlined.Sort, stringResource(R.string.sort)) }
+                                IconButton(onClick = { graph.settings.update { it.copy(listLayout = !it.listLayout) } }, modifier = Modifier.testTag("toggle-layout")) {
+                                    Icon(if (list) Icons.Outlined.GridView else Icons.AutoMirrored.Outlined.ViewList, if (list) stringResource(R.string.lib_show_covers) else stringResource(R.string.lib_show_list))
+                                }
                             }
                         }
                     }
@@ -207,8 +214,10 @@ fun ItemCard(item: LibraryItem, progress: MediaProgress?, modifier: Modifier = M
     ) {
         val context = LocalContext.current
         Cover(context.graph.accounts.activeClient?.coverUrl(item.id)?.toString(), item.title, Modifier.fillMaxWidth(), podcast = item.isPodcast)
-        if (progress != null && (progress.progress > 0 || progress.isFinished)) ProgressLine(if (progress.isFinished) 1.0 else progress.progress)
-        Text(item.recentEpisode?.title ?: item.title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Box(Modifier.fillMaxWidth().height(4.dp)) {
+            if (progress != null && (progress.progress > 0 || progress.isFinished)) ProgressLine(if (progress.isFinished) 1.0 else progress.progress)
+        }
+        Text(item.recentEpisode?.title ?: item.title, style = MaterialTheme.typography.titleSmall, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
         if (item.author.isNotEmpty()) Text(item.author, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
@@ -216,12 +225,12 @@ fun ItemCard(item: LibraryItem, progress: MediaProgress?, modifier: Modifier = M
 @Composable
 fun ItemRow(item: LibraryItem, progress: MediaProgress?, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick).padding(vertical = 6.dp).testTag("item-${item.id}"),
-        horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically,
+        Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick).heightIn(min = 80.dp).padding(vertical = 8.dp).testTag("item-${item.id}"),
+        horizontalArrangement = Arrangement.spacedBy(ShelfSpacing.gap), verticalAlignment = Alignment.CenterVertically,
     ) {
         val context = LocalContext.current
         Cover(context.graph.accounts.activeClient?.coverUrl(item.id)?.toString(), item.title, Modifier.size(64.dp), podcast = item.isPodcast)
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(item.title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
             if (item.author.isNotEmpty()) Text(item.author, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
             val duration = item.duration

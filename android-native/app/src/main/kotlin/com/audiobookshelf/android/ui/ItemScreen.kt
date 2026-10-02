@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -89,11 +91,11 @@ fun ItemDetail(
         metadata.description?.let { HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_COMPACT).toString().trim() }?.takeIf { it.isNotEmpty() }
     }
     BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
-        val wide = maxWidth >= 640.dp
+        val wide = maxWidth >= 720.dp && LocalDensity.current.fontScale <= 1.3f
         LazyColumn(
-            Modifier.fillMaxSize().testTag("item-detail"),
-            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.align(Alignment.TopCenter).widthIn(max = 1000.dp).fillMaxSize().testTag("item-detail"),
+            contentPadding = PaddingValues(start = ShelfSpacing.page, end = ShelfSpacing.page, top = 8.dp, bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(ShelfSpacing.gap),
         ) {
             item {
                 val header: @Composable () -> Unit = {
@@ -151,7 +153,7 @@ fun ItemDetail(
             }
             item { extra() }
             if (metadata.genres.isNotEmpty()) item {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     metadata.genres.forEach { genre -> AssistChip(onClick = { actions.onGenre(genre) }, label = { Text(genre) }, modifier = Modifier.testTag("genre-$genre")) }
                 }
             }
@@ -159,11 +161,13 @@ fun ItemDetail(
             more()
             val chapters = item.media.chapters
             if (chapters.isNotEmpty()) {
-                item { Text(stringResource(R.string.chapters), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) }
+                item { Text(stringResource(R.string.chapters), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp).semantics { heading() }) }
                 itemsIndexed(chapters) { index, chapter ->
-                    Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.testTag("chapter-$index"), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(chapter.title.ifBlank { stringResource(R.string.item_chapter_number, index + 1) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                        Text(formatClock(chapter.start), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceContainer) {
+                        Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.testTag("chapter-$index").padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(chapter.title.ifBlank { stringResource(R.string.item_chapter_number, index + 1) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            Text(formatClock(chapter.start), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 }
             }
