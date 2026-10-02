@@ -1,0 +1,481 @@
+# Slovenian drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Računi
+title_new_collection	Nova zbirka
+action_retry	Poskusi znova
+action_read	Preberi %1$s
+action_mark_finished	Označi kot dokončano
+choose_library	Izberite knjižnico
+all_titles	Vsi naslovi
+all_podcasts	Vsi podcasti
+filter	Filter
+sort	Razvrsti
+theme_system	Sistemska
+screen_orientation	Usmerjenost zaslona
+jump_forward	Skoči naprej
+jump_back	Skoči nazaj
+set_settings_not_saved	Nastavitev ni bilo mogoče shraniti v tej napravi, zato se ni nič spremenilo. Sprostite nekaj prostora in poskusite znova.
+set_orientation_follow_device	Sledi napravi
+set_orientation_portrait	Pokončno
+set_orientation_landscape	Ležeče
+set_haptic_light	Šibko
+set_rewind_on_resume	Ob nadaljevanju malo previj nazaj
+set_rewind_on_resume_detail	Po premoru se vrne nekaj sekund nazaj, po daljšem premoru več.
+set_seek_system_controls	Premikanje s sistemskimi kontrolniki
+set_seek_system_controls_detail	Zaklenjenemu zaslonu in obvestilu omogoči premikanje vrstice položaja.
+set_mp3_index_seeking	Natančno premikanje v MP3
+set_mp3_index_seeking_detail	Ustvari indeks za premikanje za datoteke MP3 z nezanesljivo dolžino. Premikanje se začne počasneje.
+set_shake_to_reset	Tresenje za ponastavitev
+set_shake_to_reset_detail	Tresenje telefona med delovanjem časovnika ga znova zažene.
+set_sleep_fade_out	Postopno utišanje
+set_sleep_fade_out_detail	V zadnji minuti zniža glasnost.
+set_vibrate_on_reset	Vibriranje ob ponastavitvi
+set_auto_sleep_timer_detail	Zažene časovnik ob predvajanju med %1$s in %2$s.
+set_heading_mobile_data	Mobilni podatki
+set_storage	Shramba
+set_heading_support	Podpora
+set_diagnostics	Diagnostika
+set_something_went_wrong	Prišlo je do napake.
+set_statistics_unavailable	Statistika ni na voljo
+set_try_again	Poskusite znova
+set_minutes_listened:one	%1$d minuta poslušanja
+set_minutes_listened:two	%1$d minuti poslušanja
+set_minutes_listened:few	%1$d minute poslušanja
+set_minutes_listened:other	%1$d minut poslušanja
+set_days_listened:one	%1$d dan poslušanja
+set_days_listened:two	%1$d dneva poslušanja
+set_days_listened:few	%1$d dnevi poslušanja
+set_days_listened:other	%1$d dni poslušanja
+set_titles_finished:one	%1$d dokončan naslov
+set_titles_finished:two	%1$d dokončana naslova
+set_titles_finished:few	%1$d dokončani naslovi
+set_titles_finished:other	%1$d dokončanih naslovov
+set_day_minutes_listened:one	%1$s, %2$d minuta poslušanja
+set_day_minutes_listened:two	%1$s, %2$d minuti poslušanja
+set_day_minutes_listened:few	%1$s, %2$d minute poslušanja
+set_day_minutes_listened:other	%1$s, %2$d minut poslušanja
+set_set_aside_failed	Odlaganje ni uspelo. Poskusite znova.
+set_connection	Povezava
+set_diagnostics_area_media	Predstavnost
+set_diagnostics_area_sync	Sinhronizacija
+set_unreadable_resets_title	Shranjenih zavrženj napredka ni bilo mogoče prebrati
+set_unreadable_resets_detail	Med njimi je lahko katerikoli naslov, zato se nič ne predvaja in noben položaj branja se ne pošlje, dokler se ne odločite. Če jih odložite, datoteka ostane v tej napravi, napredek, ki naj bi ga zavrgli, pa ostane na vašem strežniku.
+set_set_them_aside	Odloži jih
+set_listening_storage_title	Poslušanja izpred zaprtja aplikacije ni bilo mogoče shraniti
+set_listening_storage_detail	Shramba v tej napravi ni na voljo ali je polna. Nič se ne predvaja in nobeno poslušanje se ne pošlje, dokler ni shranjeno; do takrat je ohranjeno.
+set_unreadable_writes_title	Zapisov neodgovorjenih shranjevanj napredka ni bilo mogoče prebrati
+set_unreadable_writes_detail	Shranjevanje katerega koli naslova lahko še doseže vaš strežnik, zato se poslušanje in branje ne pošiljata in noben napredek se ne zavrže, dokler se ne odločite. Če jih odložite, datoteka ostane v tej napravi; zapoznelo shranjevanje lahko nato vrne napredek, ki ga zavržete.
+set_diagnostics_server	Strežnik %1$s
+set_diagnostics_signed_in_as	Prijavljeni kot %1$s
+set_diagnostics_app_version	Aplikacija %1$s
+set_recent_problems	Nedavne težave
+set_clear	Počisti
+set_no_problems	V tej napravi ni zabeleženih težav.
+set_unreadable_writes_confirm_title	Odložim neberljive zapise?
+set_unreadable_writes_confirm_detail	Položaji poslušanja in branja se znova pošiljajo, zavrženja pa se lahko izvedejo.
+set_set_aside	Odloži
+set_unreadable_resets_confirm_title	Odložim neberljiva zavrženja?
+set_unreadable_resets_confirm_detail	Naslovi se predvajajo in položaji branja se znova pošiljajo. Znova zavrzite napredek za vsak naslov, ki ga še želite začeti od začetka.
+set_signed_in	Prijavljeni
+set_other_accounts	Drugi računi
+set_server_sign_in_required	%1$s · potrebna je prijava
+set_remove_account	Odstrani %1$s
+set_switch_to_account	Preklopi na ta račun
+set_add_account	Dodaj račun
+set_sign_out_of	Odjava iz %1$s
+set_sign_out_detail	Odstrani ta račun iz naprave. Prenosi in neposlano poslušanje zanj ostanejo, dokler se znova ne prijavi.
+set_accounts_footer	Vsak račun ima svoj napredek, prenose in izbiro knjižnice. Preklapljanje jih nikoli ne pomeša.
+set_remove_account_confirm	Odstranim %1$s?
+set_remove_account_detail	Račun lahko pozneje znova dodate. Njegovi prenosi in neposlano poslušanje ostanejo v tej napravi.
+set_add_an_account	Dodajte račun
+set_connect_intro	Povežite se neposredno s svojim strežnikom. Nič ne poteka prek druge storitve.
+set_change_server	Zamenjaj strežnik
+set_sign_in	Prijava
+set_sign_in_openid	Prijava z OpenID
+set_saved_accounts	Shranjeni računi
+set_use_account	Uporabi
+set_edit	Uredi
+set_add_podcast	Dodaj podcast
+set_not_available_yet	Še ni na voljo
+set_not_available_yet_detail	Ta del predogledne različice je še v izdelavi.
+set_import_previous_app	Uvoz iz prejšnje aplikacije
+set_import_interrupted	Uvoz se ni dokončal. Izberite isti izvoz, da nadaljujete, kjer se je ustavil.
+set_import_already	Ta izvoz je bil že uvožen. Naslovi, poslušanje in položaji iz njega so v tej napravi.
+set_import_preflight	%1$s\nPrejšnja aplikacija in ta datoteka se samo bereta; v njiju se nič ne spremeni. Naslovi, poslušanje in položaji se pripnejo računu, ko se ta tukaj prijavi. Gesel ni v izvozu, zato se vsak račun znova prijavi.
+set_import_account_signed_in	%1$s · prijavljen
+set_import_account_sign_in_later	%1$s · prijava po uvozu
+set_import_titles	Naslovi
+set_import_title_partial	%1$s · preostanek se znova prenese
+set_not_imported	Ni uvoženo
+set_import_space	Potrebno: %1$s; prosto: %2$s.
+set_import_no_space	V tej napravi ni dovolj prostega prostora. Sprostite nekaj prostora in znova izberite izvoz.
+set_import_progress	Kopiranje datotek: %1$d od %2$d. Če se aplikacija zapre, znova izberite isti izvoz za nadaljevanje.
+set_import_done	Uvoženo: naslovi %1$d, seje poslušanja %2$d in položaji %3$d. Nastavitve iz prejšnje aplikacije so bile uporabljene.
+set_import_waiting	Prijavite se v %1$s kot %2$s, da pripnete njegove naslove, poslušanje in položaje.
+set_import	Uvozi
+set_continue	Nadaljuj
+set_close	Zapri
+set_import_file_unreadable	Izbrane datoteke ni bilo mogoče prebrati. Izberite jo znova ali jo najprej shranite v to napravo.
+set_import_stopped	Uvoz se je ustavil, preden se je dokončal. Nič ni izgubljeno: znova izberite isti izvoz, da nadaljujete, kjer se je ustavil.
+set_import_item_gone	Ni več na strežniku, zato ni bil prevzet.
+set_import_file_changed	Datoteka v tej napravi se je po uvozu spremenila, zato se znova prenese s strežnika.
+set_openid_not_enabled	Prijava z OpenID na tem strežniku ni omogočena. Uporabite uporabniško ime in geslo.
+set_openid_canceled	Prijava v brskalniku je bila preklicana. Vaši shranjeni računi so ohranjeni.
+set_openid_invalid	Odgovora prijave v brskalniku ni bilo mogoče preveriti. Poskusite se znova prijaviti in preverite nastavitve preusmeritve OpenID na strežniku.
+set_vault_unreadable	Shranjenih prijav ni bilo mogoče dešifrirati. Ohranjene so v napravi; za nadaljevanje se znova prijavite.
+set_session_ended	Vaša seja za %1$s se je končala. Znova se prijavite; neposlano poslušanje in prenosi so ohranjeni.
+set_play_blocked_listening_storage	Poslušanja izpred zaprtja aplikacije ni bilo mogoče shraniti, ker shramba ni na voljo, zato se nič ne predvaja, dokler to ni mogoče. Sprostite nekaj prostora in poskusite znova.
+set_play_blocked_unreadable_resets	Shranjenih zavrženj napredka ni bilo mogoče prebrati, zato se nič ne predvaja, dokler jih ne razrešite v Diagnostiki.
+set_play_blocked_discarding	Napredek tega naslova se še zavrača. Ko bo to končano, se bo predvajal od začetka.
+dl_not_saved	Seznama prenosov ni bilo mogoče shraniti v tej napravi, zato se ni nič spremenilo. Sprostite nekaj prostora in poskusite znova.
+dl_not_allowed	Vaš račun nima dovoljenja za prenašanje.
+dl_no_audio	Ta element nima zvoka za prenos.
+dl_no_space	V tej napravi ni dovolj prostega prostora za %1$s, ob tem da ostane dovolj prostora za sistem.
+dl_folder_lost_nothing_downloaded	Dostop do %1$s je bil odstranjen, zato ni bilo nič preneseno. V Nastavitvah znova izberite mapo za prenose.
+dl_downloading_percent	Prenašanje %1$d%%
+dl_cancel_download	Prekliči prenos
+dl_downloaded_plays_offline	Preneseno · predvaja se brez povezave
+dl_failed	Prenos ni uspel.
+dl_discard	Zavrzi
+dl_cellular_title	Prenesem prek mobilnih podatkov?
+dl_cellular_message	Uporabljate povezavo z merjenim prenosom podatkov. To lahko spremenite v Nastavitvah.
+dl_not_now	Ne zdaj
+dl_folder_cannot_be_kept	Te mape ni mogoče obdržati za prenose. Izberite drugo.
+dl_saved_in_folder	Prenosi se shranjujejo v %1$s
+dl_saved_in_app_storage	Prenosi se shranjujejo v shrambo aplikacije
+dl_folder_visible_to_other_apps	Druge aplikacije v tej napravi lahko vidijo te datoteke. Prenosi, narejeni pred spremembo, ostanejo, kjer so.
+dl_folder_private_to_app	Te datoteke vidi samo ta aplikacija. Izberite mapo, da bodo prenosi tam, kjer jih lahko dosežejo druge aplikacije.
+dl_choose_folder	Izberi mapo
+dl_use_app_storage	Uporabi shrambo aplikacije
+dl_ebook_missing	E-knjige ni v tej napravi. Znova jo prenesite, da jo odprete.
+dl_no_app_opens_format	Nobena aplikacija v tej napravi ne odpre datotek %1$s. Namestite takšno in poskusite znova.
+dl_no_app_opens_this_kind	Nobena aplikacija v tej napravi ne odpre te vrste datotek. Namestite takšno in poskusite znova.
+dl_folder_lost_choose_again_open	Ta prenos je v %1$s, dostop do %1$s pa je bil odstranjen. Znova izberite %1$s, da ga odprete.
+dl_folder_lost_choose_again_play	Ta prenos je v %1$s, dostop do %1$s pa je bil odstranjen. Znova izberite %1$s, da ga predvajate.
+dl_names_or	%1$s ali %2$s
+dl_names_and	%1$s in %2$s
+dl_remove_title	Odstranim prenos?
+dl_remove_message	»%1$s« bo odstranjen iz te naprave. Vaš napredek poslušanja ostane.
+dl_keep	Obdrži
+dl_not_that_folder	To ni %1$s. Izberite mapo, v kateri so ti prenosi.
+dl_folder_access_not_kept	Dostopa do te mape ni bilo mogoče obdržati. Poskusite znova.
+dl_no_downloads	Ni prenosov
+dl_no_downloads_message	Prenesite knjige ali epizode z njihove strani, da jih poslušate brez povezave.
+dl_access_removed_title	Dostop do %1$s je bil odstranjen
+dl_downloads_kept_there:one	%1$d prenos je shranjen tam. Znova izberite %2$s, da ga predvajate in odprete.
+dl_downloads_kept_there:two	%1$d prenosa sta shranjena tam. Znova izberite %2$s, da ju predvajate in odprete.
+dl_downloads_kept_there:few	%1$d prenosi so shranjeni tam. Znova izberite %2$s, da jih predvajate in odprete.
+dl_downloads_kept_there:other	%1$d prenosov je shranjenih tam. Znova izberite %2$s, da jih predvajate in odprete.
+dl_choose_again	Znova izberi %1$s
+dl_some_files_missing	Nekatere datoteke manjkajo v tej napravi
+dl_size_in_folder	%1$s v %2$s
+dl_open_in_another_app	Odpri %1$s v drugi aplikaciji
+dl_download_again_named	Znova prenesi %1$s
+dl_the_chosen_folder	izbrana mapa
+dl_files_missing_play	Nekatere datoteke tega prenosa manjkajo v tej napravi. Znova ga prenesite, da ga predvajate.
+dl_play_named	Predvajaj %1$s
+dl_retry_named	Znova poskusi %1$s
+dl_cancel_named	Prekliči %1$s
+dl_remove_named	Odstrani %1$s
+dl_sign_in_again	Za prenašanje se znova prijavite v ta račun.
+dl_folder_lost_choose_in_downloads	Dostop do %1$s je bil odstranjen. Znova izberite mapo v Prenosih.
+dl_connection_interrupted	Povezava je bila prekinjena.
+dl_error_retrying	%1$s Ponovni poskus…
+dl_server_refused	Strežnik je zavrnil prenos.
+dl_server_sent_type_not_audio	Strežnik je namesto zvoka poslal %1$s, zato ni bilo nič shranjeno. Preverite strežnik ali posredniški strežnik in poskusite znova.
+dl_server_sent_unknown_not_audio	Strežnik je namesto zvoka poslal neznan odgovor, zato ni bilo nič shranjeno. Preverite strežnik ali posredniški strežnik in poskusite znova.
+dl_size_mismatch	Prenesena datoteka je imela %1$d bajtov, strežnik pa je navedel %2$d, zato je bila zavržena. Poskusite znova, da jo ponovno prenesete.
+dl_server_sent_not_pdf	Strežnik je poslal nekaj drugega kot PDF, zato ni bilo nič shranjeno. Preverite strežnik ali posredniški strežnik in poskusite znova.
+dl_notification_downloading	Prenašanje %1$s
+rd_positions_not_restored	Shranjenih položajev branja ni bilo mogoče obnoviti, zato se strani ne shranjujejo. Izvirni podatki so ohranjeni.
+rd_positions_not_overwritten	Shranjenih položajev branja ni bilo mogoče prebrati, zato se ne prepišejo.
+rd_not_a_pdf	Ta datoteka ni PDF, ki bi ga ta naprava lahko odprla.
+rd_document_not_opened	Dokumenta ni bilo mogoče odpreti.
+rd_page_not_saved	Te strani ni bilo mogoče shraniti v tej napravi.
+rd_choice_not_saved	Vaše izbire ni bilo mogoče shraniti v tej napravi.
+rd_conflict_title	Kje nadaljujem?
+rd_conflict_page	Druga naprava je dosegla stran %1$d, medtem ko stran %2$d tukaj še ni bila shranjena na strežnik.
+rd_conflict_location	Druga naprava je shranila položaj branja, ki ga ta bralnik ne more prikazati kot stran, medtem ko stran %1$d tukaj še ni bila shranjena na strežnik.
+rd_go_to_page_number	Pojdi na stran %1$d
+rd_keep_other_position	Obdrži drugi položaj
+rd_stay_on_page	Ostani na strani %1$d
+rd_close_reader	Zapri bralnik
+rd_rotate_pages	Zasukaj strani
+rd_continuous_scrolling	Neprekinjeno drsenje
+rd_document_error_title	Tega dokumenta ni bilo mogoče odpreti
+rd_try_again	Poskusite znova
+rd_go_to_page	Pojdi na stran
+rd_previous_page	Prejšnja stran
+rd_next_page	Naslednja stran
+rd_page_of	Stran %1$d od %2$d
+rd_page_number	Stran %1$d
+rd_download_folder_lost	Ta prenos je v %1$s, dostop do %1$s pa je bil odstranjen. Znova izberite mapo v Prenosih.
+rd_downloaded_document_missing	Prenesenega dokumenta ni v tej napravi. Znova ga prenesite.
+rd_document_not_stored	Dokumenta ni bilo mogoče shraniti za branje.
+rd_supplementary_pdf	dodatni PDF
+rd_format_not_available	Branje %1$s v tej predogledni različici še ni na voljo. Vaš položaj branja na strežniku ostane.
+rd_ebook_not_available	Branje te e-knjige v tej predogledni različici še ni na voljo. Vaš položaj branja na strežniku ostane.
+grp_unavailable_title	Nedosegljiv naslov
+grp_could_not_load_collections	Zbirk ni bilo mogoče naložiti.
+grp_could_not_load_playlists	Seznamov predvajanja ni bilo mogoče naložiti.
+grp_collections_unavailable	Zbirke niso na voljo
+grp_playlists_unavailable	Seznami predvajanja niso na voljo
+grp_no_collections_yet	Še ni zbirk
+grp_no_playlists_yet	Še ni seznamov predvajanja
+grp_create_one_hint	Ustvarite ga, da naslove združite v svojem vrstnem redu.
+grp_title_count:one	%1$d naslov
+grp_title_count:two	%1$d naslova
+grp_title_count:few	%1$d naslovi
+grp_title_count:other	%1$d naslovov
+grp_collection_deleted	Ta zbirka je bila izbrisana.
+grp_playlist_deleted	Ta seznam predvajanja je bil izbrisan.
+grp_could_not_load	Nalaganje ni uspelo.
+grp_collection_unavailable	Zbirka ni na voljo
+grp_playlist_unavailable	Seznam predvajanja ni na voljo
+grp_nothing_in_collection_can_play	Nič v tej zbirki ni mogoče predvajati.
+grp_nothing_in_playlist_can_play	Nič na tem seznamu predvajanja ni mogoče predvajati.
+grp_could_not_start_playback	Predvajanja ni bilo mogoče začeti.
+grp_resume	Nadaljuj
+grp_play_collection	Predvajaj zbirko
+grp_play_playlist	Predvajaj seznam predvajanja
+grp_edit_collection	Uredi zbirko
+grp_edit_playlist	Uredi seznam predvajanja
+grp_delete_collection	Izbriši zbirko
+grp_delete_playlist	Izbriši seznam predvajanja
+grp_no_titles_yet	Še ni naslovov
+grp_delete_collection_question	Izbrišem zbirko?
+grp_delete_playlist_question	Izbrišem seznam predvajanja?
+grp_delete_group_explanation	»%1$s« bo odstranjen z vašega strežnika. Naslovi v njem ostanejo.
+grp_not_deleted	Ni izbrisano: %1$s
+grp_not_deleted_try_again	Ni izbrisano: poskusite znova
+grp_not_allowed_to_change_collection	Vaš račun na strežniku nima dovoljenja za spreminjanje te zbirke.
+grp_not_allowed_to_change_playlist	Vaš račun na strežniku nima dovoljenja za spreminjanje tega seznama predvajanja.
+grp_collection_no_longer_exists	Ta zbirka ne obstaja več.
+grp_playlist_no_longer_exists	Ta seznam predvajanja ne obstaja več.
+grp_not_saved	Ni shranjeno: %1$s
+grp_not_saved_try_again	Ni shranjeno: poskusite znova
+grp_saving	Shranjevanje…
+grp_create_collection	Ustvari zbirko
+grp_create_playlist	Ustvari seznam predvajanja
+grp_save_changes	Shrani spremembe
+grp_choose_at_least_one_title	Izberite vsaj en naslov.
+grp_order	Vrstni red
+grp_move_up	Premakni %1$s navzgor
+grp_remove_member	Odstrani %1$s
+grp_add_titles	Dodaj naslove
+grp_add_episodes_hint	Epizode dodajte s strani epizod podcasta.
+grp_add_to_playlist_or_collection	Dodaj na seznam predvajanja ali v zbirko
+grp_add_to	Dodaj v
+grp_nothing_to_add_to	Tukaj še ni ničesar, kamor bi lahko dodali.
+grp_added_to	Dodano v %1$s
+grp_not_added	Ni dodano: %1$s
+grp_not_added_try_again	Ni dodano: poskusite znova
+grp_already_included	Že vključeno
+grp_close	Zapri
+grp_titles_could_not_load	Naslovov ni bilo mogoče naložiti
+grp_nothing_here	Tukaj ni ničesar
+pod_feed_episodes	Epizode vira
+pod_sort_newest_first	Najprej najnovejše, tapnite za najprej najstarejše
+pod_sort_oldest_first	Najprej najstarejše, tapnite za najprej najnovejše
+pod_episodes_queued:one	%1$d epizoda je v čakalni vrsti na vašem strežniku: %2$s
+pod_episodes_queued:two	%1$d epizodi sta v čakalni vrsti na vašem strežniku: %2$s
+pod_episodes_queued:few	%1$d epizode so v čakalni vrsti na vašem strežniku: %2$s
+pod_episodes_queued:other	%1$d epizod je v čakalni vrsti na vašem strežniku: %2$s
+pod_server_could_not_download	Vaš strežnik ni mogel prenesti »%1$s«.
+pod_dismiss	Opusti
+pod_no_episodes_yet	Še ni epizod
+pod_no_episodes_match_filter	Temu filtru ne ustreza nobena epizoda
+pod_episode_details	Podrobnosti epizode
+pod_untitled_episode	Neimenovana epizoda
+pod_play_named	Predvajaj %1$s
+pod_episode_not_available	Epizoda ni na voljo
+pod_episode_may_have_been_removed	Morda je bila odstranjena s strežnika.
+pod_percent_listened	%1$d%% poslušano
+pod_feed_could_not_open	Vira ni bilo mogoče odpreti.
+pod_retry_feed	Znova poskusi vir
+pod_no_feed_episodes	V viru ni bilo najdenih epizod
+pod_already_on_server	Že na strežniku
+pod_selected	Izbrano
+pod_not_selected	Ni izbrano
+pod_no_audio_enclosure	Ni zvočne priloge
+pod_not_queued	Ni v čakalni vrsti: %1$s
+pod_not_queued_try_again	Ni v čakalni vrsti: poskusite znova
+pod_queueing_on_server	Dodajanje v čakalno vrsto na vašem strežniku…
+pod_add_selected_episodes	Dodaj izbrane epizode na strežnik
+pod_something_went_wrong	Prišlo je do napake.
+pod_adding_not_available	Dodajanje podcastov ni na voljo
+pod_adding_needs_permission	Vaš račun na strežniku potrebuje dovoljenje za upravljanje podcastov v knjižnici podcastov.
+pod_search_podcasts	Iskanje podcastov
+pod_or_rss_feed_url	Ali URL vira RSS
+pod_enter_complete_feed_url	Vnesite celoten URL vira HTTP ali HTTPS.
+pod_preview_feed	Predogled vira
+pod_create_podcast	Ustvari podcast
+pod_choose_different_feed	Izberite drug vir
+item_something_went_wrong	Prišlo je do napake. Poskusite znova.
+item_feed_subscribe_at	Aplikacije za podcaste se lahko na to vsebino naročijo na naslovu:
+item_copied	Kopirano
+item_copy_address	Kopiraj naslov
+item_hidden_from_directories	Skrito pred imeniki podcastov
+item_feed_public_warning	Vsak, ki pozna naslov, lahko to vsebino posluša brez prijave.
+item_feed_name	Ime vira
+item_feed_name_rule	Samo črke, številke, - in _
+item_hide_from_directories	Skrij pred imeniki podcastov
+item_done	Končano
+item_sending	Pošiljanje…
+item_sent_to	Poslano na %1$s
+item_send_ebook_explanation	Vaš strežnik po e-pošti pošlje e-knjigo na napravo, ki jo izberete.
+item_ereader_or_ebook_gone	%1$s ali ta e-knjiga ni več na voljo na strežniku. Nič ni bilo poslano.
+item_not_sent_to	Ni poslano na %1$s. %2$s
+item_not_saved_try_again	Ni shranjeno. Poskusite znova.
+item_mark_unfinished	Označi kot nedokončano
+item_discard_uncertain	Prejšnje shranjevanje napredka tega naslova ni dobilo odgovora in lahko še doseže vaš strežnik. Če prispe po zavrženju, vrne napredek. Vaš strežnik tej aplikaciji ne more povedati, ali se bo to zgodilo.
+item_discard_anyway	Vseeno zavrzi
+item_discard_under_way	To zavrženje že poteka in ga ni mogoče preklicati.
+item_keep_progress	Obdrži napredek
+item_discard_pending	Zavračanje napredka. Končano bo, ko bo vaš strežnik dosegljiv in bo poslušanje tega naslova poslano.
+item_discard_anyway_question	Vseeno zavržem?
+item_discard_anyway_explanation	Napredek se zdaj odstrani. Če prejšnje shranjevanje pozneje doseže vaš strežnik, se napredek tega naslova vrne in ga lahko znova zavržete.
+item_discard	Zavrzi
+item_discard_progress_question	Zavržem napredek?
+item_discard_progress_explanation	Vaš položaj in stanje dokončanosti za ta naslov se odstranita s strežnika za vse naprave.
+item_could_not_load	Tega naslova ni bilo mogoče naložiti
+item_narrated_by	Bere
+item_series	Serija: %1$s
+item_series_with_sequence	Serija: %1$s #%2$s
+item_episode_count:one	%1$d epizoda
+item_episode_count:two	%1$d epizodi
+item_episode_count:few	%1$d epizode
+item_episode_count:other	%1$d epizod
+item_listened_and_left	%1$d%% poslušano · še %2$s
+item_chapter_number	Poglavje %1$d
+pl_minimize_player	Pomanjšaj predvajalnik
+pl_nothing_playing	Nič se ne predvaja
+pl_chapter_number	Poglavje %1$d
+pl_try_again	Poskusite znova
+pl_speed_value	Hitrost %1$s
+pl_sleep	Spanje
+pl_position_of_duration	%1$s od %2$s
+pl_buffering	Medpomnjenje
+pl_previous_chapter	Prejšnje poglavje
+pl_next_chapter	Naslednje poglavje
+pl_jump_forward_seconds:one	Skoči naprej za %1$d sekundo
+pl_jump_forward_seconds:two	Skoči naprej za %1$d sekundi
+pl_jump_forward_seconds:few	Skoči naprej za %1$d sekunde
+pl_jump_forward_seconds:other	Skoči naprej za %1$d sekund
+pl_jump_back_seconds:one	Skoči nazaj za %1$d sekundo
+pl_jump_back_seconds:two	Skoči nazaj za %1$d sekundi
+pl_jump_back_seconds:few	Skoči nazaj za %1$d sekunde
+pl_jump_back_seconds:other	Skoči nazaj za %1$d sekund
+pl_jump_forward_minutes:one	Skoči naprej za %1$d minuto
+pl_jump_forward_minutes:two	Skoči naprej za %1$d minuti
+pl_jump_forward_minutes:few	Skoči naprej za %1$d minute
+pl_jump_forward_minutes:other	Skoči naprej za %1$d minut
+pl_jump_back_minutes:one	Skoči nazaj za %1$d minuto
+pl_jump_back_minutes:two	Skoči nazaj za %1$d minuti
+pl_jump_back_minutes:few	Skoči nazaj za %1$d minute
+pl_jump_back_minutes:other	Skoči nazaj za %1$d minut
+pl_open_player	Odpri predvajalnik
+pl_playback_stopped	Predvajanje ustavljeno
+pl_listening_unsaved	Del poslušanja v tej napravi še ni shranjen. Ohranjen je in bo shranjen, takoj ko bo shramba to dopuščala.
+pl_playing	Predvajanje
+pl_resume	Nadaljuj
+pl_streaming_cellular_refused	Pretakanje prek mobilnih podatkov je v Nastavitvah izklopljeno. Povežite se z omrežjem Wi-Fi ali najprej prenesite ta naslov.
+pl_stream_cellular_title	Pretakam prek mobilnih podatkov?
+pl_stream_cellular_message	Uporabljate povezavo z merjenim prenosom podatkov. To lahko spremenite v Nastavitvah.
+pl_not_now	Ne zdaj
+pl_sleep_stops_end_of_chapter	Ustavi se na koncu tega poglavja, čez %1$s
+pl_sleep_stops_in	Ustavi se čez %1$s
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Izklopi
+pl_bookmark_not_saved_reason	Zaznamek ni shranjen: %1$s
+pl_bookmark_not_saved	Zaznamek ni shranjen: poskusite znova
+pl_bookmark_add_at	Dodaj pri %1$s
+pl_bookmark_go_to	Pojdi na zaznamek
+pl_bookmark_default	Zaznamek
+pl_bookmark_rename_named	Preimenuj %1$s
+pl_bookmark_delete_named	Izbriši %1$s
+pl_bookmark_at	Zaznamek pri %1$s
+pl_bookmark_rename	Preimenuj zaznamek
+pl_bookmark_new	Nov zaznamek
+pl_untitled	Brez naslova
+pl_playback_stopped_reason	Predvajanje ustavljeno: %1$s. Vaš položaj je ohranjen.
+pl_playback_stopped_unknown	Predvajanje ustavljeno: zvoka ni bilo mogoče naložiti. Vaš položaj je ohranjen.
+pl_no_playable_audio	Ta element nima zvoka, ki bi ga bilo mogoče predvajati.
+pl_could_not_start	Predvajanja ni bilo mogoče začeti.
+pl_listening_save_failed	Poslušanja ni bilo mogoče shraniti v tej napravi, zato je predvajanje začasno ustavljeno. Sprostite nekaj prostora in poskusite znova.
+cast_casting_to	Predvajanje na %1$s
+cast_cast	Predvajaj na napravi
+cast_playing_on	Predvaja se na %1$s
+cast_connecting_to	Povezovanje z %1$s…
+cast_playing_on_phone	Predvaja se na tem telefonu
+cast_stop	Ustavi predvajanje na napravi
+cast_looking	Iskanje naprav za predvajanje…
+cast_none_found	Ni najdenih naprav za predvajanje. Preverite, ali je sprejemnik vklopljen in v istem omrežju Wi-Fi kot ta telefon.
+cast_close	Zapri
+cast_download_not_castable	Prenesene kopije se predvajajo samo na tem telefonu. Ustavite predvajanje na napravi, da poslušate tukaj, ali pa naslov raje pretakajte.
+cast_resumed_without_title	Predvajanje na napravi se je ustavilo, ker se je aplikacija med njim znova zagnala. Znova odprite naslov, da nadaljujete poslušanje z zadnjega mesta, ki ga je shranil ta telefon.
+cast_needs_play_services	Predvajanje na napravi potrebuje storitve Google Play, ki jih ta naprava nima ali jih mora posodobiti.
+cast_could_not_start	Predvajanja na napravi ni bilo mogoče začeti v tej napravi: %1$s.
+cast_connect_failed_named	Povezava z %1$s ni uspela. Preverite, ali je vklopljen in v istem omrežju Wi-Fi kot ta telefon.
+cast_connect_failed	Povezava s sprejemnikom ni uspela. Preverite, ali je vklopljen in v istem omrežju Wi-Fi kot ta telefon.
+cast_connection_lost_named	Povezava z %1$s je bila izgubljena. Predvajanje se nadaljuje na tem telefonu.
+cast_connection_lost	Povezava s sprejemnikom je bila izgubljena. Predvajanje se nadaljuje na tem telefonu.
+auto_continue	Nadaljuj
+auto_recent	Nedavno
+auto_discovery	Odkrivanje
+auto_authors_count:one	%1$d avtor
+auto_authors_count:two	%1$d avtorja
+auto_authors_count:few	%1$d avtorji
+auto_authors_count:other	%1$d avtorjev
+auto_series_count:one	%1$d serija
+auto_series_count:two	%1$d seriji
+auto_series_count:few	%1$d serije
+auto_series_count:other	%1$d serij
+lib_books_count:one	%1$d knjiga
+lib_books_count:two	%1$d knjigi
+lib_books_count:few	%1$d knjige
+lib_books_count:other	%1$d knjig
+lib_items_count:one	%1$d element
+lib_items_count:two	%1$d elementa
+lib_items_count:few	%1$d elementi
+lib_items_count:other	%1$d elementov
+lib_selected	Izbrano
+lib_all_filters	Vsi filtri
+lib_nothing_to_filter	Tukaj ni ničesar za filtriranje.
+lib_sort_descending_switch	Padajoče, preklopi na naraščajoče
+lib_sort_ascending_switch	Naraščajoče, preklopi na padajoče
+lib_sort_descending	Padajoče
+lib_sort_ascending	Naraščajoče
+lib_unavailable	Knjižnica ni na voljo
+lib_unavailable_message	%1$s Vaš račun in neposlano poslušanje sta ohranjena.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Prikaži naslovnice
+lib_show_list	Prikaži seznam
+lib_filtered	Filtrirano
+lib_empty_title	Tukaj še ni ničesar
+lib_empty_message	Ta knjižnica nima elementov, do katerih imate dostop.
+lib_page_error	Več naslovov ni bilo mogoče naložiti
+lib_card_finished	%1$s, dokončano
+lib_card_percent_listened	%1$s, %2$d odstotkov poslušano
+lib_search_in	Iskanje v %1$s
+lib_search_library	Iskanje v knjižnici
+lib_clear_search	Počisti iskanje
+lib_search_failed	Iskanje ni uspelo
+lib_search_idle_title	Poiščite nekaj za poslušanje
+lib_search_idle_message	Iščite naslove, avtorje, serije, bralce in epizode.
+lib_search_no_match	Nič se ne ujema z »%1$s«. Poskusite z manj besedami ali drugačnim zapisom.
+err_invalid_server	Vnesite naslov strežnika, ki se začne s http:// ali https://, na primer https://books.example.com/abs.
+err_unsafe_media_url	Strežnik je vrnil naslov medija zunaj tega strežnika. Ni bil odprt.
+err_sign_in_required	Vaša seja ni več sprejeta. Znova se prijavite; neposlano poslušanje je ohranjeno.
+err_untrusted	Ta naprava ne zaupa potrdilu strežnika. Namestite overitelja potrdil svojega strežnika v Nastavitve Androida > Varnost > Šifriranje in poverilnice ter poskusite znova.
+err_offline	Strežnika ni bilo mogoče doseči. Preverite naslov ali povezavo in poskusite znova.
+err_forbidden	Vaš račun nima dovoljenja za to.
+err_not_found	Ta vsebina ni več na voljo na strežniku.
+err_server_problem	Strežnik je imel začasno težavo (HTTP %1$d). Poskusite znova.
+err_rejected	Strežnik je zavrnil zahtevo (HTTP %1$d).
+err_invalid_response	Strežnik je poslal odgovor, ki ga ta aplikacija ni mogla prebrati.
+err_no_audio	Ta element nima zvoka, ki bi ga bilo mogoče predvajati.
+err_login_rejected	Uporabniško ime ali geslo ni bilo sprejeto.
+err_publications_unreadable	Zapisov neodgovorjenih shranjevanj napredka ni bilo mogoče prebrati. Najprej jih razrešite v Diagnostiki.
+err_discards_unreadable	Shranjenih zavrženj napredka ni bilo mogoče prebrati. Najprej jih razrešite v Diagnostiki.

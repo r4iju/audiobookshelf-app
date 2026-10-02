@@ -1,0 +1,467 @@
+# Hebrew drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	חשבונות
+title_new_collection	אוסף חדש
+action_retry	נסה שוב
+action_read	קרא %1$s
+action_mark_finished	סמן כהושלם
+choose_library	בחר ספרייה
+all_titles	כל הכותרים
+all_podcasts	כל הפודקאסטים
+filter	סינון
+sort	מיון
+theme_system	מערכת
+screen_orientation	כיוון מסך
+jump_forward	דלג קדימה
+jump_back	דלג אחורה
+set_settings_not_saved	לא ניתן היה לשמור את ההגדרות במכשיר הזה, ולכן דבר לא השתנה. פנה מעט שטח אחסון ונסה שוב.
+set_orientation_follow_device	לפי המכשיר
+set_orientation_portrait	לאורך
+set_orientation_landscape	לרוחב
+set_haptic_light	קל
+set_unit_seconds_short	%1$d שנ׳
+set_unit_minutes_short	%1$d דק׳
+set_rewind_on_resume	חזור מעט אחורה בעת המשך
+set_rewind_on_resume_detail	חוזר כמה שניות אחורה אחרי השהיה, ויותר אחרי השהיה ארוכה יותר.
+set_seek_system_controls	שינוי מיקום מפקדי המערכת
+set_seek_system_controls_detail	מאפשר למסך הנעילה ולהתראה להזיז את סרגל המיקום.
+set_mp3_index_seeking	ניווט מדויק ב-MP3
+set_mp3_index_seeking_detail	בונה אינדקס ניווט לקובצי MP3 שאורכם אינו אמין. הניווט מתחיל לאט יותר.
+set_shake_to_reset	ניעור לאיפוס
+set_shake_to_reset_detail	ניעור הטלפון בזמן שהטיימר פועל מפעיל אותו מחדש.
+set_sleep_fade_out	דהיית שמע
+set_sleep_fade_out_detail	מנמיך את עוצמת הקול בדקה האחרונה.
+set_vibrate_on_reset	רטט באיפוס
+set_auto_sleep_timer_detail	מפעיל את הטיימר בעת ניגון בין %1$s ל-%2$s.
+set_heading_mobile_data	נתונים סלולריים
+set_storage	אחסון
+set_heading_support	תמיכה
+set_diagnostics	אבחון
+set_something_went_wrong	משהו השתבש.
+set_statistics_unavailable	הסטטיסטיקה אינה זמינה
+set_try_again	נסה שוב
+set_minutes_listened:one	%1$d דקת האזנה
+set_minutes_listened:two	%1$d דקות האזנה
+set_minutes_listened:other	%1$d דקות האזנה
+set_days_listened:one	%1$d יום האזנה
+set_days_listened:two	%1$d ימי האזנה
+set_days_listened:other	%1$d ימי האזנה
+set_titles_finished:one	%1$d כותר הושלם
+set_titles_finished:two	%1$d כותרים הושלמו
+set_titles_finished:other	%1$d כותרים הושלמו
+set_day_minutes_listened:one	%1$s, %2$d דקת האזנה
+set_day_minutes_listened:two	%1$s, %2$d דקות האזנה
+set_day_minutes_listened:other	%1$s, %2$d דקות האזנה
+set_set_aside_failed	לא ניתן היה להעביר הצידה. נסה שוב.
+set_connection	חיבור
+set_diagnostics_area_media	מדיה
+set_diagnostics_area_sync	סנכרון
+set_unreadable_resets_title	לא ניתן היה לקרוא את איפוסי ההתקדמות השמורים
+set_unreadable_resets_detail	כל כותר עשוי להיות ביניהם, ולכן דבר לא מתנגן ושום מיקום קריאה לא נשלח עד שתחליט. העברתם הצידה שומרת את הקובץ במכשיר הזה, וכל התקדמות שהם היו אמורים לאפס נשארת בשרת שלך.
+set_set_them_aside	העבר אותם הצידה
+set_listening_storage_title	לא ניתן היה לשמור את ההאזנה מלפני סגירת האפליקציה
+set_listening_storage_detail	האחסון במכשיר הזה אינו זמין או מלא. דבר לא מתנגן ושום האזנה לא נשלחת עד שהיא תישמר; היא נשמרת עד אז.
+set_unreadable_writes_title	לא ניתן היה לקרוא רשומות של שמירות התקדמות שלא נענו
+set_unreadable_writes_detail	שמירה של כל כותר עדיין עשויה להגיע לשרת שלך, ולכן שום האזנה או קריאה לא נשלחת ושום התקדמות לא מאופסת עד שתחליט. העברתן הצידה שומרת את הקובץ במכשיר הזה; שמירה מאוחרת עלולה אז להחזיר התקדמות שאיפסת.
+set_diagnostics_server	שרת %1$s
+set_diagnostics_signed_in_as	מחובר כ-%1$s
+set_diagnostics_app_version	אפליקציה %1$s
+set_recent_problems	בעיות אחרונות
+set_clear	נקה
+set_no_problems	לא נרשמו בעיות במכשיר הזה.
+set_unreadable_writes_confirm_title	להעביר הצידה רשומות שלא ניתן לקרוא?
+set_unreadable_writes_confirm_detail	מיקומי האזנה וקריאה יישלחו שוב, ואיפוסים יוכלו להתבצע.
+set_set_aside	העבר הצידה
+set_unreadable_resets_confirm_title	להעביר הצידה איפוסים שלא ניתן לקרוא?
+set_unreadable_resets_confirm_detail	כותרים יתנגנו ומיקומי קריאה יישלחו שוב. אפס שוב את ההתקדמות של כל כותר שעדיין תרצה להתחיל מההתחלה.
+set_signed_in	מחובר
+set_other_accounts	חשבונות אחרים
+set_server_sign_in_required	%1$s · נדרשת התחברות
+set_remove_account	הסר את %1$s
+set_switch_to_account	עבור לחשבון זה
+set_add_account	הוסף חשבון
+set_sign_out_of	התנתק מ-%1$s
+set_sign_out_detail	מסיר את החשבון הזה מהמכשיר. ההורדות וההאזנה שלא נשלחה שלו נשמרות עד שיתחבר שוב.
+set_accounts_footer	כל חשבון שומר את ההתקדמות, ההורדות ובחירת הספרייה שלו. המעבר בין חשבונות לעולם לא מערבב ביניהם.
+set_remove_account_confirm	להסיר את %1$s?
+set_remove_account_detail	תוכל להוסיף את החשבון שוב מאוחר יותר. ההורדות וההאזנה שלא נשלחה שלו נשארות במכשיר הזה.
+set_add_an_account	הוסף חשבון
+set_connect_intro	התחבר ישירות לשרת שלך. שום דבר לא מנותב דרך שירות אחר.
+set_change_server	החלף שרת
+set_sign_in	התחבר
+set_sign_in_openid	התחבר באמצעות OpenID
+set_saved_accounts	חשבונות שמורים
+set_use_account	השתמש
+set_edit	ערוך
+set_add_podcast	הוסף פודקאסט
+set_not_available_yet	עדיין לא זמין
+set_not_available_yet_detail	החלק הזה בגרסת התצוגה המקדימה עדיין בבנייה.
+set_import_previous_app	ייבוא מהאפליקציה הקודמת
+set_import_interrupted	ייבוא לא הסתיים. בחר באותו קובץ ייצוא כדי להמשיך מהמקום שבו נעצר.
+set_import_already	קובץ הייצוא הזה כבר יובא. הכותרים, ההאזנה והמיקומים ממנו נמצאים במכשיר הזה.
+set_import_preflight	%1$s\nהאפליקציה הקודמת והקובץ הזה רק נקראים; דבר בהם לא משתנה. כותרים, האזנה ומיקומים משויכים לחשבון ברגע שהוא מתחבר כאן. סיסמאות אינן כלולות בייצוא, ולכן כל חשבון מתחבר מחדש.
+set_import_account_signed_in	%1$s · מחובר
+set_import_account_sign_in_later	%1$s · התחבר לאחר הייבוא
+set_import_titles	כותרים
+set_import_title_partial	%1$s · השאר יורד מחדש
+set_not_imported	לא יובא
+set_import_space	נדרשים %1$s; פנויים %2$s.
+set_import_no_space	אין מספיק שטח פנוי במכשיר הזה. פנה מעט שטח ואז בחר שוב בקובץ הייצוא.
+set_import_progress	מעתיק קבצים: %1$d מתוך %2$d. אם האפליקציה נסגרת, בחר שוב באותו קובץ ייצוא כדי להמשיך.
+set_import_done	יובאו %1$d כותרים, %2$d הפעלות האזנה ו-%3$d מיקומים. ההגדרות מהאפליקציה הקודמת הוחלו.
+set_import_waiting	התחבר אל %1$s בתור %2$s כדי לשייך את הכותרים, ההאזנה והמיקומים שלו.
+set_import	ייבוא
+set_continue	המשך
+set_close	סגור
+set_import_file_unreadable	לא ניתן היה לקרוא את הקובץ שנבחר. בחר בו שוב, או שמור אותו קודם במכשיר הזה.
+set_import_stopped	הייבוא נעצר לפני שהסתיים. דבר לא אבד: בחר שוב באותו קובץ ייצוא כדי להמשיך מהמקום שבו נעצר.
+set_import_item_gone	הוא כבר לא נמצא בשרת, ולכן לא אומץ.
+set_import_file_changed	קובץ השתנה במכשיר הזה לאחר שיובא, ולכן הוא יורד שוב מהשרת.
+set_openid_not_enabled	התחברות באמצעות OpenID אינה מופעלת בשרת הזה. השתמש בשם המשתמש ובסיסמה שלך.
+set_openid_canceled	ההתחברות בדפדפן בוטלה. החשבונות השמורים שלך נשמרים.
+set_openid_invalid	לא ניתן היה לאמת את תגובת ההתחברות מהדפדפן. נסה להתחבר שוב ובדוק את הגדרות ההפניה של OpenID בשרת.
+set_vault_unreadable	לא ניתן היה לפענח את פרטי ההתחברות השמורים. הם נשמרים במכשיר; התחבר שוב כדי להמשיך.
+set_session_ended	ההפעלה שלך ב-%1$s הסתיימה. התחבר שוב; האזנה שלא נשלחה והורדות נשמרות.
+set_play_blocked_listening_storage	לא ניתן היה לשמור את ההאזנה מלפני סגירת האפליקציה כי האחסון אינו זמין, ולכן דבר לא יתנגן עד שניתן יהיה לשמור אותה. פנה מעט שטח ונסה שוב.
+set_play_blocked_unreadable_resets	לא ניתן היה לקרוא את איפוסי ההתקדמות השמורים, ולכן דבר לא יתנגן עד שיטופלו באבחון.
+set_play_blocked_discarding	ההתקדמות של הכותר הזה עדיין מתאפסת. הוא יתנגן מההתחלה כשזה יסתיים.
+dl_not_saved	לא ניתן היה לשמור את רשימת ההורדות במכשיר הזה, ולכן דבר לא השתנה. פנה מעט שטח אחסון ונסה שוב.
+dl_not_allowed	לחשבון שלך אין הרשאה להוריד.
+dl_no_audio	לפריט הזה אין שמע להורדה.
+dl_no_space	אין מספיק שטח פנוי במכשיר הזה עבור %1$s תוך השארת אחסון פנוי למערכת.
+dl_folder_lost_nothing_downloaded	הגישה אל %1$s הוסרה, ולכן דבר לא הורד. בחר שוב את תיקיית ההורדות בהגדרות.
+dl_downloading_percent	מוריד %1$d%%
+dl_cancel_download	בטל הורדה
+dl_downloaded_plays_offline	הורד · מתנגן במצב לא מקוון
+dl_failed	ההורדה נכשלה.
+dl_discard	התעלם
+dl_cellular_title	להוריד באמצעות נתונים סלולריים?
+dl_cellular_message	אתה מחובר לרשת מדודה. תוכל לשנות זאת בהגדרות.
+dl_not_now	לא עכשיו
+dl_folder_cannot_be_kept	לא ניתן לשמור את התיקייה הזו להורדות. בחר תיקייה אחרת.
+dl_saved_in_folder	ההורדות נשמרות ב-%1$s
+dl_saved_in_app_storage	ההורדות נשמרות באחסון האפליקציה
+dl_folder_visible_to_other_apps	אפליקציות אחרות במכשיר הזה יכולות לראות את הקבצים האלה. הורדות שבוצעו לפני שינוי נשארות במקומן.
+dl_folder_private_to_app	רק האפליקציה הזו יכולה לראות את הקבצים האלה. בחר תיקייה כדי לשמור הורדות במקום שאפליקציות אחרות יכולות לגשת אליו.
+dl_choose_folder	בחר תיקייה
+dl_use_app_storage	השתמש באחסון האפליקציה
+dl_ebook_missing	הספר האלקטרוני חסר במכשיר הזה. הורד אותו שוב כדי לפתוח אותו.
+dl_no_app_opens_format	אין במכשיר הזה אפליקציה שפותחת קובצי %1$s. התקן אפליקציה שפותחת אותם ונסה שוב.
+dl_no_app_opens_this_kind	אין במכשיר הזה אפליקציה שפותחת קבצים מסוג זה. התקן אפליקציה שפותחת אותם ונסה שוב.
+dl_folder_lost_choose_again_open	ההורדה הזו נמצאת ב-%1$s, והגישה אל %1$s הוסרה. בחר שוב את %1$s כדי לפתוח אותה.
+dl_folder_lost_choose_again_play	ההורדה הזו נמצאת ב-%1$s, והגישה אל %1$s הוסרה. בחר שוב את %1$s כדי לנגן אותה.
+dl_names_or	%1$s או %2$s
+dl_names_and	%1$s ו-%2$s
+dl_remove_title	להסיר את ההורדה?
+dl_remove_message	"%1$s" יוסר מהמכשיר הזה. התקדמות ההאזנה שלך נשמרת.
+dl_keep	השאר
+dl_not_that_folder	זו לא %1$s. בחר את התיקייה שבה נמצאות ההורדות האלה.
+dl_folder_access_not_kept	לא ניתן היה לשמור את הגישה לתיקייה הזו. נסה שוב.
+dl_no_downloads	אין הורדות
+dl_no_downloads_message	הורד ספרים או פרקים מהעמוד שלהם כדי להאזין ללא חיבור.
+dl_access_removed_title	הגישה אל %1$s הוסרה
+dl_downloads_kept_there:one	הורדה %1$d נשמרת שם. בחר שוב את %2$s כדי לנגן ולפתוח אותה.
+dl_downloads_kept_there:two	%1$d הורדות נשמרות שם. בחר שוב את %2$s כדי לנגן ולפתוח אותן.
+dl_downloads_kept_there:other	%1$d הורדות נשמרות שם. בחר שוב את %2$s כדי לנגן ולפתוח אותן.
+dl_choose_again	בחר שוב את %1$s
+dl_some_files_missing	חלק מהקבצים חסרים במכשיר הזה
+dl_size_in_folder	%1$s ב-%2$s
+dl_open_in_another_app	פתח את %1$s באפליקציה אחרת
+dl_download_again_named	הורד שוב את %1$s
+dl_the_chosen_folder	התיקייה שנבחרה
+dl_files_missing_play	חלק מהקבצים של ההורדה הזו חסרים במכשיר הזה. הורד אותה שוב כדי לנגן אותה.
+dl_play_named	נגן את %1$s
+dl_retry_named	נסה שוב את %1$s
+dl_cancel_named	בטל את %1$s
+dl_remove_named	הסר את %1$s
+dl_sign_in_again	התחבר שוב לחשבון הזה כדי להוריד.
+dl_folder_lost_choose_in_downloads	הגישה אל %1$s הוסרה. בחר שוב את התיקייה בהורדות.
+dl_connection_interrupted	החיבור נקטע.
+dl_error_retrying	%1$s מנסה שוב…
+dl_server_refused	השרת דחה את ההורדה.
+dl_server_sent_type_not_audio	השרת שלח %1$s במקום שמע, ולכן דבר לא נשמר. בדוק את השרת או את ה-proxy שלך ונסה שוב.
+dl_server_sent_unknown_not_audio	השרת שלח תגובה לא מוכרת במקום שמע, ולכן דבר לא נשמר. בדוק את השרת או את ה-proxy שלך ונסה שוב.
+dl_size_mismatch	גודל הקובץ שהורד היה %1$d בתים אך השרת ציין %2$d, ולכן הוא נמחק. נסה שוב כדי להוריד אותו מחדש.
+dl_server_sent_not_pdf	השרת שלח משהו שאינו קובץ ה-PDF, ולכן דבר לא נשמר. בדוק את השרת או את ה-proxy שלך ונסה שוב.
+dl_notification_downloading	מוריד את %1$s
+rd_positions_not_restored	לא ניתן היה לשחזר את מיקומי הקריאה השמורים, ולכן עמודים אינם נשמרים. הנתונים המקוריים נשמרים.
+rd_positions_not_overwritten	לא ניתן היה לקרוא את מיקומי הקריאה השמורים, ולכן הם לא נדרסים.
+rd_not_a_pdf	הקובץ הזה אינו PDF שהמכשיר הזה יכול לפתוח.
+rd_document_not_opened	לא ניתן היה לפתוח את המסמך.
+rd_page_not_saved	לא ניתן היה לשמור את העמוד הזה במכשיר הזה.
+rd_choice_not_saved	לא ניתן היה לשמור את הבחירה שלך במכשיר הזה.
+rd_conflict_title	להמשיך מאיפה?
+rd_conflict_page	מכשיר אחר הגיע לעמוד %1$d בזמן שעמוד %2$d כאן עדיין לא נשמר בשרת.
+rd_conflict_location	מכשיר אחר שמר מיקום קריאה שהקורא הזה לא יכול להציג כעמוד, בזמן שעמוד %1$d כאן עדיין לא נשמר בשרת.
+rd_go_to_page_number	עבור לעמוד %1$d
+rd_keep_other_position	שמור את המיקום האחר
+rd_stay_on_page	הישאר בעמוד %1$d
+rd_close_reader	סגור את הקורא
+rd_rotate_pages	סובב עמודים
+rd_continuous_scrolling	גלילה רציפה
+rd_document_error_title	לא ניתן היה לפתוח את המסמך הזה
+rd_try_again	נסה שוב
+rd_go_to_page	עבור לעמוד
+rd_previous_page	העמוד הקודם
+rd_next_page	העמוד הבא
+rd_page_of	עמוד %1$d מתוך %2$d
+rd_page_number	עמוד %1$d
+rd_download_folder_lost	ההורדה הזו נמצאת ב-%1$s, והגישה אל %1$s הוסרה. בחר שוב את התיקייה בהורדות.
+rd_downloaded_document_missing	המסמך שהורד חסר במכשיר הזה. הורד אותו שוב.
+rd_document_not_stored	לא ניתן היה לאחסן את המסמך לקריאה.
+rd_supplementary_pdf	PDF משלים
+rd_format_not_available	קריאת %1$s עדיין אינה זמינה בגרסת התצוגה המקדימה הזו. מיקום הקריאה שלך בשרת נשמר.
+rd_ebook_not_available	קריאת הספר האלקטרוני הזה עדיין אינה זמינה בגרסת התצוגה המקדימה הזו. מיקום הקריאה שלך בשרת נשמר.
+grp_unavailable_title	כותר לא זמין
+grp_could_not_load_collections	לא ניתן היה לטעון אוספים.
+grp_could_not_load_playlists	לא ניתן היה לטעון רשימות השמעה.
+grp_collections_unavailable	האוספים אינם זמינים
+grp_playlists_unavailable	רשימות ההשמעה אינן זמינות
+grp_no_collections_yet	אין עדיין אוספים
+grp_no_playlists_yet	אין עדיין רשימות השמעה
+grp_create_one_hint	צור אחד כדי לשמור כותרים יחד בסדר שלך.
+grp_title_count:one	כותר %1$d
+grp_title_count:two	%1$d כותרים
+grp_title_count:other	%1$d כותרים
+grp_collection_deleted	האוסף הזה נמחק.
+grp_playlist_deleted	רשימת ההשמעה הזו נמחקה.
+grp_could_not_load	לא ניתן היה לטעון.
+grp_collection_unavailable	האוסף אינו זמין
+grp_playlist_unavailable	רשימת ההשמעה אינה זמינה
+grp_nothing_in_collection_can_play	אין באוסף הזה שום דבר שניתן לנגן.
+grp_nothing_in_playlist_can_play	אין ברשימת ההשמעה הזו שום דבר שניתן לנגן.
+grp_could_not_start_playback	לא ניתן היה להתחיל את הניגון.
+grp_resume	המשך
+grp_play_collection	נגן אוסף
+grp_play_playlist	נגן רשימת השמעה
+grp_edit_collection	ערוך אוסף
+grp_edit_playlist	ערוך רשימת השמעה
+grp_delete_collection	מחק אוסף
+grp_delete_playlist	מחק רשימת השמעה
+grp_no_titles_yet	אין עדיין כותרים
+grp_delete_collection_question	למחוק את האוסף?
+grp_delete_playlist_question	למחוק את רשימת ההשמעה?
+grp_delete_group_explanation	“%1$s” יוסר מהשרת שלך. הכותרים שבו נשמרים.
+grp_not_deleted	לא נמחק: %1$s
+grp_not_deleted_try_again	לא נמחק: נסה שוב
+grp_not_allowed_to_change_collection	לחשבון השרת שלך אין הרשאה לשנות את האוסף הזה.
+grp_not_allowed_to_change_playlist	לחשבון השרת שלך אין הרשאה לשנות את רשימת ההשמעה הזו.
+grp_collection_no_longer_exists	האוסף הזה כבר לא קיים.
+grp_playlist_no_longer_exists	רשימת ההשמעה הזו כבר לא קיימת.
+grp_not_saved	לא נשמר: %1$s
+grp_not_saved_try_again	לא נשמר: נסה שוב
+grp_saving	שומר…
+grp_create_collection	צור אוסף
+grp_create_playlist	צור רשימת השמעה
+grp_save_changes	שמור שינויים
+grp_choose_at_least_one_title	בחר לפחות כותר אחד.
+grp_order	סדר
+grp_move_up	הזז את %1$s למעלה
+grp_remove_member	הסר את %1$s
+grp_add_titles	הוסף כותרים
+grp_add_episodes_hint	הוסף פרקים מעמוד הפרקים של פודקאסט.
+grp_add_to_playlist_or_collection	הוסף לרשימת השמעה או לאוסף
+grp_add_to	הוסף אל
+grp_nothing_to_add_to	עדיין אין כאן שום דבר שאפשר להוסיף אליו.
+grp_added_to	נוסף אל %1$s
+grp_not_added	לא נוסף: %1$s
+grp_not_added_try_again	לא נוסף: נסה שוב
+grp_already_included	כבר כלול
+grp_close	סגור
+grp_titles_could_not_load	לא ניתן היה לטעון כותרים
+grp_nothing_here	אין כאן כלום
+pod_feed_episodes	פרקי הערוץ
+pod_sort_newest_first	החדש ביותר קודם, הקש לישן ביותר קודם
+pod_sort_oldest_first	הישן ביותר קודם, הקש לחדש ביותר קודם
+pod_episodes_queued:one	פרק %1$d נכנס לתור בשרת שלך: %2$s
+pod_episodes_queued:two	%1$d פרקים נכנסו לתור בשרת שלך: %2$s
+pod_episodes_queued:other	%1$d פרקים נכנסו לתור בשרת שלך: %2$s
+pod_server_could_not_download	השרת שלך לא הצליח להוריד את “%1$s”.
+pod_dismiss	סגור
+pod_no_episodes_yet	אין עדיין פרקים
+pod_no_episodes_match_filter	אין פרקים שתואמים לסינון הזה
+pod_episode_details	פרטי הפרק
+pod_untitled_episode	פרק ללא שם
+pod_play_named	נגן את %1$s
+pod_episode_not_available	הפרק אינו זמין
+pod_episode_may_have_been_removed	ייתכן שהוא הוסר מהשרת.
+pod_percent_listened	%1$d%% הושמעו
+pod_feed_could_not_open	לא ניתן היה לפתוח את הערוץ.
+pod_retry_feed	נסה שוב את הערוץ
+pod_no_feed_episodes	לא נמצאו פרקים בערוץ
+pod_already_on_server	כבר בשרת
+pod_selected	נבחר
+pod_not_selected	לא נבחר
+pod_no_audio_enclosure	אין קובץ שמע מצורף
+pod_not_queued	לא נכנס לתור: %1$s
+pod_not_queued_try_again	לא נכנס לתור: נסה שוב
+pod_queueing_on_server	מכניס לתור בשרת שלך…
+pod_add_selected_episodes	הוסף את הפרקים שנבחרו לשרת
+pod_something_went_wrong	משהו השתבש.
+pod_adding_not_available	הוספת פודקאסטים אינה זמינה
+pod_adding_needs_permission	חשבון השרת שלך זקוק להרשאת ניהול פודקאסטים בספריית פודקאסטים.
+pod_search_podcasts	חפש פודקאסטים
+pod_or_rss_feed_url	או כתובת URL של ערוץ RSS
+pod_enter_complete_feed_url	הזן כתובת ערוץ HTTP או HTTPS מלאה.
+pod_preview_feed	תצוגה מקדימה של הערוץ
+pod_create_podcast	צור פודקאסט
+pod_choose_different_feed	בחר ערוץ אחר
+item_something_went_wrong	משהו השתבש. נסה שוב.
+item_feed_subscribe_at	אפליקציות פודקאסט יכולות להירשם לכותר הזה בכתובת:
+item_copied	הועתק
+item_copy_address	העתק כתובת
+item_hidden_from_directories	מוסתר ממדריכי פודקאסטים
+item_feed_public_warning	כל מי שיש לו את הכתובת יכול להאזין לכותר הזה בלי להתחבר.
+item_feed_name	שם הערוץ
+item_feed_name_rule	אותיות, ספרות, - ו-_ בלבד
+item_hide_from_directories	הסתר ממדריכי פודקאסטים
+item_done	סיום
+item_sending	שולח…
+item_sent_to	נשלח אל %1$s
+item_send_ebook_explanation	השרת שלך שולח את הספר האלקטרוני בדוא״ל למכשיר שתבחר.
+item_ereader_or_ebook_gone	%1$s או הספר האלקטרוני הזה כבר אינם זמינים בשרת. דבר לא נשלח.
+item_not_sent_to	לא נשלח אל %1$s. %2$s
+item_not_saved_try_again	לא נשמר. נסה שוב.
+item_mark_unfinished	סמן כלא הושלם
+item_discard_uncertain	שמירה קודמת של ההתקדמות בכותר הזה לא קיבלה תשובה ועדיין עשויה להגיע לשרת שלך. אם היא תגיע אחרי האיפוס, היא תחזיר את ההתקדמות. השרת שלך לא יכול לדעת אם זה יקרה ולהודיע לאפליקציה.
+item_discard_anyway	אפס בכל זאת
+item_discard_under_way	האיפוס הזה כבר בתהליך ולא ניתן לבטל אותו.
+item_keep_progress	שמור התקדמות
+item_discard_pending	מאפס את ההתקדמות. הפעולה תסתיים כשניתן יהיה להגיע לשרת שלך וההאזנה לכותר הזה תישלח.
+item_discard_anyway_question	לאפס בכל זאת?
+item_discard_anyway_explanation	ההתקדמות תוסר עכשיו. אם השמירה הקודמת תגיע לשרת שלך אחר כך, ההתקדמות בכותר הזה תחזור ותוכל לאפס אותה שוב.
+item_discard	אפס
+item_discard_progress_question	לאפס את ההתקדמות?
+item_discard_progress_explanation	המיקום שלך ומצב ההשלמה של הכותר הזה יוסרו מהשרת עבור כל המכשירים.
+item_could_not_load	לא ניתן היה לטעון את הכותר הזה
+item_narrated_by	בקריינות
+item_series	סדרה: %1$s
+item_series_with_sequence	סדרה: %1$s #%2$s
+item_episode_count:one	פרק %1$d
+item_episode_count:two	%1$d פרקים
+item_episode_count:other	%1$d פרקים
+item_listened_and_left	%1$d%% הושמעו · נותרו %2$s
+item_chapter_number	פרק %1$d
+pl_minimize_player	מזער נגן
+pl_nothing_playing	שום דבר לא מתנגן
+pl_chapter_number	פרק %1$d
+pl_try_again	נסה שוב
+pl_speed_value	מהירות %1$s
+pl_sleep	שינה
+pl_position_of_duration	%1$s מתוך %2$s
+pl_buffering	אוגר נתונים
+pl_previous_chapter	הפרק הקודם
+pl_next_chapter	הפרק הבא
+pl_jump_forward_seconds:one	דלג קדימה %1$d שנייה
+pl_jump_forward_seconds:two	דלג קדימה %1$d שניות
+pl_jump_forward_seconds:other	דלג קדימה %1$d שניות
+pl_jump_back_seconds:one	דלג אחורה %1$d שנייה
+pl_jump_back_seconds:two	דלג אחורה %1$d שניות
+pl_jump_back_seconds:other	דלג אחורה %1$d שניות
+pl_jump_forward_minutes:one	דלג קדימה %1$d דקה
+pl_jump_forward_minutes:two	דלג קדימה %1$d דקות
+pl_jump_forward_minutes:other	דלג קדימה %1$d דקות
+pl_jump_back_minutes:one	דלג אחורה %1$d דקה
+pl_jump_back_minutes:two	דלג אחורה %1$d דקות
+pl_jump_back_minutes:other	דלג אחורה %1$d דקות
+pl_open_player	פתח נגן
+pl_playback_stopped	הניגון נעצר
+pl_listening_unsaved	חלק מההאזנה עדיין לא נשמר במכשיר הזה. היא נשמרת בצד ותישמר ברגע שהאחסון יאפשר זאת.
+pl_playing	מתנגן
+pl_resume	המשך
+pl_streaming_cellular_refused	הזרמה באמצעות נתונים סלולריים כבויה בהגדרות. התחבר ל-Wi-Fi או הורד קודם את הכותר הזה.
+pl_stream_cellular_title	להזרים באמצעות נתונים סלולריים?
+pl_stream_cellular_message	אתה מחובר לרשת מדודה. תוכל לשנות זאת בהגדרות.
+pl_not_now	לא עכשיו
+pl_sleep_stops_end_of_chapter	ייעצר בסוף הפרק הזה, בעוד %1$s
+pl_sleep_stops_in	ייעצר בעוד %1$s
+pl_sleep_minus_minutes	−%1$d דק׳
+pl_sleep_plus_minutes	+%1$d דק׳
+pl_sleep_minutes	%1$d דק׳
+pl_sleep_turn_off	כבה
+pl_bookmark_not_saved_reason	הסימנייה לא נשמרה: %1$s
+pl_bookmark_not_saved	הסימנייה לא נשמרה: נסה שוב
+pl_bookmark_add_at	הוסף ב-%1$s
+pl_bookmark_go_to	עבור לסימנייה
+pl_bookmark_default	סימנייה
+pl_bookmark_rename_named	שנה את שם %1$s
+pl_bookmark_delete_named	מחק את %1$s
+pl_bookmark_at	סימנייה ב-%1$s
+pl_bookmark_rename	שנה שם סימנייה
+pl_bookmark_new	סימנייה חדשה
+pl_untitled	ללא שם
+pl_playback_stopped_reason	הניגון נעצר: %1$s. המיקום שלך נשמר.
+pl_playback_stopped_unknown	הניגון נעצר: לא ניתן היה לטעון את השמע. המיקום שלך נשמר.
+pl_no_playable_audio	לפריט הזה אין שמע שניתן לנגן.
+pl_could_not_start	לא ניתן היה להתחיל את הניגון.
+pl_listening_save_failed	לא ניתן היה לשמור את ההאזנה במכשיר הזה, ולכן הניגון הושהה. פנה מעט שטח אחסון ונסה שוב.
+cast_casting_to	משדר אל %1$s
+cast_cast	שידור
+cast_playing_on	מתנגן ב-%1$s
+cast_connecting_to	מתחבר אל %1$s…
+cast_playing_on_phone	מתנגן בטלפון הזה
+cast_stop	הפסק שידור
+cast_looking	מחפש מכשירי שידור…
+cast_none_found	לא נמצאו מכשירי שידור. ודא שהמקלט מופעל ומחובר לאותה רשת Wi-Fi כמו הטלפון הזה.
+cast_close	סגור
+cast_download_not_castable	עותקים שהורדו מתנגנים רק בטלפון הזה. הפסק את השידור כדי להאזין כאן, או הזרם את הכותר במקום.
+cast_resumed_without_title	השידור נעצר כי האפליקציה הופעלה מחדש במהלך השידור. פתח שוב את הכותר כדי להמשיך להאזין מהמקום האחרון שהטלפון הזה שמר.
+cast_needs_play_services	שידור דורש את שירותי Google Play, שאינם קיימים במכשיר הזה או שיש לעדכן אותם.
+cast_could_not_start	לא ניתן היה להתחיל לשדר במכשיר הזה: %1$s.
+cast_connect_failed_named	לא ניתן היה להתחבר אל %1$s. ודא שהוא מופעל ומחובר לאותה רשת Wi-Fi כמו הטלפון הזה.
+cast_connect_failed	לא ניתן היה להתחבר למקלט. ודא שהוא מופעל ומחובר לאותה רשת Wi-Fi כמו הטלפון הזה.
+cast_connection_lost_named	החיבור אל %1$s אבד. הניגון ממשיך בטלפון הזה.
+cast_connection_lost	החיבור למקלט אבד. הניגון ממשיך בטלפון הזה.
+auto_continue	המשך
+auto_recent	אחרונים
+auto_discovery	גילוי
+auto_authors_count:one	סופר %1$d
+auto_authors_count:two	%1$d סופרים
+auto_authors_count:other	%1$d סופרים
+auto_series_count:one	סדרה %1$d
+auto_series_count:two	%1$d סדרות
+auto_series_count:other	%1$d סדרות
+lib_books_count:one	ספר %1$d
+lib_books_count:two	%1$d ספרים
+lib_books_count:other	%1$d ספרים
+lib_items_count:one	פריט %1$d
+lib_items_count:two	%1$d פריטים
+lib_items_count:other	%1$d פריטים
+lib_selected	נבחר
+lib_all_filters	כל המסננים
+lib_nothing_to_filter	אין כאן לפי מה לסנן.
+lib_sort_descending_switch	סדר יורד, עבור לסדר עולה
+lib_sort_ascending_switch	סדר עולה, עבור לסדר יורד
+lib_sort_descending	סדר יורד
+lib_sort_ascending	סדר עולה
+lib_unavailable	הספרייה אינה זמינה
+lib_unavailable_message	%1$s החשבון שלך וההאזנה שלא נשלחה נשמרים.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	הצג עטיפות
+lib_show_list	הצג רשימה
+lib_filtered	מסונן
+lib_empty_title	אין כאן עדיין כלום
+lib_empty_message	בספרייה הזו אין פריטים שיש לך גישה אליהם.
+lib_page_error	לא ניתן היה לטעון כותרים נוספים
+lib_card_finished	%1$s, הושלם
+lib_card_percent_listened	%1$s, %2$d אחוז הושמעו
+lib_search_in	חפש ב-%1$s
+lib_search_library	חפש בספרייה
+lib_clear_search	נקה חיפוש
+lib_search_failed	החיפוש נכשל
+lib_search_idle_title	מצא משהו להאזין לו
+lib_search_idle_message	חפש כותרים, סופרים, סדרות, מספרים ופרקים.
+lib_search_no_match	אין תוצאות עבור "%1$s". נסה פחות מילים או איות אחר.
+err_invalid_server	הזן כתובת שרת שמתחילה ב-http:// או ב-https://, לדוגמה https://books.example.com/abs.
+err_unsafe_media_url	השרת החזיר כתובת מדיה מחוץ לשרת הזה. היא לא נפתחה.
+err_sign_in_required	ההפעלה שלך כבר לא מתקבלת. התחבר שוב; האזנה שלא נשלחה נשמרת.
+err_untrusted	האישור של השרת אינו מהימן במכשיר הזה. התקן את רשות האישורים של השרת שלך בהגדרות Android > אבטחה > הצפנה ופרטי כניסה, ואז נסה שוב.
+err_offline	לא ניתן היה להגיע לשרת. בדוק את הכתובת או את החיבור שלך ונסה שוב.
+err_forbidden	לחשבון שלך אין הרשאה לעשות זאת.
+err_not_found	התוכן הזה כבר אינו זמין בשרת.
+err_server_problem	בשרת הייתה בעיה זמנית (HTTP %1$d). נסה שוב.
+err_rejected	השרת דחה את הבקשה (HTTP %1$d).
+err_invalid_response	השרת שלח תגובה שהאפליקציה הזו לא יכולה לקרוא.
+err_no_audio	לפריט הזה אין שמע שניתן לנגן.
+err_login_rejected	שם המשתמש או הסיסמה לא התקבלו.
+err_publications_unreadable	לא ניתן היה לקרוא רשומות של כתיבות התקדמות שלא נענו. טפל בהן קודם באבחון.
+err_discards_unreadable	לא ניתן היה לקרוא את איפוסי ההתקדמות השמורים. טפל בהם קודם באבחון.

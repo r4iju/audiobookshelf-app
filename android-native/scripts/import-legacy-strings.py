@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """Writes the app's string resources from app/src/main/strings/strings.tsv, carrying the legacy app's
 own translations (repository /strings) for every string whose meaning the legacy app already has.
-Strings without a legacy translation fall back to English. Run after editing the table.
+In the tables, \\n is a line break.
+A string the legacy app lacks takes its draft from app/src/main/strings/drafts/<legacy code>.tsv (name, text),
+machine-drafted and not reviewed by a native speaker. Anything else falls back to English. Run after editing.
 
 A row named `name:one`, `name:other` (any CLDR quantity) becomes one quantity of the plural `name`. A language
-gets a plural only when every English quantity is translated; otherwise the plural falls back to English."""
-import json, re, shutil
+gets a legacy plural only when every English quantity is translated. A drafted plural carries exactly the
+language's own quantities (PLURALS). Otherwise the plural falls back to English. A draft with an unknown name,
+other placeholders than the English text, or the wrong quantities stops the script. --check validates and reports
+without writing."""
+import json, re, shutil, sys
 from pathlib import Path
 
 android = Path(__file__).resolve().parent.parent
@@ -17,12 +22,20 @@ LANGUAGES = {'no': ('nb', 'nb'), 'he': ('he', 'iw'), 'pt-br': ('pt-BR', 'pt-rBR'
 # A language is offered in the system's per-app language list only when most of these strings are translated.
 OFFERED = 0.8
 PLACEHOLDER = re.compile(r'%\d\$[sd]')
+# CLDR cardinal plural categories Android uses, by legacy file name; English's one/other elsewhere.
+PLURALS = {'ar': 'zero one two few many other', 'be': 'one few many other', 'cs': 'one few many other', 'fr': 'one many other',
+           'es': 'one many other', 'it': 'one many other', 'ca': 'one many other', 'pt-br': 'one many other', 'he': 'one two other',
+           'hr': 'one few other', 'ja': 'other', 'ko': 'other', 'lt': 'one few many other', 'lv': 'zero one other', 'pl': 'one few many other',
+           'ro': 'one few other', 'ru': 'one few many other', 'sk': 'one few many other', 'sl': 'one two few other', 'uk': 'one few many other',
+           'vi-vn': 'other', 'zh-cn': 'other', 'zh_Hant': 'other', 'fa': 'one other', 'hi': 'one other', 'gu': 'one other', 'bn': 'one other'}
+drafts = android / 'app/src/main/strings/drafts'
+check = '--check' in sys.argv
 
 rows = []
 for line in (android / 'app/src/main/strings/strings.tsv').read_text().splitlines():
     if line and not line.startswith('#'):
         name, key, text, *wrong = line.split('\t')
-        rows.append((name, key, text, set(wrong[0].split()) if wrong else set()))
+        rows.append((name, key, text.replace('\\n', '\n'), set(wrong[0].split()) if wrong else set()))
 
 def escape(text):
     text = text.replace('\\', '\\\\').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
@@ -30,6 +43,8 @@ def escape(text):
     return '\\' + text if text[:1] in '@?' else text
 
 def write(directory, strings):
+    if check:
+        return
     directory.mkdir(parents=True, exist_ok=True)
     plurals = {}
     for name, text in strings:
@@ -40,12 +55,40 @@ def write(directory, strings):
                     for name, items in plurals.items())
     (directory / 'strings.xml').write_text(f'<?xml version="1.0" encoding="utf-8"?>\n{HEADER}\n<resources>\n{body}</resources>\n')
 
-for old in res.glob('values-*/strings.xml'):
+for old in [] if check else res.glob('values-*/strings.xml'):
     if HEADER in old.read_text():
         shutil.rmtree(old.parent) if len(list(old.parent.iterdir())) == 1 else old.unlink()
 write(res / 'values', [(name, text) for name, _, text, _ in rows])
 mapped = [row for row in rows if row[1] != '-']
+english = {name: text for name, _, text, _ in rows}
+order = {name.split(':')[0]: index for index, (name, *_) in reversed(list(enumerate(rows)))}
+groups = {name.split(':')[0] for name in english}  # what a person counts: each string, and each plural once
 offered, report = ['en'], []
+
+def drafted(code):
+    path = drafts / f'{code}.tsv'
+    if not path.exists():
+        return {}
+    quantities = set(PLURALS.get(code, 'one other').split())
+    found = {}
+    for number, line in enumerate(path.read_text().splitlines(), 1):
+        if not line or line.startswith('#'):
+            continue
+        name, text = line.split('\t')
+        text = text.replace('\\n', '\n')
+        group, _, quantity = name.partition(':')
+        source = english.get(name) or english.get(f'{group}:other') if quantity else english.get(name)
+        problem = ('unknown name' if source is None or (quantity and quantity not in quantities) else
+                   'placeholders differ' if set(PLACEHOLDER.findall(text)) - set(PLACEHOLDER.findall(source))
+                   or (quantity in ('', 'other') and sorted(PLACEHOLDER.findall(text)) != sorted(PLACEHOLDER.findall(source))) else None)
+        if problem or not text.strip():
+            raise SystemExit(f'{path.name}:{number} {name}: {problem or "empty"}')
+        found[name] = text
+    for group in {name.split(':')[0] for name in found if ':' in name}:
+        if {name.split(':')[1] for name in found if name.split(':')[0] == group} != quantities:
+            raise SystemExit(f'{path.name} {group}: needs exactly the quantities {" ".join(sorted(quantities))}')
+    return found
+
 for path in sorted(legacy.glob('*.json')):
     code = path.stem
     if code == 'en-us':
@@ -66,12 +109,17 @@ for path in sorted(legacy.glob('*.json')):
             quantities.setdefault(name.split(':')[0], set()).add(name)
     translated = {name for name, _ in strings}
     strings = [(name, value) for name, value in strings if ':' not in name or quantities[name.split(':')[0]] <= translated]
-    report.append(f'{code} {len(strings)}/{len(mapped)}')
+    legacy_groups = {name.split(':')[0] for name, _ in strings}
+    draft = drafted(code)
+    strings += [(name, value) for name, value in draft.items() if name.split(':')[0] not in legacy_groups]
+    covered = {name.split(':')[0] for name, _ in strings}
+    report.append(f'{code} {len(covered)}/{len(groups)} ({len(legacy_groups)} legacy, {len(covered) - len(legacy_groups)} drafted)')
     if strings:
-        write(res / f'values-{qualifier}', strings)
-        if len(strings) >= OFFERED * len(mapped):
+        write(res / f'values-{qualifier}', sorted(strings, key=lambda item: order[item[0].split(':')[0]]))
+        if len(covered) >= OFFERED * len(groups):
             offered.append(tag)
-(res / 'xml/locales_config.xml').write_text('<?xml version="1.0" encoding="utf-8"?>\n<!-- Generated by scripts/import-legacy-strings.py. -->\n<locale-config xmlns:android="http://schemas.android.com/apk/res/android">\n' + ''.join(f'    <locale android:name="{tag}" />\n' for tag in offered) + '</locale-config>\n')
-print(f'{len(rows)} strings, {len(mapped)} with a legacy equivalent')
+if not check:
+    (res / 'xml/locales_config.xml').write_text('<?xml version="1.0" encoding="utf-8"?>\n<!-- Generated by scripts/import-legacy-strings.py. -->\n<locale-config xmlns:android="http://schemas.android.com/apk/res/android">\n' + ''.join(f'    <locale android:name="{tag}" />\n' for tag in offered) + '</locale-config>\n')
+print(f'{len(groups)} strings and plurals, {len(mapped)} rows with a legacy equivalent')
 print('; '.join(report))
 print(f'Offered ({len(offered) - 1} besides English):', ' '.join(offered))

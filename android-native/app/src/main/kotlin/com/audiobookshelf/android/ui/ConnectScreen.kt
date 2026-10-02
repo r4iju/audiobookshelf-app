@@ -80,7 +80,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
             try {
                 server = graph.accounts.probe(address)
             } catch (error: Exception) {
-                connectionError = error.message
+                connectionError = error.localizedMessage
             } finally { busy = false }
         }
     }
@@ -138,9 +138,9 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                                     try {
                                         graph.accounts.signIn(connected.first, username, password)
                                     } catch (error: AuthApi.LoginRejected) {
-                                        signInError = error.message
+                                        signInError = error.localizedMessage
                                     } catch (error: Exception) {
-                                        signInError = error.message
+                                        signInError = error.localizedMessage
                                     } finally { busy = false; password = "" }
                                 }
                             },

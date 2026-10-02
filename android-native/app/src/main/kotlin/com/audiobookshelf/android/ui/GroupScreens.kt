@@ -115,7 +115,7 @@ fun GroupsScreen(kind: String, active: SessionState.Active, catalog: CatalogMode
         error = null
         try {
             groups = if (kind == COLLECTIONS) active.client.collections(libraryId).map(Group::of) else active.client.playlists(libraryId).map(Group::of)
-        } catch (failure: Exception) { error = failure.message ?: context.getString(byKind(kind, R.string.grp_could_not_load_collections, R.string.grp_could_not_load_playlists)); graph.accounts.handle(failure) }
+        } catch (failure: Exception) { error = failure.localizedMessage ?: context.getString(byKind(kind, R.string.grp_could_not_load_collections, R.string.grp_could_not_load_playlists)); graph.accounts.handle(failure) }
     }
     val list = groups
     Box(Modifier.fillMaxSize().padding(padding).testTag("groups-$kind")) {
@@ -160,7 +160,7 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
         error = null
         try { group = active.client.group(kind, id) } catch (failure: Exception) {
             error = if (failure is ApiError.Http && failure.status == 404) context.getString(byKind(kind, R.string.grp_collection_deleted, R.string.grp_playlist_deleted))
-                else failure.message ?: context.getString(R.string.grp_could_not_load)
+                else failure.localizedMessage ?: context.getString(R.string.grp_could_not_load)
             graph.accounts.handle(failure)
         }
     }
@@ -198,7 +198,7 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
                                     if (sources.isEmpty()) actionError = context.getString(byKind(kind, R.string.grp_nothing_in_collection_can_play, R.string.grp_nothing_in_playlist_can_play))
                                     else graph.playback.playQueue(loaded.id, sources)
                                 } catch (failure: Exception) {
-                                    actionError = failure.message ?: context.getString(R.string.grp_could_not_start_playback); graph.accounts.handle(failure)
+                                    actionError = failure.localizedMessage ?: context.getString(R.string.grp_could_not_start_playback); graph.accounts.handle(failure)
                                 } finally { busy = false }
                             }
                         },
@@ -246,7 +246,7 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
                 confirmDelete = false; actionError = null
                 scope.launch {
                     try { active.client.deleteGroup(kind, loaded.id); onDeleted() }
-                    catch (failure: Exception) { actionError = failure.message?.let { context.getString(R.string.grp_not_deleted, it) } ?: context.getString(R.string.grp_not_deleted_try_again); graph.accounts.handle(failure) }
+                    catch (failure: Exception) { actionError = failure.localizedMessage?.let { context.getString(R.string.grp_not_deleted, it) } ?: context.getString(R.string.grp_not_deleted_try_again); graph.accounts.handle(failure) }
                 }
             }, modifier = Modifier.testTag("confirm-delete-group")) { Text(stringResource(R.string.grp_delete), color = MaterialTheme.colorScheme.error) }
         },
@@ -277,7 +277,7 @@ fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, ca
         try {
             val group = active.client.group(kind, id)
             saved = group; name = group.name; description = group.description; members = group.members
-        } catch (failure: Exception) { loadError = failure.message ?: context.getString(R.string.grp_could_not_load); graph.accounts.handle(failure) }
+        } catch (failure: Exception) { loadError = failure.localizedMessage ?: context.getString(R.string.grp_could_not_load); graph.accounts.handle(failure) }
     }
     val choosable = catalog.library?.isPodcast == false
     LaunchedEffect(libraryId, choosable) {
@@ -329,7 +329,7 @@ fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, ca
                 error = when {
                     failure is ApiError.Http && failure.status == 403 -> context.getString(byKind(kind, R.string.grp_not_allowed_to_change_collection, R.string.grp_not_allowed_to_change_playlist))
                     failure is ApiError.Http && failure.status == 404 -> context.getString(byKind(kind, R.string.grp_collection_no_longer_exists, R.string.grp_playlist_no_longer_exists))
-                    else -> failure.message?.let { context.getString(R.string.grp_not_saved, it) } ?: context.getString(R.string.grp_not_saved_try_again)
+                    else -> failure.localizedMessage?.let { context.getString(R.string.grp_not_saved, it) } ?: context.getString(R.string.grp_not_saved_try_again)
                 }
                 graph.accounts.handle(failure)
             } finally { saving = false }
@@ -404,7 +404,7 @@ fun AddToGroupButton(itemId: String, episodeId: String?, active: SessionState.Ac
                 groups = kinds.flatMap { kind ->
                     if (kind == COLLECTIONS) active.client.collections(libraryId).map(Group::of) else active.client.playlists(libraryId).map(Group::of)
                 }.filter { it.canEdit(catalog.user) }
-            } catch (failure: Exception) { message = failure.message; open = false; graph.accounts.handle(failure) }
+            } catch (failure: Exception) { message = failure.localizedMessage; open = false; graph.accounts.handle(failure) }
         }
         AlertDialog(
             onDismissRequest = { open = false },
@@ -426,7 +426,7 @@ fun AddToGroupButton(itemId: String, episodeId: String?, active: SessionState.Ac
                                         context.getString(R.string.grp_added_to, group.name)
                                     } catch (failure: Exception) {
                                         graph.accounts.handle(failure)
-                                        failure.message?.let { context.getString(R.string.grp_not_added, it) } ?: context.getString(R.string.grp_not_added_try_again)
+                                        failure.localizedMessage?.let { context.getString(R.string.grp_not_added, it) } ?: context.getString(R.string.grp_not_added_try_again)
                                     }
                                 }
                             }.padding(vertical = 10.dp).testTag("add-to-${group.id}")) {

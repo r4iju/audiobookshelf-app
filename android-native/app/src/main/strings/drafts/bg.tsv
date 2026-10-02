@@ -1,0 +1,451 @@
+# Bulgarian drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Профили
+title_new_collection	Нова колекция
+action_retry	Опитай отново
+action_read	Прочети %1$s
+action_mark_finished	Маркирай като завършено
+choose_library	Изберете библиотека
+all_titles	Всички заглавия
+all_podcasts	Всички подкасти
+filter	Филтър
+sort	Подреждане
+theme_system	Системна
+screen_orientation	Ориентация на екрана
+jump_forward	Прескачане напред
+jump_back	Прескачане назад
+set_settings_not_saved	Настройките не можаха да бъдат запазени на това устройство, затова нищо не е променено. Освободете място и опитайте отново.
+set_orientation_follow_device	Според устройството
+set_orientation_portrait	Портретна
+set_orientation_landscape	Пейзажна
+set_haptic_light	Лека
+set_rewind_on_resume	Леко връщане назад при продължаване
+set_rewind_on_resume_detail	Връща няколко секунди назад след пауза и повече след по-дълга пауза.
+set_seek_system_controls	Превъртане от системните контроли
+set_seek_system_controls_detail	Позволява на заключения екран и известието да местят лентата за позиция.
+set_mp3_index_seeking	Точно превъртане в MP3
+set_mp3_index_seeking_detail	Създава индекс за превъртане за MP3 файлове с ненадеждна продължителност. Превъртането започва по-бавно.
+set_shake_to_reset	Разклащане за рестартиране
+set_shake_to_reset_detail	Разклащането на телефона, докато таймерът работи, го рестартира.
+set_sleep_fade_out	Затихване
+set_sleep_fade_out_detail	Намалява силата на звука през последната минута.
+set_vibrate_on_reset	Вибрация при рестартиране
+set_auto_sleep_timer_detail	Стартира таймера при възпроизвеждане между %1$s и %2$s.
+set_heading_mobile_data	Мобилни данни
+set_storage	Хранилище
+set_heading_support	Поддръжка
+set_diagnostics	Диагностика
+set_something_went_wrong	Нещо се обърка.
+set_statistics_unavailable	Статистиката не е налична
+set_try_again	Опитайте отново
+set_minutes_listened:one	%1$d слушана минута
+set_minutes_listened:other	%1$d слушани минути
+set_days_listened:one	%1$d ден слушане
+set_days_listened:other	%1$d дни слушане
+set_titles_finished:one	%1$d завършено заглавие
+set_titles_finished:other	%1$d завършени заглавия
+set_day_minutes_listened:one	%1$s, %2$d слушана минута
+set_day_minutes_listened:other	%1$s, %2$d слушани минути
+set_set_aside_failed	Не можаха да бъдат оставени настрана. Опитайте отново.
+set_connection	Връзка
+set_diagnostics_area_media	Медия
+set_diagnostics_area_sync	Синхронизация
+set_unreadable_resets_title	Запазените нулирания на прогреса не можаха да бъдат прочетени
+set_unreadable_resets_detail	Всяко заглавие може да е сред тях, затова нищо не се възпроизвежда и не се изпраща позиция на четене, докато не решите. Ако ги оставите настрана, файлът остава на това устройство, а прогресът, който е трябвало да нулират, остава на сървъра Ви.
+set_set_them_aside	Остави ги настрана
+set_listening_storage_title	Слушането отпреди затварянето на приложението не можа да бъде запазено
+set_listening_storage_detail	Хранилището на това устройство е недостъпно или пълно. Нищо не се възпроизвежда и не се изпраща слушане, докато то не бъде запазено; дотогава се пази.
+set_unreadable_writes_title	Записите за запазвания на прогреса без отговор не можаха да бъдат прочетени
+set_unreadable_writes_detail	Запазване на всяко заглавие все още може да достигне до сървъра Ви, затова не се изпраща слушане или четене и не се нулира прогрес, докато не решите. Ако ги оставите настрана, файлът остава на това устройство; закъсняло запазване може тогава да върне прогрес, който сте нулирали.
+set_diagnostics_server	Сървър %1$s
+set_diagnostics_signed_in_as	Влезли сте като %1$s
+set_diagnostics_app_version	Приложение %1$s
+set_recent_problems	Скорошни проблеми
+set_clear	Изчисти
+set_no_problems	Няма записани проблеми на това устройство.
+set_unreadable_writes_confirm_title	Да се оставят ли нечетимите записи настрана?
+set_unreadable_writes_confirm_detail	Позициите на слушане и четене отново се изпращат и нулиранията могат да продължат.
+set_set_aside	Остави настрана
+set_unreadable_resets_confirm_title	Да се оставят ли нечетимите нулирания настрана?
+set_unreadable_resets_confirm_detail	Заглавията отново се възпроизвеждат и позициите на четене се изпращат. Нулирайте отново прогреса на всяко заглавие, което все още искате да започнете отначало.
+set_signed_in	Влезли сте
+set_other_accounts	Други профили
+set_server_sign_in_required	%1$s · изисква се вход
+set_remove_account	Премахни %1$s
+set_switch_to_account	Превключи към този профил
+set_add_account	Добави профил
+set_sign_out_of	Изход от %1$s
+set_sign_out_detail	Премахва този профил от устройството. Изтеглянията и неизпратеното слушане за него остават, докато влезе отново.
+set_accounts_footer	Всеки профил пази собствения си прогрес, изтегляния и избор на библиотека. Превключването никога не ги смесва.
+set_remove_account_confirm	Да се премахне ли %1$s?
+set_remove_account_detail	Можете да добавите профила отново по-късно. Неговите изтегляния и неизпратено слушане остават на това устройство.
+set_add_an_account	Добавяне на профил
+set_connect_intro	Свържете се директно със собствения си сървър. Нищо не минава през друга услуга.
+set_change_server	Смени сървъра
+set_sign_in	Вход
+set_sign_in_openid	Вход с OpenID
+set_saved_accounts	Запазени профили
+set_use_account	Използвай
+set_edit	Редактирай
+set_add_podcast	Добави подкаст
+set_not_available_yet	Все още не е налично
+set_not_available_yet_detail	Тази част от предварителната версия все още се разработва.
+set_import_previous_app	Импортиране от предишното приложение
+set_import_interrupted	Едно импортиране не завърши. Изберете същия експорт, за да продължите оттам, където е спряло.
+set_import_already	Този експорт вече е импортиран. Заглавията, слушането и позициите от него са на това устройство.
+set_import_preflight	%1$s\nПредишното приложение и този файл само се четат; нищо в тях не се променя. Заглавията, слушането и позициите се свързват с профил, след като той влезе тук. Паролите не са в експорта, затова всеки профил влиза отново.
+set_import_account_signed_in	%1$s · влязъл
+set_import_account_sign_in_later	%1$s · влезте след импортирането
+set_import_titles	Заглавия
+set_import_title_partial	%1$s · останалото се изтегля отново
+set_not_imported	Не е импортирано
+set_import_space	Нужни са %1$s; свободни са %2$s.
+set_import_no_space	Няма достатъчно свободно място на това устройство. Освободете място и изберете експорта отново.
+set_import_progress	Копиране на файлове: %1$d от %2$d. Ако приложението се затвори, изберете същия експорт отново, за да продължите.
+set_import_done	Импортирани са %1$d заглавия, %2$d сесии на слушане и %3$d позиции. Настройките от предишното приложение са приложени.
+set_import_waiting	Влезте в %1$s като %2$s, за да свържете неговите заглавия, слушане и позиции.
+set_import	Импортирай
+set_continue	Продължи
+set_close	Затвори
+set_import_file_unreadable	Избраният файл не можа да бъде прочетен. Изберете го отново или първо го запазете на това устройство.
+set_import_stopped	Импортирането спря, преди да завърши. Нищо не е загубено: изберете същия експорт отново, за да продължите оттам, където е спряло.
+set_import_item_gone	Вече не е на сървъра, затова не беше прието.
+set_import_file_changed	Файл е променен на това устройство след импортирането, затова се изтегля отново от сървъра.
+set_openid_not_enabled	Входът с OpenID не е активиран на този сървър. Използвайте потребителското си име и парола.
+set_openid_canceled	Входът през браузъра беше отменен. Запазените Ви профили са запазени.
+set_openid_invalid	Отговорът от входа през браузъра не можа да бъде проверен. Опитайте да влезете отново и проверете настройките за пренасочване на OpenID на сървъра.
+set_vault_unreadable	Запазените входове не можаха да бъдат дешифрирани. Те се пазят на устройството; влезте отново, за да продължите.
+set_session_ended	Сесията Ви за %1$s приключи. Влезте отново; неизпратеното слушане и изтеглянията се пазят.
+set_play_blocked_listening_storage	Слушането отпреди затварянето на приложението не можа да бъде запазено, защото хранилището е недостъпно, затова нищо не се възпроизвежда, докато това не стане възможно. Освободете място и опитайте отново.
+set_play_blocked_unreadable_resets	Запазените нулирания на прогреса не можаха да бъдат прочетени, затова нищо не се възпроизвежда, докато не бъдат решени в Диагностика.
+set_play_blocked_discarding	Прогресът за това заглавие все още се нулира. То ще започне отначало, след като това приключи.
+dl_not_saved	Списъкът с изтегляния не можа да бъде запазен на това устройство, затова нищо не е променено. Освободете място и опитайте отново.
+dl_not_allowed	Профилът Ви няма право да изтегля.
+dl_no_audio	Този елемент няма аудио за изтегляне.
+dl_no_space	Няма достатъчно свободно място на това устройство за %1$s, като се запази място за системата.
+dl_folder_lost_nothing_downloaded	Достъпът до %1$s беше премахнат, затова нищо не е изтеглено. Изберете отново папката за изтегляния в Настройки.
+dl_downloading_percent	Изтегляне %1$d%%
+dl_cancel_download	Отмени изтеглянето
+dl_downloaded_plays_offline	Изтеглено · възпроизвежда се офлайн
+dl_failed	Изтеглянето не бе успешно.
+dl_discard	Отхвърли
+dl_cellular_title	Изтегляне чрез мобилни данни?
+dl_cellular_message	Използвате връзка с таксуване на данни. Можете да промените това в Настройки.
+dl_not_now	Не сега
+dl_folder_cannot_be_kept	Тази папка не може да бъде запазена за изтегляния. Изберете друга.
+dl_saved_in_folder	Изтеглянията се записват в %1$s
+dl_saved_in_app_storage	Изтеглянията се записват в хранилището на приложението
+dl_folder_visible_to_other_apps	Други приложения на това устройство могат да виждат тези файлове. Изтеглянията отпреди промяна остават, където са.
+dl_folder_private_to_app	Само това приложение вижда тези файлове. Изберете папка, за да държите изтеглянията там, където други приложения имат достъп до тях.
+dl_choose_folder	Избери папка
+dl_use_app_storage	Използвай хранилището на приложението
+dl_ebook_missing	Е-книгата липсва на това устройство. Изтеглете я отново, за да я отворите.
+dl_no_app_opens_format	Няма приложение на това устройство, което отваря файлове %1$s. Инсталирайте такова и опитайте отново.
+dl_no_app_opens_this_kind	Няма приложение на това устройство, което отваря този вид файлове. Инсталирайте такова и опитайте отново.
+dl_folder_lost_choose_again_open	Това изтегляне е в %1$s, а достъпът до %1$s беше премахнат. Изберете %1$s отново, за да го отворите.
+dl_folder_lost_choose_again_play	Това изтегляне е в %1$s, а достъпът до %1$s беше премахнат. Изберете %1$s отново, за да го възпроизведете.
+dl_names_or	%1$s или %2$s
+dl_names_and	%1$s и %2$s
+dl_remove_title	Да се премахне ли изтеглянето?
+dl_remove_message	„%1$s“ ще бъде премахнато от това устройство. Прогресът Ви на слушане се запазва.
+dl_keep	Запази
+dl_not_that_folder	Това не е %1$s. Изберете папката, в която са тези изтегляния.
+dl_folder_access_not_kept	Достъпът до тази папка не можа да бъде запазен. Опитайте отново.
+dl_no_downloads	Няма изтегляния
+dl_no_downloads_message	Изтегляйте книги или епизоди от тяхната страница, за да слушате без връзка.
+dl_access_removed_title	Достъпът до %1$s беше премахнат
+dl_downloads_kept_there:one	%1$d изтегляне се пази там. Изберете %2$s отново, за да го възпроизвеждате и отваряте.
+dl_downloads_kept_there:other	%1$d изтегляния се пазят там. Изберете %2$s отново, за да ги възпроизвеждате и отваряте.
+dl_choose_again	Изберете %1$s отново
+dl_some_files_missing	Някои файлове липсват на това устройство
+dl_size_in_folder	%1$s в %2$s
+dl_open_in_another_app	Отвори %1$s в друго приложение
+dl_download_again_named	Изтегли %1$s отново
+dl_the_chosen_folder	избраната папка
+dl_files_missing_play	Някои файлове от това изтегляне липсват на това устройство. Изтеглете го отново, за да го възпроизведете.
+dl_play_named	Пусни %1$s
+dl_retry_named	Опитай отново %1$s
+dl_cancel_named	Отмени %1$s
+dl_remove_named	Премахни %1$s
+dl_sign_in_again	Влезте отново в този профил, за да изтегляте.
+dl_folder_lost_choose_in_downloads	Достъпът до %1$s беше премахнат. Изберете папката отново в Изтегляния.
+dl_connection_interrupted	Връзката беше прекъсната.
+dl_error_retrying	%1$s Нов опит…
+dl_server_refused	Сървърът отказа изтеглянето.
+dl_server_sent_type_not_audio	Сървърът изпрати %1$s вместо аудио, затова нищо не е запазено. Проверете сървъра или проксито си и опитайте отново.
+dl_server_sent_unknown_not_audio	Сървърът изпрати неизвестен отговор вместо аудио, затова нищо не е запазено. Проверете сървъра или проксито си и опитайте отново.
+dl_size_mismatch	Изтегленият файл беше %1$d байта, но сървърът посочи %2$d, затова беше отхвърлен. Опитайте отново, за да го изтеглите пак.
+dl_server_sent_not_pdf	Сървърът изпрати нещо различно от PDF файла, затова нищо не е запазено. Проверете сървъра или проксито си и опитайте отново.
+dl_notification_downloading	Изтегляне на %1$s
+rd_positions_not_restored	Запазените позиции на четене не можаха да бъдат възстановени, затова страниците не се запазват. Оригиналните данни се пазят.
+rd_positions_not_overwritten	Запазените позиции на четене не можаха да бъдат прочетени, затова не се презаписват.
+rd_not_a_pdf	Този файл не е PDF, който това устройство може да отвори.
+rd_document_not_opened	Документът не можа да бъде отворен.
+rd_page_not_saved	Тази страница не можа да бъде запазена на това устройство.
+rd_choice_not_saved	Изборът Ви не можа да бъде запазен на това устройство.
+rd_conflict_title	Откъде да продължите?
+rd_conflict_page	Друго устройство стигна до страница %1$d, докато страница %2$d тук още не беше запазена на сървъра.
+rd_conflict_location	Друго устройство запази позиция на четене, която този четец не може да покаже като страница, докато страница %1$d тук още не беше запазена на сървъра.
+rd_go_to_page_number	Към страница %1$d
+rd_keep_other_position	Запази другата позиция
+rd_stay_on_page	Остани на страница %1$d
+rd_close_reader	Затвори четеца
+rd_rotate_pages	Завърти страниците
+rd_continuous_scrolling	Непрекъснато превъртане
+rd_document_error_title	Този документ не можа да бъде отворен
+rd_try_again	Опитайте отново
+rd_go_to_page	Към страница
+rd_previous_page	Предишна страница
+rd_next_page	Следваща страница
+rd_page_of	Страница %1$d от %2$d
+rd_page_number	Страница %1$d
+rd_download_folder_lost	Това изтегляне е в %1$s, а достъпът до %1$s беше премахнат. Изберете папката отново в Изтегляния.
+rd_downloaded_document_missing	Изтегленият документ липсва на това устройство. Изтеглете го отново.
+rd_document_not_stored	Документът не можа да бъде съхранен за четене.
+rd_supplementary_pdf	допълнителен PDF
+rd_format_not_available	Четенето на %1$s все още не е налично в тази предварителна версия. Позицията Ви на четене на сървъра се запазва.
+rd_ebook_not_available	Четенето на тази е-книга все още не е налично в тази предварителна версия. Позицията Ви на четене на сървъра се запазва.
+grp_unavailable_title	Недостъпно заглавие
+grp_could_not_load_collections	Колекциите не можаха да бъдат заредени.
+grp_could_not_load_playlists	Плейлистите не можаха да бъдат заредени.
+grp_collections_unavailable	Колекциите не са налични
+grp_playlists_unavailable	Плейлистите не са налични
+grp_no_collections_yet	Все още няма колекции
+grp_no_playlists_yet	Все още няма плейлисти
+grp_create_one_hint	Създайте такъв, за да събирате заглавия заедно в собствен ред.
+grp_title_count:one	%1$d заглавие
+grp_title_count:other	%1$d заглавия
+grp_collection_deleted	Тази колекция беше изтрита.
+grp_playlist_deleted	Този плейлист беше изтрит.
+grp_could_not_load	Не можа да се зареди.
+grp_collection_unavailable	Колекцията не е налична
+grp_playlist_unavailable	Плейлистът не е наличен
+grp_nothing_in_collection_can_play	Нищо в тази колекция не може да се възпроизведе.
+grp_nothing_in_playlist_can_play	Нищо в този плейлист не може да се възпроизведе.
+grp_could_not_start_playback	Възпроизвеждането не можа да започне.
+grp_resume	Продължи
+grp_play_collection	Пусни колекцията
+grp_play_playlist	Пусни плейлиста
+grp_edit_collection	Редактирай колекцията
+grp_edit_playlist	Редактирай плейлиста
+grp_delete_collection	Изтрий колекцията
+grp_delete_playlist	Изтрий плейлиста
+grp_no_titles_yet	Все още няма заглавия
+grp_delete_collection_question	Да се изтрие ли колекцията?
+grp_delete_playlist_question	Да се изтрие ли плейлистът?
+grp_delete_group_explanation	„%1$s“ се премахва от сървъра Ви. Заглавията в него се запазват.
+grp_not_deleted	Не е изтрито: %1$s
+grp_not_deleted_try_again	Не е изтрито: опитайте отново
+grp_not_allowed_to_change_collection	Профилът Ви на сървъра няма право да променя тази колекция.
+grp_not_allowed_to_change_playlist	Профилът Ви на сървъра няма право да променя този плейлист.
+grp_collection_no_longer_exists	Тази колекция вече не съществува.
+grp_playlist_no_longer_exists	Този плейлист вече не съществува.
+grp_not_saved	Не е запазено: %1$s
+grp_not_saved_try_again	Не е запазено: опитайте отново
+grp_saving	Запазване…
+grp_create_collection	Създай колекция
+grp_create_playlist	Създай плейлист
+grp_save_changes	Запази промените
+grp_choose_at_least_one_title	Изберете поне едно заглавие.
+grp_order	Ред
+grp_move_up	Премести %1$s нагоре
+grp_remove_member	Премахни %1$s
+grp_add_titles	Добави заглавия
+grp_add_episodes_hint	Добавяйте епизоди от страницата с епизоди на подкаста.
+grp_add_to_playlist_or_collection	Добави в плейлист или колекция
+grp_add_to	Добави в
+grp_nothing_to_add_to	Все още няма нищо, в което да добавите.
+grp_added_to	Добавено в %1$s
+grp_not_added	Не е добавено: %1$s
+grp_not_added_try_again	Не е добавено: опитайте отново
+grp_already_included	Вече е включено
+grp_close	Затвори
+grp_titles_could_not_load	Заглавията не можаха да бъдат заредени
+grp_nothing_here	Тук няма нищо
+pod_filter_in_progress	В процес
+pod_feed_episodes	Епизоди от емисията
+pod_sort_newest_first	Първо най-новите, докоснете за първо най-старите
+pod_sort_oldest_first	Първо най-старите, докоснете за първо най-новите
+pod_episodes_queued:one	%1$d епизод е в опашката на сървъра Ви: %2$s
+pod_episodes_queued:other	%1$d епизода са в опашката на сървъра Ви: %2$s
+pod_server_could_not_download	Сървърът Ви не можа да изтегли „%1$s“.
+pod_dismiss	Затвори
+pod_no_episodes_yet	Все още няма епизоди
+pod_no_episodes_match_filter	Няма епизоди, отговарящи на този филтър
+pod_episode_details	Подробности за епизода
+pod_untitled_episode	Епизод без заглавие
+pod_play_named	Пусни %1$s
+pod_episode_not_available	Епизодът не е наличен
+pod_episode_may_have_been_removed	Може да е бил премахнат от сървъра.
+pod_percent_listened	%1$d%% слушано
+pod_feed_could_not_open	Емисията не можа да бъде отворена.
+pod_retry_feed	Опитай емисията отново
+pod_no_feed_episodes	Не са намерени епизоди в емисията
+pod_already_on_server	Вече е на сървъра
+pod_selected	Избрано
+pod_not_selected	Не е избрано
+pod_no_audio_enclosure	Няма прикачено аудио
+pod_not_queued	Не е добавено в опашката: %1$s
+pod_not_queued_try_again	Не е добавено в опашката: опитайте отново
+pod_queueing_on_server	Добавяне в опашката на сървъра Ви…
+pod_add_selected_episodes	Добави избраните епизоди в сървъра
+pod_something_went_wrong	Нещо се обърка.
+pod_adding_not_available	Добавянето на подкасти не е налично
+pod_adding_needs_permission	Профилът Ви на сървъра се нуждае от право за управление на подкасти в библиотека с подкасти.
+pod_search_podcasts	Търсене на подкасти
+pod_or_rss_feed_url	Или URL на RSS емисия
+pod_enter_complete_feed_url	Въведете пълен HTTP или HTTPS URL на емисия.
+pod_preview_feed	Преглед на емисията
+pod_create_podcast	Създай подкаст
+pod_choose_different_feed	Изберете друга емисия
+item_something_went_wrong	Нещо се обърка. Опитайте отново.
+item_feed_subscribe_at	Приложенията за подкасти могат да се абонират за това заглавие на:
+item_copied	Копирано
+item_copy_address	Копирай адреса
+item_hidden_from_directories	Скрито от каталозите за подкасти
+item_feed_public_warning	Всеки, който има адреса, може да слуша това заглавие без вход.
+item_feed_name	Име на емисията
+item_feed_name_rule	Само букви, цифри, - и _
+item_hide_from_directories	Скрий от каталозите за подкасти
+item_done	Готово
+item_sending	Изпращане…
+item_sent_to	Изпратено до %1$s
+item_send_ebook_explanation	Сървърът Ви изпраща е-книгата по имейл до избраното от Вас устройство.
+item_ereader_or_ebook_gone	%1$s или тази е-книга вече не е налична на сървъра. Нищо не е изпратено.
+item_not_sent_to	Не е изпратено до %1$s. %2$s
+item_not_saved_try_again	Не е запазено. Опитайте отново.
+item_mark_unfinished	Маркирай като незавършено
+item_discard_uncertain	По-ранно запазване на прогреса на това заглавие не получи отговор и все още може да достигне до сървъра Ви. Ако пристигне след нулирането, ще върне прогреса. Сървърът Ви не може да каже на това приложение дали ще стане така.
+item_discard_anyway	Нулирай въпреки това
+item_discard_under_way	Това нулиране вече е в ход и не може да бъде отменено.
+item_keep_progress	Запази прогреса
+item_discard_pending	Прогресът се нулира. Това приключва, когато сървърът Ви е достъпен и слушането на това заглавие е изпратено.
+item_discard_anyway_question	Да се нулира ли въпреки това?
+item_discard_anyway_explanation	Прогресът се премахва сега. Ако по-ранното запазване достигне до сървъра Ви след това, прогресът на това заглавие се връща и можете да го нулирате отново.
+item_discard	Нулирай
+item_discard_progress_question	Да се нулира ли прогресът?
+item_discard_progress_explanation	Позицията Ви и състоянието „завършено“ за това заглавие се премахват от сървъра за всички устройства.
+item_could_not_load	Това заглавие не можа да бъде заредено
+item_narrated_by	Чете
+item_series	Серия: %1$s
+item_series_with_sequence	Серия: %1$s #%2$s
+item_episode_count:one	%1$d епизод
+item_episode_count:other	%1$d епизода
+item_listened_and_left	%1$d%% слушано · остават %2$s
+item_chapter_number	Глава %1$d
+pl_minimize_player	Минимизирай плейъра
+pl_nothing_playing	Нищо не се възпроизвежда
+pl_chapter_number	Глава %1$d
+pl_try_again	Опитайте отново
+pl_speed_value	Скорост %1$s
+pl_sleep	Заспиване
+pl_position_of_duration	%1$s от %2$s
+pl_buffering	Буфериране
+pl_previous_chapter	Предишна глава
+pl_next_chapter	Следваща глава
+pl_jump_forward_seconds:one	Напред с %1$d секунда
+pl_jump_forward_seconds:other	Напред с %1$d секунди
+pl_jump_back_seconds:one	Назад с %1$d секунда
+pl_jump_back_seconds:other	Назад с %1$d секунди
+pl_jump_forward_minutes:one	Напред с %1$d минута
+pl_jump_forward_minutes:other	Напред с %1$d минути
+pl_jump_back_minutes:one	Назад с %1$d минута
+pl_jump_back_minutes:other	Назад с %1$d минути
+pl_open_player	Отвори плейъра
+pl_playback_stopped	Възпроизвеждането спря
+pl_listening_unsaved	Част от слушането все още не е запазена на това устройство. Тя се пази и ще бъде запазена веднага щом хранилището позволи.
+pl_playing	Възпроизвежда се
+pl_resume	Продължи
+pl_streaming_cellular_refused	Стриймването чрез мобилни данни е изключено в Настройки. Свържете се с Wi-Fi или първо изтеглете това заглавие.
+pl_stream_cellular_title	Стриймване чрез мобилни данни?
+pl_stream_cellular_message	Използвате връзка с таксуване на данни. Можете да промените това в Настройки.
+pl_not_now	Не сега
+pl_sleep_stops_end_of_chapter	Спира в края на тази глава, след %1$s
+pl_sleep_stops_in	Спира след %1$s
+pl_sleep_minus_minutes	−%1$d мин
+pl_sleep_plus_minutes	+%1$d мин
+pl_sleep_minutes	%1$d мин
+pl_sleep_turn_off	Изключи
+pl_bookmark_not_saved_reason	Отметката не е запазена: %1$s
+pl_bookmark_not_saved	Отметката не е запазена: опитайте отново
+pl_bookmark_add_at	Добави на %1$s
+pl_bookmark_go_to	Към отметката
+pl_bookmark_default	Отметка
+pl_bookmark_rename_named	Преименувай %1$s
+pl_bookmark_delete_named	Изтрий %1$s
+pl_bookmark_at	Отметка на %1$s
+pl_bookmark_rename	Преименувай отметката
+pl_bookmark_new	Нова отметка
+pl_untitled	Без заглавие
+pl_playback_stopped_reason	Възпроизвеждането спря: %1$s. Позицията Ви се запазва.
+pl_playback_stopped_unknown	Възпроизвеждането спря: аудиото не можа да бъде заредено. Позицията Ви се запазва.
+pl_no_playable_audio	Този елемент няма аудио за възпроизвеждане.
+pl_could_not_start	Възпроизвеждането не можа да започне.
+pl_listening_save_failed	Слушането не можа да бъде запазено на това устройство, затова възпроизвеждането е на пауза. Освободете място и опитайте отново.
+cast_casting_to	Предаване към %1$s
+cast_cast	Предаване
+cast_playing_on	Възпроизвежда се на %1$s
+cast_connecting_to	Свързване с %1$s…
+cast_playing_on_phone	Възпроизвежда се на този телефон
+cast_stop	Спри предаването
+cast_looking	Търсене на устройства за предаване…
+cast_none_found	Не са намерени устройства за предаване. Проверете дали приемникът е включен и е в същата Wi-Fi мрежа като този телефон.
+cast_close	Затвори
+cast_download_not_castable	Изтеглените копия се възпроизвеждат само на този телефон. Спрете предаването, за да слушате тук, или вместо това стриймвайте заглавието.
+cast_resumed_without_title	Предаването спря, защото приложението се рестартира по време на предаване. Отворете заглавието отново, за да продължите да слушате от последното място, запазено от този телефон.
+cast_needs_play_services	Предаването изисква услугите на Google Play, които това устройство няма или трябва да актуализира.
+cast_could_not_start	Предаването не можа да започне на това устройство: %1$s.
+cast_connect_failed_named	Неуспешно свързване с %1$s. Проверете дали е включено и е в същата Wi-Fi мрежа като този телефон.
+cast_connect_failed	Неуспешно свързване с приемника. Проверете дали е включен и е в същата Wi-Fi мрежа като този телефон.
+cast_connection_lost_named	Връзката с %1$s беше загубена. Възпроизвеждането продължава на този телефон.
+cast_connection_lost	Връзката с приемника беше загубена. Възпроизвеждането продължава на този телефон.
+auto_continue	Продължи
+auto_recent	Скорошни
+auto_discovery	Откриване
+auto_authors_count:one	%1$d автор
+auto_authors_count:other	%1$d автори
+auto_series_count:one	%1$d серия
+auto_series_count:other	%1$d серии
+lib_books_count:one	%1$d книга
+lib_books_count:other	%1$d книги
+lib_items_count:one	%1$d елемент
+lib_items_count:other	%1$d елемента
+lib_filter_in_progress	В процес
+lib_selected	Избрано
+lib_all_filters	Всички филтри
+lib_nothing_to_filter	Тук няма нищо за филтриране.
+lib_sort_descending_switch	Низходящо, превключи към възходящо
+lib_sort_ascending_switch	Възходящо, превключи към низходящо
+lib_sort_descending	Низходящо
+lib_sort_ascending	Възходящо
+lib_unavailable	Библиотеката не е налична
+lib_unavailable_message	%1$s Профилът Ви и неизпратеното слушане се пазят.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Покажи корици
+lib_show_list	Покажи списък
+lib_filtered	Филтрирано
+lib_empty_title	Все още няма нищо тук
+lib_empty_message	Тази библиотека няма елементи, до които имате достъп.
+lib_page_error	Още заглавия не можаха да бъдат заредени
+lib_card_finished	%1$s, завършено
+lib_card_percent_listened	%1$s, %2$d процента слушано
+lib_search_in	Търсене в %1$s
+lib_search_library	Търсене в библиотеката
+lib_clear_search	Изчисти търсенето
+lib_search_failed	Търсенето не бе успешно
+lib_search_idle_title	Намерете нещо за слушане
+lib_search_idle_message	Търсете заглавия, автори, серии, четци и епизоди.
+lib_search_no_match	Нищо не отговаря на „%1$s“. Опитайте с по-малко думи или друго изписване.
+err_invalid_server	Въведете адрес на сървър, който започва с http:// или https://, например https://books.example.com/abs.
+err_unsafe_media_url	Сървърът върна адрес на медия извън този сървър. Той не беше отворен.
+err_sign_in_required	Сесията Ви вече не се приема. Влезте отново; неизпратеното слушане се пази.
+err_untrusted	Сертификатът на сървъра не е доверен за това устройство. Инсталирайте сертифициращия орган на сървъра си в Настройки на Android > Сигурност > Шифроване и идентификационни данни и опитайте отново.
+err_offline	Сървърът не можа да бъде достигнат. Проверете адреса или връзката си и опитайте отново.
+err_forbidden	Профилът Ви няма право да прави това.
+err_not_found	Това съдържание вече не е налично на сървъра.
+err_server_problem	Сървърът имаше временен проблем (HTTP %1$d). Опитайте отново.
+err_rejected	Сървърът отхвърли заявката (HTTP %1$d).
+err_invalid_response	Сървърът изпрати отговор, който това приложение не можа да прочете.
+err_no_audio	Този елемент няма аудио за възпроизвеждане.
+err_login_rejected	Потребителското име или паролата не бяха приети.
+err_publications_unreadable	Записите за запазвания на прогреса без отговор не можаха да бъдат прочетени. Първо ги решете в Диагностика.
+err_discards_unreadable	Запазените нулирания на прогреса не можаха да бъдат прочетени. Първо ги решете в Диагностика.

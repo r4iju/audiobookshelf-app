@@ -1,0 +1,453 @@
+# Turkish drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Hesaplar
+title_new_collection	Yeni koleksiyon
+action_retry	Yeniden dene
+action_read	%1$s oku
+action_mark_finished	Bitirildi olarak işaretle
+choose_library	Kütüphane seç
+all_titles	Tüm eserler
+all_podcasts	Tüm podcast'ler
+filter	Filtrele
+sort	Sırala
+theme_system	Sistem
+screen_orientation	Ekran yönü
+jump_forward	İleri atla
+jump_back	Geri atla
+set_settings_not_saved	Ayarlar bu cihaza kaydedilemedi, bu nedenle hiçbir şey değişmedi. Biraz depolama alanı boşaltıp tekrar deneyin.
+set_orientation_follow_device	Cihazı takip et
+set_orientation_portrait	Dikey
+set_orientation_landscape	Yatay
+set_unit_seconds_short	%1$d sn
+set_unit_minutes_short	%1$d dk
+set_rewind_on_resume	Devam ederken biraz geri sar
+set_rewind_on_resume_detail	Bir duraklatmadan sonra birkaç saniye, daha uzun bir duraklatmadan sonra daha fazla geri gider.
+set_seek_system_controls	Sistem kontrollerinden konum değiştir
+set_seek_system_controls_detail	Kilit ekranının ve bildirimin konum çubuğunu hareket ettirmesine izin verir.
+set_mp3_index_seeking	Hassas MP3 sarma
+set_mp3_index_seeking_detail	Süresi güvenilir olmayan MP3 dosyaları için bir sarma dizini oluşturur. Sarma daha yavaş başlar.
+set_shake_to_reset	Sallayarak sıfırla
+set_shake_to_reset_detail	Zamanlayıcı çalışırken telefonu sallamak onu yeniden başlatır.
+set_sleep_fade_out	Sesi yavaşça kıs
+set_sleep_fade_out_detail	Son dakikada ses seviyesini düşürür.
+set_vibrate_on_reset	Sıfırlamada titreş
+set_auto_sleep_timer_detail	%1$s ile %2$s arasında oynatırken zamanlayıcıyı başlatır.
+set_heading_mobile_data	Mobil veri
+set_storage	Depolama
+set_heading_support	Destek
+set_diagnostics	Tanılama
+set_something_went_wrong	Bir şeyler ters gitti.
+set_statistics_unavailable	İstatistikler kullanılamıyor
+set_try_again	Tekrar dene
+set_minutes_listened:one	%1$d dakika dinlendi
+set_minutes_listened:other	%1$d dakika dinlendi
+set_days_listened:one	%1$d gün dinlendi
+set_days_listened:other	%1$d gün dinlendi
+set_titles_finished:one	%1$d eser bitirildi
+set_titles_finished:other	%1$d eser bitirildi
+set_day_minutes_listened:one	%1$s, %2$d dakika dinlendi
+set_day_minutes_listened:other	%1$s, %2$d dakika dinlendi
+set_set_aside_failed	Kenara ayrılamadı. Tekrar deneyin.
+set_connection	Bağlantı
+set_diagnostics_area_media	Medya
+set_diagnostics_area_sync	Eşitleme
+set_unreadable_resets_title	Kaydedilmiş ilerleme sıfırlamaları okunamadı
+set_unreadable_resets_detail	Herhangi bir eser bunların arasında olabilir; bu nedenle siz karar verene kadar hiçbir şey oynatılmaz ve okuma konumu gönderilmez. Bunları kenara ayırmak dosyayı bu cihazda tutar ve sıfırlamaları gereken ilerleme sunucunuzda kalır.
+set_set_them_aside	Kenara ayır
+set_listening_storage_title	Uygulama kapanmadan önceki dinleme kaydedilemedi
+set_listening_storage_detail	Bu cihazdaki depolama alanı kullanılamıyor veya dolu. Kaydedilene kadar hiçbir şey oynatılmaz ve dinleme gönderilmez; o zamana kadar saklanır.
+set_unreadable_writes_title	Yanıt alınamayan ilerleme kayıtlarının kayıtları okunamadı
+set_unreadable_writes_detail	Herhangi bir eserin kaydı hâlâ sunucunuza ulaşabilir; bu nedenle siz karar verene kadar dinleme veya okuma gönderilmez ve hiçbir ilerleme sıfırlanmaz. Bunları kenara ayırmak dosyayı bu cihazda tutar; geç gelen bir kayıt sıfırladığınız ilerlemeyi geri getirebilir.
+set_diagnostics_server	Sunucu %1$s
+set_diagnostics_signed_in_as	%1$s olarak oturum açıldı
+set_diagnostics_app_version	Uygulama %1$s
+set_recent_problems	Son sorunlar
+set_clear	Temizle
+set_no_problems	Bu cihazda kaydedilmiş sorun yok.
+set_unreadable_writes_confirm_title	Okunamayan kayıtlar kenara ayrılsın mı?
+set_unreadable_writes_confirm_detail	Dinleme ve okuma konumları yeniden gönderilir ve sıfırlamalar gerçekleşebilir.
+set_set_aside	Kenara ayır
+set_unreadable_resets_confirm_title	Okunamayan sıfırlamalar kenara ayrılsın mı?
+set_unreadable_resets_confirm_detail	Eserler oynatılır ve okuma konumları yeniden gönderilir. Baştan başlamak istediğiniz her eser için ilerlemeyi yeniden sıfırlayın.
+set_signed_in	Oturum açık
+set_other_accounts	Diğer hesaplar
+set_server_sign_in_required	%1$s · oturum açılması gerekiyor
+set_remove_account	Kaldır: %1$s
+set_switch_to_account	Bu hesaba geç
+set_add_account	Hesap ekle
+set_sign_out_of	Oturumu kapat: %1$s
+set_sign_out_detail	Bu hesabı cihazdan kaldırır. Hesabın indirilenleri ve gönderilmemiş dinlemeleri, yeniden oturum açana kadar saklanır.
+set_accounts_footer	Her hesap kendi ilerlemesini, indirilenlerini ve kütüphane seçimini tutar. Hesap değiştirmek bunları asla karıştırmaz.
+set_remove_account_confirm	%1$s kaldırılsın mı?
+set_remove_account_detail	Hesabı daha sonra yeniden ekleyebilirsiniz. İndirilenleri ve gönderilmemiş dinlemeleri bu cihazda kalır.
+set_add_an_account	Hesap ekleyin
+set_connect_intro	Doğrudan kendi sunucunuza bağlanın. Hiçbir şey başka bir hizmet üzerinden yönlendirilmez.
+set_change_server	Sunucuyu değiştir
+set_sign_in	Oturum aç
+set_sign_in_openid	OpenID ile oturum aç
+set_saved_accounts	Kayıtlı hesaplar
+set_use_account	Kullan
+set_edit	Düzenle
+set_add_podcast	Podcast ekle
+set_not_available_yet	Henüz kullanılamıyor
+set_not_available_yet_detail	Önizlemenin bu bölümü hâlâ geliştiriliyor.
+set_import_previous_app	Önceki uygulamadan içe aktar
+set_import_interrupted	Bir içe aktarma tamamlanmadı. Kaldığı yerden devam etmek için aynı dışa aktarma dosyasını seçin.
+set_import_already	Bu dışa aktarma zaten içe aktarıldı. İçindeki eserler, dinlemeler ve konumlar bu cihazda.
+set_import_preflight	%1$s\nÖnceki uygulama ve bu dosya yalnızca okunur; içlerinde hiçbir şey değişmez. Eserler, dinlemeler ve konumlar, bir hesap burada oturum açtığında o hesaba bağlanır. Şifreler dışa aktarmada bulunmaz, bu nedenle her hesap yeniden oturum açar.
+set_import_account_signed_in	%1$s · oturum açık
+set_import_account_sign_in_later	%1$s · içe aktardıktan sonra oturum açın
+set_import_titles	Eserler
+set_import_title_partial	%1$s · geri kalanı yeniden indirilir
+set_not_imported	İçe aktarılmadı
+set_import_space	%1$s gerekiyor; %2$s boş.
+set_import_no_space	Bu cihazda yeterli boş alan yok. Biraz alan boşaltın, ardından dışa aktarma dosyasını yeniden seçin.
+set_import_progress	Dosyalar kopyalanıyor: %1$d / %2$d. Uygulama kapanırsa devam etmek için aynı dışa aktarma dosyasını yeniden seçin.
+set_import_done	%1$d eser, %2$d dinleme oturumu ve %3$d konum içe aktarıldı. Önceki uygulamanın ayarları uygulandı.
+set_import_waiting	Eserlerini, dinlemelerini ve konumlarını bağlamak için %1$s sunucusunda %2$s olarak oturum açın.
+set_import	İçe aktar
+set_continue	Devam
+set_close	Kapat
+set_import_file_unreadable	Seçilen dosya okunamadı. Yeniden seçin veya önce bu cihaza kaydedin.
+set_import_stopped	İçe aktarma tamamlanmadan durdu. Hiçbir şey kaybolmadı: kaldığı yerden devam etmek için aynı dışa aktarma dosyasını yeniden seçin.
+set_import_item_gone	Artık sunucuda olmadığından devralınmadı.
+set_import_file_changed	Bir dosya içe aktarıldıktan sonra bu cihazda değişti, bu nedenle sunucudan yeniden indiriliyor.
+set_openid_not_enabled	Bu sunucuda OpenID ile oturum açma etkin değil. Kullanıcı adınızı ve şifrenizi kullanın.
+set_openid_canceled	Tarayıcıda oturum açma iptal edildi. Kayıtlı hesaplarınız korunuyor.
+set_openid_invalid	Tarayıcıdan gelen oturum açma yanıtı doğrulanamadı. Yeniden oturum açmayı deneyin ve sunucunun OpenID yönlendirme ayarlarını kontrol edin.
+set_vault_unreadable	Kayıtlı oturum bilgilerinin şifresi çözülemedi. Cihazda saklanıyorlar; devam etmek için yeniden oturum açın.
+set_session_ended	%1$s oturumunuz sona erdi. Yeniden oturum açın; gönderilmemiş dinlemeler ve indirilenler korunur.
+set_play_blocked_listening_storage	Depolama alanı kullanılamadığı için uygulama kapanmadan önceki dinleme kaydedilemedi; bu nedenle kaydedilene kadar hiçbir şey oynatılmaz. Biraz alan boşaltıp tekrar deneyin.
+set_play_blocked_unreadable_resets	Kaydedilmiş ilerleme sıfırlamaları okunamadı; bu nedenle Tanılama'da çözülene kadar hiçbir şey oynatılmaz.
+set_play_blocked_discarding	Bu eserin ilerlemesi hâlâ sıfırlanıyor. Bu işlem bitince baştan oynatılır.
+dl_not_saved	İndirme listesi bu cihaza kaydedilemedi, bu nedenle hiçbir şey değişmedi. Biraz depolama alanı boşaltıp tekrar deneyin.
+dl_not_allowed	Hesabınızın indirme izni yok.
+dl_no_audio	Bu öğede indirilecek ses yok.
+dl_no_space	Sistem için depolama alanı ayrıldığında bu cihazda %1$s için yeterli boş alan kalmıyor.
+dl_folder_lost_nothing_downloaded	%1$s erişimi kaldırıldığı için hiçbir şey indirilmedi. İndirme klasörünü Ayarlar'da yeniden seçin.
+dl_downloading_percent	İndiriliyor %%%1$d
+dl_cancel_download	İndirmeyi iptal et
+dl_downloaded_plays_offline	İndirildi · çevrimdışı oynatılır
+dl_failed	İndirme başarısız oldu.
+dl_discard	Sil
+dl_cellular_title	Mobil veriyle indirilsin mi?
+dl_cellular_message	Kotalı bir bağlantı kullanıyorsunuz. Bunu Ayarlar'dan değiştirebilirsiniz.
+dl_not_now	Şimdi değil
+dl_folder_cannot_be_kept	Bu klasör indirmeler için kullanılamıyor. Başka bir klasör seçin.
+dl_saved_in_folder	İndirilenler şuraya kaydedilir: %1$s
+dl_saved_in_app_storage	İndirilenler uygulama depolama alanına kaydedilir
+dl_folder_visible_to_other_apps	Bu cihazdaki diğer uygulamalar bu dosyaları görebilir. Değişiklikten önce yapılan indirmeler oldukları yerde kalır.
+dl_folder_private_to_app	Bu dosyaları yalnızca bu uygulama görebilir. İndirmeleri diğer uygulamaların erişebileceği bir yerde tutmak için bir klasör seçin.
+dl_choose_folder	Klasör seç
+dl_use_app_storage	Uygulama depolama alanını kullan
+dl_ebook_missing	E-kitap bu cihazda yok. Açmak için yeniden indirin.
+dl_no_app_opens_format	Bu cihazda %1$s dosyalarını açan bir uygulama yok. Açabilen bir uygulama yükleyip tekrar deneyin.
+dl_no_app_opens_this_kind	Bu cihazda bu tür dosyaları açan bir uygulama yok. Açabilen bir uygulama yükleyip tekrar deneyin.
+dl_folder_lost_choose_again_open	Bu indirme %1$s içinde ve %1$s erişimi kaldırıldı. Açmak için %1$s klasörünü yeniden seçin.
+dl_folder_lost_choose_again_play	Bu indirme %1$s içinde ve %1$s erişimi kaldırıldı. Oynatmak için %1$s klasörünü yeniden seçin.
+dl_names_or	%1$s veya %2$s
+dl_names_and	%1$s ve %2$s
+dl_remove_title	İndirme kaldırılsın mı?
+dl_remove_message	"%1$s" bu cihazdan kaldırılacak. Dinleme ilerlemeniz korunur.
+dl_keep	Sakla
+dl_not_that_folder	Bu %1$s değil. Bu indirmelerin bulunduğu klasörü seçin.
+dl_folder_access_not_kept	Bu klasöre erişim korunamadı. Tekrar deneyin.
+dl_no_downloads	İndirme yok
+dl_no_downloads_message	Bağlantı olmadan dinlemek için kitapları veya bölümleri kendi sayfalarından indirin.
+dl_access_removed_title	%1$s erişimi kaldırıldı
+dl_downloads_kept_there:one	Orada %1$d indirme bulunuyor. Oynatmak ve açmak için %2$s klasörünü yeniden seçin.
+dl_downloads_kept_there:other	Orada %1$d indirme bulunuyor. Oynatmak ve açmak için %2$s klasörünü yeniden seçin.
+dl_choose_again	%1$s klasörünü yeniden seç
+dl_some_files_missing	Bazı dosyalar bu cihazda eksik
+dl_size_in_folder	%1$s, %2$s içinde
+dl_open_in_another_app	%1$s öğesini başka bir uygulamada aç
+dl_download_again_named	%1$s öğesini yeniden indir
+dl_the_chosen_folder	seçilen klasör
+dl_files_missing_play	Bu indirmenin bazı dosyaları bu cihazda eksik. Oynatmak için yeniden indirin.
+dl_play_named	Oynat: %1$s
+dl_retry_named	Yeniden dene: %1$s
+dl_cancel_named	İptal et: %1$s
+dl_remove_named	Kaldır: %1$s
+dl_sign_in_again	İndirmek için bu hesapta yeniden oturum açın.
+dl_folder_lost_choose_in_downloads	%1$s erişimi kaldırıldı. Klasörü İndirilenler'de yeniden seçin.
+dl_connection_interrupted	Bağlantı kesildi.
+dl_error_retrying	%1$s Yeniden deneniyor…
+dl_server_refused	Sunucu indirmeyi reddetti.
+dl_server_sent_type_not_audio	Sunucu ses yerine %1$s gönderdi, bu nedenle hiçbir şey kaydedilmedi. Sunucunuzu veya proxy'nizi kontrol edip yeniden deneyin.
+dl_server_sent_unknown_not_audio	Sunucu ses yerine bilinmeyen bir yanıt gönderdi, bu nedenle hiçbir şey kaydedilmedi. Sunucunuzu veya proxy'nizi kontrol edip yeniden deneyin.
+dl_size_mismatch	İndirilen dosya %1$d bayttı ancak sunucu %2$d bayt bildirdi, bu nedenle silindi. Yeniden indirmek için tekrar deneyin.
+dl_server_sent_not_pdf	Sunucu PDF yerine başka bir şey gönderdi, bu nedenle hiçbir şey kaydedilmedi. Sunucunuzu veya proxy'nizi kontrol edip yeniden deneyin.
+dl_notification_downloading	İndiriliyor: %1$s
+rd_positions_not_restored	Kaydedilmiş okuma konumları geri yüklenemedi, bu nedenle sayfalar kaydedilmiyor. Özgün veriler korunuyor.
+rd_positions_not_overwritten	Kaydedilmiş okuma konumları okunamadı, bu nedenle üzerlerine yazılmıyor.
+rd_not_a_pdf	Bu dosya, bu cihazın açabileceği bir PDF değil.
+rd_document_not_opened	Belge açılamadı.
+rd_page_not_saved	Bu sayfa bu cihaza kaydedilemedi.
+rd_choice_not_saved	Seçiminiz bu cihaza kaydedilemedi.
+rd_conflict_title	Nereden devam edilsin?
+rd_conflict_page	Buradaki %2$d. sayfa henüz sunucuya kaydedilmemişken başka bir cihaz %1$d. sayfaya ulaştı.
+rd_conflict_location	Buradaki %1$d. sayfa henüz sunucuya kaydedilmemişken başka bir cihaz, bu okuyucunun sayfa olarak gösteremediği bir okuma konumu kaydetti.
+rd_go_to_page_number	%1$d. sayfaya git
+rd_keep_other_position	Diğer konumu koru
+rd_stay_on_page	%1$d. sayfada kal
+rd_close_reader	Okuyucuyu kapat
+rd_rotate_pages	Sayfaları döndür
+rd_continuous_scrolling	Sürekli kaydırma
+rd_document_error_title	Bu belge açılamadı
+rd_try_again	Tekrar dene
+rd_go_to_page	Sayfaya git
+rd_previous_page	Önceki sayfa
+rd_next_page	Sonraki sayfa
+rd_page_of	Sayfa %1$d / %2$d
+rd_page_number	Sayfa %1$d
+rd_download_folder_lost	Bu indirme %1$s içinde ve %1$s erişimi kaldırıldı. Klasörü İndirilenler'de yeniden seçin.
+rd_downloaded_document_missing	İndirilen belge bu cihazda yok. Yeniden indirin.
+rd_document_not_stored	Belge okuma için saklanamadı.
+rd_supplementary_pdf	ek PDF
+rd_format_not_available	%1$s okuma bu önizlemede henüz kullanılamıyor. Sunucudaki okuma konumunuz korunur.
+rd_ebook_not_available	Bu e-kitabı okumak bu önizlemede henüz mümkün değil. Sunucudaki okuma konumunuz korunur.
+grp_unavailable_title	Kullanılamayan eser
+grp_could_not_load_collections	Koleksiyonlar yüklenemedi.
+grp_could_not_load_playlists	Oynatma listeleri yüklenemedi.
+grp_collections_unavailable	Koleksiyonlar kullanılamıyor
+grp_playlists_unavailable	Oynatma listeleri kullanılamıyor
+grp_no_collections_yet	Henüz koleksiyon yok
+grp_no_playlists_yet	Henüz oynatma listesi yok
+grp_create_one_hint	Eserleri kendi sıranızda bir arada tutmak için bir tane oluşturun.
+grp_title_count:one	%1$d eser
+grp_title_count:other	%1$d eser
+grp_collection_deleted	Bu koleksiyon silindi.
+grp_playlist_deleted	Bu oynatma listesi silindi.
+grp_could_not_load	Yüklenemedi.
+grp_collection_unavailable	Koleksiyon kullanılamıyor
+grp_playlist_unavailable	Oynatma listesi kullanılamıyor
+grp_nothing_in_collection_can_play	Bu koleksiyonda oynatılabilecek bir şey yok.
+grp_nothing_in_playlist_can_play	Bu oynatma listesinde oynatılabilecek bir şey yok.
+grp_could_not_start_playback	Oynatma başlatılamadı.
+grp_resume	Sürdür
+grp_play_collection	Koleksiyonu oynat
+grp_play_playlist	Oynatma listesini oynat
+grp_edit_collection	Koleksiyonu düzenle
+grp_edit_playlist	Oynatma listesini düzenle
+grp_delete_collection	Koleksiyonu sil
+grp_delete_playlist	Oynatma listesini sil
+grp_no_titles_yet	Henüz eser yok
+grp_delete_collection_question	Koleksiyon silinsin mi?
+grp_delete_playlist_question	Oynatma listesi silinsin mi?
+grp_delete_group_explanation	“%1$s” sunucunuzdan kaldırılır. İçindeki eserler korunur.
+grp_not_deleted	Silinmedi: %1$s
+grp_not_deleted_try_again	Silinmedi: tekrar deneyin
+grp_not_allowed_to_change_collection	Sunucu hesabınızın bu koleksiyonu değiştirme izni yok.
+grp_not_allowed_to_change_playlist	Sunucu hesabınızın bu oynatma listesini değiştirme izni yok.
+grp_collection_no_longer_exists	Bu koleksiyon artık mevcut değil.
+grp_playlist_no_longer_exists	Bu oynatma listesi artık mevcut değil.
+grp_not_saved	Kaydedilmedi: %1$s
+grp_not_saved_try_again	Kaydedilmedi: tekrar deneyin
+grp_saving	Kaydediliyor…
+grp_create_collection	Koleksiyon oluştur
+grp_create_playlist	Oynatma listesi oluştur
+grp_save_changes	Değişiklikleri kaydet
+grp_choose_at_least_one_title	En az bir eser seçin.
+grp_order	Sıra
+grp_move_up	%1$s öğesini yukarı taşı
+grp_remove_member	Kaldır: %1$s
+grp_add_titles	Eser ekle
+grp_add_episodes_hint	Bölümleri bir podcast'in bölüm sayfasından ekleyin.
+grp_add_to_playlist_or_collection	Oynatma listesine veya koleksiyona ekle
+grp_add_to	Şuraya ekle
+grp_nothing_to_add_to	Henüz ekleme yapabileceğiniz bir yer yok.
+grp_added_to	Eklendi: %1$s
+grp_not_added	Eklenmedi: %1$s
+grp_not_added_try_again	Eklenmedi: tekrar deneyin
+grp_already_included	Zaten ekli
+grp_close	Kapat
+grp_titles_could_not_load	Eserler yüklenemedi
+grp_nothing_here	Burada bir şey yok
+pod_feed_episodes	Akış bölümleri
+pod_sort_newest_first	Önce en yeni; en eskiyi önce görmek için dokunun
+pod_sort_oldest_first	Önce en eski; en yeniyi önce görmek için dokunun
+pod_episodes_queued:one	%1$d bölüm sunucunuzda sıraya alındı: %2$s
+pod_episodes_queued:other	%1$d bölüm sunucunuzda sıraya alındı: %2$s
+pod_server_could_not_download	Sunucunuz “%1$s” bölümünü indiremedi.
+pod_dismiss	Kapat
+pod_no_episodes_yet	Henüz bölüm yok
+pod_no_episodes_match_filter	Bu filtreyle eşleşen bölüm yok
+pod_episode_details	Bölüm ayrıntıları
+pod_untitled_episode	Adsız bölüm
+pod_play_named	Oynat: %1$s
+pod_episode_not_available	Bölüm kullanılamıyor
+pod_episode_may_have_been_removed	Sunucudan kaldırılmış olabilir.
+pod_percent_listened	%%%1$d dinlendi
+pod_feed_could_not_open	Akış açılamadı.
+pod_retry_feed	Akışı yeniden dene
+pod_no_feed_episodes	Akışta bölüm bulunamadı
+pod_already_on_server	Zaten sunucuda
+pod_selected	Seçildi
+pod_not_selected	Seçilmedi
+pod_no_audio_enclosure	Ses eki yok
+pod_not_queued	Sıraya alınmadı: %1$s
+pod_not_queued_try_again	Sıraya alınmadı: tekrar deneyin
+pod_queueing_on_server	Sunucunuzda sıraya alınıyor…
+pod_add_selected_episodes	Seçili bölümleri sunucuya ekle
+pod_something_went_wrong	Bir şeyler ters gitti.
+pod_adding_not_available	Podcast ekleme kullanılamıyor
+pod_adding_needs_permission	Sunucu hesabınızın bir podcast kütüphanesinde podcast yönetme iznine sahip olması gerekir.
+pod_search_podcasts	Podcast ara
+pod_or_rss_feed_url	Veya RSS akış URL'si
+pod_enter_complete_feed_url	Eksiksiz bir HTTP veya HTTPS akış URL'si girin.
+pod_preview_feed	Akışı önizle
+pod_create_podcast	Podcast oluştur
+pod_choose_different_feed	Başka bir akış seç
+item_something_went_wrong	Bir şeyler ters gitti. Tekrar deneyin.
+item_feed_subscribe_at	Podcast uygulamaları bu esere şu adresten abone olabilir:
+item_copied	Kopyalandı
+item_copy_address	Adresi kopyala
+item_hidden_from_directories	Podcast dizinlerinden gizli
+item_feed_public_warning	Adrese sahip olan herkes bu eseri oturum açmadan dinleyebilir.
+item_feed_name	Akış adı
+item_feed_name_rule	Yalnızca harf, rakam, - ve _
+item_hide_from_directories	Podcast dizinlerinden gizle
+item_done	Bitti
+item_sending	Gönderiliyor…
+item_sent_to	Gönderildi: %1$s
+item_send_ebook_explanation	Sunucunuz e-kitabı seçtiğiniz cihaza e-postayla gönderir.
+item_ereader_or_ebook_gone	%1$s veya bu e-kitap artık sunucuda mevcut değil. Hiçbir şey gönderilmedi.
+item_not_sent_to	%1$s cihazına gönderilmedi. %2$s
+item_not_saved_try_again	Kaydedilmedi. Tekrar deneyin.
+item_mark_unfinished	Bitirilmedi olarak işaretle
+item_discard_uncertain	Bu eserin ilerlemesine ait önceki bir kayıt yanıt almadı ve hâlâ sunucunuza ulaşabilir. Sıfırlamadan sonra ulaşırsa ilerlemeyi geri getirir. Sunucunuz bunun olup olmayacağını bu uygulamaya bildiremez.
+item_discard_anyway	Yine de sıfırla
+item_discard_under_way	Bu sıfırlama zaten devam ediyor ve geri alınamaz.
+item_keep_progress	İlerlemeyi koru
+item_discard_pending	İlerleme sıfırlanıyor. Bu işlem, sunucunuza ulaşılabildiğinde ve bu eserin dinlemesi gönderildiğinde tamamlanır.
+item_discard_anyway_question	Yine de sıfırlansın mı?
+item_discard_anyway_explanation	İlerleme şimdi kaldırılır. Önceki kayıt daha sonra sunucunuza ulaşırsa bu eserin ilerlemesi geri gelir ve onu yeniden sıfırlayabilirsiniz.
+item_discard	Sıfırla
+item_discard_progress_question	İlerleme sıfırlansın mı?
+item_discard_progress_explanation	Bu eserdeki konumunuz ve bitirildi durumu, tüm cihazlar için sunucudan kaldırılır.
+item_could_not_load	Bu eser yüklenemedi
+item_narrated_by	Anlatan
+item_series	Seri: %1$s
+item_series_with_sequence	Seri: %1$s #%2$s
+item_episode_count:one	%1$d bölüm
+item_episode_count:other	%1$d bölüm
+item_listened_and_left	%%%1$d dinlendi · %2$s kaldı
+item_chapter_number	Bölüm %1$d
+pl_minimize_player	Oynatıcıyı küçült
+pl_nothing_playing	Hiçbir şey oynatılmıyor
+pl_chapter_number	Bölüm %1$d
+pl_try_again	Tekrar dene
+pl_speed_value	Hız %1$s
+pl_sleep	Uyku
+pl_position_of_duration	%1$s / %2$s
+pl_buffering	Arabelleğe alınıyor
+pl_previous_chapter	Önceki bölüm
+pl_next_chapter	Sonraki bölüm
+pl_jump_forward_seconds:one	%1$d saniye ileri atla
+pl_jump_forward_seconds:other	%1$d saniye ileri atla
+pl_jump_back_seconds:one	%1$d saniye geri atla
+pl_jump_back_seconds:other	%1$d saniye geri atla
+pl_jump_forward_minutes:one	%1$d dakika ileri atla
+pl_jump_forward_minutes:other	%1$d dakika ileri atla
+pl_jump_back_minutes:one	%1$d dakika geri atla
+pl_jump_back_minutes:other	%1$d dakika geri atla
+pl_open_player	Oynatıcıyı aç
+pl_playback_stopped	Oynatma durdu
+pl_listening_unsaved	Bazı dinlemeler henüz bu cihaza kaydedilmedi. Saklanıyorlar ve depolama alanı izin verir vermez kaydedilecekler.
+pl_playing	Oynatılıyor
+pl_resume	Sürdür
+pl_streaming_cellular_refused	Mobil veriyle akış Ayarlar'da kapalı. Wi-Fi'ye bağlanın veya önce bu eseri indirin.
+pl_stream_cellular_title	Mobil veriyle akış yapılsın mı?
+pl_stream_cellular_message	Kotalı bir bağlantı kullanıyorsunuz. Bunu Ayarlar'dan değiştirebilirsiniz.
+pl_not_now	Şimdi değil
+pl_sleep_stops_end_of_chapter	Bu bölümün sonunda, %1$s sonra durur
+pl_sleep_stops_in	%1$s sonra durur
+pl_sleep_minus_minutes	−%1$d dk
+pl_sleep_plus_minutes	+%1$d dk
+pl_sleep_minutes	%1$d dk
+pl_sleep_turn_off	Kapat
+pl_bookmark_not_saved_reason	Yer işareti kaydedilmedi: %1$s
+pl_bookmark_not_saved	Yer işareti kaydedilmedi: tekrar deneyin
+pl_bookmark_add_at	%1$s konumuna ekle
+pl_bookmark_go_to	Yer işaretine git
+pl_bookmark_default	Yer işareti
+pl_bookmark_rename_named	Yeniden adlandır: %1$s
+pl_bookmark_delete_named	Sil: %1$s
+pl_bookmark_at	%1$s konumunda yer işareti
+pl_bookmark_rename	Yer işaretini yeniden adlandır
+pl_bookmark_new	Yeni yer işareti
+pl_untitled	Adsız
+pl_playback_stopped_reason	Oynatma durdu: %1$s. Konumunuz korunur.
+pl_playback_stopped_unknown	Oynatma durdu: ses yüklenemedi. Konumunuz korunur.
+pl_no_playable_audio	Bu öğede oynatılabilir ses yok.
+pl_could_not_start	Oynatma başlatılamadı.
+pl_listening_save_failed	Dinleme bu cihaza kaydedilemedi, bu nedenle oynatma duraklatıldı. Biraz depolama alanı boşaltıp tekrar deneyin.
+cast_casting_to	%1$s cihazına yayınlanıyor
+cast_cast	Yayınla
+cast_playing_on	%1$s üzerinde oynatılıyor
+cast_connecting_to	%1$s cihazına bağlanılıyor…
+cast_playing_on_phone	Bu telefonda oynatılıyor
+cast_stop	Yayını durdur
+cast_looking	Yayın cihazları aranıyor…
+cast_none_found	Yayın cihazı bulunamadı. Alıcının açık olduğunu ve bu telefonla aynı Wi-Fi ağında olduğunu kontrol edin.
+cast_close	Kapat
+cast_download_not_castable	İndirilen kopyalar yalnızca bu telefonda oynatılır. Burada dinlemek için yayını durdurun veya eseri akış olarak oynatın.
+cast_resumed_without_title	Uygulama yayın sırasında yeniden başladığı için yayın durdu. Bu telefonun kaydettiği son yerden dinlemeye devam etmek için eseri yeniden açın.
+cast_needs_play_services	Yayınlama için Google Play hizmetleri gerekir; bu cihazda bulunmuyor veya güncellenmesi gerekiyor.
+cast_could_not_start	Yayınlama bu cihazda başlatılamadı: %1$s.
+cast_connect_failed_named	%1$s cihazına bağlanılamadı. Açık olduğunu ve bu telefonla aynı Wi-Fi ağında olduğunu kontrol edin.
+cast_connect_failed	Alıcıya bağlanılamadı. Açık olduğunu ve bu telefonla aynı Wi-Fi ağında olduğunu kontrol edin.
+cast_connection_lost_named	%1$s ile bağlantı kesildi. Oynatma bu telefonda devam ediyor.
+cast_connection_lost	Alıcıyla bağlantı kesildi. Oynatma bu telefonda devam ediyor.
+auto_continue	Devam et
+auto_recent	Son
+auto_discovery	Keşfet
+auto_authors_count:one	%1$d yazar
+auto_authors_count:other	%1$d yazar
+auto_series_count:one	%1$d seri
+auto_series_count:other	%1$d seri
+lib_books_count:one	%1$d kitap
+lib_books_count:other	%1$d kitap
+lib_items_count:one	%1$d öğe
+lib_items_count:other	%1$d öğe
+lib_selected	Seçili
+lib_all_filters	Tüm filtreler
+lib_nothing_to_filter	Burada filtrelenecek bir şey yok.
+lib_sort_progress_updated	İlerleme: son güncelleme
+lib_sort_progress_started	İlerleme: başlangıç
+lib_sort_progress_finished	İlerleme: bitiş
+lib_sort_descending_switch	Azalan, artana geç
+lib_sort_ascending_switch	Artan, azalana geç
+lib_sort_descending	Azalan
+lib_sort_ascending	Artan
+lib_unavailable	Kütüphane kullanılamıyor
+lib_unavailable_message	%1$s Hesabınız ve gönderilmemiş dinlemeleriniz korunur.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Kapakları göster
+lib_show_list	Listeyi göster
+lib_filtered	Filtrelendi
+lib_empty_title	Burada henüz bir şey yok
+lib_empty_message	Bu kütüphanede erişebileceğiniz öğe yok.
+lib_page_error	Daha fazla eser yüklenemedi
+lib_card_finished	%1$s, bitirildi
+lib_card_percent_listened	%1$s, yüzde %2$d dinlendi
+lib_search_in	%1$s içinde ara
+lib_search_library	Kütüphanede ara
+lib_clear_search	Aramayı temizle
+lib_search_failed	Arama başarısız oldu
+lib_search_idle_title	Dinleyecek bir şey bulun
+lib_search_idle_message	Eser, yazar, seri, anlatıcı ve bölüm arayın.
+lib_search_no_match	"%1$s" ile eşleşen bir şey yok. Daha az kelime veya farklı bir yazım deneyin.
+err_invalid_server	http:// veya https:// ile başlayan bir sunucu adresi girin, örneğin https://books.example.com/abs.
+err_unsafe_media_url	Sunucu, bu sunucunun dışında bir medya adresi döndürdü. Adres açılmadı.
+err_sign_in_required	Oturumunuz artık kabul edilmiyor. Yeniden oturum açın; gönderilmemiş dinlemeler korunur.
+err_untrusted	Sunucunun sertifikası bu cihaz tarafından güvenilir bulunmuyor. Sunucunuzun sertifika yetkilisini Android Ayarlar > Güvenlik > Şifreleme ve kimlik bilgileri bölümünden yükleyip tekrar deneyin.
+err_offline	Sunucuya ulaşılamadı. Adresi veya bağlantınızı kontrol edip tekrar deneyin.
+err_forbidden	Hesabınızın bunu yapma izni yok.
+err_not_found	Bu içerik artık sunucuda mevcut değil.
+err_server_problem	Sunucuda geçici bir sorun oluştu (HTTP %1$d). Tekrar deneyin.
+err_rejected	Sunucu isteği reddetti (HTTP %1$d).
+err_invalid_response	Sunucu, bu uygulamanın okuyamadığı bir yanıt gönderdi.
+err_no_audio	Bu öğede oynatılabilir ses yok.
+err_login_rejected	Kullanıcı adı veya şifre kabul edilmedi.
+err_publications_unreadable	Yanıt alınamayan ilerleme yazma işlemlerinin kayıtları okunamadı. Önce bunları Tanılama'da çözün.
+err_discards_unreadable	Kaydedilmiş ilerleme sıfırlamaları okunamadı. Önce bunları Tanılama'da çözün.

@@ -37,7 +37,9 @@ class PublicationLedger(private val file: File) {
 
     @Serializable private data class Document(val version: Int = 1, val attempts: List<Attempt> = emptyList())
 
-    class Unreadable : java.io.IOException("Records of unanswered progress writes could not be read. Resolve them in Diagnostics first.")
+    class Unreadable : java.io.IOException("Records of unanswered progress writes could not be read. Resolve them in Diagnostics first.") {
+        override fun getLocalizedMessage(): String? = ErrorText.of(this)
+    }
 
     private val state = MutableStateFlow(emptyList<Attempt>())
     /** Writes that may still be applied, including any out right now. */

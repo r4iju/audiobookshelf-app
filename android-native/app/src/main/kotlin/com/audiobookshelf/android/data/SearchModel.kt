@@ -33,7 +33,7 @@ class SearchModel(private val scope: CoroutineScope, val client: ApiClient, priv
                 results = client.search(library, text.trim(), limit = 25)
             } catch (failure: Exception) {
                 if (failure is kotlinx.coroutines.CancellationException) throw failure
-                error = failure.message; accounts.handle(failure)
+                error = failure.localizedMessage; accounts.handle(failure)
             } finally { loading = false }
         }
     }
@@ -62,7 +62,7 @@ class PagedItems(private val scope: CoroutineScope, private val client: ApiClien
                 items = items + next.results.filter { it.id !in known }
                 total = next.total; page += 1
             } catch (failure: Exception) {
-                error = failure.message; accounts.handle(failure)
+                error = failure.localizedMessage; accounts.handle(failure)
             } finally { busy = false; loading = false }
         }
     }

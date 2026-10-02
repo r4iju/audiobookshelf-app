@@ -1,0 +1,481 @@
+# Slovak drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Účty
+title_new_collection	Nová zbierka
+action_retry	Skúsiť znova
+action_read	Čítať %1$s
+action_mark_finished	Označiť ako dokončené
+choose_library	Vybrať knižnicu
+all_titles	Všetky tituly
+all_podcasts	Všetky podcasty
+filter	Filter
+sort	Zoradiť
+theme_system	Systémová
+screen_orientation	Orientácia obrazovky
+jump_forward	Skok dopredu
+jump_back	Skok dozadu
+set_settings_not_saved	Nastavenia sa nepodarilo uložiť v tomto zariadení, preto sa nič nezmenilo. Uvoľnite miesto v úložisku a skúste to znova.
+set_orientation_follow_device	Podľa zariadenia
+set_orientation_portrait	Na výšku
+set_orientation_landscape	Na šírku
+set_haptic_light	Jemná
+set_rewind_on_resume	Pri pokračovaní sa trochu vrátiť
+set_rewind_on_resume_detail	Po pozastavení sa vráti o niekoľko sekúnd, po dlhšej prestávke o viac.
+set_seek_system_controls	Posúvanie zo systémových ovládačov
+set_seek_system_controls_detail	Umožní posúvať lištu pozície na uzamknutej obrazovke a v notifikácii.
+set_mp3_index_seeking	Presné posúvanie v MP3
+set_mp3_index_seeking_detail	Vytvorí index posúvania pre súbory MP3 s nespoľahlivou dĺžkou. Posúvanie sa spúšťa pomalšie.
+set_shake_to_reset	Reštart potrasením
+set_shake_to_reset_detail	Potrasenie telefónu počas behu časovača ho spustí odznova.
+set_sleep_fade_out	Postupné stlmenie
+set_sleep_fade_out_detail	Počas poslednej minúty zníži hlasitosť.
+set_vibrate_on_reset	Vibrovať pri reštarte
+set_auto_sleep_timer_detail	Spustí časovač pri prehrávaní medzi %1$s a %2$s.
+set_heading_mobile_data	Mobilné dáta
+set_storage	Úložisko
+set_heading_support	Podpora
+set_diagnostics	Diagnostika
+set_something_went_wrong	Niečo sa pokazilo.
+set_statistics_unavailable	Štatistiky nie sú k dispozícii
+set_try_again	Skúsiť znova
+set_minutes_listened:one	%1$d vypočutá minúta
+set_minutes_listened:few	%1$d vypočuté minúty
+set_minutes_listened:many	%1$d vypočutej minúty
+set_minutes_listened:other	%1$d vypočutých minút
+set_days_listened:one	%1$d deň počúvania
+set_days_listened:few	%1$d dni počúvania
+set_days_listened:many	%1$d dňa počúvania
+set_days_listened:other	%1$d dní počúvania
+set_titles_finished:one	%1$d dokončený titul
+set_titles_finished:few	%1$d dokončené tituly
+set_titles_finished:many	%1$d dokončeného titulu
+set_titles_finished:other	%1$d dokončených titulov
+set_day_minutes_listened:one	%1$s, %2$d vypočutá minúta
+set_day_minutes_listened:few	%1$s, %2$d vypočuté minúty
+set_day_minutes_listened:many	%1$s, %2$d vypočutej minúty
+set_day_minutes_listened:other	%1$s, %2$d vypočutých minút
+set_set_aside_failed	Nepodarilo sa odložiť. Skúste to znova.
+set_connection	Pripojenie
+set_diagnostics_area_media	Médiá
+set_diagnostics_area_sync	Synchronizácia
+set_unreadable_resets_title	Uložené zahodenia priebehu sa nepodarilo prečítať
+set_unreadable_resets_detail	Môžu sa týkať ktoréhokoľvek titulu, preto sa nič neprehrá a neodošle sa žiadna pozícia čítania, kým sa nerozhodnete. Ak ich odložíte, súbor zostane v tomto zariadení a priebeh, ktorý mali zahodiť, zostane na vašom serveri.
+set_set_them_aside	Odložiť ich
+set_listening_storage_title	Počúvanie spred zatvorenia aplikácie sa nepodarilo uložiť
+set_listening_storage_detail	Úložisko v tomto zariadení je nedostupné alebo plné. Kým sa počúvanie neuloží, nič sa neprehrá a nič sa neodošle; dovtedy sa uchováva.
+set_unreadable_writes_title	Záznamy o nepotvrdených ukladaniach priebehu sa nepodarilo prečítať
+set_unreadable_writes_detail	Uloženie ktoréhokoľvek titulu sa ešte môže dostať na váš server, preto sa neodošle žiadne počúvanie ani čítanie a nezahodí sa žiadny priebeh, kým sa nerozhodnete. Ak ich odložíte, súbor zostane v tomto zariadení; oneskorené uloženie potom môže vrátiť priebeh, ktorý zahodíte.
+set_diagnostics_server	Server %1$s
+set_diagnostics_signed_in_as	Prihlásený ako %1$s
+set_diagnostics_app_version	Aplikácia %1$s
+set_recent_problems	Nedávne problémy
+set_clear	Vymazať
+set_no_problems	V tomto zariadení neboli zaznamenané žiadne problémy.
+set_unreadable_writes_confirm_title	Odložiť nečitateľné záznamy?
+set_unreadable_writes_confirm_detail	Pozície počúvania a čítania sa opäť odosielajú a zahodenia môžu pokračovať.
+set_set_aside	Odložiť
+set_unreadable_resets_confirm_title	Odložiť nečitateľné zahodenia?
+set_unreadable_resets_confirm_detail	Tituly sa opäť prehrávajú a pozície čítania sa odosielajú. Pri tituloch, ktoré chcete stále začať odznova, zahoďte priebeh znova.
+set_signed_in	Prihlásený
+set_other_accounts	Ostatné účty
+set_server_sign_in_required	%1$s · vyžaduje sa prihlásenie
+set_remove_account	Odstrániť %1$s
+set_switch_to_account	Prepnúť na tento účet
+set_add_account	Pridať účet
+set_sign_out_of	Odhlásiť sa z %1$s
+set_sign_out_detail	Odstráni tento účet zo zariadenia. Jeho stiahnuté súbory a neodoslané počúvanie zostanú, kým sa znova neprihlási.
+set_accounts_footer	Každý účet má vlastný priebeh, stiahnuté súbory a výber knižnice. Prepínanie ich nikdy nezmieša.
+set_remove_account_confirm	Odstrániť %1$s?
+set_remove_account_detail	Účet môžete neskôr znova pridať. Jeho stiahnuté súbory a neodoslané počúvanie zostanú v tomto zariadení.
+set_add_an_account	Pridať účet
+set_connect_intro	Pripojte sa priamo k vlastnému serveru. Nič sa nesmeruje cez inú službu.
+set_change_server	Zmeniť server
+set_sign_in	Prihlásiť sa
+set_sign_in_openid	Prihlásiť sa cez OpenID
+set_saved_accounts	Uložené účty
+set_use_account	Použiť
+set_edit	Upraviť
+set_add_podcast	Pridať podcast
+set_not_available_yet	Zatiaľ nie je k dispozícii
+set_not_available_yet_detail	Táto časť ukážkovej verzie sa ešte vyvíja.
+set_import_previous_app	Importovať z predchádzajúcej aplikácie
+set_import_interrupted	Import sa nedokončil. Vyberte ten istý export a pokračujte tam, kde sa zastavil.
+set_import_already	Tento export už bol importovaný. Tituly, počúvanie a pozície z neho sú v tomto zariadení.
+set_import_preflight	%1$s\nPredchádzajúca aplikácia a tento súbor sa iba čítajú; nič sa v nich nezmení. Tituly, počúvanie a pozície sa priradia k účtu, keď sa tu prihlási. Heslá nie sú súčasťou exportu, preto sa každý účet prihlási znova.
+set_import_account_signed_in	%1$s · prihlásený
+set_import_account_sign_in_later	%1$s · prihláste sa po importe
+set_import_titles	Tituly
+set_import_title_partial	%1$s · zvyšok sa stiahne znova
+set_not_imported	Neimportované
+set_import_space	Potrebné: %1$s; voľné: %2$s.
+set_import_no_space	V tomto zariadení nie je dostatok voľného miesta. Uvoľnite miesto a potom znova vyberte export.
+set_import_progress	Kopírovanie súborov: %1$d z %2$d. Ak sa aplikácia zatvorí, pokračujte opätovným výberom toho istého exportu.
+set_import_done	Importované tituly: %1$d, relácie počúvania: %2$d, pozície: %3$d. Nastavenia z predchádzajúcej aplikácie boli použité.
+set_import_waiting	Prihláste sa do %1$s ako %2$s, aby sa priradili jeho tituly, počúvanie a pozície.
+set_import	Importovať
+set_continue	Pokračovať
+set_close	Zavrieť
+set_import_file_unreadable	Vybraný súbor sa nepodarilo prečítať. Vyberte ho znova alebo ho najprv uložte do tohto zariadenia.
+set_import_stopped	Import sa zastavil pred dokončením. Nič sa nestratilo: znova vyberte ten istý export a pokračujte tam, kde sa zastavil.
+set_import_item_gone	Na serveri už nie je, preto nebol prevzatý.
+set_import_file_changed	Súbor sa po importe v tomto zariadení zmenil, preto sa znova stiahne zo servera.
+set_openid_not_enabled	Prihlásenie cez OpenID nie je na tomto serveri povolené. Použite používateľské meno a heslo.
+set_openid_canceled	Prihlásenie v prehliadači bolo zrušené. Vaše uložené účty zostali zachované.
+set_openid_invalid	Odpoveď prihlásenia z prehliadača sa nepodarilo overiť. Skúste sa prihlásiť znova a skontrolujte nastavenia presmerovania OpenID na serveri.
+set_vault_unreadable	Uložené prihlásenia sa nepodarilo dešifrovať. Zostávajú v zariadení; ak chcete pokračovať, prihláste sa znova.
+set_session_ended	Vaša relácia pre %1$s skončila. Prihláste sa znova; neodoslané počúvanie a stiahnuté súbory sa zachovajú.
+set_play_blocked_listening_storage	Počúvanie spred zatvorenia aplikácie sa nepodarilo uložiť, pretože úložisko je nedostupné, a kým sa to nepodarí, nič sa neprehrá. Uvoľnite miesto a skúste to znova.
+set_play_blocked_unreadable_resets	Uložené zahodenia priebehu sa nepodarilo prečítať, preto sa nič neprehrá, kým sa nevyriešia v Diagnostike.
+set_play_blocked_discarding	Priebeh tohto titulu sa ešte zahadzuje. Po dokončení sa titul prehrá od začiatku.
+dl_not_saved	Zoznam stiahnutých súborov sa nepodarilo uložiť v tomto zariadení, preto sa nič nezmenilo. Uvoľnite miesto v úložisku a skúste to znova.
+dl_not_allowed	Váš účet nemá povolené sťahovanie.
+dl_no_audio	Táto položka nemá žiadny zvuk na stiahnutie.
+dl_no_space	V tomto zariadení nie je dostatok voľného miesta pre %1$s, ak má zostať voľné miesto pre systém.
+dl_folder_lost_nothing_downloaded	Prístup k %1$s bol odobratý, preto sa nič nestiahlo. V Nastaveniach znova vyberte priečinok na sťahovanie.
+dl_downloading_percent	Sťahovanie %1$d%%
+dl_cancel_download	Zrušiť sťahovanie
+dl_downloaded_plays_offline	Stiahnuté · prehrá sa offline
+dl_failed	Sťahovanie zlyhalo.
+dl_discard	Zahodiť
+dl_cellular_title	Sťahovať cez mobilné dáta?
+dl_cellular_message	Ste na meranom pripojení. Môžete to zmeniť v Nastaveniach.
+dl_not_now	Teraz nie
+dl_folder_cannot_be_kept	Tento priečinok nemožno použiť na sťahovanie. Vyberte iný.
+dl_saved_in_folder	Stiahnuté súbory sa ukladajú do %1$s
+dl_saved_in_app_storage	Stiahnuté súbory sa ukladajú do úložiska aplikácie
+dl_folder_visible_to_other_apps	Tieto súbory vidia aj ostatné aplikácie v tomto zariadení. Súbory stiahnuté pred zmenou zostanú tam, kde sú.
+dl_folder_private_to_app	Tieto súbory vidí iba táto aplikácia. Vyberte priečinok, ak chcete mať stiahnuté súbory tam, kde sa k nim dostanú aj iné aplikácie.
+dl_choose_folder	Vybrať priečinok
+dl_use_app_storage	Použiť úložisko aplikácie
+dl_ebook_missing	E-kniha v tomto zariadení chýba. Ak ju chcete otvoriť, stiahnite ju znova.
+dl_no_app_opens_format	Žiadna aplikácia v tomto zariadení neotvára súbory %1$s. Nainštalujte takú, ktorá ich otvára, a skúste to znova.
+dl_no_app_opens_this_kind	Žiadna aplikácia v tomto zariadení neotvára tento typ súborov. Nainštalujte takú, ktorá ich otvára, a skúste to znova.
+dl_folder_lost_choose_again_open	Toto stiahnutie je v %1$s a prístup k %1$s bol odobratý. Ak ho chcete otvoriť, znova vyberte %1$s.
+dl_folder_lost_choose_again_play	Toto stiahnutie je v %1$s a prístup k %1$s bol odobratý. Ak ho chcete prehrať, znova vyberte %1$s.
+dl_names_or	%1$s alebo %2$s
+dl_names_and	%1$s a %2$s
+dl_remove_title	Odstrániť stiahnutý súbor?
+dl_remove_message	„%1$s“ sa odstráni z tohto zariadenia. Váš priebeh počúvania sa zachová.
+dl_keep	Ponechať
+dl_not_that_folder	To nie je %1$s. Vyberte priečinok, v ktorom sú tieto stiahnuté súbory.
+dl_folder_access_not_kept	Prístup k tomuto priečinku sa nepodarilo zachovať. Skúste to znova.
+dl_no_downloads	Žiadne stiahnuté súbory
+dl_no_downloads_message	Stiahnite si knihy alebo epizódy z ich stránky a počúvajte bez pripojenia.
+dl_access_removed_title	Prístup k %1$s bol odobratý
+dl_downloads_kept_there:one	Je tam uložený %1$d stiahnutý súbor. Ak ho chcete prehrať a otvoriť, znova vyberte %2$s.
+dl_downloads_kept_there:few	Sú tam uložené %1$d stiahnuté súbory. Ak ich chcete prehrať a otvoriť, znova vyberte %2$s.
+dl_downloads_kept_there:many	Stiahnuté súbory uložené tam: %1$d. Ak ich chcete prehrať a otvoriť, znova vyberte %2$s.
+dl_downloads_kept_there:other	Je tam uložených %1$d stiahnutých súborov. Ak ich chcete prehrať a otvoriť, znova vyberte %2$s.
+dl_choose_again	Znova vybrať %1$s
+dl_some_files_missing	V tomto zariadení chýbajú niektoré súbory
+dl_size_in_folder	%1$s v %2$s
+dl_open_in_another_app	Otvoriť %1$s v inej aplikácii
+dl_download_again_named	Znova stiahnuť %1$s
+dl_the_chosen_folder	vybraný priečinok
+dl_files_missing_play	Niektoré súbory tohto stiahnutia v tomto zariadení chýbajú. Ak ho chcete prehrať, stiahnite ho znova.
+dl_play_named	Prehrať %1$s
+dl_retry_named	Zopakovať %1$s
+dl_cancel_named	Zrušiť %1$s
+dl_remove_named	Odstrániť %1$s
+dl_sign_in_again	Ak chcete sťahovať, znova sa prihláste do tohto účtu.
+dl_folder_lost_choose_in_downloads	Prístup k %1$s bol odobratý. Znova vyberte priečinok v Stiahnutých súboroch.
+dl_connection_interrupted	Pripojenie bolo prerušené.
+dl_error_retrying	%1$s Skúšam znova…
+dl_server_refused	Server odmietol sťahovanie.
+dl_server_sent_type_not_audio	Server namiesto zvuku poslal %1$s, preto sa nič neuložilo. Skontrolujte server alebo proxy a skúste to znova.
+dl_server_sent_unknown_not_audio	Server namiesto zvuku poslal neznámu odpoveď, preto sa nič neuložilo. Skontrolujte server alebo proxy a skúste to znova.
+dl_size_mismatch	Stiahnutý súbor mal %1$d bajtov, ale server uviedol %2$d, preto bol zahodený. Skúste ho stiahnuť znova.
+dl_server_sent_not_pdf	Server poslal niečo iné ako PDF, preto sa nič neuložilo. Skontrolujte server alebo proxy a skúste to znova.
+dl_notification_downloading	Sťahuje sa %1$s
+rd_positions_not_restored	Uložené pozície čítania sa nepodarilo obnoviť, preto sa strany neukladajú. Pôvodné údaje sa zachovávajú.
+rd_positions_not_overwritten	Uložené pozície čítania sa nepodarilo prečítať, preto sa neprepíšu.
+rd_not_a_pdf	Tento súbor nie je PDF, ktoré toto zariadenie dokáže otvoriť.
+rd_document_not_opened	Dokument sa nepodarilo otvoriť.
+rd_page_not_saved	Túto stranu sa nepodarilo uložiť v tomto zariadení.
+rd_choice_not_saved	Vašu voľbu sa nepodarilo uložiť v tomto zariadení.
+rd_conflict_title	Kde pokračovať?
+rd_conflict_page	Iné zariadenie sa dostalo na stranu %1$d, kým strana %2$d tu ešte nebola uložená na server.
+rd_conflict_location	Iné zariadenie uložilo pozíciu čítania, ktorú táto čítačka nedokáže zobraziť ako stranu, kým strana %1$d tu ešte nebola uložená na server.
+rd_go_to_page_number	Prejsť na stranu %1$d
+rd_keep_other_position	Ponechať druhú pozíciu
+rd_stay_on_page	Zostať na strane %1$d
+rd_close_reader	Zavrieť čítačku
+rd_rotate_pages	Otočiť strany
+rd_continuous_scrolling	Plynulé posúvanie
+rd_document_error_title	Tento dokument sa nepodarilo otvoriť
+rd_try_again	Skúsiť znova
+rd_go_to_page	Prejsť na stranu
+rd_previous_page	Predchádzajúca strana
+rd_next_page	Ďalšia strana
+rd_page_of	Strana %1$d z %2$d
+rd_page_number	Strana %1$d
+rd_download_folder_lost	Toto stiahnutie je v %1$s a prístup k %1$s bol odobratý. Znova vyberte priečinok v Stiahnutých súboroch.
+rd_downloaded_document_missing	Stiahnutý dokument v tomto zariadení chýba. Stiahnite ho znova.
+rd_document_not_stored	Dokument sa nepodarilo uložiť na čítanie.
+rd_supplementary_pdf	doplnkové PDF
+rd_format_not_available	Čítanie %1$s zatiaľ nie je v tejto ukážkovej verzii k dispozícii. Vaša pozícia čítania na serveri sa zachováva.
+rd_ebook_not_available	Čítanie tejto e-knihy zatiaľ nie je v tejto ukážkovej verzii k dispozícii. Vaša pozícia čítania na serveri sa zachováva.
+grp_unavailable_title	Nedostupný titul
+grp_could_not_load_collections	Zbierky sa nepodarilo načítať.
+grp_could_not_load_playlists	Playlisty sa nepodarilo načítať.
+grp_collections_unavailable	Zbierky nie sú k dispozícii
+grp_playlists_unavailable	Playlisty nie sú k dispozícii
+grp_no_collections_yet	Zatiaľ žiadne zbierky
+grp_no_playlists_yet	Zatiaľ žiadne playlisty
+grp_create_one_hint	Vytvorte si zoznam a majte tituly pohromade vo vlastnom poradí.
+grp_title_count:one	%1$d titul
+grp_title_count:few	%1$d tituly
+grp_title_count:many	%1$d titulu
+grp_title_count:other	%1$d titulov
+grp_collection_deleted	Táto zbierka bola zmazaná.
+grp_playlist_deleted	Tento playlist bol zmazaný.
+grp_could_not_load	Nepodarilo sa načítať.
+grp_collection_unavailable	Zbierka nie je k dispozícii
+grp_playlist_unavailable	Playlist nie je k dispozícii
+grp_nothing_in_collection_can_play	V tejto zbierke sa nedá nič prehrať.
+grp_nothing_in_playlist_can_play	V tomto playliste sa nedá nič prehrať.
+grp_could_not_start_playback	Prehrávanie sa nepodarilo spustiť.
+grp_resume	Pokračovať
+grp_play_collection	Prehrať zbierku
+grp_play_playlist	Prehrať playlist
+grp_edit_collection	Upraviť zbierku
+grp_edit_playlist	Upraviť playlist
+grp_delete_collection	Zmazať zbierku
+grp_delete_playlist	Zmazať playlist
+grp_no_titles_yet	Zatiaľ žiadne tituly
+grp_delete_collection_question	Zmazať zbierku?
+grp_delete_playlist_question	Zmazať playlist?
+grp_delete_group_explanation	„%1$s“ sa odstráni z vášho servera. Tituly, ktoré obsahuje, sa zachovajú.
+grp_not_deleted	Nezmazané: %1$s
+grp_not_deleted_try_again	Nezmazané: skúste to znova
+grp_not_allowed_to_change_collection	Váš účet na serveri nemá povolené meniť túto zbierku.
+grp_not_allowed_to_change_playlist	Váš účet na serveri nemá povolené meniť tento playlist.
+grp_collection_no_longer_exists	Táto zbierka už neexistuje.
+grp_playlist_no_longer_exists	Tento playlist už neexistuje.
+grp_not_saved	Neuložené: %1$s
+grp_not_saved_try_again	Neuložené: skúste to znova
+grp_saving	Ukladá sa…
+grp_create_collection	Vytvoriť zbierku
+grp_create_playlist	Vytvoriť playlist
+grp_save_changes	Uložiť zmeny
+grp_choose_at_least_one_title	Vyberte aspoň jeden titul.
+grp_order	Poradie
+grp_move_up	Posunúť %1$s nahor
+grp_remove_member	Odstrániť %1$s
+grp_add_titles	Pridať tituly
+grp_add_episodes_hint	Epizódy pridáte zo stránky epizódy podcastu.
+grp_add_to_playlist_or_collection	Pridať do playlistu alebo zbierky
+grp_add_to	Pridať do
+grp_nothing_to_add_to	Zatiaľ tu nie je nič, do čoho by ste mohli pridávať.
+grp_added_to	Pridané do %1$s
+grp_not_added	Nepridané: %1$s
+grp_not_added_try_again	Nepridané: skúste to znova
+grp_already_included	Už je zahrnuté
+grp_close	Zavrieť
+grp_titles_could_not_load	Tituly sa nepodarilo načítať
+grp_nothing_here	Nič tu nie je
+pod_feed_episodes	Epizódy zo zdroja
+pod_sort_newest_first	Najnovšie prvé, ťuknutím zobrazíte najstaršie prvé
+pod_sort_oldest_first	Najstaršie prvé, ťuknutím zobrazíte najnovšie prvé
+pod_episodes_queued:one	%1$d epizóda zaradená do frontu na vašom serveri: %2$s
+pod_episodes_queued:few	%1$d epizódy zaradené do frontu na vašom serveri: %2$s
+pod_episodes_queued:many	%1$d epizódy zaradenej do frontu na vašom serveri: %2$s
+pod_episodes_queued:other	%1$d epizód zaradených do frontu na vašom serveri: %2$s
+pod_server_could_not_download	Váš server nemohol stiahnuť „%1$s“.
+pod_dismiss	Zavrieť
+pod_no_episodes_yet	Zatiaľ žiadne epizódy
+pod_no_episodes_match_filter	Tomuto filtru nezodpovedajú žiadne epizódy
+pod_episode_details	Podrobnosti epizódy
+pod_untitled_episode	Epizóda bez názvu
+pod_play_named	Prehrať %1$s
+pod_episode_not_available	Epizóda nie je k dispozícii
+pod_episode_may_have_been_removed	Možno bola odstránená zo servera.
+pod_percent_listened	Vypočuté %1$d%%
+pod_feed_could_not_open	Zdroj sa nepodarilo otvoriť.
+pod_retry_feed	Znova načítať zdroj
+pod_no_feed_episodes	V zdroji sa nenašli žiadne epizódy
+pod_already_on_server	Už je na serveri
+pod_selected	Vybrané
+pod_not_selected	Nevybrané
+pod_no_audio_enclosure	Bez zvukovej prílohy
+pod_not_queued	Nezaradené do frontu: %1$s
+pod_not_queued_try_again	Nezaradené do frontu: skúste to znova
+pod_queueing_on_server	Zaraďuje sa do frontu na vašom serveri…
+pod_add_selected_episodes	Pridať vybrané epizódy na server
+pod_something_went_wrong	Niečo sa pokazilo.
+pod_adding_not_available	Pridávanie podcastov nie je k dispozícii
+pod_adding_needs_permission	Váš účet na serveri potrebuje oprávnenie na správu podcastov v knižnici podcastov.
+pod_search_podcasts	Hľadať podcasty
+pod_or_rss_feed_url	Alebo URL RSS zdroja
+pod_enter_complete_feed_url	Zadajte úplnú URL zdroja HTTP alebo HTTPS.
+pod_preview_feed	Ukážka zdroja
+pod_create_podcast	Vytvoriť podcast
+pod_choose_different_feed	Vybrať iný zdroj
+item_something_went_wrong	Niečo sa pokazilo. Skúste to znova.
+item_feed_subscribe_at	Podcastové aplikácie môžu odoberať tento titul na adrese:
+item_copied	Skopírované
+item_copy_address	Kopírovať adresu
+item_hidden_from_directories	Skryté v podcastových katalógoch
+item_feed_public_warning	Ktokoľvek s touto adresou môže počúvať tento titul bez prihlásenia.
+item_feed_name	Názov zdroja
+item_feed_name_rule	Iba písmená, číslice, - a _
+item_hide_from_directories	Skryť v podcastových katalógoch
+item_done	Hotovo
+item_sending	Odosiela sa…
+item_sent_to	Odoslané do %1$s
+item_send_ebook_explanation	Váš server pošle e-knihu e-mailom do zariadenia, ktoré vyberiete.
+item_ereader_or_ebook_gone	%1$s alebo táto e-kniha už na serveri nie je k dispozícii. Nič sa neodoslalo.
+item_not_sent_to	Neodoslané do %1$s. %2$s
+item_not_saved_try_again	Neuložené. Skúste to znova.
+item_mark_unfinished	Označiť ako nedokončené
+item_discard_uncertain	Na skoršie uloženie priebehu tohto titulu neprišla odpoveď a ešte sa môže dostať na váš server. Ak dorazí po zahodení, priebeh sa vráti. Váš server nedokáže tejto aplikácii povedať, či sa tak stane.
+item_discard_anyway	Napriek tomu zahodiť
+item_discard_under_way	Toto zahodenie už prebieha a nedá sa odvolať.
+item_keep_progress	Ponechať priebeh
+item_discard_pending	Priebeh sa zahadzuje. Dokončí sa, keď bude váš server dostupný a počúvanie tohto titulu sa odošle.
+item_discard_anyway_question	Napriek tomu zahodiť?
+item_discard_anyway_explanation	Priebeh sa teraz odstráni. Ak skoršie uloženie dorazí na váš server neskôr, priebeh tohto titulu sa vráti a môžete ho zahodiť znova.
+item_discard	Zahodiť
+item_discard_progress_question	Zahodiť priebeh?
+item_discard_progress_explanation	Vaša pozícia a stav dokončenia tohto titulu sa odstránia zo servera pre všetky zariadenia.
+item_could_not_load	Tento titul sa nepodarilo načítať
+item_narrated_by	Číta
+item_series	Séria: %1$s
+item_series_with_sequence	Séria: %1$s #%2$s
+item_episode_count:one	%1$d epizóda
+item_episode_count:few	%1$d epizódy
+item_episode_count:many	%1$d epizódy
+item_episode_count:other	%1$d epizód
+item_listened_and_left	Vypočuté %1$d%% · zostáva %2$s
+item_chapter_number	Kapitola %1$d
+pl_minimize_player	Minimalizovať prehrávač
+pl_nothing_playing	Nič sa neprehráva
+pl_chapter_number	Kapitola %1$d
+pl_try_again	Skúsiť znova
+pl_speed_value	Rýchlosť %1$s
+pl_sleep	Spánok
+pl_position_of_duration	%1$s z %2$s
+pl_buffering	Načítava sa
+pl_previous_chapter	Predchádzajúca kapitola
+pl_next_chapter	Ďalšia kapitola
+pl_jump_forward_seconds:one	Skok dopredu o %1$d sekundu
+pl_jump_forward_seconds:few	Skok dopredu o %1$d sekundy
+pl_jump_forward_seconds:many	Skok dopredu o %1$d sekundy
+pl_jump_forward_seconds:other	Skok dopredu o %1$d sekúnd
+pl_jump_back_seconds:one	Skok dozadu o %1$d sekundu
+pl_jump_back_seconds:few	Skok dozadu o %1$d sekundy
+pl_jump_back_seconds:many	Skok dozadu o %1$d sekundy
+pl_jump_back_seconds:other	Skok dozadu o %1$d sekúnd
+pl_jump_forward_minutes:one	Skok dopredu o %1$d minútu
+pl_jump_forward_minutes:few	Skok dopredu o %1$d minúty
+pl_jump_forward_minutes:many	Skok dopredu o %1$d minúty
+pl_jump_forward_minutes:other	Skok dopredu o %1$d minút
+pl_jump_back_minutes:one	Skok dozadu o %1$d minútu
+pl_jump_back_minutes:few	Skok dozadu o %1$d minúty
+pl_jump_back_minutes:many	Skok dozadu o %1$d minúty
+pl_jump_back_minutes:other	Skok dozadu o %1$d minút
+pl_open_player	Otvoriť prehrávač
+pl_playback_stopped	Prehrávanie zastavené
+pl_listening_unsaved	Časť počúvania ešte nie je uložená v tomto zariadení. Uchováva sa a uloží sa, hneď ako to úložisko dovolí.
+pl_playing	Prehráva sa
+pl_resume	Pokračovať
+pl_streaming_cellular_refused	Streamovanie cez mobilné dáta je vypnuté v Nastaveniach. Pripojte sa k Wi-Fi alebo si tento titul najprv stiahnite.
+pl_stream_cellular_title	Streamovať cez mobilné dáta?
+pl_stream_cellular_message	Ste na meranom pripojení. Môžete to zmeniť v Nastaveniach.
+pl_not_now	Teraz nie
+pl_sleep_stops_end_of_chapter	Zastaví sa na konci tejto kapitoly, o %1$s
+pl_sleep_stops_in	Zastaví sa o %1$s
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Vypnúť
+pl_bookmark_not_saved_reason	Záložka neuložená: %1$s
+pl_bookmark_not_saved	Záložka neuložená: skúste to znova
+pl_bookmark_add_at	Pridať na %1$s
+pl_bookmark_go_to	Prejsť na záložku
+pl_bookmark_default	Záložka
+pl_bookmark_rename_named	Premenovať %1$s
+pl_bookmark_delete_named	Zmazať %1$s
+pl_bookmark_at	Záložka na %1$s
+pl_bookmark_rename	Premenovať záložku
+pl_bookmark_new	Nová záložka
+pl_untitled	Bez názvu
+pl_playback_stopped_reason	Prehrávanie zastavené: %1$s. Vaša pozícia sa zachováva.
+pl_playback_stopped_unknown	Prehrávanie zastavené: zvuk sa nepodarilo načítať. Vaša pozícia sa zachováva.
+pl_no_playable_audio	Táto položka nemá prehrateľný zvuk.
+pl_could_not_start	Prehrávanie sa nepodarilo spustiť.
+pl_listening_save_failed	Počúvanie sa nepodarilo uložiť v tomto zariadení, preto sa prehrávanie pozastavilo. Uvoľnite miesto v úložisku a skúste to znova.
+cast_casting_to	Prenáša sa do %1$s
+cast_cast	Prenášať
+cast_playing_on	Prehráva sa na %1$s
+cast_connecting_to	Pripája sa k %1$s…
+cast_playing_on_phone	Prehráva sa v tomto telefóne
+cast_stop	Zastaviť prenos
+cast_looking	Hľadajú sa zariadenia na prenos…
+cast_none_found	Nenašli sa žiadne zariadenia na prenos. Skontrolujte, či je prijímač zapnutý a v rovnakej sieti Wi-Fi ako tento telefón.
+cast_close	Zavrieť
+cast_download_not_castable	Stiahnuté kópie sa prehrávajú iba v tomto telefóne. Ak chcete počúvať tu, zastavte prenos, alebo titul namiesto toho streamujte.
+cast_resumed_without_title	Prenos sa zastavil, pretože sa aplikácia počas prenosu reštartovala. Znova otvorte titul a pokračujte v počúvaní od miesta, ktoré tento telefón uložil naposledy.
+cast_needs_play_services	Prenos vyžaduje služby Google Play, ktoré toto zariadenie nemá alebo ich treba aktualizovať.
+cast_could_not_start	Prenos sa v tomto zariadení nepodarilo spustiť: %1$s.
+cast_connect_failed_named	Nepodarilo sa pripojiť k %1$s. Skontrolujte, či je zapnuté a v rovnakej sieti Wi-Fi ako tento telefón.
+cast_connect_failed	Nepodarilo sa pripojiť k prijímaču. Skontrolujte, či je zapnutý a v rovnakej sieti Wi-Fi ako tento telefón.
+cast_connection_lost_named	Pripojenie k %1$s sa stratilo. Prehrávanie pokračuje v tomto telefóne.
+cast_connection_lost	Pripojenie k prijímaču sa stratilo. Prehrávanie pokračuje v tomto telefóne.
+auto_continue	Pokračovať
+auto_recent	Nedávne
+auto_discovery	Objavovanie
+auto_authors_count:one	%1$d autor
+auto_authors_count:few	%1$d autori
+auto_authors_count:many	%1$d autora
+auto_authors_count:other	%1$d autorov
+auto_series_count:one	%1$d séria
+auto_series_count:few	%1$d série
+auto_series_count:many	%1$d série
+auto_series_count:other	%1$d sérií
+lib_books_count:one	%1$d kniha
+lib_books_count:few	%1$d knihy
+lib_books_count:many	%1$d knihy
+lib_books_count:other	%1$d kníh
+lib_items_count:one	%1$d položka
+lib_items_count:few	%1$d položky
+lib_items_count:many	%1$d položky
+lib_items_count:other	%1$d položiek
+lib_selected	Vybrané
+lib_all_filters	Všetky filtre
+lib_nothing_to_filter	Tu nie je podľa čoho filtrovať.
+lib_sort_descending_switch	Zostupne, prepnúť na vzostupne
+lib_sort_ascending_switch	Vzostupne, prepnúť na zostupne
+lib_sort_descending	Zostupne
+lib_sort_ascending	Vzostupne
+lib_unavailable	Knižnica nie je k dispozícii
+lib_unavailable_message	%1$s Váš účet a neodoslané počúvanie sa zachovajú.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Zobraziť obálky
+lib_show_list	Zobraziť zoznam
+lib_filtered	Filtrované
+lib_empty_title	Zatiaľ tu nič nie je
+lib_empty_message	Táto knižnica neobsahuje žiadne položky, ku ktorým máte prístup.
+lib_page_error	Ďalšie tituly sa nepodarilo načítať
+lib_card_finished	%1$s, dokončené
+lib_card_percent_listened	%1$s, vypočuté %2$d percent
+lib_search_in	Hľadať v %1$s
+lib_search_library	Hľadať v knižnici
+lib_clear_search	Vymazať hľadanie
+lib_search_failed	Hľadanie zlyhalo
+lib_search_idle_title	Nájdite si niečo na počúvanie
+lib_search_idle_message	Hľadajte tituly, autorov, série, interpretov a epizódy.
+lib_search_no_match	Hľadaniu „%1$s“ nič nezodpovedá. Skúste menej slov alebo iný pravopis.
+err_invalid_server	Zadajte adresu servera začínajúcu na http:// alebo https://, napríklad https://books.example.com/abs.
+err_unsafe_media_url	Server vrátil adresu média mimo tohto servera. Nebola otvorená.
+err_sign_in_required	Vaša relácia už nie je platná. Prihláste sa znova; neodoslané počúvanie sa zachová.
+err_untrusted	Toto zariadenie nedôveruje certifikátu servera. Nainštalujte certifikačnú autoritu svojho servera v Nastaveniach Androidu > Zabezpečenie > Šifrovanie a poverenia a skúste to znova.
+err_offline	Server je nedostupný. Skontrolujte adresu alebo pripojenie a skúste to znova.
+err_forbidden	Váš účet na to nemá povolenie.
+err_not_found	Tento obsah už na serveri nie je k dispozícii.
+err_server_problem	Server mal dočasný problém (HTTP %1$d). Skúste to znova.
+err_rejected	Server odmietol požiadavku (HTTP %1$d).
+err_invalid_response	Server poslal odpoveď, ktorú táto aplikácia nedokáže prečítať.
+err_no_audio	Táto položka nemá prehrateľný zvuk.
+err_login_rejected	Používateľské meno alebo heslo nebolo prijaté.
+err_publications_unreadable	Záznamy o nepotvrdených zápisoch priebehu sa nepodarilo prečítať. Najprv ich vyriešte v Diagnostike.
+err_discards_unreadable	Uložené zahodenia priebehu sa nepodarilo prečítať. Najprv ich vyriešte v Diagnostike.

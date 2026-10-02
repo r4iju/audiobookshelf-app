@@ -124,7 +124,7 @@ fun LibraryScreen(catalog: CatalogModel, padding: PaddingValues, open: (LibraryI
             val error = catalog.error
             when {
                 error != null -> item(span = { GridItemSpan(maxLineSpan) }) {
-                    MessageState(stringResource(R.string.lib_unavailable), stringResource(R.string.lib_unavailable_message, error), tag = "catalog-error", action = stringResource(R.string.action_retry), actionTag = "catalog-retry") { catalog.reload() }
+                    MessageState(stringResource(R.string.lib_unavailable), stringResource(R.string.lib_unavailable_message, error.ifEmpty { stringResource(R.string.set_something_went_wrong) }), tag = "catalog-error", action = stringResource(R.string.action_retry), actionTag = "catalog-retry") { catalog.reload() }
                 }
                 catalog.loading -> item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }

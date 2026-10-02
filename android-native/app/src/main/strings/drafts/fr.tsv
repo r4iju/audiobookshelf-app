@@ -1,0 +1,464 @@
+# French drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+title_accounts	Comptes
+title_new_collection	Nouvelle collection
+action_retry	Réessayer
+action_read	Lire %1$s
+action_mark_finished	Marquer comme terminé
+choose_library	Choisir une bibliothèque
+all_titles	Tous les titres
+all_podcasts	Tous les podcasts
+filter	Filtrer
+sort	Trier
+theme_system	Système
+screen_orientation	Orientation de l’écran
+jump_forward	Saut avant
+jump_back	Saut arrière
+set_settings_not_saved	Les paramètres n’ont pas pu être enregistrés sur cet appareil, rien n’a donc changé. Libérez de l’espace et réessayez.
+set_orientation_follow_device	Suivre l’appareil
+set_orientation_portrait	Portrait
+set_orientation_landscape	Paysage
+set_haptic_light	Léger
+set_rewind_on_resume	Reculer un peu à la reprise
+set_rewind_on_resume_detail	Recule de quelques secondes après une pause, davantage après une pause plus longue.
+set_seek_system_controls	Rechercher depuis les commandes système
+set_seek_system_controls_detail	Permet à l’écran de verrouillage et à la notification de déplacer la barre de position.
+set_mp3_index_seeking	Recherche précise dans les MP3
+set_mp3_index_seeking_detail	Crée un index de recherche pour les fichiers MP3 dont la durée n’est pas fiable. La recherche démarre plus lentement.
+set_shake_to_reset	Secouer pour redémarrer
+set_shake_to_reset_detail	Secouer le téléphone pendant que la minuterie tourne la redémarre.
+set_sleep_fade_out	Fondu de fin
+set_sleep_fade_out_detail	Baisse le volume pendant la dernière minute.
+set_vibrate_on_reset	Vibrer au redémarrage
+set_auto_sleep_timer_detail	Démarre la minuterie lors d’une lecture entre %1$s et %2$s.
+set_heading_mobile_data	Données mobiles
+set_storage	Stockage
+set_heading_support	Assistance
+set_diagnostics	Diagnostics
+set_something_went_wrong	Un problème est survenu.
+set_statistics_unavailable	Statistiques non disponibles
+set_try_again	Réessayer
+set_minutes_listened:one	%1$d minute d’écoute
+set_minutes_listened:many	%1$d minutes d’écoute
+set_minutes_listened:other	%1$d minutes d’écoute
+set_days_listened:one	%1$d jour d’écoute
+set_days_listened:many	%1$d jours d’écoute
+set_days_listened:other	%1$d jours d’écoute
+set_titles_finished:one	%1$d titre terminé
+set_titles_finished:many	%1$d titres terminés
+set_titles_finished:other	%1$d titres terminés
+set_day_minutes_listened:one	%1$s, %2$d minute d’écoute
+set_day_minutes_listened:many	%1$s, %2$d minutes d’écoute
+set_day_minutes_listened:other	%1$s, %2$d minutes d’écoute
+set_set_aside_failed	Impossible de mettre de côté. Réessayez.
+set_connection	Connexion
+set_diagnostics_area_media	Médias
+set_diagnostics_area_sync	Synchronisation
+set_unreadable_resets_title	Les suppressions de progression enregistrées n’ont pas pu être lues
+set_unreadable_resets_detail	N’importe quel titre peut en faire partie : rien n’est donc lu et aucune position de lecture n’est envoyée tant que vous n’avez pas décidé. Les mettre de côté conserve le fichier sur cet appareil, et toute progression qu’elles devaient supprimer reste sur votre serveur.
+set_set_them_aside	Les mettre de côté
+set_listening_storage_title	L’écoute antérieure à la fermeture de l’application n’a pas pu être enregistrée
+set_listening_storage_detail	Le stockage de cet appareil est indisponible ou plein. Rien n’est lu et aucune écoute n’est envoyée tant qu’elle n’est pas enregistrée ; elle est conservée jusque-là.
+set_unreadable_writes_title	Les enregistrements de progression restés sans réponse n’ont pas pu être lus
+set_unreadable_writes_detail	Un enregistrement de n’importe quel titre peut encore atteindre votre serveur : aucune écoute ni lecture n’est donc envoyée et aucune progression n’est supprimée tant que vous n’avez pas décidé. Les mettre de côté conserve le fichier sur cet appareil ; un enregistrement tardif peut alors rétablir une progression que vous supprimez.
+set_diagnostics_server	Serveur %1$s
+set_diagnostics_signed_in_as	Connecté en tant que %1$s
+set_diagnostics_app_version	Application %1$s
+set_recent_problems	Problèmes récents
+set_clear	Effacer
+set_no_problems	Aucun problème enregistré sur cet appareil.
+set_unreadable_writes_confirm_title	Mettre de côté les enregistrements illisibles ?
+set_unreadable_writes_confirm_detail	Les positions d’écoute et de lecture sont de nouveau envoyées et les suppressions peuvent avoir lieu.
+set_set_aside	Mettre de côté
+set_unreadable_resets_confirm_title	Mettre de côté les suppressions illisibles ?
+set_unreadable_resets_confirm_detail	Les titres sont de nouveau lus et les positions de lecture envoyées. Supprimez à nouveau la progression de tout titre que vous souhaitez encore recommencer.
+set_signed_in	Connecté
+set_other_accounts	Autres comptes
+set_server_sign_in_required	%1$s · connexion requise
+set_remove_account	Retirer %1$s
+set_switch_to_account	Passer à ce compte
+set_add_account	Ajouter un compte
+set_sign_out_of	Se déconnecter de %1$s
+set_sign_out_detail	Retire ce compte de l’appareil. Ses téléchargements et son écoute non envoyée restent jusqu’à sa prochaine connexion.
+set_accounts_footer	Chaque compte conserve sa propre progression, ses téléchargements et son choix de bibliothèque. Changer de compte ne les mélange jamais.
+set_remove_account_confirm	Retirer %1$s ?
+set_remove_account_detail	Vous pourrez ajouter ce compte à nouveau plus tard. Ses téléchargements et son écoute non envoyée restent sur cet appareil.
+set_add_an_account	Ajouter un compte
+set_connect_intro	Connectez-vous directement à votre propre serveur. Rien ne passe par un autre service.
+set_change_server	Changer de serveur
+set_sign_in	Se connecter
+set_sign_in_openid	Se connecter avec OpenID
+set_saved_accounts	Comptes enregistrés
+set_use_account	Utiliser
+set_edit	Modifier
+set_add_podcast	Ajouter un podcast
+set_not_available_yet	Pas encore disponible
+set_not_available_yet_detail	Cette partie de la préversion est encore en développement.
+set_import_previous_app	Importer depuis l’ancienne application
+set_import_interrupted	Une importation ne s’est pas terminée. Choisissez le même export pour reprendre là où elle s’est arrêtée.
+set_import_already	Cet export a déjà été importé. Ses titres, écoutes et positions sont sur cet appareil.
+set_import_preflight	%1$s\nL’ancienne application et ce fichier sont uniquement lus ; rien n’y est modifié. Les titres, écoutes et positions sont rattachés à un compte dès qu’il se connecte ici. Les mots de passe ne figurent pas dans l’export : chaque compte doit donc se reconnecter.
+set_import_account_signed_in	%1$s · connecté
+set_import_account_sign_in_later	%1$s · connexion après l’importation
+set_import_titles	Titres
+set_import_title_partial	%1$s · le reste est téléchargé à nouveau
+set_not_imported	Non importé
+set_import_space	Nécessite %1$s ; %2$s disponibles.
+set_import_no_space	Il n’y a pas assez d’espace libre sur cet appareil. Libérez de l’espace, puis choisissez à nouveau l’export.
+set_import_progress	Copie des fichiers : %1$d sur %2$d. Si l’application se ferme, choisissez à nouveau le même export pour continuer.
+set_import_done	%1$d titres, %2$d sessions d’écoute et %3$d positions importés. Les paramètres de l’ancienne application ont été appliqués.
+set_import_waiting	Connectez-vous à %1$s en tant que %2$s pour y rattacher ses titres, écoutes et positions.
+set_import	Importer
+set_continue	Continuer
+set_close	Fermer
+set_import_file_unreadable	Le fichier choisi n’a pas pu être lu. Choisissez-le à nouveau, ou enregistrez-le d’abord sur cet appareil.
+set_import_stopped	L’importation s’est arrêtée avant la fin. Rien n’a été perdu : choisissez à nouveau le même export pour reprendre là où elle s’est arrêtée.
+set_import_item_gone	Il n’est plus sur le serveur, il n’a donc pas été repris.
+set_import_file_changed	Un fichier a été modifié sur cet appareil après son importation : il est donc téléchargé à nouveau depuis le serveur.
+set_openid_not_enabled	La connexion OpenID n’est pas activée sur ce serveur. Utilisez votre nom d’utilisateur et votre mot de passe.
+set_openid_canceled	La connexion via le navigateur a été annulée. Vos comptes enregistrés sont conservés.
+set_openid_invalid	La réponse de connexion du navigateur n’a pas pu être vérifiée. Réessayez de vous connecter et vérifiez les paramètres de redirection OpenID du serveur.
+set_vault_unreadable	Les connexions enregistrées n’ont pas pu être déchiffrées. Elles sont conservées sur l’appareil ; reconnectez-vous pour continuer.
+set_session_ended	Votre session pour %1$s a pris fin. Reconnectez-vous ; l’écoute non envoyée et les téléchargements sont conservés.
+set_play_blocked_listening_storage	L’écoute antérieure à la fermeture de l’application n’a pas pu être enregistrée car le stockage est indisponible : rien n’est lu tant qu’elle ne peut pas l’être. Libérez de l’espace, puis réessayez.
+set_play_blocked_unreadable_resets	Les suppressions de progression enregistrées n’ont pas pu être lues : rien n’est lu tant qu’elles ne sont pas résolues dans Diagnostics.
+set_play_blocked_discarding	La progression de ce titre est encore en cours de suppression. Il sera lu depuis le début une fois l’opération terminée.
+dl_not_saved	La liste des téléchargements n’a pas pu être enregistrée sur cet appareil, rien n’a donc changé. Libérez de l’espace et réessayez.
+dl_not_allowed	Votre compte n’est pas autorisé à télécharger.
+dl_no_audio	Cet élément n’a pas d’audio à télécharger.
+dl_no_space	Pas assez d’espace libre sur cet appareil pour %1$s tout en gardant de l’espace pour le système.
+dl_folder_lost_nothing_downloaded	L’accès à %1$s a été retiré, rien n’a donc été téléchargé. Choisissez à nouveau le dossier de téléchargement dans Paramètres.
+dl_downloading_percent	Téléchargement %1$d %%
+dl_cancel_download	Annuler le téléchargement
+dl_downloaded_plays_offline	Téléchargé · lecture hors ligne
+dl_failed	Le téléchargement a échoué.
+dl_discard	Supprimer
+dl_cellular_title	Télécharger via les données mobiles ?
+dl_cellular_message	Vous utilisez une connexion limitée. Vous pouvez modifier ce choix dans Paramètres.
+dl_not_now	Pas maintenant
+dl_folder_cannot_be_kept	Ce dossier ne peut pas être conservé pour les téléchargements. Choisissez-en un autre.
+dl_saved_in_folder	Les téléchargements sont enregistrés dans %1$s
+dl_saved_in_app_storage	Les téléchargements sont enregistrés dans le stockage de l’application
+dl_folder_visible_to_other_apps	Les autres applications de cet appareil peuvent voir ces fichiers. Les téléchargements effectués avant un changement restent où ils sont.
+dl_folder_private_to_app	Seule cette application peut voir ces fichiers. Choisissez un dossier pour garder les téléchargements accessibles aux autres applications.
+dl_choose_folder	Choisir un dossier
+dl_use_app_storage	Utiliser le stockage de l’application
+dl_ebook_missing	Le livre numérique est absent de cet appareil. Téléchargez-le à nouveau pour l’ouvrir.
+dl_no_app_opens_format	Aucune application de cet appareil n’ouvre les fichiers %1$s. Installez-en une qui le fait et réessayez.
+dl_no_app_opens_this_kind	Aucune application de cet appareil n’ouvre ce type de fichiers. Installez-en une qui le fait et réessayez.
+dl_folder_lost_choose_again_open	Ce téléchargement se trouve dans %1$s, et l’accès à %1$s a été retiré. Choisissez à nouveau %1$s pour l’ouvrir.
+dl_folder_lost_choose_again_play	Ce téléchargement se trouve dans %1$s, et l’accès à %1$s a été retiré. Choisissez à nouveau %1$s pour le lire.
+dl_names_or	%1$s ou %2$s
+dl_names_and	%1$s et %2$s
+dl_remove_title	Retirer le téléchargement ?
+dl_remove_message	« %1$s » sera retiré de cet appareil. Votre progression d’écoute est conservée.
+dl_keep	Conserver
+dl_not_that_folder	Ce n’est pas %1$s. Choisissez le dossier qui contient ces téléchargements.
+dl_folder_access_not_kept	L’accès à ce dossier n’a pas pu être conservé. Réessayez.
+dl_no_downloads	Aucun téléchargement
+dl_no_downloads_message	Téléchargez des livres ou des épisodes depuis leur page pour les écouter sans connexion.
+dl_access_removed_title	L’accès à %1$s a été retiré
+dl_downloads_kept_there:one	%1$d téléchargement y est conservé. Choisissez à nouveau %2$s pour le lire et l’ouvrir.
+dl_downloads_kept_there:many	%1$d téléchargements y sont conservés. Choisissez à nouveau %2$s pour les lire et les ouvrir.
+dl_downloads_kept_there:other	%1$d téléchargements y sont conservés. Choisissez à nouveau %2$s pour les lire et les ouvrir.
+dl_choose_again	Choisir à nouveau %1$s
+dl_some_files_missing	Certains fichiers sont absents de cet appareil
+dl_size_in_folder	%1$s dans %2$s
+dl_open_in_another_app	Ouvrir %1$s dans une autre application
+dl_download_again_named	Télécharger à nouveau %1$s
+dl_the_chosen_folder	le dossier choisi
+dl_files_missing_play	Certains fichiers de ce téléchargement sont absents de cet appareil. Téléchargez-le à nouveau pour le lire.
+dl_play_named	Lire %1$s
+dl_retry_named	Réessayer %1$s
+dl_cancel_named	Annuler %1$s
+dl_remove_named	Retirer %1$s
+dl_sign_in_again	Reconnectez-vous à ce compte pour télécharger.
+dl_folder_lost_choose_in_downloads	L’accès à %1$s a été retiré. Choisissez à nouveau le dossier dans Téléchargements.
+dl_connection_interrupted	La connexion a été interrompue.
+dl_error_retrying	%1$s Nouvel essai…
+dl_server_refused	Le serveur a refusé le téléchargement.
+dl_server_sent_type_not_audio	Le serveur a envoyé %1$s au lieu d’audio, rien n’a donc été enregistré. Vérifiez votre serveur ou votre proxy et réessayez.
+dl_server_sent_unknown_not_audio	Le serveur a envoyé une réponse inconnue au lieu d’audio, rien n’a donc été enregistré. Vérifiez votre serveur ou votre proxy et réessayez.
+dl_size_mismatch	Le fichier téléchargé faisait %1$d octets alors que le serveur en indiquait %2$d : il a donc été supprimé. Réessayez pour le télécharger à nouveau.
+dl_server_sent_not_pdf	Le serveur a envoyé autre chose que le PDF, rien n’a donc été enregistré. Vérifiez votre serveur ou votre proxy et réessayez.
+rd_positions_not_restored	Les positions de lecture enregistrées n’ont pas pu être restaurées : les pages ne sont donc pas enregistrées. Les données d’origine sont conservées.
+rd_positions_not_overwritten	Les positions de lecture enregistrées n’ont pas pu être lues : elles ne sont donc pas écrasées.
+rd_not_a_pdf	Ce fichier n’est pas un PDF que cet appareil peut ouvrir.
+rd_document_not_opened	Le document n’a pas pu être ouvert.
+rd_page_not_saved	Cette page n’a pas pu être enregistrée sur cet appareil.
+rd_choice_not_saved	Votre choix n’a pas pu être enregistré sur cet appareil.
+rd_conflict_title	Reprendre où ?
+rd_conflict_page	Un autre appareil a atteint la page %1$d alors que la page %2$d ici n’était pas encore enregistrée sur le serveur.
+rd_conflict_location	Un autre appareil a enregistré une position de lecture que ce lecteur ne peut pas afficher sous forme de page, alors que la page %1$d ici n’était pas encore enregistrée sur le serveur.
+rd_go_to_page_number	Aller à la page %1$d
+rd_keep_other_position	Garder l’autre position
+rd_stay_on_page	Rester à la page %1$d
+rd_close_reader	Fermer la liseuse
+rd_rotate_pages	Faire pivoter les pages
+rd_continuous_scrolling	Défilement continu
+rd_document_error_title	Ce document n’a pas pu être ouvert
+rd_try_again	Réessayer
+rd_go_to_page	Aller à la page
+rd_previous_page	Page précédente
+rd_next_page	Page suivante
+rd_page_of	Page %1$d sur %2$d
+rd_page_number	Page %1$d
+rd_download_folder_lost	Ce téléchargement se trouve dans %1$s, et l’accès à %1$s a été retiré. Choisissez à nouveau le dossier dans Téléchargements.
+rd_downloaded_document_missing	Le document téléchargé est absent de cet appareil. Téléchargez-le à nouveau.
+rd_document_not_stored	Le document n’a pas pu être stocké pour la lecture.
+rd_supplementary_pdf	PDF supplémentaire
+rd_format_not_available	La lecture de %1$s n’est pas encore disponible dans cette préversion. Votre position de lecture sur le serveur est conservée.
+rd_ebook_not_available	La lecture de ce livre numérique n’est pas encore disponible dans cette préversion. Votre position de lecture sur le serveur est conservée.
+grp_unavailable_title	Titre indisponible
+grp_could_not_load_collections	Impossible de charger les collections.
+grp_could_not_load_playlists	Impossible de charger les listes de lecture.
+grp_collections_unavailable	Collections indisponibles
+grp_playlists_unavailable	Listes de lecture indisponibles
+grp_no_collections_yet	Aucune collection pour l’instant
+grp_no_playlists_yet	Aucune liste de lecture pour l’instant
+grp_create_one_hint	Créez-en une pour regrouper des titres dans l’ordre de votre choix.
+grp_title_count:one	%1$d titre
+grp_title_count:many	%1$d titres
+grp_title_count:other	%1$d titres
+grp_collection_deleted	Cette collection a été supprimée.
+grp_playlist_deleted	Cette liste de lecture a été supprimée.
+grp_could_not_load	Impossible de charger.
+grp_collection_unavailable	Collection indisponible
+grp_playlist_unavailable	Liste de lecture indisponible
+grp_nothing_in_collection_can_play	Rien dans cette collection ne peut être lu.
+grp_nothing_in_playlist_can_play	Rien dans cette liste de lecture ne peut être lu.
+grp_could_not_start_playback	Impossible de démarrer la lecture.
+grp_resume	Reprendre
+grp_play_collection	Lire la collection
+grp_play_playlist	Lire la liste de lecture
+grp_edit_collection	Modifier la collection
+grp_edit_playlist	Modifier la liste de lecture
+grp_delete_collection	Supprimer la collection
+grp_delete_playlist	Supprimer la liste de lecture
+grp_no_titles_yet	Aucun titre pour l’instant
+grp_delete_collection_question	Supprimer la collection ?
+grp_delete_playlist_question	Supprimer la liste de lecture ?
+grp_delete_group_explanation	« %1$s » est supprimé de votre serveur. Les titres qu’il contient sont conservés.
+grp_not_deleted	Non supprimé : %1$s
+grp_not_deleted_try_again	Non supprimé : réessayez
+grp_not_allowed_to_change_collection	Votre compte sur le serveur n’est pas autorisé à modifier cette collection.
+grp_not_allowed_to_change_playlist	Votre compte sur le serveur n’est pas autorisé à modifier cette liste de lecture.
+grp_collection_no_longer_exists	Cette collection n’existe plus.
+grp_playlist_no_longer_exists	Cette liste de lecture n’existe plus.
+grp_not_saved	Non enregistré : %1$s
+grp_not_saved_try_again	Non enregistré : réessayez
+grp_saving	Enregistrement…
+grp_create_collection	Créer la collection
+grp_create_playlist	Créer la liste de lecture
+grp_save_changes	Enregistrer les modifications
+grp_choose_at_least_one_title	Choisissez au moins un titre.
+grp_order	Ordre
+grp_move_up	Monter %1$s
+grp_remove_member	Retirer %1$s
+grp_add_titles	Ajouter des titres
+grp_add_episodes_hint	Ajoutez des épisodes depuis la page des épisodes d’un podcast.
+grp_add_to_playlist_or_collection	Ajouter à une liste de lecture ou une collection
+grp_add_to	Ajouter à
+grp_nothing_to_add_to	Rien à quoi ajouter ici pour l’instant.
+grp_added_to	Ajouté à %1$s
+grp_not_added	Non ajouté : %1$s
+grp_not_added_try_again	Non ajouté : réessayez
+grp_already_included	Déjà inclus
+grp_close	Fermer
+grp_titles_could_not_load	Les titres n’ont pas pu être chargés
+grp_nothing_here	Rien ici
+pod_feed_episodes	Épisodes du flux
+pod_sort_newest_first	Plus récents d’abord, touchez pour les plus anciens d’abord
+pod_sort_oldest_first	Plus anciens d’abord, touchez pour les plus récents d’abord
+pod_episodes_queued:one	%1$d épisode en file d’attente sur votre serveur : %2$s
+pod_episodes_queued:many	%1$d épisodes en file d’attente sur votre serveur : %2$s
+pod_episodes_queued:other	%1$d épisodes en file d’attente sur votre serveur : %2$s
+pod_server_could_not_download	Votre serveur n’a pas pu télécharger « %1$s ».
+pod_dismiss	Ignorer
+pod_no_episodes_yet	Aucun épisode pour l’instant
+pod_no_episodes_match_filter	Aucun épisode ne correspond à ce filtre
+pod_episode_details	Détails de l’épisode
+pod_untitled_episode	Épisode sans titre
+pod_play_named	Lire %1$s
+pod_episode_not_available	Épisode indisponible
+pod_episode_may_have_been_removed	Il a peut-être été supprimé du serveur.
+pod_percent_listened	%1$d %% écouté
+pod_feed_could_not_open	Le flux n’a pas pu être ouvert.
+pod_retry_feed	Réessayer le flux
+pod_no_feed_episodes	Aucun épisode trouvé dans le flux
+pod_already_on_server	Déjà sur le serveur
+pod_selected	Sélectionné
+pod_not_selected	Non sélectionné
+pod_no_audio_enclosure	Aucun fichier audio joint
+pod_not_queued	Non mis en file d’attente : %1$s
+pod_not_queued_try_again	Non mis en file d’attente : réessayez
+pod_queueing_on_server	Mise en file d’attente sur votre serveur…
+pod_add_selected_episodes	Ajouter les épisodes sélectionnés au serveur
+pod_something_went_wrong	Un problème est survenu.
+pod_adding_not_available	L’ajout de podcasts n’est pas disponible
+pod_adding_needs_permission	Votre compte sur le serveur a besoin de l’autorisation de gérer les podcasts dans une bibliothèque de podcasts.
+pod_search_podcasts	Rechercher des podcasts
+pod_or_rss_feed_url	Ou URL du flux RSS
+pod_enter_complete_feed_url	Saisissez une URL de flux HTTP ou HTTPS complète.
+pod_preview_feed	Aperçu du flux
+pod_create_podcast	Créer le podcast
+pod_choose_different_feed	Choisir un autre flux
+item_something_went_wrong	Un problème est survenu. Réessayez.
+item_feed_subscribe_at	Les applications de podcasts peuvent s’abonner à ce titre à l’adresse :
+item_copied	Copié
+item_copy_address	Copier l’adresse
+item_hidden_from_directories	Masqué des annuaires de podcasts
+item_feed_public_warning	Toute personne disposant de l’adresse peut écouter ce titre sans se connecter.
+item_feed_name	Nom du flux
+item_feed_name_rule	Lettres, chiffres, - et _ uniquement
+item_hide_from_directories	Masquer des annuaires de podcasts
+item_done	Terminé
+item_sending	Envoi…
+item_sent_to	Envoyé à %1$s
+item_send_ebook_explanation	Votre serveur envoie le livre numérique par e-mail à l’appareil que vous choisissez.
+item_ereader_or_ebook_gone	%1$s ou ce livre numérique n’est plus disponible sur le serveur. Rien n’a été envoyé.
+item_not_sent_to	Non envoyé à %1$s. %2$s
+item_not_saved_try_again	Non enregistré. Réessayez.
+item_mark_unfinished	Marquer comme non terminé
+item_discard_uncertain	Un enregistrement antérieur de la progression de ce titre est resté sans réponse et peut encore atteindre votre serveur. S’il arrive après la suppression, il rétablit la progression. Votre serveur ne peut pas indiquer à cette application si cela se produira.
+item_discard_anyway	Supprimer quand même
+item_discard_under_way	Cette suppression est déjà en cours et ne peut pas être annulée.
+item_keep_progress	Conserver la progression
+item_discard_pending	Suppression de la progression. Elle se termine dès que votre serveur est joignable et que l’écoute de ce titre est envoyée.
+item_discard_anyway_question	Supprimer quand même ?
+item_discard_anyway_explanation	La progression est supprimée maintenant. Si l’enregistrement antérieur atteint votre serveur ensuite, la progression de ce titre revient et vous pourrez la supprimer à nouveau.
+item_discard	Supprimer
+item_discard_progress_question	Supprimer la progression ?
+item_discard_progress_explanation	Votre position et l’état terminé de ce titre sont supprimés du serveur pour tous les appareils.
+item_could_not_load	Ce titre n’a pas pu être chargé
+item_narrated_by	Lu par
+item_series	Série : %1$s
+item_series_with_sequence	Série : %1$s nº %2$s
+item_episode_count:one	%1$d épisode
+item_episode_count:many	%1$d épisodes
+item_episode_count:other	%1$d épisodes
+item_listened_and_left	%1$d %% écouté · %2$s restant
+item_chapter_number	Chapitre %1$d
+pl_minimize_player	Réduire le lecteur
+pl_nothing_playing	Aucune lecture en cours
+pl_chapter_number	Chapitre %1$d
+pl_try_again	Réessayer
+pl_speed_value	Vitesse %1$s
+pl_sleep	Minuterie
+pl_position_of_duration	%1$s sur %2$s
+pl_buffering	Mise en mémoire tampon
+pl_previous_chapter	Chapitre précédent
+pl_next_chapter	Chapitre suivant
+pl_jump_forward_seconds:one	Avancer de %1$d seconde
+pl_jump_forward_seconds:many	Avancer de %1$d secondes
+pl_jump_forward_seconds:other	Avancer de %1$d secondes
+pl_jump_back_seconds:one	Reculer de %1$d seconde
+pl_jump_back_seconds:many	Reculer de %1$d secondes
+pl_jump_back_seconds:other	Reculer de %1$d secondes
+pl_jump_forward_minutes:one	Avancer de %1$d minute
+pl_jump_forward_minutes:many	Avancer de %1$d minutes
+pl_jump_forward_minutes:other	Avancer de %1$d minutes
+pl_jump_back_minutes:one	Reculer de %1$d minute
+pl_jump_back_minutes:many	Reculer de %1$d minutes
+pl_jump_back_minutes:other	Reculer de %1$d minutes
+pl_open_player	Ouvrir le lecteur
+pl_playback_stopped	Lecture arrêtée
+pl_listening_unsaved	Une partie de l’écoute n’est pas encore enregistrée sur cet appareil. Elle est conservée et sera enregistrée dès que le stockage le permettra.
+pl_playing	Lecture en cours
+pl_resume	Reprendre
+pl_streaming_cellular_refused	La diffusion via les données mobiles est désactivée dans Paramètres. Connectez-vous au Wi-Fi ou téléchargez d’abord ce titre.
+pl_stream_cellular_title	Diffuser via les données mobiles ?
+pl_stream_cellular_message	Vous utilisez une connexion limitée. Vous pouvez modifier ce choix dans Paramètres.
+pl_not_now	Pas maintenant
+pl_sleep_stops_end_of_chapter	S’arrête à la fin de ce chapitre, dans %1$s
+pl_sleep_stops_in	S’arrête dans %1$s
+pl_sleep_minus_minutes	−%1$d min
+pl_sleep_plus_minutes	+%1$d min
+pl_sleep_minutes	%1$d min
+pl_sleep_turn_off	Désactiver
+pl_bookmark_not_saved_reason	Marque-page non enregistré : %1$s
+pl_bookmark_not_saved	Marque-page non enregistré : réessayez
+pl_bookmark_add_at	Ajouter à %1$s
+pl_bookmark_go_to	Aller au marque-page
+pl_bookmark_default	Marque-page
+pl_bookmark_rename_named	Renommer %1$s
+pl_bookmark_delete_named	Supprimer %1$s
+pl_bookmark_at	Marque-page à %1$s
+pl_bookmark_rename	Renommer le marque-page
+pl_bookmark_new	Nouveau marque-page
+pl_untitled	Sans titre
+pl_playback_stopped_reason	Lecture arrêtée : %1$s. Votre position est conservée.
+pl_playback_stopped_unknown	Lecture arrêtée : l’audio n’a pas pu être chargé. Votre position est conservée.
+pl_no_playable_audio	Cet élément n’a pas d’audio lisible.
+pl_could_not_start	La lecture n’a pas pu démarrer.
+pl_listening_save_failed	L’écoute n’a pas pu être enregistrée sur cet appareil, la lecture a donc été mise en pause. Libérez de l’espace et réessayez.
+cast_casting_to	Diffusion sur %1$s
+cast_cast	Caster
+cast_playing_on	Lecture sur %1$s
+cast_connecting_to	Connexion à %1$s…
+cast_playing_on_phone	Lecture sur ce téléphone
+cast_stop	Arrêter la diffusion
+cast_looking	Recherche d’appareils de diffusion…
+cast_none_found	Aucun appareil de diffusion trouvé. Vérifiez que le récepteur est allumé et connecté au même réseau Wi-Fi que ce téléphone.
+cast_close	Fermer
+cast_download_not_castable	Les copies téléchargées ne sont lues que sur ce téléphone. Arrêtez la diffusion pour écouter ici, ou diffusez le titre en streaming.
+cast_resumed_without_title	La diffusion s’est arrêtée car l’application a redémarré pendant la diffusion. Ouvrez à nouveau le titre pour reprendre l’écoute à la dernière position enregistrée par ce téléphone.
+cast_needs_play_services	La diffusion nécessite les services Google Play, absents de cet appareil ou à mettre à jour.
+cast_could_not_start	La diffusion n’a pas pu démarrer sur cet appareil : %1$s.
+cast_connect_failed_named	Impossible de se connecter à %1$s. Vérifiez qu’il est allumé et connecté au même réseau Wi-Fi que ce téléphone.
+cast_connect_failed	Impossible de se connecter au récepteur. Vérifiez qu’il est allumé et connecté au même réseau Wi-Fi que ce téléphone.
+cast_connection_lost_named	La connexion à %1$s a été perdue. La lecture continue sur ce téléphone.
+cast_connection_lost	La connexion au récepteur a été perdue. La lecture continue sur ce téléphone.
+auto_continue	Continuer
+auto_recent	Récents
+auto_discovery	Découverte
+auto_authors_count:one	%1$d auteur
+auto_authors_count:many	%1$d auteurs
+auto_authors_count:other	%1$d auteurs
+auto_series_count:one	%1$d série
+auto_series_count:many	%1$d séries
+auto_series_count:other	%1$d séries
+lib_books_count:one	%1$d livre
+lib_books_count:many	%1$d livres
+lib_books_count:other	%1$d livres
+lib_items_count:one	%1$d élément
+lib_items_count:many	%1$d éléments
+lib_items_count:other	%1$d éléments
+lib_selected	Sélectionné
+lib_all_filters	Tous les filtres
+lib_nothing_to_filter	Rien à filtrer ici.
+lib_sort_descending_switch	Décroissant, passer en croissant
+lib_sort_ascending_switch	Croissant, passer en décroissant
+lib_sort_descending	Décroissant
+lib_sort_ascending	Croissant
+lib_unavailable	Bibliothèque indisponible
+lib_unavailable_message	%1$s Votre compte et l’écoute non envoyée sont conservés.
+lib_heading_with_total	%1$s · %2$d
+lib_show_covers	Afficher les couvertures
+lib_show_list	Afficher la liste
+lib_filtered	Filtré
+lib_empty_title	Rien ici pour l’instant
+lib_empty_message	Cette bibliothèque ne contient aucun élément auquel vous avez accès.
+lib_page_error	Impossible de charger plus de titres
+lib_card_finished	%1$s, terminé
+lib_card_percent_listened	%1$s, écouté à %2$d pour cent
+lib_search_in	Rechercher dans %1$s
+lib_search_library	Rechercher dans la bibliothèque
+lib_clear_search	Effacer la recherche
+lib_search_failed	La recherche a échoué
+lib_search_idle_title	Trouvez quelque chose à écouter
+lib_search_idle_message	Recherchez des titres, auteurs, séries, narrateurs et épisodes.
+lib_search_no_match	Aucun résultat pour « %1$s ». Essayez moins de mots ou une autre orthographe.
+err_invalid_server	Saisissez une adresse de serveur commençant par http:// ou https://, par exemple https://books.example.com/abs.
+err_unsafe_media_url	Le serveur a renvoyé une adresse de média extérieure à ce serveur. Elle n’a pas été ouverte.
+err_sign_in_required	Votre session n’est plus acceptée. Reconnectez-vous ; l’écoute non envoyée est conservée.
+err_untrusted	Le certificat du serveur n’est pas approuvé par cet appareil. Installez l’autorité de certification de votre serveur dans Paramètres Android > Sécurité > Chiffrement et identifiants, puis réessayez.
+err_offline	Le serveur est injoignable. Vérifiez l’adresse ou votre connexion et réessayez.
+err_forbidden	Votre compte n’est pas autorisé à effectuer cette action.
+err_not_found	Ce contenu n’est plus disponible sur le serveur.
+err_server_problem	Le serveur a rencontré un problème temporaire (HTTP %1$d). Réessayez.
+err_rejected	Le serveur a rejeté la requête (HTTP %1$d).
+err_invalid_response	Le serveur a envoyé une réponse que cette application ne peut pas lire.
+err_no_audio	Cet élément n’a pas d’audio lisible.
+err_login_rejected	Le nom d’utilisateur ou le mot de passe n’a pas été accepté.
+err_publications_unreadable	Les enregistrements de progression restés sans réponse n’ont pas pu être lus. Résolvez-les d’abord dans Diagnostics.
+err_discards_unreadable	Les suppressions de progression enregistrées n’ont pas pu être lues. Résolvez-les d’abord dans Diagnostics.

@@ -9,6 +9,11 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 
 class AbsApplication : Application(), SingletonImageLoader.Factory {
+    override fun onCreate() {
+        super.onCreate()
+        installErrorTexts(this)
+    }
+
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         // Artwork needs the bearer token, but only for the active server's own origin and subpath.
         val auth = Interceptor { chain ->
