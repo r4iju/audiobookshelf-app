@@ -17,7 +17,7 @@ Applying Apple's patch alone gives `3ef58609…`, the file Apple tested. Apple's
 
 ## Runner
 
-`run-combined.sh` builds both files and checks every hash above, then stops on any mismatch. It reads Apple's files without changing them, from `APPLE_USERCACHE_DIR` (default: this checkout's `apple-real-server/server-usercache`). Servers are this lane's own `abs-android-qa` (127.0.0.1:28870), freshly seeded with synthetic data by the unmodified `web/qa/server.mjs`, behind `require-local-image.sh`.
+`run-combined.sh` builds the files and checks the pristine file, both candidate patches and the combined file against the hashes above, then stops on any mismatch. It records the instrumentation hashes but does not pin them. It reads Apple's files without changing them, from `APPLE_USERCACHE_DIR` (default: this checkout's `apple-real-server/server-usercache`). Servers are this lane's own `abs-android-qa` (127.0.0.1:28870), freshly seeded with synthetic data by the unmodified `web/qa/server.mjs`, behind `require-local-image.sh`.
 
 Modes:
 - `assemble` builds and verifies the files.
