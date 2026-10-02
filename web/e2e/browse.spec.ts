@@ -116,3 +116,26 @@ test("the keyboard can skip straight to the content", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page.getByRole("main")).toBeFocused();
 });
+
+test("series can be collapsed into one card each on the bookshelf, and stay collapsed", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const count = async (collapse: boolean) =>
+    (await api.call(`/api/libraries/${qa.libraries.books}/items?limit=1&collapseseries=${collapse ? 1 : 0}`))
+      .body.total as number;
+  const [all, collapsed] = [await count(false), await count(true)];
+  expect(collapsed).toBeLessThan(all);
+
+  await signIn(page);
+  await page.goto(`/library/${qa.libraries.books}/items`);
+  await expect(page.getByText(`${all} items`)).toBeVisible();
+  await page.getByLabel("Collapse Series").check();
+  await expect(page.getByText(`${collapsed} items`)).toBeVisible();
+  const seriesCard = grid(page).locator(`a[href*="/library/${qa.libraries.books}/series/"]`).first();
+  await expect(seriesCard).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByLabel("Collapse Series")).toBeChecked();
+  await expect(page.getByText(`${collapsed} items`)).toBeVisible();
+  await page.getByLabel("Collapse Series").uncheck();
+  await expect(page.getByText(`${all} items`)).toBeVisible();
+});

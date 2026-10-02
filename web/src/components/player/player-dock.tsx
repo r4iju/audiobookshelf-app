@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useId, useState } from "react";
 import { Cover } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
+import { InlineToggle } from "@/components/ui/field";
 import { Alert } from "@/components/ui/status";
 import { formatUnit, type Translate, useI18n } from "@/i18n/i18n";
 import { formatClock } from "@/lib/abs/media";
@@ -301,13 +302,13 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
           ) : null}
           <div className="flex flex-col gap-1 text-xs font-medium">
             {chapters.length ? (
-              <TrackSwitch
+              <InlineToggle
                 label={t("LabelChapterTrack")}
                 checked={settings.useChapterTrack}
                 onChange={(checked) => updateSettings({ useChapterTrack: checked })}
               />
             ) : null}
-            <TrackSwitch
+            <InlineToggle
               label={t("LabelScaleElapsedTimeBySpeed")}
               checked={settings.scaleElapsedTimeBySpeed}
               onChange={(checked) => updateSettings({ scaleElapsedTimeBySpeed: checked })}
@@ -366,29 +367,5 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
         />
       ) : null}
     </section>
-  );
-}
-
-function TrackSwitch({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}) {
-  return (
-    <label className="flex min-h-9 items-center gap-2">
-      <input
-        type="checkbox"
-        role="switch"
-        aria-checked={checked}
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-        className="size-4 accent-[var(--accent-strong)] focus-ring"
-      />
-      {label}
-    </label>
   );
 }

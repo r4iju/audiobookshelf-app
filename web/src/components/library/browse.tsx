@@ -5,13 +5,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { errorMessage } from "@/components/app/errors";
 import { CardGrid } from "@/components/media/item-card";
 import { Button } from "@/components/ui/button";
-import { SelectField } from "@/components/ui/field";
+import { InlineToggle, SelectField } from "@/components/ui/field";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
 import { type Translate, useI18n } from "@/i18n/i18n";
 import { type BrowseState, browseToParams, encodeFilter, naturalDesc, sortsFor } from "@/lib/abs/browse";
 import { PAGE_SIZE, useFilterData, useItems } from "@/lib/abs/queries";
 import type { FilterData, Library } from "@/lib/abs/schemas";
-import { useSettings } from "@/lib/settings/store";
+import { useSettings, useSettingsStore } from "@/lib/settings/store";
 import { ItemCard } from "./cards";
 import { Pager } from "./pager";
 import { useLibrary } from "./use-library";
@@ -64,6 +64,7 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
   const router = useRouter();
   const pathname = usePathname();
   const settings = useSettings();
+  const updateSettings = useSettingsStore((state) => state.update);
   const { library, shape } = useLibrary(libraryId);
   const mediaType = library?.mediaType ?? "book";
   const items = useItems(libraryId, state, mediaType === "book" && settings.collapseSeries);
@@ -137,6 +138,16 @@ export function LibraryBrowse({ libraryId, state }: { libraryId: string; state: 
               </optgroup>
             ))}
           </SelectField>
+          {mediaType === "book" ? (
+            <InlineToggle
+              label={t("LabelCollapseSeries")}
+              checked={settings.collapseSeries}
+              onChange={(checked) => {
+                updateSettings({ collapseSeries: checked });
+                if (state.page > 1) go({});
+              }}
+            />
+          ) : null}
         </div>
       </header>
 
