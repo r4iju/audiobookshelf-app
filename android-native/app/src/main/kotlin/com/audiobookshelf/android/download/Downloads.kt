@@ -35,6 +35,16 @@ import com.audiobookshelf.core.ListeningJournal
 import com.audiobookshelf.core.MediaProgress
 import com.audiobookshelf.core.await
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
@@ -44,6 +54,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.security.MessageDigest
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 /**
@@ -82,6 +93,36 @@ class Downloads(
     /** Transfers stall-fail after a minute without data, like the existing app. */
     private val transfer = http.newBuilder().readTimeout(60, TimeUnit.SECONDS).build()
     private val slots = Semaphore(3)
+    private class TransferOwner {
+        val writes = Mutex()
+        var generation = 0L
+        var call: okhttp3.Call? = null
+    }
+    // Cancelled WorkManager work can overlap its retry; retain exclusive file ownership until IO closes.
+    private val owners = ConcurrentHashMap<String, TransferOwner>()
+    private fun owner(id: String) = owners.getOrPut(id) { TransferOwner() }
+
+    private inner class Attempt(val id: String, val owner: TransferOwner, val generation: Long, val job: Job) {
+        fun <T> owned(action: () -> T): T = synchronized(owner) {
+            job.ensureActive()
+            if (generation != owner.generation) throw CancellationException("Download cancelled")
+            action()
+        }
+        fun check() = owned { }
+        fun update(transform: (DownloadStore.Record) -> DownloadStore.Record) = owned { store.update(id, transform) }
+
+        // Call.await binds cancellation only until headers; keep the call bound through body close.
+        suspend fun bind(call: okhttp3.Call): Job {
+            owned { owner.call = call }
+            return CoroutineScope(currentCoroutineContext()).launch(Dispatchers.Default, start = CoroutineStart.UNDISPATCHED) {
+                try { awaitCancellation() } finally { call.cancel() }
+            }
+        }
+        fun unbind(call: okhttp3.Call, cancellation: Job) {
+            synchronized(owner) { if (owner.call === call) owner.call = null }
+            cancellation.cancel()
+        }
+    }
     val records = store.records
 
     fun find(account: AccountIdentity, itemId: String, episodeId: String?) = store.get(recordId(account, itemId, episodeId))
@@ -185,6 +226,23 @@ class Downloads(
         return true
     }
 
+    /** Stops transfer work but retains verified files and a durable, explicitly retryable record. */
+    fun cancel(id: String): Boolean = synchronized(owner(id)) {
+        val owner = owner(id)
+        try {
+            store.update(id) {
+                if (it.state == DownloadStore.State.COMPLETE) it
+                else it.copy(state = DownloadStore.State.FAILED, error = context.getString(R.string.dl_cancelled))
+            } ?: return true
+        } catch (failure: IOException) {
+            Log.w(TAG, "Download list not saved", failure); return false
+        }
+        owner.generation++
+        owner.call?.cancel()
+        WorkManager.getInstance(context).cancelUniqueWork(workName(id))
+        true
+    }
+
     /**
      * Removes the record and then its files, so a record never points at deleted files; listening history
      * in the journal is kept. False when the download list could not be written and nothing was removed.
@@ -276,35 +334,52 @@ class Downloads(
     private fun metered() = context.getSystemService(ConnectivityManager::class.java)?.isActiveNetworkMetered == true
 
     /** Runs one download attempt; the return value says whether WorkManager should try again. */
-    internal suspend fun run(id: String, attempt: Int, foreground: suspend (ForegroundInfo) -> Unit): Outcome = slots.withPermit {
-        val record = store.get(id) ?: return Outcome.Done
-        if (record.state == DownloadStore.State.COMPLETE) return Outcome.Done
+    internal suspend fun run(id: String, attempt: Int, foreground: suspend (ForegroundInfo) -> Unit): Outcome = owner(id).writes.withLock {
+        runOwned(id, attempt, foreground)
+    }
+
+    private suspend fun runOwned(id: String, attempt: Int, foreground: suspend (ForegroundInfo) -> Unit): Outcome = slots.withPermit {
+        val owner = owner(id)
+        val job = currentCoroutineContext()[Job]!!
+        val active = synchronized(owner) {
+            val record = store.get(id) ?: return Outcome.Done
+            if (record.state != DownloadStore.State.QUEUED && record.state != DownloadStore.State.RUNNING) return Outcome.Done
+            record to Attempt(id, owner, owner.generation, job)
+        }
+        val (record, transfer) = active
         runCatching { foreground(notification(record)) }.onFailure { Log.i(TAG, "Download continues without a foreground notice: ${it.javaClass.simpleName}") }
         try {
-            store.update(id) { it.copy(state = DownloadStore.State.RUNNING, error = null) }
+            transfer.update { it.copy(state = DownloadStore.State.RUNNING, error = null) }
             val client = accounts.clientFor(record.account) ?: throw Rejected(context.getString(R.string.dl_sign_in_again))
             val directory = File(record.directory).apply { mkdirs() }
             if (folderLost(record)) throw Rejected(context.getString(R.string.dl_folder_lost_choose_in_downloads, record.folderName.toString()))
             for (part in record.parts) {
                 if (part.done && present(record, part)) continue
-                fetch(client, id, directory, part)
-                val placed = record.folder?.let { tree ->
-                    val file = File(directory, part.name)
-                    val name = part.fileName?.takeIf { it.isNotBlank() } ?: part.name
-                    folder.place(tree, listOfNotNull(record.author.ifBlank { null }, record.title), name, part.mimeType ?: "application/octet-stream", file)
-                        .also { file.delete() }.toString()
+                fetch(client, directory, part, transfer)
+                val placed = transfer.owned {
+                    record.folder?.let { tree ->
+                        val file = File(directory, part.name)
+                        val name = part.fileName?.takeIf { it.isNotBlank() } ?: part.name
+                        folder.place(tree, listOfNotNull(record.author.ifBlank { null }, record.title), name, part.mimeType ?: "application/octet-stream", file)
+                            .also { file.delete() }.toString()
+                    }
                 }
-                store.update(id) { current -> current.copy(parts = current.parts.map { if (it.path == part.path) it.copy(done = true, uri = placed) else it }) }
+                transfer.update { current -> current.copy(parts = current.parts.map { if (it.path == part.path) it.copy(done = true, uri = placed) else it }) }
             }
-            runCatching { File(directory, COVER).writeBytes(client.bytes("api/items/${record.itemId}/cover")) }
+            runCatching {
+                val cover = client.bytes("api/items/${record.itemId}/cover")
+                transfer.owned { File(directory, COVER).writeBytes(cover) }
+            }
                 .onFailure { Log.i(TAG, "Cover not saved: ${it.javaClass.simpleName}") }
-            store.update(id) { it.copy(state = DownloadStore.State.COMPLETE, error = null, completedAt = System.currentTimeMillis()) }
+            transfer.update { it.copy(state = DownloadStore.State.COMPLETE, error = null, completedAt = System.currentTimeMillis()) }
             Outcome.Done
         } catch (failure: Rejected) {
+            transfer.check()
             report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Download of \"${record.title}\" stopped: ${failure.message}", null)
-            try { store.update(id) { it.copy(state = DownloadStore.State.FAILED, error = failure.localizedMessage) } } catch (unsaved: IOException) { return Outcome.Retry }
+            try { transfer.update { it.copy(state = DownloadStore.State.FAILED, error = failure.localizedMessage) } } catch (unsaved: IOException) { return Outcome.Retry }
             Outcome.Done
         } catch (failure: Exception) {
+            transfer.check()
             if (failure is kotlinx.coroutines.CancellationException) throw failure
             accounts.handle(failure)
             report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Download of \"${record.title}\" failed", failure)
@@ -316,13 +391,13 @@ class Downloads(
             val again = attempt < MAX_ATTEMPTS && failure !is ApiError.SignInRequired
             // A state that cannot be written is retried later rather than reported as settled.
             try {
-                store.update(id) { it.copy(state = if (again) DownloadStore.State.QUEUED else DownloadStore.State.FAILED, error = if (again) context.getString(R.string.dl_error_retrying, message.toString()) else message) }
+                transfer.update { it.copy(state = if (again) DownloadStore.State.QUEUED else DownloadStore.State.FAILED, error = if (again) context.getString(R.string.dl_error_retrying, message.toString()) else message) }
             } catch (unsaved: IOException) { return Outcome.Retry }
             if (again) Outcome.Retry else Outcome.Done
         }
     }
 
-    private suspend fun fetch(client: ApiClient, id: String, directory: File, part: DownloadStore.Part) = withContext(Dispatchers.IO) {
+    private suspend fun fetch(client: ApiClient, directory: File, part: DownloadStore.Part, attempt: Attempt) = withContext(Dispatchers.IO) {
         val target = File(directory, part.name)
         val staging = File(directory, part.name + ".part")
         val url = client.mediaUrl(part.path)
@@ -331,60 +406,68 @@ class Downloads(
             val offset = staging.takeIf { it.exists() }?.length() ?: 0L
             val request = okhttp3.Request.Builder().url(url).header("Authorization", "Bearer $token").header("Accept-Encoding", "identity")
                 .apply { if (offset > 0) header("Range", "bytes=$offset-") }.build()
-            transfer.newCall(request).await().use { response ->
+            val call = transfer.newCall(request)
+            val cancellation = attempt.bind(call)
+            try { call.await().use { response ->
+                attempt.check()
                 when {
                     response.code == 401 && round == 0 -> { token = client.bearerAfterRejection(token); return@repeat }
                     response.code == 401 -> throw ApiError.SignInRequired(client.account, token)
                     response.code == 416 -> {
-                        if (part.size != null && offset == part.size) { staging.renameTo(target); return@withContext }
-                        staging.delete(); throw IOException("Range not satisfiable")
+                        if (part.size != null && offset == part.size) { attempt.owned { staging.renameTo(target) }; return@withContext }
+                        attempt.owned { staging.delete() }; throw IOException("Range not satisfiable")
                     }
                     response.code == 403 || response.code == 404 -> throw Rejected(ApiError.Http(response.code).localizedMessage ?: context.getString(R.string.dl_server_refused))
                     !response.isSuccessful -> throw ApiError.Http(response.code)
                 }
                 val type = response.header("Content-Type")?.substringBefore(";")?.trim()?.lowercase()
                 if (if (part.ebookFileId != null) type == "text/html" || type == "application/json" else !acceptable(type, part.mimeType)) {
-                    staging.delete()
+                    attempt.owned { staging.delete() }
                     throw Rejected(if (type != null) context.getString(R.string.dl_server_sent_type_not_audio, type) else context.getString(R.string.dl_server_sent_unknown_not_audio))
                 }
                 val append = response.code == 206 && offset > 0
                 val body = response.body ?: throw IOException("Empty response")
                 var written = if (append) offset else 0L
                 var reported = 0L
-                FileOutputStream(staging, append).use { output ->
+                attempt.owned { FileOutputStream(staging, append) }.use { output ->
                     body.byteStream().use { input ->
                         val buffer = ByteArray(64 * 1024)
                         while (true) {
+                            attempt.check()
                             val read = input.read(buffer)
+                            attempt.check()
                             if (read < 0) break
-                            output.write(buffer, 0, read)
+                            attempt.owned { output.write(buffer, 0, read) }
                             written += read
                             val now = System.currentTimeMillis()
-                            if (now - reported > 500) { reported = now; progress(id, part, written) }
+                            if (now - reported > 500) { reported = now; progress(attempt, part, written) }
                         }
                     }
                 }
+                attempt.check()
                 val expected = part.size ?: body.contentLength().takeIf { it >= 0 && !append }
                 if (expected != null && written != expected) {
-                    staging.delete()
+                    attempt.owned { staging.delete() }
                     throw Rejected(context.getString(R.string.dl_size_mismatch, written, expected))
                 }
                 if (part.ebookFormat == "pdf" && !staging.inputStream().use { input -> ByteArray(5).also { input.read(it) } }.contentEquals("%PDF-".toByteArray())) {
-                    staging.delete()
+                    attempt.owned { staging.delete() }
                     throw Rejected(context.getString(R.string.dl_server_sent_not_pdf))
                 }
-                target.delete()
-                if (!staging.renameTo(target)) throw IOException("Could not move the finished file into place")
-                progress(id, part, written)
+                attempt.owned {
+                    target.delete()
+                    if (!staging.renameTo(target)) throw IOException("Could not move the finished file into place")
+                }
+                progress(attempt, part, written)
                 return@withContext
-            }
+            } } finally { attempt.unbind(call, cancellation) }
         }
     }
 
     /** Byte counts are only shown progress; the finished parts recorded separately are what resuming relies on. */
-    private fun progress(id: String, part: DownloadStore.Part, written: Long) {
+    private fun progress(attempt: Attempt, part: DownloadStore.Part, written: Long) {
         runCatching {
-            store.update(id) { current ->
+            attempt.update { current ->
                 val finished = current.parts.takeWhile { it.path != part.path }.sumOf { it.size ?: 0L }
                 current.copy(bytes = finished + written)
             }

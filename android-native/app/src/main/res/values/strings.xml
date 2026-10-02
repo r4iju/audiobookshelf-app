@@ -209,6 +209,7 @@
     <string name="dl_cancel_download">Cancel download</string>
     <string name="dl_downloaded_plays_offline">Downloaded · plays offline</string>
     <string name="dl_remove">Remove</string>
+    <string name="dl_cancelled">Download cancelled. Completed files are kept. Retry to finish.</string>
     <string name="dl_failed">The download failed.</string>
     <string name="dl_discard">Discard</string>
     <string name="dl_cellular_title">Download on mobile data?</string>
