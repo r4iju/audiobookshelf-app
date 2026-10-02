@@ -429,6 +429,64 @@ test("arrow keys move within an open reader dialog without turning the page behi
   await expect(page.getByText("Page 1 of 12")).toBeVisible();
 });
 
+async function chooseLanguage(page: import("@playwright/test").Page, code: string) {
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await page.getByLabel("Language").selectOption(code);
+  await expect(page.locator("html")).toHaveAttribute("lang", code);
+}
+
+for (const code of ["ar", "he"]) {
+  test(`in a right-to-left language (${code}), the reader's arrows, arrow keys and swipes follow the mirrored layout`, async ({
+    page,
+  }) => {
+    const api = await serverApi(accounts.user);
+    const id = await bookId(api, "Skyline 1");
+    await resetProgress(api, id);
+    await signIn(page);
+    await chooseLanguage(page, code);
+    await page.goto(`/read/${id}`);
+    const pageNumber = page.locator("#reader-page");
+    await expect(pageNumber).toHaveValue("1");
+
+    // Next sits at the left end of the bar, pointing left, and Previous at the right end, pointing right.
+    const next = page.getByRole("button", { name: "Next page" });
+    const previous = page.getByRole("button", { name: "Previous page" });
+    expect((await next.boundingBox())?.x ?? 0).toBeLessThan((await previous.boundingBox())?.x ?? 0);
+    await expect(next.locator("svg.lucide-chevron-left")).toHaveCount(1);
+    await expect(previous.locator("svg.lucide-chevron-right")).toHaveCount(1);
+
+    await page.keyboard.press("ArrowLeft");
+    await expect(pageNumber).toHaveValue("2");
+    await page.keyboard.press("ArrowRight");
+    await expect(pageNumber).toHaveValue("1");
+    await page.keyboard.press("PageDown");
+    await expect(pageNumber).toHaveValue("2");
+
+    // A swipe towards the right brings the next page in from the left.
+    const image = page.getByRole("main").getByRole("img", { name: /^Page \d+$/ });
+    await image.dispatchEvent("pointerdown", { pointerType: "touch", clientX: 100, clientY: 300 });
+    await image.dispatchEvent("pointerup", { pointerType: "touch", clientX: 260, clientY: 310 });
+    await expect(pageNumber).toHaveValue("3");
+
+    // Keys in an open dialog stay with the dialog.
+    await page.getByRole("button", { name: "Pages" }).click();
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(pageNumber).toHaveValue("3");
+  });
+}
+
+test("the reader's settings are named in the chosen language, as in the legacy reader", async ({ page }) => {
+  const api = await serverApi(accounts.user);
+  const id = await bookId(api, "Paper Lanterns");
+  await signIn(page);
+  await chooseLanguage(page, "he");
+  await page.goto(`/read/${id}`);
+  await page.getByRole("button", { name: "הגדרות קורא אלקטרוני" }).click();
+  await expect(page.getByRole("dialog", { name: "הגדרות קורא אלקטרוני" })).toBeVisible();
+});
+
 test("a damaged comic is reported as unreadable", async ({ page }) => {
   const api = await serverApi(accounts.user);
   const id = await bookId(api, "Skyline 1");
