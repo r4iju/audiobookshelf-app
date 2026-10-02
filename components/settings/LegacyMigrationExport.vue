@@ -15,9 +15,10 @@
       <p class="text-xs text-fg-muted">{{ result.files }} files, {{ $bytesPretty(result.bytes) }}</p>
       <p v-if="error" class="text-sm text-error py-1">{{ error }}</p>
       <p v-if="state === 'saved'" class="text-sm text-success py-1">Saved. Open the new app and import this file. You can remove it from here when the import has finished.</p>
-      <p v-else class="text-sm text-fg-muted py-1">Choose "On My iPhone" in the save dialog to keep the file off cloud storage.</p>
+      <p v-else-if="isiOS" class="text-sm text-fg-muted py-1">Choose "On My iPhone" in the save dialog to keep the file off cloud storage.</p>
+      <p v-else class="text-sm text-fg-muted py-1">Choose a folder on this device, such as Downloads, to keep the file off cloud storage.</p>
       <div class="flex items-center pt-2">
-        <ui-btn small :loading="saving" @click="save">Save to Files</ui-btn>
+        <ui-btn small :loading="saving" @click="save">{{ isiOS ? 'Save to Files' : 'Save to device' }}</ui-btn>
         <ui-btn small class="ml-2" :disabled="saving" @click="discard">Remove export</ui-btn>
       </div>
     </div>
@@ -44,6 +45,9 @@ export default {
     }
   },
   computed: {
+    isiOS() {
+      return this.$platform === 'ios'
+    },
     fraction() {
       return progressFraction(this.progress)
     },

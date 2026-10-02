@@ -1,0 +1,269 @@
+{
+  "platform": "android-native",
+  "sourceSha": "838261115c03b2bb67340191249f9f493d3132a9",
+  "evidenceKind": "emulator and synthetic loopback fixture only; no live server, owner account or physical device",
+  "identity": {
+    "applicationId": "com.audiobookshelf.app.nativepreview",
+    "label": "Audiobookshelf Preview",
+    "versionName": "0.15.0-native-preview",
+    "versionCode": 200,
+    "legacyApplicationIdUntouched": "com.audiobookshelf.app"
+  },
+  "device": {
+    "serial": "emulator-5584",
+    "avd": "abs_native_android_qa",
+    "androidRelease": "16"
+  },
+  "commands": {
+    "unit": "./gradlew :core:test :app:testDebugUnitTest",
+    "journeys": "ABS_FIXTURE_LOG=/tmp/abs-android-http.log scripts/verify-journeys.sh",
+    "package": "scripts/package.sh"
+  },
+  "unitTests": {
+    "core": {
+      "tests": 59,
+      "failures": 0
+    },
+    "app": {
+      "tests": 6,
+      "failures": 0
+    }
+  },
+  "journeys": {
+    "classes": 23,
+    "tests": 81,
+    "failures": 1,
+    "singleRun": true,
+    "result": "80 of 81 journeys in one full run at 838261115c (with CastHandoverTest 5 of 5 in the same run: 85 of 86). Not a clean full run.",
+    "failed": "PlayerToolsJourney a_bookmarksAreAddedRenamedUsedAndDeletedOnTheServer: ComposeTimeoutException after 15 s waiting for bookmarks-empty right after opening the bookmarks sheet (line 35)",
+    "byClass": {
+      "AccessibilityJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "AccountsJourney": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0
+      },
+      "BrowseJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "CarJourney": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0
+      },
+      "CastJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "ConnectionJourney": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0
+      },
+      "DownloadJourney": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0
+      },
+      "GroupsJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "ItemActionsJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "LatePublicationJourney": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0
+      },
+      "ListeningDurabilityJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "ListeningRecoveryJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "LocalFilesJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "LocalizationJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "MigrationJourney": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0
+      },
+      "MigrationSelectionJourney": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0
+      },
+      "PdfJourney": {
+        "tests": 10,
+        "failures": 0,
+        "errors": 0
+      },
+      "PlaybackJourney": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0
+      },
+      "PlayerToolsJourney": {
+        "tests": 2,
+        "failures": 1,
+        "errors": 0
+      },
+      "PodcastJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      "ProgressResetJourney": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0
+      },
+      "ReadingListeningJourney": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "SettingsJourney": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      }
+    },
+    "preserved": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/full-83826111/"
+  },
+  "artifact": {
+    "path": "android-native/app/build/outputs/apk/release/app-release.apk",
+    "sha256": "e406678e3ba84167a5c1608867242ace7a4e27000794a6d1a412b1c8cc7975a9",
+    "bytes": 22214564,
+    "signer": "local Android debug key (CN=Android Debug), certificate SHA-256 118d754789a01ef088d67fabb4a9be5fd51447997cf20dcaa66ab59f2a13f688",
+    "distribution": "local internal install only; not uploaded or published",
+    "preservedCopy": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/audiobookshelf-native-preview-83826111.apk"
+  },
+  "readiness": {
+    "migration": "Legacy export (legacy app instrumented test) and native import verified with synthetic archives: refusal, corruption, resume after interruption with rehashing of staged files, account binding, adoption with damaged files fetched again, repeated export recognised",
+    "accessibility": "AccessibilityJourney runs Accessibility Test Framework 4.1.1 checks (errors fail) on the main screens",
+    "localization": "NOT MET: the native app is English only; the legacy app ships 38 locales",
+    "backupRollback": "Separate identity; the legacy app and its data are never modified, so uninstalling the preview is the rollback. Listening already sent to the server is not undone"
+  },
+  "physicalGates": [
+    "Migration on the owner's device from the real legacy installation",
+    "Driving the legacy export UI on a device",
+    "TalkBack walkthrough",
+    "Android Auto / car head unit and Bluetooth controls",
+    "Metered and lost networks on real radios",
+    "Owner-signed release key",
+    "Cast to a real Chromecast/Google TV receiver (#49)"
+  ],
+  "diagnosticRuns": [
+    {
+      "sha": "598ba9c4",
+      "result": "77 of 78; MigrationJourney c counted downloads made by earlier journeys (test isolation, fixed)"
+    },
+    {
+      "sha": "11060261",
+      "result": "77 of 78; PlayerToolsJourney a timed out once and passed 2 of 2 when rerun with no player change"
+    },
+    {
+      "sha": "f065e892",
+      "result": "79 of 80; AccountsJourney c timed out waiting for the browser's approval page because Chrome was not force-stopped before the run; passed in the full run at 87c18a1c"
+    },
+    {
+      "sha": "097bd373 (before commit, same code)",
+      "result": "78 of 81 in one full run (PlaybackJourney a: notification pause not reflected; ProgressResetJourney a: server progress not cleared in 15 s; LocalFilesJourney: stale system folder picker node). The three classes then passed 15 of 15; PlaybackJourney a later failed once with a second listening session (a frozen, unanswered write) and passed 3 of 3 alone. The committed 097bd373 full run passed 81 of 81."
+    },
+    {
+      "sha": "10a78ee5",
+      "result": "Full run stopped by this lane after the resumed-session blocker was confirmed; interrupted, not passed. Partial log at /Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/interrupted-10a78ee5/"
+    },
+    {
+      "sha": "e89c584b",
+      "result": "Full run stopped by this lane after the return-to-phone prepare and ownership blockers were confirmed; interrupted, not passed. Partial log at /Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/interrupted-e89c584b/"
+    },
+    {
+      "sha": "838261115c (diagnosis)",
+      "result": "PlaybackJourney a timed out at line 59 (stream close request within 10 s of closing the player) in 2 of the 9 diagnostic runs; it passed in the full and targeted runs. Same journey as the 097bd373 pre-commit diagnostic."
+    }
+  ],
+  "layoutFollowUp": {
+    "sha": "87984807",
+    "change": "PDF page bar and mini-player kept above the gesture area; author link alignment; empty-state icons",
+    "journeys": {
+      "AccessibilityJourney": 1,
+      "PdfJourney": 10,
+      "BrowseJourney": 4,
+      "DownloadJourney": 6,
+      "PlaybackJourney": 5,
+      "failures": 0
+    },
+    "note": "Subset run, not a full-suite run; the full single run is the one at sourceSha"
+  },
+  "notImplemented": [],
+  "localization": {
+    "status": "partial",
+    "strings": 87,
+    "withLegacyTranslation": 72,
+    "languagesOffered": 33,
+    "journey": "LocalizationJourney (German)",
+    "untranslated": "About 350 English UI lines remain unextracted (errors, dialogs, downloads, PDF reader, podcasts, groups, migration, diagnostics, statistics, accessibility descriptions); Playing, Resume, Edit, Read PDF and Mark finished/unfinished stay English"
+  },
+  "casting": {
+    "status": "implemented; physical receiver acceptance pending",
+    "receiverApplicationId": "FD1F76C5",
+    "unitTests": "CastMediaTest (3): receiver track URLs per server version",
+    "journey": "CastJourney: no receiver on the emulator network, sheet explains it and phone playback continues",
+    "screenshot": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/cast-no-receivers-097bd373.png",
+    "notVerified": [
+      "Connecting to a real receiver",
+      "Remote play/pause/seek/speed",
+      "Transfer back to the phone on receiver loss",
+      "Listening published while casting",
+      "Play services missing and connection-failure states",
+      "Resuming a real receiver session after an app restart",
+      "Downloaded title handover with a real receiver"
+    ],
+    "instrumentedTests": "CastHandoverTest (5), replaying Media3 1.9 CastPlayerImpl.updateActivePlayer order (callback, then prepare the destination only when the source is not idle, then stop the source): a download stays on the phone and resumes prepared at its part and position; a title closed or replaced while the session ends is cleared, not resumed; a pause in that window holds; a receiver queue with no open title is not copied to the phone; a real CastRoutes ends a session resumed after a restart with no title and explains it. RED: at 097bd373 the phone kept 0 of 2 parts; at 10a78ee5 the leftover queue reached the phone and no notice was shown; at e89c584b (with the SDK-faithful switch) the phone was left idle, the closed title was kept and the pause was lost. Failing results at /Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/red-handover-e89c584b/",
+    "resumedSession": "A cast session resumed after the app process restarted, with no title open, is ended with a notice to open the title again; no remote session is rebuilt"
+  },
+  "instrumentedTests": {
+    "CastHandoverTest": {
+      "tests": 5,
+      "failures": 0
+    }
+  },
+  "unresolvedAutomationSignals": [
+    {
+      "test": "PlayerToolsJourney a_bookmarksAreAddedRenamedUsedAndDeletedOnTheServer",
+      "observations": [
+        "Targeted affected run at 838261115c (7 classes): 26 of 27; timed out at line 55 waiting for delete-bookmark-0 after reopening the sheet. Class rerun alone: 2 of 2.",
+        "Full run at 838261115c: timed out at line 35 waiting for bookmarks-empty after first opening the sheet. These are different stages; one mechanism is not proven.",
+        "Bounded diagnosis: nine further runs in suite-like order (Playback+PlayerTools x4, Accounts+Cast+Download+LocalFiles+Playback+PlayerTools x2, Cast+Playback+PlayerTools x3) with a temporary, uncommitted failure dump of the screen tree and fixture requests never reproduced it, so no failure screen or request/response was captured. App logcat of the full-run failure shows nothing from the app between pausing and the timeout.",
+        "Same test timed out once earlier at 11060261 (see diagnosticRuns)."
+      ],
+      "conclusion": "No confirmed product cause and no evidenced harness cause; unresolved. Timeouts and assertions are unchanged."
+    }
+  ]
+}

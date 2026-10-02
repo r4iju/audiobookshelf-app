@@ -1,6 +1,6 @@
 import { registerPlugin, WebPlugin } from '@capacitor/core'
 
-const unavailable = 'Exporting for the new app is only available in the iOS app.'
+const unavailable = 'Exporting for the new app is only available in the iOS and Android apps.'
 
 class LegacyMigrationExportWeb extends WebPlugin {
   async exportArchive() {
