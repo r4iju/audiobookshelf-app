@@ -306,7 +306,7 @@
       "27ccefd9"
     ],
     "journeys": {
-      "a_passwordSignInBrowsesAndStreamsAcrossFilesWithProgressOnTheServer": "passed",
+      "a_passwordSignInBrowsesAndStreamsAcrossFilesWithProgressOnTheServer": "passed: streams to 33 s of three 30 s files (into the second file) and the paused position is stored; does not prove playback through all three files",
       "b_pdfPageTurnIsSavedOnTheServer": "passed",
       "c_offlineListeningOnADownloadReachesTheServerAfterReconnect": "passed",
       "d_finishingADownloadOfflineMarksItFinishedOnTheServerAfterReconnect": "fails on 2.30.0: first progress created from a local session is not marked finished; client mark-finished patch held back pending root decision"
@@ -318,6 +318,7 @@
       "realtime socket updates",
       "physical device",
       "receiver/Android Auto"
-    ]
+    ],
+    "artifactRoot": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts (outside the repository)"
   }
 }

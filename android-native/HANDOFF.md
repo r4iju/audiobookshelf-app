@@ -4,6 +4,9 @@
 `fork/android-l10n-bookmarks`, branched from there. The app installs as the preview identity
 `com.audiobookshelf.app.nativepreview` beside the legacy `com.audiobookshelf.app`, which it never touches.
 
+Evidence paths written as `artifacts/...` are outside the repository, under
+`/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/`. The worktree's `artifacts` link to it has been removed.
+
 ## Issue mapping (for ticket maintenance)
 
 Source `f256272b` (f256272b76251decaafd5099e6568f3a6b77d890, branch `fork/android-l10n-bookmarks` from `fork/native-tv` at 79b31196): one full run passed 88 of 88, that is 83 of 83 journeys in 23 classes plus `CastHandoverTest` 5 of 5. Unit tests pass (core 63, app 6). The two full runs before it on this branch each had one failure, both kept with their own XML: 2efb7f3d (87 of 88, the Chrome sign-in page; harness fixed in e3627918) and e3627918 (87 of 88, a lost listening write; fixed in f256272b); see Journey failures below. The bookmarks journey signal from 83826111 has not recurred but its cause is unknown, so it stays open. The APK is packaged from the merged source after root's merge and recorded on the pull request. All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: casting (#49) has not been tried with a real receiver, localization is partial, and the physical gates below remain.
@@ -396,7 +399,7 @@ Before this, every Android journey had only run against the Python and Node fixt
 - No owner server, owner data, real identity provider or receiver is involved. The Apple and web QA containers are not touched.
 
 **Results** (RealServerJourney, emulator-5584)
-- a: password sign-in, browse, streaming across three files, with progress stored on the server. Passed.
+- a: password sign-in, browse, and streaming to 33 s of a book of three 30 s files, so into its second file, with the paused position stored on the server. Passed. It does not prove playback through all three files.
 - b: a PDF page turn is stored on the server (`ebookLocation`). Passed.
 - c: a downloaded book played offline with networking off, then its listening is stored on the server after reconnect. Passed.
 - d: a downloaded book finished offline. **Fails on 2.30.0.**
