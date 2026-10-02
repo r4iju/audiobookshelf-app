@@ -31,7 +31,9 @@ test("PDF rotation retains its page and links through reload", async ({ page }) 
   const canvas = page.locator("main canvas");
   await expect(page.getByText("Field Guide to Quiet - Page 1", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Rotate page", exact: true }).click();
-  await expect.poll(() => canvas.evaluate((node) => node.width > node.height)).toBe(true);
+  await expect
+    .poll(() => canvas.evaluate((node) => node instanceof HTMLCanvasElement && node.width > node.height))
+    .toBe(true);
   const words = page.locator(".textLayer").getByText("Jump to page 3", { exact: true });
   const link = page.getByRole("link", { name: "Jump to page 3", exact: true });
   // A click on the printed words must hit the annotation after rotating, too.
@@ -43,16 +45,22 @@ test("PDF rotation retains its page and links through reload", async ({ page }) 
   await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toBe("3");
   await page.reload();
   await expect(page.getByText("Field Guide to Quiet - Page 3", { exact: true })).toBeVisible();
-  await expect.poll(() => canvas.evaluate((node) => node.width > node.height)).toBe(true);
+  await expect
+    .poll(() => canvas.evaluate((node) => node instanceof HTMLCanvasElement && node.width > node.height))
+    .toBe(true);
   await page.getByLabel("Go to page").fill("1");
   await page.getByLabel("Go to page").press("Enter");
   for (let turn = 0; turn < 3; turn++) {
     await page.getByRole("button", { name: "Rotate page", exact: true }).click();
-    await expect.poll(() => canvas.evaluate((node) => node.width > node.height)).toBe(turn === 1);
+    await expect
+      .poll(() => canvas.evaluate((node) => node instanceof HTMLCanvasElement && node.width > node.height))
+      .toBe(turn === 1);
     await expect(link).toBeVisible();
   }
   await page.reload();
-  await expect.poll(() => canvas.evaluate((node) => node.width < node.height)).toBe(true);
+  await expect
+    .poll(() => canvas.evaluate((node) => node instanceof HTMLCanvasElement && node.width < node.height))
+    .toBe(true);
 });
 
 test("a PDF turns pages and follows its links, and resumes where it was left here and on other clients", async ({
@@ -112,7 +120,11 @@ test("reading a book's PDF while its audio plays keeps both positions", async ({
   await expect(page.getByText("The Long Tide Companion - Page 1", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Rotate page", exact: true }).click();
   await expect
-    .poll(() => page.locator("main canvas").evaluate((node) => node.width > node.height))
+    .poll(() =>
+      page
+        .locator("main canvas")
+        .evaluate((node) => node instanceof HTMLCanvasElement && node.width > node.height),
+    )
     .toBe(true);
   await page.getByRole("button", { name: "Next page" }).click();
   await expect(page.getByText("Page 2 of 12")).toBeVisible();
