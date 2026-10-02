@@ -2,7 +2,8 @@
 
 Branch `fork/nextjs-client`, based on `origin/fork/native-tv` at `39ad6af65715957c585e7b0f0d20238ebe60ee8f`. The
 client is the isolated `web/` package. It does not touch the legacy Nuxt app, the native apps, the server, or the
-shared modernization documents. Issues #55 to #65.
+shared modernization documents. Issues #55 to #65. Phase 2 readiness work continues on `fork/web-phase2-readiness`,
+from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` unchanged under `web/`).
 
 - How to run and deploy it: [web/README.md](../../web/README.md), [web/docs/DEPLOYMENT.md](../../web/docs/DEPLOYMENT.md)
 - What it needs from the server: [web/docs/SERVER-CONTRACT.md](../../web/docs/SERVER-CONTRACT.md)
@@ -51,6 +52,11 @@ shared modernization documents. Issues #55 to #65.
 | `dd7e3ab2` | Merges `fork/native-tv` at `f51b6e9e` (no change under `web/`) |
 | `8c597c9f` | MOBI and AZW3 places save in WebKit, which sends no events from a script-less frame |
 | `45149135` | A deployment names its server (`ABS_WEB_SERVER`); a fresh visit goes straight to signing in to it |
+| `27e1b2f7` | The player lists the book's bookmarks, to go to, rename or remove (they could only be created before) |
+| `30e8ea60` | An episode on the home shelves opens at its own page and shows its own progress, so Continue Listening resumes it |
+| `f474124b` | A series longer than one page pages through all its books (it stopped at the first 24) |
+| `67192033` | Page keys pressed in an open reader dialog stay in the dialog instead of turning the page behind it |
+| `6ee58e3c` | Labels with a matching legacy string use its key, so every translated language gets them; seconds and minutes are formatted for the language; the player's cover link has a name; the search icon follows right-to-left layouts |
 
 ## Checks
 
@@ -114,6 +120,17 @@ Changes after that run were checked by the journeys they affect, not a new full 
   (`server-discovery-red.log`, `server-discovery-red-manual.log`). After: Biome and `tsc` clean, vitest 115 passed,
   and the deployment and connect journeys passed 12 of 12 against the rebuilt image (`server-discovery-green.log`).
 
+Phase 2 readiness commits, checked by the journeys they affect (logs in `web/qa/.runtime/`):
+
+- Each behaviour change failed first: bookmarks (`bookmarks-red.log`), the Continue Listening episode
+  (`continue-episode-red.log`), the series pages (`series-pages-red.log`, which also holds two attempts whose own
+  setup was wrong before the real failure), and page keys in a dialog (`dialog-keys-red.log`). `6ee58e3c` changes
+  labels and formatting only, with no new test.
+- On `6ee58e3c`: Biome and `tsc` clean, vitest 115 passed (`l10n-static.log`); in Chromium the playback, podcasts,
+  browse, readers, settings, session, lists and item-actions journeys passed 53 of 53 (`phase2-chromium.log`); the
+  bookmarks and dialog-keys journeys passed in Firefox and WebKit (`phase2-ff-webkit.log`).
+- Not rerun for these commits: the deployment, connect, statistics and OpenID journeys, whose code they do not touch.
+
 Every behaviour change since the first commit started from a failing test that was observed failing, then made to
 pass. The browser journeys drive the production UI in Chromium. They check results on the server (its API and files)
 and in the browser's durable state, not component internals.
@@ -150,7 +167,12 @@ server, or a physical device. The production container `audiobookshelf` (port 13
     (`web/qa/.runtime/mobi-scroll-fix.log`, `mobi-scroll-fix-repeat.log`): the 13 reader journeys passed in
     Chromium, Firefox and WebKit, and the MOBI and AZW3 journeys passed 48 of 48 repeated in Firefox and WebKit.
     Still in WebKit, links inside a MOBI or AZW3 book and keys pressed with the focus inside the book reach no
-    handler; the reader's own buttons, keys and contents work.
+    handler; the reader's own buttons, keys and contents work. Assessed for Phase 2 on `79b31196` with throwaway
+    probes: in WebKit the Contents dialog, Previous and Next across sections, page keys with the focus outside the
+    book, scrolling and resuming all work. A link inside the book leaves the book where it is, and after a click into
+    the text, PageDown moved one screen in 12 presses where Chromium reached chapter 3. The main contents and buttons
+    flow covers the baseline, so this is recorded as a Safari limitation, not fixed: reaching those events needs
+    scripts in the frame, which would loosen the sandbox that keeps a book's own scripts from running.
   The other journeys (deployment, lists, podcasts, settings, statistics) were not run in these engines.
   Playwright's WebKit is not Safari: Safari on a Mac and an iPhone, including Media Session, background audio and
   phone autoplay rules, still needs checking by hand.
@@ -162,6 +184,41 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 - **Physical listening.** Audible output, Bluetooth and lock-screen controls, long sessions and sleep.
 - **Release acceptance** (#55 and the parent issue). Compatibility, preservation and the owner's acceptance remain
   required before this client replaces anything. The legacy interface stays served by the server at `/`.
+
+## Phase 2 audit (#55 to #65), on `6ee58e3c`
+
+Software gaps found against the baseline and fixed on this branch: bookmarks were create-only (`27e1b2f7`), an
+episode in Continue Listening did not resume (`30e8ea60`), series stopped at 24 books (`f474124b`), page keys turned
+pages behind reader dialogs (`67192033`), and the localization and accessibility items in `6ee58e3c`.
+
+Secondary gaps left open, none blocking a main workflow:
+
+- Stored preferences with no control yet: chapter track (`useChapterTrack`), elapsed time scaled by speed
+  (`scaleElapsedTimeBySpeed`) and collapsed series (`collapseSeries`). There is no list view of a library.
+- About 200 web-only strings (`web/src/i18n/web-strings.ts`) are English in every language, since no legacy string
+  means the same. Page titles on the connect and OpenID return pages and client error messages
+  (`src/lib/abs/client.ts`) are English too. The server-rendered `lang="en"` shows until the chosen language loads.
+- Routes have no titles of their own; the reader's arrows do not flip in right-to-left languages.
+- No journey covers a token refresh mid-session, a server under a subpath, or the message shown when the browser
+  blocks autoplay.
+- `parity.json` has 61 browser rows with empty `replacementEvidence.browser`. It is a shared document this lane does
+  not edit; the journeys above are the evidence to record there.
+
+Readiness by issue. Every issue stays open: each still needs a physical or owner check that fixtures cannot show.
+
+| Issue | Software on fixtures | Still open |
+| --- | --- | --- |
+| #55 connect, authenticate, deploy | Done: password and OpenID sign-in, saved servers, same-origin deployment under `/web` with its own server, internal deployment | A real identity provider; owner sign-in on the deployment |
+| #56 browse and discover | Done, with series pages | List view and collapsed series (secondary) |
+| #57 audiobook playback | Done, with the bookmarks list | Safari, physical audio, lock screen and Media Session; chapter-track and speed-scaled time preferences (secondary) |
+| #58 progress and recovery | Done | Long sessions on real networks |
+| #59 podcasts, collections, playlists | Done, with Continue Listening episodes | Owner feeds are not mutated by tests; checking them is the owner's |
+| #60 EPUB | Done in Chromium, Firefox and WebKit | Safari by hand |
+| #61 PDF | Done in Chromium, Firefox and WebKit | Safari by hand |
+| #62 MOBI | Done; WebKit limits above | Safari by hand |
+| #63 comics | Done, with dialog keys | Safari by hand |
+| #64 preferences and browser capabilities | Done for the controls present | Secondary preferences above; web-only strings untranslated |
+| #65 internal deployment, retire legacy | Deployed internally, smoke checked read-only | Owner acceptance; the legacy client stays until then |
 
 ## Internal deployment
 
