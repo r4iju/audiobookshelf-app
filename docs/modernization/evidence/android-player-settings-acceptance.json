@@ -1,0 +1,222 @@
+{
+  "acceptedAtUtc": "2026-10-02T19:29:41.270287+00:00",
+  "scope": "Manual synthetic-emulator acceptance of player timeline, scaled clock, lock and relaunch persistence introduced in PR #123. No production changes required.",
+  "source": "9c8cfca1662cefcc3bc0316799655a8f072db411",
+  "androidTree": "53260205786f131dba0dc1fd8728be1427ffcb17",
+  "installedApk": {
+    "source": "f63b7906f47c373cfc0397b429cf6c3525c06bcb",
+    "sha256": "ab1815b60df2af303a4c0611afc16ca0adde13eb0c8f942f5db416be4268261e",
+    "applicationId": "com.audiobookshelf.app.nativepreview",
+    "signature": "existing Android debug certificate",
+    "productionInputsMatch": true
+  },
+  "environment": {
+    "serial": "emulator-5584",
+    "avd": "abs_native_android_qa",
+    "api": 36,
+    "model": "sdk_gphone64_arm64",
+    "server": "synthetic localhost 28765/28769",
+    "dependencies": "npm ci --prefix verification/realtime --ignore-scripts --no-audit --no-fund --offline, 25 packages installed"
+  },
+  "results": [
+    {
+      "case": "Both timelines",
+      "result": "pass",
+      "observation": "Turning on Total track while Chapter track is on produces two player sliders, chapter and book clocks.",
+      "evidence": [
+        "player.xml"
+      ]
+    },
+    {
+      "case": "Scaled clocks",
+      "result": "pass",
+      "observation": "With scaling enabled and 2x playback speed, selecting Opening while paused displays chapter 0:00 / -0:04 and total 0:00 / -0:10 for an 8-second chapter and 20-second book.",
+      "evidence": [
+        "unlocked-opening.xml"
+      ]
+    },
+    {
+      "case": "Lock blocks seek",
+      "result": "pass",
+      "observation": "Paused chapter/total clocks stay 0:03/-0:02 and 0:07/-0:02 after jump-forward tap, Opening chapter tap and chapter slider swipe. Jump control parent is disabled. Unlocking permits Opening selection and resets both clocks.",
+      "evidence": [
+        "locked.xml",
+        "locked-after-seek-attempts.xml",
+        "unlocked-opening.xml",
+        "locked.png"
+      ]
+    },
+    {
+      "case": "Total-only and scaling off",
+      "result": "pass",
+      "observation": "Turning off Chapter track and scaling produces one total slider, 0:00 / -0:20, while speed remains 2x.",
+      "evidence": [
+        "total-unscaled.xml"
+      ]
+    },
+    {
+      "case": "Keep one timeline and persist",
+      "result": "pass",
+      "observation": "With Chapter track off, turning off Total track enables Chapter track. Enabling scaling and lock, then force-stopping/relaunching and starting the book produces one chapter slider, scaled chapter remaining time, Speed 2.0x and Unlock player; seeking controls are disabled.",
+      "evidence": [
+        "chapter-locked-settings.xml",
+        "persisted-player.xml"
+      ]
+    },
+    {
+      "case": "Play/pause stays available while locked",
+      "result": "pass",
+      "observation": "The locked player enters playing with Pause enabled, then a Pause tap shows Play enabled at chapter 0:04/-0:01 without Finished.",
+      "evidence": [
+        "locked-play-pause.xml",
+        "locked-pause-confirmed.xml",
+        "locked-pause-confirmed.png"
+      ]
+    }
+  ],
+  "limits": [
+    "No retained legacy preference import or older committed-import upgrade exercised; #52 runtime mapping acceptance remains open.",
+    "No broad journey or unit rerun, new tests, compile, lint or rebuilt package.",
+    "No physical device, cast receiver, Auto/DHU, TalkBack, owner signing/import/cutover or native-speaker acceptance.",
+    "Bookmark #37 and timer #38 signals untouched; prior emulator debug app data/logcat retained before installing separate nativepreview identity."
+  ],
+  "localEvidenceDirectory": "/Volumes/ai-ssd/developer-caches/abs-android-finish-gpt/settings-acceptance-9c8cfca1",
+  "artifacts": {
+    "catalog-playing.xml": {
+      "bytes": 40645,
+      "sha256": "254a567fc70d983a035c06be35bf1df9bc65921b39c9cea09e26e20db0da4352"
+    },
+    "catalog.xml": {
+      "bytes": 38483,
+      "sha256": "51ba822ae04344c23fce54c63e576af06d45f4a5152fe39ec569a03a06970cbb"
+    },
+    "chapter-locked-settings.xml": {
+      "bytes": 41156,
+      "sha256": "9bec4762617d3786b02f61afdb3681663cc5352e6cf799270956069c5d5769ed"
+    },
+    "fixture-observations.json": {
+      "bytes": 93105,
+      "sha256": "fdf614af0d4bd9f57756d9481e0459de9ca123f7a5debb6bd36d5e4c0b287ed5"
+    },
+    "item.xml": {
+      "bytes": 16795,
+      "sha256": "25c41c29d1cf6fea7cb21184c728ec0b640688113fd7234cb77b8d5dfd96091f"
+    },
+    "locked-after-seek-attempts.xml": {
+      "bytes": 25326,
+      "sha256": "9bcfa73672b929e833b9f0d460ff8de4691b10c5e54dbcc2a3494de34e7be843"
+    },
+    "locked-pause-confirmed.png": {
+      "bytes": 475505,
+      "sha256": "44399534d04027dcfd40a3e4ffbe4acdec7295280252a2998116f53f5d12fa7c"
+    },
+    "locked-pause-confirmed.xml": {
+      "bytes": 23836,
+      "sha256": "ffb47ee33c8866809da1626427bec0c7e36629ca53edc71e620f94527e910215"
+    },
+    "locked-paused-summary.txt": {
+      "bytes": 3454,
+      "sha256": "4603c14cf742fc6380ac00b968c8ac3d0d1bf5d3e209fc3e4f6b98630e37e8cb"
+    },
+    "locked-paused.xml": {
+      "bytes": 24216,
+      "sha256": "0e593a91e2e777b4df5d73abd13b94b8f8e7347b9810dafbabc68d08b0bf27f5"
+    },
+    "locked-play-pause.xml": {
+      "bytes": 23832,
+      "sha256": "2400eadddd762782e091e07d6cb5c3f51038ef5ebf4e7ea73307624a88d39a2c"
+    },
+    "locked-replay-paused.xml": {
+      "bytes": 24216,
+      "sha256": "0e593a91e2e777b4df5d73abd13b94b8f8e7347b9810dafbabc68d08b0bf27f5"
+    },
+    "locked.png": {
+      "bytes": 481080,
+      "sha256": "83b59703ece94b7aad4a26f5dd292311c486ee4e671804a322fff75b1b769e27"
+    },
+    "locked.xml": {
+      "bytes": 25326,
+      "sha256": "9bcfa73672b929e833b9f0d460ff8de4691b10c5e54dbcc2a3494de34e7be843"
+    },
+    "login-ui.xml": {
+      "bytes": 11306,
+      "sha256": "a7bec8a7a36d0c36d5b76198a2431ddfe34df15a1dbac997f9cbcff649b2fe3c"
+    },
+    "login.xml": {
+      "bytes": 11306,
+      "sha256": "a7bec8a7a36d0c36d5b76198a2431ddfe34df15a1dbac997f9cbcff649b2fe3c"
+    },
+    "persisted-player.png": {
+      "bytes": 477643,
+      "sha256": "c45c6a218fb04dbb4d1b73b99d751874b0554d5b0b9cc0e2fdd67b5d984c8531"
+    },
+    "persisted-player.xml": {
+      "bytes": 23832,
+      "sha256": "c47817634173a65dff31535e2de3fa4128490f77cdea278415cf99b8951e95ad"
+    },
+    "player.xml": {
+      "bytes": 25304,
+      "sha256": "aab5cfd50930e3cd1c93977388920082fd91f2c5fcbe9600ab7d1f1a3ebe3126"
+    },
+    "prior-debug-data.tar": {
+      "bytes": 718848,
+      "sha256": "ddd669ab2576c745e18d2514d1f2f6c2ceab487eca1db4d0b6170094199c78b7"
+    },
+    "prior-logcat.txt": {
+      "bytes": 28386454,
+      "sha256": "169b57e86e7cc7522518234fb1c1ea916c5bb0dfdd13dfa1ab0f971ae0d1448f"
+    },
+    "prior-preview-data.tar": {
+      "bytes": 62,
+      "sha256": "13a2ed1175796edcbea4cc02a2522c6d5c2bb1c36dc2c58c69d8947c6f3548c3"
+    },
+    "relaunch-item-summary.txt": {
+      "bytes": 2021,
+      "sha256": "4fe0e83215a462e6c47b09850fce3e520ee69b3f778bb00a83be4fc261622095"
+    },
+    "relaunch-item.xml": {
+      "bytes": 16078,
+      "sha256": "5626699f1887cf0d3ec1830bcecfa45d7d1903be1fc2e2e64e5579e4e43c5629"
+    },
+    "relaunched.xml": {
+      "bytes": 37680,
+      "sha256": "b650668b535d8d1ee6217b340fb36a792cda1110ca2d2a7fff8735bbc989464e"
+    },
+    "runtime-logcat.txt": {
+      "bytes": 28846125,
+      "sha256": "ab88f0e249b4d74c7370d4579a0c12f2ac7492b9ad53ce3410fd82bff70d6d88"
+    },
+    "scaled.xml": {
+      "bytes": 25308,
+      "sha256": "6c4f61c6c783175363e660eb8d2216575d879644123e952fedf94b681f609fe9"
+    },
+    "settings-top.xml": {
+      "bytes": 40829,
+      "sha256": "0049e5ae8bd38b9952e44a6d90371803f851df0b22b87136f4abe75788bf3407"
+    },
+    "speed.xml": {
+      "bytes": 11927,
+      "sha256": "70ad75bb2c60d76c83f68775c311eb21ceab67001a0b17e9f24857a915ed7890"
+    },
+    "start-ui.xml": {
+      "bytes": 8340,
+      "sha256": "d53203dc8467a3b2dabed50c948e06c774f4a78de74da8a4755d9f3d326a6648"
+    },
+    "total-settings.xml": {
+      "bytes": 41154,
+      "sha256": "dcdf9f183e34941d056afd5f80166c380fa41dcf8c57d4cf2ab6ac52a0a657b3"
+    },
+    "total-unscaled.xml": {
+      "bytes": 23813,
+      "sha256": "6857766e4f8ff98c40b070c3ae5adabbf508aba1f4634406d75f5aa94bb29069"
+    },
+    "ui.py": {
+      "bytes": 1043,
+      "sha256": "9827ec9d9af5399e94594c94cc8fee9833543c3ecc73671731789595c734fe79"
+    },
+    "unlocked-opening.xml": {
+      "bytes": 25299,
+      "sha256": "cc5486ea7cff3dc6d6d953867c84962781eb1edf24d0b386290ac2ec86322257"
+    }
+  }
+}

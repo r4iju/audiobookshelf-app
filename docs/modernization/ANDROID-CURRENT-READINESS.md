@@ -1,7 +1,7 @@
-# Android current readiness, October 2, 2026
+# Android current readiness, October 3, 2026
 
 <!-- android-current-status:start -->
-**Status: scoped software finishing implemented; root review, merged-head packaging and replacement acceptance pending.**
+**Status: scoped software finishing merged and locally packaged; focused player-preference emulator acceptance passed. Replacement acceptance remains pending.**
 
 Base: `d3152a5d`. Implementation: `125634de7da2b00bc5d59c75f860d48e8c5260ca`. This pass inspected the explicit Android parity rows and tickets #51–#54, rather than repeating the broad audit or emulator journeys.
 
@@ -19,6 +19,13 @@ Base: `d3152a5d`. Implementation: `125634de7da2b00bc5d59c75f860d48e8c5260ca`. Th
 - No new tests, unit reruns, emulator journeys, physical-device access, installation or package in this lane. Existing tests do not establish the newly applied player-setting values, so they are not presented as fresh mapping/controls acceptance.
 - Exact compiled app source tree: `4645c6acb9c6d6b1766d970e328e5cb0429c64fd`; core source tree: `0470dba34361d773aef64f627d9861b0c91c2b1f`; generator blob: `22fe94adffe6dc92c7612e47536823c1058a4c85`. Evidence-only commits do not change these production inputs.
 
+## Focused signed-candidate acceptance, October 3
+
+- At source `9c8cfca1`, the Android tree `53260205786f131dba0dc1fd8728be1427ffcb17` matches the retained `f63b7906` signed candidate exactly. Installed that APK (SHA-256 `ab1815b60df2af303a4c0611afc16ca0adde13eb0c8f942f5db416be4268261e`) on API 36 `emulator-5584`, using synthetic localhost fixtures only.
+- Manual production-UI acceptance passed: both chapter/total timelines; 2× scaled chapter/book durations; disabling scaling and chapter track yields one unscaled total timeline; disabling the remaining total track enables chapter track; lock blocks jump, chapter selection and slider input; unlocking restores chapter selection; play/pause remains available while locked; timeline/scaling/lock and 2× speed persist after force-stop/relaunch.
+- No defect found in this scope, no production edits or new tests. [Exact results and local artifact hashes](evidence/android-player-settings-acceptance.json) identify XML snapshots, screenshots, fixture observations and logs. Existing emulator debug-app data and logcat were retained before installation under the separate preview identity.
+- This closes the compile-only caveat for these player controls, not legacy preference mapping. New imports and older committed-import upgrade paths were not exercised; #52 runtime acceptance remains open. Bookmark #37, timer #38, baseline lint and physical/owner acceptance remain unchanged. No broad journey/unit rerun, rebuild or new package.
+
 ## Saved evidence reused, not rerun
 
 - `e5a904de81dd610ad9319aed8cc599cb3c5a1b02`, Android tree `7f2fee1458a231e7adf1ec6430ab94cb3fa9daaf`, identical to reviewed `4bbbacdeb0fd85d07f698d505c9f9482db68a260` and this lane's `d3152a5d` base: core 63/app 6; Localization 3/3; Migration 7/7; local package successful. This is prior evidence, not new player-preference acceptance.
@@ -28,7 +35,7 @@ Base: `d3152a5d`. Implementation: `125634de7da2b00bc5d59c75f860d48e8c5260ca`. Th
 
 ## Open acceptance gates
 
-- Root fresh source review and one local package at the reviewed merged head. This lane's new controls/mapping have compile/static evidence only.
+- The scoped implementation was merged through [PR #123](https://github.com/r4iju/audiobookshelf-app/pull/123), with the reviewed merged-head local signed package retained. Focused player controls now have emulator evidence above; retained legacy player-preference mapping still has compile/static evidence only. Replacement acceptance remains pending.
 - Native-speaker review of machine-drafted language resources, including the reused Lithuanian texts; full localization acceptance is not claimed.
 - Physical casting receiver, Android Auto/car or DHU, background/lock-screen/headset/Bluetooth/route/interruption controls, shake/chime, real metered-network behavior and TalkBack. Automated accessibility and simulator evidence do not close these gates; large-text, reader/import accessibility acceptance remains incomplete.
 - Owner signing/installation and real legacy export/import, including SAF downloads. The preview cannot read upstream private storage. In-place migration and owner cutover are not accepted.
