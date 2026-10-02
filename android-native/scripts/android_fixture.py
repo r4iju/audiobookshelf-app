@@ -7,6 +7,8 @@ import argparse
 import base64
 import copy
 import io
+import hashlib
+import select
 import json
 import re
 import socket
@@ -20,7 +22,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from verification.fixture import make_server  # noqa: E402
+from verification.fixture import make_server, pdf  # noqa: E402
 
 
 def android_server(port, prefix, bind='127.0.0.1'):
@@ -33,7 +35,8 @@ def android_server(port, prefix, bind='127.0.0.1'):
     # ordering is observable with a document present. Any reconfiguration accepts listening again.
     refusal = {'listening': False, 'reading': False}
     discard_delay = {'seconds': 0}
-    download_control = {'mode': 'normal', 'held': 0}
+    download_control = {'mode': 'normal', 'held': 0, 'bodyStarted': 0, 'bodyClosed': 0, 'bodyEnded': 0, 'pdfSha256': hashlib.sha256(pdf()).hexdigest()}
+    release_body = threading.Event()
     # A write whose answer never reaches the client while the server applies it later, as when a
     # server handler is still waiting on its database after the client's connection has failed.
     late = {'armed': {}, 'applied': []}
@@ -166,6 +169,30 @@ def android_server(port, prefix, bind='127.0.0.1'):
                 if download_control['mode'] == 'fail':
                     self.route()
                     return self.respond(403, {})
+                if download_control['mode'] == 'body':
+                    document = pdf()
+                    self.route()
+                    self.observed_request['status'] = 200
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/pdf')
+                    self.send_header('Content-Length', str(len(document)))
+                    self.end_headers()
+                    self.wfile.write(document[:512])
+                    self.wfile.flush()
+                    download_control['bodyStarted'] += 1
+                    try:
+                        deadline = time.monotonic() + 30
+                        while not release_body.is_set() and time.monotonic() < deadline:
+                            if select.select([self.connection], [], [], 0.05)[0] and not self.connection.recv(1, socket.MSG_PEEK):
+                                download_control['bodyClosed'] += 1
+                                return
+                        self.wfile.write(document[512:])
+                        self.wfile.flush()
+                    except (BrokenPipeError, ConnectionResetError):
+                        download_control['bodyClosed'] += 1
+                    finally:
+                        download_control['bodyEnded'] += 1
+                    return
                 if download_control['mode'] == 'hold':
                     download_control['held'] += 1
                     deadline = time.monotonic() + 30
@@ -246,7 +273,13 @@ def android_server(port, prefix, bind='127.0.0.1'):
 
         def do_POST(self):
             if self.own_path() == '/__android__/download-control':
-                download_control['mode'] = self.body()['mode']
+                mode = self.body()['mode']
+                if mode == 'release':
+                    release_body.set()
+                else:
+                    download_control['mode'] = mode
+                    if mode == 'body':
+                        release_body.clear()
                 return self.respond(200, download_control)
             path = self.own_path()
             if path == '/__android__/ereader-devices':

@@ -55,39 +55,54 @@ class DownloadRecoveryJourney {
             assertEquals(2, failed.parts.count { it.done })
             retained = failed.parts.filter { it.done }.associate { it.name to digest(File(failed.directory, it.name)) }
             assertEquals(2, audioRequests())
-            val heldBefore = JSONObject(Fixture.get("${Fixture.server}/__android__/download-control")).getInt("held")
-            control("hold")
+            val bodyBefore = JSONObject(Fixture.get("${Fixture.server}/__android__/download-control"))
+            control("body")
             compose.onNodeWithTag("download-retry").performScrollTo().performClick()
-            eventually(15_000) { JSONObject(Fixture.get("${Fixture.server}/__android__/download-control")).getInt("held") > heldBefore }
+            eventually(15_000) {
+                JSONObject(Fixture.get("${Fixture.server}/__android__/download-control")).getInt("bodyStarted") > bodyBefore.getInt("bodyStarted") &&
+                    File(failed.directory, "ebook.pdf.part").length() == 512L
+            }
             compose.onNodeWithTag("download-cancel").performScrollTo().performClick()
             val cancelled = saved()
             assertNotNull("Cancel must retain the persisted download and completed audio", cancelled)
             assertEquals("Cancelled work must remain retryable", DownloadStore.State.FAILED, cancelled!!.state)
             retained.forEach { (name, hash) -> assertEquals(hash, digest(File(cancelled.directory, name))) }
-        }
-        control("normal")
-        ActivityScenario.launch(MainActivity::class.java).use {
+            control("normal")
+            compose.onNodeWithTag("download-retry").performScrollTo().performClick()
+            assertTrue("Cancel must close the active response body before its withheld tail is released", runCatching {
+                eventually(5_000) { JSONObject(Fixture.get("${Fixture.server}/__android__/download-control")).getInt("bodyClosed") > bodyBefore.getInt("bodyClosed") }
+            }.isSuccess)
+            compose.pressBack()
             compose.tap("tab-downloads")
-            compose.tap("download-retry-book-0")
             compose.waitForTag("offline-book-0", 45_000)
             val complete = saved()!!
             assertEquals(DownloadStore.State.COMPLETE, complete.state)
             assertTrue(complete.parts.all { it.done })
             retained.forEach { (name, hash) -> assertEquals(hash, digest(File(complete.directory, name))) }
             assertEquals("Retry must not fetch completed audio again", 2, audioRequests())
+            val expectedPdf = JSONObject(Fixture.get("${Fixture.server}/__android__/download-control")).getString("pdfSha256")
+            assertEquals(expectedPdf, MessageDigest.getInstance("SHA-256").digest(File(complete.directory, "ebook.pdf").readBytes()).joinToString("") { "%02x".format(it) })
+            control("release")
+            eventually(5_000) { JSONObject(Fixture.get("${Fixture.server}/__android__/download-control")).getInt("bodyEnded") > bodyBefore.getInt("bodyEnded") }
+            assertEquals(DownloadStore.State.COMPLETE, saved()!!.state)
+            assertFalse("The stopped body must not recreate staging", File(complete.directory, "ebook.pdf.part").exists())
+            assertEquals(expectedPdf, MessageDigest.getInstance("SHA-256").digest(File(complete.directory, "ebook.pdf").readBytes()).joinToString("") { "%02x".format(it) })
         }
         Fixture.configure("offline-library")
+        val offlineStart = Fixture.requests().size
         ActivityScenario.launch(MainActivity::class.java).use {
             compose.tap("tab-downloads")
             compose.tap("play-offline-book-0")
             compose.waitForTag("mini-playing", 10_000)
             compose.tap("mini-player")
-            compose.waitForSeconds(9, 15_000)
             compose.waitForText("Next chapter")
             compose.closePlayer()
             compose.tap("read-offline-book-0")
             compose.waitForTag("pdf-document", 10_000)
             assertEquals(2, audioRequests())
+            assertFalse("Offline content must use retained files", Fixture.requests().drop(offlineStart).any {
+                it.getString("path").startsWith("/api/items/book-0/file/") || it.getString("path").startsWith("/api/items/book-0/play")
+            })
         }
     }
 }
