@@ -1,5 +1,7 @@
 # Server candidate: first progress from a local session (Audiobookshelf 2.30.0)
 
+> **Superseded.** This patch is held: it also finished progress first created through `PATCH /api/me/progress` within 10 s of the end. `evidence/web-real-server/server-combined/` replaces it with `first-progress-session-candidate.patch` (`ed88f5e0…8fcb`), which applies the rule to playback-session syncs only.
+
 A candidate only. It has not been applied to any owner server and nothing here is resolved on one.
 
 ## Defect in pinned 2.30.0

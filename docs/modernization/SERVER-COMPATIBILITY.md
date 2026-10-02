@@ -15,6 +15,21 @@ The automated matrix below tests synthetic contracts drawn from the existing cli
 
 The legacy-to-refresh authentication candidate demonstrates an aligned client: the same shipped TVCore accepts both supported authentication response shapes and persists the refreshed credentials. Unrecognized catalog/event changes deliberately block adoption. They are fault injection, not invented adapters for hypothetical upstream changes.
 
+## Combined 2.30.0 server candidate (local, not deployed)
+
+The deployed server stays on the pinned 2.30.0 image. Two locally packaged candidates replace server files to fix defects that the native clients found against it: Apple's user-cache race and Android's first progress from a local session. Promotion is the owner's decision; `SERVER-CANDIDATE-RUNBOOK.md` is the reviewable procedure. Every row ran on a synthetic server and synthetic accounts.
+
+| Client | `candidate` `c649a2bd` (**held**) | `session` `cd703e87` | Evidence |
+| --- | --- | --- | --- |
+| Apple: affected native cases (`test1`, `test4a`, `test4d`, `test4e`, migration probe) | 5/5 | not run yet | `evidence/apple-real-server/server-combined/` |
+| Android: `RealServerJourney` a-d, emulator | 4/4 | 4/4 (client `4bbbacde`: `a23db59b` plus localization, progress code unchanged) | `evidence/android-real-server/server-combined/`; for `session`, the Android lane's private artifacts |
+| Server checks: first progress from local sessions (8), seams (3), cold-cache race (10) | 8/8, 3/3, 0/10 stale | 8/8, 3/3, 0/10 stale | Android and Apple evidence; `evidence/web-real-server/server-combined/` for `session` |
+| Server checks: first progress through PATCH and batch PATCH (20), streamed sessions (5) | **10/20 (regression)**, 5/5 | 20/20, 5/5 | `evidence/web-real-server/server-combined/` |
+| Next.js production client: Chromium, every spec except the nginx deployment (77) | **75/77**: two podcast episode journeys fail | 77/77 | `evidence/web-real-server/server-combined/` |
+| Next.js production client: Firefox + WebKit, connect/session/playback/podcasts (50) | not run | 50/50 | `evidence/web-real-server/server-combined/` |
+
+`c649a2bd` is held because it stores progress first created through `PATCH /api/me/progress` within 10 s of the end as finished. Stock 2.30.0 keeps what the client sent. `cd703e87` applies the finished rule at creation only to playback-session syncs. Its Apple row must still be rerun on that image; the `c649a2bd` pass does not carry over. Physical devices, owner libraries and owner acceptance remain open for every client.
+
 ## Reproduce on the Studio
 
 ```sh
