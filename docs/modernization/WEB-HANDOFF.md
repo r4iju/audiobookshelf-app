@@ -42,7 +42,13 @@ shared modernization documents. Issues #55 to #65.
 | `843a928c` | Only blocks whose delete was never issued are cleaned up when their book cannot be read; removing an episode leaves its page only if that page is still showing for the same account |
 | `d272afbf` | Restart recovery: a delete that may still be running, with no discard left to finish it, is released only by a server restart the user asked for and then confirmed, retiring only the records recorded at the request |
 | `296259de` | A restart request is used only if it is the account's own; a retired delete ends as a confirmed one; a request sent again after a renewed sign-in is a new attempt |
-| (this commit) | Records the full local run on `296259de` |
+| `b5ca38a1` | Records the full local run on `296259de` |
+| `14916937` | Records the hand check of the restart notices in the preview |
+| `4e836346` | Journeys run in Firefox and WebKit on request (`ABS_WEB_ENGINES`) |
+| `0bd3ab11` | A route for an existing proxy (`web/deploy/existing-proxy.conf`) and a read-only deployment smoke check (`web/qa/smoke.mjs`) |
+| `74d63f16` | Records the smoke check on a healthy QA deployment |
+| `a2db7a36` | The end-of-chapter sleep timer stops where a chapter ends with its file |
+| `dd7e3ab2` | Merges `fork/native-tv` at `f51b6e9e` (no change under `web/`) |
 
 ## Checks
 
@@ -113,32 +119,40 @@ server, or a physical device. The production container `audiobookshelf` (port 13
 
 ## Remaining gates (not met by this branch)
 
-- **Real browsers.** Only Chromium was automated. Safari (macOS and iOS) and Firefox, including Media Session,
-  background audio and autoplay rules on phones, are unchecked. Playwright's own Firefox and WebKit builds are not
-  installed on the Studio (only `chromium-1234`): a run with them stops at "Executable doesn't exist" for
-  `firefox-1538` and `webkit-2336` (`web/qa/.runtime/engines-unavailable.log`). Installing them downloads from
-  Playwright's CDN, which needs the user's authorization for that egress. The config is ready; from `web/`:
-
-  ```sh
-  npx playwright install firefox webkit
-  ABS_WEB_ENGINES=firefox,webkit npx playwright test --project=firefox --project=webkit \
-    e2e/playback.spec.ts e2e/readers.spec.ts e2e/session.spec.ts
-  npm run qa:deploy -- up && ABS_WEB_ENGINES=firefox,webkit npx playwright test --project=firefox \
-    --project=webkit e2e/deployment.spec.ts
-  ```
-
-  Without `ABS_WEB_ENGINES` only Chromium runs, as before. Some journeys state what Chromium does, such as the
-  deployment journey's two tabs without Web Locks on a plain-HTTP origin, and may need their own expectations per
-  engine. Playwright's WebKit is not Safari: it shares the engine, not Safari's media, autoplay or storage policies,
-  and whether its build runs on macOS 27 is unknown. Neither replaces checking Safari on a Mac and an iPhone by hand.
-- **The owner's server and network.** No deployment beside the owner's server, behind the owner's HTTPS proxy and
-  host name. That deployment is the root coordinator's call, following DEPLOYMENT.md.
+- **Real browsers.** Firefox 153 and WebKit 26.5 (Playwright's builds, installed on 2026-10-02 into an SSD cache
+  through the default route) ran the playback, reader and session journeys on synthetic QA from `74d63f16`
+  (`web/qa/.runtime/engines-main.log`): 45 of 48 passed. Of the three failures:
+  - Firefox, sleep timer at the end of a chapter: failed every time. A real bug in every browser (a chapter ending
+    with its file moved the timer to the next chapter), fixed in `a2db7a36` from a failing unit test; the journey then
+    passed 3 of 3 in Firefox and WebKit and in Chromium (`sleep-fix.log`).
+  - Firefox, progress from another device appearing live: failed once, then passed 2 of 2 (`engines-rerun.log`).
+  - WebKit, the AZW3 reader's contents jump: fails every time (`toBeInViewport`, ratio 0); MOBI passes. Not fixed:
+    AZW3 is a rare format here, and the same check is the one Chromium failed intermittently before.
+  The other journeys (deployment, lists, podcasts, settings, statistics) were not run in these engines.
+  Playwright's WebKit is not Safari: Safari on a Mac and an iPhone, including Media Session, background audio and
+  phone autoplay rules, still needs checking by hand.
+- **The owner's server and network.** Deployed internally on 2026-10-02 from `74d63f16` (see "Internal deployment"
+  below). Signing in and playing there, against the owner's library, is the owner's check.
 - **A real identity provider.** Only the loopback provider was used. A real provider adds consent screens, its own
   key rotation and logout.
 - **Real e-reader delivery.** This needs the owner's SMTP settings and a device.
 - **Physical listening.** Audible output, Bluetooth and lock-screen controls, long sessions and sleep.
 - **Release acceptance** (#55 and the parent issue). Compatibility, preservation and the owner's acceptance remain
   required before this client replaces anything. The legacy interface stays served by the server at `/`.
+
+## Internal deployment
+
+On 2026-10-02 the client from `74d63f16` was deployed at `/web` beside the owner's server, as authorized for internal
+use, following "Using your own reverse proxy" in DEPLOYMENT.md. Its configuration, the proxy route's rollback copy,
+the image build log and the checks live in the owner's private infrastructure repository, not here.
+
+- A client-only compose file with one container on the existing proxy network, at an address outside those the
+  owner's stack assigns. The server container, its data, its image and `/` were not touched, and neither the server
+  nor the proxy restarted (their start times were unchanged).
+- One `location ~ ^/web(/|$)` block added to the server's proxy snippet; `nginx -t` passed before a graceful reload.
+- Before: `/status` 200 over HTTP and HTTPS, `/` 200, `/web/connect` 404. After: the same, `/web/connect` 200 over
+  both, and `/webhooks` still reaching the server. `node qa/smoke.mjs` passed 4 of 4 over HTTP and over HTTPS.
+- Nothing signed in or played against the owner's library.
 
 ## The owner's deployment, as read
 
