@@ -36,7 +36,7 @@ Previous source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full 
 | #49 casting | Implemented; receiver acceptance pending | `CastMediaTest` (3), `CastHandoverTest` (5), CastJourney (no receiver on the emulator network) | **Physical receiver journey not run**: connecting, remote controls, transfer back on receiver loss and progress while casting are untested on a real Chromecast/Google TV |
 | #50 Android Auto | Partial | CarJourney | Car or Desktop Head Unit |
 | #51 preferences, statistics, diagnostics | Done (emulator) | SettingsJourney | |
-| #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `playerSettings` now applied once (compile/static evidence; affected runtime acceptance pending); `ereaderSettings` and `lastLibraryId` preserved but not applied (the legacy app language is applied since 28cde313); listening history and logs not exported |
+| #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `playerSettings` and older committed imports verified in seven retained runtime outcomes (PR #136); `ereaderSettings` and `lastLibraryId` preserved but not applied (the legacy app language is applied since 28cde313); local history preserved as recovery JSON; diagnostic logs excluded (see inventory below) |
 | #53 migrate downloads and reading locations | Done for audio and PDF (emulator) | MigrationJourney c, d, f | EPUB and other locations preserved, applied when #45/#47/#48 exist; a file damaged after commit is fetched from the server, not the archive; legacy downloads in user-chosen (SAF) folders not exercised on a device |
 | #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization partial**: all UI text and core error messages are in resources (577 strings and plurals) in 33 languages besides English: legacy translations where they match, the rest machine-drafted and not reviewed by native speakers; right-to-left checked in Arabic (LocalizationJourney); native review open (see Localization); TalkBack by a person; owner signing key; install on the owner's phone |
 | #45, #47, #48 | Deferred (after #65) | | Files and locations are preserved by migration |
@@ -299,7 +299,7 @@ The preview keeps its own identity (`com.audiobookshelf.app.nativepreview`, debu
 - Paper records are exported as the legacy app's own JSON:
   - connections, device settings and allowlisted preferences;
   - reader web storage (`ereaderSettings`, `ebookLocations-*`);
-  - local items, progress, sessions and running downloads.
+  - local items, progress, sessions, local media-item history and running downloads.
 - Tokens, refresh tokens, custom headers and the device identity are removed. The archive is written as `.partial` and renamed only when complete, and `archive.json` is written last.
 - Nothing in the legacy installation changes.
 - `LegacyMigrationExportTest` (legacy androidTest) seeds a synthetic installation on the emulator and asserts these properties. `android-native/scripts/export-legacy-fixture.sh` rebuilds `core/src/test/resources/migration/legacy-export.absmigration` from it.
@@ -321,7 +321,7 @@ The import works in these stages:
   - Each title is checked against the server's item (track count or the running download's indexes, and the ebook's format and ino). It is adopted as a finished download without fetching again; a running download fetches only its unfinished parts.
   - Unsent legacy sessions go to the server under their own IDs with their absolute totals.
   - Audio positions and PDF pages become this device's positions unless the server's are newer.
-- **Preserved, not yet used.** EPUB and other locations, and reader settings, stay in `outcome.json` until those readers exist (#65).
+- **Preserved, not yet used.** EPUB and other locations, reader settings and local event history stay in `outcome.json`. `legacySnapshot` retains every exported snapshot field, including unknown fields and rows that are not safe to attach. History is recovery data, not replayed listening or a history UI. Deferred readers remain #65.
 
 **Rollback.**
 - The legacy app and its data are never modified, and the export file is only read.
@@ -335,6 +335,8 @@ The import works in these stages:
 - server-held progress, finished state, collections and playlists follow the account;
 - downloads are fetched again;
 - anything the upstream app never sent to the server stays in that app. Open it online once first so it sends what it holds.
+
+**Preservation inventory:** See [Android migration preservation](../docs/modernization/ANDROID-MIGRATION-PRESERVATION.md) for each local store, server-held state, exclusions and current verification.
 
 **Player preferences:** `playerSettings` is now applied once: chapter/total timeline choices, elapsed-time scaling and player UI lock. A separate persisted marker also completes this step for older committed imports on matching account attachment without replaying previously applied device/display preferences. See current readiness for evidence limits.
 

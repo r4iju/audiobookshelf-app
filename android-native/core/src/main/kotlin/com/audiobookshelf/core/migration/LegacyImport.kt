@@ -62,6 +62,8 @@ import java.security.MessageDigest
     val issues: List<Issue>,
     val settingsApplied: Boolean = false,
     val playerSettingsApplied: Boolean = false,
+    /** Original exported records, including local history and fields deferred by this reader. Never uploaded. */
+    val legacySnapshot: JsonObject? = null,
 )
 
 data class PlannedAccount(val identity: AccountIdentity, val name: String, val username: String, val signedIn: Boolean)
@@ -152,6 +154,7 @@ class LegacyImport(private val root: File) {
         }
         val outcome = Outcome(
             fingerprint = archive.fingerprint,
+            legacySnapshot = archive.snapshotDocument,
             archiveCreatedAt = archive.manifest.createdAt,
             accounts = accounts(snapshot),
             titles = adopted.map { it.title },

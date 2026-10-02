@@ -129,6 +129,10 @@ class LegacyMigrationExportTest {
       1_790_000_000_000 - 7_000, 1_790_000_000_000, 7, mutableListOf(), 9.5, null, null, null, "conn-qa", server, "exo-player",
     ))
 
+    db.saveMediaItemHistory(MediaItemHistory("local_book-0", "Stories for Tomorrow 01", "book-0", null, false,
+      "conn-qa", server, qa, 1_790_000_000_000, mutableListOf(
+        MediaItemEvent("Seek", "Playback", "", 9.5, false, null, null, 1_790_000_000_000))))
+
     // A download still running when the legacy app last ran: one part finished and moved.
     val partial = place("book-4", "track-1.wav", wav(8), "audio/wav")
     val unfinished = File(downloads, "book-4/track-2.wav")
@@ -179,6 +183,8 @@ class LegacyMigrationExportTest {
       assertEquals("2", snapshot["localMediaProgress"].first { it["id"].asText() == "local_book-0" }["ebookLocation"].asText())
       assertEquals(7, snapshot["playbackSessions"].single()["timeListening"].asInt())
       assertEquals(1, snapshot["downloadItems"].size())
+      assertNotNull("Local history is exported, not only pending server sessions", snapshot["mediaItemHistory"])
+      assertEquals("Seek", snapshot["mediaItemHistory"].single()["events"].single()["name"].asText())
 
       val digests = archive["digests"]
       val stored = archive["storedPaths"]
