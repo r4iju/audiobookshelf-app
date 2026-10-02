@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { expect, type Page, test } from "@playwright/test";
-import { clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
+import { clearProgress, itemIdByTitle, qa, serverApi, signIn, stack } from "./qa";
 
 // "The Long Tide": three 30 s MP3 files, one chapter per file. Chromium plays MP3 natively.
 
@@ -214,7 +214,7 @@ test("listening held by a delete that may still be running is sent once a restar
     "if it did not, a delete still running there can remove progress sent after",
   );
 
-  execFileSync("docker", ["restart", "abs-web-qa"]);
+  execFileSync("docker", ["restart", stack.container]);
   execFileSync("node", ["qa/server.mjs", "up"], { stdio: "ignore" });
   await notice.getByRole("button", { name: "I restarted the server" }).click();
 

@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { accounts, qa, serverApi, signIn } from "./qa";
+import { accounts, qa, serverApi, signIn, stack } from "./qa";
 
 type Api = Awaited<ReturnType<typeof serverApi>>;
 
@@ -122,7 +122,7 @@ test("an administrator adds a podcast from its feed and downloads an episode on 
   await signIn(page, accounts.admin);
   await page.goto(`/library/${qa.libraries.podcasts}`);
   await page.getByRole("link", { name: "Add podcast" }).click();
-  await page.getByLabel("RSS feed URL").fill("http://host.docker.internal:19885/feed.xml");
+  await page.getByLabel("RSS feed URL").fill(`http://host.docker.internal:${stack.feedPort}/feed.xml`);
   await page.getByRole("button", { name: "Search", exact: true }).click();
 
   await expect(page.getByLabel("Title")).toHaveValue("QA Feed Show");
@@ -150,7 +150,7 @@ test("an administrator adds a podcast from its feed and downloads an episode on 
 test("a feed the server cannot read is reported as such", async ({ page }) => {
   await signIn(page, accounts.admin);
   await page.goto(`/library/${qa.libraries.podcasts}/add-podcast`);
-  await page.getByLabel("RSS feed URL").fill("http://host.docker.internal:19885/missing.xml");
+  await page.getByLabel("RSS feed URL").fill(`http://host.docker.internal:${stack.feedPort}/missing.xml`);
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page.getByRole("main").getByRole("alert")).toContainText("could not read this feed");
   await expect(page.getByRole("button", { name: "Create" })).toHaveCount(0);
@@ -258,7 +258,10 @@ test("an administrator follows the server's download queue, clears it, and remov
         folderId: folder.id,
         path: "/podcasts/QA Slow Show",
         media: {
-          metadata: { title: "QA Slow Show", feedUrl: "http://host.docker.internal:19885/slow/feed.xml" },
+          metadata: {
+            title: "QA Slow Show",
+            feedUrl: `http://host.docker.internal:${stack.feedPort}/slow/feed.xml`,
+          },
           autoDownloadEpisodes: false,
         },
       },
@@ -310,7 +313,10 @@ test("removing an episode returns to its podcast only if its page is still showi
         folderId: folder.id,
         path: "/podcasts/QA Remove Show",
         media: {
-          metadata: { title: "QA Remove Show", feedUrl: "http://host.docker.internal:19885/feed.xml" },
+          metadata: {
+            title: "QA Remove Show",
+            feedUrl: `http://host.docker.internal:${stack.feedPort}/feed.xml`,
+          },
           autoDownloadEpisodes: false,
         },
       },
