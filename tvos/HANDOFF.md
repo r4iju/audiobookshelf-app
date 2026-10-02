@@ -21,6 +21,6 @@ Scope: stories #26–#30 (TV browsing, playback controls, durable progress, podc
 ## Integration notes
 
 - TV journeys use ports 20765 (HTTP) and 20767 (HTTPS), served by `tvos/scripts/related_fixture.py` on top of `verification/fixture.py`, and simulator `00DD108F-2435-4FEC-9C37-3E62861A0EF6`. They do not touch 19765–19769 or the iPhone/iPad QA simulators.
-- The HTTPS fixture uses a throwaway CA generated for each run and trusted only in the TV QA simulator (`simctl keychain add-root-cert`). This mirrors a homelab CA profile installed on the TV. The app adds no pinning or trust exceptions.
+- The HTTPS fixture uses a throwaway CA generated for each run and trusted only in the leased TV simulator, which `sim acquire tv --fresh` erases before each run (`simctl keychain add-root-cert`). This mirrors a homelab CA profile installed on the TV. The app adds no pinning or trust exceptions.
 - `tvos/App/LibraryStore.swift` and `Views.swift` were replaced by `CatalogStore`, `LibraryBrowser` and per-screen views. Nothing outside `tvos/App` referenced them.
 - The TV still compiles `apple/Playback` and `tvos/Core/Sources/TVCore` directly. It relies on these public members of `ApplePlayback`: `start`, `toggle`, `pause`, `skip`, `seek`, `changeSpeed`, `stop`, `sync`, `restoreListening`, `setFinished`, the sleep-timer API, `authenticationRestored`, and the published state used in `NowPlayingView`. Changing their behaviour requires rerunning `./tvos/scripts/verify-ui.sh`.
