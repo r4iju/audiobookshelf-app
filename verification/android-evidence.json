@@ -1,6 +1,6 @@
 {
   "platform": "android-native",
-  "sourceSha": "87c18a1c0bd0fc5026978cc2790326f773bc9f6f",
+  "sourceSha": "097bd373f468f0a23436062628579d98b80692ff",
   "evidenceKind": "emulator and synthetic loopback fixture only; no live server, owner account or physical device",
   "identity": {
     "applicationId": "com.audiobookshelf.app.nativepreview",
@@ -21,7 +21,7 @@
   },
   "unitTests": {
     "core": {
-      "tests": 56,
+      "tests": 59,
       "failures": 0
     },
     "app": {
@@ -30,8 +30,8 @@
     }
   },
   "journeys": {
-    "classes": 22,
-    "tests": 80,
+    "classes": 23,
+    "tests": 81,
     "failures": 0,
     "singleRun": true,
     "byClass": {
@@ -52,6 +52,11 @@
       },
       "CarJourney": {
         "tests": 5,
+        "failures": 0,
+        "errors": 0
+      },
+      "CastJourney": {
+        "tests": 1,
         "failures": 0,
         "errors": 0
       },
@@ -149,10 +154,11 @@
   },
   "artifact": {
     "path": "android-native/app/build/outputs/apk/release/app-release.apk",
-    "sha256": "f776af23cd8880e4eacee4f712290d071ca12b744be875964f5a1b9c279918b2",
-    "bytes": 22198112,
+    "sha256": "3cd0e383e5260bcb05302c4226d1acdfa84f031e825f1905d8e1fc5cdb77d1a3",
+    "bytes": 22214564,
     "signer": "local Android debug key (CN=Android Debug), certificate SHA-256 118d754789a01ef088d67fabb4a9be5fd51447997cf20dcaa66ab59f2a13f688",
-    "distribution": "local internal install only; not uploaded or published"
+    "distribution": "local internal install only; not uploaded or published",
+    "preservedCopy": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/audiobookshelf-native-preview-097bd373.apk"
   },
   "readiness": {
     "migration": "Legacy export (legacy app instrumented test) and native import verified with synthetic archives: refusal, corruption, resume after interruption with rehashing of staged files, account binding, adoption with damaged files fetched again, repeated export recognised",
@@ -166,7 +172,8 @@
     "TalkBack walkthrough",
     "Android Auto / car head unit and Bluetooth controls",
     "Metered and lost networks on real radios",
-    "Owner-signed release key"
+    "Owner-signed release key",
+    "Cast to a real Chromecast/Google TV receiver (#49)"
   ],
   "diagnosticRuns": [
     {
@@ -180,6 +187,10 @@
     {
       "sha": "f065e892",
       "result": "79 of 80; AccountsJourney c timed out waiting for the browser's approval page because Chrome was not force-stopped before the run; passed in the full run at 87c18a1c"
+    },
+    {
+      "sha": "097bd373 (before commit, same code)",
+      "result": "78 of 81 in one full run (PlaybackJourney a: notification pause not reflected; ProgressResetJourney a: server progress not cleared in 15 s; LocalFilesJourney: stale system folder picker node). The three classes then passed 15 of 15; PlaybackJourney a later failed once with a second listening session (a frozen, unanswered write) and passed 3 of 3 alone. The committed 097bd373 full run passed 81 of 81."
     }
   ],
   "layoutFollowUp": {
@@ -195,9 +206,7 @@
     },
     "note": "Subset run, not a full-suite run; the full single run is the one at sourceSha"
   },
-  "notImplemented": [
-    "#49 casting"
-  ],
+  "notImplemented": [],
   "localization": {
     "status": "partial",
     "strings": 87,
@@ -205,5 +214,19 @@
     "languagesOffered": 33,
     "journey": "LocalizationJourney (German)",
     "untranslated": "About 350 English UI lines remain unextracted (errors, dialogs, downloads, PDF reader, podcasts, groups, migration, diagnostics, statistics, accessibility descriptions); Playing, Resume, Edit, Read PDF and Mark finished/unfinished stay English"
+  },
+  "casting": {
+    "status": "implemented; physical receiver acceptance pending",
+    "receiverApplicationId": "FD1F76C5",
+    "unitTests": "CastMediaTest (3): receiver track URLs per server version",
+    "journey": "CastJourney: no receiver on the emulator network, sheet explains it and phone playback continues",
+    "screenshot": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/cast-no-receivers-097bd373.png",
+    "notVerified": [
+      "Connecting to a real receiver",
+      "Remote play/pause/seek/speed",
+      "Transfer back to the phone on receiver loss",
+      "Listening published while casting",
+      "Play services missing and connection-failure states"
+    ]
   }
 }

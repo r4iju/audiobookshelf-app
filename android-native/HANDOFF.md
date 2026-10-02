@@ -6,7 +6,7 @@ Not merged into `fork/native-tv`. The app installs as the preview identity
 
 ## Issue mapping (for ticket maintenance)
 
-Source `87c18a1c`: the full suite passes 80 of 80 journeys in 22 classes in one run, unit tests pass (core 56, app 6), and the packaged APK has SHA-256 `f776af23cd8880e4eacee4f712290d071ca12b744be875964f5a1b9c279918b2` (22198112 bytes, debug-key signed, `com.audiobookshelf.app.nativepreview` 0.15.0-native-preview; see `verification/android-evidence.json`). All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: casting (#49) is not implemented and localization is partial.
+Source `097bd373`: the full suite passes 81 of 81 journeys in 23 classes in one run, unit tests pass (core 59, app 6), and the packaged APK has SHA-256 `3cd0e383e5260bcb05302c4226d1acdfa84f031e825f1905d8e1fc5cdb77d1a3` (22214564 bytes, debug-key signed, `com.audiobookshelf.app.nativepreview` 0.15.0-native-preview; a copy is kept at `/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/audiobookshelf-native-preview-097bd373.apk`; see `verification/android-evidence.json`). All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: casting (#49) has not been tried with a real receiver, localization is partial, and the physical gates below remain.
 
 | Issue | Status | Evidence | Open follow-ups |
 | --- | --- | --- | --- |
@@ -25,7 +25,7 @@ Source `87c18a1c`: the full suite passes 80 of 80 journeys in 22 classes in one 
 | #43 offline and reconnection | Done (emulator) | DownloadJourney, MigrationJourney d, LatePublication | Real network loss |
 | #44 local files and opening | Done (emulator) | LocalFilesJourney | |
 | #46 PDF | Done (emulator) | PdfJourney (10) | |
-| #49 casting | **Not implemented** | None. The legacy app has `CastManager`/`CastPlayer`; the native app has no cast code | Whole story, including a real receiver |
+| #49 casting | Implemented; receiver acceptance pending | `CastMediaTest` (3), CastJourney (no receiver on the emulator network) | **Physical receiver journey not run**: connecting, remote controls, transfer back on receiver loss and progress while casting are untested on a real Chromecast/Google TV |
 | #50 Android Auto | Partial | CarJourney | Car or Desktop Head Unit |
 | #51 preferences, statistics, diagnostics | Done (emulator) | SettingsJourney | |
 | #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `ereaderSettings` and some preferences preserved but not applied; listening history and logs not exported |
@@ -33,6 +33,19 @@ Source `87c18a1c`: the full suite passes 80 of 80 journeys in 22 classes in one 
 | #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization partial**: main screens carry legacy translations in 33 languages besides English (LocalizationJourney); about 350 UI lines are still English only (see Localization); TalkBack by a person; owner signing key; install on the owner's phone |
 | #45, #47, #48 | Deferred (after #65) | | Files and locations are preserved by migration |
 
+
+## Casting (#49) in 097bd373
+
+- The player's cast button opens a sheet listing receivers for the existing app's Audiobookshelf receiver (`FD1F76C5`, the same id as legacy `CastOptionsProvider`). While connected it shows "Playing on <receiver>" and offers Stop casting. The receiver app stops when the session ends, as in legacy.
+- Media3 `CastPlayer` wraps the phone's ExoPlayer and a `RemoteCastPlayer`. On connect it moves the queue, position and play state to the receiver, and back to the phone when the session ends or the receiver is lost. The engine keeps journaling and publishing listening from whichever player is active, under the same server session.
+- Track URLs follow legacy `PlaybackSession.getContentUri`: direct play on servers from 2.22.0 uses `/public/session/<id>/track/<index>`, transcoded streams use their server path, and older servers get `?token=`. The server version comes from `/status`, fetched once per server per process when casting is possible.
+- Downloaded titles stay on the phone. While casting, opening one, or connecting while one plays, explains that downloads play only on the phone.
+- Auto-rewind and the sleep-timer fade change only the phone's volume, never the receiver's.
+- Actionable states: no receivers found (checked on the emulator), Play services missing or unable to start, connection failed, connection lost. The last three are not exercised by a test.
+- Differences from legacy: the server session keeps `mediaPlayer: "exo-player"`; legacy reopened the session as `cast-player`. Legacy's separate cast volume mapping on the media session is not carried over. The cast sheet text is English only.
+- Before the commit, one full run of the same code passed 78 of 81. PlaybackJourney a, ProgressResetJourney a and LocalFilesJourney failed. Rerun, those classes passed 15 of 15. PlaybackJourney a failed once more with a second listening session, which comes from a listening write that went unanswered, and then passed 3 of 3 alone. The full run of the committed 097bd373 passed 81 of 81.
+- RED: `CastMediaTest` failed 2 of 3 against a stub that returned the phone URL. `CastJourney` failed because the player had no cast button.
+- **Pending, physical only:** a real receiver journey, covering discovery, connecting, play/pause/seek/speed on the receiver, receiver loss, and progress reaching the server while casting.
 
 ## Localization (#54, partial)
 
