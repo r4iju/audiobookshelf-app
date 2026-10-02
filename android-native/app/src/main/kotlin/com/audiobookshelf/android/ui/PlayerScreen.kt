@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,12 +45,19 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -67,6 +75,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -80,6 +89,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.audiobookshelf.android.graph
 import com.audiobookshelf.android.playback.PlaySource
+import com.audiobookshelf.android.playback.PlaybackEngine
 import com.audiobookshelf.android.playback.PlayerState
 import com.audiobookshelf.android.playback.itemKey
 import com.audiobookshelf.core.Chapter
@@ -93,6 +103,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
     val engine = LocalContext.current.graph.playback
     val state by engine.state.collectAsState()
     val now = state.now
+    val artworkFraction = 0.65f / LocalDensity.current.fontScale.coerceAtLeast(1f)
     var speedSheet by remember { mutableStateOf(false) }
     var castSheet by remember { mutableStateOf(false) }
     var tool by remember { mutableStateOf<String?>(null) }
@@ -107,14 +118,24 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onCollapse, modifier = Modifier.testTag("player-collapse")) { Icon(Icons.Outlined.KeyboardArrowDown, stringResource(R.string.pl_minimize_player)) }
                 Spacer(Modifier.weight(1f))
-                TextButton(onClick = {
-                    preferenceError = try { graph.settings.update { it.copy(lockUi = !it.lockUi) }; null }
-                    catch (_: java.io.IOException) { saveFailed }
-                }, modifier = Modifier.testTag("player-lock")) {
-                    Text(stringResource(if (settings.lockUi) R.string.pl_unlock else R.string.pl_lock))
+                IconToggleButton(
+                    checked = settings.lockUi,
+                    onCheckedChange = { locked ->
+                        preferenceError = try { graph.settings.update { it.copy(lockUi = locked) }; null }
+                        catch (_: java.io.IOException) { saveFailed }
+                    },
+                    modifier = Modifier.size(48.dp).testTag("player-lock"),
+                    colors = IconButtonDefaults.iconToggleButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    ),
+                ) {
+                    Icon(if (settings.lockUi) Icons.Outlined.Lock else Icons.Outlined.LockOpen,
+                        stringResource(if (settings.lockUi) R.string.pl_unlock else R.string.pl_lock))
                 }
                 CastButton(graph.casting) { castSheet = true }
-                IconButton(onClick = { engine.close(); onClosed() }, modifier = Modifier.testTag("player-close")) { Icon(Icons.Outlined.Close, stringResource(R.string.action_close_player)) }
+                PlayerOverflow(engine, onClosed = onClosed)
             }
             if (now == null) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -130,7 +151,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                item { Cover(now.coverUrl, now.title, Modifier.widthIn(max = 300.dp).fillMaxWidth(0.7f), podcast = now.isPodcast) }
+                item { Cover(now.coverUrl, now.title, Modifier.widthIn(max = 220.dp).fillMaxWidth(artworkFraction), podcast = now.isPodcast) }
                 item {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(now.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
@@ -156,16 +177,15 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                 }
                 item { Controls(state, engine::previousChapter, { engine.jump(false) }, engine::toggle, { engine.jump(true) }, engine::nextChapter, hasChapters = now.chapters.isNotEmpty()) }
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         TextButton(onClick = { speedSheet = true }, modifier = Modifier.testTag("player-speed")) { Text(stringResource(R.string.pl_speed_value, formatSpeed(state.speed))) }
                         val remaining = state.sleepRemaining
                         val sleepTimerLabel = stringResource(R.string.sleep_timer)
                         TextButton(onClick = { tool = "sleep" }, modifier = Modifier.testTag("player-sleep")) {
-                            Icon(Icons.Outlined.Bedtime, if (remaining != null) stringResource(R.string.sleep_timer) else null, Modifier.size(18.dp))
-                            if (remaining == null) Text(stringResource(R.string.pl_sleep), Modifier.padding(start = 6.dp))
+                            Icon(Icons.Outlined.Bedtime, null, Modifier.size(18.dp))
+                            Text(stringResource(R.string.pl_sleep), Modifier.padding(start = 6.dp))
+                            if (remaining != null) Text(formatClock(remaining), Modifier.padding(start = 6.dp).semantics { stateDescription = sleepTimerLabel }.testTag("sleep-remaining"))
                         }
-                        if (remaining != null) Text(formatClock(remaining), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.semantics { stateDescription = sleepTimerLabel }.testTag("sleep-remaining"))
                         if (client != null) TextButton(onClick = { tool = "bookmarks" }, modifier = Modifier.testTag("player-bookmarks")) {
                             Icon(Icons.Outlined.BookmarkBorder, null, Modifier.size(18.dp))
                             Text(stringResource(R.string.bookmarks), Modifier.padding(start = 6.dp))
@@ -190,9 +210,10 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                 Text(stringResource(R.string.playback_speed), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
                 Text(formatSpeed(state.speed), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(vertical = 8.dp))
                 Slider(value = state.speed, onValueChange = { engine.setSpeed((it * 20).toInt() / 20f) }, valueRange = 0.5f..3f, modifier = Modifier.testTag("speed-slider"))
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     speedPresets.forEach { speed ->
-                        TextButton(onClick = { engine.setSpeed(speed) }, modifier = Modifier.weight(1f).testTag("speed-$speed")) { Text(formatSpeed(speed), maxLines = 1) }
+                        FilterChip(selected = state.speed == speed, onClick = { engine.setSpeed(speed) },
+                            modifier = Modifier.testTag("speed-$speed"), label = { Text(formatSpeed(speed)) })
                     }
                 }
             }
@@ -237,14 +258,14 @@ private fun Controls(state: PlayerState, onPrevious: () -> Unit, onBack: () -> U
     val haptic = rememberHaptic()
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = { haptic(); onPrevious() }, enabled = hasChapters && !settings.lockUi, modifier = Modifier.testTag("previous-chapter")) { Icon(Icons.Filled.SkipPrevious, stringResource(R.string.pl_previous_chapter)) }
-        IconButton(onClick = { haptic(); onBack() }, enabled = !settings.lockUi, modifier = Modifier.size(56.dp).testTag("jump-back")) { Icon(jumpIcon(false, settings.jumpBackwardsTime), jumpDescription(false, settings.jumpBackwardsTime), Modifier.size(32.dp)) }
+        IconButton(onClick = { haptic(); onBack() }, enabled = !settings.lockUi, modifier = Modifier.size(48.dp).testTag("jump-back")) { Icon(jumpIcon(false, settings.jumpBackwardsTime), jumpDescription(false, settings.jumpBackwardsTime), Modifier.size(32.dp)) }
         Box(Modifier.testTag(if (state.playing) "player-playing" else "player-paused")) {
-            FilledIconButton(onClick = { haptic(); onToggle() }, modifier = Modifier.size(72.dp).testTag("play-pause"), colors = IconButtonDefaults.filledIconButtonColors()) {
+            FilledIconButton(onClick = { haptic(); onToggle() }, modifier = Modifier.size(64.dp).testTag("play-pause"), colors = IconButtonDefaults.filledIconButtonColors()) {
                 if (state.loading) CircularProgressIndicator(Modifier.size(28.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 3.dp)
                 else Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) stringResource(R.string.action_pause) else stringResource(R.string.action_play), Modifier.size(40.dp))
             }
         }
-        IconButton(onClick = { haptic(); onForward() }, enabled = !settings.lockUi, modifier = Modifier.size(56.dp).testTag("jump-forward")) { Icon(jumpIcon(true, settings.jumpForwardTime), jumpDescription(true, settings.jumpForwardTime), Modifier.size(32.dp)) }
+        IconButton(onClick = { haptic(); onForward() }, enabled = !settings.lockUi, modifier = Modifier.size(48.dp).testTag("jump-forward")) { Icon(jumpIcon(true, settings.jumpForwardTime), jumpDescription(true, settings.jumpForwardTime), Modifier.size(32.dp)) }
         IconButton(onClick = { haptic(); onNext() }, enabled = hasChapters && !settings.lockUi, modifier = Modifier.testTag("next-chapter")) { Icon(Icons.Filled.SkipNext, stringResource(R.string.pl_next_chapter)) }
     }
 }
@@ -270,9 +291,27 @@ private fun ChapterRow(index: Int, chapter: Chapter, current: Boolean, enabled: 
         ) {
             Text(chapter.title.ifBlank { stringResource(R.string.pl_chapter_number, index + 1) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f),
                 color = if (current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, fontWeight = if (current) FontWeight.SemiBold else null)
-            Text(formatClock(chapter.start), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(formatClock(chapter.start), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 12.dp))
         }
         HorizontalDivider()
+    }
+}
+
+@Composable
+private fun PlayerOverflow(engine: PlaybackEngine, tagPrefix: String = "player", onClosed: () -> Unit = {}) {
+    var more by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { more = true }, modifier = Modifier.size(48.dp).testTag("$tagPrefix-more")) {
+            Icon(Icons.Outlined.MoreVert, stringResource(R.string.menu_more))
+        }
+        DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_close_player)) },
+                leadingIcon = { Icon(Icons.Outlined.Close, null) },
+                onClick = { more = false; engine.close(); onClosed() },
+                modifier = Modifier.testTag("$tagPrefix-close"),
+            )
+        }
     }
 }
 
@@ -311,6 +350,7 @@ fun MiniPlayer(onOpen: () -> Unit) {
                         Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) stringResource(R.string.action_pause) else stringResource(R.string.action_play))
                     }
                 }
+                PlayerOverflow(engine, tagPrefix = "mini-player")
             }
         }
     }

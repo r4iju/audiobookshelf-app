@@ -42,7 +42,7 @@ class RealServerJourney {
             compose.tap("play-pause")
             compose.waitForTag("player-paused")
             val shown = compose.shownSeconds()
-            compose.tap("player-close")
+            compose.closePlayer()
             eventually(20_000) { RealServer.progress(book)?.let { abs(it.getDouble("currentTime") - shown) <= 2 } == true }
         }
     }
@@ -83,7 +83,7 @@ class RealServerJourney {
                 compose.tap("play-pause")
                 compose.waitForTag("player-paused")
                 val shown = compose.shownSeconds()
-                compose.tap("player-close")
+                compose.closePlayer()
                 Network.on()
                 eventually(60_000) { RealServer.progress(book)?.let { abs(it.getDouble("currentTime") - shown) <= 2 } == true }
             } finally {

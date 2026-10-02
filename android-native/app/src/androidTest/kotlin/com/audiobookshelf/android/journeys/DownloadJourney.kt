@@ -103,7 +103,7 @@ class DownloadJourney {
             compose.tap("mini-player")
             compose.tap("jump-forward")
             compose.waitForSeconds(16, 10_000)
-            compose.tap("player-close")
+            compose.closePlayer()
         }
     }
 

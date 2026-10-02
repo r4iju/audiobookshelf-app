@@ -5,6 +5,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
 import android.content.Context
 import android.view.HapticFeedbackConstants
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -162,7 +165,6 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         item { SettingsHeading(stringResource(R.string.set_storage)) }
         item { DownloadLocation(settings, change) }
 
-        item { ImportLegacyButton() }
         item { SettingsHeading(stringResource(R.string.settings_android_auto)) }
         item {
             Choices(stringResource(R.string.set_car_grouping), (CAR_GROUPING + settings.androidAutoBrowseLimitForGrouping).distinct().sorted(), settings.androidAutoBrowseLimitForGrouping, "car-grouping", label = { it.toString() }) { value -> change { it.copy(androidAutoBrowseLimitForGrouping = value) } }
@@ -172,6 +174,7 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         }
 
         item { SettingsHeading(stringResource(R.string.set_heading_support)) }
+        item { ImportLegacyButton() }
         item {
             OutlinedButton(onClick = onDiagnostics, modifier = Modifier.fillMaxWidth().testTag("open-diagnostics")) { Text(stringResource(R.string.set_diagnostics)) }
         }
@@ -213,12 +216,12 @@ private fun <T> Choices(title: String, values: List<T>, current: T, tagPrefix: S
 
 @Composable
 private fun Toggle(title: String, detail: String?, on: Boolean, tag: String, onChange: (Boolean) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(value = on, role = Role.Switch, onValueChange = onChange).testTag(tag).padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f).padding(end = 12.dp)) {
             Text(title, style = MaterialTheme.typography.bodyLarge)
             detail?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }
-        Switch(checked = on, onCheckedChange = onChange, modifier = Modifier.testTag(tag).semantics { contentDescription = title })
+        Switch(checked = on, onCheckedChange = null)
     }
 }
 

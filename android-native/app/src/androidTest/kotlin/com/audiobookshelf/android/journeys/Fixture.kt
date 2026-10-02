@@ -101,6 +101,11 @@ fun ComposeTestRule.tap(tag: String) {
     onNodeWithTag(tag).performClick()
 }
 
+fun ComposeTestRule.closePlayer() {
+    tap("player-more")
+    tap("player-close")
+}
+
 fun ComposeTestRule.hideKeyboard() {
     waitForIdle()
     if (Device.device.executeShellCommand("dumpsys input_method").contains("mInputShown=true")) Device.device.pressBack()

@@ -133,7 +133,7 @@ class LocalFilesJourney {
             compose.tap("play-offline-book-0")
             compose.waitForTag("mini-playing", 10_000)
             compose.tap("mini-player")
-            compose.tap("player-close")
+            compose.closePlayer()
 
             // The grant is gone, as after the user removes the app's access to the folder.
             target.contentResolver.persistedUriPermissions.forEach {
