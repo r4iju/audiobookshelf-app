@@ -1,3 +1,9 @@
+## Approved acceptance amendment, October 3, 2026
+
+The owner now requests relying on simulators for acceptance and skipping physical checks for the current milestone: “lets skip physical checks for now and instead rely on simulators. if something is turned on and available feel free to use it though but dont make it a blocker.” Simulator/browser and isolated local-server verification is the current required acceptance target across platforms. Already available hardware may provide supplemental evidence, but absent phones/tablets, remotes, receivers, cars or physical assistive-technology walkthroughs do not block completion.
+
+Retain physical route/control/receiver checks and on-device owner-migration validation as explicitly deferred physical evidence when the required hardware is absent; do not relabel synthetic proof as physical/owner acceptance. This amendment does not waive migration implementation, translation quality, owner-data preservation or cutover safety. Native-speaker approval and real owner-data outcomes cannot be claimed from simulator evidence. Required software functionality, production-shaped synthetic migration/recovery correctness, simulator-inspectable accessibility and localization behavior, local builds/signing/packaging and internal delivery remain required. No destructive owner migration, legacy deletion or irreversible cutover is authorized solely by this testing amendment. All document reader formats in the next amendment remain required.
+
 ## Approved scope amendment, October 3, 2026
 
 The owner has reactivated all remaining EPUB, MOBI/AZW3 and CBZ/CBR reader implementation and acceptance for iPhone/iPad and Android: “all the way to epub/mobi/comics. let's cover it.” These readers are current Phase 1 requirements alongside PDF. They no longer depend on completion of Next.js readiness (#65). This amendment supersedes the October 1 reader deferral below; that dated decision remains historical context.
