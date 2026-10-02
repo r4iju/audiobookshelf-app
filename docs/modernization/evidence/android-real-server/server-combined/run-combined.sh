@@ -6,6 +6,7 @@
 #   run-combined.sh seams    pristine|combined  Apple's three user-cache seam checks, in the image without network
 #   run-combined.sh progress pristine|combined  first-progress-check.mjs (eight cases)
 #   run-combined.sh race     pristine|combined  cold-cache race: TRIES tries (default 10) of a finish racing GET /api/me
+# Every mode exits nonzero when any of its checks fails; on pristine that failure is the expected RED.
 #   run-combined.sh native   pristine|combined  Android RealServerJourney a-d on emulator-5584
 #   run-combined.sh down                     remove the container and its volumes
 # Apple's files are read, never changed, from APPLE_USERCACHE_DIR (default: this checkout's
@@ -70,9 +71,11 @@ progress() { # label item
 
 # The same steps as Apple's diag-race.sh, on this lane's container. Right after a restart the user cache is empty; a
 # local-all session that finishes "The Long Tide" races GET /api/me, and a stale copy cached last keeps answering
-# unfinished. Judged from the per-try rows: STALE when the read 3 s later is still unfinished.
+# unfinished. STALE when the read 3 s later is still unfinished. Fails when any try is stale, or when the reset, the
+# GET or the finish is not answered 200 (a failed reset would leave the item finished and the try look right).
 race() {
-  local book duration stale=0
+  local book duration stale=0 errors=0 codes
+  codes="$(mktemp -d)"
   book=$(curl -s "$S/api/libraries" -H "Authorization: Bearer $(token)" | python3 -c 'import json,sys; print([l["id"] for l in json.load(sys.stdin)["libraries"] if l["mediaType"]=="book"][0])')
   book=$(curl -s "$S/api/libraries/$book/items?limit=200" -H "Authorization: Bearer $(token)" | python3 -c 'import json,sys; print([i["id"] for i in json.load(sys.stdin)["results"] if i["media"]["metadata"]["title"]=="The Long Tide"][0])')
   duration=$(curl -s "$S/api/items/$book?expanded=1" -H "Authorization: Bearer $(token)" | python3 -c 'import json,sys; print(json.load(sys.stdin)["media"]["duration"])')
@@ -80,20 +83,26 @@ race() {
     local t since now body out
     t=$(token)
     curl -s -X PATCH "$S/api/me/progress/$book" -H "Authorization: Bearer $t" -H 'Content-Type: application/json' \
-      -d "{\"currentTime\":34,\"duration\":$duration,\"progress\":0.38,\"isFinished\":false}" -o /dev/null -w "try $try: unfinished %{http_code}; "
+      -d "{\"currentTime\":34,\"duration\":$duration,\"progress\":0.38,\"isFinished\":false}" -o /dev/null -w "%{http_code}" > "$codes/reset"
     restart; sleep 1
     since=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     now=$(python3 -c 'import time; print(int(time.time()*1000))')
     body=$(python3 -c "import json,uuid; print(json.dumps({'sessions':[{'id':str(uuid.uuid4()),'libraryItemId':'$book','episodeId':None,'mediaType':'book','displayTitle':'The Long Tide','duration':$duration,'playMethod':3,'mediaPlayer':'exo-player','startedAt':$now-30000,'updatedAt':$now,'timeListening':20,'currentTime':$duration}]}))")
-    curl -s "$S/api/me" -H "Authorization: Bearer $t" -o /dev/null &
-    curl -s -X POST "$S/api/session/local-all" -H "Authorization: Bearer $t" -H 'Content-Type: application/json' -d "$body" -o /dev/null -w "finish %{http_code}\n" &
+    curl -s "$S/api/me" -H "Authorization: Bearer $t" -o /dev/null -w "%{http_code}" > "$codes/get" &
+    curl -s -X POST "$S/api/session/local-all" -H "Authorization: Bearer $t" -H 'Content-Type: application/json' -d "$body" -o /dev/null -w "%{http_code}" > "$codes/finish" &
     wait
+    echo "try $try: reset $(cat "$codes/reset"), GET /api/me $(cat "$codes/get"), finish $(cat "$codes/finish")"
+    for request in reset get finish; do
+      [[ "$(cat "$codes/$request")" == 200 ]] || { errors=$((errors + 1)); echo "ERROR on try $try: $request answered $(cat "$codes/$request")"; }
+    done
     progress "  read" "$book"; sleep 3; out=$(progress "  3 s later" "$book"); echo "$out"
     [[ "$out" == *"isFinished False"* ]] && { stale=$((stale + 1)); echo "STALE on try $try"; }
     restart; progress "  after a restart" "$book"
     echo "  DIAG lines:"; docker logs --since "$since" "$ABS_QA_CONTAINER" 2>&1 | grep -E "DIAG|Syncing|Updating" | sed 's/^/    /' | cut -c1-230
   done
-  echo "stale tries: $stale of ${TRIES:-10}"
+  rm -rf "$codes"
+  echo "stale tries: $stale of ${TRIES:-10}, request errors: $errors"
+  [[ $stale == 0 && $errors == 0 ]]
 }
 
 side="${2:-combined}"
@@ -103,11 +112,16 @@ assemble > "$out/hashes.txt" 2>&1 || { cat "$out/hashes.txt"; exit 1; }
 case "$mode" in
   assemble) cat "$out/hashes.txt" ;;
   seams)
+    failed=0
     for check in concurrent-load-check.js invalidation-during-load-check.js delayed-write-check.js; do
       echo "== $check, User.$side.js"
+      rc=0
       docker run --rm --network none --entrypoint node -w /app \
-        -v "$out/User.$side.js:/app/server/models/User.js:ro" -v "$apple/$check:/check.js:ro" "$pinned_image" /check.js && echo "exit=0" || echo "exit=$?"
-    done ;;
+        -v "$out/User.$side.js:/app/server/models/User.js:ro" -v "$apple/$check:/check.js:ro" "$pinned_image" /check.js || rc=$?
+      echo "exit=$rc"
+      [[ $rc == 0 ]] || failed=1
+    done
+    exit "$failed" ;;
   progress) serve "$out/User.$side.js"; node "$here/../server-first-progress/first-progress-check.mjs" "$S" ;;
   race) serve "$out/User.$side-instrumented.js"; race ;;
   native)

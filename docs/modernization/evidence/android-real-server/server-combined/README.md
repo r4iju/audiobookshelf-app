@@ -33,22 +33,37 @@ Modes:
 - `native pristine|combined` runs Android `RealServerJourney` a-d.
 - `down` removes the container.
 
-## Preliminary results (before Apple's evidence merged)
+## Final proof on merged source
 
-Apple's files were read from Apple's own checkout (`audiobookshelf-final-mobile-qa` at dc22a79e) with the hashes above. The runner was on `fork/android-combined-server-candidate` from `fork/native-tv` 767a3d62. These runs validate the controls. They are not the merged-source proof.
+Source: `fork/native-tv` 6de5e359, which includes #94 (Apple's evidence, read in-repo from `apple-real-server/server-usercache` with the hashes above) and #101. Runner branch `fork/android-combined-server-candidate`.
+- **Client:** the Android app in `RealServerJourney` was built from this tree. Its `android-native` source is unchanged since f583677a, apart from the real-server scripts in #101.
+- **Server files:** every server ran the files the runner assembled, checked in-container with `sha256sum`. The combined file was `15ee2c33…` and the instrumented combined file `304b2502…`.
 
 | Control | Pristine 2.30.0 | Combined |
 | --- | --- | --- |
 | Apple seam checks (concurrent load, invalidation during load, delayed write) | 3 of 3 fail | 3 of 3 pass |
 | `first-progress-check.mjs` | 7 of 8 fail | 8 of 8 pass |
-| Cold-cache race, 10 tries | 4 of 10 stale (the cached copy that a second load replaced took the finish; every read after a restart is finished) | 0 of 10 stale; every read finished |
-| Android `RealServerJourney` a-d | not rerun (a-c pass, d fails at f583677a) | waits for the merged source |
+| Cold-cache race, 10 tries | 7 of 10 stale | 0 of 10 stale, every read finished |
+| Android `RealServerJourney` a-d, emulator-5584 | not rerun (d fails at f583677a) | 4 of 4 pass |
 
-Outputs are under `/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/combined-candidate/`, outside the repository.
+**Runner versions.** The progress and native rows ran on 7bf48af2. On that version, the seams and race modes printed results but always exited 0, and race did not check its HTTP answers. Root found this. The fixed runner (`run-combined.sh` SHA-256 `37f191de14e485ce1cc1f34b01e400a30747fc51d676450f45196ca12eda422f`) changes it:
+- seams keeps each check's exit code and fails if any check fails;
+- race fails on any stale try or on any reset, GET or finish not answered 200.
 
-## Still to do
+The seams and race rows above come from the fixed runner:
+- pristine runner exit 1;
+- combined runner exit 0;
+- every request in every race try answered 200.
 
-The merged-source proof runs once Apple's evidence is in `fork/native-tv`, from the in-repo Apple path. It covers the seams, the eight first-progress cases, the race and the Android a-d.
+Running them on 7bf48af2 had given the same counts.
+
+Outputs are outside the repository, under `/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/`:
+- `combined-final-7bf48af2/`: progress, native, and the first seams and race;
+- `combined-final-corrected-runner/`: seams and race on the fixed runner.
+
+The earlier preliminary runs, from Apple's own checkout before #94 merged, gave the same results except the pristine race (4 of 10 stale). They are kept in `combined-candidate/`.
+
+## Limits
 
 Not covered:
 - owner servers and libraries;
