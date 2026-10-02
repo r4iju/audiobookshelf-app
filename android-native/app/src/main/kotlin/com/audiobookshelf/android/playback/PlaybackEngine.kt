@@ -22,6 +22,8 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.cast.CastPlayer
+import androidx.media3.cast.RemoteCastPlayer
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.extractor.DefaultExtractorsFactory
@@ -35,6 +37,7 @@ import com.audiobookshelf.android.data.SettingsStore
 import com.audiobookshelf.core.AccountIdentity
 import com.audiobookshelf.core.ApiClient
 import com.audiobookshelf.core.ApiError
+import com.audiobookshelf.core.AuthApi
 import com.audiobookshelf.core.AudioTrack
 import com.audiobookshelf.core.Chapter
 import com.audiobookshelf.core.DeviceInfo
@@ -42,6 +45,7 @@ import com.audiobookshelf.core.ListeningJournal
 import com.audiobookshelf.core.ListeningMedia
 import com.audiobookshelf.core.SleepTimer
 import com.audiobookshelf.core.Timeline
+import com.audiobookshelf.core.castTrackUrl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -128,6 +132,8 @@ class PlaybackEngine(
     private val report: com.audiobookshelf.android.data.Report = { _, _, _ -> },
     /** Why the title may not start while progress is being discarded, or null when it may. */
     private val resetPending: (AccountIdentity, String, String?) -> String? = { _, _, _ -> null },
+    /** Receiver discovery, or null where casting is not offered. */
+    private val casting: CastRoutes? = null,
 ) {
     private class Loaded(
         val source: PlaySource,
@@ -158,7 +164,12 @@ class PlaybackEngine(
     /** Wall-clock time of the last user pause; 0 after a seek, matching the existing app's auto-rewind. */
     private var pausedAt = 0L
 
-    val player: ExoPlayer by lazy { buildPlayer() }
+    /** The phone's own player. Volume is only ever changed here: on a receiver it is the room's volume. */
+    private val exo: ExoPlayer by lazy { buildPlayer() }
+
+    /** The phone's player, or one that moves playback between the phone and a cast receiver. */
+    val player: Player by lazy { (castPlayer() ?: exo).also(::listen) }
+    private val serverVersions = java.util.concurrent.ConcurrentHashMap<String, String>()
 
     private val sleep = SleepController(context, settings, onShakeRestart = { if (!player.playWhenReady) resume() })
         .also { controller -> controller.bind { Triple(globalPosition(), loaded?.now?.chapters.orEmpty(), player.playbackParameters.speed) } }
@@ -190,6 +201,10 @@ class PlaybackEngine(
     }
 
     private fun start(source: PlaySource) {
+        if (source is PlaySource.Local && casting?.status?.value?.connectedTo != null) {
+            mutable.value = mutable.value.copy(openError = itemKey(source.itemId, source.episodeId) to DOWNLOAD_NOT_CASTABLE)
+            return
+        }
         val current = loaded
         if (current != null && current.source.account == source.account && current.source.itemId == source.itemId &&
             current.source.episodeId == source.episodeId && mutable.value.error == null) {
@@ -251,7 +266,7 @@ class PlaybackEngine(
 
     fun cancelSleep() {
         sleep.cancel()
-        player.volume = 1f
+        exo.volume = 1f
         mutable.value = mutable.value.copy(sleepRemaining = null, sleepEndOfChapter = false)
     }
 
@@ -330,7 +345,7 @@ class PlaybackEngine(
         queue = emptyList()
         generation++
         sleep.cancel()
-        player.volume = 1f
+        exo.volume = 1f
         stopCurrent(closeStream = true)
         mutable.value = PlayerState(speed = mutable.value.speed)
         if (!writer.busy) ended.tryEmit(Unit)
@@ -429,9 +444,13 @@ class PlaybackEngine(
         if (at == null && duration - start < 5) start = 0.0
         Log.i(TAG, "Opening at $start (requested $at, journal $cached, server ${session.currentTime})")
         val now = NowPlaying(source.itemId, source.episodeId, title, author, source.coverUrl, session.chapters, duration, source.episodeId != null, local = false)
+        val castable = casting?.castContext != null
+        val version = if (castable) serverVersion(source.client) else null
+        val token = if (castable) source.client.bearer() else ""
         val items = tracks.mapIndexed { index, track ->
             val url = source.client.mediaUrl(track.contentUrl ?: throw ApiError.NoAudio())
-            mediaItem("${source.itemId}/${source.episodeId.orEmpty()}/$index", url.toString(), now, track.mimeType)
+            val cast = if (castable) CastExtras.of(castTrackUrl(source.client.address, version, session.id, track, transcode, token).toString(), track.mimeType, track.duration) else null
+            mediaItem("${source.itemId}/${source.episodeId.orEmpty()}/$index", url.toString(), now, track.mimeType, cast)
         }
         return Opened(now, tracks, items, start.coerceIn(0.0, duration), session.id)
     }
@@ -444,14 +463,38 @@ class PlaybackEngine(
         return Opened(now, source.tracks, items, start, null)
     }
 
-    private fun mediaItem(id: String, uri: String, now: NowPlaying, mime: String?): MediaItem = MediaItem.Builder()
+    private suspend fun serverVersion(client: ApiClient): String? = serverVersions[client.address.canonical]
+        ?: runCatching { AuthApi(http).status(client.address).let { it.serverVersion ?: it.version } }.getOrNull()
+            ?.also { serverVersions[client.address.canonical] = it }
+
+    private fun castPlayer(): Player? {
+        casting?.castContext ?: return null
+        val remote = RemoteCastPlayer.Builder(context)
+            .setMediaItemConverter(CastConverter())
+            .setSeekBackIncrementMs(settings.current.jumpBackwardsTime * 1000L)
+            .setSeekForwardIncrementMs(settings.current.jumpForwardTime * 1000L)
+            .build()
+        return CastPlayer.Builder(context).setLocalPlayer(exo).setRemotePlayer(remote).setTransferCallback(::transfer).build()
+    }
+
+    private fun transfer(from: Player, to: Player) {
+        if (to !== exo && (0 until from.mediaItemCount).any { !CastExtras.castable(from.getMediaItemAt(it)) }) {
+            from.pause()
+            casting?.explain(DOWNLOAD_NOT_CASTABLE)
+            return
+        }
+        CastPlayer.TransferCallback.DEFAULT.transferState(from, to)
+    }
+
+    private fun mediaItem(id: String, uri: String, now: NowPlaying, mime: String?, cast: android.os.Bundle? = null): MediaItem = MediaItem.Builder()
         .setMediaId(id)
         .setUri(uri)
         .apply { if (mime == "application/vnd.apple.mpegurl" || uri.contains(".m3u8")) setMimeType(androidx.media3.common.MimeTypes.APPLICATION_M3U8) }
         .setMediaMetadata(
             MediaMetadata.Builder().setTitle(now.title).setArtist(now.author).setAlbumTitle(now.title)
                 .setArtworkUri(now.coverUrl?.let(Uri::parse)).setIsPlayable(true).setIsBrowsable(false)
-                .setMediaType(if (now.isPodcast) MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE else MediaMetadata.MEDIA_TYPE_AUDIO_BOOK).build(),
+                .setMediaType(if (now.isPodcast) MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE else MediaMetadata.MEDIA_TYPE_AUDIO_BOOK)
+                .setExtras(cast).build(),
         )
         .build()
 
@@ -553,7 +596,7 @@ class PlaybackEngine(
         current.lastTick = now
         val position = globalPosition()
         val slept = sleep.tick(player.isPlaying, position, player.playbackParameters.speed)
-        if (slept.remaining != null || slept.expired) player.volume = slept.volume
+        if (slept.remaining != null || slept.expired) exo.volume = slept.volume
         if (slept.expired) pause()
         mutable.value = mutable.value.copy(position = position, sleepRemaining = slept.remaining, sleepEndOfChapter = sleep.mode == SleepTimer.Mode.EndOfChapter)
         if (now - current.lastRecord >= RECORD_INTERVAL_MS) persist(current, force = false)
@@ -681,34 +724,35 @@ class PlaybackEngine(
             .setSeekBackIncrementMs(settings.current.jumpBackwardsTime * 1000L)
             .setSeekForwardIncrementMs(settings.current.jumpForwardTime * 1000L)
             .build()
-            .also { player ->
-                player.addListener(object : Player.Listener {
-                    override fun onIsPlayingChanged(isPlaying: Boolean) {
-                        mutable.value = mutable.value.copy(playing = player.playWhenReady && mutable.value.error == null)
-                        if (!isPlaying) persist(force = true)
-                    }
+    }
 
-                    override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-                        mutable.value = mutable.value.copy(playing = playWhenReady && mutable.value.error == null)
-                        if (!playWhenReady && reason != Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM) {
-                            pausedAt = System.currentTimeMillis()
-                            loaded?.let { current -> persist(current, force = true) { sync.publish(current.source.account) } }
-                        }
-                        if (playWhenReady) player.volume = 1f
-                    }
-
-                    override fun onPlaybackStateChanged(state: Int) {
-                        mutable.value = mutable.value.copy(buffering = state == Player.STATE_BUFFERING)
-                        if (state == Player.STATE_ENDED) onEnded()
-                    }
-
-                    override fun onPositionDiscontinuity(old: Player.PositionInfo, new: Player.PositionInfo, reason: Int) {
-                        if (reason == Player.DISCONTINUITY_REASON_SEEK) pausedAt = 0
-                    }
-
-                    override fun onPlayerError(error: PlaybackException) = onError(error)
-                })
+    private fun listen(player: Player) {
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                mutable.value = mutable.value.copy(playing = player.playWhenReady && mutable.value.error == null)
+                if (!isPlaying) persist(force = true)
             }
+
+            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                mutable.value = mutable.value.copy(playing = playWhenReady && mutable.value.error == null)
+                if (!playWhenReady && reason != Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM) {
+                    pausedAt = System.currentTimeMillis()
+                    loaded?.let { current -> persist(current, force = true) { sync.publish(current.source.account) } }
+                }
+                if (playWhenReady) exo.volume = 1f
+            }
+
+            override fun onPlaybackStateChanged(state: Int) {
+                mutable.value = mutable.value.copy(buffering = state == Player.STATE_BUFFERING)
+                if (state == Player.STATE_ENDED) onEnded()
+            }
+
+            override fun onPositionDiscontinuity(old: Player.PositionInfo, new: Player.PositionInfo, reason: Int) {
+                if (reason == Player.DISCONTINUITY_REASON_SEEK) pausedAt = 0
+            }
+
+            override fun onPlayerError(error: PlaybackException) = onError(error)
+        })
     }
 
     companion object {
@@ -717,6 +761,7 @@ class PlaybackEngine(
         private const val SETTLE_TIMEOUT_MS = 10_000L
         private const val SAVE_ERROR = "Listening could not be saved on this device, so playback paused. Free some storage and try again."
         private const val PUBLISH_INTERVAL_MS = 15_000L
+        private const val DOWNLOAD_NOT_CASTABLE = "Downloaded copies play on this phone only. Stop casting to listen here, or stream the title instead."
 
         /** Same thresholds as the existing Android app, keyed by how long playback was paused. */
         fun autoRewindSeconds(pausedMs: Long): Double = when {

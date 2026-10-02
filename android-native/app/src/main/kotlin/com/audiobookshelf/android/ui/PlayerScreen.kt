@@ -92,6 +92,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
     val state by engine.state.collectAsState()
     val now = state.now
     var speedSheet by remember { mutableStateOf(false) }
+    var castSheet by remember { mutableStateOf(false) }
     var tool by remember { mutableStateOf<String?>(null) }
     val graph = LocalContext.current.graph
     val client = graph.accounts.activeClient
@@ -101,6 +102,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onCollapse, modifier = Modifier.testTag("player-collapse")) { Icon(Icons.Outlined.KeyboardArrowDown, "Minimize player") }
                 Spacer(Modifier.weight(1f))
+                CastButton(graph.casting) { castSheet = true }
                 IconButton(onClick = { engine.close(); onClosed() }, modifier = Modifier.testTag("player-close")) { Icon(Icons.Outlined.Close, stringResource(R.string.action_close_player)) }
             }
             if (now == null) {
@@ -124,6 +126,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                             maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() })
                         if (now.author.isNotBlank()) Text(now.author, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
                         chapter?.let { Text(it.title.ifBlank { "Chapter ${chapterIndex + 1}" }, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 4.dp)) }
+                        CastLine(graph.casting)
                     }
                 }
                 item { Timeline(state, chapter, onSeek = engine::seekTo) }
@@ -164,6 +167,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
         "sleep" -> SleepSheet(engine, state) { tool = null }
         "bookmarks" -> if (now != null && client != null) BookmarksSheet(client, now.itemId, state.position, engine::seekTo, graph.accounts::handle) { tool = null }
     }
+    if (castSheet) CastSheet(graph.casting) { castSheet = false }
     if (speedSheet) {
         ModalBottomSheet(onDismissRequest = { speedSheet = false }) {
             Column(Modifier.padding(horizontal = 24.dp, vertical = 8.dp).padding(bottom = 24.dp)) {

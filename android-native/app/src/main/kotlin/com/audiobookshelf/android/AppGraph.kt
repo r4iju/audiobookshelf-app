@@ -60,6 +60,8 @@ class AppGraph internal constructor(val context: Context) {
             })
         }
     }
+    /** Created on the main thread, which media routing requires. */
+    val casting by lazy { com.audiobookshelf.android.playback.CastRoutes(context) }
     /** Creating the engine publishes listening left by a previous process once [listeningRecovery] is saved. */
     val playback: PlaybackEngine by lazy {
         listeningRecovery
@@ -71,7 +73,7 @@ class AppGraph internal constructor(val context: Context) {
                     resets.pending(account, itemId, episodeId) -> "Progress for this title is still being discarded. It plays from the beginning once that is done."
                     else -> null
                 }
-            }).also { progressSync.publishAll() }
+            }, casting = casting).also { progressSync.publishAll() }
     }
 
     val downloads by lazy {
