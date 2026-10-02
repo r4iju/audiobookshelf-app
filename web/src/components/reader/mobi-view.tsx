@@ -246,8 +246,8 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
     // Arriving at the target has already scrolled; only later scrolling counts.
     quietScroll.current = false;
     let scrolled = doc.scrollingElement?.scrollTop;
-    // Nor does it report keys there, so a click in the text hands the keyboard back to the reader; a link reached with
-    // Tab keeps it, and Enter follows it like a click.
+    // Nor does it report keys there, so a click into the text hands the keyboard back to the reader. Arriving with Tab
+    // keeps the focus in the book, so Tab can still move on through it and past it.
     let heard = false;
     const hear = () => {
       heard = true;
@@ -255,6 +255,12 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
     doc.addEventListener("abs-probe", hear);
     doc.dispatchEvent(new view.Event("abs-probe"));
     doc.removeEventListener("abs-probe", hear);
+    let tabbing = false;
+    const onTab = (event: KeyboardEvent) => {
+      if (event.key === "Tab") tabbing = true;
+    };
+    window.addEventListener("keydown", onTab, true);
+    let frameFocused = document.activeElement === element;
     let frameRequest = requestAnimationFrame(function watch() {
       frameRequest = requestAnimationFrame(watch);
       if (element?.contentDocument !== doc) return;
@@ -267,9 +273,12 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
         );
         openLink(link?.getAttribute(LINK) ?? null);
       }
+      const focused = document.activeElement === element;
       const inText = !doc.activeElement || doc.activeElement === doc.body;
-      if (!heard && document.activeElement === element && inText)
+      if (!heard && focused && !frameFocused && !tabbing && inText)
         area.current?.focus({ preventScroll: true });
+      frameFocused = document.activeElement === element;
+      tabbing = false;
       if (!showing() || doc.scrollingElement?.scrollTop === scrolled) return;
       scrolled = doc.scrollingElement?.scrollTop;
       const quiet = quietScroll.current;
@@ -286,6 +295,7 @@ export function MobiView({ file, start, onPlace }: ReaderViewProps) {
     return () => {
       doc.removeEventListener("keydown", onKey);
       doc.removeEventListener("click", onClick);
+      window.removeEventListener("keydown", onTab, true);
       cancelAnimationFrame(frameRequest);
       if (!unsaved.current) return;
       // A section replaced by the next has already left the frame; its last measured place stands.
