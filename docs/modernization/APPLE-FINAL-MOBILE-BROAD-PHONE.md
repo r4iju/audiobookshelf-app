@@ -45,7 +45,7 @@ Simulator scope means these synthetic-fixture runs on b1a82fea app source. "Phys
 | 14 | Podcasts | Podcast ×9 (broad) | Real feeds and server |
 | 15 | Downloads | Offline, Podcast download failures (broad); NativeTests download storage | Physical: device restart, cellular, real low storage |
 | 16 | Offline and reconnection | Offline ×3, Collection offline, Reader offline PDF (broad) | Real network loss on device |
-| 17 | Local files and opening modes | Preferences legacy import, Reader supplementary PDF (broad) | No local-folder or external-opening journey; non-PDF formats deferred |
+| 17 | Local files and opening modes | Downloads view, offline play and offline PDF (Offline, Collection, Reader in broad); legacy import screen reachable (Preferences ×2) | Missing-download recovery has no test; see the #17 audit below |
 | 18 | EPUB | Not in scope | Deferred after Phase 2 |
 | 19 | PDF | Reader PDF journeys (broad) | Representative real PDFs |
 | 20 | MOBI | None | Deferred |
@@ -55,4 +55,30 @@ Simulator scope means these synthetic-fixture runs on b1a82fea app source. "Phys
 | 24 | Migrate media and reading locations | NativeTests adoption; Reader upgrade journey (broad) | Physical: real migrated downloads and locations |
 | 25 | Replacement readiness | All of the above | Physical acceptance, real server matrix, owner devices |
 
-Suggested closure on simulator scope: #6, #10, #13, #14, #16 and #19 have no remaining simulator gap (only real-library or real-media confirmation). #4, #5, #7, #8, #11, #12, #15, #22, #23 and #24 are simulator-complete with physical criteria open. #9 and #25 need physical acceptance. #17 has a coverage gap. #18, #20 and #21 are deferred.
+Suggested closure on simulator scope: #6, #10, #13, #14, #16 and #19 have no remaining simulator gap (only real-library or real-media confirmation). #4, #5, #7, #8, #11, #12, #15, #22, #23 and #24 are simulator-complete with physical criteria open. #9 and #25 need physical acceptance. #17 has no missing mainstream feature but one unverified recovery path. #18, #20 and #21 are deferred.
+
+## #17 audit: local files and opening modes
+
+Bounded audit of the production source (b1a82fea app files) against the baseline iOS app in this repository.
+
+What the baseline offers on iOS:
+
+- Local folders, folder permissions and folder scanning: none. `ios/App/App/plugins/AbsFileSystem.swift` answers `selectFolder`, `checkFolderPermission` and `scanFolder` with "Not available on iOS". `BASELINE.md` says to keep the downloaded and local opening workflows without inventing folder support.
+- External opening: none for media or ebooks. The baseline Info.plist registers only the `audiobookshelf` URL scheme, which is the OpenID callback (covered by OpenIDJourney). It declares no document types, and the readers have no open-elsewhere action.
+
+What production has, and how it is verified:
+
+| Route | Where | Verification |
+| --- | --- | --- |
+| Downloads list, separate from server content (`offline-<item>`) | `DownloadsView.swift` | Broad: Offline ×3, Collection offline, Podcast downloads |
+| Play a download with no server | Downloads, "Play offline" | Broad: Offline, Collection offline (Group A too) |
+| Open a downloaded or supplementary PDF offline | Reader | Broad: Reader offline PDF (Group B too) |
+| Import previous app data from Files (document picker, security-scoped access) | Connect screen and Settings, "Import previous app data" | Screen reachability only (Preferences ×2). Picking a file goes through the system picker. The import itself is #23 (Migration package 39/39). |
+| Files app visibility of the app's Documents folder (`UIFileSharingEnabled`, `LSSupportsOpeningDocumentsInPlace`) | `project.yml` | Not verified; it exists so a legacy export can be placed for the import above |
+| Missing downloaded file on launch: entry fails with "A downloaded file is missing. Retry to restore it; existing files are retained." | `NativeDownloads.swift` init | **No test**: no journey or NativeTests case removes a downloaded file |
+
+Findings:
+
+- Missing feature: none. No local audio or PDF import and no external opening is a baseline match on iOS, not a regression. "Moved files" can happen only to downloads, which live in Application Support and are excluded from backup (so iOS does not purge them, and a restore to a new device restores neither manifest nor files).
+- Missing verification: the missing-file recovery above. Next step: one RED-first-able journey that downloads a book, terminates the app, removes one part file (on the simulator through `xcrun simctl get_app_container <udid> com.forkzed.audiobookshelf.native.preview data` then `Library/Application Support/NativeDownloads/`, driven from the test through a fixture or host helper), relaunches, and expects the failed entry with the retry text and that "Retry" restores playback. It is not added here, because the behavior already exists and backfilling a green test was not requested.
+- Simulator limits, recorded rather than claimed: the system document picker and the Files app are out of process, so picking a legacy export, revoking Files permission and a moved security-scoped file need a device or a manual picker session. Unavailable external handlers do not apply, since the app hands no media or ebook to another app.
