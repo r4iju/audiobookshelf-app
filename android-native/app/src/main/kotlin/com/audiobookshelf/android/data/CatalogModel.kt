@@ -107,7 +107,7 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
                 total = page.total
                 nextPage += 1
             } catch (failure: Exception) {
-                if (current == generation) { pageError = failure.message; accounts.handle(failure) }
+                if (current == generation) { pageError = failure.localizedMessage; accounts.handle(failure) }
             } finally {
                 if (current == generation) pageLoading = false
             }
@@ -159,7 +159,7 @@ class CatalogModel(private val scope: CoroutineScope, val client: ApiClient, pri
         Log.w("AbsCatalog", "Catalog load failed", failure)
         report(Diagnostics.Area.CONNECTION, "The library could not be loaded from ${client.account.server}", failure)
         loading = false
-        error = failure.message ?: "Something went wrong."
+        error = failure.localizedMessage.orEmpty()
         accounts.handle(failure)
     }
 }

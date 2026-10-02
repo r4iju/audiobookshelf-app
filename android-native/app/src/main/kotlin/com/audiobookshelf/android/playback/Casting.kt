@@ -180,7 +180,7 @@ class CastRoutes(private val context: Context) {
         } else {
             @Suppress("DEPRECATION")
             runCatching { CastContext.getSharedInstance(context) }.getOrElse {
-                mutable.value = CastStatus(unavailable = context.getString(R.string.cast_could_not_start, it.message ?: it.javaClass.simpleName))
+                mutable.value = CastStatus(unavailable = context.getString(R.string.cast_could_not_start, it.localizedMessage ?: it.javaClass.simpleName))
                 null
             }
         }

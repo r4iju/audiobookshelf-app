@@ -53,7 +53,7 @@ fun LoadItem(client: ApiClient, id: String, padding: PaddingValues, onFailure: (
     var error by remember(id) { mutableStateOf<String?>(null) }
     LaunchedEffect(id, attempt) {
         error = null
-        try { item = client.item(id) } catch (failure: Exception) { error = failure.message; onFailure(failure) }
+        try { item = client.item(id) } catch (failure: Exception) { error = failure.localizedMessage; onFailure(failure) }
     }
     val loaded = item
     when {

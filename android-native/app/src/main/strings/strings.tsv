@@ -582,3 +582,17 @@ lib_search_failed	-	Search failed
 lib_search_idle_title	-	Find something to listen to
 lib_search_idle_message	-	Search titles, authors, series, narrators and episodes.
 lib_search_no_match	-	Nothing matches "%1$s". Try fewer words or another spelling.
+err_invalid_server	-	Enter a server address starting with http:// or https://, for example https://books.example.com/abs.
+err_unsafe_media_url	-	The server returned a media address outside this server. It was not opened.
+err_sign_in_required	-	Your session is no longer accepted. Sign in again; unsent listening is kept.
+err_untrusted	-	The server's certificate is not trusted by this device. Install your server's certificate authority in Android Settings > Security > Encryption & credentials, then try again.
+err_offline	-	The server could not be reached. Check the address or your connection and try again.
+err_forbidden	-	Your account is not allowed to do this.
+err_not_found	-	This content is no longer available on the server.
+err_server_problem	-	The server had a temporary problem (HTTP %1$d). Try again.
+err_rejected	-	The server rejected the request (HTTP %1$d).
+err_invalid_response	-	The server sent a response this app could not read.
+err_no_audio	-	This item has no playable audio.
+err_login_rejected	-	The username or password was not accepted.
+err_publications_unreadable	-	Records of unanswered progress writes could not be read. Resolve them in Diagnostics first.
+err_discards_unreadable	-	Saved progress discards could not be read. Resolve them in Diagnostics first.

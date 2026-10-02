@@ -51,7 +51,9 @@ class ProgressResets(
 
     @Serializable private data class Document(val version: Int = 1, val resets: List<Reset> = emptyList())
 
-    class Unreadable : java.io.IOException("Saved progress discards could not be read. Resolve them in Diagnostics first.")
+    class Unreadable : java.io.IOException("Saved progress discards could not be read. Resolve them in Diagnostics first.") {
+        override fun getLocalizedMessage(): String? = ErrorText.of(this)
+    }
 
     private val state = MutableStateFlow(emptyList<Reset>())
     /** Resets requested and not yet complete. */

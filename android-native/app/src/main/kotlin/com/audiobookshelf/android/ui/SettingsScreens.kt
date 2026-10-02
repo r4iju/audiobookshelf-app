@@ -234,7 +234,7 @@ fun StatisticsScreen(active: SessionState.Active, catalog: CatalogModel, padding
         } catch (failure: Exception) {
             graph.diagnostics.record(Diagnostics.Area.CONNECTION, "Listening statistics could not be loaded", failure)
             graph.accounts.handle(failure)
-            error = failure.message ?: somethingWrong
+            error = failure.localizedMessage ?: somethingWrong
         }
     }
     val current = stats
@@ -363,7 +363,7 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
             TextButton(onClick = {
                 settingAside = false
                 runCatching { graph.publications.setAsideUnreadable(); graph.progressSync.publishAll(); graph.readingSync.publishAll(); graph.completeResets() }
-                    .onFailure { resolveError = it.message ?: setAsideFailed }
+                    .onFailure { resolveError = it.localizedMessage ?: setAsideFailed }
             }, modifier = Modifier.testTag("confirm-resolve-unreadable-writes")) { Text(stringResource(R.string.set_set_aside)) }
         },
         dismissButton = { TextButton(onClick = { settingAside = false }) { Text(stringResource(R.string.action_cancel)) } },
@@ -376,7 +376,7 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
             TextButton(onClick = {
                 resolving = false
                 runCatching { graph.resets.abandonUnreadable(); graph.readingSync.publishAll() }
-                    .onFailure { resolveError = it.message ?: setAsideFailed }
+                    .onFailure { resolveError = it.localizedMessage ?: setAsideFailed }
             }, modifier = Modifier.testTag("confirm-resolve-unreadable-resets")) { Text(stringResource(R.string.set_set_aside)) }
         },
         dismissButton = { TextButton(onClick = { resolving = false }) { Text(stringResource(R.string.action_cancel)) } },

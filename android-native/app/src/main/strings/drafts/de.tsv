@@ -1,0 +1,15 @@
+# German drafts for strings the legacy app lacks: machine-drafted, not reviewed by a native speaker.
+err_invalid_server	Gib eine Serveradresse ein, die mit http:// oder https:// beginnt, zum Beispiel https://books.example.com/abs.
+err_unsafe_media_url	Der Server hat eine Medienadresse außerhalb dieses Servers geliefert. Sie wurde nicht geöffnet.
+err_sign_in_required	Deine Sitzung wird nicht mehr akzeptiert. Melde dich erneut an; nicht gesendetes Hören bleibt erhalten.
+err_untrusted	Das Zertifikat des Servers ist auf diesem Gerät nicht vertrauenswürdig. Installiere die Zertifizierungsstelle deines Servers unter Android-Einstellungen > Sicherheit > Verschlüsselung & Anmeldedaten und versuche es dann erneut.
+err_offline	Der Server ist nicht erreichbar. Prüfe die Adresse oder deine Verbindung und versuche es erneut.
+err_forbidden	Dein Konto darf das nicht.
+err_not_found	Dieser Inhalt ist auf dem Server nicht mehr verfügbar.
+err_server_problem	Der Server hatte ein vorübergehendes Problem (HTTP %1$d). Versuche es erneut.
+err_rejected	Der Server hat die Anfrage abgelehnt (HTTP %1$d).
+err_invalid_response	Der Server hat eine Antwort gesendet, die diese App nicht lesen kann.
+err_no_audio	Dieser Titel hat kein abspielbares Audio.
+err_login_rejected	Benutzername oder Passwort wurden nicht akzeptiert.
+err_publications_unreadable	Aufzeichnungen unbeantworteter Fortschrittsänderungen konnten nicht gelesen werden. Klär sie zuerst unter Diagnose.
+err_discards_unreadable	Gespeicherte verworfene Fortschritte konnten nicht gelesen werden. Klär sie zuerst unter Diagnose.

@@ -142,4 +142,18 @@
     <string name="lib_sort_progress_updated">Fortschritt: Letzte Aktualisierung</string>
     <string name="lib_sort_progress_started">Fortschritt: Gestartet</string>
     <string name="lib_sort_progress_finished">Fortschritt: Beendet</string>
+    <string name="err_invalid_server">Gib eine Serveradresse ein, die mit http:// oder https:// beginnt, zum Beispiel https://books.example.com/abs.</string>
+    <string name="err_unsafe_media_url">Der Server hat eine Medienadresse außerhalb dieses Servers geliefert. Sie wurde nicht geöffnet.</string>
+    <string name="err_sign_in_required">Deine Sitzung wird nicht mehr akzeptiert. Melde dich erneut an; nicht gesendetes Hören bleibt erhalten.</string>
+    <string name="err_untrusted">Das Zertifikat des Servers ist auf diesem Gerät nicht vertrauenswürdig. Installiere die Zertifizierungsstelle deines Servers unter Android-Einstellungen &gt; Sicherheit &gt; Verschlüsselung &amp; Anmeldedaten und versuche es dann erneut.</string>
+    <string name="err_offline">Der Server ist nicht erreichbar. Prüfe die Adresse oder deine Verbindung und versuche es erneut.</string>
+    <string name="err_forbidden">Dein Konto darf das nicht.</string>
+    <string name="err_not_found">Dieser Inhalt ist auf dem Server nicht mehr verfügbar.</string>
+    <string name="err_server_problem">Der Server hatte ein vorübergehendes Problem (HTTP %1$d). Versuche es erneut.</string>
+    <string name="err_rejected">Der Server hat die Anfrage abgelehnt (HTTP %1$d).</string>
+    <string name="err_invalid_response">Der Server hat eine Antwort gesendet, die diese App nicht lesen kann.</string>
+    <string name="err_no_audio">Dieser Titel hat kein abspielbares Audio.</string>
+    <string name="err_login_rejected">Benutzername oder Passwort wurden nicht akzeptiert.</string>
+    <string name="err_publications_unreadable">Aufzeichnungen unbeantworteter Fortschrittsänderungen konnten nicht gelesen werden. Klär sie zuerst unter Diagnose.</string>
+    <string name="err_discards_unreadable">Gespeicherte verworfene Fortschritte konnten nicht gelesen werden. Klär sie zuerst unter Diagnose.</string>
 </resources>

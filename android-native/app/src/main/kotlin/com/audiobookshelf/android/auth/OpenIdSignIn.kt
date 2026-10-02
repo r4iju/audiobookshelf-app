@@ -74,7 +74,7 @@ class OpenIdSignIn private constructor(private val context: Context) {
                     if (launcher !is android.app.Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }.launchUrl(launcher, Uri.parse(provider.toString()))
             } catch (failure: Exception) {
-                error = failure.message
+                error = failure.localizedMessage
                 busy = false
             }
         }
@@ -100,7 +100,7 @@ class OpenIdSignIn private constructor(private val context: Context) {
                 if (response.code != 200) throw ApiError.Http(response.code)
                 graph.accounts.adopt(AuthApi.credentialsFrom(address, response.body))
             } catch (failure: Exception) {
-                error = failure.message
+                error = failure.localizedMessage
             } finally { busy = false }
         }
         return true

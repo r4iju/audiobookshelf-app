@@ -57,7 +57,7 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
         saving = true; error = null
         scope.launch {
             try { action() } catch (failure: Exception) {
-                error = failure.message ?: context.getString(R.string.item_not_saved_try_again); graph.accounts.handle(failure)
+                error = failure.localizedMessage ?: context.getString(R.string.item_not_saved_try_again); graph.accounts.handle(failure)
             } finally { saving = false }
         }
     }

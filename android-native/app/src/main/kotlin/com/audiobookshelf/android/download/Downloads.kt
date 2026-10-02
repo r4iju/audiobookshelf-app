@@ -302,7 +302,7 @@ class Downloads(
             Outcome.Done
         } catch (failure: Rejected) {
             report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Download of \"${record.title}\" stopped: ${failure.message}", null)
-            try { store.update(id) { it.copy(state = DownloadStore.State.FAILED, error = failure.message) } } catch (unsaved: IOException) { return Outcome.Retry }
+            try { store.update(id) { it.copy(state = DownloadStore.State.FAILED, error = failure.localizedMessage) } } catch (unsaved: IOException) { return Outcome.Retry }
             Outcome.Done
         } catch (failure: Exception) {
             if (failure is kotlinx.coroutines.CancellationException) throw failure
@@ -310,7 +310,7 @@ class Downloads(
             report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Download of \"${record.title}\" failed", failure)
             val message = when (failure) {
                 is ApiError.SignInRequired -> context.getString(R.string.dl_sign_in_again)
-                is ApiError -> failure.message
+                is ApiError -> failure.localizedMessage
                 else -> context.getString(R.string.dl_connection_interrupted)
             }
             val again = attempt < MAX_ATTEMPTS && failure !is ApiError.SignInRequired
@@ -339,7 +339,7 @@ class Downloads(
                         if (part.size != null && offset == part.size) { staging.renameTo(target); return@withContext }
                         staging.delete(); throw IOException("Range not satisfiable")
                     }
-                    response.code == 403 || response.code == 404 -> throw Rejected(ApiError.Http(response.code).message ?: context.getString(R.string.dl_server_refused))
+                    response.code == 403 || response.code == 404 -> throw Rejected(ApiError.Http(response.code).localizedMessage ?: context.getString(R.string.dl_server_refused))
                     !response.isSuccessful -> throw ApiError.Http(response.code)
                 }
                 val type = response.header("Content-Type")?.substringBefore(";")?.trim()?.lowercase()

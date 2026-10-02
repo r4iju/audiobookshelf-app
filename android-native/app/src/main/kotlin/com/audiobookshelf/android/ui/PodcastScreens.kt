@@ -274,7 +274,7 @@ private fun FeedEpisodesSheet(active: SessionState.Active, item: LibraryItem, on
             }
             // A write from a worker thread can land before the sheet's dialog window first composes and be missed.
             withContext(Dispatchers.Main) { episodes = parsed }
-        } catch (failure: Exception) { error = failure.message ?: context.getString(R.string.pod_feed_could_not_open); graph.accounts.handle(failure) }
+        } catch (failure: Exception) { error = failure.localizedMessage ?: context.getString(R.string.pod_feed_could_not_open); graph.accounts.handle(failure) }
     }
     ModalBottomSheet(onDismissRequest = { if (!adding) onDismiss() }) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -320,7 +320,7 @@ private fun FeedEpisodesSheet(active: SessionState.Active, item: LibraryItem, on
                             onQueued(); onDismiss()
                         } catch (failure: Exception) {
                             if (failure is ApiError.Http && failure.status in listOf(400, 401, 403, 404, 413)) runCatching { graph.podcastRequests.reject(account, item.id, choices.mapNotNull { it.url }) }
-                            error = failure.message?.let { context.getString(R.string.pod_not_queued, it) } ?: context.getString(R.string.pod_not_queued_try_again); graph.accounts.handle(failure)
+                            error = failure.localizedMessage?.let { context.getString(R.string.pod_not_queued, it) } ?: context.getString(R.string.pod_not_queued_try_again); graph.accounts.handle(failure)
                         } finally { adding = false }
                     }
                 },
@@ -354,7 +354,7 @@ fun AddPodcastScreen(active: SessionState.Active, catalog: CatalogModel, padding
 
     fun run(block: suspend () -> Unit) {
         busy = true; error = null
-        scope.launch { try { block() } catch (failure: Exception) { error = failure.message ?: context.getString(R.string.pod_something_went_wrong); graph.accounts.handle(failure) } finally { busy = false } }
+        scope.launch { try { block() } catch (failure: Exception) { error = failure.localizedMessage ?: context.getString(R.string.pod_something_went_wrong); graph.accounts.handle(failure) } finally { busy = false } }
     }
     fun preview(url: String, chosen: PodcastDiscovery?) = run {
         val value = active.client.podcastFeed(url)

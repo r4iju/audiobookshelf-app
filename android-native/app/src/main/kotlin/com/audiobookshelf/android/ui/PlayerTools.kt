@@ -93,12 +93,12 @@ fun BookmarksSheet(client: ApiClient, itemId: String, position: Double, onSeek: 
     var adding by remember { mutableStateOf(false) }
     LaunchedEffect(itemId) {
         runCatching { client.me() }.onSuccess { me -> bookmarks = me.bookmarks.filter { it.libraryItemId == itemId }.sortedBy { it.time } }
-            .onFailure { error = it.message; onFailure(it) }
+            .onFailure { error = it.localizedMessage; onFailure(it) }
     }
     fun mutate(action: suspend () -> List<Bookmark>) {
         scope.launch {
             runCatching { action() }.onSuccess { bookmarks = it.sortedBy { mark -> mark.time }; error = null }
-                .onFailure { error = it.message?.let { message -> context.getString(R.string.pl_bookmark_not_saved_reason, message) } ?: context.getString(R.string.pl_bookmark_not_saved); onFailure(it) }
+                .onFailure { error = it.localizedMessage?.let { message -> context.getString(R.string.pl_bookmark_not_saved_reason, message) } ?: context.getString(R.string.pl_bookmark_not_saved); onFailure(it) }
         }
     }
     ModalBottomSheet(onDismissRequest = onDismiss) {

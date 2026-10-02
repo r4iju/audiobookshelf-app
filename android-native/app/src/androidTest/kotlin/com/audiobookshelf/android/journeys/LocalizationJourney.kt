@@ -46,6 +46,27 @@ class LocalizationJourney {
     }
 
     @Test
+    fun connectionAndSignInErrorsFollowTheAppLanguage() {
+        Fixture.resetAppData()
+        Fixture.configure("baseline")
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { locales.applicationLocales = LocaleList.forLanguageTags("de") }
+        ActivityScenario.launch(MainActivity::class.java).use {
+            compose.waitForTag("server-address")
+            compose.replaceText("server-address", "books.example.com")
+            compose.tap("connect")
+            compose.waitForText("Gib eine Serveradresse ein, die mit http:// oder https:// beginnt, zum Beispiel https://books.example.com/abs.")
+            compose.replaceText("server-address", Fixture.server)
+            compose.tap("connect")
+            compose.waitForTag("username")
+            compose.replaceText("username", "qa")
+            compose.replaceText("password", "not-the-password")
+            compose.tap("sign-in")
+            compose.waitForText("Benutzername oder Passwort wurden nicht akzeptiert.")
+            compose.capture("localized-sign-in-error")
+        }
+    }
+
+    @Test
     fun libraryControlsReadRightToLeftInArabic() {
         Fixture.resetAppData()
         Fixture.configure("baseline")

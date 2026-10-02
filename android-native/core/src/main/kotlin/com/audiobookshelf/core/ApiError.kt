@@ -5,6 +5,8 @@ package com.audiobookshelf.core
  * authorization rejection: only [SignInRequired] may lead to reauthentication.
  */
 sealed class ApiError(message: String, cause: Throwable? = null) : Exception(message, cause) {
+    override fun getLocalizedMessage(): String? = ErrorText.of(this)
+
     class InvalidServer : ApiError("Enter a server address starting with http:// or https://, for example https://books.example.com/abs.")
     class UnsafeMediaUrl : ApiError("The server returned a media address outside this server. It was not opened.")
     /** [account] and [rejectedToken] identify which saved session was refused, so a late failure cannot sign out another one. */

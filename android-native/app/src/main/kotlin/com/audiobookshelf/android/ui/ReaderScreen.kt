@@ -135,8 +135,8 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
             graph.accounts.handle(failure)
             graph.diagnostics.record(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "PDF \"${route.title}\" could not be opened", failure)
             error = when (failure) {
-                is ApiError -> failure.message
-                else -> failure.message ?: context.getString(R.string.rd_document_not_opened)
+                is ApiError -> failure.localizedMessage
+                else -> failure.localizedMessage ?: context.getString(R.string.rd_document_not_opened)
             }
         }
     }
@@ -341,7 +341,7 @@ private fun ContinuousPages(document: PdfDocument, page: Int, rotation: Int, onP
 
 /** A failure's message; the reading store's refusal to overwrite positions it could not read is shown in the reader's language. */
 private fun storeFailure(context: android.content.Context, graph: AppGraph, failure: Exception): String? =
-    if (failure is IllegalStateException && !graph.reading.writable) context.getString(R.string.rd_positions_not_overwritten) else failure.message
+    if (failure is IllegalStateException && !graph.reading.writable) context.getString(R.string.rd_positions_not_overwritten) else failure.localizedMessage
 
 /** The downloaded copy when there is one, otherwise the server's file streamed to the cache. */
 private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Reader): () -> ParcelFileDescriptor {

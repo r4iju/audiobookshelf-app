@@ -52,7 +52,9 @@ class AuthApi(private val http: OkHttpClient) {
         return credentialsFrom(address, response)
     }
 
-    class LoginRejected : Exception("The username or password was not accepted.")
+    class LoginRejected : Exception("The username or password was not accepted.") {
+        override fun getLocalizedMessage(): String? = ErrorText.of(this)
+    }
 
     companion object {
         fun credentialsFrom(address: ServerAddress, response: String): Credentials {

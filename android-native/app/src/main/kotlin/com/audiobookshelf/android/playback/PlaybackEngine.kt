@@ -674,12 +674,12 @@ class PlaybackEngine(
                     current.streamSessionId = media.streamSessionId
                     load(current, media.items, position)
                 } catch (failure: Exception) {
-                    if (request == generation) fail(current, failure.message ?: error.message)
+                    if (request == generation) fail(current, failure.localizedMessage ?: error.localizedMessage)
                 }
             }
             return
         }
-        fail(current, error.message)
+        fail(current, error.localizedMessage)
     }
 
     private fun fail(current: Loaded, message: String?) {
@@ -689,7 +689,7 @@ class PlaybackEngine(
 
     private fun describe(failure: Throwable): String = when (failure) {
         is ApiError.NoAudio -> context.getString(R.string.pl_no_playable_audio)
-        else -> failure.message ?: context.getString(R.string.pl_could_not_start)
+        else -> failure.localizedMessage ?: context.getString(R.string.pl_could_not_start)
     }
 
     private fun startService() {
