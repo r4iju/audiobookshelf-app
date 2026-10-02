@@ -42,6 +42,29 @@ test("cards keep one height whether or not a book has a cover or a long title", 
   expect(new Set(heights).size).toBe(1);
 });
 
+test("in a translated language, navigation, sorting, paging and search use the server interface's translations", async ({
+  page,
+}) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await page.getByLabel("Language").selectOption("de");
+  await expect(page.locator("html")).toHaveAttribute("lang", "de");
+  await expect(page.getByLabel("Sprache").locator('option[value=""]')).toHaveText("Standard-Server-Sprache");
+  await expect(page.getByRole("navigation", { name: "Bibliothek" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Statistiken" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Abmelden" })).toBeVisible();
+
+  await page.goto(`/library/${qa.libraries.books}/items`);
+  await page.getByRole("button", { name: "Aufsteigend" }).click();
+  await expect(page.getByRole("button", { name: "Aufsteigend" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Absteigend" })).toHaveAttribute("aria-pressed", "false");
+  await page.getByRole("link", { name: "Vor", exact: true }).click();
+  await expect(page.getByText(/^Seite 2 von \d+$/)).toBeVisible();
+
+  await page.goto(`/library/${qa.libraries.books}/search`);
+  await expect(page.getByRole("searchbox")).toHaveAttribute("placeholder", "Suche...");
+});
+
 test("search leads to a book, its series and its author", async ({ page }) => {
   await signIn(page);
   await page.goto(`/library/${qa.libraries.books}/search`);
