@@ -164,6 +164,9 @@ object Failures {
                 .onSuccess { tree -> tree.lines().forEach { android.util.Log.e(LOG, "semantics $it") } }
                 .onFailure { android.util.Log.e(LOG, "no semantics: $it") }
         }
+        runCatching { Device.device.executeShellCommand("dumpsys media_session") }
+            .onSuccess { dump -> dump.lines().filter { "nativepreview" in it || "state=PlaybackState" in it }.forEach { android.util.Log.e(LOG, "media $it") } }
+            .onFailure { android.util.Log.e(LOG, "no media sessions: $it") }
         runCatching { Fixture.requests().filterNot { it.optString("path").startsWith("/__") }.takeLast(40) }
             .onSuccess { requests -> requests.forEach { android.util.Log.e(LOG, "request ${it.optString("method")} ${it.optString("path")} -> ${it.opt("status") ?: "no answer yet"}") } }
             .onFailure { android.util.Log.e(LOG, "no fixture requests: $it") }
@@ -234,7 +237,7 @@ fun ComposeTestRule.shownSeconds(tag: String = "player-position"): Int {
 }
 
 fun ComposeTestRule.waitForSeconds(atLeast: Int, timeoutMs: Long = 30_000, tag: String = "player-position") =
-    waitUntil(timeoutMs) { shownSeconds(tag) >= atLeast }
+    Failures.capturing(this, "$tag at $atLeast s") { waitUntil(timeoutMs) { shownSeconds(tag) >= atLeast } }
 
 object Device {
     val device get() = androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
