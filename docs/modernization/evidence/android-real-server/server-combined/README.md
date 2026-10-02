@@ -1,5 +1,7 @@
 # Combined 2.30.0 server candidate: Apple user cache + Android first progress
 
+> **Superseded.** This combined file (`15ee2c33`, packaged as image `c649a2bd`) is held: Android's patch in it also finished progress first created through `PATCH /api/me/progress` within 10 s of the end. `evidence/web-real-server/server-combined/` replaces Android's patch with `first-progress-session-candidate.patch` (`ed88f5e0…8fcb`), which applies the rule to playback-session syncs only, in image `cd703e87`.
+
 A candidate only. It is not applied to any owner server, and nothing here is resolved on one.
 
 ## Inputs
