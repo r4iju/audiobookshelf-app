@@ -1,0 +1,7 @@
+server restarted 18:34:39
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+phone lease=75FA9768-B15C-40B6-ACC7-790D7FCAD29C
+phone-online-test1 exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test1SignInBrowseAndStreamAcrossFiles]' passed (107.678 seconds).
+overall exit=0
+run exit=0

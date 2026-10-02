@@ -1,0 +1,79 @@
+== delayed-write-check.js, models/User.js: User.orig.js (2174eec7)
+  request got version 1, cache then gave version 1, 1 loads
+FAIL a write in flight during a load is not returned or cached stale: the request went on with the row read before the write landed
+1 !== 2
+exit=1
+== delayed-write-check.js, models/User.js: User.candidate.js (b1480234)
+  request got version 1, cache then gave version 1, 1 loads
+FAIL a write in flight during a load is not returned or cached stale: the request went on with the row read before the write landed
+1 !== 2
+exit=1
+== delayed-write-check.js, models/User.js: User.candidate2.js (569a673a)
+  request got version 1, cache then gave version 1, 1 loads
+FAIL a write in flight during a load is not returned or cached stale: the request went on with the row read before the write landed
+1 !== 2
+exit=1
+== delayed-write-check.js, models/User.js: User.candidate3.js (3ef58609)
+  request got version 2, cache then gave version 2, 2 loads
+PASS a write in flight during a load is not returned or cached stale
+exit=0
+== invalidation-during-load-check.js, models/User.js: User.orig.js (2174eec7)
+  request got version 1, cache then gave version 1, 1 loads
+FAIL a change during the load is not returned stale or cached: the request went on with the user read before the change
+1 !== 2
+  request got version 1, 1 loads
+PASS another user changing during the load costs no reload
+  request got version undefined, 1 loads
+PASS a user changed during every load still gets an answer after at most three loads
+exit=1
+== invalidation-during-load-check.js, models/User.js: User.candidate.js (b1480234)
+  request got version 1, cache then gave version 2, 2 loads
+FAIL a change during the load is not returned stale or cached: the request went on with the user read before the change
+1 !== 2
+  request got version 1, 1 loads
+PASS another user changing during the load costs no reload
+  request got version undefined, 1 loads
+PASS a user changed during every load still gets an answer after at most three loads
+exit=1
+== invalidation-during-load-check.js, models/User.js: User.candidate2.js (569a673a)
+  request got version 2, cache then gave version 2, 2 loads
+PASS a change during the load is not returned stale or cached
+  request got version 1, 1 loads
+PASS another user changing during the load costs no reload
+  request got version 11, 3 loads
+PASS a user changed during every load still gets an answer after at most three loads
+exit=0
+== invalidation-during-load-check.js, models/User.js: User.candidate3.js (3ef58609)
+  request got version 2, cache then gave version 2, 2 loads
+PASS a change during the load is not returned stale or cached
+  request got version 1, 1 loads
+PASS another user changing during the load costs no reload
+  request got version 11, 3 loads
+PASS a user changed during every load still gets an answer after at most three loads
+exit=0
+== concurrent-load-check.js, models/User.js: User.orig.js (2174eec7)
+first request got load 1, second got load 2, cache holds load 2
+FAIL: the first request holds an object the cache no longer returns
++ actual - expected
+  {
+    extraData: {},
+    fromCache: true,
+    id: 'u1',
++   load: 1,
+-   load: 2,
+    mediaProgresses: [],
+    username: 'qa'
+  }
+exit=1
+== concurrent-load-check.js, models/User.js: User.candidate.js (b1480234)
+first request got load 1, second got load 1, cache holds load 1
+PASS
+exit=0
+== concurrent-load-check.js, models/User.js: User.candidate2.js (569a673a)
+first request got load 1, second got load 1, cache holds load 1
+PASS
+exit=0
+== concurrent-load-check.js, models/User.js: User.candidate3.js (3ef58609)
+first request got load 1, second got load 1, cache holds load 1
+PASS
+exit=0

@@ -53,7 +53,7 @@ The isolated real-server run (`APPLE-REAL-SERVER-QA.md`) covers some of the soft
 - TV resume of a server position left by another install
 - pending migration sessions accepted by the server
 
-One software gate from that run is open: **finish sync**. A book finished offline reaches the server and is stored, but after a server start the 2.30.0 server can go on returning the earlier unfinished progress until it restarts. The cause is a race in the server's user cache, confirmed with instrumentation in an owned container. A candidate server patch is recorded but not reviewed or deployed. The gate stays open until a fix is confirmed and the matched same-item probe passes against the server in use.
+One software gate from that run is open: **finish sync**. A book finished offline reaches the server and is stored, but after a server start the 2.30.0 server can go on returning the earlier unfinished progress until it restarts. The cause is a race in the server's user cache, confirmed with instrumentation in an owned container. A candidate server patch passes isolated checks. It is not deployed, and the owner's server is unchanged. The gate stays open until a fix is confirmed and the matched same-item probe passes against the server in use.
 
 Every gate below still needs a device, the owner, or owner data.
 

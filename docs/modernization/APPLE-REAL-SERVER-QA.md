@@ -129,27 +129,41 @@ The earlier checks on the QA server itself, with no app and no instrumentation:
 
 ### Candidate server fix, not promoted
 
-`server-usercache/usercache-candidate.patch` changes only `server/models/User.js` of the pinned 2.30.0 image:
+The current candidate is `server-usercache/usercache-candidate-3ef58609.patch`. It changes only `server/models/User.js` of the pinned 2.30.0 image. Applied to the pinned file (SHA-256 `2174eec7…`), it gives `3ef58609…`. It keeps one user object per cached user, and never caches or returns a load that a change to that user overlapped:
 
-- all five lookups load through one `UserCache.load`; a load that finishes after another load for the same user was cached returns the cached object, so concurrent requests share one object
-- a load that started before an invalidation is returned without being cached
-- `maybeInvalidate` also evicts when the cached object is not the one that was updated
+- **One object per user.** All five lookups load through `UserCache.load`. A load that finishes after another load for the same user was cached returns the cached object.
+- **Changes during a load.** `UserCache.delete` stamps the user's invalidation. A load overlapped by a stamp is repeated and checked against the cache again. Only a change to the same user causes a reload. After three overlapped loads in a row, the last is returned uncached, like any read that overlaps a write. The stamps are kept per user id.
+- **Writes still in flight.** `update`, `save` and `destroy` invalidate before their database write, as before, and again once it settles (`finally`), so a load that read the row during the write is not kept. For the cached object itself both calls do nothing, since it already holds its own changes.
+- **Displaced objects.** `maybeInvalidate` also evicts when the cached object is not the one that was updated.
 
-It applies cleanly to the pinned file. It is not in the app, the owner's server or any image beyond the owned diagnostic container, and it needs review before anything is done with it.
+Two earlier candidates were each corrected after review, by first writing a check that fails on them:
 
-| Check | Pinned 2.30.0 | Candidate |
-| --- | --- | --- |
-| `concurrent-load-check.js` | exit 1, two objects | exit 0, one shared object |
-| `diag-race.sh`, 10 tries, judged from each try's rows (the script's exit status is not a result) | 8 stale | 0 stale; every try's reads were finished, and each shows the later load returning the cached object |
-| native run, same cases and order as `97bac3e3` (`server-usercache/run-candidate.sh`) | `test4e` failed at `97bac3e3` (1 of 2 fresh runs) | all 8 cases exit 0, `test4e` included: 90.2 s, finished, at once and after a restart |
+- `usercache-candidate-b1480234.patch` only fenced caching. A request waiting on an overlapped load still went on with the object read before the change (`invalidation-during-load-check.js`).
+- `usercache-candidate-569a673a.patch` reloaded after an invalidation. But the model invalidates before awaiting its write, so a reload during the write still read and cached the old row (`delayed-write-check.js`).
 
-The native run used the app at `386fed27`, whose `apple/` and `tvos/` are identical to `97bac3e3`, and the probes from `97bac3e3`. The image was the pinned `ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53…` with only `models/User.js` replaced. The file in the container had SHA-256 `b1480234…`, which is the pinned file (`2174eec7…`) with the patch applied (`server-usercache/native-candidate-tested.txt`). It met the failing run's precondition: the server had just started, the row was unfinished at 34.4 s from the TV, and the app's sync and socket reached the server 10 ms apart. A single native pass does not show the race was hit in that run; the controlled checks above are the proof (`native-candidate-output.txt`, `native-candidate-results.txt`, `native-candidate-server-long-tide.txt`).
+No candidate is in the app, the owner's server or any image beyond the owned diagnostic container. Root's reviews cleared `3ef58609` (patch file SHA-256 `b59ea8c8…`) as a candidate only. This patch is independent of any other server change.
 
-A first, narrower candidate covered only the two id lookups (`first-candidate.diff`, `race-5-first-candidate.txt`: 0 stale of 5). It was replaced by the patch above, which covers every lookup, loads that span an invalidation, and displaced objects. `race-5-pristine-first.txt` is the first instrumented pristine run (3 stale of 5); its DIAG lines accumulate across tries.
+| Check | Pinned `2174eec7` | `b1480234` | `569a673a` | `3ef58609` |
+| --- | --- | --- | --- | --- |
+| `concurrent-load-check.js`: concurrent misses share one object | exit 1 | exit 0 | exit 0 | exit 0 |
+| `invalidation-during-load-check.js`: a change while a load awaits is not returned or cached stale; an unrelated change costs no reload; constant change still answers within three loads | exit 1 | exit 1 | exit 0 | exit 0 |
+| `delayed-write-check.js`: a write in flight during a load is not returned or cached stale | exit 1 | exit 1 | exit 1 | exit 0 |
+| `diag-race.sh`, 10 tries, judged from each try's rows (the script's exit status is not a result) | 8 stale | 0 stale | 0 stale | 0 stale, all 30 reads finished |
+| native run, same cases and order as `97bac3e3` (`run-candidate.sh`) | `test4e` 65 at `97bac3e3` (1 of 2 fresh runs) | 8 of 8 exit 0 | 8 of 8 exit 0 | 7 of 8 exit 0, finish cases included; `phone-online` 65 on a probe fault (below), then `test1` alone exit 0 with the corrected poll |
+
+**The `3ef58609` native run's failure.** `phone-online` failed in `test1`: "server 32 vs app 37" (`native-candidate-3ef58609-output.txt`). The server log shows the app's reports in order and none refused: 32 s at 09:25:24.558 from the skips, then the paused 37.419 s at 09:25:31.239 (the session's `updatedAt` is the pause, 09:25:30.013). The probe polled right after Close, about 0.5 s after the pause, and accepted the first row with at least 30 s, which was the 32 s. Its next assertion, the app's position within 3 s, then failed. This was the probe accepting too early, not the app or the server. The poll now accepts only a row that meets both conditions, with the same 30 s timeout, threshold and assertion. `test1` alone against a freshly seeded `3ef58609` server then passed, with the paused 36.45 s position reaching the server (`native-candidate-3ef58609-test1-*`). The finish cases of the failing run (`test4d`, `test4e`) had passed, and the corrected poll does not touch them. Earlier runs used the old poll condition and passed it.
+
+`seam-checks.txt` holds all three seam checks for all four files. `concurrent-load-check.txt`, `invalidation-during-load-check-red.txt` and `delayed-write-check-red.txt` are the first runs. Each native run's outputs carry its patch hash (`native-candidate-<hash>-*`). Each was against its own patch only: the `b1480234` and `569a673a` passes say nothing about `3ef58609`.
+
+The native runs used the app at `386fed27`, whose `apple/` and `tvos/` are identical to `97bac3e3`, and the probes from `97bac3e3`. The image was the pinned `ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53…` with only `models/User.js` replaced, its hash recorded in each run's `*-tested.txt`. Each run met the failing run's precondition: the server had just started, the row was unfinished at 34.4 s from the TV, and the app's sync and socket reached the server within 20 ms. A single native pass does not show the race was hit in that run; the controlled checks are the proof.
+
+What the native finish case covers: the finish updates a progress row that already exists ("previously 34.4"). It does not cover a book's first progress being created by an offline session that already finished, which takes the server's separate create branch.
+
+An earlier, narrower attempt covered only the two id lookups (`first-candidate.diff`, `race-5-first-candidate.txt`: 0 stale of 5). `race-5-pristine-first.txt` is the first instrumented pristine run (3 stale of 5); its DIAG lines accumulate across tries.
 
 ### Finish sync gate: still open
 
-The matched production probe, unfinished to finished on the same item, failed at `97bac3e3` against the real 2.30.0 server and passed at `386fed27`. The failure is the server returning stale progress after storing the finish, not a lost finish. The real server does not pass this case. The cause is confirmed in the server. The candidate fix passes the controlled checks and the native run in the owned diagnostic container only; it is unreviewed and not deployed anywhere else, so the gate stays open. No app code changed.
+The matched production probe, unfinished to finished on the same item, failed at `97bac3e3` against the real 2.30.0 server and passed at `386fed27`. The failure is the server returning stale progress after storing the finish, not a lost finish. The real server does not pass this case. The cause is confirmed in the server. The candidate fix passes the controlled checks and the native finish sequence in the owned diagnostic container only. It is not deployed anywhere else, and the owner's server is unchanged, so the gate stays open. No app code changed.
 
 An app-side change, sending pending sessions before opening the socket, would remove only the app's own concurrent pair, not other requests or other clients that miss the cache at the same moment. It has not been made.
 
@@ -196,7 +210,7 @@ During offline playback with the server stopped, the player shows "Playback prog
   - TV resume from a server position left by another install, with chapter movement across files
   - TV search and podcast episode progress
   - migration session and position upload, including idempotence
-- **Open software gate: finish sync.** The finish reaches the server and is stored, but in that run the server went on returning the earlier unfinished progress until it restarted. The cause is a user-cache race in the 2.30.0 server, confirmed with instrumentation. A candidate server patch is recorded but not reviewed or deployed, so the gate stays open.
+- **Open software gate: finish sync.** The finish reaches the server and is stored, but in that run the server went on returning the earlier unfinished progress until it restarted. The cause is a user-cache race in the 2.30.0 server, confirmed with instrumentation. A candidate server patch (`usercache-candidate-3ef58609.patch`) passes the isolated checks and has been reviewed. It is not deployed anywhere, so the gate stays open.
 - **No product defect was found in the apps, so no app code changed.**
 - **Still open, physical or owner gates:**
   - devices, lock screen and routes

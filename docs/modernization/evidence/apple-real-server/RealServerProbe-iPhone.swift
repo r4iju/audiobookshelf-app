@@ -109,7 +109,11 @@ import XCTest
         XCTAssertGreaterThanOrEqual(position, 30)
         capture("real-server-player")
         app.buttons["Close playback"].tap()
-        let progress = try await serverProgress(Self.longTide) { (($0["currentTime"] as? Double) ?? 0) >= 30 }
+        // The seek reports arrive before the pause is published, so wait for the paused position itself.
+        let progress = try await serverProgress(Self.longTide) {
+            let time = ($0["currentTime"] as? Double) ?? 0
+            return time >= 30 && abs(time - Double(position)) <= 3
+        }
         XCTAssertEqual((progress["currentTime"] as? Double).map { abs($0 - Double(position)) <= 3 }, true, "server \(progress["currentTime"] ?? "nil") vs app \(position)")
         let listened = try await sessions(for: Self.longTide).compactMap { $0["timeListening"] as? Double }.reduce(0, +)
         XCTAssertGreaterThan(listened, 0, "The server must record listening time")

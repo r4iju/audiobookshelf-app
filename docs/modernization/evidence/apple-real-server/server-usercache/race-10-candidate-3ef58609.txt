@@ -1,0 +1,141 @@
+try 1: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932932908
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932932908
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932932908
+  DIAG lines for this try:
+    [2026-10-02 09:22:12.994] INFO: [DIAG] cache.set user=qa inst=13wu3 replacing=- progress=[[34,false]]
+    [2026-10-02 09:22:13.005] INFO: [DIAG] load: returning cached inst=13wu3 instead of new inst=hi3ta
+    [2026-10-02 09:22:13.009] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (87de128e-19b9-47f0-8593-961dafd1e444) (updatedAt: 1790932932908)
+    [2026-10-02 09:22:13.019] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 34)
+    [2026-10-02 09:22:13.024] INFO: [DIAG] progress update on inst=13wu3 fromCache=true cached=13wu3 progress=[[90.2,true]]
+    [2026-10-02 09:22:13.078] INFO: [DIAG] progress read on inst=13wu3 progress=[[90.2,true]]
+    [2026-10-02 09:22:16.137] INFO: [DIAG] progress read on inst=13wu3 progress=[[90.2,true]]
+    [2026-10-02 09:22:17.596] INFO: [DIAG] cache.set user=qa inst=i77s8 replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:22:17.643] INFO: [DIAG] progress read on inst=i77s8 progress=[[90.2,true]]
+try 2: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932940084
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932940084
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932940084
+  DIAG lines for this try:
+    [2026-10-02 09:22:21.043] INFO: [DIAG] cache.set user=qa inst=j0w8h replacing=- progress=[[0,false]]
+    [2026-10-02 09:22:21.059] INFO: [DIAG] load: returning cached inst=j0w8h instead of new inst=1eb60
+    [2026-10-02 09:22:21.066] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (bee8a309-4611-4f91-880d-42b166b66769) (updatedAt: 1790932940084)
+    [2026-10-02 09:22:21.080] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:22:21.088] INFO: [DIAG] progress update on inst=j0w8h fromCache=true cached=j0w8h progress=[[90.2,true]]
+    [2026-10-02 09:22:21.146] INFO: [DIAG] progress read on inst=j0w8h progress=[[90.2,true]]
+    [2026-10-02 09:22:24.201] INFO: [DIAG] progress read on inst=j0w8h progress=[[90.2,true]]
+    [2026-10-02 09:22:25.583] INFO: [DIAG] cache.set user=qa inst=13eik replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:22:25.625] INFO: [DIAG] progress read on inst=13eik progress=[[90.2,true]]
+try 3: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932948104
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932948104
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932948104
+  DIAG lines for this try:
+    [2026-10-02 09:22:28.186] INFO: [DIAG] cache.set user=qa inst=ilkxi replacing=- progress=[[0,false]]
+    [2026-10-02 09:22:28.196] INFO: [DIAG] load: returning cached inst=ilkxi instead of new inst=7dg6f
+    [2026-10-02 09:22:28.199] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (55c656c4-7d46-4d7f-a944-5bba72626f8a) (updatedAt: 1790932948104)
+    [2026-10-02 09:22:28.208] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:22:28.214] INFO: [DIAG] progress update on inst=ilkxi fromCache=true cached=ilkxi progress=[[90.2,true]]
+    [2026-10-02 09:22:28.264] INFO: [DIAG] progress read on inst=ilkxi progress=[[90.2,true]]
+    [2026-10-02 09:22:31.326] INFO: [DIAG] progress read on inst=ilkxi progress=[[90.2,true]]
+    [2026-10-02 09:22:32.781] INFO: [DIAG] cache.set user=qa inst=bccmx replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:22:32.822] INFO: [DIAG] progress read on inst=bccmx progress=[[90.2,true]]
+try 4: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932955319
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932955319
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932955319
+  DIAG lines for this try:
+    [2026-10-02 09:22:36.048] INFO: [DIAG] cache.set user=qa inst=063cd replacing=- progress=[[0,false]]
+    [2026-10-02 09:22:36.050] INFO: [DIAG] load: returning cached inst=063cd instead of new inst=670sx
+    [2026-10-02 09:22:36.064] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (e21103e5-d6ee-4d1b-938e-88b95a64bcc5) (updatedAt: 1790932955319)
+    [2026-10-02 09:22:36.073] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:22:36.081] INFO: [DIAG] progress update on inst=063cd fromCache=true cached=063cd progress=[[90.2,true]]
+    [2026-10-02 09:22:36.133] INFO: [DIAG] progress read on inst=063cd progress=[[90.2,true]]
+    [2026-10-02 09:22:39.191] INFO: [DIAG] progress read on inst=063cd progress=[[90.2,true]]
+    [2026-10-02 09:22:41.058] INFO: [DIAG] cache.set user=qa inst=8wqpt replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:22:41.103] INFO: [DIAG] progress read on inst=8wqpt progress=[[90.2,true]]
+try 5: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932963599
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932963599
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932963599
+  DIAG lines for this try:
+    [2026-10-02 09:22:43.683] INFO: [DIAG] cache.set user=qa inst=4s3wv replacing=- progress=[[0,false]]
+    [2026-10-02 09:22:43.694] INFO: [DIAG] load: returning cached inst=4s3wv instead of new inst=oiart
+    [2026-10-02 09:22:43.697] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (5f5b0ac4-f67e-409b-afae-57b9f33a65bb) (updatedAt: 1790932963599)
+    [2026-10-02 09:22:43.706] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:22:43.711] INFO: [DIAG] progress update on inst=4s3wv fromCache=true cached=4s3wv progress=[[90.2,true]]
+    [2026-10-02 09:22:43.760] INFO: [DIAG] progress read on inst=4s3wv progress=[[90.2,true]]
+    [2026-10-02 09:22:46.817] INFO: [DIAG] progress read on inst=4s3wv progress=[[90.2,true]]
+    [2026-10-02 09:22:48.269] INFO: [DIAG] cache.set user=qa inst=aybmw replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:22:48.317] INFO: [DIAG] progress read on inst=aybmw progress=[[90.2,true]]
+try 6: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932970761
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932970761
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932970761
+  DIAG lines for this try:
+    [2026-10-02 09:22:51.050] INFO: [DIAG] cache.set user=qa inst=wa4ni replacing=- progress=[[0,false]]
+    [2026-10-02 09:22:51.063] INFO: [DIAG] load: returning cached inst=wa4ni instead of new inst=vmr8f
+    [2026-10-02 09:22:51.067] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (b19cd4e3-3007-47e9-a1ae-3bf77fcc8d99) (updatedAt: 1790932970761)
+    [2026-10-02 09:22:51.079] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:22:51.087] INFO: [DIAG] progress update on inst=wa4ni fromCache=true cached=wa4ni progress=[[90.2,true]]
+    [2026-10-02 09:22:51.137] INFO: [DIAG] progress read on inst=wa4ni progress=[[90.2,true]]
+    [2026-10-02 09:22:54.203] INFO: [DIAG] progress read on inst=wa4ni progress=[[90.2,true]]
+    [2026-10-02 09:22:55.612] INFO: [DIAG] cache.set user=qa inst=l0bug replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:22:55.658] INFO: [DIAG] progress read on inst=l0bug progress=[[90.2,true]]
+try 7: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932978117
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932978117
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932978117
+  DIAG lines for this try:
+    [2026-10-02 09:22:58.201] INFO: [DIAG] cache.set user=qa inst=t27k6 replacing=- progress=[[0,false]]
+    [2026-10-02 09:22:58.204] INFO: [DIAG] load: returning cached inst=t27k6 instead of new inst=vvxsa
+    [2026-10-02 09:22:58.216] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (bee10ade-f991-48cd-a3d3-07ad2755aa50) (updatedAt: 1790932978117)
+    [2026-10-02 09:22:58.223] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:22:58.229] INFO: [DIAG] progress update on inst=t27k6 fromCache=true cached=t27k6 progress=[[90.2,true]]
+    [2026-10-02 09:22:58.278] INFO: [DIAG] progress read on inst=t27k6 progress=[[90.2,true]]
+    [2026-10-02 09:23:01.334] INFO: [DIAG] progress read on inst=t27k6 progress=[[90.2,true]]
+    [2026-10-02 09:23:02.755] INFO: [DIAG] cache.set user=qa inst=iox69 replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:23:02.798] INFO: [DIAG] progress read on inst=iox69 progress=[[90.2,true]]
+try 8: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932985256
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932985256
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932985256
+  DIAG lines for this try:
+    [2026-10-02 09:23:05.440] INFO: [DIAG] cache.set user=qa inst=1xs3t replacing=- progress=[[0,false]]
+    [2026-10-02 09:23:05.443] INFO: [DIAG] load: returning cached inst=1xs3t instead of new inst=sbt17
+    [2026-10-02 09:23:05.455] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (9de28422-04d5-40f5-971b-64404077b656) (updatedAt: 1790932985256)
+    [2026-10-02 09:23:05.465] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:23:05.471] INFO: [DIAG] progress update on inst=1xs3t fromCache=true cached=1xs3t progress=[[90.2,true]]
+    [2026-10-02 09:23:05.521] INFO: [DIAG] progress read on inst=1xs3t progress=[[90.2,true]]
+    [2026-10-02 09:23:08.602] INFO: [DIAG] progress read on inst=1xs3t progress=[[90.2,true]]
+    [2026-10-02 09:23:10.022] INFO: [DIAG] cache.set user=qa inst=61kew replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:23:11.045] INFO: [DIAG] progress read on inst=61kew progress=[[90.2,true]]
+try 9: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790932993547
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790932993547
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790932993547
+  DIAG lines for this try:
+    [2026-10-02 09:23:13.633] INFO: [DIAG] cache.set user=qa inst=f1cl5 replacing=- progress=[[0,false]]
+    [2026-10-02 09:23:13.636] INFO: [DIAG] load: returning cached inst=f1cl5 instead of new inst=jn65m
+    [2026-10-02 09:23:13.657] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (eafabb20-3d1e-43a7-8b64-70f6f88e241b) (updatedAt: 1790932993547)
+    [2026-10-02 09:23:13.667] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:23:13.673] INFO: [DIAG] progress update on inst=f1cl5 fromCache=true cached=f1cl5 progress=[[90.2,true]]
+    [2026-10-02 09:23:13.723] INFO: [DIAG] progress read on inst=f1cl5 progress=[[90.2,true]]
+    [2026-10-02 09:23:16.794] INFO: [DIAG] progress read on inst=f1cl5 progress=[[90.2,true]]
+    [2026-10-02 09:23:18.238] INFO: [DIAG] cache.set user=qa inst=twxu4 replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:23:18.281] INFO: [DIAG] progress read on inst=twxu4 progress=[[90.2,true]]
+try 10: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790933000743
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790933000743
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790933000743
+  DIAG lines for this try:
+    [2026-10-02 09:23:20.878] INFO: [DIAG] cache.set user=qa inst=d3p6k replacing=- progress=[[0,false]]
+    [2026-10-02 09:23:20.889] INFO: [DIAG] load: returning cached inst=d3p6k instead of new inst=fgq82
+    [2026-10-02 09:23:20.893] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (bcd39b11-3a55-4387-90be-431916502d82) (updatedAt: 1790933000743)
+    [2026-10-02 09:23:20.903] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.200817 (previously 0)
+    [2026-10-02 09:23:20.909] INFO: [DIAG] progress update on inst=d3p6k fromCache=true cached=d3p6k progress=[[90.2,true]]
+    [2026-10-02 09:23:20.961] INFO: [DIAG] progress read on inst=d3p6k progress=[[90.2,true]]
+    [2026-10-02 09:23:24.022] INFO: [DIAG] progress read on inst=d3p6k progress=[[90.2,true]]
+    [2026-10-02 09:23:26.066] INFO: [DIAG] cache.set user=qa inst=ua2th replacing=- progress=[[90.2,true]]
+    [2026-10-02 09:23:26.109] INFO: [DIAG] progress read on inst=ua2th progress=[[90.2,true]]
+stale=0

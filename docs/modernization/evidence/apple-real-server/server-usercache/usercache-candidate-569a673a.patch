@@ -1,0 +1,175 @@
+--- a/server/models/User.js	2025-10-09 00:34:44
++++ b/server/models/User.js	2026-10-02 18:08:42
+@@ -10,6 +10,9 @@
+ class UserCache {
+   constructor() {
+     this.cache = new LRUCache({ max: 100 })
++    this.clock = 0
++    /** @type {Map<string, number>} clock value of each user's latest invalidation */
++    this.invalidated = new Map()
+   }
+ 
+   getById(id) {
+@@ -42,12 +45,38 @@
+     this.cache.set(user.id, user)
+   }
+ 
++  /**
++   * Every lookup that misses the cache loads through here, so concurrent requests for one user share one object.
++   * A load that finishes after another load for the same user was cached returns the cached object. A load that the
++   * user's invalidation overlapped may predate the change, so it is repeated. After three overlapped loads in a row the
++   * last one is returned uncached: it started after the previous change, like any read that overlaps a write.
++   *
++   * @param {() => Promise<User|null>} loader
++   * @returns {Promise<User|null>}
++   */
++  async load(loader) {
++    for (let attempt = 1; ; attempt++) {
++      const started = this.clock
++      const user = await loader()
++      if (!user) return null
++      const cached = this.cache.get(user.id)
++      if (cached) return cached
++      if ((this.invalidated.get(user.id) ?? 0) <= started) {
++        this.set(user)
++        return user
++      }
++      if (attempt === 3) return user
++    }
++  }
++
+   delete(userId) {
++    this.invalidated.set(userId, ++this.clock)
+     this.cache.delete(userId)
+   }
+ 
+   maybeInvalidate(user) {
+-    if (!user.fromCache) this.delete(user.id)
++    // An object displaced from the cache by another load still has fromCache set
++    if (!user.fromCache || this.cache.get(user.id) !== user) this.delete(user.id)
+   }
+ }
+ 
+@@ -351,18 +380,16 @@
+     const cachedUser = userCache.getByUsername(username)
+     if (cachedUser) return cachedUser
+ 
+-    const user = await this.findOne({
+-      where: {
+-        username: {
+-          [sequelize.Op.like]: username
+-        }
+-      },
+-      include: this.sequelize.models.mediaProgress
+-    })
+-
+-    if (user) userCache.set(user)
+-
+-    return user
++    return userCache.load(() =>
++      this.findOne({
++        where: {
++          username: {
++            [sequelize.Op.like]: username
++          }
++        },
++        include: this.sequelize.models.mediaProgress
++      })
++    )
+   }
+ 
+   /**
+@@ -376,18 +403,16 @@
+     const cachedUser = userCache.getByEmail(email)
+     if (cachedUser) return cachedUser
+ 
+-    const user = await this.findOne({
+-      where: {
+-        email: {
+-          [sequelize.Op.like]: email
+-        }
+-      },
+-      include: this.sequelize.models.mediaProgress
+-    })
+-
+-    if (user) userCache.set(user)
+-
+-    return user
++    return userCache.load(() =>
++      this.findOne({
++        where: {
++          email: {
++            [sequelize.Op.like]: email
++          }
++        },
++        include: this.sequelize.models.mediaProgress
++      })
++    )
+   }
+ 
+   /**
+@@ -401,13 +426,11 @@
+     const cachedUser = userCache.getById(userId)
+     if (cachedUser) return cachedUser
+ 
+-    const user = await this.findByPk(userId, {
+-      include: this.sequelize.models.mediaProgress
+-    })
+-
+-    if (user) userCache.set(user)
+-
+-    return user
++    return userCache.load(() =>
++      this.findByPk(userId, {
++        include: this.sequelize.models.mediaProgress
++      })
++    )
+   }
+ 
+   /**
+@@ -422,16 +445,14 @@
+     const cachedUser = userCache.getById(userId) || userCache.getByOldId(userId)
+     if (cachedUser) return cachedUser
+ 
+-    const user = await this.findOne({
+-      where: {
+-        [sequelize.Op.or]: [{ id: userId }, { 'extraData.oldUserId': userId }]
+-      },
+-      include: this.sequelize.models.mediaProgress
+-    })
+-
+-    if (user) userCache.set(user)
+-
+-    return user
++    return userCache.load(() =>
++      this.findOne({
++        where: {
++          [sequelize.Op.or]: [{ id: userId }, { 'extraData.oldUserId': userId }]
++        },
++        include: this.sequelize.models.mediaProgress
++      })
++    )
+   }
+ 
+   /**
+@@ -445,14 +466,12 @@
+     const cachedUser = userCache.getByOpenIDSub(sub)
+     if (cachedUser) return cachedUser
+ 
+-    const user = await this.findOne({
+-      where: sequelize.where(sequelize.literal(`extraData->>"authOpenIDSub"`), sub),
+-      include: this.sequelize.models.mediaProgress
+-    })
+-
+-    if (user) userCache.set(user)
+-
+-    return user
++    return userCache.load(() =>
++      this.findOne({
++        where: sequelize.where(sequelize.literal(`extraData->>"authOpenIDSub"`), sub),
++        include: this.sequelize.models.mediaProgress
++      })
++    )
+   }
+ 
+   /**
