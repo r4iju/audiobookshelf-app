@@ -160,11 +160,12 @@ Read-only, on 2026-10-02, without changing or restarting anything:
 No owner hostnames, addresses or account details are recorded here, since this repository is public.
 
 For a deployment beside an existing proxy, `web/deploy/existing-proxy.conf` is the one route to add, and
-`web/qa/smoke.mjs <origin>` is a read-only check of the result (GET requests only, no sign-in). The smoke check was
-run on 2026-10-02 against the QA deployment fixture only while Docker's storage was failing
-(`web/qa/.runtime/smoke-qa-deploy.log`): it reported the client's scripts and the server's interface answering 500,
-and the server's status and live channel answering. It was not run against a healthy deployment or the owner's
-server.
+`web/qa/smoke.mjs <origin>` is a read-only check of the result (GET requests only, no sign-in). On 2026-10-02 it first ran while Docker's storage in the colima VM was failing with
+write I/O errors (`web/qa/.runtime/smoke-qa-deploy.log`), and correctly reported the broken fixture (the client's
+scripts and the server's interface answering 500). After the VM was restarted (by someone other than this lane) and
+showed no further I/O errors, the deployment fixture was rebuilt from `0bd3ab11` and passed all four checks, and the
+7 deployment journeys passed against it, including OpenID sign-in, readers and playback over the one origin
+(`web/qa/.runtime/smoke-healthy.log`). Neither was run against the owner's server.
 
 ## Decisions and known differences
 
