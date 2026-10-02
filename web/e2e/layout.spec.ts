@@ -42,6 +42,21 @@ const bottomOf = async (locator: Locator) => {
   return box.y + box.height;
 };
 
+test("on a desktop the player's expand button opens and closes its extra controls", async ({ page }) => {
+  await play(page);
+  const speed = player(page).getByLabel("Playback Speed", { exact: true });
+  await expect(speed).toBeHidden();
+  const collapsed = (await player(page).boundingBox())?.height ?? 0;
+
+  await player(page).getByRole("button", { name: "Open full player" }).click();
+  await expect(speed).toBeVisible();
+  expect((await player(page).boundingBox())?.height).toBeGreaterThan(collapsed + 30);
+
+  await player(page).getByRole("button", { name: "Minimize player" }).click();
+  await expect(speed).toBeHidden();
+  expect((await player(page).boundingBox())?.height).toBe(collapsed);
+});
+
 test("the end of a page can be scrolled above the expanded player on a phone", async ({ page }) => {
   await page.setViewportSize(phone);
   await play(page);
@@ -60,6 +75,18 @@ test("the page's scrollbar ends above the player", async ({ page }) => {
   await openLibrary(page);
   const dockTop = (await player(page).boundingBox())?.y ?? 0;
   expect((await pageScroller(page)).bottom).toBeLessThanOrEqual(dockTop + 1);
+});
+
+test("the expanded player on a phone moves between chapters", async ({ page }) => {
+  await page.setViewportSize(phone);
+  await play(page);
+  await player(page).getByRole("button", { name: "Open full player" }).click();
+  await player(page).getByRole("button", { name: "Next chapter" }).click();
+  await expect
+    .poll(() => player(page).getByRole("slider", { name: "Seek" }).inputValue().then(Number), {
+      timeout: 15_000,
+    })
+    .toBeGreaterThan(29);
 });
 
 test("going back to a list returns to where it was scrolled", async ({ page }) => {
