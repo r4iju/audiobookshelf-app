@@ -52,3 +52,11 @@ QA commits added since the selection was prepared:
 - Loopback port exhaustion on a busy host makes an account switch report "The server could not be reached"; whether to retry once is a product decision.
 - Not in this selection: podcasts, EPUB and other formats (#18, #20, #21 deferred), realtime, OpenID, groups, statistics and year review, presentation and localization, and the 27765, 25765 and 26765 runners.
 - Physical acceptance: lock screen and system controls, audio routes, background timers, a real server and library, real legacy migration data, owner devices.
+
+## Root integration and internal installations
+
+Root integrates the equivalent fixture and recovery-journey corrections at `6b59eda0`. The restart helper uses the canonical fixture port and recovery comparisons use whole-book elapsed time. Connection setup and offline collection teardown restore baseline fixture state. Both bounded source reviews are clear; `python3 -m unittest verification.test_fixture verification.test_upgrade_gate` passes 16 tests. Production Apple app source is unchanged from PR #85 (`9e46bc19`).
+
+The iPad lane records 21/21 of the same main-use-case selection in one run on `10e34133`, using a leased pooled iPad. Its evidence is `/tmp/ipadqa/evidence/smoke/smoke-21-10e34133.log` and the matching result bundle. Its fixture port remap is local to that lane. Earlier broad failures are retained; final broad and accessibility acceptance remain separate work.
+
+The signed Release native preview was built from `9e46bc19`, passed strict codesign validation and was installed on both paired physical devices without launching it. Installation logs are `/tmp/abs-final-native-iphone-install.log` and `/tmp/abs-final-native-ipad-install.log`; signature evidence is `/tmp/abs-root-final-mobile-ios-codesign.log`. The installed bundle is `com.forkzed.audiobookshelf.native.preview` (Audiobookshelf Native). Installation does not establish physical playback, audio-route, migration or accessibility acceptance. The signed TV build from PR #84 is also installed; its simulator suite passed 40/40.
