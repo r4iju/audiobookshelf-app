@@ -248,6 +248,34 @@ for (const { title, format } of [
   });
 }
 
+for (const { title, format } of [
+  { title: "Night Ferry", format: "MOBI" },
+  { title: "Glass Orchard", format: "AZW3" },
+]) {
+  test(`a ${format} book's own contents page links to its chapters, and page keys turn pages after a click in the text`, async ({
+    page,
+  }) => {
+    const api = await serverApi(accounts.user);
+    const id = await bookId(api, title);
+    await resetProgress(api, id);
+    // The contents page the book carries after its last chapter.
+    await api.call(`/api/me/progress/${id}`, { method: "PATCH", body: { ebookLocation: "mobi:1:6:0" } });
+
+    await signIn(page);
+    await page.goto(`/read/${id}`);
+    await expect(book(page).getByText("Table of Contents")).toBeInViewport();
+    await book(page).getByRole("link", { name: "Chapter 3: Lantern 3" }).click();
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).toBeInViewport();
+    await expect.poll(async () => (await serverProgress(api, id))?.ebookLocation).toMatch(/^mobi:1:2:/);
+
+    await book(page).getByText("Passage 3.2.").click();
+    await page.keyboard.press("PageDown");
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).not.toBeInViewport();
+    await page.keyboard.press("PageUp");
+    await expect(book(page).getByText("Chapter 3: Lantern 3")).toBeInViewport();
+  });
+}
+
 test("MOBI books take the reader's display settings and cannot run scripts", async ({ page }) => {
   const api = await serverApi(accounts.user);
   const id = await bookId(api, "Night Ferry");
