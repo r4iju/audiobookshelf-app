@@ -21,10 +21,11 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
   const { library, shape } = useLibrary(libraryId);
   const results = useSearch(libraryId, q, limit);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  // Where the results More asked for begin, so the keyboard continues there instead of losing its place.
-  const revealedFrom = useRef<number | null>(null);
-  const continueAt = (index: number) => (node: HTMLLIElement | null) => {
-    if (node && index === revealedFrom.current) {
+  // How many of each kind showed when More was pressed: the first new entry, in page order, takes the keyboard's
+  // place instead of losing it.
+  const revealedFrom = useRef<Record<ResultKind, number> | null>(null);
+  const continueAt = (kind: ResultKind, index: number) => (node: HTMLLIElement | null) => {
+    if (node && index === revealedFrom.current?.[kind]) {
       revealedFrom.current = null;
       node.querySelector("a")?.focus();
     }
@@ -82,7 +83,7 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                   >
                     <CardGrid shape={shape} label={t("WebSearchResults")}>
                       {items.map((item, index) => (
-                        <li key={item.id} ref={continueAt(index)}>
+                        <li key={item.id} ref={continueAt("items", index)}>
                           <ItemCard item={item} shape={shape} />
                         </li>
                       ))}
@@ -92,8 +93,8 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                 {data.series.length ? (
                   <ResultSection title={t("LabelSeries")}>
                     <CardGrid shape={shape}>
-                      {data.series.map(({ series, books }) => (
-                        <li key={series.id}>
+                      {data.series.map(({ series, books }, index) => (
+                        <li key={series.id} ref={continueAt("series", index)}>
                           <SeriesCard series={{ ...series, books }} libraryId={libraryId} shape={shape} />
                         </li>
                       ))}
@@ -103,8 +104,8 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                 {data.authors.length ? (
                   <ResultSection title={t("LabelAuthors")}>
                     <CardGrid shape="square">
-                      {data.authors.map((author) => (
-                        <li key={author.id}>
+                      {data.authors.map((author, index) => (
+                        <li key={author.id} ref={continueAt("authors", index)}>
                           <AuthorCard author={author} libraryId={libraryId} />
                         </li>
                       ))}
@@ -121,8 +122,8 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                   entries.length ? (
                     <ResultSection key={group} title={title}>
                       <ul className="flex flex-wrap gap-2">
-                        {entries.map((entry) => (
-                          <li key={entry.name}>
+                        {entries.map((entry, index) => (
+                          <li key={entry.name} ref={continueAt(group, index)}>
                             <Link
                               href={`/library/${libraryId}/items?${new URLSearchParams({ filter: encodeFilter(group, entry.name) })}`}
                               className="inline-flex min-h-9 items-center rounded-full bg-surface-2 px-3 text-sm hover:bg-surface-3 focus-ring"
@@ -141,7 +142,14 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                     replace
                     scroll={false}
                     onClick={() => {
-                      revealedFrom.current = items.length;
+                      revealedFrom.current = {
+                        items: items.length,
+                        series: data.series.length,
+                        authors: data.authors.length,
+                        narrators: data.narrators.length,
+                        tags: data.tags.length,
+                        genres: data.genres.length,
+                      };
                     }}
                     className="inline-flex min-h-11 items-center self-center rounded-full bg-surface-2 px-5 text-sm font-medium hover:bg-surface-3 focus-ring"
                   >
@@ -156,6 +164,8 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
     </div>
   );
 }
+
+type ResultKind = "items" | "series" | "authors" | "narrators" | "tags" | "genres";
 
 function ResultSection({ title, children }: { title: string; children: ReactNode }) {
   return (

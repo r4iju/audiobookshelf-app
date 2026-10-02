@@ -65,3 +65,42 @@ test("asking for more from the keyboard continues at the first result it reveale
   }
   await expect(more).toBeHidden();
 });
+
+test("asking for more authors from the keyboard continues at the first author it revealed", async ({
+  page,
+}) => {
+  // Thirteen books get authors named by a word no title holds, so only the authors outnumber the first results.
+  const api = await serverApi(accounts.admin);
+  const { body } = await api.call(`/api/libraries/${qa.libraries.books}/items?limit=0`);
+  const ids = (body.results as { id: string; media: { metadata: { title: string } } }[])
+    .filter(({ media }) => /catalog/i.test(media.metadata.title))
+    .slice(0, 13)
+    .map(({ id }) => id);
+  // The listing leaves out the authors themselves; each book's own record has them to put back.
+  const books: { id: string; authors: { id: string; name: string }[] }[] = [];
+  for (const id of ids) {
+    const { body: item } = await api.call(`/api/items/${id}`);
+    books.push({ id, authors: item.media.metadata.authors });
+  }
+  const setAuthors = (id: string, authors: { name: string }[]) =>
+    api.call(`/api/items/${id}/media`, { method: "PATCH", body: { metadata: { authors } } });
+  try {
+    for (const [index, book] of books.entries()) {
+      await setAuthors(book.id, [{ name: `Quillon Writer ${String(index + 1).padStart(2, "0")}` }]);
+    }
+    await signIn(page);
+    await page.goto(`/library/${qa.libraries.books}/search?q=quillon`);
+    const authors = page
+      .locator("section", { has: page.getByRole("heading", { name: "Authors", exact: true }) })
+      .getByRole("listitem");
+    await expect(authors).toHaveCount(12);
+
+    const more = page.getByRole("main").getByRole("link", { name: "More" });
+    await more.focus();
+    await page.keyboard.press("Enter");
+    await expect(authors.nth(12).getByRole("link").first()).toBeFocused();
+    await expect(more).toBeHidden();
+  } finally {
+    for (const book of books) await setAuthors(book.id, book.authors);
+  }
+});
