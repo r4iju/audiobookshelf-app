@@ -345,7 +345,9 @@
         "hints": 3,
         "previousErrors": 704,
         "baselineErrors": 690,
-        "newErrMissingTranslation": 0
+        "newErrMissingTranslation": 0,
+        "playerScreenBlob": "5ef1ee76a4bfb1206bca71b63cc47ab0a3d72995",
+        "sourceNote": "before final accessibility-description-only adjustment; all other app/resource inputs identical; final compile repeated"
       },
       "resources": "40 resource sets preserve existing values; all 14 errors present; regeneration byte-identical; offered languages unchanged"
     },
