@@ -1,0 +1,8 @@
+phone-online 0
+phone-download 0
+phone-offline 0
+phone-reconnect 0
+tv-all 0
+phone-finish-offline 0
+phone-finish-reconnect 0
+migration 0

@@ -1,0 +1,10 @@
+== delayed-write-check.js, models/User.js: User.orig.js (2174eec7)
+  request got version 1, cache then gave version 1, 1 loads
+FAIL a write in flight during a load is not returned or cached stale: the request went on with the row read before the write landed
+1 !== 2
+exit=1
+== delayed-write-check.js, models/User.js: User.candidate2.js (569a673a)
+  request got version 1, cache then gave version 1, 1 loads
+FAIL a write in flight during a load is not returned or cached stale: the request went on with the row read before the write landed
+1 !== 2
+exit=1

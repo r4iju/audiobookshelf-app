@@ -1,0 +1,22 @@
+First run of invalidation-during-load-check.js, before its third case was added, against the pinned file and the first
+candidate. This file was deleted by mistake before commit and is restored from that run's recorded tool output;
+seam-checks.txt has the same results from a full rerun.
+
+== models/User.js: User.orig.js (2174eec7)
+  request got version 1, cache then gave version 1, 1 loads
+FAIL a change during the load is not returned stale or cached: the request went on with the user read before the change
+
+1 !== 2
+
+  request got version 1, 1 loads
+PASS another user changing during the load costs no reload
+exit=1
+== models/User.js: User.candidate.js (b1480234)
+  request got version 1, cache then gave version 2, 2 loads
+FAIL a change during the load is not returned stale or cached: the request went on with the user read before the change
+
+1 !== 2
+
+  request got version 1, 1 loads
+PASS another user changing during the load costs no reload
+exit=1

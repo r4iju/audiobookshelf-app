@@ -1,0 +1,62 @@
+server restarted 18:10:58
+ABS_RS_BOOKS=497596c1-b589-4134-9060-4d40d2339a01
+ABS_RS_EVENING_STORIES=9f5be2df-2099-43cc-89a1-2680402e8aa4
+ABS_RS_FIELD_GUIDE=8ea370c6-bf2f-4d88-8364-3f6fe4f97a51
+ABS_RS_LONG_STORY=cb6ac50a-cefc-4237-819d-9a75da392ca2
+ABS_RS_LONG_TIDE=89aabf37-da85-4d08-ab8a-17d6a97f9a88
+ABS_RS_OTHER_USER=d4d4017b-b902-46b2-91be-d54e24baa0e3
+ABS_RS_OUT=/Volumes/ai-ssd/code/audiobookshelf-real-server-repro/apple/build-qa/candidate2-native
+ABS_RS_PODCASTS=54d2b718-8c6f-4882-8055-3258d78b0fd0
+ABS_RS_SALT=5fb5323d-e7e6-4e1a-b3f3-b55b00ad766b
+ABS_RS_SERVER=http://127.0.0.1:19900
+ABS_RS_VOLUME1=6c82e826-d303-4402-8366-683ac4560974
+ABS_RS_VOLUME2=8ecf7066-e843-40d1-b88b-9c757b2852ab
+ABS_RS_VOLUME3=72bbf217-670b-4ea3-9fc8-03962fe6433a
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+phone lease=75FA9768-B15C-40B6-ACC7-790D7FCAD29C
+phone-online exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test1SignInBrowseAndStreamAcrossFiles]' passed (79.258 seconds).
+Test Case '-[NativeJourneyTests.RealServerProbe test2PDFPageSavedToServerAndRestored]' passed (104.014 seconds).
+Test Case '-[NativeJourneyTests.RealServerProbe test3PodcastEpisodeProgress]' passed (28.163 seconds).
+phone-download exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test4aDownloadForOffline]' passed (64.599 seconds).
+server stopped 18:16:25
+phone-offline exit=0
+OFFLINE_START=39
+OFFLINE_POSITION=60
+Test Case '-[NativeJourneyTests.RealServerProbe test4bPlayOfflineWithServerStopped]' passed (19.673 seconds).
+server started 18:17:03
+phone-reconnect exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test4cReconnectPublishesOfflineListening]' passed (6.636 seconds).
+after offline reconnect currentTime 74.792113296 isFinished False lastUpdate 1790932617327
+tv-all exit=0
+TV_RESUME before=74.792113296 resumedAt=75 resumedChapter=Landfall · Chapter 3 of 3 chapter=Crossing · Chapter 2 of 3 reachedSecond=true saved=34.415517366
+Test Case '-[TVJourneyTests.RealServerProbe test1ResumeAnotherClientsPositionAndCrossFiles]' passed (39.940 seconds).
+TV_EPISODE episode=9c81f824-d4a2-4c6a-b6c0-5861b7959283 before=0.0 saved=7.891549832
+Test Case '-[TVJourneyTests.RealServerProbe test2SearchAndPodcastEpisode]' passed (44.170 seconds).
+after TV currentTime 34.415517366 isFinished False lastUpdate 1790932706633
+server stopped 18:19:16
+phone-finish-offline exit=0
+FINISH_START=1 min File 3 of 3
+FINISH_END=1 min remaining −0 sec
+Test Case '-[NativeJourneyTests.RealServerProbe test4dFinishOfflineWithServerStopped]' passed (14.812 seconds).
+server started 18:19:51
+phone-finish-reconnect exit=0
+FINISH_SERVER=["duration": 90.200817, "mediaItemType": book, "userId": 9ccb456d-9a08-4f8c-85fd-fccdf33db20d, "libraryItemId": 89aabf37-da85-4d08-ab8a-17d6a97f9a88, "isFinished": 1, "ebookLocation": <null>, "startedAt": 1790932352130, "progress": 1, "hideFromContinueListening": 0, "id": 7e3a77c5-709e-4eda-8eee-905725f5c0f4, "ebookProgress": 0, "finishedAt": 1790932811066, "episodeId": <null>, "lastUpdate": 1790932783698, "mediaItemId": 452e26b1-cbaf-40ca-98ad-aea8f7713e19, "currentTime": 90.20081677551021]
+Test Case '-[NativeJourneyTests.RealServerProbe test4eReconnectPublishesTheFinish]' passed (6.612 seconds).
+after finish reconnect currentTime 90.2008167755102 isFinished True lastUpdate 1790932783698
+server restarted 18:20:18
+after a further restart currentTime 90.2008167755102 isFinished True lastUpdate 1790932783698
+sync cb4f0077-bd49-4f01-b036-223bba8d9df1 200
+server restarted 18:20:19
+sync 3d94a7b4-7b61-45bb-a821-1e303bfecd1d 200
+volume3 200
+open=3d94a7b4-7b61-45bb-a821-1e303bfecd1d restarted=cb4f0077-bd49-4f01-b036-223bba8d9df1
+migration exit=0
+ADOPTION_REPORT 3 downloads are ready once their accounts are signed in. 3 listening sessions are waiting to be sent to the server. 2 listening positions are waiting to be compared with the server. Sign in to 1 account to use the rest of its data. issues=["Listening for http://127.0.0.1:19900 is waiting to be sent (3 sessions, 2 positions).", "Sign in to http://127.0.0.1:19900 as qa-other again. Downloads, progress and unsent listening for this account are kept and become available after sign-in."]
+SYNC_1 acknowledged=3 pending=0 unconfirmed=0 failures=[]
+SYNC_2 acknowledged=0 pending=0 unconfirmed=0 failures=[]
+SERVER open=25/25 restarted=11/11 local=3/3.5 volume2=2.0 volume3=3.0 (before 3.0)
+Test Case '-[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce]' passed (2.575 seconds).
+overall exit=0
+run-candidate exit=0

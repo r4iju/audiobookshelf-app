@@ -1,0 +1,19 @@
+== models/User.js: User.orig.js
+first request got load 1, second got load 2, cache holds load 2
+FAIL: the first request holds an object the cache no longer returns
++ actual - expected
+
+  {
+    extraData: {},
+    fromCache: true,
+    id: 'u1',
++   load: 1,
+-   load: 2,
+    mediaProgresses: [],
+    username: 'qa'
+  }
+exit=1
+== models/User.js: User.candidate.js
+first request got load 1, second got load 1, cache holds load 1
+PASS
+exit=0

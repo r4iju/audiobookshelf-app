@@ -1,0 +1,15 @@
+Tested source and image:
+app and probe source: worktree audiobookshelf-real-server-repro at 386fed27 (app code identical to 97bac3e3: yes), probes copied from 97bac3e3's evidence folder
+image: ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03
+image id: sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03
+models/User.js in abs-apple-diag during the native run: b1480234179b71a7de897d95e7f62ea071a696676267532dbffdae29ad4bea74
+pinned 2.30.0 models/User.js: 2174eec7b50b43ed3e0da55c4e54edaa90f9f98c30cefb9b4819430b744f6a1d
+pinned file + usercache-candidate.patch: b1480234179b71a7de897d95e7f62ea071a696676267532dbffdae29ad4bea74
+
+Finish window of the native run (LocalAuth lines left out):
+[2026-10-02 09:04:31.993] INFO: [Server] Init v2.30.0
+[2026-10-02 09:04:51.147] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (5d65e5a7-4b92-4a0e-832b-4c502298e95f) (updatedAt: 1790931864139.918)
+[2026-10-02 09:04:51.157] INFO: [SocketAuthority] Socket Connected to /socket.io nlcIB2enS1n4ZEpJAAAB
+[2026-10-02 09:04:51.160] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.2008167755102 (previously 34.398236746)
+[2026-10-02 09:04:51.163] INFO: [MediaProgress] Marking media progress as finished because time remaining (2.2448979564160254e-7) is less than 10 seconds (media item dc65a9b9-1690-425f-bd93-3c324fbf3cdf)
+[2026-10-02 09:04:58.472] INFO: [Server] Init v2.30.0

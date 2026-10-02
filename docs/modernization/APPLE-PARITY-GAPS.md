@@ -22,6 +22,19 @@ Root reset journeys pass 4/4 at `da6460ef`, result `apple/build-reset/Root-Publi
 
 ## Remaining local gates
 
+Status update after the a39bb589 audit: items 1 to 4 below are kept as written at the time. Final runs recorded after they were written close them at simulator level:
+
+- broad iPhone 90 of 90 plus the gated 5, and playback authorization 1 of 1 (`APPLE-FINAL-MOBILE-BROAD-PHONE.md`)
+- on iPad (`APPLE-FINAL-BROAD-ACCEPTANCE-IPAD.md`):
+  - 89 journeys plus the corrected playlist journey
+  - the 3 gated audits
+  - `CollectionJourney` 6 of 6
+  - the dedicated reset 4 of 4, on the same app source
+- the final integrated TV run, 40 of 40 at `f868f8c4`, including the recovery journeys (below)
+- publication recovery 1 of 1, from root's run as cited in `APPLE-FINAL-MOBILE-BROAD-PHONE.md`
+
+The dedicated reset suite was not rerun on iPhone at the final source. Items 5 to 8 stay open.
+
 1. **Final combined phone and tablet suites.** Initial broad runs predate the integrated source. Whole-book time assertions and iPad duplicate menu selection are corrected without relaxing their numeric thresholds. Account-switch restoration is still intermittent in the phone slice; the iPad timer interaction is still under diagnosis. No final full-suite pass is claimed.
 2. **TV unanswered-save recovery.** The remote-operable request-before-restart / confirm-after-restart flow is integrated. All three recovery journeys pass in the root 39-case run at `f2cdf7ad`. A final run covering subsequent storage, localization and sign-in layout changes is in progress.
 3. **Combined reset/recovery and authorization UI.** Unit safety passes; run the journeys on the final source, including preservation of held listening and no automatic playback after sign-in.
@@ -32,6 +45,17 @@ Root reset journeys pass 4/4 at `da6460ef`, result `apple/build-reset/Root-Publi
 8. **Interruption and route behavior.** The production-handler simulator probe passed 9/9 while decoding audio. Real calls, Siri, alarms, CarPlay/Bluetooth and media-services-reset recovery remain unverified.
 
 ## Physical, live-server and owner gates (none performed)
+
+The isolated real-server run (`APPLE-REAL-SERVER-QA.md`) covers some of the software side, against a throwaway synthetic 2.30.0 container rather than the owner's server:
+
+- main phone and TV journeys
+- offline publishing after the server returns
+- TV resume of a server position left by another install
+- pending migration sessions accepted by the server
+
+One software gate from that run is open: **finish sync**. A book finished offline reaches the server and is stored, but after a server start the 2.30.0 server can go on returning the earlier unfinished progress until it restarts. The cause is a race in the server's user cache, confirmed with instrumentation in an owned container. A candidate server patch passes isolated checks. It is not deployed, and the owner's server is unchanged. The gate stays open until a fix is confirmed and the matched same-item probe passes against the server in use.
+
+Every gate below still needs a device, the owner, or owner data.
 
 - **iPhone and iPad:**
   - lock screen, headset and Bluetooth controls

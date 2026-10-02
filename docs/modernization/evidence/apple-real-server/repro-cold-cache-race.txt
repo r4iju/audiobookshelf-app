@@ -1,0 +1,10 @@
+try 1: unfinished 200; finish 200
+  read currentTime 90.200817 isFinished True lastUpdate 1790930641273
+  3 s later currentTime 90.200817 isFinished True lastUpdate 1790930641273
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790930641273
+try 2: unfinished 200; finish 200
+  read currentTime 0 isFinished False lastUpdate 1790930646869
+  3 s later currentTime 0 isFinished False lastUpdate 1790930646869
+  after a restart currentTime 90.200817 isFinished True lastUpdate 1790930649291
+STALE on try 2
+stale=1

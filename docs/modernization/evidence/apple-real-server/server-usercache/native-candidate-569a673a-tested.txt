@@ -1,0 +1,11 @@
+Tested source and image:
+app and probe source: worktree audiobookshelf-real-server-repro at 386fed27 (apple/ and tvos/ identical to 97bac3e3), probes from 97bac3e3's evidence folder
+image: ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03
+models/User.js in abs-apple-diag during the native run: 569a673ac0d3f1cd42f2279581a723b5de780ac7b7f2b35f8d1a496e9e19b047
+
+Finish window (LocalAuth lines left out):
+[2026-10-02 09:19:51.387] INFO: [Server] Init v2.30.0
+[2026-10-02 09:20:11.034] INFO: [SocketAuthority] Socket Connected to /socket.io rZ6NWk1dvi3VuXkkAAAB
+[2026-10-02 09:20:11.052] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (f54d474e-6691-4606-afc7-2b7cc771c18c) (updatedAt: 1790932783698.5413)
+[2026-10-02 09:20:11.063] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.2008167755102 (previously 34.415517366)
+[2026-10-02 09:20:11.066] INFO: [MediaProgress] Marking media progress as finished because time remaining (2.2448979564160254e-7) is less than 10 seconds (media item 452e26b1-cbaf-40ca-98ad-aea8f7713e19)

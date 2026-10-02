@@ -1,0 +1,12 @@
+2026-10-02T09:36:16.418589632Z [2026-10-02 09:36:16.418] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (56699553-07ea-419c-ae32-46baf4de78b6) (updatedAt: 1790933776366.6448)
+2026-10-02T09:36:16.430233794Z [2026-10-02 09:36:16.430] INFO: [PlaybackSessionManager] Creating new media progress for media item "The Long Tide"
+2026-10-02T09:36:18.811886897Z [2026-10-02 09:36:18.811] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (56699553-07ea-419c-ae32-46baf4de78b6) (updatedAt: 1790933778771.059)
+2026-10-02T09:36:18.818304408Z [2026-10-02 09:36:18.818] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 11.000082671 (previously 0)
+2026-10-02T09:36:19.245570114Z [2026-10-02 09:36:19.245] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (56699553-07ea-419c-ae32-46baf4de78b6) (updatedAt: 1790933779197.86)
+2026-10-02T09:36:19.250913138Z [2026-10-02 09:36:19.250] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 21 (previously 11.000082671)
+2026-10-02T09:36:19.681476534Z [2026-10-02 09:36:19.681] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (56699553-07ea-419c-ae32-46baf4de78b6) (updatedAt: 1790933779630.247)
+2026-10-02T09:36:19.688442060Z [2026-10-02 09:36:19.688] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 31 (previously 21)
+2026-10-02T09:36:26.334403709Z [2026-10-02 09:36:26.334] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (56699553-07ea-419c-ae32-46baf4de78b6) (updatedAt: 1790933785148.604)
+2026-10-02T09:36:26.349908070Z [2026-10-02 09:36:26.348] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 36.445911704000004 (previously 31)
+2026-10-02T09:36:26.370984739Z [2026-10-02 09:36:26.368] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (56699553-07ea-419c-ae32-46baf4de78b6) (updatedAt: 1790933785476.7341)
+2026-10-02T09:36:26.413252447Z [2026-10-02 09:36:26.413] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 36.450600162 (previously 36.445911704000004)

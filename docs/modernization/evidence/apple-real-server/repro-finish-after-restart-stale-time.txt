@@ -1,0 +1,8 @@
+patch 200
+progress 1 False 1790928066540
+restarted 17:01:06
+{"results":[{"id":"a6ebb81b-5d64-4c50-9a0a-0ca8fefcac93","success":true,"progressSynced":false}]}
+progress 1 False 1790928066540
+progress 1 False 1790928066540
+[2026-10-02 08:01:08.860] INFO: [PlaybackSessionManager] Syncing local session "Catalog Volume 02" (a6ebb81b-5d64-4c50-9a0a-0ca8fefcac93) (updatedAt: 1790928048797)
+[2026-10-02 08:01:08.870] INFO: [PlaybackSessionManager] Not updating progress for "Catalog Volume 02" because it has been updated more recently (1790928066540 > 1790928048797) (incoming currentTime: 4.075102) (current currentTime
