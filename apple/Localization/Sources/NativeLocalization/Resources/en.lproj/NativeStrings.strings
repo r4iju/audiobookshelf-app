@@ -3,6 +3,7 @@
 "1 book" = "1 book";
 "1 episode" = "1 episode";
 "1 title" = "1 title";
+"A downloaded file is missing. Retry to restore it; existing files are retained." = "A downloaded file is missing. Retry to restore it; existing files are retained.";
 "A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry." = "A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry.";
 "A short banner with your book counts." = "A short banner with your book counts.";
 "About this book" = "About this book";
@@ -30,12 +31,16 @@
 "An earlier import is already saved. Choose its original export to retry or repair it." = "An earlier import is already saved. Choose its original export to retry or repair it.";
 "An earlier save of this title got no answer, so newer listening stays on this TV. Settings shows how to send it." = "An earlier save of this title got no answer, so newer listening stays on this TV. Settings shows how to send it.";
 "An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed." = "An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.";
+"An earlier save of this title's progress got no answer, and the server may still apply it over anything sent after it. Later progress is kept on this device until a restart of the Audiobookshelf server is confirmed." = "An earlier save of this title's progress got no answer, and the server may still apply it over anything sent after it. Later progress is kept on this device until a restart of the Audiobookshelf server is confirmed.";
 "Appearance" = "Appearance";
 "Apple TV" = "Apple TV";
 "Are you sure you want to reset your progress?" = "Are you sure you want to reset your progress?";
 "Ascending order" = "Ascending order";
 "Ask" = "Ask";
+"Ask for the server restart first, restart the Audiobookshelf server, then confirm it." = "Ask for the server restart first, restart the Audiobookshelf server, then confirm it.";
 "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions." = "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions.";
+"Audio could not be played. Check the server connection, then reopen this item to retry." = "Audio could not be played. Check the server connection, then reopen this item to retry.";
+"Audio could not be prepared at this position. Check the server connection and try again." = "Audio could not be prepared at this position. Check the server connection and try again.";
 "Audio volume: {0}%" = "Audio volume: {0}%";
 "Audiobooks & reading" = "Audiobooks & reading";
 "Audiobookshelf server {0} in review" = "Audiobookshelf server {0} in review";
@@ -123,6 +128,7 @@
 "Diagnostics" = "Diagnostics";
 "Diagnostics storage" = "Diagnostics storage";
 "Discard progress" = "Discard progress";
+"Discarding progress has not finished, so this title stays on hold until it does. Try again. {0}" = "Discarding progress has not finished, so this title stays on hold until it does. Try again. {0}";
 "Discover" = "Discover";
 "Discover a podcast" = "Discover a podcast";
 "Dismiss" = "Dismiss";
@@ -133,6 +139,9 @@
 "Downloaded" = "Downloaded";
 "Downloading on server" = "Downloading on server";
 "Downloads" = "Downloads";
+"Downloads are waiting: {0}" = "Downloads are waiting: {0}";
+"Downloads could not be restored: {0}" = "Downloads could not be restored: {0}";
+"Downloads could not restore network permissions: {0}" = "Downloads could not restore network permissions: {0}";
 "Duration" = "Duration";
 "Ebook sent to {0}" = "Ebook sent to {0}";
 "Ebooks" = "Ebooks";
@@ -206,6 +215,7 @@
 "Listen Again" = "Listen Again";
 "Listen on the big screen" = "Listen on the big screen";
 "Listening" = "Listening";
+"Listening could not be saved on this device: {0}" = "Listening could not be saved on this device: {0}";
 "Listening on this TV is saved locally first and sent to the server regularly while playing, on pause, on stop and when the app opens." = "Listening on this TV is saved locally first and sent to the server regularly while playing, on pause, on stop and when the app opens.";
 "Listening order" = "Listening order";
 "Listening progress" = "Listening progress";
@@ -333,6 +343,8 @@
 "Previous page" = "Previous page";
 "Previous year" = "Previous year";
 "Progress" = "Progress";
+"Progress can be discarded once playback and listening sync finish. Try again." = "Progress can be discarded once playback and listening sync finish. Try again.";
+"Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Ask for a restart here, restart the Audiobookshelf server, confirm it, then discard again." = "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Ask for a restart here, restart the Audiobookshelf server, confirm it, then discard again.";
 "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart." = "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart.";
 "Published date" = "Published date";
 "Published year" = "Published year";
@@ -346,6 +358,7 @@
 "Reading" = "Reading";
 "Reading could not be saved on this device: {0}" = "Reading could not be saved on this device: {0}";
 "Reading could not be saved: {0}" = "Reading could not be saved: {0}";
+"Reading is saved on this device and waiting to sync: {0}" = "Reading is saved on this device and waiting to sync: {0}";
 "Reading settings" = "Reading settings";
 "Ready" = "Ready";
 "Ready to import" = "Ready to import";
@@ -386,8 +399,11 @@
 "Save books or episodes from your library to listen offline." = "Save books or episodes from your library to listen offline.";
 "Save group" = "Save group";
 "Save progress again" = "Save progress again";
+"Saved account" = "Saved account";
 "Saved connections" = "Saved connections";
 "Saved import" = "Saved import";
+"Saved listening is waiting to sync: {0}" = "Saved listening is waiting to sync: {0}";
+"Saved reading could not be restored: {0}" = "Saved reading could not be restored: {0}";
 "Saves waiting" = "Saves waiting";
 "Saving changes…" = "Saving changes…";
 "Saving your progress…" = "Saving your progress…";
@@ -492,6 +508,7 @@
 "The reader could not continue: {0}" = "The reader could not continue: {0}";
 "The reader stopped. Close and reopen the book to restore your passage." = "The reader stopped. Close and reopen the book to restore your passage.";
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed.";
+"The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again.";
 "The recorded problems are removed from this device." = "The recorded problems are removed from this device.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "The server address could not be found. Check the host name and that the TV is on the same network.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained.";
@@ -508,6 +525,7 @@
 "The server returned HTTP {0}. Please try again." = "The server returned HTTP {0}. Please try again.";
 "The server returned a media URL outside this server." = "The server returned a media URL outside this server.";
 "The server returned no more books. Refresh the library to try again." = "The server returned no more books. Refresh the library to try again.";
+"The server returned unsupported content. Check the server and retry the download." = "The server returned unsupported content. Check the server and retry the download.";
 "The sign-in browser could not open. Return to the app and try again." = "The sign-in browser could not open. Return to the app and try again.";
 "The slug had to be modified. Check it, then open the feed again." = "The slug had to be modified. Check it, then open the feed again.";
 "The username or password was not accepted." = "The username or password was not accepted.";

@@ -29,7 +29,7 @@ import Security
     }
 
     func summaries() throws -> [Summary] {
-        try document().connections.map { Summary(id: $0.id, server: $0.credentials.server, username: $0.credentials.username ?? "Saved account") }
+        try document().connections.map { Summary(id: $0.id, server: $0.credentials.server, username: $0.credentials.username ?? NativeStrings.current("Saved account")) }
     }
 
     func activeConnection() throws -> Connection? {

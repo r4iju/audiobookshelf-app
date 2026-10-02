@@ -41,7 +41,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
 @MainActor final class NativeDownloads: ObservableObject {
     private enum Failure: LocalizedError {
         case invalidContent
-        var errorDescription: String? { "The server returned unsupported content. Check the server and retry the download." }
+        var errorDescription: String? { NativeStrings.current("The server returned unsupported content. Check the server and retry the download.") }
     }
     enum State: String, Codable { case queued, ready, failed, cancelled }
     struct Entry: Codable, Identifiable {
@@ -123,7 +123,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                     }
                     if valid.count != recovered[index].finished.count {
                         recovered[index].finished = valid; recovered[index].state = .failed
-                        recovered[index].error = "A downloaded file is missing. Retry to restore it; existing files are retained."
+                        recovered[index].error = NativeStrings.current("A downloaded file is missing. Retry to restore it; existing files are retained.")
                     }
                 }
                 let policy = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey).rawValue
@@ -137,7 +137,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             for file in try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) where file.lastPathComponent.hasPrefix("staging-") {
                 try? FileManager.default.removeItem(at: file)
             }
-        } catch { self.error = "Downloads could not be restored: " + error.localizedDescription; writable = false }
+        } catch { self.error = NativeStrings.current("Downloads could not be restored: {0}", error.localizedDescription); writable = false }
         let config = configuration
         config.sessionSendsLaunchEvents = true; config.isDiscretionary = false
         config.allowsCellularAccess = true; config.httpMaximumConnectionsPerHost = 2
@@ -167,7 +167,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                         self.policyBlocked = false
                     } catch {
                         existing.forEach { $0.cancel() }
-                        self.error = "Downloads could not restore network permissions: " + error.localizedDescription
+                        self.error = NativeStrings.current("Downloads could not restore network permissions: {0}", error.localizedDescription)
                         return
                     }
                 }
@@ -318,7 +318,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                     tasks[key] = task; task.resume()
                 }
             }
-        } catch { self.error = "Downloads are waiting: " + error.localizedDescription }
+        } catch { self.error = NativeStrings.current("Downloads are waiting: {0}", error.localizedDescription) }
     }
     fileprivate func progress(task: URLSessionDownloadTask, received: Int64, expected: Int64) {
         guard let key = task.taskDescription, part(for: key) != nil, expected > 0 else { return }
