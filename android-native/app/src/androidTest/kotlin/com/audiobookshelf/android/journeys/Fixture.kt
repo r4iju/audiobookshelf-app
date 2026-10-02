@@ -5,6 +5,8 @@ import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isRoot
+import androidx.compose.ui.test.printToString
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -79,11 +81,13 @@ object Fixture {
 
 fun JSONArray.objects(): List<JSONObject> = (0 until length()).map { getJSONObject(it) }
 
-fun ComposeTestRule.waitForTag(tag: String, timeoutMs: Long = 15_000) =
+fun ComposeTestRule.waitForTag(tag: String, timeoutMs: Long = 15_000) = Failures.capturing(this, "tag $tag") {
     waitUntil(timeoutMs) { onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().isNotEmpty() }
+}
 
-fun ComposeTestRule.waitForText(text: String, timeoutMs: Long = 15_000, substring: Boolean = true) =
+fun ComposeTestRule.waitForText(text: String, timeoutMs: Long = 15_000, substring: Boolean = true) = Failures.capturing(this, "text $text") {
     waitUntil(timeoutMs) { onAllNodes(hasText(text, substring = substring)).fetchSemanticsNodes().isNotEmpty() }
+}
 
 fun ComposeTestRule.isShown(tag: String) = onAllNodes(hasTestTag(tag)).fetchSemanticsNodes().isNotEmpty()
 
@@ -126,7 +130,44 @@ fun eventually(timeoutMs: Long = 15_000, check: () -> Boolean) {
         if (runCatching(check).getOrDefault(false)) return
         Thread.sleep(200)
     }
-    if (!check()) throw ComposeTimeoutException("Condition not met within $timeoutMs ms")
+    if (!check()) Failures.capturing(null, "eventually") { throw ComposeTimeoutException("Condition not met within $timeoutMs ms") }
+}
+
+/**
+ * Records what a failed wait was looking at, while the screen is still showing: a screenshot, every window's
+ * semantics and the app's latest requests to the fixture with their answers. Nothing is recorded for passing journeys.
+ * `scripts/verify-journeys.sh` pulls the screenshots; the rest goes to the test's logcat under `JourneyFailure`.
+ */
+object Failures {
+    const val DIRECTORY = "/data/local/tmp/abs-journey-failures"
+    private const val LOG = "JourneyFailure"
+
+    fun <T> capturing(compose: ComposeTestRule?, waitingFor: String, block: () -> T): T = try {
+        block()
+    } catch (failure: Throwable) {
+        record(compose, waitingFor)
+        throw failure
+    }
+
+    private fun record(compose: ComposeTestRule?, waitingFor: String) {
+        val test = Thread.currentThread().stackTrace.firstOrNull { it.className.endsWith("Journey") }
+            ?.let { "${it.className.substringAfterLast('.')}-${it.methodName}-${it.lineNumber}" } ?: "journey"
+        val name = "$test-${System.currentTimeMillis()}"
+        android.util.Log.e(LOG, "$name waiting for $waitingFor")
+        runCatching {
+            Device.device.executeShellCommand("mkdir -p $DIRECTORY")
+            Device.device.executeShellCommand("screencap -p $DIRECTORY/$name.png")
+            android.util.Log.e(LOG, "screenshot $DIRECTORY/$name.png")
+        }.onFailure { android.util.Log.e(LOG, "no screenshot: $it") }
+        compose?.let { rule ->
+            runCatching { rule.onAllNodes(isRoot(), useUnmergedTree = true).printToString(maxDepth = Int.MAX_VALUE) }
+                .onSuccess { tree -> tree.lines().forEach { android.util.Log.e(LOG, "semantics $it") } }
+                .onFailure { android.util.Log.e(LOG, "no semantics: $it") }
+        }
+        runCatching { Fixture.requests().filterNot { it.optString("path").startsWith("/__") }.takeLast(40) }
+            .onSuccess { requests -> requests.forEach { android.util.Log.e(LOG, "request ${it.optString("method")} ${it.optString("path")} -> ${it.opt("status") ?: "no answer yet"}") } }
+            .onFailure { android.util.Log.e(LOG, "no fixture requests: $it") }
+    }
 }
 
 @Suppress("unused") private fun SemanticsNodeInteractionsProvider.unused() = Unit
