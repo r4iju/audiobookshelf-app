@@ -48,19 +48,19 @@ function sleepValue(sleep: Sleep) {
   return sleep.kind === "off" ? "off" : sleep.kind === "chapter-end" ? "chapter" : "running";
 }
 
-/** `fullWindow` when no navigation surrounds it, as while reading, where it sits under the page instead of over it. */
+/** Sits in the page's flow under its scrolling box; `fullWindow` when nothing follows it, as while reading. */
 export function PlayerDock({ fullWindow = false }: { fullWindow?: boolean }) {
   const player = usePlayer();
   const pending = useProgressSync();
   const { t } = useI18n();
   if (player.phase !== "active") {
+    // Floats over the end of the page, just above whatever follows the dock's place.
     return pending > 0 ? (
-      <p
-        role="status"
-        className={`fixed right-4 z-30 rounded-full bg-surface-2 px-3 py-1 text-xs ${fullWindow ? "bottom-4" : "bottom-20 lg:bottom-4"}`}
-      >
-        {t("WebPendingProgress", pending)}
-      </p>
+      <div className="relative">
+        <p role="status" className="absolute end-4 bottom-3 z-30 rounded-full bg-surface-2 px-3 py-1 text-xs">
+          {t("WebPendingProgress", pending)}
+        </p>
+      </div>
     ) : null;
   }
   return <Dock player={player} pending={pending} fullWindow={fullWindow} />;
@@ -98,7 +98,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
   return (
     <section
       aria-label={t("WebPlayer")}
-      className={`z-40 border-t border-line bg-surface/95 shadow-[0_-8px_24px_rgb(0_0_0/0.25)] backdrop-blur ${fullWindow ? "pb-[env(safe-area-inset-bottom)]" : "fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] lg:bottom-0 lg:left-60"}`}
+      className={`relative z-10 border-t border-line bg-surface shadow-[0_-8px_24px_rgb(0_0_0/0.25)] ${fullWindow ? "pb-[env(safe-area-inset-bottom)]" : "lg:pb-[env(safe-area-inset-bottom)]"}`}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 lg:px-6">
         {error ? <Alert>{error}</Alert> : null}
