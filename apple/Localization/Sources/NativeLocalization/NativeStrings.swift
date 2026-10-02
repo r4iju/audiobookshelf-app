@@ -13,7 +13,7 @@ public enum NativeTextContext: String, CaseIterable, Sendable {
 }
 
 /// Looks up native text by its English wording. `apple/Localization/generate.py` writes the tables, carrying a legacy
-/// translation only where its meaning matches; anything else stays in English. The table name keeps SwiftUI's own
+/// translation where its meaning matches, then a maintained native translation, with English as the fallback. The table name keeps SwiftUI's own
 /// `Text` lookup from translating literals that were never reviewed.
 public struct NativeStrings {
     public let language: NativeLanguage

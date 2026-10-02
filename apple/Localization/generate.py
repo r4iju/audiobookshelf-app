@@ -15,6 +15,7 @@ English table maps it back to `Light`.
     python3 apple/Localization/generate.py          # rewrite tables and COVERAGE.md
     python3 apple/Localization/generate.py --check  # fail when they are stale
 """
+from collections import Counter
 import json
 import pathlib
 import re
@@ -131,7 +132,7 @@ def english_keys():
 
 def usable(candidate, key):
     return bool(candidate and candidate.strip()) and '<' not in candidate and \
-        set(PLACEHOLDER.findall(candidate)) == set(PLACEHOLDER.findall(english(key)))
+        Counter(PLACEHOLDER.findall(candidate)) == Counter(PLACEHOLDER.findall(english(key)))
 
 
 def maintained(code, keys, inherited):
@@ -186,6 +187,8 @@ def outputs():
               '`translations/<code>.json`, if there is one, and otherwise stays in English. Wording with several meanings counts '
               'once per meaning (`theme::Light`, `hapticStrength::Light`).'
               .format(len(keys), len(mapping)), '',
+              'Coverage counts available entries, not translation quality. Maintained translations are machine-drafted and have '
+              'not had native-speaker review. Physical-device and assistive-technology acceptance remain separate gates.', '',
               '| Language | Resources | From legacy | Maintained here | English only | Translated |',
               '| --- | --- | ---: | ---: | ---: | ---: |']
     for code, localization, count, inherited in rows:
