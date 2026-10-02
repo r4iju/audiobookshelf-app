@@ -46,5 +46,6 @@ test("a new search starts again from the first results", async ({ page }) => {
 
   await box.fill("catalog volume");
   await expect(page).toHaveURL(/q=catalog\+volume/);
+  await expect(page).not.toHaveURL(/limit=/);
   await expect(results).toHaveCount(12);
 });

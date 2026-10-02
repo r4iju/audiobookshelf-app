@@ -206,8 +206,8 @@ export function useFilterData(libraryId: string) {
 }
 
 /**
- * Up to `limit` matches of each kind, with the limit they were found under. The server has no paging, so one more
- * than that is asked for: `more` says some kind returned it, and a larger limit would show further matches.
+ * Up to `limit` matches of each kind. The server has no paging, so one more than that is asked for: `more` says some
+ * kind returned it, and a larger limit would show further matches.
  */
 export function useSearch(libraryId: string, q: string, limit: number) {
   const { client, connection } = useAbs();
@@ -236,7 +236,6 @@ export function useSearch(libraryId: string, q: string, limit: number) {
         narrators: found.narrators.slice(0, limit),
         tags: found.tags.slice(0, limit),
         genres: found.genres.slice(0, limit),
-        limit,
         more: kinds.some((matches) => matches.length > limit),
       };
     },
