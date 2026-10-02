@@ -218,7 +218,7 @@ fun ItemCard(item: LibraryItem, progress: MediaProgress?, modifier: Modifier = M
             if (progress != null && (progress.progress > 0 || progress.isFinished)) ProgressLine(if (progress.isFinished) 1.0 else progress.progress)
         }
         Text(item.recentEpisode?.title ?: item.title, style = MaterialTheme.typography.titleSmall, minLines = 2, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        if (item.author.isNotEmpty()) Text(item.author, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(item.author, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, minLines = 1, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
