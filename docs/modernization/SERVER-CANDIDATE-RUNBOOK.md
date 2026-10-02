@@ -14,14 +14,14 @@
 | `server/managers/PlaybackSessionManager.js` | base `e196eea6e727fbe634a985ee475f5f50782069e6debc4a81f7a2517114885428`, candidate `a140b5679a81e8b48b3485f6bd7e2bee0c20fb6bd79819a61279e465c8f685ae` |
 | Patches, in order | Apple user cache `b59ea8c8…0a94` (`evidence/apple-real-server/server-usercache`), session-only first progress `ed88f5e0…8fcb` (`evidence/web-real-server/server-combined`) |
 | Saved image | `abs-server-candidate-2.30.0-usercache-firstprogress-session.tar`, SHA-256 `4e8d60b873dae59ceed49ff991a16c8eb4fa32eccf4196db72b723f4483f02a6`, in the private package beside the earlier candidate, with the build context and both patches |
-| Source of the proof | `fork/native-tv` at `a23db59b` (#94, #101, #102, #103) and this change |
+| Source of the proof | Original #94/#101/#102/#103 evidence at `a23db59b`; session-scoped correction #119 at `481acf98`; exact packaged Apple five-case proof #122 using client `d3152a5d`. See `SERVER-COMPATIBILITY.md` for per-row provenance. |
 | Held, not for promotion | `abs-server-candidate:2.30.0-usercache-firstprogress`, `sha256:c649a2bd…9abd` (`User.js` `15ee2c33…ac4`). It stores progress first created by PATCH within 10 s of the end as finished. Kept unchanged as historical evidence. |
 
 The candidate changes no database schema and adds no migration: the database it writes is the database 2.30.0 reads. That is what makes rollback to the pinned base image safe without restoring data.
 
 ## Gates before promotion
 
-All must hold. The compatibility matrix is in `SERVER-COMPATIBILITY.md`.
+All must hold. The compatibility matrix is in `SERVER-COMPATIBILITY.md`. Gate 1 now has scoped synthetic evidence for every listed client, including the exact packaged Apple run in #122. Owner review, physical acceptance and execution remain separate; this evidence does not authorize or perform promotion.
 
 1. Every completed client is green against **this** image, `cd703e87`, on a synthetic server: Apple affected native cases, Android `RealServerJourney`, the controlled progress and cache checks, and the Next.js production journeys. Passes on the held `c649a2bd` do not count.
 2. The owner has reviewed both patches and the known limits in `evidence/android-real-server/server-first-progress/README.md` and `evidence/web-real-server/server-combined/README.md`.
