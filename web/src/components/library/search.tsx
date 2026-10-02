@@ -21,8 +21,17 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
   const { library, shape } = useLibrary(libraryId);
   const results = useSearch(libraryId, q, limit);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Where the results More asked for begin, so the keyboard continues there instead of losing its place.
+  const revealedFrom = useRef<number | null>(null);
+  const continueAt = (index: number) => (node: HTMLLIElement | null) => {
+    if (node && index === revealedFrom.current) {
+      revealedFrom.current = null;
+      node.querySelector("a")?.focus();
+    }
+  };
 
   const onChange = (value: string) => {
+    revealedFrom.current = null;
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       router.replace(value.trim() ? `${pathname}?${new URLSearchParams({ q: value })}` : pathname);
@@ -72,8 +81,8 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                     title={library?.mediaType === "podcast" ? t("LabelPodcasts") : t("LabelBooks")}
                   >
                     <CardGrid shape={shape} label={t("WebSearchResults")}>
-                      {items.map((item) => (
-                        <li key={item.id}>
+                      {items.map((item, index) => (
+                        <li key={item.id} ref={continueAt(index)}>
                           <ItemCard item={item} shape={shape} />
                         </li>
                       ))}
@@ -131,6 +140,9 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                     href={`${pathname}?${new URLSearchParams({ q, limit: String(limit * 4) })}`}
                     replace
                     scroll={false}
+                    onClick={() => {
+                      revealedFrom.current = items.length;
+                    }}
                     className="inline-flex min-h-11 items-center self-center rounded-full bg-surface-2 px-5 text-sm font-medium hover:bg-surface-3 focus-ring"
                   >
                     {t("LabelMore")}

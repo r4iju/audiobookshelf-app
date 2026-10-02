@@ -49,3 +49,19 @@ test("a new search starts again from the first results", async ({ page }) => {
   await expect(page).not.toHaveURL(/limit=/);
   await expect(results).toHaveCount(12);
 });
+
+test("asking for more from the keyboard continues at the first result it revealed", async ({ page }) => {
+  await signIn(page);
+  await page.goto(`/library/${qa.libraries.books}/search?q=catalog`);
+  const results = page.getByRole("list", { name: "Search results" }).getByRole("listitem");
+  await expect(results).toHaveCount(12);
+
+  const more = page.getByRole("main").getByRole("link", { name: "More" });
+  for (let step = 0; step < 5 && (await more.isVisible()); step++) {
+    const shown = await results.count();
+    await more.focus();
+    await page.keyboard.press("Enter");
+    await expect(results.nth(shown).getByRole("link").first()).toBeFocused();
+  }
+  await expect(more).toBeHidden();
+});
