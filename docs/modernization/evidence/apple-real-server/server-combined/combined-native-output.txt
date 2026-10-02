@@ -1,0 +1,38 @@
+2174eec7b50b43ed3e0da55c4e54edaa90f9f98c30cefb9b4819430b744f6a1d apple/build-qa/combined-native/combined/server/models/User.js
+b59ea8c83dceaece79b33abc72159abf9d6d4537b24b519f243c8fae74f50a94 docs/modernization/evidence/apple-real-server/server-combined/../server-usercache/usercache-candidate-3ef58609.patch
+6313948fcce74d83ad7b320da1db0b587bb81557892cabdaad1207237cdf7367 docs/modernization/evidence/android-real-server/server-first-progress/first-progress-candidate.patch
+15ee2c33d88fab0e6e8e43d9ffe3c7eddb272ea6ba3f11906cabeb455c0ffac4 apple/build-qa/combined-native/combined/server/models/User.js
+server restarted 18:44:29
+models/User.js in abs-apple-diag: 15ee2c33d88fab0e6e8e43d9ffe3c7eddb272ea6ba3f11906cabeb455c0ffac4  /app/server/models/User.js
+sim: leased Pool iPhone 1 (iOS 27.0) for 4h; run `sim release 75FA9768-B15C-40B6-ACC7-790D7FCAD29C` when done
+phone lease=75FA9768-B15C-40B6-ACC7-790D7FCAD29C
+phone-stream exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test1SignInBrowseAndStreamAcrossFiles]' passed (105.179 seconds).
+after streaming currentTime 37.428127119 isFinished False lastUpdate 1790934378186
+phone-download exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe test4aDownloadForOffline]' passed (64.283 seconds).
+server stopped 18:48:12
+phone-finish-offline exit=0
+FINISH_START=39 sec File 2 of 3
+FINISH_END=1 min remaining −0 sec
+Test Case '-[NativeJourneyTests.RealServerProbe test4dFinishOfflineWithServerStopped]' passed (16.442 seconds).
+server started 18:48:47
+phone-finish-reconnect exit=0
+FINISH_SERVER=["finishedAt": 1790934546252, "episodeId": <null>, "isFinished": 1, "ebookLocation": <null>, "mediaItemId": bf99aa5b-028f-42cf-98de-7a3f77153781, "currentTime": 90.20081677551021, "progress": 1, "lastUpdate": 1790934520221, "userId": c9614baf-3f6d-462f-b0e3-701ab65121a1, "duration": 90.200817, "libraryItemId": 113125d2-cb2b-463c-b8fd-3c47604ecf8a, "ebookProgress": 0, "mediaItemType": book, "startedAt": 1790934368288, "id": 2fb45f43-9fdb-43fc-b66e-e42d919eef29, "hideFromContinueListening": 0]
+Test Case '-[NativeJourneyTests.RealServerProbe test4eReconnectPublishesTheFinish]' passed (9.965 seconds).
+after finish reconnect currentTime 90.2008167755102 isFinished True lastUpdate 1790934520221
+server restarted 18:49:16
+after a further restart currentTime 90.2008167755102 isFinished True lastUpdate 1790934520221
+sync a23b2c45-f992-4248-9735-82b421c453f3 200
+server restarted 18:49:18
+sync 1288a40f-d0f7-428a-a1ce-ff1394edcfbb 200
+volume3 200
+open=1288a40f-d0f7-428a-a1ce-ff1394edcfbb restarted=a23b2c45-f992-4248-9735-82b421c453f3
+migration exit=0
+ADOPTION_REPORT 3 downloads are ready once their accounts are signed in. 3 listening sessions are waiting to be sent to the server. 2 listening positions are waiting to be compared with the server. Sign in to 1 account to use the rest of its data. issues=["Listening for http://127.0.0.1:19900 is waiting to be sent (3 sessions, 2 positions).", "Sign in to http://127.0.0.1:19900 as qa-other again. Downloads, progress and unsent listening for this account are kept and become available after sign-in."]
+SYNC_1 acknowledged=3 pending=0 unconfirmed=0 failures=[]
+SYNC_2 acknowledged=0 pending=0 unconfirmed=0 failures=[]
+SERVER open=25/25 restarted=11/11 local=3/3.5 volume2=2.0 volume3=3.0 (before 3.0)
+Test Case '-[NativeTests.RealServerAdoptionProbe testPendingLegacyListeningReachesTheRealServerExactlyOnce]' passed (1.089 seconds).
+overall exit=0
+runner exit=0

@@ -159,6 +159,8 @@ The native runs used the app at `386fed27`, whose `apple/` and `tvos/` are ident
 
 What the native finish case covers: the finish updates a progress row that already exists ("previously 34.4"). It does not cover a book's first progress being created by an offline session that already finished, which takes the server's separate create branch.
 
+**Combined with Android's first-progress patch.** `server-combined/` runs only the affected Apple cases against both reviewed candidates together: this patch, then Android's `first-progress-candidate.patch` (SHA-256 `6313948f…`), which gives `models/User.js` `15ee2c33…`, the hash the Android track pins. The source was the merge of #94 (`6de5e359`) and the server a freshly seeded owned diagnostic container. `test1`, `test4a`, `test4d` (server stopped), `test4e` and the migration probe each exited 0. The Long Tide's first row, created by `test1`, now takes the session's `lastUpdate`. The finish updated it to the end, and it stayed finished after the reconnect and after a restart. The migration's Volume 01 session created its row already finished, which the pinned server would not do; the adoption probe passed unchanged. As above, this is not deployed, and one pass does not show the race was hit.
+
 An earlier, narrower attempt covered only the two id lookups (`first-candidate.diff`, `race-5-first-candidate.txt`: 0 stale of 5). `race-5-pristine-first.txt` is the first instrumented pristine run (3 stale of 5); its DIAG lines accumulate across tries.
 
 ### Finish sync gate: still open

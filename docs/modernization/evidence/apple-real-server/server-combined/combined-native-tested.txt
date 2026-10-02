@@ -1,0 +1,11 @@
+Tested source and image:
+app source and probes: worktree audiobookshelf-combined-native at 6de5e359 (merge of PR #94 into fork/native-tv), probes from its evidence folder (with the test1 poll correction)
+image: ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03
+models/User.js, built by run-combined-native.sh and checked before the run (combined-native-output.txt):
+  pinned file read from the image                    2174eec7b50b43ed3e0da55c4e54edaa90f9f98c30cefb9b4819430b744f6a1d
+  Apple patch server-usercache/usercache-candidate-3ef58609.patch            b59ea8c83dceaece79b33abc72159abf9d6d4537b24b519f243c8fae74f50a94
+  Android patch android-real-server/server-first-progress/first-progress-candidate.patch  6313948fcce74d83ad7b320da1db0b587bb81557892cabdaad1207237cdf7367
+  result, Apple patch then Android patch             15ee2c33d88fab0e6e8e43d9ffe3c7eddb272ea6ba3f11906cabeb455c0ffac4
+  sha256sum in abs-apple-diag after the copy and restart: 15ee2c33d88fab0e6e8e43d9ffe3c7eddb272ea6ba3f11906cabeb455c0ffac4
+The combined hash is the one the Android track pins (fork/android-combined-server-candidate 74e73ee9, server-combined/README.md).
+Server: abs-apple-diag on 127.0.0.1:19900, helpers on 19904 to 19906, seeded fresh with the synthetic library. Phone: pooled iPhone 75FA9768 (iOS 27.0), leased erased.

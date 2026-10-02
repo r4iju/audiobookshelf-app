@@ -1,0 +1,29 @@
+[2026-10-02 09:46:08.273] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (9a6bb0cc-e66a-43cd-ae9d-beb593697c6c) (updatedAt: 1790934368238.503)
+[2026-10-02 09:46:08.285] INFO: [PlaybackSessionManager] Creating new media progress for media item "The Long Tide"
+[2026-10-02 09:46:08.292] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:46:08.238 +00:00' (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
+[2026-10-02 09:46:11.534] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (9a6bb0cc-e66a-43cd-ae9d-beb593697c6c) (updatedAt: 1790934371497.59)
+[2026-10-02 09:46:11.541] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 12.00008523 (previously 0)
+[2026-10-02 09:46:11.545] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:46:11.497 +00:00' (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
+[2026-10-02 09:46:11.960] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (9a6bb0cc-e66a-43cd-ae9d-beb593697c6c) (updatedAt: 1790934371934.753)
+[2026-10-02 09:46:11.967] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 22 (previously 12.00008523)
+[2026-10-02 09:46:11.970] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:46:11.934 +00:00' (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
+[2026-10-02 09:46:12.401] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (9a6bb0cc-e66a-43cd-ae9d-beb593697c6c) (updatedAt: 1790934372365.46)
+[2026-10-02 09:46:12.412] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 32 (previously 22)
+[2026-10-02 09:46:12.418] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:46:12.365 +00:00' (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
+[2026-10-02 09:46:12.431] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (9a6bb0cc-e66a-43cd-ae9d-beb593697c6c) (updatedAt: 1790934372393.77)
+[2026-10-02 09:46:12.439] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 31.998605667 (previously 32)
+[2026-10-02 09:46:12.443] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:46:12.393 +00:00' (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
+[2026-10-02 09:46:18.208] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (9a6bb0cc-e66a-43cd-ae9d-beb593697c6c) (updatedAt: 1790934377866.802)
+[2026-10-02 09:46:18.214] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 37.427067411 (previously 31.998605667)
+[2026-10-02 09:46:18.217] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:46:17.866 +00:00' (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
+[2026-10-02 09:46:18.288] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (9a6bb0cc-e66a-43cd-ae9d-beb593697c6c) (updatedAt: 1790934378186.45)
+[2026-10-02 09:46:18.307] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 37.428127119 (previously 37.427067411)
+[2026-10-02 09:46:18.313] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:46:18.186 +00:00' (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
+[2026-10-02 09:48:04.953] INFO: [LibraryItemController] User "qa" requested download for item "The Long Tide" file at "/library/books/Mira Vale/Harbor Lights/Book 1 - The Long Tide/01 - Arrival.mp3"
+[2026-10-02 09:48:04.958] INFO: [LibraryItemController] User "qa" requested download for item "The Long Tide" file at "/library/books/Mira Vale/Harbor Lights/Book 1 - The Long Tide/02 - Crossing.mp3"
+[2026-10-02 09:48:04.975] INFO: [LibraryItemController] User "qa" requested download for item "The Long Tide" file at "/library/books/Mira Vale/Harbor Lights/Book 1 - The Long Tide/03 - Landfall.mp3"
+[2026-10-02 09:48:04.979] INFO: [LibraryItemController] User "qa" requested download for item "The Long Tide" file at "/library/books/Mira Vale/Harbor Lights/Book 1 - The Long Tide/The Long Tide Companion.pdf"
+[2026-10-02 09:49:06.225] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (8770a3a2-a466-4db1-a70b-c6065ddfbf44) (updatedAt: 1790934520221.32)
+[2026-10-02 09:49:06.249] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.2008167755102 (previously 37.428127119)
+[2026-10-02 09:49:06.252] INFO: [MediaProgress] Marking media progress as finished because time remaining (2.2448979564160254e-7) is less than 10 seconds (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
+[2026-10-02 09:49:06.255] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 09:48:40.221 +00:00' (media item bf99aa5b-028f-42cf-98de-7a3f77153781)
