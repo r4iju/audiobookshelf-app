@@ -186,19 +186,32 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               <SkipForward aria-hidden className="size-5 rtl:rotate-180" />
             </Button>
           </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            aria-expanded={expanded}
-            aria-label={expanded ? t("WebCollapsePlayer") : t("WebExpandPlayer")}
-            onClick={() => updateSettings({ playerExpanded: !expanded })}
-          >
-            {expanded ? (
-              <ChevronDown aria-hidden className="size-5" />
-            ) : (
-              <ChevronUp aria-hidden className="size-5" />
-            )}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-expanded={expanded}
+              aria-label={expanded ? t("WebCollapsePlayer") : t("WebExpandPlayer")}
+              onClick={() => updateSettings({ playerExpanded: !expanded })}
+            >
+              {expanded ? (
+                <ChevronDown aria-hidden className="size-5" />
+              ) : (
+                <ChevronUp aria-hidden className="size-5" />
+              )}
+            </Button>
+            <span aria-hidden className="h-6 w-px bg-line" />
+            <Button
+              size="icon"
+              variant="ghost"
+              className="text-muted hover:text-fg"
+              aria-label={t("LabelClosePlayer")}
+              title={t("LabelClosePlayer")}
+              onClick={() => void actions().stop()}
+            >
+              <X aria-hidden className="size-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 text-xs text-muted tabular-nums">
@@ -347,12 +360,6 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               {t("ToastBookmarkCreateFailed")}
             </span>
           ) : null}
-          <div className="ms-auto flex items-center gap-3">
-            <Button size="sm" variant="ghost" onClick={() => void actions().stop()}>
-              <X aria-hidden className="size-4" />
-              {t("LabelClosePlayer")}
-            </Button>
-          </div>
         </div>
       </div>
       {bookmarksOpen ? (
