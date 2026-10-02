@@ -45,12 +45,14 @@
 "Duration" = "Süre";
 "Ebooks" = "E-kitaplar";
 "End of chapter" = "Bölüm Sonu";
+"Episode number" = "Bölüm";
 "Episodes" = "Bölümler";
 "Explicit content" = "Açık İçerik";
 "Feed slug" = "RSS Akışı Kısa Adı";
 "File created" = "Dosya Oluşturulma Zamanı";
 "File modified" = "Dosya Değiştirilme Zamanı";
 "File size" = "Boyut";
+"Filename" = "Dosya Adı";
 "Finished" = "Bitirildi";
 "Font" = "Yazı tipi ailesi";
 "Font size" = "Yazı Tipi Ölçeği";
@@ -108,6 +110,7 @@
 "Podcasts" = "Podcast'ler";
 "Prevent indexing" = "Dizine Eklemeyi Önle";
 "Progress" = "İlerleme";
+"Published date" = "Yayın Tarihi";
 "Published year" = "Yayın Yılı";
 "RSS feed" = "RSS Akışı";
 "RSS feed URL" = "Akış URL'si";
@@ -120,6 +123,7 @@
 "Remove download" = "Yerel öğeyi sil";
 "Scale elapsed time by speed" = "Geçen Süreyi Hıza Göre Ölçekle";
 "Search" = "Ara";
+"Season" = "Sezon";
 "Select a device" = "Bir cihaz seçin";
 "Send ebook to device" = "E-kitabı Cihaza Gönder";
 "Series" = "Seriler";

@@ -48,12 +48,14 @@
 "Duration" = "Időtartam";
 "Ebooks" = "E-könyvek";
 "End of chapter" = "Fejezet vége";
+"Episode number" = "Epizód";
 "Episodes" = "Epizódok";
 "Explicit content" = "Szókimondó";
 "Feed slug" = "RSS hírcsatorna rövid cím";
 "File created" = "Fájl létrehozásának ideje";
 "File modified" = "Fájl módosítva";
 "File size" = "Méret";
+"Filename" = "Fájlnév";
 "Finished" = "Befejezve";
 "Font" = "Betűcsalád";
 "Font size" = "Betűméret skála";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcastok";
 "Prevent indexing" = "Indexelés megakadályozása";
 "Progress" = "Haladás";
+"Published date" = "Közzététel dátuma";
 "Published year" = "Kiadás éve";
 "RSS feed" = "RSS Hírcsatorna";
 "RSS feed URL" = "Hírcsatorna URL";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Eltelt idő skálázása sebesség szerint";
 "Search" = "Keresés";
+"Season" = "Évad";
 "Select a device" = "Eszköz kiválasztása";
 "Send ebook to device" = "E-könyv küldése eszközre";
 "Series" = "Sorozat";

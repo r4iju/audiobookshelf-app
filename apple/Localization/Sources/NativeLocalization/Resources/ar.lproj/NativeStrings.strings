@@ -48,12 +48,14 @@
 "Duration" = "المدة";
 "Ebooks" = "الكتب الإلكترونية";
 "End of chapter" = "نهاية الفصل";
+"Episode number" = "الحلقة";
 "Episodes" = "الحلقات";
 "Explicit content" = "محتوى صريح";
 "Feed slug" = "اسم تعريف تغذية RSS";
 "File created" = "وقت انشاء الملف";
 "File modified" = "تم تعديل الملف";
 "File size" = "الحجم";
+"Filename" = "اسم الملف";
 "Finished" = "المنجزة";
 "Font" = "عائلة الخطوط";
 "Font size" = "نطاق الخط";
@@ -112,6 +114,7 @@
 "Podcasts" = "بودكاست";
 "Prevent indexing" = "منع الفهرسة";
 "Progress" = "تقدم";
+"Published date" = "تاريخ النشر";
 "Published year" = "سنة النشر";
 "RSS feed" = "تغذية RSS";
 "RSS feed URL" = "عنوان التغذية";
@@ -125,6 +128,7 @@
 "Sans serif" = "سانس";
 "Scale elapsed time by speed" = "تعديل الوقت المنصرم حسب السرعة";
 "Search" = "بحث";
+"Season" = "الموسم";
 "Select a device" = "اختيار جهاز";
 "Send ebook to device" = "أرسل الكتاب إلى الجهاز";
 "Series" = "المسلسلات";

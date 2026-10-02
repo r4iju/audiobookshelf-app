@@ -48,12 +48,14 @@
 "Duration" = "持续时间";
 "Ebooks" = "电子书";
 "End of chapter" = "章节结束";
+"Episode number" = "剧集";
 "Episodes" = "剧集";
 "Explicit content" = "含成人内容";
 "Feed slug" = "RSS 源别名（Slug）";
 "File created" = "文件创建时间";
 "File modified" = "文件修改时间";
 "File size" = "文件大小";
+"Filename" = "文件名";
 "Finished" = "已听完";
 "Font" = "字体";
 "Font size" = "字体比例";
@@ -112,6 +114,7 @@
 "Podcasts" = "播客";
 "Prevent indexing" = "防止索引";
 "Progress" = "进度";
+"Published date" = "出版日期";
 "Published year" = "发布年份";
 "RSS feed" = "RSS 源";
 "RSS feed URL" = "源 URL";
@@ -125,6 +128,7 @@
 "Sans serif" = "无衬线字体";
 "Scale elapsed time by speed" = "按速度缩放播放时间";
 "Search" = "查找";
+"Season" = "季";
 "Select a device" = "选择设备";
 "Send ebook to device" = "将电子书发送到设备";
 "Series" = "系列";

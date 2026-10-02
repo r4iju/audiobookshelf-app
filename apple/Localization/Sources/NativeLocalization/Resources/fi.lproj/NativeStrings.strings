@@ -48,12 +48,14 @@
 "Duration" = "Kesto";
 "Ebooks" = "S-kirjat";
 "End of chapter" = "Luvun loppu";
+"Episode number" = "Jakso";
 "Episodes" = "Jaksot";
 "Explicit content" = "Sopimaton";
 "Feed slug" = "RSS-syöte Slug";
 "File created" = "Tiedoston syntymäaika";
 "File modified" = "Muutettu tiedosto";
 "File size" = "Koko";
+"Filename" = "Tiedostonimi";
 "Finished" = "Valmis";
 "Font" = "Fonttiperhe";
 "Font size" = "Kirjasintyyppien skaalautuminen";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcastit";
 "Prevent indexing" = "Estä indeksointi";
 "Progress" = "Edistyminen";
+"Published date" = "Julkaisupäivä";
 "Published year" = "Julkaisuvuosi";
 "RSS feed" = "RSS syöte";
 "RSS feed URL" = "Syötteen URL";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Skaalaa kulunut aika nopeuden mukaan";
 "Search" = "Etsi";
+"Season" = "Kausi";
 "Select a device" = "Valitse laite";
 "Send ebook to device" = "Lähetä kirja lukulaitteeseen";
 "Series" = "Sarja";

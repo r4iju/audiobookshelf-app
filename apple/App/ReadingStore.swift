@@ -37,7 +37,7 @@ import Combine
                 guard document.version == 1, document.positions.allSatisfy({ $0.fraction.isFinite && $0.fraction >= 0 && $0.fraction <= 1 && $0.updatedAt.isFinite }) else { throw ListeningJournal.Failure.invalidData }
                 positions = document.positions
             }
-        } catch { self.error = "Saved reading could not be restored: " + error.localizedDescription; writable = false }
+        } catch { self.error = NativeStrings.current("Saved reading could not be restored: {0}", error.localizedDescription); writable = false }
         player.registerProgressResetCleanup("reading") { [weak self] intent in
             if intent.episodeID == nil { try self?.discardProgress(account: intent.account, itemID: intent.itemID, confirmedAt: intent.requestedAt) }
         }
@@ -112,7 +112,7 @@ import Combine
                 try adopt(remote, account: account, itemID: itemID, format: format)
             }
             sync(api: api)
-        } catch { if !(error is CancellationError) { self.error = "Reading is saved on this device and waiting to sync: " + error.localizedDescription } }
+        } catch { if !(error is CancellationError) { self.error = NativeStrings.current("Reading is saved on this device and waiting to sync: {0}", error.localizedDescription) } }
     }
     func sync(api: APIClient) {
         guard writable else { return }
@@ -152,7 +152,7 @@ import Combine
                     }
                 }
                 error = nil
-            } catch { if !(error is CancellationError) { self.error = "Reading is saved on this device and waiting to sync: " + error.localizedDescription } }
+            } catch { if !(error is CancellationError) { self.error = NativeStrings.current("Reading is saved on this device and waiting to sync: {0}", error.localizedDescription) } }
         }
     }
     private func save(_ next: [Position]) throws {

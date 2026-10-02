@@ -45,12 +45,14 @@
 "Duration" = "기간";
 "Ebooks" = "전자책";
 "End of chapter" = "챕터의 마지작";
+"Episode number" = "에피소드";
 "Episodes" = "에피소드";
 "Explicit content" = "명백한";
 "Feed slug" = "RSS 피드 슬러그";
 "File created" = "파일 생년월일";
 "File modified" = "파일 수정됨";
 "File size" = "크기";
+"Filename" = "파일 이름";
 "Finished" = "완료됨";
 "Font" = "글꼴 모양";
 "Font size" = "글꼴 크기";
@@ -108,6 +110,7 @@
 "Podcasts" = "팟케스트";
 "Prevent indexing" = "인덱싱 방지";
 "Progress" = "진행";
+"Published date" = "출판 날짜";
 "Published year" = "출판 연도";
 "RSS feed" = "RSS 피드";
 "RSS feed URL" = "피드 URL";
@@ -121,6 +124,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "속도에 따른 경과 시간 스케일링";
 "Search" = "검색";
+"Season" = "시즌";
 "Select a device" = "기기를 선택하세요";
 "Send ebook to device" = "기기로 전자책 보내기";
 "Series" = "시리즈";

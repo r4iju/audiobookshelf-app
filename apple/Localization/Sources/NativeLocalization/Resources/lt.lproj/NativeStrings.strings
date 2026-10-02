@@ -38,11 +38,13 @@
 "Duration" = "Trukmė";
 "Ebooks" = "El. knygos";
 "End of chapter" = "Skyriaus pabaiga";
+"Episode number" = "Epizodas";
 "Episodes" = "Epizodai";
 "Feed slug" = "RSS srauto identifikatorius";
 "File created" = "Failo kūrimo laikas";
 "File modified" = "Failo keitimo laikas";
 "File size" = "Dydis";
+"Filename" = "Failo pavadinimas";
 "Finished" = "Baigta";
 "Font size" = "Šrifto mastelis";
 "Genre" = "Žanras";
@@ -85,6 +87,7 @@
 "Podcasts" = "Tinklalaidės";
 "Prevent indexing" = "Neleisti indeksuoti";
 "Progress" = "Progresas";
+"Published date" = "Publikavimo data";
 "Published year" = "Leidimo metai";
 "RSS feed" = "RSS sklaidos kanalas";
 "RSS feed URL" = "Srauto URL";
@@ -94,6 +97,7 @@
 "Recently Added" = "Naujausiai įkelta";
 "Recently added" = "Naujausiai įkelta";
 "Search" = "Ieškoti";
+"Season" = "Sezonas";
 "Series" = "Serija";
 "Server folder" = "Aplankas";
 "Settings" = "Nustatymai";

@@ -48,12 +48,14 @@
 "Duration" = "Trajanje";
 "Ebooks" = "E-knjige";
 "End of chapter" = "Konec poglavja";
+"Episode number" = "Epizoda";
 "Episodes" = "Epizode";
 "Explicit content" = "Eksplicitno";
 "Feed slug" = "Slug RSS vira";
 "File created" = "Čas ustvarjanja datoteke";
 "File modified" = "Datoteke spremenjena";
 "File size" = "Velikost";
+"Filename" = "Ime datoteke";
 "Finished" = "Zaključeno";
 "Font" = "Družina pisav";
 "Font size" = "Merilo pisave";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcasti";
 "Prevent indexing" = "Prepreči indeksiranje";
 "Progress" = "Napredek";
+"Published date" = "Datum objave";
 "Published year" = "Leto izdaje";
 "RSS feed" = "RSS vir";
 "RSS feed URL" = "URL vir";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Meri pretečeni čas glede na hitrost";
 "Search" = "Poišči";
+"Season" = "Sezona";
 "Select a device" = "Izberite napravo";
 "Send ebook to device" = "Pošlji e-knjigo v napravo";
 "Series" = "Serije";

@@ -404,7 +404,7 @@ import UIKit
 
     private enum PlaybackFailure: LocalizedError {
         case seekFailed
-        var errorDescription: String? { "Audio could not be prepared at this position. Check the server connection and try again." }
+        var errorDescription: String? { NativeStrings.current("Audio could not be prepared at this position. Check the server connection and try again.") }
     }
 
     private func loadTrack(_ index: Int) async throws {
@@ -500,7 +500,7 @@ import UIKit
 
     private func playbackFailed() {
         pause()
-        error = "Audio could not be played. Check the server connection, then reopen this item to retry."
+        error = NativeStrings.current("Audio could not be played. Check the server connection, then reopen this item to retry.")
     }
     private func trackEnded() async {
         guard let session, !closing, !seeking else { return }
@@ -540,7 +540,7 @@ import UIKit
                 player.pause()
                 playing = false
                 wantsPlayback = false
-                failed(error, prefix: "Listening could not be saved on this device: ")
+                failed(error) { NativeStrings.current("Listening could not be saved on this device: {0}", $0) }
             }
         }
         if now.timeIntervalSince(lastSync) >= 15 { sync() }
@@ -556,7 +556,7 @@ import UIKit
                 try await listening.flush()
                 lastSync = Date()
                 clearProgressFailure()
-            } catch { failed(error, prefix: "Playback progress could not be saved: ", origin: .progress) }
+            } catch { failed(error, origin: .progress) { NativeStrings.current("Playback progress could not be saved: {0}", $0) } }
         }
     }
 
@@ -613,7 +613,7 @@ import UIKit
 
     func restoreListening() async {
         do { try await listening.flush(); clearProgressFailure() }
-        catch { failed(error, prefix: "Saved listening is waiting to sync: ", origin: .progress) }
+        catch { failed(error, origin: .progress) { NativeStrings.current("Saved listening is waiting to sync: {0}", $0) } }
         await resumeProgressResets()
     }
 
@@ -638,14 +638,14 @@ import UIKit
         if failureOrigin == .progress { error = nil }
     }
 
-    private func failed(_ failure: Error, prefix: String = "", origin: FailureOrigin = .playback) {
+    private func failed(_ failure: Error, origin: FailureOrigin = .playback, describe: (String) -> String = { $0 }) {
         if failure is CancellationError { return }
         if failure as? APIError == .signInRequired {
             needsSignIn = true
             // Audio, downloaded or streamed, stops with the login and waits for signing in again.
             if wantsPlayback || playing { pause() }
         }
-        error = prefix + failure.localizedDescription
+        error = describe(failure.localizedDescription)
         failureOrigin = origin
     }
 
@@ -793,7 +793,7 @@ import UIKit
     /// it ends the write, and `requestServerRestart` and `confirmServerRestarted` record that.
     struct UnresolvedProgressWrites: LocalizedError {
         var errorDescription: String? {
-            "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Ask for a restart here, restart the Audiobookshelf server, confirm it, then discard again."
+            NativeStrings.current("Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Ask for a restart here, restart the Audiobookshelf server, confirm it, then discard again.")
         }
     }
 
@@ -802,8 +802,8 @@ import UIKit
         case unfinished(Error)
         var errorDescription: String? {
             switch self {
-            case .busy: return "Progress can be discarded once playback and listening sync finish. Try again."
-            case .unfinished(let error): return "Discarding progress has not finished, so this title stays on hold until it does. Try again. " + error.localizedDescription
+            case .busy: return NativeStrings.current("Progress can be discarded once playback and listening sync finish. Try again.")
+            case .unfinished(let error): return NativeStrings.current("Discarding progress has not finished, so this title stays on hold until it does. Try again. {0}", error.localizedDescription)
             }
         }
     }

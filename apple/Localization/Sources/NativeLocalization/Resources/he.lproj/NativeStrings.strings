@@ -47,12 +47,14 @@
 "Duration" = "משך";
 "Ebooks" = "ספרים אלקטרוניים";
 "End of chapter" = "סוף הפרק";
+"Episode number" = "פרק";
 "Episodes" = "פרקים";
 "Explicit content" = "מפורש";
 "Feed slug" = "Slug של ערוץ ה-RSS";
 "File created" = "זמן יצירת הקובץ";
 "File modified" = "קובץ נערך";
 "File size" = "גודל";
+"Filename" = "שם קובץ";
 "Finished" = "הושלם";
 "Font size" = "גודל פונט";
 "Forward interval" = "הרץ קדימה";
@@ -109,6 +111,7 @@
 "Podcasts" = "פודקאסטים";
 "Prevent indexing" = "מנע רישום";
 "Progress" = "התקדמות";
+"Published date" = "תאריך פרסום";
 "Published year" = "שנת הפרסום";
 "RSS feed" = "ערוץ RSS";
 "RSS feed URL" = "כתובת ערוץ";
@@ -121,6 +124,7 @@
 "Remove download" = "מחק פריט מקומי";
 "Scale elapsed time by speed" = "שנה קנה מידה של זמן שחלף לפי מהירות ההשמעה";
 "Search" = "חיפוש";
+"Season" = "עונה";
 "Select a device" = "בחר מכשיר";
 "Send ebook to device" = "שלח ספר אלקטרוני למכשיר";
 "Series" = "סדרה";

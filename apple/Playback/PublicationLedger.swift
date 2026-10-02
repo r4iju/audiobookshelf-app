@@ -62,11 +62,11 @@ import Foundation
         var errorDescription: String? {
             switch self {
             case .unreadable:
-                return "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again."
+                return NativeStrings.current("The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again.")
             case .waiting:
-                return "An earlier save of this title's progress got no answer, and the server may still apply it over anything sent after it. Later progress is kept on this device until a restart of the Audiobookshelf server is confirmed."
+                return NativeStrings.current("An earlier save of this title's progress got no answer, and the server may still apply it over anything sent after it. Later progress is kept on this device until a restart of the Audiobookshelf server is confirmed.")
             case .restartNotRequested:
-                return "Ask for the server restart first, restart the Audiobookshelf server, then confirm it."
+                return NativeStrings.current("Ask for the server restart first, restart the Audiobookshelf server, then confirm it.")
             }
         }
     }

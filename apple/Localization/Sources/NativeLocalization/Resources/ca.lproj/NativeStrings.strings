@@ -44,12 +44,14 @@
 "Duration" = "Durada";
 "Ebooks" = "Llibres electrònics";
 "End of chapter" = "Final del capítol";
+"Episode number" = "Episodi";
 "Episodes" = "Episodis";
 "Explicit content" = "Explícit";
 "Feed slug" = "URL semàntic del canal RSS";
 "File created" = "Fitxer creat a";
 "File modified" = "Fitxer modificat";
 "File size" = "Mida";
+"Filename" = "Nom del fitxer";
 "Finished" = "Acabat";
 "Font" = "Família tipogràfica";
 "Font size" = "Escala de la lletra";
@@ -104,6 +106,7 @@
 "Podcasts" = "Pòdcasts";
 "Prevent indexing" = "Evita la indexació";
 "Progress" = "Progrés";
+"Published date" = "Data de publicació";
 "Published year" = "Any de publicació";
 "RSS feed" = "Font RSS";
 "RSS feed URL" = "Font URL";

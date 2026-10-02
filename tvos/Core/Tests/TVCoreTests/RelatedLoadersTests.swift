@@ -117,7 +117,7 @@ import XCTest
         XCTAssertEqual(series.books.items.map(\.id), ["b5", "b2", "b9", "b1"], "The server's sequence order is kept, not re-sorted by title or as text")
         XCTAssertEqual(series.books.items.map { series.sequence(of: $0) }, ["1", "2", "2.5", "10"])
         XCTAssertEqual(series.series?.progress?.libraryItemIdsFinished, ["b5"])
-        XCTAssertEqual(series.summary, "4 books · 1 finished")
+        XCTAssertEqual(series.counts, .init(books: 4, finished: 1))
         let query = try XCTUnwrap(requests("/abs/api/libraries/books/items").first)
         XCTAssertEqual(query["sort"], "sequence")
         XCTAssertEqual(query["filter"], "series." + Data("saga".utf8).base64EncodedString())
@@ -143,7 +143,7 @@ import XCTest
         await series.load()
         XCTAssertNil(series.error)
         XCTAssertEqual(series.series?.name, "Saga")
-        XCTAssertEqual(series.summary, "1 book", "Without the server's progress only the count is known")
+        XCTAssertEqual(series.counts, .init(books: 1, finished: nil), "Without the server's progress only the count is known")
         XCTAssertEqual(series.books.items.map(\.id), ["b1"])
     }
 

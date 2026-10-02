@@ -48,12 +48,14 @@
 "Duration" = "Тривалість";
 "Ebooks" = "Електронні книги";
 "End of chapter" = "Кінець глави";
+"Episode number" = "Епізод";
 "Episodes" = "Епізоди";
 "Explicit content" = "Відвертий";
 "Feed slug" = "Назва RSS-каналу";
 "File created" = "Дата створення файлу";
 "File modified" = "Дата зміни файлу";
 "File size" = "Розмір";
+"Filename" = "Ім'я файлу";
 "Finished" = "Завершено";
 "Font" = "Сімейство шрифтів";
 "Font size" = "Розмір шрифту";
@@ -112,6 +114,7 @@
 "Podcasts" = "Подкасти";
 "Prevent indexing" = "Запобігати індексації";
 "Progress" = "Прогрес";
+"Published date" = "Дата публікації";
 "Published year" = "Рік публікації";
 "RSS feed" = "RSS-канал";
 "RSS feed URL" = "Адреса стрічки";
@@ -125,6 +128,7 @@
 "Sans serif" = "Санс";
 "Scale elapsed time by speed" = "Час відповідно швидкості";
 "Search" = "Пошук";
+"Season" = "Сезон";
 "Select a device" = "Обрати пристрій";
 "Send ebook to device" = "Надіслати книгу на пристрій";
 "Series" = "Серії";

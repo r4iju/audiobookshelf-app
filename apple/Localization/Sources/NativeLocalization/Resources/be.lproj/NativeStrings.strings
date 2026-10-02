@@ -48,12 +48,14 @@
 "Duration" = "Працягласць";
 "Ebooks" = "Электронныя кнігі";
 "End of chapter" = "Канец раздзела";
+"Episode number" = "Выпуск";
 "Episodes" = "Выпускі";
 "Explicit content" = "Непрыстойнае";
 "Feed slug" = "Ідэнтыфікатар RSS-стужкі";
 "File created" = "Час стварэння файла";
 "File modified" = "Час змянення файла";
 "File size" = "Памер";
+"Filename" = "Назва файла";
 "Finished" = "Завершана";
 "Font" = "Сямейства шрыфтоў";
 "Font size" = "Памер шрыфту";
@@ -112,6 +114,7 @@
 "Podcasts" = "Падкасты";
 "Prevent indexing" = "Прадухіліць індэксацыю";
 "Progress" = "Прагрэс";
+"Published date" = "Дата публікацыі";
 "Published year" = "Год публікацыі";
 "RSS feed" = "RSS-стужка";
 "RSS feed URL" = "URL стужкі";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Маштабаваць мінулы час па хуткасці";
 "Search" = "Пошук";
+"Season" = "Сезон";
 "Select a device" = "Выбраць прыладу";
 "Send ebook to device" = "Адправіць электронную кнігу на прыладу";
 "Series" = "Серыі";

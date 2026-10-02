@@ -48,12 +48,14 @@
 "Duration" = "Dĺžka";
 "Ebooks" = "E-knihy";
 "End of chapter" = "Koniec kapitoly";
+"Episode number" = "Epizóda";
 "Episodes" = "Epizódy";
 "Explicit content" = "Explicitný obsah";
 "Feed slug" = "Slug RSS zdroja";
 "File created" = "Čas vytvorenia súboru";
 "File modified" = "Súbor zmenený";
 "File size" = "Veľkosť";
+"Filename" = "Názov súboru";
 "Finished" = "Ukončené";
 "Font" = "písmo";
 "Font size" = "Veľkosť písma";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcasty";
 "Prevent indexing" = "Zakázať indexovanie";
 "Progress" = "Aktuálny stav";
+"Published date" = "Dátum publikovania";
 "Published year" = "Rok vydania";
 "RSS feed" = "RSS zdroj";
 "RSS feed URL" = "URL zdroja";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Zmeniť ubehnutý čas podľa rýchlosti";
 "Search" = "Vyhľadať";
+"Season" = "Sezóna";
 "Select a device" = "Vyberte zariadenie";
 "Send ebook to device" = "Poslať e-knihu do zariadenia";
 "Series" = "Série";

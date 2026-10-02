@@ -48,12 +48,14 @@
 "Duration" = "Varighet";
 "Ebooks" = "E-bøker";
 "End of chapter" = "Slutt på kapittel";
+"Episode number" = "Episode";
 "Episodes" = "Episoder";
 "Explicit content" = "Eksplisitt";
 "Feed slug" = "RSS-informasjonskanalunderadresse";
 "File created" = "Fil Opprettelsesdato";
 "File modified" = "Fil Endret";
 "File size" = "Størrelse";
+"Filename" = "Filnavn";
 "Finished" = "Fullført";
 "Font" = "Skriftfamilie";
 "Font size" = "Font størrelse";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcaster";
 "Prevent indexing" = "Forhindre indeksering";
 "Progress" = "Framgang";
+"Published date" = "Publiseringsdato";
 "Published year" = "Publikasjonsår";
 "RSS feed" = "RSS-informasjonskanal";
 "RSS feed URL" = "Feed Adresse";
@@ -125,6 +128,7 @@
 "Sans serif" = "Sans";
 "Scale elapsed time by speed" = "Skaler forløpt tid etter hastighet";
 "Search" = "Søk";
+"Season" = "Sesong";
 "Select a device" = "Velg en enhet";
 "Send ebook to device" = "Send e-bok til enhet";
 "Series" = "Serier";

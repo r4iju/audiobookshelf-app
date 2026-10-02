@@ -48,12 +48,14 @@
 "Duration" = "Délka trvání";
 "Ebooks" = "E-knihy";
 "End of chapter" = "Konec kapitoly";
+"Episode number" = "Epizoda";
 "Episodes" = "Epizody";
 "Explicit content" = "Explicitní";
 "Feed slug" = "Klíčové slovo kanálu RSS";
 "File created" = "Čas vytvoření souboru";
 "File modified" = "Soubor upraven";
 "File size" = "Velikost";
+"Filename" = "Název souboru";
 "Finished" = "Dokončeno";
 "Font" = "Rodina písem";
 "Font size" = "Velikost písma";
@@ -112,6 +114,7 @@
 "Podcasts" = "Podcasty";
 "Prevent indexing" = "Zabránit indexování";
 "Progress" = "Průběh";
+"Published date" = "Datum vydání";
 "Published year" = "Rok vydání";
 "RSS feed" = "RSS kanál";
 "RSS feed URL" = "URL kanálu";
@@ -125,6 +128,7 @@
 "Sans serif" = "Bezpatkové";
 "Scale elapsed time by speed" = "Škálovat uplynulý čas podle rychlosti";
 "Search" = "Hledat";
+"Season" = "Sezóna";
 "Select a device" = "Vyberte zařízení";
 "Send ebook to device" = "Odeslat e-knihu na zařízení";
 "Series" = "Série";

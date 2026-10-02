@@ -32,6 +32,7 @@ struct RelatedLabel: View {
 /// The links from a book's details to each of its series and authors.
 /// It keeps only the derived links: `LibraryItem` equality is by id, so holding the item would hide the expanded item's series.
 struct RelatedLinks: View {
+    @Environment(\.nativeStrings) private var l10n
     private let series: [(reference: SeriesReference, link: RelatedLink)]
     private let authors: [RelatedLink]
 
@@ -50,10 +51,10 @@ struct RelatedLinks: View {
                     ForEach(series, id: \.link) { series in
                         let reference = series.reference
                         NavigationLink(value: Route.series(series.link)) {
-                            Label(reference.name + (reference.sequence.map { " · Book " + $0 } ?? ""), systemImage: "books.vertical.fill")
+                            Label(reference.sequence.map { l10n("{0} · Book {1}", reference.name, $0) } ?? reference.name, systemImage: "books.vertical.fill")
                         }
                         .accessibilityIdentifier("detail-series." + reference.id)
-                        .accessibilityLabel(reference.name + (reference.sequence.map { ", book " + $0 } ?? ""))
+                        .accessibilityLabel(reference.sequence.map { l10n("{0}, book {1}", reference.name, $0) } ?? reference.name)
                     }
                     ForEach(authors, id: \.self) { author in
                         NavigationLink(value: Route.author(author)) { Label(author.name, systemImage: "person.fill") }
@@ -76,6 +77,7 @@ struct AuthorView: View {
 }
 
 private struct AuthorScreen: View {
+    @Environment(\.nativeStrings) private var l10n
     let author: RelatedLink
     let catalog: CatalogStore
     @StateObject private var page: RelatedAuthor
@@ -104,7 +106,7 @@ private struct AuthorScreen: View {
                     VStack(alignment: .leading, spacing: 18) {
                         Text(page.author?.name ?? author.name).font(.system(size: 52, weight: .bold)).accessibilityIdentifier("author-name")
                         if books.total > 0 {
-                            Text(books.total == 1 ? "1 title" : "\(books.total) titles").font(.headline).accessibilityIdentifier("author-count")
+                            Text(books.total == 1 ? l10n("1 title") : l10n("{0} titles", books.total)).font(.headline).accessibilityIdentifier("author-count")
                         }
                         if let bio = page.author?.description.map(Format.plainText), !bio.isEmpty {
                             Text(bio).foregroundStyle(.secondary).lineLimit(6).accessibilityIdentifier("author-bio")
@@ -117,7 +119,7 @@ private struct AuthorScreen: View {
                 }
                 if !page.series.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Series").font(.title3.bold())
+                        Text(l10n("Series")).font(.title3.bold())
                         ScrollView(.horizontal) {
                             HStack(spacing: 30) {
                                 ForEach(page.series) { series in
@@ -134,7 +136,7 @@ private struct AuthorScreen: View {
                     .focusSection()
                 }
                 if !books.items.isEmpty {
-                    Text("Titles").font(.title3.bold())
+                    Text(l10n("Titles")).font(.title3.bold())
                     LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
                         ForEach(books.items) { item in
                             NavigationLink(value: Route.to(item)) { ItemTile(item: item) }
@@ -170,9 +172,16 @@ struct SeriesView: View {
 }
 
 private struct SeriesScreen: View {
+    @Environment(\.nativeStrings) private var l10n
     let series: RelatedLink
     let catalog: CatalogStore
     @StateObject private var page: RelatedSeries
+
+    private var progressSummary: String? {
+        guard let counts = page.counts else { return nil }
+        let books = counts.books == 1 ? l10n("1 book") : l10n("{0} books", counts.books)
+        return counts.finished.map { l10n("{0} · {1} finished", books, $0) } ?? books
+    }
 
     init(series: RelatedLink, catalog: CatalogStore) {
         self.series = series
@@ -186,7 +195,7 @@ private struct SeriesScreen: View {
             VStack(alignment: .leading, spacing: 44) {
                 VStack(alignment: .leading, spacing: 18) {
                     Text(page.series?.name ?? series.name).font(.system(size: 52, weight: .bold)).accessibilityIdentifier("series-name")
-                    if let progress = page.summary { Text(progress).font(.headline).accessibilityIdentifier("series-progress") }
+                    if let progress = progressSummary { Text(progress).font(.headline).accessibilityIdentifier("series-progress") }
                     if let description = page.series?.description.map(Format.plainText), !description.isEmpty {
                         Text(description).foregroundStyle(.secondary).lineLimit(6).accessibilityIdentifier("series-description")
                     }
@@ -198,7 +207,7 @@ private struct SeriesScreen: View {
                     ForEach(books.items) { item in
                         VStack(alignment: .leading, spacing: 30) {
                             if let sequence = page.sequence(of: item) {
-                                Text("Book " + sequence).font(.headline).accessibilityIdentifier("series-sequence." + item.id)
+                                Text(l10n("Book {0}", sequence)).font(.headline).accessibilityIdentifier("series-sequence." + item.id)
                             }
                             NavigationLink(value: Route.to(item)) { ItemTile(item: item) }
                                 .buttonStyle(.card)
