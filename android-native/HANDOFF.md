@@ -384,6 +384,42 @@ Not covered:
 
 **Localization: partial.** UI text is in resources with the legacy translations (see Localization). Messages built in `core` are still English.
 
+## Real 2.30.0 server (pinned image, synthetic data) in c4cb1087 and 27ccefd9
+
+Before this, every Android journey had only run against the Python and Node fixtures.
+
+**Setup**
+- `scripts/verify-real-server.sh` starts the web lane's unmodified QA container from the local pinned image `ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03` (2.30.0, never pulled).
+- It runs under this lane's own name and ports: `abs-android-qa`, with the server on 28870 and its helpers on 28874-28876.
+- Data is the synthetic library and the synthetic `qa` account, and the server is recreated fresh on each run.
+- The emulator reaches it as 10.0.2.2, so turning the emulator's networking off really cuts it off.
+- No owner server, owner data, real identity provider or receiver is involved. The Apple and web QA containers are not touched.
+
+**Results** (RealServerJourney, emulator-5584)
+- a: password sign-in, browse, streaming across three files, with progress stored on the server. Passed.
+- b: a PDF page turn is stored on the server (`ebookLocation`). Passed.
+- c: a downloaded book played offline with networking off, then its listening is stored on the server after reconnect. Passed.
+- d: a downloaded book finished offline. **Fails on 2.30.0.**
+  - After reconnect the server stores the end position (20.06 of 20.06 s) but `isFinished` stays false.
+  - The server log shows "Creating new media progress" with no finished marking.
+  - In 2.30.0, a local session that creates a title's first progress (`User.createUpdateMediaProgressFromPayload`, create branch) takes `isFinished` only from the payload. Its 10 s finished rule (`MediaProgress.applyProgressUpdate`) runs only for existing progress.
+  - RED evidence: `artifacts/real-server-6-d`.
+  - A client patch that marks such titles finished made d pass (`artifacts/green-real-server-finish`). It is held back, not merged: it adds a progress write, and its check reads progress the server may serve from its user cache, where Apple found a 2.30.0 cache race. Open for root's decision.
+
+**Client defect found and fixed** (27ccefd9)
+- A finished book showed "Finished" with a pause button, and the mini player stayed in its playing state.
+- Media3 keeps `playWhenReady` at the end of the last file, and its callback overwrote the paused state set on end.
+- RED: PlaybackJourney e at line 131 (`artifacts/red-playing-after-end`). GREEN: Playback 5/5 and RealServer a-c (`artifacts/green-playing-after-end`).
+
+**Harness mistakes during these runs** (not product defects)
+- The Downloads tab was tapped while the item detail covered it.
+- b and c relied on an earlier test's sign-in.
+- A reused server let playback start past the checked position.
+- d first waited for the mini player rather than the finished state.
+
+**Unchanged**
+- 2.30.0 has no podcast progress concern for Android: it always reads episode progress with the episode ID.
+
 ## Known limits
 
 - Listening that is held in memory because storage refuses writes is lost if the process dies before storage recovers. The player pauses and warns as soon as a write fails, which bounds the loss to the listening already played.
