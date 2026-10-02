@@ -6,6 +6,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +32,7 @@ class CastHandoverTest {
             phone.playWhenReady = true
             var ended = 0
             val notices = mutableListOf<String>()
-            val handover = CastHandover(phone, endSession = { ended++ }, explain = { notices += it })
+            val handover = CastHandover(phone, endSession = { ended++ }, explain = { notices += it }, hasTitle = { true })
 
             switch(handover, phone, receiver)
             switch(handover, receiver, phone)
@@ -47,6 +48,40 @@ class CastHandoverTest {
             } finally {
                 phone.release(); receiver.release()
             }
+        }
+    }
+
+    @Test
+    fun aReceiverQueueFromBeforeTheAppRestartedIsNeitherKeptNorCopiedToThePhone() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.runOnMainSync {
+            val context = instrumentation.targetContext
+            val phone = ExoPlayer.Builder(context).build()
+            val receiver = ExoPlayer.Builder(context).build()
+            // Left playing on the receiver by the process that died; this process opened no title.
+            receiver.setMediaItems(listOf(MediaItem.fromUri("https://server.invalid/public/session/old/track/0")), 0, 9_000)
+            receiver.playWhenReady = true
+            val handover = CastHandover(phone, endSession = {}, explain = {}, hasTitle = { false })
+
+            try {
+                switch(handover, receiver, phone)
+                assertEquals("Nothing from the receiver reaches the phone", 0, phone.mediaItemCount)
+                assertFalse("The phone does not start playing", phone.playWhenReady)
+            } finally {
+                phone.release(); receiver.release()
+            }
+        }
+    }
+
+    @Test
+    fun aSessionResumedAfterTheAppRestartedWithNoTitleOpenIsEndedWithAnExplanation() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.runOnMainSync {
+            val routes = CastRoutes(instrumentation.targetContext)
+            assertEquals("Play services provides casting on the QA emulator", null, routes.status.value.unavailable)
+            routes.keepResumed = { false }
+            routes.resumed()
+            assertEquals(CastRoutes.RESUMED_WITHOUT_TITLE, routes.status.value.problem)
         }
     }
 }

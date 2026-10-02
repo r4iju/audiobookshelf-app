@@ -102,7 +102,14 @@ internal class CastConverter : MediaItemConverter {
  * be refused, so a downloaded title is kept on the phone, which Media3 only stops, and the receiver
  * session is ended; when Media3 switches back, the phone resumes where it was.
  */
-internal class CastHandover(private val phone: Player, private val endSession: () -> Unit, private val explain: (String) -> Unit) {
+internal class CastHandover(
+    private val phone: Player,
+    private val endSession: () -> Unit,
+    private val explain: (String) -> Unit,
+    /** True while the engine holds an opened title, bound to its account and listening record. */
+    private val hasTitle: () -> Boolean,
+) {
+
     private var keptOnPhone = false
     private var resume = false
 
@@ -118,6 +125,8 @@ internal class CastHandover(private val phone: Player, private val endSession: (
                 keptOnPhone = false
                 phone.playWhenReady = resume
             }
+            // A receiver queue no open title accounts for, such as one left by a process that died, stays off the phone.
+            to === phone && !hasTitle() -> Unit
             else -> CastPlayer.TransferCallback.DEFAULT.transferState(from, to)
         }
     }
@@ -176,11 +185,21 @@ class CastRoutes(private val context: Context) {
         override fun onSessionEnded(session: CastSession, error: Int) =
             refresh(problem = if (error != 0) "The connection to ${session.castDevice?.friendlyName ?: "the receiver"} was lost. Playback continues on this phone." else mutable.value.problem)
         override fun onSessionResuming(session: CastSession, sessionId: String) = refresh()
-        override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) = refresh(problem = null)
+        override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) = resumed()
         override fun onSessionResumeFailed(session: CastSession, error: Int) = refresh()
         override fun onSessionSuspended(session: CastSession, reason: Int) = refresh()
     }
     private var watchers = 0
+
+    /** Whether a session the system resumes belongs to a title this process opened and accounts for. */
+    var keepResumed: () -> Boolean = { false }
+
+    /** Called for every resumed session, including the one the system restores after the app restarts. */
+    internal fun resumed() {
+        if (keepResumed()) return refresh(problem = null)
+        mutable.value = mutable.value.copy(problem = RESUMED_WITHOUT_TITLE)
+        castContext?.sessionManager?.endCurrentSession(true)
+    }
 
     init {
         if (castContext != null) {
@@ -217,6 +236,10 @@ class CastRoutes(private val context: Context) {
     fun disconnect() {
         castContext?.sessionManager?.endCurrentSession(true)
         refresh()
+    }
+
+    companion object {
+        const val RESUMED_WITHOUT_TITLE = "Casting stopped because the app restarted while casting. Open the title again to keep listening from the last place this phone saved."
     }
 
     private fun refresh(problem: String? = mutable.value.problem) {

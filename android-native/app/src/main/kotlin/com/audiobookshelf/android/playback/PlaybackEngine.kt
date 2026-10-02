@@ -171,6 +171,10 @@ class PlaybackEngine(
     val player: Player by lazy { (castPlayer() ?: exo).also(::listen) }
     private val serverVersions = java.util.concurrent.ConcurrentHashMap<String, String>()
 
+    init {
+        casting?.keepResumed = { loaded != null }
+    }
+
     private val sleep = SleepController(context, settings, onShakeRestart = { if (!player.playWhenReady) resume() })
         .also { controller -> controller.bind { Triple(globalPosition(), loaded?.now?.chapters.orEmpty(), player.playbackParameters.speed) } }
 
@@ -474,7 +478,7 @@ class PlaybackEngine(
             .setSeekBackIncrementMs(settings.current.jumpBackwardsTime * 1000L)
             .setSeekForwardIncrementMs(settings.current.jumpForwardTime * 1000L)
             .build()
-        val handover = CastHandover(exo, endSession = { main.post { casting?.disconnect() } }, explain = { main.post { casting?.explain(it) } })
+        val handover = CastHandover(exo, endSession = { main.post { casting?.disconnect() } }, explain = { main.post { casting?.explain(it) } }, hasTitle = { loaded != null })
         return CastPlayer.Builder(context).setLocalPlayer(exo).setRemotePlayer(remote).setTransferCallback(handover::transfer).build()
     }
 
