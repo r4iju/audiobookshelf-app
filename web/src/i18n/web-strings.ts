@@ -69,6 +69,7 @@ export const webStrings = {
   WebPage: "Page {0}",
   WebPrevious: "Previous",
   WebNext: "Next",
+  WebRotatePage: "Rotate page",
   WebNextPage: "Next page",
   WebPreviousPage: "Previous page",
   WebGoToPageNumber: "Go to page {0}",
