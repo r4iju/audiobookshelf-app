@@ -24,7 +24,8 @@ import SwiftUI
     func play(_ item: LibraryItem, episode: Episode? = nil, restart: Bool, player: TVPlayer, navigator: TVNavigator) async {
         error = nil
         await player.start(item: item, episode: episode)
-        guard player.session != nil else { return }
+        // A start that could not replace the playing title leaves it in place; the failure shows here instead (#112).
+        guard player.session != nil, player.itemID == item.id, player.episodeID == episode?.id else { return }
         if restart {
             do { try await player.seek(to: 0, autoplay: true) }
             catch {

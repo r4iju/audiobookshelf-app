@@ -67,4 +67,42 @@ final class PlaybackJourney: TVJourney {
         wait(app.staticTexts["playback-status"], label: "Finished", timeout: 30)
         XCTAssertEqual(label("now-playing-elapsed"), "0:20")
     }
+
+    /// Issue #112: starting another title while one plays replaces it in Now Playing and in the session.
+    func testStartingAnotherTitleWhileOnePlaysReplacesIt() async throws {
+        let earlier = try await observations().requests.count
+        startContinueListening()
+        tab("Audiobooks")
+        select(app.buttons["item-book-1"])
+        wait(app.buttons["play-item"], label: "Play")
+        select(app.buttons["play-item"])
+        wait(app.staticTexts["now-playing-title"], label: "Stories for Tomorrow 02", timeout: 20)
+        wait(app.staticTexts["playback-status"], label: "Playing", timeout: 20)
+        sleep(3)
+        XCTAssertEqual(label("now-playing-title"), "Stories for Tomorrow 02", "The earlier title must not come back")
+        let requests = try await observations().requests.dropFirst(earlier).filter { $0.method == "POST" }.map(\.path)
+        let firstPlay = requests.firstIndex(of: "/api/items/book-0/play"), secondPlay = requests.firstIndex(of: "/api/items/book-1/play")
+        XCTAssertNotNil(firstPlay, "\(requests)")
+        XCTAssertNotNil(secondPlay, "The second title must open its own session: \(requests)")
+        if let firstPlay, let secondPlay {
+            XCTAssertTrue(requests[firstPlay..<secondPlay].contains { $0.hasPrefix("/api/session/") && $0.hasSuffix("/close") },
+                          "The first session closes before the second opens: \(requests)")
+        }
+        XCTAssertEqual(requests.filter { $0 == "/api/items/book-0/play" }.count, 1, "The first title must not be started again: \(requests)")
+    }
+
+    /// Issue #112: a start that cannot replace the playing title says so on the chosen title instead of showing the
+    /// earlier one in Now Playing. The server refuses the earlier session's save and close here.
+    func testAStartThatCannotReplaceThePlayingTitleStaysOnTheChosenTitle() async throws {
+        startContinueListening()
+        try await Fixture.configure("offline-progress")
+        tab("Audiobooks")
+        select(app.buttons["item-book-1"])
+        wait(app.buttons["play-item"], label: "Play")
+        select(app.buttons["play-item"])
+        XCTAssertTrue(app.staticTexts["detail-error"].waitForExistence(timeout: 20), "The chosen title explains why it did not start")
+        sleep(2)
+        XCTAssertTrue(app.buttons["play-item"].exists, "The chosen title stays open")
+        XCTAssertFalse(app.staticTexts["now-playing-title"].exists, "Now Playing must not open on the earlier title")
+    }
 }

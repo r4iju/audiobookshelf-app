@@ -71,16 +71,19 @@ import Foundation
         }
     }
 
-    private let file: URL
+    private let record: SavedRecord
     private var document: Document?
 
-    init(file: URL) {
-        self.file = file
-        guard FileManager.default.fileExists(atPath: file.path) else {
+    convenience init(file: URL) { self.init(record: SavedRecord(file: file)) }
+
+    init(record: SavedRecord) {
+        self.record = record
+        let data: Data?
+        do { data = try record.read() } catch { document = nil; return }
+        guard let data else {
             document = Document(version: 1, writes: [], unreadableBefore: nil, restarts: [:])
             return
         }
-        guard let data = try? Data(contentsOf: file) else { document = nil; return }
         if let saved = try? JSONDecoder().decode(Document.self, from: data), saved.version == 1 {
             document = saved
             return
@@ -88,11 +91,10 @@ import Foundation
         // Set aside rather than discarded, and every earlier write counts as unknown. Copied, not moved:
         // until the fresh record replaces it, the unreadable one stays in place for the next launch.
         let now = Self.now
-        let aside = file.deletingLastPathComponent().appendingPathComponent("publications-unreadable-\(Int(now)).json")
         do {
-            try FileManager.default.copyItem(at: file, to: aside)
+            try record.setAside(data, named: "publications-unreadable-\(Int(now)).json")
             let fresh = Document(version: 1, writes: [], unreadableBefore: now, restarts: [:])
-            try Self.write(fresh, to: file)
+            try record.write(JSONEncoder().encode(fresh))
             document = fresh
         } catch { document = nil }
     }
@@ -194,17 +196,8 @@ import Foundation
     static let changed = Notification.Name("PublicationLedgerChanged")
 
     private func save(_ next: Document) throws {
-        try Self.write(next, to: file)
+        try record.write(JSONEncoder().encode(next))
         document = next
         NotificationCenter.default.post(name: Self.changed, object: self)
-    }
-
-    private static func write(_ document: Document, to file: URL) throws {
-        try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
-        var options: Data.WritingOptions = .atomic
-        #if os(iOS) || os(tvOS)
-        options.insert(.completeFileProtectionUntilFirstUserAuthentication)
-        #endif
-        try JSONEncoder().encode(document).write(to: file, options: options)
     }
 }

@@ -18,12 +18,9 @@ struct ProgressResetIntent: Codable, Equatable {
 }
 
 @MainActor final class ListeningSync {
-    static var file: URL {
-        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("NativeListening/listening.json")
-    }
+    static var file: URL { ListeningStorage.standard.journalFile }
     /// Where `publications` is kept unless the resets are kept elsewhere.
-    static var publicationsFile: URL { file.deletingLastPathComponent().appendingPathComponent("publications.json") }
+    static var publicationsFile: URL { ListeningStorage.standard.publicationsFile }
     private let api: APIClient
     private let journal: ListeningJournal?
     private let loadingFailure: Error?
@@ -32,25 +29,25 @@ struct ProgressResetIntent: Codable, Equatable {
         let task: Task<Void, Error>
     }
     private var request: Transfer?
-    private let resetsFile: URL
+    private let resetsRecord: SavedRecord
     private var resets: Result<[ProgressResetIntent], Error>
     /// Every progress write this app sends, listening, reading and carried-over data alike.
     let publications: PublicationLedger
 
-    init(api: APIClient, resets: URL? = nil) {
+    init(api: APIClient, storage: ListeningStorage = .standard, resets: URL? = nil) {
         self.api = api
-        resetsFile = resets ?? Self.file.deletingLastPathComponent().appendingPathComponent("progress-resets.json")
-        publications = PublicationLedger(file: resetsFile.deletingLastPathComponent().appendingPathComponent("publications.json"))
+        if let resets {
+            resetsRecord = SavedRecord(file: resets)
+            publications = PublicationLedger(file: resets.deletingLastPathComponent().appendingPathComponent("publications.json"))
+        } else {
+            resetsRecord = storage.resets
+            publications = PublicationLedger(record: storage.publications)
+        }
         do {
-            self.resets = .success(FileManager.default.fileExists(atPath: resetsFile.path)
-                ? try JSONDecoder().decode([ProgressResetIntent].self, from: Data(contentsOf: resetsFile)) : [])
+            self.resets = .success(try resetsRecord.read().map { try JSONDecoder().decode([ProgressResetIntent].self, from: $0) } ?? [])
         } catch { self.resets = .failure(error) }
         do {
-            #if os(tvOS)
-            let journal = try ListeningJournal(file: Self.file, persistentDefaults: .standard)
-            #else
-            let journal = try ListeningJournal(file: Self.file)
-            #endif
+            let journal = try ListeningJournal(file: storage.journalFile, persistentDefaults: storage.defaults)
             try journal.finishRecoveredSessions()
             self.journal = journal
             loadingFailure = nil
@@ -108,12 +105,7 @@ struct ProgressResetIntent: Codable, Equatable {
     }
 
     private func saveResets(_ next: [ProgressResetIntent]) throws {
-        try FileManager.default.createDirectory(at: resetsFile.deletingLastPathComponent(), withIntermediateDirectories: true)
-        var options: Data.WritingOptions = .atomic
-        #if os(iOS) || os(tvOS)
-        options.insert(.completeFileProtectionUntilFirstUserAuthentication)
-        #endif
-        try JSONEncoder().encode(next).write(to: resetsFile, options: options)
+        try resetsRecord.write(JSONEncoder().encode(next))
         resets = .success(next)
     }
 
