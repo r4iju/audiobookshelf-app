@@ -86,7 +86,7 @@ function ListChooser({
           if (parsed.success) onCreate(parsed.data.name);
         }}
       >
-        <TextField label={newLabel} name="name" required className="flex-1" autoComplete="off" />
+        <TextField label={newLabel} name="name" required className="min-w-0 flex-1" autoComplete="off" />
         <Button type="submit" variant="primary" disabled={busy}>
           {t("ButtonCreate")}
         </Button>
