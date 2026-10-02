@@ -165,7 +165,6 @@ export const webStrings = {
   WebQueuedOnServer: "Queued on the server",
   WebEpisodesCount_one: "{0} episode",
   WebEpisodesCount: "{0} episodes",
-  WebReaderSettings: "Reader settings",
   WebBookText: "Book text",
   WebNumberRange: "Enter a whole number from {0} to {1}.",
   WebReaderLocation: "Location {0} of {1}",

@@ -68,6 +68,9 @@ from `fork/native-tv` at `79b31196` (which carries everything up to `45149135` u
 | `4ee4703b` | In WebKit, MOBI and AZW3 links point at fragments of their own section, which the frame watcher follows; a deaf frame holding focus with nothing inside it focused hands the keyboard back to the reader. The sandbox is unchanged |
 | `6ca78083` | Journey: Tab is never held in one place by a MOBI book |
 | `6164959b` | The keyboard goes back to the reader only when the frame gains the focus without a Tab, which `4ee4703b` had turned into a WebKit focus trap |
+| `1ccd4ca8` | Journeys: in Arabic or Hebrew the reader's arrows, keys and swipes follow the mirrored layout; the reader's settings carry the legacy reader's name |
+| `c99840ad` | In right-to-left languages Next's chevron points left, ArrowLeft and a rightward swipe turn to the next page; PageDown and PageUp keep their meaning |
+| `9a9252df` | The reader's settings use the legacy reader's key (`HeaderEreaderSettings`, the heading of its settings), so every translated language has them |
 
 ## Checks
 
@@ -187,6 +190,15 @@ Phase 2 readiness commits, checked by the journeys they affect (logs in `web/qa/
   the book, a click in its text leaves page keys with the book until Tab leaves it. Full Chromium run on `4ee4703b`
   (`webkit-links-full.log`): 75 of 75, before the Tab fix. Not tested: web links inside a book in WebKit, touch, text
   selection, assistive technology, real-world books, Safari.
+- Right-to-left reader controls on `fork/web-reader-rtl` (`reader-rtl-red.log`). On unchanged product code the
+  Arabic and Hebrew journeys failed at Next's chevron, and the reader settings journey found no Hebrew-named button.
+  With the chevrons fixed but keys and swipes not mirrored, a temporary check failed at ArrowLeft (page stayed 1);
+  the swipe assertion was not reached in any failing run, so it has no observed RED of its own. After `c99840ad`
+  the two right-to-left journeys passed; after `9a9252df` the settings journey too. Reader and settings journeys
+  26 of 26 in Chromium and reader journeys 20 of 20 in each of Firefox and WebKit (`reader-rtl-green.log`). Full run
+  on `9a9252df` (`reader-rtl-full.log`): Biome and `tsc` clean, vitest 115 passed, Chromium 79 of 79. Translation
+  audit for the reader's web-only labels: only the settings label has a legacy string with the same role; Next
+  page, Previous page, Go to page, Reading position and the page counts have none and stay English.
 - Not rerun for these commits: the deployment, connect, statistics and OpenID journeys, whose code they do not touch.
 
 Every behaviour change since the first commit started from a failing test that was observed failing, then made to
@@ -257,11 +269,15 @@ controls, the bookshelf has a list view, and pages have titles. Gaps still open:
   (`src/lib/abs/client.ts`) are English too. The server-rendered `lang="en"` shows until the chosen language loads.
 - The bookmarks list does not mark the bookmark at the current time, and does not create a bookmark with a typed
   title, as the legacy list does; creating stays a player button.
-- The reader's arrows do not flip in right-to-left languages.
+- The reader's arrows, arrow keys and swipes now follow right-to-left languages (`c99840ad`, on
+  `fork/web-reader-rtl`, not yet merged or deployed). Swipes are checked only with synthetic touch pointer events, not
+  on a touch screen.
 - In WebKit, links inside a MOBI or AZW3 book and page keys after a click in its text did nothing. Fixed on
-  `fork/web-reader-webkit-links` (`6164959b`) without letting the book run scripts; not deployed until it is
-  reviewed, merged and passes post-merge QA. A link to a web page inside a book, in WebKit, is not tested: the
-  reader opens it from its frame watcher, outside a click, where the browser may block the new tab.
+  `fork/web-reader-webkit-links` (`6164959b`) without letting the book run scripts; merged in #97 and deployed from
+  `13385800` after post-merge QA (`postmerge-97.log`). A link to a web page inside a book, in WebKit, is not tested:
+  the reader opens it from its frame watcher, outside a click, where the browser may block the new tab. After Tabbing
+  into a book, a click in its text leaves page keys with the book until Tab leaves it. Touch, text selection and
+  assistive technology are not checked.
 - No journey covers a token refresh mid-session, a server under a subpath, or the message shown when the browser
   blocks autoplay.
 - `parity.json`: the browser rows' `replacementEvidence.browser` is filled on this branch from these journeys,
@@ -278,9 +294,9 @@ Readiness by issue. Every issue stays open: each still needs a physical or owner
 | #59 podcasts, collections, playlists | Done, with Continue Listening episodes | Owner feeds are not mutated by tests; checking them is the owner's |
 | #60 EPUB | Done in Chromium, Firefox and WebKit | Safari by hand |
 | #61 PDF | Done in Chromium, Firefox and WebKit | Safari by hand |
-| #62 MOBI | Done in Chromium and Firefox; WebKit fixed on `6164959b`, not yet merged or deployed | WebKit: web links inside a book; Safari by hand |
+| #62 MOBI | Done in Chromium, Firefox and WebKit (deployed from `13385800`) | WebKit: web links inside a book, keys after Tab then a click; touch, text selection, assistive technology; Safari by hand |
 | #63 comics | Done, with dialog keys | Safari by hand |
-| #64 preferences and browser capabilities | Done for the stored preferences, which all have controls now | About 200 web-only strings untranslated; reader arrows in right-to-left languages |
+| #64 preferences and browser capabilities | Done for the stored preferences, which all have controls now | About 200 web-only strings untranslated; right-to-left reader controls on `fork/web-reader-rtl`, not yet merged; swipes not checked on a touch screen |
 | #65 internal deployment, retire legacy | Deployed internally, smoke checked read-only | Owner acceptance; the legacy client stays until then |
 
 ## Internal deployment

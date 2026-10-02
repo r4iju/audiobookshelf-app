@@ -25,7 +25,7 @@ export function ReaderSettingsDialog({ onClose, paged }: { onClose: () => void; 
   const { shape } = readerSettingsSchema;
 
   return (
-    <Dialog open onClose={onClose} title={t("WebReaderSettings")}>
+    <Dialog open onClose={onClose} title={t("HeaderEreaderSettings")}>
       <div className="grid gap-4 sm:grid-cols-2">
         <SelectField
           label={t("LabelTheme")}

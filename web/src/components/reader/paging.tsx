@@ -5,6 +5,7 @@ import { type PointerEvent, type ReactNode, useEffect, useEffectEvent, useRef } 
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/i18n";
+import { rtlLanguages } from "@/i18n/languages";
 
 export interface Turns {
   next: () => void;
@@ -18,6 +19,9 @@ const typing = (target: EventTarget | null) =>
 const inDialog = (target: EventTarget | null) =>
   target instanceof Element && target.closest("dialog[open]") !== null;
 
+/** In a right-to-left layout the next page is to the left, so arrows and swipes turn the other way. */
+const mirrored = () => document.documentElement.dir === "rtl";
+
 /** Turns the page for an arrow or page key, and reports whether it did. */
 export function turnForKey(event: KeyboardEvent, turns: Turns) {
   if (
@@ -29,8 +33,11 @@ export function turnForKey(event: KeyboardEvent, turns: Turns) {
     inDialog(event.target)
   )
     return false;
-  if (event.key === "ArrowRight" || event.key === "PageDown") turns.next();
-  else if (event.key === "ArrowLeft" || event.key === "PageUp") turns.previous();
+  const [left, right] = mirrored() ? [turns.next, turns.previous] : [turns.previous, turns.next];
+  if (event.key === "ArrowRight") right();
+  else if (event.key === "ArrowLeft") left();
+  else if (event.key === "PageDown") turns.next();
+  else if (event.key === "PageUp") turns.previous();
   else return false;
   return true;
 }
@@ -63,7 +70,7 @@ export function useSwipe(turns: Turns) {
       if (!from || Date.now() - from.at >= 1000) return;
       const dx = event.clientX - from.x;
       if (Math.abs(dx) <= 60 || Math.abs(dx) <= Math.abs(event.clientY - from.y)) return;
-      if (dx < 0) turns.next();
+      if (dx < 0 !== mirrored()) turns.next();
       else turns.previous();
     },
   };
@@ -83,7 +90,10 @@ export function ReaderBar({
   canGoOn?: boolean;
   children: ReactNode;
 }) {
-  const { t } = useI18n();
+  const { t, code } = useI18n();
+  const [PreviousIcon, NextIcon] = rtlLanguages.has(code)
+    ? [ChevronRight, ChevronLeft]
+    : [ChevronLeft, ChevronRight];
   return (
     <nav
       aria-label={t("WebReaderNavigation")}
@@ -96,11 +106,11 @@ export function ReaderBar({
         disabled={!canGoBack}
         onClick={onPrevious}
       >
-        <ChevronLeft aria-hidden className="size-5" />
+        <PreviousIcon aria-hidden className="size-5" />
       </Button>
       {children}
       <Button variant="ghost" size="icon" aria-label={t("WebNextPage")} disabled={!canGoOn} onClick={onNext}>
-        <ChevronRight aria-hidden className="size-5" />
+        <NextIcon aria-hidden className="size-5" />
       </Button>
     </nav>
   );
