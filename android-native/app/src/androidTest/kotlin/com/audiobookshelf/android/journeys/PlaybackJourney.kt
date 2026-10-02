@@ -127,6 +127,8 @@ class PlaybackJourney {
             compose.tap("player-chapter-1")
             repeat(2) { compose.tap("jump-forward") }
             compose.waitForTag("player-finished", 30_000)
+            // Nothing plays once the book has ended, so the control offers to play rather than pause.
+            compose.waitForTag("player-paused")
             eventually(20_000) {
                 Fixture.observations().getJSONArray("localSessions").objects().any { it.getString("libraryItemId") == "book-3" && it.getDouble("currentTime") >= 20 }
             }

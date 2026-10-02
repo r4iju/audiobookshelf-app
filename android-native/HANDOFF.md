@@ -4,6 +4,9 @@
 `fork/android-l10n-bookmarks`, branched from there. The app installs as the preview identity
 `com.audiobookshelf.app.nativepreview` beside the legacy `com.audiobookshelf.app`, which it never touches.
 
+Evidence paths written as `artifacts/...` are outside the repository, under
+`/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/`. The worktree's `artifacts` link to it has been removed.
+
 ## Issue mapping (for ticket maintenance)
 
 Source `f256272b` (f256272b76251decaafd5099e6568f3a6b77d890, branch `fork/android-l10n-bookmarks` from `fork/native-tv` at 79b31196): one full run passed 88 of 88, that is 83 of 83 journeys in 23 classes plus `CastHandoverTest` 5 of 5. Unit tests pass (core 63, app 6). The two full runs before it on this branch each had one failure, both kept with their own XML: 2efb7f3d (87 of 88, the Chrome sign-in page; harness fixed in e3627918) and e3627918 (87 of 88, a lost listening write; fixed in f256272b); see Journey failures below. The bookmarks journey signal from 83826111 has not recurred but its cause is unknown, so it stays open. The APK is packaged from the merged source after root's merge and recorded on the pull request. All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: casting (#49) has not been tried with a real receiver, localization is partial, and the physical gates below remain.
@@ -383,6 +386,42 @@ Not covered:
 - the reader and import screens.
 
 **Localization: partial.** UI text is in resources with the legacy translations (see Localization). Messages built in `core` are still English.
+
+## Real 2.30.0 server (pinned image, synthetic data) in c4cb1087 and 27ccefd9
+
+Before this, every Android journey had only run against the Python and Node fixtures.
+
+**Setup**
+- `scripts/verify-real-server.sh` starts the web lane's unmodified QA container from the local pinned image `ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03` (2.30.0, never pulled).
+- It runs under this lane's own name and ports: `abs-android-qa`, with the server on 28870 and its helpers on 28874-28876.
+- Data is the synthetic library and the synthetic `qa` account, and the server is recreated fresh on each run.
+- The emulator reaches it as 10.0.2.2, so turning the emulator's networking off really cuts it off.
+- No owner server, owner data, real identity provider or receiver is involved. The Apple and web QA containers are not touched.
+
+**Results** (RealServerJourney, emulator-5584)
+- a: password sign-in, browse, and streaming to 33 s of a book of three 30 s files, so into its second file, with the paused position stored on the server. Passed. It does not prove playback through all three files.
+- b: a PDF page turn is stored on the server (`ebookLocation`). Passed.
+- c: a downloaded book played offline with networking off, then its listening is stored on the server after reconnect. Passed.
+- d: a downloaded book finished offline. **Fails on 2.30.0.**
+  - After reconnect the server stores the end position (20.06 of 20.06 s) but `isFinished` stays false.
+  - The server log shows "Creating new media progress" with no finished marking.
+  - In 2.30.0, a local session that creates a title's first progress (`User.createUpdateMediaProgressFromPayload`, create branch) takes `isFinished` only from the payload. Its 10 s finished rule (`MediaProgress.applyProgressUpdate`) runs only for existing progress.
+  - RED evidence: `artifacts/real-server-6-d`.
+  - A client patch that marks such titles finished made d pass (`artifacts/green-real-server-finish`). It is held back, not merged: it adds a progress write, and its check reads progress the server may serve from its user cache, where Apple found a 2.30.0 cache race. Open for root's decision.
+
+**Client defect found and fixed** (27ccefd9)
+- A finished book showed "Finished" with a pause button, and the mini player stayed in its playing state.
+- Media3 keeps `playWhenReady` at the end of the last file, and its callback overwrote the paused state set on end.
+- RED: PlaybackJourney e at line 131 (`artifacts/red-playing-after-end`). GREEN: Playback 5/5 and RealServer a-c (`artifacts/green-playing-after-end`).
+
+**Harness mistakes during these runs** (not product defects)
+- The Downloads tab was tapped while the item detail covered it.
+- b and c relied on an earlier test's sign-in.
+- A reused server let playback start past the checked position.
+- d first waited for the mini player rather than the finished state.
+
+**Unchanged**
+- 2.30.0 has no podcast progress concern for Android: it always reads episode progress with the episode ID.
 
 ## Known limits
 

@@ -288,5 +288,37 @@
         "Failed once at line 38 (phone position did not advance after closing the cast sheet) in 6 exact-order runs at 942ece9c plus the close change, before the position wait was captured; the emulator audio output went to standby right after the sheet closed. Not reproduced since; cause unknown."
       ]
     }
-  ]
+  ],
+  "realServer": {
+    "image": "ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03",
+    "serverVersion": "2.30.0",
+    "container": "abs-android-qa",
+    "ports": [
+      28870,
+      28874,
+      28875,
+      28876
+    ],
+    "data": "synthetic library and synthetic qa account (web/qa/make-library.sh, web/qa/server.mjs seed); fresh per run",
+    "command": "android-native/scripts/verify-real-server.sh",
+    "sources": [
+      "c4cb1087",
+      "27ccefd9"
+    ],
+    "journeys": {
+      "a_passwordSignInBrowsesAndStreamsAcrossFilesWithProgressOnTheServer": "passed: streams to 33 s of three 30 s files (into the second file) and the paused position is stored; does not prove playback through all three files",
+      "b_pdfPageTurnIsSavedOnTheServer": "passed",
+      "c_offlineListeningOnADownloadReachesTheServerAfterReconnect": "passed",
+      "d_finishingADownloadOfflineMarksItFinishedOnTheServerAfterReconnect": "fails on 2.30.0: first progress created from a local session is not marked finished; client mark-finished patch held back pending root decision"
+    },
+    "clientDefectFixed": "finished book shown as playing (27ccefd9); RED PlaybackJourney.kt:131, GREEN PlaybackJourney 5/5",
+    "notCovered": [
+      "OpenID against a real provider",
+      "podcasts",
+      "realtime socket updates",
+      "physical device",
+      "receiver/Android Auto"
+    ],
+    "artifactRoot": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts (outside the repository)"
+  }
 }
