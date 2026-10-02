@@ -2,6 +2,7 @@ package com.audiobookshelf.android.ui
 
 import com.audiobookshelf.android.R
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -59,9 +60,9 @@ fun SearchScreen(search: SearchModel, catalog: CatalogModel, padding: PaddingVal
         item {
             OutlinedTextField(
                 value = search.query, onValueChange = { search.update(it, catalog.library?.id) },
-                placeholder = { Text("Search ${catalog.library?.name ?: "library"}") },
+                placeholder = { Text(catalog.library?.name?.let { stringResource(R.string.lib_search_in, it) } ?: stringResource(R.string.lib_search_library)) },
                 leadingIcon = { Icon(Icons.Outlined.Search, null) },
-                trailingIcon = { if (search.query.isNotEmpty()) IconButton(onClick = { search.update("", catalog.library?.id) }) { Icon(Icons.Outlined.Close, "Clear search") } },
+                trailingIcon = { if (search.query.isNotEmpty()) IconButton(onClick = { search.update("", catalog.library?.id) }) { Icon(Icons.Outlined.Close, stringResource(R.string.lib_clear_search)) } },
                 singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 modifier = Modifier.fillMaxWidth().padding(16.dp).focusRequester(focus).testTag("search-field"),
             )
@@ -70,25 +71,25 @@ fun SearchScreen(search: SearchModel, catalog: CatalogModel, padding: PaddingVal
         val results = search.results
         val error = search.error
         when {
-            error != null -> item { MessageState("Search failed", error, tag = "search-error", action = "Retry", actionTag = "search-retry") { search.retry() } }
-            search.query.isBlank() -> item { MessageState("Find something to listen to", "Search titles, authors, series, narrators and episodes.", icon = Icons.Outlined.Search, tag = "search-idle") }
+            error != null -> item { MessageState(stringResource(R.string.lib_search_failed), error, tag = "search-error", action = stringResource(R.string.action_retry), actionTag = "search-retry") { search.retry() } }
+            search.query.isBlank() -> item { MessageState(stringResource(R.string.lib_search_idle_title), stringResource(R.string.lib_search_idle_message), icon = Icons.Outlined.Search, tag = "search-idle") }
             results == null -> Unit
-            results.isEmpty -> item { MessageState(stringResource(R.string.search_no_results), "Nothing matches \"${search.query}\". Try fewer words or another spelling.", icon = Icons.Outlined.Search, tag = "search-empty") }
+            results.isEmpty -> item { MessageState(stringResource(R.string.search_no_results), stringResource(R.string.lib_search_no_match, search.query), icon = Icons.Outlined.Search, tag = "search-empty") }
             else -> {
                 section(booksHeading, results.book.map { it.libraryItem }) { ResultRow(it, client, "search-item-${it.id}") { open(it) } }
                 section(podcastsHeading, results.podcast.map { it.libraryItem }) { ResultRow(it, client, "search-item-${it.id}") { open(it) } }
                 section(episodesHeading, results.episodes.map { it.libraryItem }) { ResultRow(it, client, "search-episode-${it.recentEpisode?.id ?: it.id}") { open(it) } }
                 section(authorsHeading, results.authors) { author ->
-                    LinkRow(author.name, author.numBooks?.let { "$it books" }, Icons.Outlined.Person, "search-author-${author.id}") { openFiltered(ApiClient.filter("authors", author.id), author.name) }
+                    LinkRow(author.name, author.numBooks?.let { pluralStringResource(R.plurals.lib_books_count, it, it) }, Icons.Outlined.Person, "search-author-${author.id}") { openFiltered(ApiClient.filter("authors", author.id), author.name) }
                 }
                 section(seriesHeading, results.series) { series ->
-                    LinkRow(series.series.name, "${series.books.size} books", Icons.AutoMirrored.Outlined.LibraryBooks, "search-series-${series.series.id}") { openFiltered(ApiClient.filter("series", series.series.id), series.series.name) }
+                    LinkRow(series.series.name, pluralStringResource(R.plurals.lib_books_count, series.books.size, series.books.size), Icons.AutoMirrored.Outlined.LibraryBooks, "search-series-${series.series.id}") { openFiltered(ApiClient.filter("series", series.series.id), series.series.name) }
                 }
                 section(narratorsHeading, results.narrators) { narrator ->
-                    LinkRow(narrator.name, "${narrator.numBooks} books", Icons.Outlined.RecordVoiceOver, "search-narrator-${narrator.name}") { openFiltered(ApiClient.filter("narrators", narrator.name), narrator.name) }
+                    LinkRow(narrator.name, pluralStringResource(R.plurals.lib_books_count, narrator.numBooks, narrator.numBooks), Icons.Outlined.RecordVoiceOver, "search-narrator-${narrator.name}") { openFiltered(ApiClient.filter("narrators", narrator.name), narrator.name) }
                 }
                 section(tagsHeading, results.tags) { tag ->
-                    LinkRow(tag.name, "${tag.numItems} items", Icons.Outlined.Sell, "search-tag-${tag.name}") { openFiltered(ApiClient.filter("tags", tag.name), tag.name) }
+                    LinkRow(tag.name, pluralStringResource(R.plurals.lib_items_count, tag.numItems, tag.numItems), Icons.Outlined.Sell, "search-tag-${tag.name}") { openFiltered(ApiClient.filter("tags", tag.name), tag.name) }
                 }
             }
         }

@@ -12,4 +12,12 @@
     <string name="action_clear_filter">ફિલ્ટર જતુ કરો</string>
     <string name="action_show_more">વધારે વાંચો</string>
     <string name="action_show_less">ઓછું વાંચો</string>
+    <string name="set_auto_sleep_starts_at">Start Time</string>
+    <string name="set_remove">કાઢી નાખો</string>
+    <string name="set_import_issue_account">એકાઉન્ટ</string>
+    <string name="dl_remove">કાઢી નાખો</string>
+    <string name="grp_delete">કાઢી નાખો</string>
+    <string name="grp_back">પાછા</string>
+    <string name="item_open_feed">ફીડ ખોલો</string>
+    <string name="item_close_feed">ફીડ બંધ કરો</string>
 </resources>

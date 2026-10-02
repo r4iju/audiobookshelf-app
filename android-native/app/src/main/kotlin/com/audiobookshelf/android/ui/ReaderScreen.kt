@@ -99,7 +99,8 @@ private class Opened(val document: PdfDocument, val startPage: Int)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: CatalogModel, onClose: () -> Unit) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val account = active.client.account
     val fileKey = if (route.supplementary) route.ino else PRIMARY_EBOOK
     val settings by graph.settings.settings.collectAsState()
@@ -109,7 +110,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
     var error by remember { mutableStateOf<String?>(null) }
     var page by remember { mutableIntStateOf(1) }
     var rotation by remember { mutableIntStateOf(0) }
-    var saveError by remember { mutableStateOf(if (graph.reading.writable) null else "Saved reading positions could not be restored, so pages are not being saved. The original data is kept.") }
+    var saveError by remember { mutableStateOf(if (graph.reading.writable) null else context.getString(R.string.rd_positions_not_restored)) }
 
     LaunchedEffect(attempt) {
         error = null
@@ -117,7 +118,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
         try {
             val file = resolve(graph, active.client, route)
             val document = withContext(Dispatchers.IO) {
-                runCatching { PdfDocument.open(file()) }.getOrElse { throw IOException("This file is not a PDF this device can open.") }
+                runCatching { PdfDocument.open(file()) }.getOrElse { throw IOException(context.getString(R.string.rd_not_a_pdf)) }
             }
             if (!route.supplementary) {
                 // A fresh server position is worth a short wait; offline, the last known one is used.
@@ -135,7 +136,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
             graph.diagnostics.record(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "PDF \"${route.title}\" could not be opened", failure)
             error = when (failure) {
                 is ApiError -> failure.message
-                else -> failure.message ?: "The document could not be opened."
+                else -> failure.message ?: context.getString(R.string.rd_document_not_opened)
             }
         }
     }
@@ -153,7 +154,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
                 graph.reading.record(account, route.itemId, fileKey, primary = !route.supplementary, page = shown, pages = current.pageCount)
                 if (!route.supplementary) graph.readingSync.publishAll()
             } catch (failure: Exception) {
-                saveError = failure.message ?: "This page could not be saved on this device."
+                saveError = storeFailure(context, graph, failure) ?: context.getString(R.string.rd_page_not_saved)
             }
         }
     }
@@ -167,22 +168,22 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
                 graph.reading.resolveConflict(account, route.itemId, fileKey, keepLocal)
                 if (keepLocal) graph.readingSync.publishAll() else if (conflict != null) page = conflict.coerceIn(1, document.pageCount)
             } catch (failure: Exception) {
-                saveError = failure.message ?: "Your choice could not be saved on this device."
+                saveError = storeFailure(context, graph, failure) ?: context.getString(R.string.rd_choice_not_saved)
             }
         }
         AlertDialog(
             onDismissRequest = {},
-            title = { Text("Continue where?") },
+            title = { Text(stringResource(R.string.rd_conflict_title)) },
             text = {
-                Text(if (conflict != null) "Another device reached page $conflict while page $page here was not yet saved to the server."
-                    else "Another device saved a reading position this reader cannot show as a page while page $page here was not yet saved to the server.")
+                Text(if (conflict != null) stringResource(R.string.rd_conflict_page, conflict, page)
+                    else stringResource(R.string.rd_conflict_location, page))
             },
             confirmButton = {
                 TextButton(onClick = { resolve(keepLocal = false) }, modifier = Modifier.testTag("reading-conflict-remote")) {
-                    Text(if (conflict != null) "Go to page $conflict" else "Keep the other position")
+                    Text(if (conflict != null) stringResource(R.string.rd_go_to_page_number, conflict) else stringResource(R.string.rd_keep_other_position))
                 }
             },
-            dismissButton = { TextButton(onClick = { resolve(keepLocal = true) }, modifier = Modifier.testTag("reading-conflict-local")) { Text("Stay on page $page") } },
+            dismissButton = { TextButton(onClick = { resolve(keepLocal = true) }, modifier = Modifier.testTag("reading-conflict-local")) { Text(stringResource(R.string.rd_stay_on_page, page)) } },
             modifier = Modifier.testTag("reading-conflict"),
         )
     }
@@ -191,13 +192,14 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
         topBar = {
             TopAppBar(
                 title = { Text(route.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                navigationIcon = { IconButton(onClick = onClose, modifier = Modifier.testTag("reader-close")) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Close reader") } },
+                navigationIcon = { IconButton(onClick = onClose, modifier = Modifier.testTag("reader-close")) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.rd_close_reader)) } },
                 actions = {
-                    IconButton(onClick = { rotation = (rotation + 90) % 360 }, modifier = Modifier.testTag("pdf-rotate")) { Icon(Icons.Outlined.RotateRight, "Rotate pages") }
+                    IconButton(onClick = { rotation = (rotation + 90) % 360 }, modifier = Modifier.testTag("pdf-rotate")) { Icon(Icons.Outlined.RotateRight, stringResource(R.string.rd_rotate_pages)) }
+                    val continuous = stringResource(R.string.rd_continuous_scrolling)
                     IconToggleButton(
                         checked = settings.pdfContinuous,
                         onCheckedChange = { on -> graph.settings.update { it.copy(pdfContinuous = on) } },
-                        modifier = Modifier.testTag("pdf-continuous").semantics { contentDescription = "Continuous scrolling" },
+                        modifier = Modifier.testTag("pdf-continuous").semantics { contentDescription = continuous },
                     ) { Icon(Icons.Outlined.ViewDay, null) }
                 },
             )
@@ -211,7 +213,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding).background(MaterialTheme.colorScheme.surfaceContainer)) {
             when {
-                error != null -> MessageState("This document could not be opened", error, tag = "pdf-error", action = "Try again", actionTag = "pdf-retry", onAction = { attempt++ })
+                error != null -> MessageState(stringResource(R.string.rd_document_error_title), error, tag = "pdf-error", action = stringResource(R.string.rd_try_again), actionTag = "pdf-retry", onAction = { attempt++ })
                 document == null -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                 settings.pdfContinuous -> ContinuousPages(document, page, rotation, onPage = { page = it })
                 else -> SinglePage(document, page, rotation, onPage = { page = it.coerceIn(1, document.pageCount) })
@@ -230,19 +232,20 @@ private fun PageControls(page: Int, count: Int, onPage: (Int) -> Unit) {
     Surface(tonalElevation = 2.dp) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
             if (count > 2) {
+                val goToPage = stringResource(R.string.rd_go_to_page)
                 var dragging by remember { mutableFloatStateOf(-1f) }
                 Slider(
                     value = if (dragging >= 0) dragging else page.toFloat(),
                     onValueChange = { dragging = it },
                     onValueChangeFinished = { onPage(dragging.toInt().coerceIn(1, count)); dragging = -1f },
                     valueRange = 1f..count.toFloat(),
-                    modifier = Modifier.height(32.dp).semantics { contentDescription = "Go to page" },
+                    modifier = Modifier.height(32.dp).semantics { contentDescription = goToPage },
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                IconButton(onClick = { onPage(page - 1) }, enabled = page > 1, modifier = Modifier.testTag("pdf-previous")) { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "Previous page") }
-                Text("Page $page of $count", style = MaterialTheme.typography.labelLarge, modifier = Modifier.testTag("pdf-page"))
-                IconButton(onClick = { onPage(page + 1) }, enabled = page < count, modifier = Modifier.testTag("pdf-next")) { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, "Next page") }
+                IconButton(onClick = { onPage(page - 1) }, enabled = page > 1, modifier = Modifier.testTag("pdf-previous")) { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, stringResource(R.string.rd_previous_page)) }
+                Text(stringResource(R.string.rd_page_of, page, count), style = MaterialTheme.typography.labelLarge, modifier = Modifier.testTag("pdf-page"))
+                IconButton(onClick = { onPage(page + 1) }, enabled = page < count, modifier = Modifier.testTag("pdf-next")) { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, stringResource(R.string.rd_next_page)) }
             }
         }
     }
@@ -259,9 +262,10 @@ private fun SinglePage(document: PdfDocument, page: Int, rotation: Int, onPage: 
     BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         val width = constraints.maxWidth.coerceIn(1, 2_000)
         val rendered = rememberPage(document, page - 1, width, rotation)
+        val pageOf = stringResource(R.string.rd_page_of, page, document.pageCount)
         Box(
             Modifier.fillMaxSize().testTag("pdf-document").semantics {
-                contentDescription = "Page $page of ${document.pageCount}"
+                contentDescription = pageOf
                 stateDescription = rendered?.text.orEmpty()
             },
             contentAlignment = Alignment.Center,
@@ -315,11 +319,12 @@ private fun ContinuousPages(document: PdfDocument, page: Int, rotation: Int, onP
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val width = constraints.maxWidth.coerceIn(1, 2_000)
         var currentText by remember { mutableStateOf("") }
+        val pageOf = stringResource(R.string.rd_page_of, page, document.pageCount)
         LazyColumn(
             state = list,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxSize().testTag("pdf-document").semantics {
-                contentDescription = "Page $page of ${document.pageCount}"
+                contentDescription = pageOf
                 stateDescription = currentText
             },
         ) {
@@ -327,12 +332,16 @@ private fun ContinuousPages(document: PdfDocument, page: Int, rotation: Int, onP
                 val rendered = rememberPage(document, index, width, rotation)
                 if (index == page - 1) LaunchedEffect(rendered) { currentText = rendered?.text.orEmpty() }
                 if (rendered == null) Box(Modifier.fillMaxWidth().aspectRatio(0.77f).background(Color.White))
-                else Image(rendered.bitmap.asImageBitmap(), "Page ${index + 1}", Modifier.fillMaxWidth()
+                else Image(rendered.bitmap.asImageBitmap(), stringResource(R.string.rd_page_number, index + 1), Modifier.fillMaxWidth()
                     .aspectRatio(rendered.bitmap.width.toFloat() / rendered.bitmap.height).background(Color.White).testTag("pdf-page-image-${index + 1}"))
             }
         }
     }
 }
+
+/** A failure's message; the reading store's refusal to overwrite positions it could not read is shown in the reader's language. */
+private fun storeFailure(context: android.content.Context, graph: AppGraph, failure: Exception): String? =
+    if (failure is IllegalStateException && !graph.reading.writable) context.getString(R.string.rd_positions_not_overwritten) else failure.message
 
 /** The downloaded copy when there is one, otherwise the server's file streamed to the cache. */
 private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Reader): () -> ParcelFileDescriptor {
@@ -341,10 +350,10 @@ private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Rea
         ?: records.firstOrNull { it.account == client.account && it.itemId == route.itemId && it.episodeId == null && it.state == DownloadStore.State.COMPLETE && it.ebook?.ebookFileId == route.ino }
     if (local != null && local.ebook != null) when (val opened = graph.downloads.openPart(local, local.ebook!!)) {
         is Downloads.Opened.Readable -> return opened.open
-        is Downloads.Opened.FolderLost -> if (route.downloadId != null) throw IOException("This download is in ${opened.name}, and access to ${opened.name} was removed. Choose the folder again in Downloads.")
+        is Downloads.Opened.FolderLost -> if (route.downloadId != null) throw IOException(graph.context.getString(R.string.rd_download_folder_lost, opened.name))
         Downloads.Opened.Missing -> Unit
     }
-    if (route.downloadId != null) throw IOException("The downloaded document is missing from this device. Download it again.")
+    if (route.downloadId != null) throw IOException(graph.context.getString(R.string.rd_downloaded_document_missing))
     return withContext(Dispatchers.IO) {
         val name = MessageDigest.getInstance("SHA-256").digest("${client.account.server}\n${route.itemId}\n${route.ino}".toByteArray()).take(12).joinToString("") { "%02x".format(it) }
         val directory = File(graph.context.cacheDir, "reader").apply { mkdirs() }
@@ -361,7 +370,7 @@ private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Rea
                 val body = response.body ?: throw IOException("Empty response")
                 staging.outputStream().use { output -> body.byteStream().use { it.copyTo(output) } }
                 target.delete()
-                if (!staging.renameTo(target)) throw IOException("The document could not be stored for reading.")
+                if (!staging.renameTo(target)) throw IOException(graph.context.getString(R.string.rd_document_not_stored))
                 return@withContext { ParcelFileDescriptor.open(target, ParcelFileDescriptor.MODE_READ_ONLY) }
             }
         }
@@ -373,19 +382,20 @@ private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Rea
 @Composable
 fun ReadButtons(item: com.audiobookshelf.core.LibraryItem, onRead: (Route) -> Unit) {
     val ebook = item.media.ebookFile
+    val supplementaryPdf = stringResource(R.string.rd_supplementary_pdf)
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (ebook != null && ebook.format == "pdf") {
             androidx.compose.material3.OutlinedButton(onClick = { onRead(Route.Reader(item.id, ebook.ino, supplementary = false, title = item.title)) }, modifier = Modifier.fillMaxWidth().testTag("read-ebook")) {
                 Icon(Icons.AutoMirrored.Outlined.MenuBook, null); Text(stringResource(R.string.action_read, "PDF"), Modifier.padding(start = 6.dp))
             }
         } else if (ebook != null) {
-            Text("Reading ${ebook.format?.uppercase() ?: "this ebook"} is not available in this preview yet. Your reading position on the server is kept.",
+            Text(ebook.format?.let { stringResource(R.string.rd_format_not_available, it.uppercase()) } ?: stringResource(R.string.rd_ebook_not_available),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("ebook-unsupported"))
         }
         item.libraryFiles.filter { it.isSupplementary == true && it.format == "pdf" }.forEach { file ->
-            val name = file.metadata?.filename ?: "supplementary PDF"
+            val name = file.metadata?.filename ?: supplementaryPdf
             androidx.compose.material3.TextButton(onClick = { onRead(Route.Reader(item.id, file.ino, supplementary = true, title = name)) }, modifier = Modifier.testTag("read-file-${file.ino}")) {
-                Text("Read $name")
+                Text(stringResource(R.string.action_read, name))
             }
         }
     }

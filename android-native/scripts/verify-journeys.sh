@@ -18,9 +18,17 @@ fi
 
 fixture_dir="$(mktemp -d)"
 pids=()
+failures_dir="$android_root/app/build/outputs/journey-failures"
 cleanup() {
+    # Failure captures only exist when a wait failed; keep them with this run's fixture logs.
+    if "$adb" -s "$serial" shell ls /data/local/tmp/abs-journey-failures >/dev/null 2>&1; then
+        mkdir -p "$failures_dir" && "$adb" -s "$serial" pull /data/local/tmp/abs-journey-failures/. "$failures_dir/" >/dev/null 2>&1 || true
+        cp "$fixture_dir"/*.log "$failures_dir/" 2>/dev/null || true
+        echo "Journey failure captures: $failures_dir" >&2
+    fi
     for pid in "${pids[@]:-}"; do [[ -n "$pid" ]] && kill "$pid" 2>/dev/null || true; done
     for port in 28765 28766 28767; do "$adb" -s "$serial" reverse --remove tcp:$port >/dev/null 2>&1 || true; done
+    "$adb" -s "$serial" shell 'am clear-debug-app; rm -f /data/local/tmp/chrome-command-line' >/dev/null 2>&1 || true
     rm -rf "$fixture_dir"
 }
 trap 'status=$?; cleanup; exit $status' EXIT
@@ -59,10 +67,17 @@ for pid in "${pids[@]}"; do
     kill -0 "$pid" 2>/dev/null || { echo "A fixture process this run started ($pid) exited; its port may have been taken." >&2; exit 1; }
 done
 for port in 28765 28766 28767; do "$adb" -s "$serial" reverse tcp:$port tcp:$port >/dev/null; done
+"$adb" -s "$serial" shell rm -rf /data/local/tmp/abs-journey-failures >/dev/null 2>&1 || true
+rm -rf "$failures_dir"
 # Unrelated system notification sounds take audio focus, which pauses spoken-word playback mid-journey.
 "$adb" -s "$serial" shell cmd notification set_dnd priority >/dev/null 2>&1 || true
 # Chrome's own notification prompt can cover the sign-in page during browser journeys.
 "$adb" -s "$serial" shell pm grant com.android.chrome android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
+# Without a screen reader Chrome may leave page content out of the accessibility tree, so the sign-in page
+# shows but its link cannot be found. The flag file is read only while Chrome is the debug app.
+"$adb" -s "$serial" shell 'echo "_ --force-renderer-accessibility" > /data/local/tmp/chrome-command-line' >/dev/null 2>&1 || true
+"$adb" -s "$serial" shell am set-debug-app --persistent com.android.chrome >/dev/null 2>&1 || true
+"$adb" -s "$serial" shell am force-stop com.android.chrome >/dev/null 2>&1 || true
 
 args=()
 if (( $# > 0 )); then

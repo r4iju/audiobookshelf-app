@@ -1,6 +1,6 @@
 {
   "platform": "android-native",
-  "sourceSha": "838261115c03b2bb67340191249f9f493d3132a9",
+  "sourceSha": "f256272b76251decaafd5099e6568f3a6b77d890",
   "evidenceKind": "emulator and synthetic loopback fixture only; no live server, owner account or physical device",
   "identity": {
     "applicationId": "com.audiobookshelf.app.nativepreview",
@@ -21,7 +21,7 @@
   },
   "unitTests": {
     "core": {
-      "tests": 59,
+      "tests": 63,
       "failures": 0
     },
     "app": {
@@ -31,11 +31,15 @@
   },
   "journeys": {
     "classes": 23,
-    "tests": 81,
-    "failures": 1,
+    "tests": 83,
+    "failures": 0,
     "singleRun": true,
-    "result": "80 of 81 journeys in one full run at 838261115c (with CastHandoverTest 5 of 5 in the same run: 85 of 86). Not a clean full run.",
-    "failed": "PlayerToolsJourney a_bookmarksAreAddedRenamedUsedAndDeletedOnTheServer: ComposeTimeoutException after 15 s waiting for bookmarks-empty right after opening the bookmarks sheet (line 35)",
+    "result": "83 of 83 journeys in one full run at f256272b, with CastHandoverTest 5 of 5 in the same run (88 of 88).",
+    "earlierRunsOnThisBranch": [
+      "2efb7f3d: 87 of 88; AccountsJourney c could not find the local OpenID page because Chrome left page content out of the accessibility tree (harness, fixed in e3627918)",
+      "e3627918: 87 of 88; PlaybackJourney a reported two listening sessions after a listening write was lost on an idle pooled connection the server had closed (product, fixed in f256272b)",
+      "28cde313: interrupted by this lane after 19 of 88 (0 failed) when root review found the close-retry refresh blocker"
+    ],
     "byClass": {
       "AccessibilityJourney": {
         "tests": 1,
@@ -103,12 +107,12 @@
         "errors": 0
       },
       "LocalizationJourney": {
-        "tests": 1,
+        "tests": 2,
         "failures": 0,
         "errors": 0
       },
       "MigrationJourney": {
-        "tests": 6,
+        "tests": 7,
         "failures": 0,
         "errors": 0
       },
@@ -129,7 +133,7 @@
       },
       "PlayerToolsJourney": {
         "tests": 2,
-        "failures": 1,
+        "failures": 0,
         "errors": 0
       },
       "PodcastJourney": {
@@ -153,20 +157,29 @@
         "errors": 0
       }
     },
-    "preserved": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/full-83826111/"
+    "preserved": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/full-f256272b/",
+    "preservedEarlierRuns": [
+      "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/full-83826111/",
+      "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/full-2efb7f3d/",
+      "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/full-e3627918/",
+      "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/interrupted-28cde313/"
+    ]
   },
   "artifact": {
-    "path": "android-native/app/build/outputs/apk/release/app-release.apk",
-    "sha256": "e406678e3ba84167a5c1608867242ace7a4e27000794a6d1a412b1c8cc7975a9",
-    "bytes": 22214564,
+    "status": "packaged from the merged source after root merge; checksum recorded on the pull request and tickets",
+    "previous": {
+      "sourceSha": "838261115c03b2bb67340191249f9f493d3132a9",
+      "sha256": "e406678e3ba84167a5c1608867242ace7a4e27000794a6d1a412b1c8cc7975a9",
+      "bytes": 22214564,
+      "preservedCopy": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/audiobookshelf-native-preview-83826111.apk"
+    },
     "signer": "local Android debug key (CN=Android Debug), certificate SHA-256 118d754789a01ef088d67fabb4a9be5fd51447997cf20dcaa66ab59f2a13f688",
-    "distribution": "local internal install only; not uploaded or published",
-    "preservedCopy": "/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/audiobookshelf-native-preview-83826111.apk"
+    "distribution": "local internal install only; not uploaded or published"
   },
   "readiness": {
     "migration": "Legacy export (legacy app instrumented test) and native import verified with synthetic archives: refusal, corruption, resume after interruption with rehashing of staged files, account binding, adoption with damaged files fetched again, repeated export recognised",
     "accessibility": "AccessibilityJourney runs Accessibility Test Framework 4.1.1 checks (errors fail) on the main screens",
-    "localization": "NOT MET: the native app is English only; the legacy app ships 38 locales",
+    "localization": "PARTIAL: UI text in resources with legacy translations in 33 languages; core error messages English",
     "backupRollback": "Separate identity; the legacy app and its data are never modified, so uninstalling the preview is the rollback. Listening already sent to the server is not undone"
   },
   "physicalGates": [
@@ -224,11 +237,12 @@
   "notImplemented": [],
   "localization": {
     "status": "partial",
-    "strings": 87,
-    "withLegacyTranslation": 72,
+    "strings": 579,
+    "withLegacyTranslation": 146,
     "languagesOffered": 33,
-    "journey": "LocalizationJourney (German)",
-    "untranslated": "About 350 English UI lines remain unextracted (errors, dialogs, downloads, PDF reader, podcasts, groups, migration, diagnostics, statistics, accessibility descriptions); Playing, Resume, Edit, Read PDF and Mark finished/unfinished stay English"
+    "journey": "LocalizationJourney (German main screens; Arabic right-to-left top bar and sort options)",
+    "legacyLanguageMigration": "MigrationJourney g: the legacy lang preference is applied on Android 13 and later when offered and no app language is chosen",
+    "untranslated": "Copy the legacy app only had in English stays English (about 430 strings); the 11 core ApiError messages and diagnostics entries are English; download, playback-save and import issue texts resolved earlier keep their language until produced again"
   },
   "casting": {
     "status": "implemented; physical receiver acceptance pending",
@@ -261,9 +275,18 @@
         "Targeted affected run at 838261115c (7 classes): 26 of 27; timed out at line 55 waiting for delete-bookmark-0 after reopening the sheet. Class rerun alone: 2 of 2.",
         "Full run at 838261115c: timed out at line 35 waiting for bookmarks-empty after first opening the sheet. These are different stages; one mechanism is not proven.",
         "Bounded diagnosis: nine further runs in suite-like order (Playback+PlayerTools x4, Accounts+Cast+Download+LocalFiles+Playback+PlayerTools x2, Cast+Playback+PlayerTools x3) with a temporary, uncommitted failure dump of the screen tree and fixture requests never reproduced it, so no failure screen or request/response was captured. App logcat of the full-run failure shows nothing from the app between pausing and the timeout.",
-        "Same test timed out once earlier at 11060261 (see diagnosticRuns)."
+        "Same test timed out once earlier at 11060261 (see diagnosticRuns).",
+        "Since 83826111 not reproduced: 18 exact-order runs (Cast, Playback, PlayerTools: 6 before and 6 after the close change, 6 at f256272b), full runs at 2efb7f3d, e3627918 and f256272b (PlayerTools 2 of 2 each) and an interrupted run at 28cde313. Failure-only capture of screen, semantics, media session and fixture requests is in place. Cause unknown; not claimed fixed by the close or write changes."
       ],
-      "conclusion": "No confirmed product cause and no evidenced harness cause; unresolved. Timeouts and assertions are unchanged."
+      "conclusion": "No confirmed product cause and no evidenced harness cause; unresolved. Timeouts and assertions are unchanged.",
+      "status": "open"
+    },
+    {
+      "test": "CastJourney withNoReceiverOnTheNetworkCastingExplainsWhyAndPhonePlaybackContinues",
+      "status": "open",
+      "observations": [
+        "Failed once at line 38 (phone position did not advance after closing the cast sheet) in 6 exact-order runs at 942ece9c plus the close change, before the position wait was captured; the emulator audio output went to standby right after the sheet closed. Not reproduced since; cause unknown."
+      ]
     }
   ]
 }

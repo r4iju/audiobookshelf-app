@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,27 +45,36 @@ fun FilterSheet(catalog: CatalogModel, onDismiss: () -> Unit) {
     val data = catalog.filterData
     val podcast = catalog.library?.isPodcast == true
     val groups = buildList {
-        add("genres" to "Genre"); add("tags" to "Tag")
-        if (!podcast) { add("series" to "Series"); add("authors" to "Author"); add("narrators" to "Narrator"); add("languages" to "Language"); add("progress" to "Progress"); add("ebooks" to "Ebooks") }
+        add("genres" to stringResource(R.string.lib_filter_genre)); add("tags" to stringResource(R.string.lib_filter_tag))
+        if (!podcast) {
+            add("series" to stringResource(R.string.search_series)); add("authors" to stringResource(R.string.lib_author)); add("narrators" to stringResource(R.string.lib_filter_narrator))
+            add("languages" to stringResource(R.string.lib_filter_language)); add("progress" to stringResource(R.string.lib_filter_progress)); add("ebooks" to stringResource(R.string.lib_filter_ebooks))
+        }
     }
+    val noSeries = FilterOption(stringResource(R.string.lib_filter_no_series), "no-series")
+    val progressOptions = listOf(
+        FilterOption(stringResource(R.string.finished), "finished"), FilterOption(stringResource(R.string.lib_filter_in_progress), "in-progress"),
+        FilterOption(stringResource(R.string.lib_filter_not_started), "not-started"), FilterOption(stringResource(R.string.lib_filter_not_finished), "not-finished"),
+    )
+    val ebookOptions = listOf(FilterOption(stringResource(R.string.lib_filter_has_ebook), "ebook"), FilterOption(stringResource(R.string.lib_filter_has_supplementary_ebook), "supplementary"))
     fun options(key: String): List<FilterOption> = when (key) {
         "genres" -> data?.genres.orEmpty().map { FilterOption(it, it) }
         "tags" -> data?.tags.orEmpty().map { FilterOption(it, it) }
-        "series" -> listOf(FilterOption("No series", "no-series")) + data?.series.orEmpty().map { FilterOption(it.name, it.id) }
+        "series" -> listOf(noSeries) + data?.series.orEmpty().map { FilterOption(it.name, it.id) }
         "authors" -> data?.authors.orEmpty().map { FilterOption(it.name, it.id) }
         "narrators" -> data?.narrators.orEmpty().map { FilterOption(it, it) }
         "languages" -> data?.languages.orEmpty().map { FilterOption(it, it) }
-        "progress" -> listOf(FilterOption("Finished", "finished"), FilterOption("In progress", "in-progress"), FilterOption("Not started", "not-started"), FilterOption("Not finished", "not-finished"))
-        "ebooks" -> listOf(FilterOption("Has ebook", "ebook"), FilterOption("Has supplementary ebook", "supplementary"))
+        "progress" -> progressOptions
+        "ebooks" -> ebookOptions
         else -> emptyList()
     }
     ModalBottomSheet(onDismissRequest = onDismiss) {
         val selected = group
         LazyColumn(Modifier.fillMaxWidth().testTag("filter-sheet"), contentPadding = PaddingValues(bottom = 24.dp)) {
             if (selected == null) {
-                item { SectionTitle("Filter") }
+                item { SectionTitle(stringResource(R.string.filter)) }
                 item {
-                    ListItem(headlineContent = { Text("All") }, trailingContent = { if (catalog.query.filter == null) Icon(Icons.Outlined.Check, "Selected") },
+                    ListItem(headlineContent = { Text(stringResource(R.string.lib_filter_all)) }, trailingContent = { if (catalog.query.filter == null) Icon(Icons.Outlined.Check, stringResource(R.string.lib_selected)) },
                         modifier = Modifier.clickable(role = Role.Button) { catalog.apply(catalog.query.copy(filter = null, filterLabel = null)); onDismiss() }.testTag("filter-all"))
                 }
                 items(groups) { (key, label) ->
@@ -73,13 +84,13 @@ fun FilterSheet(catalog: CatalogModel, onDismiss: () -> Unit) {
             } else {
                 item {
                     ListItem(headlineContent = { Text(groups.first { it.first == selected }.second, style = MaterialTheme.typography.titleLarge) },
-                        leadingContent = { IconButton(onClick = { group = null }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "All filters") } })
+                        leadingContent = { IconButton(onClick = { group = null }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.lib_all_filters)) } })
                 }
                 val entries = options(selected)
-                if (entries.isEmpty()) item { Text(if (data == null) "Loading…" else "Nothing to filter by here.", Modifier.padding(24.dp)) }
+                if (entries.isEmpty()) item { Text(if (data == null) stringResource(R.string.lib_loading) else stringResource(R.string.lib_nothing_to_filter), Modifier.padding(24.dp)) }
                 items(entries) { option ->
                     val value = ApiClient.filter(selected, option.value)
-                    ListItem(headlineContent = { Text(option.label) }, trailingContent = { if (catalog.query.filter == value) Icon(Icons.Outlined.Check, "Selected") },
+                    ListItem(headlineContent = { Text(option.label) }, trailingContent = { if (catalog.query.filter == value) Icon(Icons.Outlined.Check, stringResource(R.string.lib_selected)) },
                         modifier = Modifier.clickable(role = Role.Button) { catalog.apply(catalog.query.copy(filter = value, filterLabel = option.label)); onDismiss() }
                             .testTag("filter-$selected-${option.value}"))
                 }
@@ -93,21 +104,25 @@ fun FilterSheet(catalog: CatalogModel, onDismiss: () -> Unit) {
 fun SortSheet(catalog: CatalogModel, onChange: (sort: String, descending: Boolean) -> Unit, onDismiss: () -> Unit) {
     val podcast = catalog.library?.isPodcast == true
     val options = if (podcast) listOf(
-        "media.metadata.title" to "Title", "media.metadata.author" to "Author", "addedAt" to "Date added", "size" to "Size",
-        "media.numTracks" to "Number of episodes", "birthtimeMs" to "File created", "mtimeMs" to "File modified", "random" to "Random",
+        "media.metadata.title" to stringResource(R.string.lib_sort_title), "media.metadata.author" to stringResource(R.string.lib_author),
+        "addedAt" to stringResource(R.string.lib_sort_date_added), "size" to stringResource(R.string.lib_sort_size),
+        "media.numTracks" to stringResource(R.string.lib_sort_number_of_episodes), "birthtimeMs" to stringResource(R.string.lib_sort_file_created),
+        "mtimeMs" to stringResource(R.string.lib_sort_file_modified), "random" to stringResource(R.string.lib_sort_random),
     ) else listOf(
-        "media.metadata.title" to "Title", "media.metadata.authorName" to "Author (first last)", "media.metadata.authorNameLF" to "Author (last, first)",
-        "media.metadata.publishedYear" to "Published year", "addedAt" to "Date added", "size" to "Size", "media.duration" to "Duration",
-        "birthtimeMs" to "File created", "mtimeMs" to "File modified", "progress" to "Progress: last updated",
-        "progress.createdAt" to "Progress: started", "progress.finishedAt" to "Progress: finished", "random" to "Random",
+        "media.metadata.title" to stringResource(R.string.lib_sort_title), "media.metadata.authorName" to stringResource(R.string.lib_sort_author_first_last),
+        "media.metadata.authorNameLF" to stringResource(R.string.lib_sort_author_last_first), "media.metadata.publishedYear" to stringResource(R.string.lib_sort_published_year),
+        "addedAt" to stringResource(R.string.lib_sort_date_added), "size" to stringResource(R.string.lib_sort_size), "media.duration" to stringResource(R.string.lib_sort_duration),
+        "birthtimeMs" to stringResource(R.string.lib_sort_file_created), "mtimeMs" to stringResource(R.string.lib_sort_file_modified),
+        "progress" to stringResource(R.string.lib_sort_progress_updated), "progress.createdAt" to stringResource(R.string.lib_sort_progress_started),
+        "progress.finishedAt" to stringResource(R.string.lib_sort_progress_finished), "random" to stringResource(R.string.lib_sort_random),
     )
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.testTag("sort-sheet")) {
             ListItem(
-                headlineContent = { Text("Sort", style = MaterialTheme.typography.titleLarge) },
+                headlineContent = { Text(stringResource(R.string.sort), style = MaterialTheme.typography.titleLarge) },
                 trailingContent = {
                     IconButton(onClick = { onChange(catalog.query.sort, !catalog.query.descending) }, modifier = Modifier.testTag("sort-direction")) {
-                        Icon(Icons.Outlined.SwapVert, if (catalog.query.descending) "Descending, switch to ascending" else "Ascending, switch to descending")
+                        Icon(Icons.Outlined.SwapVert, if (catalog.query.descending) stringResource(R.string.lib_sort_descending_switch) else stringResource(R.string.lib_sort_ascending_switch))
                     }
                 },
             )
@@ -115,7 +130,7 @@ fun SortSheet(catalog: CatalogModel, onChange: (sort: String, descending: Boolea
                 items(options) { (value, label) ->
                     ListItem(
                         headlineContent = { Text(label) },
-                        trailingContent = { if (catalog.query.sort == value) Text(if (catalog.query.descending) "Descending" else "Ascending", color = MaterialTheme.colorScheme.primary) },
+                        trailingContent = { if (catalog.query.sort == value) Text(if (catalog.query.descending) stringResource(R.string.lib_sort_descending) else stringResource(R.string.lib_sort_ascending), color = MaterialTheme.colorScheme.primary) },
                         modifier = Modifier.clickable(role = Role.Button) {
                             onChange(value, if (catalog.query.sort == value) !catalog.query.descending else value == "addedAt" || value.startsWith("progress"))
                         }.testTag("sort-$value"),

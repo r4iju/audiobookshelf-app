@@ -1,7 +1,9 @@
 package com.audiobookshelf.android.journeys
 
+import android.app.LocaleManager
 import android.content.Intent
 import android.net.Uri
+import android.os.LocaleList
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -134,6 +136,25 @@ class MigrationJourney {
             compose.tap("tab-downloads")
             compose.waitForTag("offline-book-0", 45_000)
             eventually(45_000) { downloaded("book-0", start).isNotEmpty() }
+        }
+    }
+
+    @Test
+    fun g_theLanguageChosenInTheLegacyAppCarriesOver() {
+        val locales = context.getSystemService(LocaleManager::class.java)
+        Fixture.resetAppData()
+        Fixture.configure("pdf-reader")
+        try {
+            open("german-legacy-export.absmigration").use {
+                compose.tap("start-import")
+                compose.waitForTag("migration-done", 30_000)
+                compose.tap("migration-close")
+                compose.waitForText("Verbinden")
+                compose.signIn()
+                compose.waitForText("Bibliothek")
+            }
+        } finally {
+            InstrumentationRegistry.getInstrumentation().runOnMainSync { locales.applicationLocales = LocaleList.getEmptyLocaleList() }
         }
     }
 }

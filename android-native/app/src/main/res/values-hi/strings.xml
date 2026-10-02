@@ -10,4 +10,12 @@
     <string name="action_play">चलाएँ</string>
     <string name="action_clear_filter">लागू फ़िल्टर साफ़ करें</string>
     <string name="connect">जोड़ना</string>
+    <string name="set_auto_sleep_starts_at">Start Time</string>
+    <string name="set_remove">हटाएं</string>
+    <string name="set_import_issue_account">खाता</string>
+    <string name="dl_remove">हटाएं</string>
+    <string name="grp_delete">हटाएं</string>
+    <string name="grp_back">पीछे</string>
+    <string name="item_open_feed">फ़ीड खोलें</string>
+    <string name="item_close_feed">फ़ीड बंद करें</string>
 </resources>

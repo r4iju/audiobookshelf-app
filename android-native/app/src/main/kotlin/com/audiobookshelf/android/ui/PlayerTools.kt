@@ -38,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
@@ -60,17 +61,17 @@ fun SleepSheet(engine: PlaybackEngine, state: PlayerState, onDismiss: () -> Unit
             Text(stringResource(R.string.sleep_timer), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
             val remaining = state.sleepRemaining
             if (remaining != null) {
-                Text(if (state.sleepEndOfChapter) "Stops at the end of this chapter, ${formatClock(remaining)} from now" else "Stops in ${formatClock(remaining)}",
+                Text(if (state.sleepEndOfChapter) stringResource(R.string.pl_sleep_stops_end_of_chapter, formatClock(remaining)) else stringResource(R.string.pl_sleep_stops_in, formatClock(remaining)),
                     style = MaterialTheme.typography.bodyLarge)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { engine.adjustSleep(-300.0) }, modifier = Modifier.testTag("sleep-subtract")) { Text("−5 min") }
-                    OutlinedButton(onClick = { engine.adjustSleep(300.0); onDismiss() }, modifier = Modifier.testTag("sleep-add")) { Text("+5 min") }
-                    Button(onClick = { engine.cancelSleep(); onDismiss() }, modifier = Modifier.testTag("sleep-cancel")) { Text("Turn off") }
+                    OutlinedButton(onClick = { engine.adjustSleep(-300.0) }, modifier = Modifier.testTag("sleep-subtract")) { Text(stringResource(R.string.pl_sleep_minus_minutes, 5)) }
+                    OutlinedButton(onClick = { engine.adjustSleep(300.0); onDismiss() }, modifier = Modifier.testTag("sleep-add")) { Text(stringResource(R.string.pl_sleep_plus_minutes, 5)) }
+                    Button(onClick = { engine.cancelSleep(); onDismiss() }, modifier = Modifier.testTag("sleep-cancel")) { Text(stringResource(R.string.pl_sleep_turn_off)) }
                 }
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 sleepPresets.forEach { minutes ->
-                    FilledTonalButton(onClick = { engine.startSleep(SleepTimer.Mode.Duration(minutes * 60.0)); onDismiss() }, modifier = Modifier.testTag("sleep-$minutes")) { Text("$minutes min") }
+                    FilledTonalButton(onClick = { engine.startSleep(SleepTimer.Mode.Duration(minutes * 60.0)); onDismiss() }, modifier = Modifier.testTag("sleep-$minutes")) { Text(stringResource(R.string.pl_sleep_minutes, minutes)) }
                 }
                 if (state.now?.chapters?.isNotEmpty() == true) {
                     FilledTonalButton(onClick = { engine.startSleep(SleepTimer.Mode.EndOfChapter); onDismiss() }, modifier = Modifier.testTag("sleep-end-of-chapter")) { Text(stringResource(R.string.end_of_chapter)) }
@@ -85,6 +86,7 @@ fun SleepSheet(engine: PlaybackEngine, state: PlayerState, onDismiss: () -> Unit
 @Composable
 fun BookmarksSheet(client: ApiClient, itemId: String, position: Double, onSeek: (Double) -> Unit, onFailure: (Throwable) -> Unit, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var bookmarks by remember { mutableStateOf<List<Bookmark>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var editing by remember { mutableStateOf<Bookmark?>(null) }
@@ -96,14 +98,14 @@ fun BookmarksSheet(client: ApiClient, itemId: String, position: Double, onSeek: 
     fun mutate(action: suspend () -> List<Bookmark>) {
         scope.launch {
             runCatching { action() }.onSuccess { bookmarks = it.sortedBy { mark -> mark.time }; error = null }
-                .onFailure { error = "Bookmark not saved: ${it.message ?: "try again"}"; onFailure(it) }
+                .onFailure { error = it.message?.let { message -> context.getString(R.string.pl_bookmark_not_saved_reason, message) } ?: context.getString(R.string.pl_bookmark_not_saved); onFailure(it) }
         }
     }
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.bookmarks), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).semantics { heading() })
-                Button(onClick = { adding = true }, modifier = Modifier.testTag("add-bookmark")) { Text("Add at ${formatClock(position)}") }
+                Button(onClick = { adding = true }, modifier = Modifier.testTag("add-bookmark")) { Text(stringResource(R.string.pl_bookmark_add_at, formatClock(position))) }
             }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("bookmark-error")) }
             val list = bookmarks
@@ -113,15 +115,15 @@ fun BookmarksSheet(client: ApiClient, itemId: String, position: Double, onSeek: 
                 else -> LazyColumn(Modifier.heightIn(max = 360.dp)) {
                     itemsIndexed(list) { index, mark ->
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f).clickable(role = Role.Button, onClickLabel = "Go to bookmark") { onSeek(mark.time); onDismiss() }
+                            Column(Modifier.weight(1f).clickable(role = Role.Button, onClickLabel = stringResource(R.string.pl_bookmark_go_to)) { onSeek(mark.time); onDismiss() }
                                 .padding(vertical = 10.dp).testTag("bookmark-$index")) {
-                                Text(mark.title.ifBlank { "Bookmark" }, style = MaterialTheme.typography.bodyLarge)
+                                Text(mark.title.ifBlank { stringResource(R.string.pl_bookmark_default) }, style = MaterialTheme.typography.bodyLarge)
                                 Text(formatClock(mark.time), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
-                            IconButton(onClick = { editing = mark }, modifier = Modifier.testTag("edit-bookmark-$index")) { Icon(Icons.Outlined.Edit, "Rename ${mark.title}") }
+                            IconButton(onClick = { editing = mark }, modifier = Modifier.testTag("edit-bookmark-$index")) { Icon(Icons.Outlined.Edit, stringResource(R.string.pl_bookmark_rename_named, mark.title)) }
                             IconButton(onClick = {
                                 mutate { client.deleteBookmark(itemId, mark.time); list.filterNot { it.time == mark.time } }
-                            }, modifier = Modifier.testTag("delete-bookmark-$index")) { Icon(Icons.Outlined.Delete, "Delete ${mark.title}") }
+                            }, modifier = Modifier.testTag("delete-bookmark-$index")) { Icon(Icons.Outlined.Delete, stringResource(R.string.pl_bookmark_delete_named, mark.title)) }
                         }
                     }
                 }
@@ -130,14 +132,16 @@ fun BookmarksSheet(client: ApiClient, itemId: String, position: Double, onSeek: 
     }
     val target = editing
     if (adding || target != null) {
-        var title by remember(target, adding) { mutableStateOf(target?.title ?: "Bookmark at ${formatClock(position)}") }
+        val defaultTitle = stringResource(R.string.pl_bookmark_at, formatClock(position))
+        val untitled = stringResource(R.string.pl_bookmark_default)
+        var title by remember(target, adding) { mutableStateOf(target?.title ?: defaultTitle) }
         AlertDialog(
             onDismissRequest = { adding = false; editing = null },
-            title = { Text(if (target != null) "Rename bookmark" else "New bookmark") },
-            text = { OutlinedTextField(title, { title = it }, singleLine = true, label = { Text("Title") }, modifier = Modifier.testTag("bookmark-title")) },
+            title = { Text(if (target != null) stringResource(R.string.pl_bookmark_rename) else stringResource(R.string.pl_bookmark_new)) },
+            text = { OutlinedTextField(title, { title = it }, singleLine = true, label = { Text(stringResource(R.string.pl_bookmark_title_field)) }, modifier = Modifier.testTag("bookmark-title")) },
             confirmButton = {
                 TextButton(onClick = {
-                    val name = title.trim().ifEmpty { "Bookmark" }
+                    val name = title.trim().ifEmpty { untitled }
                     val current = bookmarks.orEmpty()
                     if (target != null) mutate { val saved = client.saveBookmark(itemId, target.time, name, editing = true); current.map { if (it.time == target.time) saved else it } }
                     else { val time = position; mutate { current + client.saveBookmark(itemId, time, name, editing = false) } }

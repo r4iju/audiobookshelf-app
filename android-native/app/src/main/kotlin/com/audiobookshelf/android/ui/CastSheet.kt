@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.ui
 
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,8 +44,9 @@ import kotlinx.coroutines.delay
 fun CastButton(casting: CastRoutes, onClick: () -> Unit) {
     val status by casting.status.collectAsState()
     IconButton(onClick = onClick, modifier = Modifier.testTag("player-cast")) {
-        if (status.connectedTo != null) Icon(Icons.Outlined.CastConnected, "Casting to ${status.connectedTo}", tint = MaterialTheme.colorScheme.primary)
-        else Icon(Icons.Outlined.Cast, "Cast")
+        val connectedTo = status.connectedTo
+        if (connectedTo != null) Icon(Icons.Outlined.CastConnected, stringResource(R.string.cast_casting_to, connectedTo), tint = MaterialTheme.colorScheme.primary)
+        else Icon(Icons.Outlined.Cast, stringResource(R.string.cast_cast))
     }
 }
 
@@ -51,7 +54,7 @@ fun CastButton(casting: CastRoutes, onClick: () -> Unit) {
 @Composable
 fun CastLine(casting: CastRoutes) {
     val status by casting.status.collectAsState()
-    status.connectedTo?.let { Text("Playing on $it", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.testTag("cast-playing-on")) }
+    status.connectedTo?.let { Text(stringResource(R.string.cast_playing_on, it), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.testTag("cast-playing-on")) }
     status.problem?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 4.dp).testTag("cast-problem")) }
 }
 
@@ -69,13 +72,13 @@ fun CastSheet(casting: CastRoutes, onDismiss: () -> Unit) {
 
     ModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.testTag("cast-sheet")) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Cast", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
-            Text(status.connectedTo?.let { "Playing on $it" } ?: status.connecting?.let { "Connecting to $it…" } ?: "Playing on this phone",
+            Text(stringResource(R.string.cast_cast), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+            Text(status.connectedTo?.let { stringResource(R.string.cast_playing_on, it) } ?: status.connecting?.let { stringResource(R.string.cast_connecting_to, it) } ?: stringResource(R.string.cast_playing_on_phone),
                 style = MaterialTheme.typography.bodyLarge)
             status.problem?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium) }
             when {
                 status.unavailable != null -> Text(status.unavailable!!, style = MaterialTheme.typography.bodyMedium)
-                status.connectedTo != null -> Button(onClick = { casting.disconnect(); onDismiss() }, modifier = Modifier.testTag("cast-stop")) { Text("Stop casting") }
+                status.connectedTo != null -> Button(onClick = { casting.disconnect(); onDismiss() }, modifier = Modifier.testTag("cast-stop")) { Text(stringResource(R.string.cast_stop)) }
                 status.receivers.isNotEmpty() -> status.receivers.forEach { receiver ->
                     ListItem(
                         headlineContent = { Text(receiver.name) },
@@ -86,12 +89,12 @@ fun CastSheet(casting: CastRoutes, onDismiss: () -> Unit) {
                 }
                 !searched -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                    Text("Looking for cast devices…", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.cast_looking), style = MaterialTheme.typography.bodyMedium)
                 }
-                else -> Text("No cast devices found. Check that the receiver is switched on and on the same Wi-Fi network as this phone.",
+                else -> Text(stringResource(R.string.cast_none_found),
                     style = MaterialTheme.typography.bodyMedium)
             }
-            TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End).testTag("cast-close")) { Text("Close") }
+            TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End).testTag("cast-close")) { Text(stringResource(R.string.cast_close)) }
         }
     }
 }

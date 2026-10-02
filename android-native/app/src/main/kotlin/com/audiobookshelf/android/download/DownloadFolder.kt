@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
+import com.audiobookshelf.android.R
 import java.io.File
 import java.io.IOException
 
@@ -31,7 +32,7 @@ class DownloadFolder(private val context: Context) {
 
     fun name(tree: Uri): String = runCatching {
         resolver.query(root(tree), arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)?.use { if (it.moveToFirst()) it.getString(0) else null }
-    }.getOrNull() ?: tree.lastPathSegment?.substringAfterLast(':')?.substringAfterLast('/') ?: "the chosen folder"
+    }.getOrNull() ?: tree.lastPathSegment?.substringAfterLast(':')?.substringAfterLast('/') ?: context.getString(R.string.dl_the_chosen_folder)
 
     /** Copies a finished file into `<tree>/<path...>/<name>`, replacing an earlier copy; returns the document. */
     fun place(tree: String, path: List<String>, name: String, mimeType: String, source: File): Uri {

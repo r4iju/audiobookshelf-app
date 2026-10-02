@@ -32,10 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.audiobookshelf.android.R
 import com.audiobookshelf.android.data.CatalogModel
 import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.graph
@@ -48,9 +50,9 @@ import kotlinx.coroutines.launch
 
 private val SLUG = Regex("[A-Za-z0-9_-]+")
 
-private fun Exception.explanation(): String =
+private fun Exception.explanation(context: Context): String =
     (this as? ApiError.Http)?.takeIf { it.status == 400 }?.body?.takeIf { it.isNotBlank() && !it.trimStart().startsWith("{") }
-        ?: message ?: "Something went wrong. Try again."
+        ?: message ?: context.getString(R.string.item_something_went_wrong)
 
 /**
  * The item's RSS feed, as the server permits: administrators open and close it, and anyone can see
@@ -69,7 +71,7 @@ fun FeedButton(item: LibraryItem, active: SessionState.Active, catalog: CatalogM
 
     OutlinedButton(onClick = { showing = true }, modifier = Modifier.fillMaxWidth().testTag("rss-feed")) {
         Icon(Icons.Outlined.RssFeed, null, Modifier.size(18.dp))
-        Text(if (feed != null) "RSS feed is open" else "Open RSS feed", Modifier.padding(start = 8.dp))
+        Text(stringResource(if (feed != null) R.string.item_rss_feed_is_open else R.string.item_open_rss_feed), Modifier.padding(start = 8.dp))
     }
     if (!showing) return
 
@@ -85,7 +87,7 @@ fun FeedButton(item: LibraryItem, active: SessionState.Active, catalog: CatalogM
         working = true; error = null
         scope.launch {
             try { action() } catch (failure: Exception) {
-                error = failure.explanation(); graph.accounts.handle(failure)
+                error = failure.explanation(context); graph.accounts.handle(failure)
             } finally { working = false }
         }
     }
@@ -94,31 +96,33 @@ fun FeedButton(item: LibraryItem, active: SessionState.Active, catalog: CatalogM
     AlertDialog(
         onDismissRequest = { if (!working) showing = false },
         icon = { Icon(Icons.Outlined.RssFeed, null) },
-        title = { Text(if (open != null) "RSS feed" else "Open RSS feed") },
+        title = { Text(stringResource(if (open != null) R.string.item_rss_feed else R.string.item_open_rss_feed)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (open != null) {
                     val url = active.client.feedUrl(open)
-                    Text("Podcast apps can subscribe to this title at:", style = MaterialTheme.typography.bodyMedium)
+                    val clipLabel = stringResource(R.string.item_rss_feed)
+                    Text(stringResource(R.string.item_feed_subscribe_at), style = MaterialTheme.typography.bodyMedium)
                     Text(url, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.testTag("feed-url"))
                     TextButton(onClick = {
-                        (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(ClipData.newPlainText("RSS feed", url))
+                        (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(ClipData.newPlainText(clipLabel, url))
                         copied = true
-                    }, modifier = Modifier.testTag("feed-copy")) { Text(if (copied) "Copied" else "Copy address") }
-                    if (open.meta.preventIndexing) Text("Hidden from podcast directories", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }, modifier = Modifier.testTag("feed-copy")) { Text(stringResource(if (copied) R.string.item_copied else R.string.item_copy_address)) }
+                    if (open.meta.preventIndexing) Text(stringResource(R.string.item_hidden_from_directories), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
-                    Text("Anyone with the address can listen to this title without signing in.", style = MaterialTheme.typography.bodyMedium)
-                    OutlinedTextField(slug, { slug = it.trim() }, label = { Text("Feed name") }, singleLine = true,
+                    Text(stringResource(R.string.item_feed_public_warning), style = MaterialTheme.typography.bodyMedium)
+                    OutlinedTextField(slug, { slug = it.trim() }, label = { Text(stringResource(R.string.item_feed_name)) }, singleLine = true,
                         isError = slug.isNotEmpty() && !SLUG.matches(slug),
-                        supportingText = { Text("Letters, numbers, - and _ only") },
+                        supportingText = { Text(stringResource(R.string.item_feed_name_rule)) },
                         modifier = Modifier.fillMaxWidth().testTag("feed-slug"))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Hide from podcast directories", Modifier.weight(1f))
-                        Switch(preventIndexing, { preventIndexing = it }, modifier = Modifier.testTag("feed-prevent-indexing").semantics { contentDescription = "Hide from podcast directories" })
+                        val hideLabel = stringResource(R.string.item_hide_from_directories)
+                        Text(hideLabel, Modifier.weight(1f))
+                        Switch(preventIndexing, { preventIndexing = it }, modifier = Modifier.testTag("feed-prevent-indexing").semantics { contentDescription = hideLabel })
                     }
                     if (!preventIndexing) {
-                        OutlinedTextField(ownerName, { ownerName = it }, label = { Text("Owner name") }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("feed-owner-name"))
-                        OutlinedTextField(ownerEmail, { ownerEmail = it.trim() }, label = { Text("Owner email") }, singleLine = true,
+                        OutlinedTextField(ownerName, { ownerName = it }, label = { Text(stringResource(R.string.item_owner_name)) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("feed-owner-name"))
+                        OutlinedTextField(ownerEmail, { ownerEmail = it.trim() }, label = { Text(stringResource(R.string.item_owner_email)) }, singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth().testTag("feed-owner-email"))
                     }
                 }
@@ -136,21 +140,22 @@ fun FeedButton(item: LibraryItem, active: SessionState.Active, catalog: CatalogM
                 },
                 enabled = !working && SLUG.matches(slug),
                 modifier = Modifier.testTag("feed-open"),
-            ) { Text("Open feed") }
+            ) { Text(stringResource(R.string.item_open_feed)) }
             else if (admin) TextButton(
                 onClick = { run { active.client.closeFeed(open.id); feed = null; showing = false } },
                 enabled = !working,
                 modifier = Modifier.testTag("feed-close"),
-            ) { Text("Close feed", color = MaterialTheme.colorScheme.error) }
+            ) { Text(stringResource(R.string.item_close_feed), color = MaterialTheme.colorScheme.error) }
         },
-        dismissButton = { TextButton(onClick = { showing = false }, enabled = !working) { Text(if (open != null) "Done" else "Cancel") } },
+        dismissButton = { TextButton(onClick = { showing = false }, enabled = !working) { Text(stringResource(if (open != null) R.string.item_done else R.string.action_cancel)) } },
     )
 }
 
 /** Emails the title's ebook to an e-reader the server has configured for this user. */
 @Composable
 fun SendEbookButton(item: LibraryItem, active: SessionState.Active) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val scope = rememberCoroutineScope()
     var devices by remember(item.id) { mutableStateOf<List<EreaderDevice>>(emptyList()) }
     var choosing by remember { mutableStateOf(false) }
@@ -167,18 +172,18 @@ fun SendEbookButton(item: LibraryItem, active: SessionState.Active) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         OutlinedButton(onClick = { choosing = true; error = null }, enabled = !sending, modifier = Modifier.fillMaxWidth().testTag("send-ebook")) {
             Icon(Icons.AutoMirrored.Outlined.Send, null, Modifier.size(18.dp))
-            Text(if (sending) "Sending…" else "Send to e-reader", Modifier.padding(start = 8.dp))
+            Text(stringResource(if (sending) R.string.item_sending else R.string.item_send_to_ereader), Modifier.padding(start = 8.dp))
         }
-        sent?.let { Text("Sent to $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("send-ebook-sent")) }
+        sent?.let { Text(stringResource(R.string.item_sent_to, it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("send-ebook-sent")) }
         error?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("send-ebook-error")) }
     }
     if (choosing) AlertDialog(
         onDismissRequest = { choosing = false },
         icon = { Icon(Icons.AutoMirrored.Outlined.Send, null) },
-        title = { Text("Send to e-reader") },
+        title = { Text(stringResource(R.string.item_send_to_ereader)) },
         text = {
             Column {
-                Text("Your server emails the ebook to the device you choose.", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.item_send_ebook_explanation), style = MaterialTheme.typography.bodyMedium)
                 devices.forEach { device ->
                     TextButton(onClick = {
                         choosing = false; sending = true; sent = null; error = null
@@ -187,8 +192,8 @@ fun SendEbookButton(item: LibraryItem, active: SessionState.Active) {
                                 active.client.sendEbook(item.id, device.name)
                                 sent = device.name
                             } catch (failure: Exception) {
-                                error = if (failure is ApiError.Http && failure.status == 404) "${device.name} or this ebook is no longer available on the server. Nothing was sent."
-                                    else "Not sent to ${device.name}. ${failure.explanation()}"
+                                error = if (failure is ApiError.Http && failure.status == 404) context.getString(R.string.item_ereader_or_ebook_gone, device.name)
+                                    else context.getString(R.string.item_not_sent_to, device.name, failure.explanation(context))
                                 graph.accounts.handle(failure)
                             } finally { sending = false }
                         }
@@ -197,6 +202,6 @@ fun SendEbookButton(item: LibraryItem, active: SessionState.Active) {
             }
         },
         confirmButton = {},
-        dismissButton = { TextButton(onClick = { choosing = false }) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = { choosing = false }) { Text(stringResource(R.string.action_cancel)) } },
     )
 }

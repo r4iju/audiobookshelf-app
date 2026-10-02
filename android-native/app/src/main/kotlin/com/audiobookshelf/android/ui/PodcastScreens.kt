@@ -53,6 +53,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -62,7 +64,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
+import com.audiobookshelf.android.R
 import com.audiobookshelf.android.data.CatalogModel
 import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.graph
@@ -90,7 +94,7 @@ import kotlinx.serialization.json.putJsonObject
 import java.text.DateFormat
 import java.util.Date
 
-private enum class EpisodeFilter(val label: String) { ALL("All"), INCOMPLETE("Incomplete"), IN_PROGRESS("In progress"), FINISHED("Finished") }
+private enum class EpisodeFilter(@StringRes val label: Int) { ALL(R.string.pod_filter_all), INCOMPLETE(R.string.pod_filter_incomplete), IN_PROGRESS(R.string.pod_filter_in_progress), FINISHED(R.string.finished) }
 
 /** Opens playback for any source and calls [onOpened] once the player has it loaded. */
 @Composable
@@ -151,28 +155,28 @@ fun PodcastDetail(item: LibraryItem, reload: () -> Unit, active: SessionState.Ac
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FeedButton(item, active, catalog)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Episodes", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).semantics { heading() })
+                Text(stringResource(R.string.search_episodes), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).semantics { heading() })
                 if (canManage) TextButton(onClick = { feedSheet = true }, modifier = Modifier.testTag("feed-episodes")) {
-                    Icon(Icons.Outlined.RssFeed, null, Modifier.size(18.dp)); Text("Feed episodes", Modifier.padding(start = 6.dp))
+                    Icon(Icons.Outlined.RssFeed, null, Modifier.size(18.dp)); Text(stringResource(R.string.pod_feed_episodes), Modifier.padding(start = 6.dp))
                 }
                 IconButton(onClick = { graph.settings.update { it.copy(episodeDescending = !it.episodeDescending) } }, modifier = Modifier.testTag("episode-sort")) {
-                    Icon(Icons.AutoMirrored.Outlined.Sort, if (settings.episodeDescending) "Newest first, tap for oldest first" else "Oldest first, tap for newest first")
+                    Icon(Icons.AutoMirrored.Outlined.Sort, stringResource(if (settings.episodeDescending) R.string.pod_sort_newest_first else R.string.pod_sort_oldest_first))
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 EpisodeFilter.entries.forEach { option ->
-                    FilterChip(selected = filter == option, onClick = { filter = option }, label = { Text(option.label) }, modifier = Modifier.testTag("episode-filter-${option.name.lowercase()}"))
+                    FilterChip(selected = filter == option, onClick = { filter = option }, label = { Text(stringResource(option.label)) }, modifier = Modifier.testTag("episode-filter-${option.name.lowercase()}"))
                 }
             }
-            if (pending.isNotEmpty()) Text("${pending.size} episode${if (pending.size == 1) "" else "s"} queued on your server: ${pending.joinToString { it.title }}",
+            if (pending.isNotEmpty()) Text(pluralStringResource(R.plurals.pod_episodes_queued, pending.size, pending.size, pending.joinToString { it.title }),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("queued-episodes"))
             failures.forEachIndexed { index, failure ->
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.testTag("feed-failure-$index")) {
-                    Text("Your server could not download “${failure.title}”.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                    TextButton(onClick = { runCatching { graph.podcastRequests.dismiss(failure.id) } }) { Text("Dismiss") }
+                    Text(stringResource(R.string.pod_server_could_not_download, failure.title), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                    TextButton(onClick = { runCatching { graph.podcastRequests.dismiss(failure.id) } }) { Text(stringResource(R.string.pod_dismiss)) }
                 }
             }
-            if (episodes.isEmpty()) Text(if (item.media.episodes.isEmpty()) "No episodes yet" else "No episodes match this filter",
+            if (episodes.isEmpty()) Text(stringResource(if (item.media.episodes.isEmpty()) R.string.pod_no_episodes_yet else R.string.pod_no_episodes_match_filter),
                 color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("episodes-empty"))
             engineState.openError?.takeIf { it.first.startsWith("${item.id}/") }?.let { Text(it.second, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("play-error")) }
         }
@@ -191,18 +195,18 @@ fun PodcastDetail(item: LibraryItem, reload: () -> Unit, active: SessionState.Ac
 private fun EpisodeRow(episode: Episode, progress: MediaProgress?, onOpen: () -> Unit, onPlay: () -> Unit) {
     Column {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f).clickable(role = Role.Button, onClickLabel = "Episode details", onClick = onOpen).padding(vertical = 10.dp).testTag("episode-${episode.id}"),
+            Column(Modifier.weight(1f).clickable(role = Role.Button, onClickLabel = stringResource(R.string.pod_episode_details), onClick = onOpen).padding(vertical = 10.dp).testTag("episode-${episode.id}"),
                 verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(episode.title.ifBlank { "Untitled episode" }, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(episode.title.ifBlank { stringResource(R.string.pod_untitled_episode) }, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 val facts = listOfNotNull(episode.publishedAt?.let { DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(it.toLong())) },
                     episode.playableDuration.takeIf { it > 0 }?.let(::formatDuration),
-                    progress?.takeIf { !it.isFinished && it.currentTime > 0 }?.let { "${formatDuration((it.duration - it.currentTime).coerceAtLeast(0.0))} left" })
+                    progress?.takeIf { !it.isFinished && it.currentTime > 0 }?.let { stringResource(R.string.pod_time_left, formatDuration((it.duration - it.currentTime).coerceAtLeast(0.0))) })
                 Text(facts.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (progress != null && !progress.isFinished && progress.progress > 0) ProgressLine(progress.progress, Modifier.padding(top = 4.dp))
             }
-            if (progress?.isFinished == true) Icon(Icons.Filled.CheckCircle, "Finished", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 4.dp).testTag("episode-done-${episode.id}"))
+            if (progress?.isFinished == true) Icon(Icons.Filled.CheckCircle, stringResource(R.string.finished), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 4.dp).testTag("episode-done-${episode.id}"))
             IconButton(onClick = onPlay, modifier = Modifier.testTag("episode-play-${episode.id}")) {
-                Icon(Icons.Filled.PlayCircle, "Play ${episode.title}", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
+                Icon(Icons.Filled.PlayCircle, stringResource(R.string.pod_play_named, episode.title), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
             }
         }
         HorizontalDivider()
@@ -214,7 +218,7 @@ fun EpisodeScreen(item: LibraryItem, episodeId: String, active: SessionState.Act
     val graph = LocalContext.current.graph
     val episode = item.media.episodes.firstOrNull { it.id == episodeId }
     if (episode == null) {
-        Box(Modifier.padding(padding)) { MessageState("Episode not available", "It may have been removed from the server.", tag = "episode-missing") }
+        Box(Modifier.padding(padding)) { MessageState(stringResource(R.string.pod_episode_not_available), stringResource(R.string.pod_episode_may_have_been_removed), tag = "episode-missing") }
         return
     }
     val progress = catalog.progressFor(item.id, episode.id)
@@ -232,7 +236,7 @@ fun EpisodeScreen(item: LibraryItem, episodeId: String, active: SessionState.Act
         }
         if (progress != null && (progress.progress > 0 || progress.isFinished)) {
             Column(Modifier.semantics(mergeDescendants = true) {}.testTag("item-progress")) {
-                Text(if (progress.isFinished) "Finished" else "${(progress.progress * 100).toInt()}% listened", style = MaterialTheme.typography.labelLarge)
+                Text(if (progress.isFinished) stringResource(R.string.finished) else stringResource(R.string.pod_percent_listened, (progress.progress * 100).toInt()), style = MaterialTheme.typography.labelLarge)
                 ProgressLine(if (progress.isFinished) 1.0 else progress.progress)
             }
         }
@@ -249,7 +253,8 @@ private class FeedEpisode(val key: String, val title: String, val url: String?, 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FeedEpisodesSheet(active: SessionState.Active, item: LibraryItem, onQueued: () -> Unit, onDismiss: () -> Unit) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val scope = rememberCoroutineScope()
     var episodes by remember { mutableStateOf<List<FeedEpisode>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -265,38 +270,39 @@ private fun FeedEpisodesSheet(active: SessionState.Active, item: LibraryItem, on
             val parsed = list.mapIndexed { index, element ->
                 val value = element.jsonObject
                 val url = (value["enclosure"] as? JsonObject)?.get("url")?.jsonPrimitive?.contentOrNull
-                FeedEpisode(value["guid"]?.jsonPrimitive?.contentOrNull ?: "episode-$index", value["title"]?.jsonPrimitive?.contentOrNull ?: "Untitled episode", url, element)
+                FeedEpisode(value["guid"]?.jsonPrimitive?.contentOrNull ?: "episode-$index", value["title"]?.jsonPrimitive?.contentOrNull ?: context.getString(R.string.pod_untitled_episode), url, element)
             }
             // A write from a worker thread can land before the sheet's dialog window first composes and be missed.
             withContext(Dispatchers.Main) { episodes = parsed }
-        } catch (failure: Exception) { error = failure.message ?: "The feed could not be opened."; graph.accounts.handle(failure) }
+        } catch (failure: Exception) { error = failure.message ?: context.getString(R.string.pod_feed_could_not_open); graph.accounts.handle(failure) }
     }
     ModalBottomSheet(onDismissRequest = { if (!adding) onDismiss() }) {
         Column(Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Feed episodes", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+            Text(stringResource(R.string.pod_feed_episodes), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
             val list = episodes
             when {
                 error != null -> Column {
                     Text(error.orEmpty(), color = MaterialTheme.colorScheme.error)
-                    TextButton(onClick = { attempt++ }) { Text("Retry feed") }
+                    TextButton(onClick = { attempt++ }) { Text(stringResource(R.string.pod_retry_feed)) }
                 }
                 list == null -> CircularProgressIndicator()
-                list.isEmpty() -> Text("No feed episodes found")
+                list.isEmpty() -> Text(stringResource(R.string.pod_no_feed_episodes))
                 else -> LazyColumn(Modifier.heightIn(max = 420.dp)) {
                     items(list, key = { it.key }) { episode ->
                         val onServer = episode.url in existing
+                        val state = stringResource(if (onServer) R.string.pod_already_on_server else if (episode.key in selected) R.string.pod_selected else R.string.pod_not_selected)
                         val enabled = episode.url != null && !onServer && !adding
                         Row(
                             Modifier.fillMaxWidth().clickable(enabled = enabled, role = Role.Checkbox) { if (episode.key in selected) selected.remove(episode.key) else selected.add(episode.key) }
-                                .semantics { stateDescription = if (onServer) "Already on server" else if (episode.key in selected) "Selected" else "Not selected" }
+                                .semantics { stateDescription = state }
                                 .padding(vertical = 6.dp).testTag("feed-episode-${episode.key}"),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Checkbox(checked = onServer || episode.key in selected, onCheckedChange = null, enabled = enabled)
                             Column(Modifier.padding(start = 8.dp)) {
                                 Text(episode.title)
-                                if (onServer) Text("Already on server", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                else if (episode.url == null) Text("No audio enclosure", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                if (onServer) Text(stringResource(R.string.pod_already_on_server), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                else if (episode.url == null) Text(stringResource(R.string.pod_no_audio_enclosure), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -314,13 +320,13 @@ private fun FeedEpisodesSheet(active: SessionState.Active, item: LibraryItem, on
                             onQueued(); onDismiss()
                         } catch (failure: Exception) {
                             if (failure is ApiError.Http && failure.status in listOf(400, 401, 403, 404, 413)) runCatching { graph.podcastRequests.reject(account, item.id, choices.mapNotNull { it.url }) }
-                            error = "Not queued: ${failure.message ?: "try again"}"; graph.accounts.handle(failure)
+                            error = failure.message?.let { context.getString(R.string.pod_not_queued, it) } ?: context.getString(R.string.pod_not_queued_try_again); graph.accounts.handle(failure)
                         } finally { adding = false }
                     }
                 },
                 enabled = selected.isNotEmpty() && !adding && list != null,
                 modifier = Modifier.fillMaxWidth().testTag("queue-episodes"),
-            ) { Text(if (adding) "Queueing on your server…" else "Add selected episodes to server") }
+            ) { Text(stringResource(if (adding) R.string.pod_queueing_on_server else R.string.pod_add_selected_episodes)) }
         }
     }
 }
@@ -328,7 +334,8 @@ private fun FeedEpisodesSheet(active: SessionState.Active, item: LibraryItem, on
 /** Discover by name or RSS URL, preview the feed, then create the podcast in a library folder. */
 @Composable
 fun AddPodcastScreen(active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues, onCreated: () -> Unit) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val scope = rememberCoroutineScope()
     val library = catalog.library
     val permitted = catalog.user?.isAdmin == true && library?.isPodcast == true
@@ -347,7 +354,7 @@ fun AddPodcastScreen(active: SessionState.Active, catalog: CatalogModel, padding
 
     fun run(block: suspend () -> Unit) {
         busy = true; error = null
-        scope.launch { try { block() } catch (failure: Exception) { error = failure.message ?: "Something went wrong."; graph.accounts.handle(failure) } finally { busy = false } }
+        scope.launch { try { block() } catch (failure: Exception) { error = failure.message ?: context.getString(R.string.pod_something_went_wrong); graph.accounts.handle(failure) } finally { busy = false } }
     }
     fun preview(url: String, chosen: PodcastDiscovery?) = run {
         val value = active.client.podcastFeed(url)
@@ -358,17 +365,17 @@ fun AddPodcastScreen(active: SessionState.Active, catalog: CatalogModel, padding
     }
 
     if (!permitted) {
-        Box(Modifier.padding(padding)) { MessageState("Adding podcasts is not available", "Your server account needs podcast management permission in a podcast library.", tag = "add-podcast-denied") }
+        Box(Modifier.padding(padding)) { MessageState(stringResource(R.string.pod_adding_not_available), stringResource(R.string.pod_adding_needs_permission), tag = "add-podcast-denied") }
         return
     }
     Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         val loaded = feed
         if (loaded == null) {
-            OutlinedTextField(query, { query = it }, label = { Text("Search podcasts") }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("podcast-query"),
+            OutlinedTextField(query, { query = it }, label = { Text(stringResource(R.string.pod_search_podcasts)) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("podcast-query"),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { if (query.isNotBlank()) run { results = active.client.discoverPodcasts(query.trim()); searched = true } }))
-            Button(onClick = { run { results = active.client.discoverPodcasts(query.trim()); searched = true } }, enabled = !busy && query.isNotBlank(), modifier = Modifier.testTag("podcast-search")) { Text("Search") }
-            if (searched && results.isEmpty()) Text("No podcasts found", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Button(onClick = { run { results = active.client.discoverPodcasts(query.trim()); searched = true } }, enabled = !busy && query.isNotBlank(), modifier = Modifier.testTag("podcast-search")) { Text(stringResource(R.string.tab_search)) }
+            if (searched && results.isEmpty()) Text(stringResource(R.string.pod_no_podcasts_found), color = MaterialTheme.colorScheme.onSurfaceVariant)
             results.forEach { result ->
                 Row(Modifier.fillMaxWidth().clickable(enabled = !busy && result.feedUrl != null, role = Role.Button) { preview(result.feedUrl!!, result) }
                     .padding(vertical = 8.dp).testTag("podcast-discovery-${result.id}"), verticalAlignment = Alignment.CenterVertically) {
@@ -380,16 +387,16 @@ fun AddPodcastScreen(active: SessionState.Active, catalog: CatalogModel, padding
                 }
             }
             HorizontalDivider()
-            OutlinedTextField(feedUrl, { feedUrl = it }, label = { Text("Or RSS feed URL") }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("podcast-feed-url"),
+            OutlinedTextField(feedUrl, { feedUrl = it }, label = { Text(stringResource(R.string.pod_or_rss_feed_url)) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("podcast-feed-url"),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
             OutlinedButton(onClick = {
                 val url = feedUrl.trim()
-                if (!url.startsWith("http://") && !url.startsWith("https://")) error = "Enter a complete HTTP or HTTPS feed URL." else preview(url, null)
-            }, enabled = !busy && feedUrl.isNotBlank(), modifier = Modifier.testTag("preview-feed")) { Text("Preview feed") }
+                if (!url.startsWith("http://") && !url.startsWith("https://")) error = context.getString(R.string.pod_enter_complete_feed_url) else preview(url, null)
+            }, enabled = !busy && feedUrl.isNotBlank(), modifier = Modifier.testTag("preview-feed")) { Text(stringResource(R.string.pod_preview_feed)) }
         } else {
-            OutlinedTextField(title, { title = it }, label = { Text("Title") }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("podcast-title"))
-            OutlinedTextField(author, { author = it }, label = { Text("Author") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            Text("Folder", style = MaterialTheme.typography.titleSmall)
+            OutlinedTextField(title, { title = it }, label = { Text(stringResource(R.string.pod_title)) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("podcast-title"))
+            OutlinedTextField(author, { author = it }, label = { Text(stringResource(R.string.pod_author)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            Text(stringResource(R.string.pod_folder), style = MaterialTheme.typography.titleSmall)
             library.folders.forEach { folder ->
                 Row(Modifier.fillMaxWidth().clickable(role = Role.RadioButton) { folderId = folder.id }, verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(selected = folderId == folder.id, onClick = null)
@@ -397,7 +404,7 @@ fun AddPodcastScreen(active: SessionState.Active, catalog: CatalogModel, padding
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Download new episodes automatically", Modifier.weight(1f))
+                Text(stringResource(R.string.pod_auto_download_episodes), Modifier.weight(1f))
                 Switch(autoDownload, { autoDownload = it })
             }
             val folder = library.folders.firstOrNull { it.id == folderId }
@@ -423,8 +430,8 @@ fun AddPodcastScreen(active: SessionState.Active, catalog: CatalogModel, padding
                     catalog.reload()
                     onCreated()
                 }
-            }, enabled = !busy && folder != null && safeName.isNotEmpty() && safeName != "." && safeName != "..", modifier = Modifier.fillMaxWidth().testTag("create-podcast")) { Text("Create podcast") }
-            TextButton(onClick = { feed = null }) { Text("Choose a different feed") }
+            }, enabled = !busy && folder != null && safeName.isNotEmpty() && safeName != "." && safeName != "..", modifier = Modifier.fillMaxWidth().testTag("create-podcast")) { Text(stringResource(R.string.pod_create_podcast)) }
+            TextButton(onClick = { feed = null }) { Text(stringResource(R.string.pod_choose_different_feed)) }
         }
         if (busy) CircularProgressIndicator()
         error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("add-podcast-error")) }

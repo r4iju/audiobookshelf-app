@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -22,7 +26,8 @@ import java.util.zip.ZipOutputStream;
 /**
  * Serves exports the way a file manager does when the user opens one with the app: a content URI of
  * unknown type. "legacy-export" is the archive the legacy app's own exporter wrote; "corrupt" is that
- * archive with one byte of its PDF changed; "not-an-export" is any other file. "slow-legacy-export"
+ * archive with one byte of its PDF changed; "german-legacy-export" is that archive from a person who chose
+ * German in the legacy app; "not-an-export" is any other file. "slow-legacy-export"
  * arrives over two seconds, like a file from a slow network drive. Java, because this runs
  * in the test package's own process without the app's Kotlin runtime.
  */
@@ -39,6 +44,7 @@ public class ArchiveProvider extends ContentProvider {
             switch (name) {
                 case "legacy-export.absmigration": copy(source, out); break;
                 case "corrupt.absmigration": corrupt(source, out); break;
+                case "german-legacy-export.absmigration": german(source, out); break;
                 case "not-an-export.absmigration": out.write("These are notes, not an export.".getBytes()); break;
                 default: throw new FileNotFoundException(name);
             }
@@ -47,12 +53,34 @@ public class ArchiveProvider extends ContentProvider {
     }
 
     private static void corrupt(InputStream source, OutputStream out) throws IOException {
+        rewrite(source, out, (name, data) -> {
+            if (name.endsWith(".pdf")) data[100]++;
+            return data;
+        });
+    }
+
+    /** The legacy exporter copies the "lang" preference as the legacy app stored it. */
+    private static void german(InputStream source, OutputStream out) throws IOException {
+        rewrite(source, out, (name, data) -> {
+            if (!name.equals("archive.json")) return data;
+            try {
+                JSONObject archive = new JSONObject(new String(data, StandardCharsets.UTF_8));
+                archive.getJSONObject("snapshot").getJSONObject("preferences").put("lang", "de");
+                return archive.toString().getBytes(StandardCharsets.UTF_8);
+            } catch (JSONException failure) {
+                throw new IOException(failure);
+            }
+        });
+    }
+
+    private interface Entry { byte[] apply(String name, byte[] data) throws IOException; }
+
+    private static void rewrite(InputStream source, OutputStream out, Entry change) throws IOException {
         try (ZipInputStream zip = new ZipInputStream(source); ZipOutputStream rewritten = new ZipOutputStream(out)) {
             for (ZipEntry entry; (entry = zip.getNextEntry()) != null; ) {
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 copy(zip, bytes);
-                byte[] data = bytes.toByteArray();
-                if (entry.getName().endsWith(".pdf")) data[100]++;
+                byte[] data = change.apply(entry.getName(), bytes.toByteArray());
                 rewritten.putNextEntry(new ZipEntry(entry.getName()));
                 rewritten.write(data);
                 rewritten.closeEntry();

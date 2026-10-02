@@ -1,6 +1,7 @@
 package com.audiobookshelf.android.ui
 
 import com.audiobookshelf.android.R
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -58,7 +59,7 @@ fun LoadItem(client: ApiClient, id: String, padding: PaddingValues, onFailure: (
     when {
         loaded != null -> content(loaded) { attempt++ }
         error != null -> Box(Modifier.padding(padding)) {
-            MessageState("This title could not load", error, tag = "item-error", action = stringResource(R.string.action_retry), actionTag = "item-retry") { attempt++ }
+            MessageState(stringResource(R.string.item_could_not_load), error, tag = "item-error", action = stringResource(R.string.action_retry), actionTag = "item-retry") { attempt++ }
         }
         else -> Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
     }
@@ -109,7 +110,7 @@ fun ItemDetail(
                         }
                         if (item.narrators.isNotEmpty()) {
                             FlowRow(verticalArrangement = Arrangement.Center) {
-                                Text("Narrated by ", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.align(Alignment.CenterVertically))
+                                Text(stringResource(R.string.item_narrated_by) + " ", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.align(Alignment.CenterVertically))
                                 item.narrators.forEach { name ->
                                     Text(name, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.clickable(role = Role.Button) { actions.onNarrator(name) }.padding(4.dp).testTag("narrator-$name"))
@@ -117,17 +118,17 @@ fun ItemDetail(
                             }
                         }
                         metadata.series.forEach { series ->
-                            Text("Series: ${series.name}" + (series.sequence?.let { " #$it" } ?: ""), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary,
+                            Text(series.sequence?.let { stringResource(R.string.item_series_with_sequence, series.name, it) } ?: stringResource(R.string.item_series, series.name), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.clickable(role = Role.Button) { actions.onSeries(series.id, series.name) }.padding(vertical = 4.dp).testTag("series-${series.id}"))
                         }
                         val facts = listOfNotNull(
                             item.duration.takeIf { it > 0 && !item.isPodcast }?.let { formatDuration(it) },
                             metadata.publishedYear, metadata.publisher, metadata.language,
-                            item.media.numEpisodes?.let { "$it episodes" },
+                            item.media.numEpisodes?.let { pluralStringResource(R.plurals.item_episode_count, it, it) },
                         )
                         if (facts.isNotEmpty()) Text(facts.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (progress != null && (progress.progress > 0 || progress.isFinished)) {
-                            val text = if (progress.isFinished) stringResource(R.string.finished) else "${(progress.progress * 100).toInt()}% listened · ${formatDuration((progress.duration - progress.currentTime).coerceAtLeast(0.0))} left"
+                            val text = if (progress.isFinished) stringResource(R.string.finished) else stringResource(R.string.item_listened_and_left, (progress.progress * 100).toInt(), formatDuration((progress.duration - progress.currentTime).coerceAtLeast(0.0)))
                             Column(Modifier.semantics(mergeDescendants = true) {}.testTag("item-progress"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(text, style = MaterialTheme.typography.labelLarge)
                                 ProgressLine(if (progress.isFinished) 1.0 else progress.progress)
@@ -161,7 +162,7 @@ fun ItemDetail(
                 item { Text(stringResource(R.string.chapters), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) }
                 itemsIndexed(chapters) { index, chapter ->
                     Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.testTag("chapter-$index"), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(chapter.title.ifBlank { "Chapter ${index + 1}" }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                        Text(chapter.title.ifBlank { stringResource(R.string.item_chapter_number, index + 1) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                         Text(formatClock(chapter.start), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }

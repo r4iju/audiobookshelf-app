@@ -45,12 +45,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.audiobookshelf.android.R
 import com.audiobookshelf.android.data.CatalogModel
 import com.audiobookshelf.android.data.SessionState
 import com.audiobookshelf.android.graph
@@ -70,8 +73,11 @@ const val PLAYLISTS = "playlists"
 
 data class GroupMember(val itemId: String, val episodeId: String?, val item: LibraryItem?, val episode: Episode?) {
     val key get() = if (episodeId == null) itemId else "$itemId:$episodeId"
-    val title get() = episode?.title ?: item?.title ?: "Unavailable title"
+    val title: String? get() = episode?.title ?: item?.title
 }
+
+@Composable
+private fun GroupMember.displayTitle() = title ?: stringResource(R.string.grp_unavailable_title)
 
 /** Collections and playlists behave alike in the UI; only the server calls and permissions differ. */
 data class Group(val kind: String, val id: String, val libraryId: String, val ownerId: String?, val name: String, val description: String, val members: List<GroupMember>) {
@@ -86,7 +92,10 @@ data class Group(val kind: String, val id: String, val libraryId: String, val ow
     }
 }
 
-private fun label(kind: String, plural: Boolean = false) = if (kind == COLLECTIONS) (if (plural) "Collections" else "Collection") else (if (plural) "Playlists" else "Playlist")
+private fun label(kind: String) = if (kind == COLLECTIONS) R.string.grp_collection else R.string.grp_playlist
+
+/** Picks the collection or playlist wording of a message; each is a whole sentence for translators. */
+private fun byKind(kind: String, collection: Int, playlist: Int) = if (kind == COLLECTIONS) collection else playlist
 
 fun canCreateGroup(kind: String, catalog: CatalogModel) =
     if (kind == COLLECTIONS) catalog.user?.permissions?.update == true && catalog.library?.isPodcast == false else catalog.user != null
@@ -95,7 +104,8 @@ private suspend fun ApiClient.group(kind: String, id: String) = if (kind == COLL
 
 @Composable
 fun GroupsScreen(kind: String, active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues, onOpen: (String) -> Unit) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val libraryId = catalog.library?.id
     var groups by remember(kind, libraryId) { mutableStateOf<List<Group>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -105,14 +115,14 @@ fun GroupsScreen(kind: String, active: SessionState.Active, catalog: CatalogMode
         error = null
         try {
             groups = if (kind == COLLECTIONS) active.client.collections(libraryId).map(Group::of) else active.client.playlists(libraryId).map(Group::of)
-        } catch (failure: Exception) { error = failure.message ?: "Could not load ${label(kind, true).lowercase()}."; graph.accounts.handle(failure) }
+        } catch (failure: Exception) { error = failure.message ?: context.getString(byKind(kind, R.string.grp_could_not_load_collections, R.string.grp_could_not_load_playlists)); graph.accounts.handle(failure) }
     }
     val list = groups
     Box(Modifier.fillMaxSize().padding(padding).testTag("groups-$kind")) {
         when {
-            error != null && list == null -> MessageState("${label(kind, true)} unavailable", error, tag = "groups-error", action = "Retry", actionTag = "groups-retry") { attempt++ }
+            error != null && list == null -> MessageState(stringResource(byKind(kind, R.string.grp_collections_unavailable, R.string.grp_playlists_unavailable)), error, tag = "groups-error", action = stringResource(R.string.action_retry), actionTag = "groups-retry") { attempt++ }
             list == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-            list.isEmpty() -> MessageState("No ${label(kind, true).lowercase()} yet", if (canCreateGroup(kind, catalog)) "Create one to keep titles together in your own order." else null, tag = "groups-empty")
+            list.isEmpty() -> MessageState(stringResource(byKind(kind, R.string.grp_no_collections_yet, R.string.grp_no_playlists_yet)), if (canCreateGroup(kind, catalog)) stringResource(R.string.grp_create_one_hint) else null, tag = "groups-empty")
             else -> LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
                 items(list, key = { it.id }) { group ->
                     Row(
@@ -124,7 +134,7 @@ fun GroupsScreen(kind: String, active: SessionState.Active, catalog: CatalogMode
                         Cover(first?.let { active.client.coverUrl(it.itemId).toString() }, group.name, Modifier.size(56.dp), podcast = first?.episodeId != null)
                         Column(Modifier.weight(1f)) {
                             Text(group.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text("${group.members.size} ${if (group.members.size == 1) "title" else "titles"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(pluralStringResource(R.plurals.grp_title_count, group.members.size, group.members.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     HorizontalDivider()
@@ -136,7 +146,8 @@ fun GroupsScreen(kind: String, active: SessionState.Active, catalog: CatalogMode
 
 @Composable
 fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues, onMember: (GroupMember) -> Unit, onEdit: () -> Unit, onDeleted: () -> Unit) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val scope = rememberCoroutineScope()
     val player by graph.playback.state.collectAsState()
     var group by remember(id) { mutableStateOf<Group?>(null) }
@@ -148,14 +159,15 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
     LaunchedEffect(id, attempt) {
         error = null
         try { group = active.client.group(kind, id) } catch (failure: Exception) {
-            error = if (failure is ApiError.Http && failure.status == 404) "This ${label(kind).lowercase()} was deleted." else failure.message ?: "Could not load."
+            error = if (failure is ApiError.Http && failure.status == 404) context.getString(byKind(kind, R.string.grp_collection_deleted, R.string.grp_playlist_deleted))
+                else failure.message ?: context.getString(R.string.grp_could_not_load)
             graph.accounts.handle(failure)
         }
     }
     val loaded = group
     if (loaded == null) {
         Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-            if (error != null) MessageState("${label(kind)} unavailable", error, tag = "group-error", action = "Retry", actionTag = "group-retry") { attempt++ }
+            if (error != null) MessageState(stringResource(byKind(kind, R.string.grp_collection_unavailable, R.string.grp_playlist_unavailable)), error, tag = "group-error", action = stringResource(R.string.action_retry), actionTag = "group-retry") { attempt++ }
             else CircularProgressIndicator()
         }
         return
@@ -165,7 +177,7 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
     LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("group-detail-${loaded.id}"), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(label(kind), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(label(kind)), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 Text(loaded.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() })
                 if (loaded.description.isNotBlank()) Text(loaded.description, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -183,10 +195,10 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
                                         val progress = fresh.mediaProgress.firstOrNull { it.libraryItemId == member.itemId && it.episodeId == member.episodeId }
                                         PlaySource.Stream(active.client, member.itemId, member.episodeId, active.client.coverUrl(member.itemId).toString(), progress?.lastUpdate)
                                     }
-                                    if (sources.isEmpty()) actionError = "Nothing in this ${label(kind).lowercase()} can play."
+                                    if (sources.isEmpty()) actionError = context.getString(byKind(kind, R.string.grp_nothing_in_collection_can_play, R.string.grp_nothing_in_playlist_can_play))
                                     else graph.playback.playQueue(loaded.id, sources)
                                 } catch (failure: Exception) {
-                                    actionError = failure.message ?: "Could not start playback."; graph.accounts.handle(failure)
+                                    actionError = failure.message ?: context.getString(R.string.grp_could_not_start_playback); graph.accounts.handle(failure)
                                 } finally { busy = false }
                             }
                         },
@@ -195,17 +207,18 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
                     ) {
                         val pause = playingThis && player.playing
                         Icon(if (pause) Icons.Filled.Pause else Icons.Filled.PlayArrow, null)
-                        Text(if (pause) "Pause" else if (playingThis) "Resume" else "Play ${label(kind).lowercase()}", Modifier.padding(start = 6.dp))
+                        Text(if (pause) stringResource(R.string.action_pause) else if (playingThis) stringResource(R.string.grp_resume)
+                            else stringResource(byKind(kind, R.string.grp_play_collection, R.string.grp_play_playlist)), Modifier.padding(start = 6.dp))
                     }
-                    if (loaded.canEdit(user)) IconButton(onClick = onEdit, modifier = Modifier.testTag("edit-group")) { Icon(Icons.Outlined.Edit, "Edit ${label(kind).lowercase()}") }
-                    if (loaded.canDelete(user)) IconButton(onClick = { confirmDelete = true }, modifier = Modifier.testTag("delete-group")) { Icon(Icons.Outlined.Delete, "Delete ${label(kind).lowercase()}") }
+                    if (loaded.canEdit(user)) IconButton(onClick = onEdit, modifier = Modifier.testTag("edit-group")) { Icon(Icons.Outlined.Edit, stringResource(byKind(kind, R.string.grp_edit_collection, R.string.grp_edit_playlist))) }
+                    if (loaded.canDelete(user)) IconButton(onClick = { confirmDelete = true }, modifier = Modifier.testTag("delete-group")) { Icon(Icons.Outlined.Delete, stringResource(byKind(kind, R.string.grp_delete_collection, R.string.grp_delete_playlist))) }
                 }
                 (actionError ?: player.openError?.takeIf { failure -> loaded.members.any { itemKey(it.itemId, it.episodeId) == failure.first } }?.second)?.let {
                     Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("group-action-error"))
                 }
             }
         }
-        if (loaded.members.isEmpty()) item { Text("No titles yet", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        if (loaded.members.isEmpty()) item { Text(stringResource(R.string.grp_no_titles_yet), color = MaterialTheme.colorScheme.onSurfaceVariant) }
         items(loaded.members, key = { it.key }) { member ->
             val progress = catalog.progressFor(member.itemId, member.episodeId)
             Row(
@@ -213,12 +226,12 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Cover(active.client.coverUrl(member.itemId).toString(), member.title, Modifier.size(52.dp), podcast = member.episodeId != null)
+                Cover(active.client.coverUrl(member.itemId).toString(), member.displayTitle(), Modifier.size(52.dp), podcast = member.episodeId != null)
                 Column(Modifier.weight(1f)) {
-                    Text(member.title, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(member.displayTitle(), style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     val subtitle = if (member.episode != null) member.item?.title else member.item?.author
                     subtitle?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1) }
-                    if (progress?.isFinished == true) Text("Finished", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                    if (progress?.isFinished == true) Text(stringResource(R.string.finished), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     else if (progress != null && progress.progress > 0) ProgressLine(progress.progress, Modifier.padding(top = 4.dp))
                 }
             }
@@ -226,18 +239,18 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
     }
     if (confirmDelete) AlertDialog(
         onDismissRequest = { confirmDelete = false },
-        title = { Text("Delete ${label(kind).lowercase()}?") },
-        text = { Text("“${loaded.name}” is removed from your server. The titles in it are kept.") },
+        title = { Text(stringResource(byKind(kind, R.string.grp_delete_collection_question, R.string.grp_delete_playlist_question))) },
+        text = { Text(stringResource(R.string.grp_delete_group_explanation, loaded.name)) },
         confirmButton = {
             TextButton(onClick = {
                 confirmDelete = false; actionError = null
                 scope.launch {
                     try { active.client.deleteGroup(kind, loaded.id); onDeleted() }
-                    catch (failure: Exception) { actionError = "Not deleted: ${failure.message ?: "try again"}"; graph.accounts.handle(failure) }
+                    catch (failure: Exception) { actionError = failure.message?.let { context.getString(R.string.grp_not_deleted, it) } ?: context.getString(R.string.grp_not_deleted_try_again); graph.accounts.handle(failure) }
                 }
-            }, modifier = Modifier.testTag("confirm-delete-group")) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+            }, modifier = Modifier.testTag("confirm-delete-group")) { Text(stringResource(R.string.grp_delete), color = MaterialTheme.colorScheme.error) }
         },
-        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.action_cancel)) } },
     )
 }
 
@@ -247,7 +260,8 @@ fun GroupScreen(kind: String, id: String, active: SessionState.Active, catalog: 
  */
 @Composable
 fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, catalog: CatalogModel, padding: PaddingValues, onSaved: (String) -> Unit) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val scope = rememberCoroutineScope()
     val libraryId = catalog.library?.id
     var saved by remember(id) { mutableStateOf<Group?>(null) }
@@ -263,7 +277,7 @@ fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, ca
         try {
             val group = active.client.group(kind, id)
             saved = group; name = group.name; description = group.description; members = group.members
-        } catch (failure: Exception) { loadError = failure.message ?: "Could not load."; graph.accounts.handle(failure) }
+        } catch (failure: Exception) { loadError = failure.message ?: context.getString(R.string.grp_could_not_load); graph.accounts.handle(failure) }
     }
     val choosable = catalog.library?.isPodcast == false
     LaunchedEffect(libraryId, choosable) {
@@ -272,7 +286,7 @@ fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, ca
     }
     if (id != null && saved == null) {
         Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-            loadError?.let { MessageState("${label(kind)} unavailable", it, tag = "group-error") } ?: CircularProgressIndicator()
+            loadError?.let { MessageState(stringResource(byKind(kind, R.string.grp_collection_unavailable, R.string.grp_playlist_unavailable)), it, tag = "group-error") } ?: CircularProgressIndicator()
         }
         return
     }
@@ -313,9 +327,9 @@ fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, ca
                 onSaved(current.id)
             } catch (failure: Exception) {
                 error = when {
-                    failure is ApiError.Http && failure.status == 403 -> "Your server account is not allowed to change this ${label(kind).lowercase()}."
-                    failure is ApiError.Http && failure.status == 404 -> "This ${label(kind).lowercase()} no longer exists."
-                    else -> "Not saved: ${failure.message ?: "try again"}"
+                    failure is ApiError.Http && failure.status == 403 -> context.getString(byKind(kind, R.string.grp_not_allowed_to_change_collection, R.string.grp_not_allowed_to_change_playlist))
+                    failure is ApiError.Http && failure.status == 404 -> context.getString(byKind(kind, R.string.grp_collection_no_longer_exists, R.string.grp_playlist_no_longer_exists))
+                    else -> failure.message?.let { context.getString(R.string.grp_not_saved, it) } ?: context.getString(R.string.grp_not_saved_try_again)
                 }
                 graph.accounts.handle(failure)
             } finally { saving = false }
@@ -326,31 +340,31 @@ fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, ca
     LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(name, { name = it }, label = { Text("Name") }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("group-name"))
-                OutlinedTextField(description, { description = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth().testTag("group-description"))
+                OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.grp_name)) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("group-name"))
+                OutlinedTextField(description, { description = it }, label = { Text(stringResource(R.string.grp_description)) }, modifier = Modifier.fillMaxWidth().testTag("group-description"))
                 Button(onClick = ::save, enabled = !saving && name.isNotBlank() && members.isNotEmpty(), modifier = Modifier.fillMaxWidth().testTag("save-group")) {
-                    Text(if (saving) "Saving…" else if (id == null) "Create ${label(kind).lowercase()}" else "Save changes")
+                    Text(if (saving) stringResource(R.string.grp_saving) else if (id == null) stringResource(byKind(kind, R.string.grp_create_collection, R.string.grp_create_playlist)) else stringResource(R.string.grp_save_changes))
                 }
-                if (members.isEmpty()) Text("Choose at least one title.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (members.isEmpty()) Text(stringResource(R.string.grp_choose_at_least_one_title), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("group-error")) }
-                if (members.isNotEmpty()) Text("Order", style = MaterialTheme.typography.titleSmall, modifier = Modifier.semantics { heading() })
+                if (members.isNotEmpty()) Text(stringResource(R.string.grp_order), style = MaterialTheme.typography.titleSmall, modifier = Modifier.semantics { heading() })
             }
         }
         items(members, key = { "member-${it.key}" }) { member ->
             val index = members.indexOf(member)
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text("${index + 1}.", Modifier.padding(end = 8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(member.title, Modifier.weight(1f), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(member.displayTitle(), Modifier.weight(1f), maxLines = 2, overflow = TextOverflow.Ellipsis)
                 IconButton(onClick = { members = members.toMutableList().apply { add(index - 1, removeAt(index)) } }, enabled = index > 0 && !saving, modifier = Modifier.testTag("move-up-${member.key}")) {
-                    Icon(Icons.Outlined.ArrowUpward, "Move ${member.title} up")
+                    Icon(Icons.Outlined.ArrowUpward, stringResource(R.string.grp_move_up, member.displayTitle()))
                 }
                 IconButton(onClick = { members = members - member }, enabled = !saving, modifier = Modifier.testTag("remove-${member.key}")) {
-                    Icon(Icons.Outlined.Close, "Remove ${member.title}")
+                    Icon(Icons.Outlined.Close, stringResource(R.string.grp_remove_member, member.displayTitle()))
                 }
             }
         }
         if (choosable) {
-            item { Text("Add titles", style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 12.dp).semantics { heading() }) }
+            item { Text(stringResource(R.string.grp_add_titles), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 12.dp).semantics { heading() }) }
             items(candidates, key = { "choose-${it.id}" }) { item ->
                 val selected = item.id in chosen
                 Row(
@@ -364,7 +378,7 @@ fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, ca
                 }
             }
         } else if (id == null) item {
-            Text("Add episodes from a podcast's episode page.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.grp_add_episodes_hint), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -372,7 +386,8 @@ fun GroupEditorScreen(kind: String, id: String?, active: SessionState.Active, ca
 /** Adds one title or episode to an existing playlist or collection of the current library. */
 @Composable
 fun AddToGroupButton(itemId: String, episodeId: String?, active: SessionState.Active, catalog: CatalogModel) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val scope = rememberCoroutineScope()
     var open by remember { mutableStateOf(false) }
     var groups by remember { mutableStateOf<List<Group>?>(null) }
@@ -380,7 +395,7 @@ fun AddToGroupButton(itemId: String, episodeId: String?, active: SessionState.Ac
     val libraryId = catalog.library?.id ?: return
     val kinds = listOfNotNull(PLAYLISTS, COLLECTIONS.takeIf { episodeId == null && catalog.user?.permissions?.update == true })
     OutlinedButton(onClick = { open = true; message = null }, modifier = Modifier.fillMaxWidth().testTag("add-to-group")) {
-        Icon(Icons.Outlined.Add, null); Text(if (episodeId == null) "Add to playlist or collection" else "Add to playlist", Modifier.padding(start = 6.dp))
+        Icon(Icons.Outlined.Add, null); Text(stringResource(if (episodeId == null) R.string.grp_add_to_playlist_or_collection else R.string.grp_add_to_playlist), Modifier.padding(start = 6.dp))
     }
     message?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("add-to-group-result")) }
     if (open) {
@@ -393,12 +408,12 @@ fun AddToGroupButton(itemId: String, episodeId: String?, active: SessionState.Ac
         }
         AlertDialog(
             onDismissRequest = { open = false },
-            title = { Text("Add to") },
+            title = { Text(stringResource(R.string.grp_add_to)) },
             text = {
                 val list = groups
                 when {
                     list == null -> CircularProgressIndicator()
-                    list.isEmpty() -> Text("Nothing you can add to here yet.")
+                    list.isEmpty() -> Text(stringResource(R.string.grp_nothing_to_add_to))
                     else -> LazyColumn {
                         items(list, key = { it.kind + it.id }) { group ->
                             val present = group.members.any { it.itemId == itemId && it.episodeId == episodeId }
@@ -408,20 +423,23 @@ fun AddToGroupButton(itemId: String, episodeId: String?, active: SessionState.Ac
                                     message = try {
                                         if (group.kind == COLLECTIONS) active.client.collectionMembership(group.id, true, listOf(itemId))
                                         else active.client.playlistMembership(group.id, true, listOf(itemId to episodeId))
-                                        "Added to ${group.name}"
-                                    } catch (failure: Exception) { graph.accounts.handle(failure); "Not added: ${failure.message ?: "try again"}" }
+                                        context.getString(R.string.grp_added_to, group.name)
+                                    } catch (failure: Exception) {
+                                        graph.accounts.handle(failure)
+                                        failure.message?.let { context.getString(R.string.grp_not_added, it) } ?: context.getString(R.string.grp_not_added_try_again)
+                                    }
                                 }
                             }.padding(vertical = 10.dp).testTag("add-to-${group.id}")) {
                                 Column {
                                     Text(group.name)
-                                    Text(if (present) "Already included" else label(group.kind), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(stringResource(if (present) R.string.grp_already_included else label(group.kind)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                         }
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { open = false }) { Text("Close") } },
+            confirmButton = { TextButton(onClick = { open = false }) { Text(stringResource(R.string.grp_close)) } },
         )
     }
 }

@@ -2,6 +2,7 @@ package com.audiobookshelf.android.ui
 
 import com.audiobookshelf.android.R
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import com.audiobookshelf.android.data.CellularPolicy
 import androidx.compose.material3.AlertDialog
 import android.net.ConnectivityManager
@@ -100,14 +101,14 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
     Surface(Modifier.fillMaxSize().testTag("player-screen")) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onCollapse, modifier = Modifier.testTag("player-collapse")) { Icon(Icons.Outlined.KeyboardArrowDown, "Minimize player") }
+                IconButton(onClick = onCollapse, modifier = Modifier.testTag("player-collapse")) { Icon(Icons.Outlined.KeyboardArrowDown, stringResource(R.string.pl_minimize_player)) }
                 Spacer(Modifier.weight(1f))
                 CastButton(graph.casting) { castSheet = true }
                 IconButton(onClick = { engine.close(); onClosed() }, modifier = Modifier.testTag("player-close")) { Icon(Icons.Outlined.Close, stringResource(R.string.action_close_player)) }
             }
             if (now == null) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    if (state.loading) CircularProgressIndicator() else Text("Nothing is playing", style = MaterialTheme.typography.bodyLarge)
+                    if (state.loading) CircularProgressIndicator() else Text(stringResource(R.string.pl_nothing_playing), style = MaterialTheme.typography.bodyLarge)
                 }
                 return@Column
             }
@@ -125,7 +126,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                         Text(now.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
                             maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() })
                         if (now.author.isNotBlank()) Text(now.author, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-                        chapter?.let { Text(it.title.ifBlank { "Chapter ${chapterIndex + 1}" }, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 4.dp)) }
+                        chapter?.let { Text(it.title.ifBlank { stringResource(R.string.pl_chapter_number, chapterIndex + 1) }, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 4.dp)) }
                         CastLine(graph.casting)
                     }
                 }
@@ -134,22 +135,23 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                     when {
                         state.error != null -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(state.error.orEmpty(), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, modifier = Modifier.testTag("player-error"))
-                            Button(onClick = engine::retry, modifier = Modifier.testTag("player-retry")) { Text("Try again") }
+                            Button(onClick = engine::retry, modifier = Modifier.testTag("player-retry")) { Text(stringResource(R.string.pl_try_again)) }
                         }
-                        state.finished -> Text("Finished", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.testTag("player-finished"))
+                        state.finished -> Text(stringResource(R.string.finished), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.testTag("player-finished"))
                     }
                 }
                 item { Controls(state, engine::previousChapter, { engine.jump(false) }, engine::toggle, { engine.jump(true) }, engine::nextChapter, hasChapters = now.chapters.isNotEmpty()) }
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        TextButton(onClick = { speedSheet = true }, modifier = Modifier.testTag("player-speed")) { Text("Speed ${formatSpeed(state.speed)}") }
+                        TextButton(onClick = { speedSheet = true }, modifier = Modifier.testTag("player-speed")) { Text(stringResource(R.string.pl_speed_value, formatSpeed(state.speed))) }
                         val remaining = state.sleepRemaining
+                        val sleepTimerLabel = stringResource(R.string.sleep_timer)
                         TextButton(onClick = { tool = "sleep" }, modifier = Modifier.testTag("player-sleep")) {
                             Icon(Icons.Outlined.Bedtime, if (remaining != null) stringResource(R.string.sleep_timer) else null, Modifier.size(18.dp))
-                            if (remaining == null) Text("Sleep", Modifier.padding(start = 6.dp))
+                            if (remaining == null) Text(stringResource(R.string.pl_sleep), Modifier.padding(start = 6.dp))
                         }
                         if (remaining != null) Text(formatClock(remaining), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.semantics { stateDescription = "Sleep timer" }.testTag("sleep-remaining"))
+                            modifier = Modifier.semantics { stateDescription = sleepTimerLabel }.testTag("sleep-remaining"))
                         if (client != null) TextButton(onClick = { tool = "bookmarks" }, modifier = Modifier.testTag("player-bookmarks")) {
                             Icon(Icons.Outlined.BookmarkBorder, null, Modifier.size(18.dp))
                             Text(stringResource(R.string.bookmarks), Modifier.padding(start = 6.dp))
@@ -191,17 +193,18 @@ private fun Timeline(state: PlayerState, chapter: Chapter?, onSeek: (Double) -> 
     val end = chapter?.end?.takeIf { it > start } ?: now.duration
     var dragging by remember { mutableStateOf<Float?>(null) }
     val fraction = dragging ?: ((state.position - start) / (end - start)).toFloat().coerceIn(0f, 1f)
+    val positionDescription = stringResource(R.string.pl_position_of_duration, formatClock(state.position), formatClock(now.duration))
     Column(Modifier.fillMaxWidth()) {
         Slider(
             value = fraction,
             onValueChange = { dragging = it },
             onValueChangeFinished = { dragging?.let { onSeek(start + it * (end - start)) }; dragging = null },
-            modifier = Modifier.testTag("player-slider").semantics { stateDescription = "${formatClock(state.position)} of ${formatClock(now.duration)}" },
+            modifier = Modifier.testTag("player-slider").semantics { stateDescription = positionDescription },
         )
         Row(Modifier.fillMaxWidth()) {
             Text(formatClock(state.position), style = MaterialTheme.typography.labelMedium, modifier = Modifier.testTag("player-position"))
             Spacer(Modifier.weight(1f))
-            if (state.buffering) Text("Buffering", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (state.buffering) Text(stringResource(R.string.pl_buffering), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.weight(1f))
             Text("-" + formatClock((now.duration - state.position).coerceAtLeast(0.0)), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -213,7 +216,7 @@ private fun Controls(state: PlayerState, onPrevious: () -> Unit, onBack: () -> U
     val settings by LocalContext.current.graph.settings.settings.collectAsState()
     val haptic = rememberHaptic()
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { haptic(); onPrevious() }, enabled = hasChapters, modifier = Modifier.testTag("previous-chapter")) { Icon(Icons.Filled.SkipPrevious, "Previous chapter") }
+        IconButton(onClick = { haptic(); onPrevious() }, enabled = hasChapters, modifier = Modifier.testTag("previous-chapter")) { Icon(Icons.Filled.SkipPrevious, stringResource(R.string.pl_previous_chapter)) }
         IconButton(onClick = { haptic(); onBack() }, modifier = Modifier.size(56.dp).testTag("jump-back")) { Icon(jumpIcon(false, settings.jumpBackwardsTime), jumpDescription(false, settings.jumpBackwardsTime), Modifier.size(32.dp)) }
         Box(Modifier.testTag(if (state.playing) "player-playing" else "player-paused")) {
             FilledIconButton(onClick = { haptic(); onToggle() }, modifier = Modifier.size(72.dp).testTag("play-pause"), colors = IconButtonDefaults.filledIconButtonColors()) {
@@ -222,7 +225,7 @@ private fun Controls(state: PlayerState, onPrevious: () -> Unit, onBack: () -> U
             }
         }
         IconButton(onClick = { haptic(); onForward() }, modifier = Modifier.size(56.dp).testTag("jump-forward")) { Icon(jumpIcon(true, settings.jumpForwardTime), jumpDescription(true, settings.jumpForwardTime), Modifier.size(32.dp)) }
-        IconButton(onClick = { haptic(); onNext() }, enabled = hasChapters, modifier = Modifier.testTag("next-chapter")) { Icon(Icons.Filled.SkipNext, "Next chapter") }
+        IconButton(onClick = { haptic(); onNext() }, enabled = hasChapters, modifier = Modifier.testTag("next-chapter")) { Icon(Icons.Filled.SkipNext, stringResource(R.string.pl_next_chapter)) }
     }
 }
 
@@ -233,10 +236,10 @@ private fun jumpIcon(forward: Boolean, seconds: Int): ImageVector = when (second
     else -> if (forward) Icons.Filled.FastForward else Icons.Filled.FastRewind
 }
 
-fun jumpDescription(forward: Boolean, seconds: Int): String {
-    val amount = if (seconds < 60) "$seconds seconds" else (seconds / 60).let { if (it == 1) "1 minute" else "$it minutes" }
-    return "Jump ${if (forward) "forward" else "back"} $amount"
-}
+@Composable
+fun jumpDescription(forward: Boolean, seconds: Int): String =
+    if (seconds < 60) pluralStringResource(if (forward) R.plurals.pl_jump_forward_seconds else R.plurals.pl_jump_back_seconds, seconds, seconds)
+    else (seconds / 60).let { pluralStringResource(if (forward) R.plurals.pl_jump_forward_minutes else R.plurals.pl_jump_back_minutes, it, it) }
 
 @Composable
 private fun ChapterRow(index: Int, chapter: Chapter, current: Boolean, onClick: () -> Unit) {
@@ -245,7 +248,7 @@ private fun ChapterRow(index: Int, chapter: Chapter, current: Boolean, onClick: 
             Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick).semantics { selected = current }.padding(vertical = 12.dp).testTag("player-chapter-$index"),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(chapter.title.ifBlank { "Chapter ${index + 1}" }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f),
+            Text(chapter.title.ifBlank { stringResource(R.string.pl_chapter_number, index + 1) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f),
                 color = if (current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, fontWeight = if (current) FontWeight.SemiBold else null)
             Text(formatClock(chapter.start), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -260,7 +263,7 @@ fun MiniPlayer(onOpen: () -> Unit) {
     val state by engine.state.collectAsState()
     val jumpBack = LocalContext.current.graph.settings.settings.collectAsState().value.jumpBackwardsTime
     if (state.unsavedListening && (state.now == null || state.error == null)) Surface(color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.fillMaxWidth()) {
-        Text("Some listening is not saved on this device yet. It is kept and saved as soon as storage allows.",
+        Text(stringResource(R.string.pl_listening_unsaved),
             style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).testTag("listening-unsaved"))
     }
     val now = state.now ?: return
@@ -271,20 +274,20 @@ fun MiniPlayer(onOpen: () -> Unit) {
             LinearProgressIndicator(progress = { ((state.position - start) / (end - start).coerceAtLeast(0.001)).toFloat().coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().height(2.dp))
             Row(Modifier.fillMaxWidth().padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Row(
-                    Modifier.weight(1f).clickable(role = Role.Button, onClickLabel = "Open player", onClick = onOpen).padding(start = 12.dp, top = 8.dp, bottom = 8.dp).testTag("mini-player"),
+                    Modifier.weight(1f).clickable(role = Role.Button, onClickLabel = stringResource(R.string.pl_open_player), onClick = onOpen).padding(start = 12.dp, top = 8.dp, bottom = 8.dp).testTag("mini-player"),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Cover(now.coverUrl, now.title, Modifier.width(44.dp), podcast = now.isPodcast)
                     Column(Modifier.padding(horizontal = 12.dp)) {
                         Text(now.title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(state.error?.let { "Playback stopped" } ?: chapter?.title?.takeIf { it.isNotBlank() } ?: now.author, style = MaterialTheme.typography.bodySmall,
+                        Text(state.error?.let { stringResource(R.string.pl_playback_stopped) } ?: chapter?.title?.takeIf { it.isNotBlank() } ?: now.author, style = MaterialTheme.typography.bodySmall,
                             color = if (state.error != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
                 IconButton(onClick = { engine.jump(false) }, modifier = Modifier.testTag("mini-jump-back")) { Icon(jumpIcon(false, jumpBack), jumpDescription(false, jumpBack)) }
                 Box(Modifier.testTag(if (state.playing) "mini-playing" else "mini-paused")) {
                     IconButton(onClick = engine::toggle, modifier = Modifier.testTag("mini-play-pause")) {
-                        Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) "Pause" else "Play")
+                        Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) stringResource(R.string.action_pause) else stringResource(R.string.action_play))
                     }
                 }
             }
@@ -334,10 +337,10 @@ fun PlayButton(source: () -> PlaySource, itemId: String, episodeId: String?, onO
             if (waiting) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
             else {
                 Icon(Icons.Filled.PlayArrow, null)
-                Text(if (loadedHere && state.playing) "Playing" else if (loadedHere) "Resume" else stringResource(R.string.action_play), Modifier.padding(start = 6.dp))
+                Text(if (loadedHere && state.playing) stringResource(R.string.pl_playing) else if (loadedHere) stringResource(R.string.pl_resume) else stringResource(R.string.action_play), Modifier.padding(start = 6.dp))
             }
         }
-        if (refused) Text("Streaming on mobile data is turned off in Settings. Connect to Wi-Fi or download this title first.",
+        if (refused) Text(stringResource(R.string.pl_streaming_cellular_refused),
             color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("play-cellular-refused"))
         state.openError?.takeIf { it.first == key && !waiting }?.let { (_, message) ->
             Text(message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("play-error"))
@@ -346,10 +349,10 @@ fun PlayButton(source: () -> PlaySource, itemId: String, episodeId: String?, onO
     askCellular?.let { pending ->
         AlertDialog(
             onDismissRequest = { askCellular = null },
-            title = { Text("Stream on mobile data?") },
-            text = { Text("You are on a metered connection. You can change this in Settings.") },
+            title = { Text(stringResource(R.string.pl_stream_cellular_title)) },
+            text = { Text(stringResource(R.string.pl_stream_cellular_message)) },
             confirmButton = { TextButton(onClick = { askCellular = null; start(pending) }, modifier = Modifier.testTag("play-cellular-allow")) { Text(stringResource(R.string.action_stream)) } },
-            dismissButton = { TextButton(onClick = { askCellular = null }) { Text("Not now") } },
+            dismissButton = { TextButton(onClick = { askCellular = null }) { Text(stringResource(R.string.pl_not_now)) } },
         )
     }
 }

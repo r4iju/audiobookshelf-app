@@ -2,6 +2,8 @@ package com.audiobookshelf.android.ui
 
 import com.audiobookshelf.android.R
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
+import android.content.Context
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -85,15 +87,20 @@ fun rememberHaptic(): () -> Unit {
 
 @Composable
 fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val settings by graph.settings.settings.collectAsState()
     var error by remember { mutableStateOf<String?>(null) }
+    val saveFailed = stringResource(R.string.set_settings_not_saved)
+    val orientations = mapOf(Orientation.NONE to stringResource(R.string.set_orientation_follow_device), Orientation.PORTRAIT to stringResource(R.string.set_orientation_portrait), Orientation.LANDSCAPE to stringResource(R.string.set_orientation_landscape))
+    val haptics = mapOf(Haptics.OFF to stringResource(R.string.set_haptic_off), Haptics.LIGHT to stringResource(R.string.set_haptic_light), Haptics.MEDIUM to stringResource(R.string.level_medium), Haptics.HEAVY to stringResource(R.string.set_haptic_heavy))
+    val seriesOrders = mapOf(SeriesOrder.ASC to stringResource(R.string.set_series_first_to_last), SeriesOrder.DESC to stringResource(R.string.set_series_last_to_first))
     val themes = mapOf(Appearance.SYSTEM to stringResource(R.string.theme_system), Appearance.LIGHT to stringResource(R.string.theme_light), Appearance.DARK to stringResource(R.string.theme_dark), Appearance.BLACK to stringResource(R.string.theme_black))
     val levels = mapOf(ShakeSensitivity.VERY_LOW to stringResource(R.string.level_very_low), ShakeSensitivity.LOW to stringResource(R.string.level_low), ShakeSensitivity.MEDIUM to stringResource(R.string.level_medium), ShakeSensitivity.HIGH to stringResource(R.string.level_high), ShakeSensitivity.VERY_HIGH to stringResource(R.string.level_very_high))
     val policies = mapOf(CellularPolicy.ASK to stringResource(R.string.policy_ask), CellularPolicy.ALWAYS to stringResource(R.string.policy_always), CellularPolicy.NEVER to stringResource(R.string.policy_never))
     val change: ((DeviceSettings) -> DeviceSettings) -> Unit = { transform ->
         error = try { graph.settings.update(transform); null } catch (_: java.io.IOException) {
-            "Settings could not be saved on this device, so nothing changed. Free some storage and try again."
+            saveFailed
         }
     }
     LazyColumn(
@@ -107,64 +114,62 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
             Choices(stringResource(R.string.theme), Appearance.entries, settings.appearance, "theme", label = { themes.getValue(it) }) { value -> change { it.copy(appearance = value) } }
         }
         item {
-            Choices(stringResource(R.string.screen_orientation), Orientation.entries, settings.lockOrientation, "orientation", label = {
-                when (it) { Orientation.NONE -> "Follow device"; Orientation.PORTRAIT -> "Portrait"; Orientation.LANDSCAPE -> "Landscape" }
-            }) { value -> change { it.copy(lockOrientation = value) } }
+            Choices(stringResource(R.string.screen_orientation), Orientation.entries, settings.lockOrientation, "orientation", label = { orientations.getValue(it) }) { value -> change { it.copy(lockOrientation = value) } }
         }
         item {
-            Choices(stringResource(R.string.haptic_feedback), Haptics.entries, settings.hapticFeedback, "haptic", label = { it.name.lowercase().replaceFirstChar(Char::titlecase) }) { value -> change { it.copy(hapticFeedback = value) } }
+            Choices(stringResource(R.string.haptic_feedback), Haptics.entries, settings.hapticFeedback, "haptic", label = { haptics.getValue(it) }) { value -> change { it.copy(hapticFeedback = value) } }
         }
 
         item { SettingsHeading(stringResource(R.string.settings_playback)) }
-        item { Choices(stringResource(R.string.jump_forward_time), JUMP_SECONDS, settings.jumpForwardTime, "jump-forward", label = ::jumpLabel) { value -> change { it.copy(jumpForwardTime = value) } } }
-        item { Choices(stringResource(R.string.jump_back_time), JUMP_SECONDS, settings.jumpBackwardsTime, "jump-back", label = ::jumpLabel) { value -> change { it.copy(jumpBackwardsTime = value) } } }
+        item { Choices(stringResource(R.string.jump_forward_time), JUMP_SECONDS, settings.jumpForwardTime, "jump-forward", label = { jumpLabel(context, it) }) { value -> change { it.copy(jumpForwardTime = value) } } }
+        item { Choices(stringResource(R.string.jump_back_time), JUMP_SECONDS, settings.jumpBackwardsTime, "jump-back", label = { jumpLabel(context, it) }) { value -> change { it.copy(jumpBackwardsTime = value) } } }
         item {
-            Toggle("Rewind a little when resuming", "Steps back a few seconds after a pause, more after a longer one.", !settings.disableAutoRewind, "auto-rewind") { on -> change { it.copy(disableAutoRewind = !on) } }
+            Toggle(stringResource(R.string.set_rewind_on_resume), stringResource(R.string.set_rewind_on_resume_detail), !settings.disableAutoRewind, "auto-rewind") { on -> change { it.copy(disableAutoRewind = !on) } }
         }
         item {
-            Toggle("Seek from system controls", "Lets the lock screen and notification move the position bar.", settings.allowSeekingOnMediaControls, "seek-media-controls") { on -> change { it.copy(allowSeekingOnMediaControls = on) } }
+            Toggle(stringResource(R.string.set_seek_system_controls), stringResource(R.string.set_seek_system_controls_detail), settings.allowSeekingOnMediaControls, "seek-media-controls") { on -> change { it.copy(allowSeekingOnMediaControls = on) } }
         }
         item {
-            Toggle("Accurate MP3 seeking", "Builds a seek index for MP3 files with unreliable lengths. Seeking starts more slowly.", settings.enableMp3IndexSeeking, "mp3-index-seeking") { on -> change { it.copy(enableMp3IndexSeeking = on) } }
+            Toggle(stringResource(R.string.set_mp3_index_seeking), stringResource(R.string.set_mp3_index_seeking_detail), settings.enableMp3IndexSeeking, "mp3-index-seeking") { on -> change { it.copy(enableMp3IndexSeeking = on) } }
         }
 
         item { SettingsHeading(stringResource(R.string.settings_sleep_timer)) }
         item {
-            Toggle("Shake to reset", "Shaking the phone while the timer runs restarts it.", !settings.disableShakeToResetSleepTimer, "sleep-shake") { on -> change { it.copy(disableShakeToResetSleepTimer = !on) } }
+            Toggle(stringResource(R.string.set_shake_to_reset), stringResource(R.string.set_shake_to_reset_detail), !settings.disableShakeToResetSleepTimer, "sleep-shake") { on -> change { it.copy(disableShakeToResetSleepTimer = !on) } }
         }
         if (!settings.disableShakeToResetSleepTimer) item {
             Choices(stringResource(R.string.shake_sensitivity), ShakeSensitivity.entries, settings.shakeSensitivity, "shake", label = { levels.getValue(it) }) { value -> change { it.copy(shakeSensitivity = value) } }
         }
-        item { Toggle("Fade out", "Lowers the volume during the last minute.", !settings.disableSleepTimerFadeOut, "sleep-fade") { on -> change { it.copy(disableSleepTimerFadeOut = !on) } } }
-        item { Toggle("Vibrate on reset", null, !settings.disableSleepTimerResetFeedback, "sleep-reset-feedback") { on -> change { it.copy(disableSleepTimerResetFeedback = !on) } } }
-        item { Toggle("Chime when almost done", null, settings.enableSleepTimerAlmostDoneChime, "sleep-chime") { on -> change { it.copy(enableSleepTimerAlmostDoneChime = on) } } }
+        item { Toggle(stringResource(R.string.set_sleep_fade_out), stringResource(R.string.set_sleep_fade_out_detail), !settings.disableSleepTimerFadeOut, "sleep-fade") { on -> change { it.copy(disableSleepTimerFadeOut = !on) } } }
+        item { Toggle(stringResource(R.string.set_vibrate_on_reset), null, !settings.disableSleepTimerResetFeedback, "sleep-reset-feedback") { on -> change { it.copy(disableSleepTimerResetFeedback = !on) } } }
+        item { Toggle(stringResource(R.string.set_sleep_chime), null, settings.enableSleepTimerAlmostDoneChime, "sleep-chime") { on -> change { it.copy(enableSleepTimerAlmostDoneChime = on) } } }
         item {
-            Toggle(stringResource(R.string.auto_sleep_timer), "Starts the timer when playing between ${settings.autoSleepTimerStartTime} and ${settings.autoSleepTimerEndTime}.", settings.autoSleepTimer, "auto-sleep") { on -> change { it.copy(autoSleepTimer = on) } }
+            Toggle(stringResource(R.string.auto_sleep_timer), stringResource(R.string.set_auto_sleep_timer_detail, settings.autoSleepTimerStartTime, settings.autoSleepTimerEndTime), settings.autoSleepTimer, "auto-sleep") { on -> change { it.copy(autoSleepTimer = on) } }
         }
         if (settings.autoSleepTimer) {
-            item { Choices("Starts at", AUTO_SLEEP_HOURS, settings.autoSleepTimerStartTime, "auto-sleep-start", label = { it }) { value -> change { it.copy(autoSleepTimerStartTime = value) } } }
-            item { Choices("Ends at", AUTO_SLEEP_HOURS, settings.autoSleepTimerEndTime, "auto-sleep-end", label = { it }) { value -> change { it.copy(autoSleepTimerEndTime = value) } } }
+            item { Choices(stringResource(R.string.set_auto_sleep_starts_at), AUTO_SLEEP_HOURS, settings.autoSleepTimerStartTime, "auto-sleep-start", label = { it }) { value -> change { it.copy(autoSleepTimerStartTime = value) } } }
+            item { Choices(stringResource(R.string.set_auto_sleep_ends_at), AUTO_SLEEP_HOURS, settings.autoSleepTimerEndTime, "auto-sleep-end", label = { it }) { value -> change { it.copy(autoSleepTimerEndTime = value) } } }
         }
 
-        item { SettingsHeading("Mobile data") }
+        item { SettingsHeading(stringResource(R.string.set_heading_mobile_data)) }
         item { Choices(stringResource(R.string.downloads_on_mobile_data), CellularPolicy.entries, settings.downloadUsingCellular, "download-cellular", label = { policies.getValue(it) }) { value -> change { it.copy(downloadUsingCellular = value) } } }
         item { Choices(stringResource(R.string.streaming_on_mobile_data), CellularPolicy.entries, settings.streamingUsingCellular, "stream-cellular", label = { policies.getValue(it) }) { value -> change { it.copy(streamingUsingCellular = value) } } }
 
-        item { SettingsHeading("Storage") }
+        item { SettingsHeading(stringResource(R.string.set_storage)) }
         item { DownloadLocation(settings, change) }
 
         item { ImportLegacyButton() }
         item { SettingsHeading(stringResource(R.string.settings_android_auto)) }
         item {
-            Choices("Group authors and series in letters above", (CAR_GROUPING + settings.androidAutoBrowseLimitForGrouping).distinct().sorted(), settings.androidAutoBrowseLimitForGrouping, "car-grouping", label = { it.toString() }) { value -> change { it.copy(androidAutoBrowseLimitForGrouping = value) } }
+            Choices(stringResource(R.string.set_car_grouping), (CAR_GROUPING + settings.androidAutoBrowseLimitForGrouping).distinct().sorted(), settings.androidAutoBrowseLimitForGrouping, "car-grouping", label = { it.toString() }) { value -> change { it.copy(androidAutoBrowseLimitForGrouping = value) } }
         }
         item {
-            Choices(stringResource(R.string.series_books_order), SeriesOrder.entries, settings.androidAutoBrowseSeriesSequenceOrder, "car-series-order", label = { if (it == SeriesOrder.ASC) "First to last" else "Last to first" }) { value -> change { it.copy(androidAutoBrowseSeriesSequenceOrder = value) } }
+            Choices(stringResource(R.string.series_books_order), SeriesOrder.entries, settings.androidAutoBrowseSeriesSequenceOrder, "car-series-order", label = { seriesOrders.getValue(it) }) { value -> change { it.copy(androidAutoBrowseSeriesSequenceOrder = value) } }
         }
 
-        item { SettingsHeading("Support") }
+        item { SettingsHeading(stringResource(R.string.set_heading_support)) }
         item {
-            OutlinedButton(onClick = onDiagnostics, modifier = Modifier.fillMaxWidth().testTag("open-diagnostics")) { Text("Diagnostics") }
+            OutlinedButton(onClick = onDiagnostics, modifier = Modifier.fillMaxWidth().testTag("open-diagnostics")) { Text(stringResource(R.string.set_diagnostics)) }
         }
     }
 }
@@ -173,7 +178,8 @@ private val CAR_GROUPING = listOf(25, 50, 100, 200, 500)
 
 private val AUTO_SLEEP_HOURS = listOf("20:00", "21:00", "22:00", "23:00", "00:00", "05:00", "06:00", "07:00", "08:00")
 
-private fun jumpLabel(seconds: Int) = if (seconds < 60) "${seconds}s" else "${seconds / 60}m"
+private fun jumpLabel(context: Context, seconds: Int) =
+    if (seconds < 60) context.getString(R.string.set_unit_seconds_short, seconds) else context.getString(R.string.set_unit_minutes_short, seconds / 60)
 
 @Composable
 private fun SettingsHeading(text: String) {
@@ -219,6 +225,7 @@ fun StatisticsScreen(active: SessionState.Active, catalog: CatalogModel, padding
     var finished by remember { mutableIntStateOf(0) }
     var error by remember { mutableStateOf<String?>(null) }
     var attempt by remember { mutableIntStateOf(0) }
+    val somethingWrong = stringResource(R.string.set_something_went_wrong)
     LaunchedEffect(attempt) {
         error = null
         try {
@@ -227,28 +234,29 @@ fun StatisticsScreen(active: SessionState.Active, catalog: CatalogModel, padding
         } catch (failure: Exception) {
             graph.diagnostics.record(Diagnostics.Area.CONNECTION, "Listening statistics could not be loaded", failure)
             graph.accounts.handle(failure)
-            error = failure.message ?: "Something went wrong."
+            error = failure.message ?: somethingWrong
         }
     }
     val current = stats
     Box(Modifier.fillMaxSize().padding(padding)) {
         when {
-            error != null && current == null -> MessageState("Statistics not available", error, tag = "statistics-error", action = "Try again", onAction = { attempt++ })
+            error != null && current == null -> MessageState(stringResource(R.string.set_statistics_unavailable), error, tag = "statistics-error", action = stringResource(R.string.set_try_again), onAction = { attempt++ })
             current == null -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             else -> LazyColumn(Modifier.fillMaxSize().testTag("statistics"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("${minutes(current.totalTime)} minutes listened", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
-                        Text("${current.days.size} days listened")
-                        Text("$finished ${if (finished == 1) "title" else "titles"} finished")
+                        Text(pluralStringResource(R.plurals.set_minutes_listened, minutes(current.totalTime), minutes(current.totalTime)), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
+                        Text(pluralStringResource(R.plurals.set_days_listened, current.days.size, current.days.size))
+                        Text(pluralStringResource(R.plurals.set_titles_finished, finished, finished))
                     }
                 }
                 item { WeekChart(current) }
-                if (current.recentSessions.isNotEmpty()) item { SettingsHeading("Recent sessions") }
+                if (current.recentSessions.isNotEmpty()) item { SettingsHeading(stringResource(R.string.set_recent_sessions)) }
                 itemsIndexed(current.recentSessions) { index, session ->
+                    val listened = pluralStringResource(R.plurals.set_minutes_listened, minutes(session.timeListening), minutes(session.timeListening))
                     Column(Modifier.testTag("stats-session-$index")) {
                         Text(session.title, style = MaterialTheme.typography.bodyLarge)
-                        Text(listOfNotNull(session.author.takeIf { it.isNotEmpty() }, "${minutes(session.timeListening)} minutes listened").joinToString(" · "),
+                        Text(listOfNotNull(session.author.takeIf { it.isNotEmpty() }, listened).joinToString(" · "),
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -266,12 +274,13 @@ private fun WeekChart(stats: ListeningStats) {
     val days = (6 downTo 0).map { today.minusDays(it.toLong()) }.map { it to (stats.days[it.toString()] ?: 0.0) }
     val most = days.maxOf { it.second }.coerceAtLeast(60.0)
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text("Minutes listened in the last 7 days", style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.set_week_chart_title), style = MaterialTheme.typography.titleSmall)
         Row(Modifier.fillMaxWidth().height(120.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
             days.forEach { (date, time) ->
                 val name = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.getDefault())
+                val description = pluralStringResource(R.plurals.set_day_minutes_listened, minutes(time), name, minutes(time))
                 Column(
-                    Modifier.weight(1f).fillMaxHeight().clearAndSetSemantics { contentDescription = "$name, ${minutes(time)} minutes listened" },
+                    Modifier.weight(1f).fillMaxHeight().clearAndSetSemantics { contentDescription = description },
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom,
                 ) {
                     Box(Modifier.width(18.dp).fillMaxHeight((time / most).toFloat().coerceIn(0.02f, 0.85f))
@@ -294,50 +303,53 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
     val unreadableWrites by graph.publications.unreadable.collectAsState()
     val unsavedRecovery by graph.listeningRecovery.problem.collectAsState()
     var settingAside by remember { mutableStateOf(false) }
+    val setAsideFailed = stringResource(R.string.set_set_aside_failed)
+    val areaLabels = mapOf(Diagnostics.Area.CONNECTION to stringResource(R.string.set_connection), Diagnostics.Area.MEDIA to stringResource(R.string.set_diagnostics_area_media),
+        Diagnostics.Area.SYNC to stringResource(R.string.set_diagnostics_area_sync), Diagnostics.Area.STORAGE to stringResource(R.string.set_storage))
     LazyColumn(Modifier.fillMaxSize().padding(padding).testTag("diagnostics"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (unreadableResets) item {
             Column(Modifier.testTag("unreadable-resets"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Saved progress discards could not be read", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
-                Text("Any title may be among them, so nothing plays and no reading position is sent until you decide. Setting them aside keeps the file on this device, and any progress they were to discard stays on your server.",
+                Text(stringResource(R.string.set_unreadable_resets_title), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.set_unreadable_resets_detail),
                     style = MaterialTheme.typography.bodyMedium)
-                TextButton(onClick = { resolving = true }, modifier = Modifier.testTag("resolve-unreadable-resets")) { Text("Set them aside") }
+                TextButton(onClick = { resolving = true }, modifier = Modifier.testTag("resolve-unreadable-resets")) { Text(stringResource(R.string.set_set_them_aside)) }
                 resolveError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             }
         }
         if (unsavedRecovery != null) item {
             Column(Modifier.testTag("listening-storage"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Listening from before the app closed could not be saved", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
-                Text("Storage on this device is unavailable or full. Nothing plays and no listening is sent until it is saved; it is kept until then.",
+                Text(stringResource(R.string.set_listening_storage_title), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.set_listening_storage_detail),
                     style = MaterialTheme.typography.bodyMedium)
-                TextButton(onClick = { if (graph.listeningRecovery.run()) graph.progressSync.publishAll() }, modifier = Modifier.testTag("retry-listening-storage")) { Text("Try again") }
+                TextButton(onClick = { if (graph.listeningRecovery.run()) graph.progressSync.publishAll() }, modifier = Modifier.testTag("retry-listening-storage")) { Text(stringResource(R.string.set_try_again)) }
             }
         }
         if (unreadableWrites) item {
             Column(Modifier.testTag("unreadable-writes"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Records of unanswered progress saves could not be read", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
-                Text("A save of any title may still reach your server, so no listening or reading is sent and no progress is discarded until you decide. Setting them aside keeps the file on this device; a late save may then bring back progress you discard.",
+                Text(stringResource(R.string.set_unreadable_writes_title), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.set_unreadable_writes_detail),
                     style = MaterialTheme.typography.bodyMedium)
-                TextButton(onClick = { settingAside = true }, modifier = Modifier.testTag("resolve-unreadable-writes")) { Text("Set them aside") }
+                TextButton(onClick = { settingAside = true }, modifier = Modifier.testTag("resolve-unreadable-writes")) { Text(stringResource(R.string.set_set_them_aside)) }
             }
         }
         item {
             Column(Modifier.semantics(mergeDescendants = true) {}.testTag("diagnostic-connection"), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("Connection", style = MaterialTheme.typography.titleSmall)
-                Text("Server ${active.client.account.server.substringAfter("://")}")
-                Text("Signed in as ${active.connection.credentials.username}")
-                Text("App ${com.audiobookshelf.android.BuildConfig.VERSION_NAME}")
+                Text(stringResource(R.string.set_connection), style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.set_diagnostics_server, active.client.account.server.substringAfter("://")))
+                Text(stringResource(R.string.set_diagnostics_signed_in_as, active.connection.credentials.username))
+                Text(stringResource(R.string.set_diagnostics_app_version, com.audiobookshelf.android.BuildConfig.VERSION_NAME))
             }
         }
         item {
             Row(verticalAlignment = Alignment.Bottom) {
-                Box(Modifier.weight(1f)) { SettingsHeading("Recent problems") }
-                if (entries.isNotEmpty()) TextButton(onClick = { graph.diagnostics.clear() }, modifier = Modifier.testTag("diagnostics-clear")) { Text("Clear") }
+                Box(Modifier.weight(1f)) { SettingsHeading(stringResource(R.string.set_recent_problems)) }
+                if (entries.isNotEmpty()) TextButton(onClick = { graph.diagnostics.clear() }, modifier = Modifier.testTag("diagnostics-clear")) { Text(stringResource(R.string.set_clear)) }
             }
         }
-        if (entries.isEmpty()) item { Text("No problems recorded on this device.", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("diagnostics-empty")) }
+        if (entries.isEmpty()) item { Text(stringResource(R.string.set_no_problems), color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("diagnostics-empty")) }
         itemsIndexed(entries) { index, entry ->
             Column(Modifier.semantics(mergeDescendants = true) {}.testTag("diagnostic-$index")) {
-                Text("${entry.area.name.lowercase().replaceFirstChar(Char::titlecase)} · ${time.format(Date(entry.at))}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("${areaLabels.getValue(entry.area)} · ${time.format(Date(entry.at))}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(entry.message, style = MaterialTheme.typography.bodyMedium)
             }
             HorizontalDivider(Modifier.padding(top = 8.dp))
@@ -345,28 +357,28 @@ fun DiagnosticsScreen(active: SessionState.Active, padding: PaddingValues) {
     }
     if (settingAside) androidx.compose.material3.AlertDialog(
         onDismissRequest = { settingAside = false },
-        title = { Text("Set unreadable records aside?") },
-        text = { Text("Listening and reading positions are sent again and discards can go ahead.") },
+        title = { Text(stringResource(R.string.set_unreadable_writes_confirm_title)) },
+        text = { Text(stringResource(R.string.set_unreadable_writes_confirm_detail)) },
         confirmButton = {
             TextButton(onClick = {
                 settingAside = false
                 runCatching { graph.publications.setAsideUnreadable(); graph.progressSync.publishAll(); graph.readingSync.publishAll(); graph.completeResets() }
-                    .onFailure { resolveError = it.message ?: "Could not be set aside. Try again." }
-            }, modifier = Modifier.testTag("confirm-resolve-unreadable-writes")) { Text("Set aside") }
+                    .onFailure { resolveError = it.message ?: setAsideFailed }
+            }, modifier = Modifier.testTag("confirm-resolve-unreadable-writes")) { Text(stringResource(R.string.set_set_aside)) }
         },
-        dismissButton = { TextButton(onClick = { settingAside = false }) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = { settingAside = false }) { Text(stringResource(R.string.action_cancel)) } },
     )
     if (resolving) androidx.compose.material3.AlertDialog(
         onDismissRequest = { resolving = false },
-        title = { Text("Set unreadable discards aside?") },
-        text = { Text("Titles play and reading positions are sent again. Discard progress again for any title you still want to start over.") },
+        title = { Text(stringResource(R.string.set_unreadable_resets_confirm_title)) },
+        text = { Text(stringResource(R.string.set_unreadable_resets_confirm_detail)) },
         confirmButton = {
             TextButton(onClick = {
                 resolving = false
                 runCatching { graph.resets.abandonUnreadable(); graph.readingSync.publishAll() }
-                    .onFailure { resolveError = it.message ?: "Could not be set aside. Try again." }
-            }, modifier = Modifier.testTag("confirm-resolve-unreadable-resets")) { Text("Set aside") }
+                    .onFailure { resolveError = it.message ?: setAsideFailed }
+            }, modifier = Modifier.testTag("confirm-resolve-unreadable-resets")) { Text(stringResource(R.string.set_set_aside)) }
         },
-        dismissButton = { TextButton(onClick = { resolving = false }) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = { resolving = false }) { Text(stringResource(R.string.action_cancel)) } },
     )
 }

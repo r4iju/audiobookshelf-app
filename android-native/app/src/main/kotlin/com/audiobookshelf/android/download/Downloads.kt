@@ -23,6 +23,7 @@ import androidx.work.workDataOf
 import com.audiobookshelf.android.data.AccountStore
 import com.audiobookshelf.android.data.CellularPolicy
 import com.audiobookshelf.android.data.SettingsStore
+import com.audiobookshelf.android.R
 import com.audiobookshelf.android.graph
 import com.audiobookshelf.android.playback.PlaySource
 import com.audiobookshelf.core.AccountIdentity
@@ -98,7 +99,7 @@ class Downloads(
         val reserve = maxOf(MIN_FREE_BYTES, free.totalBytes / 20)
         if (free.availableBytes - needed < reserve) return Request.NoSpace(needed)
         val tree = settings.current.downloadFolder
-        val treeName = settings.current.downloadFolderName ?: "the chosen folder"
+        val treeName = settings.current.downloadFolderName ?: context.getString(R.string.dl_the_chosen_folder)
         if (tree != null && !folder.granted(tree)) return Request.FolderLost(treeName)
         if (!allowMetered && settings.current.downloadUsingCellular == CellularPolicy.ASK && metered()) return Request.NeedsCellularConsent
 
@@ -209,7 +210,7 @@ class Downloads(
         part.uri?.let(folder::exists) ?: File(record.directory, part.name).exists()
 
     fun openPart(record: DownloadStore.Record, part: DownloadStore.Part): Opened {
-        if (folderLost(record)) return Opened.FolderLost(record.folderName ?: "the chosen folder")
+        if (folderLost(record)) return Opened.FolderLost(record.folderName ?: context.getString(R.string.dl_the_chosen_folder))
         if (!present(record, part)) return Opened.Missing
         part.uri?.let { document ->
             val uri = Uri.parse(document)
@@ -281,9 +282,9 @@ class Downloads(
         runCatching { foreground(notification(record)) }.onFailure { Log.i(TAG, "Download continues without a foreground notice: ${it.javaClass.simpleName}") }
         try {
             store.update(id) { it.copy(state = DownloadStore.State.RUNNING, error = null) }
-            val client = accounts.clientFor(record.account) ?: throw Rejected("Sign in to this account again to download.")
+            val client = accounts.clientFor(record.account) ?: throw Rejected(context.getString(R.string.dl_sign_in_again))
             val directory = File(record.directory).apply { mkdirs() }
-            if (folderLost(record)) throw Rejected("Access to ${record.folderName} was removed. Choose the folder again in Downloads.")
+            if (folderLost(record)) throw Rejected(context.getString(R.string.dl_folder_lost_choose_in_downloads, record.folderName.toString()))
             for (part in record.parts) {
                 if (part.done && present(record, part)) continue
                 fetch(client, id, directory, part)
@@ -308,14 +309,14 @@ class Downloads(
             accounts.handle(failure)
             report(com.audiobookshelf.android.data.Diagnostics.Area.MEDIA, "Download of \"${record.title}\" failed", failure)
             val message = when (failure) {
-                is ApiError.SignInRequired -> "Sign in to this account again to download."
+                is ApiError.SignInRequired -> context.getString(R.string.dl_sign_in_again)
                 is ApiError -> failure.message
-                else -> "The connection was interrupted."
+                else -> context.getString(R.string.dl_connection_interrupted)
             }
             val again = attempt < MAX_ATTEMPTS && failure !is ApiError.SignInRequired
             // A state that cannot be written is retried later rather than reported as settled.
             try {
-                store.update(id) { it.copy(state = if (again) DownloadStore.State.QUEUED else DownloadStore.State.FAILED, error = if (again) "$message Retrying…" else message) }
+                store.update(id) { it.copy(state = if (again) DownloadStore.State.QUEUED else DownloadStore.State.FAILED, error = if (again) context.getString(R.string.dl_error_retrying, message.toString()) else message) }
             } catch (unsaved: IOException) { return Outcome.Retry }
             if (again) Outcome.Retry else Outcome.Done
         }
@@ -338,13 +339,13 @@ class Downloads(
                         if (part.size != null && offset == part.size) { staging.renameTo(target); return@withContext }
                         staging.delete(); throw IOException("Range not satisfiable")
                     }
-                    response.code == 403 || response.code == 404 -> throw Rejected(ApiError.Http(response.code).message ?: "The server refused the download.")
+                    response.code == 403 || response.code == 404 -> throw Rejected(ApiError.Http(response.code).message ?: context.getString(R.string.dl_server_refused))
                     !response.isSuccessful -> throw ApiError.Http(response.code)
                 }
                 val type = response.header("Content-Type")?.substringBefore(";")?.trim()?.lowercase()
                 if (if (part.ebookFileId != null) type == "text/html" || type == "application/json" else !acceptable(type, part.mimeType)) {
                     staging.delete()
-                    throw Rejected("The server sent ${type ?: "an unknown response"} instead of audio, so nothing was saved. Check your server or proxy and retry.")
+                    throw Rejected(if (type != null) context.getString(R.string.dl_server_sent_type_not_audio, type) else context.getString(R.string.dl_server_sent_unknown_not_audio))
                 }
                 val append = response.code == 206 && offset > 0
                 val body = response.body ?: throw IOException("Empty response")
@@ -366,11 +367,11 @@ class Downloads(
                 val expected = part.size ?: body.contentLength().takeIf { it >= 0 && !append }
                 if (expected != null && written != expected) {
                     staging.delete()
-                    throw Rejected("The downloaded file was ${written} bytes but the server listed $expected, so it was discarded. Retry to download it again.")
+                    throw Rejected(context.getString(R.string.dl_size_mismatch, written, expected))
                 }
                 if (part.ebookFormat == "pdf" && !staging.inputStream().use { input -> ByteArray(5).also { input.read(it) } }.contentEquals("%PDF-".toByteArray())) {
                     staging.delete()
-                    throw Rejected("The server sent something other than the PDF, so nothing was saved. Check your server or proxy and retry.")
+                    throw Rejected(context.getString(R.string.dl_server_sent_not_pdf))
                 }
                 target.delete()
                 if (!staging.renameTo(target)) throw IOException("Could not move the finished file into place")
@@ -395,10 +396,10 @@ class Downloads(
 
     private fun notification(record: DownloadStore.Record): ForegroundInfo {
         val manager = context.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26) manager.createNotificationChannel(NotificationChannel(CHANNEL, "Downloads", NotificationManager.IMPORTANCE_LOW))
+        if (Build.VERSION.SDK_INT >= 26) manager.createNotificationChannel(NotificationChannel(CHANNEL, context.getString(R.string.tab_downloads), NotificationManager.IMPORTANCE_LOW))
         val notice = NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle("Downloading ${record.title}")
+            .setContentTitle(context.getString(R.string.dl_notification_downloading, record.title))
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(0, 0, true)

@@ -68,9 +68,9 @@ class AppGraph internal constructor(val context: Context) {
         PlaybackEngine(context, scope, http, settings, accounts, journal, progressSync, { deviceInfo }, io, diagnostics::record,
             resetPending = { account, itemId, episodeId ->
                 when {
-                    !listeningRecovery.run() -> "Listening from before the app closed could not be saved because storage is unavailable, so nothing plays until it can be. Free some space, then try again."
-                    resets.unreadable.value -> "Saved progress discards could not be read, so nothing plays until they are resolved in Diagnostics."
-                    resets.pending(account, itemId, episodeId) -> "Progress for this title is still being discarded. It plays from the beginning once that is done."
+                    !listeningRecovery.run() -> context.getString(R.string.set_play_blocked_listening_storage)
+                    resets.unreadable.value -> context.getString(R.string.set_play_blocked_unreadable_resets)
+                    resets.pending(account, itemId, episodeId) -> context.getString(R.string.set_play_blocked_discarding)
                     else -> null
                 }
             }, casting = casting).also { progressSync.publishAll() }
@@ -225,7 +225,7 @@ class AppGraph internal constructor(val context: Context) {
         }
     }
 
-    val accounts by lazy { AccountStore(CredentialVault(File(context.noBackupFilesDir, "vault/connections.bin")), http, deviceInfo).also { it.restore() } }
+    val accounts by lazy { AccountStore(CredentialVault(File(context.noBackupFilesDir, "vault/connections.bin")), http, deviceInfo, context).also { it.restore() } }
 
     private fun openJournal(file: File): ListeningJournal = try {
         ListeningJournal(file)

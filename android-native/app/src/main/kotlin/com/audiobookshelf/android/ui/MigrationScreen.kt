@@ -1,6 +1,8 @@
 package com.audiobookshelf.android.ui
 
 import android.text.format.Formatter
+import com.audiobookshelf.android.R
+import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,10 +47,10 @@ fun ImportLegacyButton(modifier: Modifier = Modifier) {
     val choose = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(graph.migration::open) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         OutlinedButton(onClick = { choose.launch(arrayOf("*/*")) }, modifier = Modifier.fillMaxWidth().testTag("import-legacy")) {
-            Text("Import from the previous app")
+            Text(stringResource(R.string.set_import_previous_app))
         }
         if (graph.migration.interrupted) {
-            Text("An import did not finish. Choose the same export to continue where it stopped.", style = MaterialTheme.typography.bodyMedium,
+            Text(stringResource(R.string.set_import_interrupted), style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("migration-interrupted"))
         }
     }
@@ -70,7 +72,7 @@ fun MigrationScreen(step: Migration.Step) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
-                Text("Import from the previous app", style = MaterialTheme.typography.headlineSmall,
+                Text(stringResource(R.string.set_import_previous_app), style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.widthIn(max = 560.dp).fillMaxWidth().semantics { heading() })
             }
             when (step) {
@@ -79,43 +81,43 @@ fun MigrationScreen(step: Migration.Step) {
                     item { Notice(step.message, "migration-refused", error = true) }
                 }
                 is Migration.Step.Already -> {
-                    item { Notice("This export was already imported. Titles, listening and positions from it are on this device.", "migration-already") }
+                    item { Notice(stringResource(R.string.set_import_already), "migration-already") }
                 }
                 is Migration.Step.Ready -> {
                     val plan = step.plan
                     item {
-                        Body("${step.name}\nThe previous app and this file are only read; nothing in them changes. Titles, listening and positions attach to an account once it signs in here. Passwords are not in the export, so each account signs in again.",
+                        Body(stringResource(R.string.set_import_preflight, step.name),
                             "migration-preflight")
                     }
-                    item { Section("Accounts") }
+                    item { Section(stringResource(R.string.title_accounts)) }
                     items(plan.accounts) { account ->
-                        Row(account.username, "${account.identity.server} · ${if (account.signedIn) "signed in" else "sign in after importing"}")
+                        Row(account.username, if (account.signedIn) stringResource(R.string.set_import_account_signed_in, account.identity.server) else stringResource(R.string.set_import_account_sign_in_later, account.identity.server))
                     }
-                    item { Section("Titles") }
+                    item { Section(stringResource(R.string.set_import_titles)) }
                     items(plan.titles) { title ->
-                        Row(title.title, size(title.bytes) + if (title.partial) " · the rest downloads again" else "", "migration-title-${title.itemId}")
+                        Row(title.title, if (title.partial) stringResource(R.string.set_import_title_partial, size(title.bytes)) else size(title.bytes), "migration-title-${title.itemId}")
                     }
                     if (plan.issues.isNotEmpty()) {
-                        item { Section("Not imported") }
+                        item { Section(stringResource(R.string.set_not_imported)) }
                         items(plan.issues) { issue -> IssueRow(issue) }
                     }
                     item {
-                        Body("Needs ${size(plan.requiredBytes)}; ${size(plan.availableBytes)} free.", "migration-space")
+                        Body(stringResource(R.string.set_import_space, size(plan.requiredBytes), size(plan.availableBytes)), "migration-space")
                     }
-                    if (!plan.fits) item { Notice("There is not enough free space on this device. Free some space, then choose the export again.", "migration-no-space", error = true) }
+                    if (!plan.fits) item { Notice(stringResource(R.string.set_import_no_space), "migration-no-space", error = true) }
                 }
                 is Migration.Step.Importing -> {
-                    item { Body("Copying files: ${step.copied} of ${step.total}. If the app closes, choose the same export again to continue.", "migration-progress") }
+                    item { Body(stringResource(R.string.set_import_progress, step.copied, step.total), "migration-progress") }
                     item { LinearProgressIndicator({ if (step.total == 0) 0f else step.copied.toFloat() / step.total }, Modifier.widthIn(max = 560.dp).fillMaxWidth()) }
                 }
                 is Migration.Step.Done -> {
                     val outcome = step.outcome
-                    item { Notice("Imported ${outcome.titles.size} titles, ${outcome.sessions.size} listening sessions and ${outcome.progress.size} positions. Settings from the previous app were applied.", "migration-done") }
+                    item { Notice(stringResource(R.string.set_import_done, outcome.titles.size, outcome.sessions.size, outcome.progress.size), "migration-done") }
                     items(step.waiting) { account ->
-                        Body("Sign in to ${account.identity.server} as ${account.username} to attach its titles, listening and positions.", "migration-waiting")
+                        Body(stringResource(R.string.set_import_waiting, account.identity.server, account.username), "migration-waiting")
                     }
                     if (outcome.issues.isNotEmpty()) {
-                        item { Section("Not imported") }
+                        item { Section(stringResource(R.string.set_not_imported)) }
                         items(outcome.issues) { issue -> IssueRow(issue) }
                     }
                 }
@@ -125,11 +127,11 @@ fun MigrationScreen(step: Migration.Step) {
         Column(Modifier.widthIn(max = 560.dp).fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             when (step) {
                 is Migration.Step.Ready -> {
-                    Button(onClick = graph.migration::start, enabled = step.plan.fits, modifier = Modifier.fillMaxWidth().height(52.dp).testTag("start-import")) { Text("Import") }
-                    CloseButton("Cancel", close)
+                    Button(onClick = graph.migration::start, enabled = step.plan.fits, modifier = Modifier.fillMaxWidth().height(52.dp).testTag("start-import")) { Text(stringResource(R.string.set_import)) }
+                    CloseButton(stringResource(R.string.action_cancel), close)
                 }
-                is Migration.Step.Done -> Button(onClick = close, modifier = Modifier.fillMaxWidth().height(52.dp).testTag("migration-close")) { Text("Continue") }
-                is Migration.Step.Refused, is Migration.Step.Already -> CloseButton("Close", close)
+                is Migration.Step.Done -> Button(onClick = close, modifier = Modifier.fillMaxWidth().height(52.dp).testTag("migration-close")) { Text(stringResource(R.string.set_continue)) }
+                is Migration.Step.Refused, is Migration.Step.Already -> CloseButton(stringResource(R.string.set_close), close)
                 else -> Unit
             }
         }
@@ -154,7 +156,7 @@ private fun Row(headline: String, supporting: String, tag: String? = null) {
 }
 
 @Composable
-private fun IssueRow(issue: Issue) = Row(issue.title ?: "Account", issue.detail, "migration-issue")
+private fun IssueRow(issue: Issue) = Row(issue.title ?: stringResource(R.string.set_import_issue_account), issue.detail, "migration-issue")
 
 @Composable
 private fun Notice(text: String, tag: String, error: Boolean = false) {

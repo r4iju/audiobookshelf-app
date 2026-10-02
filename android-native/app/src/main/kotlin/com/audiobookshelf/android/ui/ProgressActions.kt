@@ -31,7 +31,8 @@ import kotlinx.coroutines.launch
 /** Marks a title or episode finished or unfinished, and discards its progress on the server. */
 @Composable
 fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Active, catalog: CatalogModel, tagPrefix: String = "item") {
-    val graph = LocalContext.current.graph
+    val context = LocalContext.current
+    val graph = context.graph
     val scope = rememberCoroutineScope()
     val progress = catalog.progressFor(itemId, episodeId)
     var saving by remember { mutableStateOf(false) }
@@ -56,7 +57,7 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
         saving = true; error = null
         scope.launch {
             try { action() } catch (failure: Exception) {
-                error = failure.message ?: "Not saved. Try again."; graph.accounts.handle(failure)
+                error = failure.message ?: context.getString(R.string.item_not_saved_try_again); graph.accounts.handle(failure)
             } finally { saving = false }
         }
     }
@@ -71,16 +72,16 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
             },
             enabled = !saving && !discarding,
             modifier = Modifier.fillMaxWidth().testTag(if (finished) "$tagPrefix-unfinish" else "$tagPrefix-finish"),
-        ) { Text(if (finished) "Mark unfinished" else stringResource(R.string.action_mark_finished)) }
+        ) { Text(if (finished) stringResource(R.string.item_mark_unfinished) else stringResource(R.string.action_mark_finished)) }
         if (uncertain) {
-            Text("An earlier save of this title's progress got no answer and may still reach your server. If it arrives after the discard, it brings the progress back. Your server cannot tell this app whether it will.",
+            Text(stringResource(R.string.item_discard_uncertain),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("discard-uncertain"))
-            if (!unreadable) TextButton(onClick = { confirmingAnyway = true }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("discard-anyway")) { Text("Discard anyway") }
+            if (!unreadable) TextButton(onClick = { confirmingAnyway = true }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("discard-anyway")) { Text(stringResource(R.string.item_discard_anyway)) }
             if (reset?.observed == false) TextButton(onClick = {
-                run { if (!graph.resolveUncertainDiscard(active.client, itemId, episodeId, discard = false)) error = "This discard is already under way and cannot be withdrawn." }
-            }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("keep-progress")) { Text("Keep progress") }
+                run { if (!graph.resolveUncertainDiscard(active.client, itemId, episodeId, discard = false)) error = context.getString(R.string.item_discard_under_way) }
+            }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("keep-progress")) { Text(stringResource(R.string.item_keep_progress)) }
         } else if (discarding) {
-            Text("Discarding progress. This finishes once your server can be reached and this title's listening is sent.",
+            Text(stringResource(R.string.item_discard_pending),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("discard-pending"))
         } else if (progress != null) {
             TextButton(onClick = { confirming = true }, enabled = !saving, modifier = Modifier.fillMaxWidth().testTag("discard-progress")) { Text(stringResource(R.string.action_discard_progress)) }
@@ -89,28 +90,28 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
     }
     if (confirmingAnyway) AlertDialog(
         onDismissRequest = { confirmingAnyway = false },
-        title = { Text("Discard anyway?") },
-        text = { Text("The progress is removed now. If the earlier save reaches your server afterwards, this title's progress comes back and you can discard it again.") },
+        title = { Text(stringResource(R.string.item_discard_anyway_question)) },
+        text = { Text(stringResource(R.string.item_discard_anyway_explanation)) },
         confirmButton = {
             TextButton(onClick = {
                 confirmingAnyway = false
                 run { graph.resolveUncertainDiscard(active.client, itemId, episodeId, discard = true) }
-            }, modifier = Modifier.testTag("confirm-discard-anyway")) { Text("Discard") }
+            }, modifier = Modifier.testTag("confirm-discard-anyway")) { Text(stringResource(R.string.item_discard)) }
         },
-        dismissButton = { TextButton(onClick = { confirmingAnyway = false }) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = { confirmingAnyway = false }) { Text(stringResource(R.string.action_cancel)) } },
     )
     if (confirming) AlertDialog(
         onDismissRequest = { confirming = false },
-        title = { Text("Discard progress?") },
-        text = { Text("Your position and finished state for this title are removed from the server for every device.") },
+        title = { Text(stringResource(R.string.item_discard_progress_question)) },
+        text = { Text(stringResource(R.string.item_discard_progress_explanation)) },
         confirmButton = {
             TextButton(onClick = {
                 confirming = false
                 run {
                     if (graph.discardProgress(active.client, itemId, episodeId)) catalog.forgetProgress(itemId, episodeId)
                 }
-            }, modifier = Modifier.testTag("confirm-discard-progress")) { Text("Discard") }
+            }, modifier = Modifier.testTag("confirm-discard-progress")) { Text(stringResource(R.string.item_discard)) }
         },
-        dismissButton = { TextButton(onClick = { confirming = false }) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = { confirming = false }) { Text(stringResource(R.string.action_cancel)) } },
     )
 }
