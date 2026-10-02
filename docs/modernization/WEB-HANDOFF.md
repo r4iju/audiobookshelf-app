@@ -49,6 +49,8 @@ shared modernization documents. Issues #55 to #65.
 | `74d63f16` | Records the smoke check on a healthy QA deployment |
 | `a2db7a36` | The end-of-chapter sleep timer stops where a chapter ends with its file |
 | `dd7e3ab2` | Merges `fork/native-tv` at `f51b6e9e` (no change under `web/`) |
+| `8c597c9f` | MOBI and AZW3 places save in WebKit, which sends no events from a script-less frame |
+| `45149135` | A deployment names its server (`ABS_WEB_SERVER`); a fresh visit goes straight to signing in to it |
 
 ## Checks
 
@@ -97,7 +99,20 @@ Intermittent failures seen in full runs on `df948480`, `f4e8d15f` and `5710199f`
   send) and the podcast feed (19885, "timeout of 30000ms exceeded"). Each is the server container reaching the Mac
   through colima's `host.docker.internal` (192.168.5.2, resolved from `/etc/hosts`, so not DNS). The deployment
   journeys then passed 5 of 5 alone and 50 of 50 repeated.
-- The AZW3 reader journey's `toBeInViewport` check failed again once. Its cause is still not diagnosed.
+- The AZW3 reader journey's `toBeInViewport` check failed again once. Its cause is still not diagnosed. A likely
+  cause, found later in WebKit: the journey recorded the contents jump's place before the scrolled place reached the
+  server. Since `8c597c9f` it waits for the scrolled place.
+
+Changes after that run were checked by the journeys they affect, not a new full run (logs in `web/qa/.runtime/`):
+
+- `a2db7a36` (sleep timer): vitest 115 passed; the sleep timer journey 3 of 3 in Firefox and WebKit, and Chromium's
+  playback journeys (`sleep-fix.log`).
+- `8c597c9f` (MOBI and AZW3 places in WebKit): the journey failed in WebKit first (`azw3-webkit-before.log`). After:
+  Biome and `tsc` clean, vitest 115 passed, the 13 reader journeys passed in Chromium, Firefox and WebKit
+  (`mobi-scroll-fix.log`), and the MOBI and AZW3 journeys 48 of 48 repeated in Firefox and WebKit.
+- `45149135` (the deployment's own server): the new journeys failed first on the earlier source
+  (`server-discovery-red.log`, `server-discovery-red-manual.log`). After: Biome and `tsc` clean, vitest 115 passed,
+  and the deployment and connect journeys passed 12 of 12 against the rebuilt image (`server-discovery-green.log`).
 
 Every behaviour change since the first commit started from a failing test that was observed failing, then made to
 pass. The browser journeys drive the production UI in Chromium. They check results on the server (its API and files)
@@ -126,13 +141,21 @@ server, or a physical device. The production container `audiobookshelf` (port 13
     with its file moved the timer to the next chapter), fixed in `a2db7a36` from a failing unit test; the journey then
     passed 3 of 3 in Firefox and WebKit and in Chromium (`sleep-fix.log`).
   - Firefox, progress from another device appearing live: failed once, then passed 2 of 2 (`engines-rerun.log`).
-  - WebKit, the AZW3 reader's contents jump: fails every time (`toBeInViewport`, ratio 0); MOBI passes. Not fixed:
-    AZW3 is a rare format here, and the same check is the one Chromium failed intermittently before.
+  - WebKit, the AZW3 reader resuming after a reload: failed every time (`toBeInViewport`, ratio 0). The cause hit
+    MOBI too, which passed only because its passage also shows from the chapter start: WebKit sends no scroll, key or
+    click events from a frame sandboxed without scripts, so scrolling never saved the place. Fixed in `8c597c9f`:
+    the reader watches the frame's scroll position, keeping the sandbox. The first version also counted a section
+    being replaced as scrolled to its top, which failed the journey 2 of 8 times in Firefox; that was fixed before
+    the commit. The journey also waits for the scrolled place to reach the server. After the fix
+    (`web/qa/.runtime/mobi-scroll-fix.log`, `mobi-scroll-fix-repeat.log`): the 13 reader journeys passed in
+    Chromium, Firefox and WebKit, and the MOBI and AZW3 journeys passed 48 of 48 repeated in Firefox and WebKit.
+    Still in WebKit, links inside a MOBI or AZW3 book and keys pressed with the focus inside the book reach no
+    handler; the reader's own buttons, keys and contents work.
   The other journeys (deployment, lists, podcasts, settings, statistics) were not run in these engines.
   Playwright's WebKit is not Safari: Safari on a Mac and an iPhone, including Media Session, background audio and
   phone autoplay rules, still needs checking by hand.
-- **The owner's server and network.** Deployed internally on 2026-10-02 from `74d63f16` (see "Internal deployment"
-  below). Signing in and playing there, against the owner's library, is the owner's check.
+- **The owner's server and network.** Deployed internally on 2026-10-02, now from `45149135` (see "Internal
+  deployment" below). Signing in and playing there, against the owner's library, is the owner's check.
 - **A real identity provider.** Only the loopback provider was used. A real provider adds consent screens, its own
   key rotation and logout.
 - **Real e-reader delivery.** This needs the owner's SMTP settings and a device.
@@ -153,6 +176,11 @@ the image build log and the checks live in the owner's private infrastructure re
 - Before: `/status` 200 over HTTP and HTTPS, `/` 200, `/web/connect` 404. After: the same, `/web/connect` 200 over
   both, and `/webhooks` still reaching the server. `node qa/smoke.mjs` passed 4 of 4 over HTTP and over HTTPS.
 - Nothing signed in or played against the owner's library.
+- Redeployed the same day from `a2db7a36`, then from `45149135` with `ABS_WEB_SERVER=/`. Each time the smoke check
+  passed 4 of 4 over HTTP and HTTPS before and after, `/status` stayed 200 on the server's own port, and the server
+  and proxy start times were unchanged. A fresh headless Chromium opening `/web/connect` over HTTP and HTTPS showed
+  "Sign in to" the proxy's host name, with the origin's root as the server, using GET requests only. The previous
+  images are kept for rollback.
 
 ## The owner's deployment, as read
 
@@ -190,6 +218,10 @@ showed no further I/O errors, the deployment fixture was rebuilt from `0bd3ab11`
   because the legacy clients never saved one.
 - **EPUB locations.** Generated EPUB locations are cached in the browser for the ten most recent books.
 - **MOBI and AZW3 content** renders in a same-origin frame without scripts, so a book cannot act as the app.
+  WebKit sends no events from such a frame, so the reader watches its scroll position each animation frame.
+- **The deployment's own server.** `ABS_WEB_SERVER` (read per request) names the server as a path on the client's
+  origin or a full address. A browser with no saved servers checks it and opens its sign-in. Unset, people enter
+  the address. The client never guesses from the host name or takes its own base path for the server's.
 - **libarchive.** Its worker and wasm are copied into `public/libarchive` before dev and build (git-ignored).
 - **Comic places** are saved when the reader turns or chooses a page. Opening a comic does not save one.
 - **Downloads** carry the access token as `?token=`, as the server's own interface does.
