@@ -1,0 +1,12 @@
+node_modules
+.next
+public/libarchive
+test-results
+playwright-report
+qa
+e2e
+deploy
+Dockerfile
+.dockerignore
+*.tsbuildinfo
+.env*
