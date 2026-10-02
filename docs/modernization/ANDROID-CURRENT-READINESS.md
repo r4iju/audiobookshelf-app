@@ -43,3 +43,7 @@ Base: `d3152a5d`. Implementation: `125634de7da2b00bc5d59c75f860d48e8c5260ca`. Th
 
 The scoped pass found no additional confirmed main-use-case software omission beyond the two changes above. This statement does not waive the original specification, unknown signals or baseline lint findings, and does not declare #54 complete or authorize replacement/promotion.
 <!-- android-current-status:end -->
+
+## Retained player-preference migration runtime evidence, October3
+
+On unchanged Android source `4ef1a06b`, current registered test-helper archive import and production account attachment passed seven focused retained-playerSettings outcomes: fresh application/relaunch/repeat, older missing-marker application, device/display preservation, older relaunch/repeat. This supersedes the mapping's compile-only caveat from PR123. No app implementation or signed delivery changed. Exact evidence and honest limits: [retained-preference runtime proof](ANDROID-MIGRATION-RUNTIME.md#current-helper-retained-preference-proof). Real owner export/import, upstream sandbox, physical and assistive-technology readiness remain separate.

@@ -60,3 +60,25 @@ restored, and persisted settings equality confirmed. Owned cache fixtures and
 reverse mapping were removed; targeted emulator shutdown succeeded and the
 owned server fixture stopped. No global ADB restart, wipe, owner operation,
 package build, broad suite, lint or localization sweep occurred.
+
+## Current-helper retained-preference proof
+
+The runtime gap above is now closed on production source `4ef1a06b9e8e427dfdc4c5375dd406743f8ae786`. Checkout `0d218c277595f2786faedad9600f47803ce6c612` has identical Android source. No implementation changed.
+
+The current existing Android test helper was built with `:app:assembleDebugAndroidTest --offline` and installed on the owned API36 emulator. Package inventory confirmed its registered archive provider before import. The retained combined debug APK was used, with no production rebuild. A preferences-only synthetic archive was served through that provider and opened through the production import UI. Account attachment and setting application ran through production startup after force-stop/relaunch.
+
+| Observed runtime outcome | Result |
+| --- | --- |
+| Fresh import applies retained chapter/total timeline, elapsed-time scaling and lock preferences | Pass |
+| Fresh imported values and completion markers survive process relaunch | Pass |
+| Repeat attachment preserves subsequently changed user preferences | Pass |
+| An older committed import with only the player-preference marker missing applies that missing step | Pass |
+| The older-import step preserves existing device/display choices, including jump intervals, haptics, appearance and playback rate | Pass |
+| Older-import values and both completion markers survive relaunch | Pass |
+| Repeat older-import attachment preserves later user choices | Pass |
+
+The first script stopped on a raw-JSON comparison after the fresh cases and older player flags had already passed. Production serialization omits default-valued fields. Comparing device/display values with their declared defaults resolved this oracle mismatch; only the remaining relaunch/repeat checks then ran. This was a verification correction, not an app fix or a new automated test.
+
+Private artifacts retain the script, settings/outcome snapshots, source/helper identities, provider inventory, initial failure, result and cleanup manifest. Every original synthetic app file was restored with exact content hashes, newly created synthetic files were removed, and owned reverse/emulator/fixture resources were stopped. The signed release already installed on the owner phone was unchanged. No owner-device operation, broad suite, baseline lint, localization sweep or release build occurred.
+
+This establishes the PR123 retained-playerSettings and older-marker runtime invariants. It does not establish real owner export/import, upstream private-sandbox access, in-place owner migration or physical/assistive-technology acceptance. The earlier failed attempts remain historical evidence rather than current limitations of the mapped values.
