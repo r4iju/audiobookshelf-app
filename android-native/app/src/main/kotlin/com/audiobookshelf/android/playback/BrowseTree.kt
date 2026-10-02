@@ -1,6 +1,8 @@
 package com.audiobookshelf.android.playback
 
 import android.content.Context
+import androidx.annotation.PluralsRes
+import com.audiobookshelf.android.R
 import android.net.Uri
 import android.os.Bundle
 import androidx.media3.common.MediaItem
@@ -51,7 +53,7 @@ class BrowseTree(private val context: Context) {
             if (parentId == DOWNLOADS) return@future LibraryResult.ofItemList(downloads(), params)
             val api = client
             if (api == null) {
-                return@future if (parentId == ROOT) LibraryResult.ofItemList(listOf(folder(DOWNLOADS, "Downloads")), params)
+                return@future if (parentId == ROOT) LibraryResult.ofItemList(listOf(folder(DOWNLOADS, context.getString(R.string.tab_downloads))), params)
                 else LibraryResult.ofError(SessionError.ERROR_SESSION_AUTHENTICATION_EXPIRED)
             }
             try {
@@ -59,7 +61,7 @@ class BrowseTree(private val context: Context) {
             } catch (failure: Exception) {
                 graph.accounts.handle(failure)
                 // Without the server the car still offers what is on the phone.
-                if (parentId == ROOT) LibraryResult.ofItemList(listOf(folder(DOWNLOADS, "Downloads")), params)
+                if (parentId == ROOT) LibraryResult.ofItemList(listOf(folder(DOWNLOADS, context.getString(R.string.tab_downloads))), params)
                 else LibraryResult.ofError(SessionError.ERROR_IO)
             }
         }
@@ -73,10 +75,10 @@ class BrowseTree(private val context: Context) {
                 val libraries = api.libraries()
                 val inProgress = libraries.any { library -> continuing(api, library.id).isNotEmpty() }
                 listOfNotNull(
-                    folder(CONTINUE, "Continue").takeIf { inProgress },
-                    folder(RECENT, "Recent"),
-                    folder(LIBRARIES, "Libraries"),
-                    folder(DOWNLOADS, "Downloads"),
+                    folder(CONTINUE, context.getString(R.string.auto_continue)).takeIf { inProgress },
+                    folder(RECENT, context.getString(R.string.auto_recent)),
+                    folder(LIBRARIES, context.getString(R.string.auto_libraries)),
+                    folder(DOWNLOADS, context.getString(R.string.tab_downloads)),
                 )
             }
             CONTINUE -> {
@@ -101,20 +103,20 @@ class BrowseTree(private val context: Context) {
                     if (library.isPodcast) {
                         api.items(library.id, 0, limit = 100).results.map { folder("podcast/${it.id}", it.title, it.author, api.coverUrl(it.id).toString()) }
                     } else listOfNotNull(
-                        folder("authors/${library.id}", "Authors"),
-                        folder("serieslist/${library.id}", "Series"),
-                        folder("collections/${library.id}", "Collections"),
-                        folder("discovery/${library.id}", "Discovery").takeIf { discovery(api, library.id).isNotEmpty() },
+                        folder("authors/${library.id}", context.getString(R.string.search_authors)),
+                        folder("serieslist/${library.id}", context.getString(R.string.search_series)),
+                        folder("collections/${library.id}", context.getString(R.string.title_collections)),
+                        folder("discovery/${library.id}", context.getString(R.string.auto_discovery)).takeIf { discovery(api, library.id).isNotEmpty() },
                     )
                 }
                 "authors" -> {
                     val authors = api.authors(parts[1]).filter { (it.numBooks ?: 0) > 0 && CarBrowsing.inGroup(it.name, letters) }.sortedBy { it.name.lowercase() }
-                    grouped(authors.map { it.name }, settings.androidAutoBrowseLimitForGrouping, letters, "authors/${parts[1]}", "authors")
+                    grouped(authors.map { it.name }, settings.androidAutoBrowseLimitForGrouping, letters, "authors/${parts[1]}", R.plurals.auto_authors_count)
                         ?: authors.map { folder("author/${parts[1]}/${it.id}", it.name) }
                 }
                 "serieslist" -> {
                     val series = api.series(parts[1]).filter { CarBrowsing.inGroup(it.name, letters) }.sortedBy { it.name.lowercase() }
-                    grouped(series.map { it.name }, settings.androidAutoBrowseLimitForGrouping, letters, "serieslist/${parts[1]}", "series")
+                    grouped(series.map { it.name }, settings.androidAutoBrowseLimitForGrouping, letters, "serieslist/${parts[1]}", R.plurals.auto_series_count)
                         ?: series.map { folder("series/${parts[1]}/${it.id}", it.name) }
                 }
                 "series", "authorseries" -> {
@@ -129,7 +131,7 @@ class BrowseTree(private val context: Context) {
                 "author" -> {
                     val progress = progress(api)
                     api.items(parts[1], 0, filter = ApiClient.filter("authors", parts[2]), limit = 1000, collapseSeries = true).results.map { item ->
-                        item.collapsedSeries?.let { folder("authorseries/${parts[1]}/${parts[2]}/${it.id}", it.name, "${it.numBooks} books") } ?: playable(item, api, progress)
+                        item.collapsedSeries?.let { folder("authorseries/${parts[1]}/${parts[2]}/${it.id}", it.name, context.resources.getQuantityString(R.plurals.lib_books_count, it.numBooks, it.numBooks)) } ?: playable(item, api, progress)
                     }
                 }
                 "collections" -> api.collections(parts[1]).map { folder("collection/${it.id}", it.name) }
@@ -145,8 +147,8 @@ class BrowseTree(private val context: Context) {
         }
     }
 
-    private fun grouped(names: List<String>, limit: Int, letters: String, base: String, noun: String): List<MediaItem>? =
-        CarBrowsing.groups(names, limit, letters)?.map { folder("$base~${it.prefix}", it.prefix, "${it.count} $noun") }
+    private fun grouped(names: List<String>, limit: Int, letters: String, base: String, @PluralsRes counted: Int): List<MediaItem>? =
+        CarBrowsing.groups(names, limit, letters)?.map { folder("$base~${it.prefix}", it.prefix, context.resources.getQuantityString(counted, it.count, it.count)) }
 
     private suspend fun continuing(api: ApiClient, libraryId: String) =
         api.personalized(libraryId).filter { it.id == "continue-listening" }.flatMap { it.items() }

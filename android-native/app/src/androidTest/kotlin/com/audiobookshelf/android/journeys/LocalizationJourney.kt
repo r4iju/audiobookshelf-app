@@ -3,11 +3,14 @@ package com.audiobookshelf.android.journeys
 import android.app.LocaleManager
 import android.os.LocaleList
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.audiobookshelf.android.MainActivity
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,6 +42,24 @@ class LocalizationJourney {
             compose.tap("open-settings")
             compose.waitForText("Einstellungen")
             compose.capture("localized-settings")
+        }
+    }
+
+    @Test
+    fun libraryControlsReadRightToLeftInArabic() {
+        Fixture.resetAppData()
+        Fixture.configure("baseline")
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { locales.applicationLocales = LocaleList.forLanguageTags("ar") }
+        ActivityScenario.launch(MainActivity::class.java).use {
+            compose.signIn()
+            val width = compose.onRoot().fetchSemanticsNode().size.width
+            assertTrue("Settings sits at the start of a right-to-left top bar", compose.onNodeWithTag("open-settings").fetchSemanticsNode().boundsInRoot.center.x < width / 2)
+            compose.tap("open-sort")
+            compose.waitForText("أضيفت على")
+            compose.capture("localized-sort-ar")
+            compose.pressBack()
+            compose.tap("open-filter")
+            compose.waitForText("التصنيف")
         }
     }
 }

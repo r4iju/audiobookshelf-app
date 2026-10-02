@@ -1,5 +1,7 @@
 package com.audiobookshelf.android.data
 
+import android.content.Context
+import com.audiobookshelf.android.R
 import com.audiobookshelf.core.AccountIdentity
 import com.audiobookshelf.core.ApiClient
 import com.audiobookshelf.core.ApiError
@@ -24,7 +26,7 @@ sealed interface SessionState {
  * Owns saved server/account connections. Switching or signing out never touches listening
  * journals or downloads: those stay keyed by [AccountIdentity] until that account returns.
  */
-class AccountStore(private val vault: CredentialVault, private val http: OkHttpClient, private val device: DeviceInfo) {
+class AccountStore(private val vault: CredentialVault, private val http: OkHttpClient, private val device: DeviceInfo, private val context: Context) {
     private val state = MutableStateFlow<SessionState>(SessionState.Loading)
     val session: StateFlow<SessionState> = state
     private val auth = AuthApi(http)
@@ -44,8 +46,8 @@ class AccountStore(private val vault: CredentialVault, private val http: OkHttpC
     fun restore() {
         val document = try {
             vault.load()
-        } catch (error: CredentialVault.Unreadable) {
-            state.value = SessionState.SignedOut(emptyList(), notice = error.message)
+        } catch (_: CredentialVault.Unreadable) {
+            state.value = SessionState.SignedOut(emptyList(), notice = context.getString(R.string.set_vault_unreadable))
             return
         }
         publish(document)
@@ -120,7 +122,7 @@ class AccountStore(private val vault: CredentialVault, private val http: OkHttpC
         state.value = when {
             active == null -> SessionState.SignedOut(document.connections)
             active.needsSignIn -> SessionState.SignedOut(document.connections, reauth = active,
-                notice = "Your session for ${active.credentials.username} ended. Sign in again; unsent listening and downloads are kept.")
+                notice = context.getString(R.string.set_session_ended, active.credentials.username))
             else -> SessionState.Active(active, clientFor(active), document.connections)
         }
     }

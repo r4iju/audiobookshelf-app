@@ -1,6 +1,8 @@
 package com.audiobookshelf.android.playback
 
 import android.content.Context
+import androidx.annotation.StringRes
+import com.audiobookshelf.android.R
 import android.net.Uri
 import android.os.Bundle
 import androidx.media3.cast.CastPlayer
@@ -105,7 +107,8 @@ internal class CastConverter : MediaItemConverter {
 internal class CastHandover(
     private val phone: Player,
     private val endSession: () -> Unit,
-    private val explain: (String) -> Unit,
+    /** Receives a string resource id explaining why playback stayed on the phone. */
+    private val explain: (Int) -> Unit,
     /** The title the engine holds open, bound to its account and listening record, or null. */
     private val title: () -> Any?,
 ) {
@@ -148,7 +151,7 @@ internal class CastHandover(
     }
 
     companion object {
-        const val DOWNLOAD_NOT_CASTABLE = "Downloaded copies play on this phone only. Stop casting to listen here, or stream the title instead."
+        @StringRes val DOWNLOAD_NOT_CASTABLE = R.string.cast_download_not_castable
     }
 }
 
@@ -172,12 +175,12 @@ class CastRoutes(private val context: Context) {
     val castContext: CastContext? = run {
         val services = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
         if (services != ConnectionResult.SUCCESS) {
-            mutable.value = CastStatus(unavailable = "Casting needs Google Play services, which this device does not have or needs to update.")
+            mutable.value = CastStatus(unavailable = context.getString(R.string.cast_needs_play_services))
             null
         } else {
             @Suppress("DEPRECATION")
             runCatching { CastContext.getSharedInstance(context) }.getOrElse {
-                mutable.value = CastStatus(unavailable = "Casting could not start on this device: ${it.message ?: it.javaClass.simpleName}.")
+                mutable.value = CastStatus(unavailable = context.getString(R.string.cast_could_not_start, it.message ?: it.javaClass.simpleName))
                 null
             }
         }
@@ -196,10 +199,10 @@ class CastRoutes(private val context: Context) {
         override fun onSessionStarting(session: CastSession) = refresh()
         override fun onSessionStarted(session: CastSession, sessionId: String) = refresh(problem = null)
         override fun onSessionStartFailed(session: CastSession, error: Int) =
-            refresh(problem = "Could not connect to ${mutable.value.connecting ?: "the receiver"}. Check that it is on and on the same Wi-Fi network as this phone.")
+            refresh(problem = mutable.value.connecting?.let { context.getString(R.string.cast_connect_failed_named, it) } ?: context.getString(R.string.cast_connect_failed))
         override fun onSessionEnding(session: CastSession) = Unit
         override fun onSessionEnded(session: CastSession, error: Int) =
-            refresh(problem = if (error != 0) "The connection to ${session.castDevice?.friendlyName ?: "the receiver"} was lost. Playback continues on this phone." else mutable.value.problem)
+            refresh(problem = if (error != 0) session.castDevice?.friendlyName?.let { context.getString(R.string.cast_connection_lost_named, it) } ?: context.getString(R.string.cast_connection_lost) else mutable.value.problem)
         override fun onSessionResuming(session: CastSession, sessionId: String) = refresh()
         override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) = resumed()
         override fun onSessionResumeFailed(session: CastSession, error: Int) = refresh()
@@ -213,7 +216,7 @@ class CastRoutes(private val context: Context) {
     /** Called for every resumed session, including the one the system restores after the app restarts. */
     internal fun resumed() {
         if (keepResumed()) return refresh(problem = null)
-        mutable.value = mutable.value.copy(problem = RESUMED_WITHOUT_TITLE)
+        mutable.value = mutable.value.copy(problem = context.getString(RESUMED_WITHOUT_TITLE))
         castContext?.sessionManager?.endCurrentSession(true)
     }
 
@@ -255,7 +258,7 @@ class CastRoutes(private val context: Context) {
     }
 
     companion object {
-        const val RESUMED_WITHOUT_TITLE = "Casting stopped because the app restarted while casting. Open the title again to keep listening from the last place this phone saved."
+        @StringRes val RESUMED_WITHOUT_TITLE = R.string.cast_resumed_without_title
     }
 
     private fun refresh(problem: String? = mutable.value.problem) {

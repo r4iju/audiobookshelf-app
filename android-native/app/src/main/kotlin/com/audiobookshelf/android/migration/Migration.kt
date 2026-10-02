@@ -3,6 +3,7 @@ package com.audiobookshelf.android.migration
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import com.audiobookshelf.android.R
 import com.audiobookshelf.android.data.AccountStore
 import com.audiobookshelf.android.data.Appearance
 import com.audiobookshelf.android.data.DeviceSettings
@@ -103,7 +104,7 @@ class Migration(
                 throw cancelled
             } catch (failure: Exception) {
                 report(Diagnostics.Area.STORAGE, "The chosen export could not be read", failure)
-                Step.Refused("The chosen file could not be read. Choose it again, or save it to this device first.")
+                Step.Refused(context.getString(R.string.set_import_file_unreadable))
             } finally {
                 // Runs once the copy has stopped, so nothing writes the file after it is removed.
                 if (selection !== mine || mine.archive == null) mine.file.delete()
@@ -161,7 +162,7 @@ class Migration(
                 report(Diagnostics.Area.STORAGE, "The import stopped", failure)
                 state.value = Step.Refused(when (failure) {
                     is MigrationError -> failure.message.orEmpty()
-                    else -> "The import stopped before it finished. Nothing was lost: choose the same export again to continue where it stopped."
+                    else -> context.getString(R.string.set_import_stopped)
                 })
             } finally {
                 importing = false
@@ -213,7 +214,7 @@ class Migration(
                 client.item(title.itemId)
             } catch (gone: ApiError.Http) {
                 if (gone.status != 404) throw gone
-                issues += Issue(Issue.Kind.ITEM_CHANGED, title.title, "It is no longer on the server, so it was not adopted.")
+                issues += Issue(Issue.Kind.ITEM_CHANGED, title.title, context.getString(R.string.set_import_item_gone))
                 return@map title.copy(attached = true)
             }
             val match = Attachment.match(title, item, title.episodeId)
@@ -224,7 +225,7 @@ class Migration(
             val audio = match.audio.map { it?.let(import::verified) }
             val ebook = match.ebook?.let(import::verified)
             if (audio.count { it != null } != match.audio.count { it != null } || match.ebook != null && ebook == null) {
-                issues += Issue(Issue.Kind.FILE_CORRUPT, title.title, "A file changed on this device after it was imported, so it is downloaded again from the server.")
+                issues += Issue(Issue.Kind.FILE_CORRUPT, title.title, context.getString(R.string.set_import_file_changed))
             }
             val episode = title.episodeId?.let { id -> item.media.episodes.firstOrNull { it.id == id } }
             val cover = runCatching { client.bytes("api/items/${item.id}/cover") }.getOrNull()

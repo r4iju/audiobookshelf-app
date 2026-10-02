@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.LibraryBooks
+import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.DownloadForOffline
@@ -143,23 +143,23 @@ private fun SignedIn(active: SessionState.Active) {
                         onEdit = { model.push(Route.GroupEditor(route.kind, route.id)) },
                         onDeleted = pop)
                 }
-                is Route.GroupEditor -> RouteScaffold(if (route.id == null) (if (route.kind == COLLECTIONS) stringResource(R.string.title_new_collection) else stringResource(R.string.title_new_playlist)) else "Edit", pop) { padding ->
+                is Route.GroupEditor -> RouteScaffold(if (route.id == null) (if (route.kind == COLLECTIONS) stringResource(R.string.title_new_collection) else stringResource(R.string.title_new_playlist)) else stringResource(R.string.set_edit), pop) { padding ->
                     GroupEditorScreen(route.kind, route.id, active, catalog, padding, onSaved = { id ->
                         model.pop()
                         if (route.id == null) model.push(Route.Group(route.kind, id))
                     })
                 }
                 is Route.Reader -> PdfReaderScreen(route, active, catalog, onClose = pop)
-                Route.AddPodcast -> RouteScaffold("Add podcast", pop) { padding -> AddPodcastScreen(active, catalog, padding, onCreated = pop) }
+                Route.AddPodcast -> RouteScaffold(stringResource(R.string.set_add_podcast), pop) { padding -> AddPodcastScreen(active, catalog, padding, onCreated = pop) }
                 is Route.Filtered -> RouteScaffold(route.label, pop) { padding ->
                     val libraryId = catalog.library?.id
                     if (libraryId != null) FilteredScreen(model.filtered(active, libraryId, route), padding, { catalog.progressFor(it) }, open)
                 }
                 Route.Settings -> RouteScaffold(stringResource(R.string.title_settings), pop) { padding -> SettingsScreen(padding, onDiagnostics = { model.push(Route.Diagnostics) }) }
-                Route.Diagnostics -> RouteScaffold("Diagnostics", pop) { padding -> DiagnosticsScreen(active, padding) }
+                Route.Diagnostics -> RouteScaffold(stringResource(R.string.set_diagnostics), pop) { padding -> DiagnosticsScreen(active, padding) }
                 Route.Statistics -> RouteScaffold(stringResource(R.string.title_statistics), pop) { padding -> StatisticsScreen(active, catalog, padding) }
                 else -> RouteScaffold("", pop) { padding ->
-                    Box(Modifier.padding(padding)) { MessageState("Not available yet", "This part of the preview is still being built.", tag = "unavailable") }
+                    Box(Modifier.padding(padding)) { MessageState(stringResource(R.string.set_not_available_yet), stringResource(R.string.set_not_available_yet_detail), tag = "unavailable") }
                 }
             }
         }
@@ -176,7 +176,7 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
         topBar = {
             if (tab == Tab.Library) LibraryTopBar(catalog) {
                 if (catalog.library?.isPodcast == true && catalog.user?.isAdmin == true) {
-                    IconButton(onClick = { model.push(Route.AddPodcast) }, modifier = Modifier.testTag("add-podcast")) { Icon(Icons.Outlined.Add, "Add podcast") }
+                    IconButton(onClick = { model.push(Route.AddPodcast) }, modifier = Modifier.testTag("add-podcast")) { Icon(Icons.Outlined.Add, stringResource(R.string.set_add_podcast)) }
                 }
                 LibraryMenu(catalog, onRoute = model::push)
                 IconButton(onClick = { model.push(Route.Accounts) }, modifier = Modifier.testTag("open-accounts")) { Icon(Icons.Outlined.AccountCircle, stringResource(R.string.title_accounts)) }
@@ -187,7 +187,7 @@ private fun Home(model: MainViewModel, active: SessionState.Active, open: (Libra
             Column {
             LocalBottomAccessory.current()
             NavigationBar {
-                NavigationBarItem(selected = tab == Tab.Library, onClick = { model.tab.value = Tab.Library }, icon = { Icon(Icons.Outlined.LibraryBooks, null) }, label = { Text(stringResource(R.string.tab_library)) }, modifier = Modifier.testTag("tab-library"))
+                NavigationBarItem(selected = tab == Tab.Library, onClick = { model.tab.value = Tab.Library }, icon = { Icon(Icons.AutoMirrored.Outlined.LibraryBooks, null) }, label = { Text(stringResource(R.string.tab_library)) }, modifier = Modifier.testTag("tab-library"))
                 NavigationBarItem(selected = tab == Tab.Search, onClick = { model.tab.value = Tab.Search }, icon = { Icon(Icons.Outlined.Search, null) }, label = { Text(stringResource(R.string.tab_search)) }, modifier = Modifier.testTag("tab-search"))
                 NavigationBarItem(selected = tab == Tab.Downloads, onClick = { model.tab.value = Tab.Downloads }, icon = { Icon(Icons.Outlined.DownloadForOffline, null) }, label = { Text(stringResource(R.string.tab_downloads)) }, modifier = Modifier.testTag("tab-downloads"))
             }

@@ -4,4 +4,6 @@
     <string name="title_collections">Söfn</string>
     <string name="action_cancel">Hætta við</string>
     <string name="action_clear_filter">Hreinsa síu</string>
+    <string name="grp_delete">Eyða</string>
+    <string name="grp_back">Bakka</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.audiobookshelf.android.playback
 
 import android.content.Context
+import com.audiobookshelf.android.R
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
@@ -151,6 +152,8 @@ class PlaybackEngine(
 
     private val mutable = MutableStateFlow(PlayerState(speed = settings.current.playbackRate))
     val state: StateFlow<PlayerState> = mutable
+    /** Resolved once so the paused-for-saving error can be recognised again by equality. */
+    private val saveError = context.getString(R.string.pl_listening_save_failed)
 
     // Read off the main thread by the reading gate.
     @Volatile private var loaded: Loaded? = null
@@ -207,7 +210,7 @@ class PlaybackEngine(
 
     private fun start(source: PlaySource) {
         if (source is PlaySource.Local && casting?.status?.value?.connectedTo != null) {
-            mutable.value = mutable.value.copy(openError = itemKey(source.itemId, source.episodeId) to CastHandover.DOWNLOAD_NOT_CASTABLE)
+            mutable.value = mutable.value.copy(openError = itemKey(source.itemId, source.episodeId) to context.getString(CastHandover.DOWNLOAD_NOT_CASTABLE))
             return
         }
         val current = loaded
@@ -323,7 +326,7 @@ class PlaybackEngine(
 
     fun retry() {
         val current = loaded ?: return
-        if (mutable.value.error == SAVE_ERROR) {
+        if (mutable.value.error == saveError) {
             // Saving, not the media, failed: try the write again and continue only once nothing is unsaved.
             writer.retryNow()
             if (current.recordId !in writer.failing.value) { mutable.value = mutable.value.copy(error = null); resume() }
@@ -373,8 +376,8 @@ class PlaybackEngine(
                 val current = loaded
                 if (current != null && current.recordId in failing && mutable.value.error == null) {
                     player.pause()
-                    mutable.value = mutable.value.copy(playing = false, error = SAVE_ERROR)
-                } else if (failing.isEmpty() && mutable.value.error == SAVE_ERROR) {
+                    mutable.value = mutable.value.copy(playing = false, error = saveError)
+                } else if (failing.isEmpty() && mutable.value.error == saveError) {
                     mutable.value = mutable.value.copy(error = null)
                 }
                 mutable.value = mutable.value.copy(unsavedListening = failing.isNotEmpty())
@@ -440,7 +443,7 @@ class PlaybackEngine(
 
     private suspend fun openStream(source: PlaySource.Stream, transcode: Boolean, at: Double?): Opened {
         val session = source.client.play(source.itemId, source.episodeId, transcode)
-        val title = session.displayTitle ?: "Untitled"
+        val title = session.displayTitle ?: context.getString(R.string.pl_untitled)
         val author = session.displayAuthor.orEmpty()
         val tracks = session.audioTracks.sortedBy { it.index ?: 0 }
         val timeline = Timeline(tracks, session.chapters)
@@ -480,7 +483,7 @@ class PlaybackEngine(
             .setSeekBackIncrementMs(settings.current.jumpBackwardsTime * 1000L)
             .setSeekForwardIncrementMs(settings.current.jumpForwardTime * 1000L)
             .build()
-        val handover = CastHandover(exo, endSession = { main.post { casting?.disconnect() } }, explain = { main.post { casting?.explain(it) } }, title = { loaded })
+        val handover = CastHandover(exo, endSession = { main.post { casting?.disconnect() } }, explain = { main.post { casting?.explain(context.getString(it)) } }, title = { loaded })
         this.handover = handover
         return CastPlayer.Builder(context).setLocalPlayer(exo).setRemotePlayer(remote).setTransferCallback(handover::transfer).build()
     }
@@ -678,12 +681,12 @@ class PlaybackEngine(
 
     private fun fail(current: Loaded, message: String?) {
         persist(current, force = true) { sync.publish(current.source.account) }
-        mutable.value = mutable.value.copy(error = "Playback stopped: ${message ?: "the audio could not be loaded"}. Your position is kept.", playing = false, loading = false)
+        mutable.value = mutable.value.copy(error = message?.let { context.getString(R.string.pl_playback_stopped_reason, it) } ?: context.getString(R.string.pl_playback_stopped_unknown), playing = false, loading = false)
     }
 
     private fun describe(failure: Throwable): String = when (failure) {
-        is ApiError.NoAudio -> "This item has no playable audio."
-        else -> failure.message ?: "Playback could not start."
+        is ApiError.NoAudio -> context.getString(R.string.pl_no_playable_audio)
+        else -> failure.message ?: context.getString(R.string.pl_could_not_start)
     }
 
     private fun startService() {
@@ -758,7 +761,6 @@ class PlaybackEngine(
         private const val TAG = "AbsPlayback"
         private const val RECORD_INTERVAL_MS = 5_000L
         private const val SETTLE_TIMEOUT_MS = 10_000L
-        private const val SAVE_ERROR = "Listening could not be saved on this device, so playback paused. Free some storage and try again."
         private const val PUBLISH_INTERVAL_MS = 15_000L
 
         /** Same thresholds as the existing Android app, keyed by how long playback was paused. */

@@ -20,7 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.LibraryBooks
+import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -92,13 +92,13 @@ fun ConnectScreen(state: SessionState.SignedOut) {
         ) {
             if (state.adding) {
                 Row(Modifier.fillMaxWidth()) {
-                    TextButton(onClick = { openId.clear(); graph.accounts.cancelAddAccount() }, modifier = Modifier.testTag("cancel-add-account")) { Text("Cancel") }
+                    TextButton(onClick = { openId.clear(); graph.accounts.cancelAddAccount() }, modifier = Modifier.testTag("cancel-add-account")) { Text(stringResource(R.string.action_cancel)) }
                 }
             } else Spacer(Modifier.height(48.dp))
             Column(Modifier.widthIn(max = 480.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Icon(Icons.Outlined.LibraryBooks, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
-                Text(if (state.adding) "Add an account" else "Audiobookshelf", style = MaterialTheme.typography.headlineMedium)
-                Text("Connect directly to your own server. Nothing is routed through another service.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(Icons.AutoMirrored.Outlined.LibraryBooks, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
+                Text(if (state.adding) stringResource(R.string.set_add_an_account) else "Audiobookshelf", style = MaterialTheme.typography.headlineMedium)
+                Text(stringResource(R.string.set_connect_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 state.notice?.let {
                     Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium) {
                         Text(it, Modifier.padding(14.dp).testTag("session-notice"), style = MaterialTheme.typography.bodyMedium)
@@ -120,7 +120,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                     }
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { server = null; signInError = null }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Change server") }
+                        IconButton(onClick = { server = null; signInError = null }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.set_change_server)) }
                         Text(connected.first.canonical, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if ("local" in connected.second.authMethods) {
@@ -146,26 +146,26 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                             },
                             enabled = !busy && username.isNotBlank(),
                             modifier = Modifier.fillMaxWidth().height(52.dp).testTag("sign-in"),
-                        ) { if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp) else Text("Sign in") }
+                        ) { if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp) else Text(stringResource(R.string.set_sign_in)) }
                     }
                     if ("openid" in connected.second.authMethods) {
                         OutlinedButton(
                             onClick = { openId.start(connected.first, context) },
                             modifier = Modifier.fillMaxWidth().height(52.dp).testTag("openid-sign-in"),
-                        ) { Text("Sign in with OpenID") }
+                        ) { Text(stringResource(R.string.set_sign_in_openid)) }
                     }
                 }
                 openId.error?.let { ErrorText(it, "openid-error") }
                 if (!state.adding) ImportLegacyButton()
                 if (state.connections.isNotEmpty()) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                    Text("Saved accounts", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.set_saved_accounts), style = MaterialTheme.typography.titleMedium)
                     state.connections.filter { it.id != reauth?.id }.forEach { saved ->
                         ListItem(
                             headlineContent = { Text(saved.credentials.username) },
-                            supportingContent = { Text(saved.credentials.server + if (saved.needsSignIn) " · sign in required" else "") },
+                            supportingContent = { Text(if (saved.needsSignIn) stringResource(R.string.set_server_sign_in_required, saved.credentials.server) else saved.credentials.server) },
                             leadingContent = { Icon(Icons.Outlined.AccountCircle, null) },
-                            trailingContent = { if (!saved.needsSignIn) TextButton(onClick = { graph.accounts.switchTo(saved.id) }, modifier = Modifier.testTag("use-account-${saved.credentials.username}")) { Text("Use") } },
+                            trailingContent = { if (!saved.needsSignIn) TextButton(onClick = { graph.accounts.switchTo(saved.id) }, modifier = Modifier.testTag("use-account-${saved.credentials.username}")) { Text(stringResource(R.string.set_use_account)) } },
                         )
                     }
                 }

@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.audiobookshelf.android.BuildConfig
+import com.audiobookshelf.android.R
 import com.audiobookshelf.android.graph
 import com.audiobookshelf.core.AbsJson
 import com.audiobookshelf.core.ApiError
@@ -52,7 +53,7 @@ class OpenIdSignIn private constructor(private val context: Context) {
         graph.scope.launch {
             try {
                 val status = AbsJson.decodeFromString(ServerStatus.serializer(), get(address.url("status")).body)
-                if ("openid" !in status.authMethods) throw Failure("OpenID sign-in is not enabled on this server. Use your username and password.")
+                if ("openid" !in status.authMethods) throw Failure(context.getString(R.string.set_openid_not_enabled))
                 val verifier = random(); val state = random()
                 val challenge = base64Url(MessageDigest.getInstance("SHA-256").digest(verifier.toByteArray()))
                 val authorize = get(address.url("auth/openid", listOf(
@@ -61,12 +62,12 @@ class OpenIdSignIn private constructor(private val context: Context) {
                 )))
                 if (authorize.code !in 300..399) {
                     if (authorize.code >= 400) throw ApiError.Http(authorize.code)
-                    throw Failure(INVALID)
+                    throw Failure(invalid)
                 }
-                val provider = authorize.location?.let { address.url("").resolve(it) } ?: throw Failure(INVALID)
+                val provider = authorize.location?.let { address.url("").resolve(it) } ?: throw Failure(invalid)
                 validateProvider(provider)
                 val providerState = provider.single("state")
-                if (providerState != state || provider.single("code_challenge") != challenge || provider.single("code_challenge_method") != "S256") throw Failure(INVALID)
+                if (providerState != state || provider.single("code_challenge") != challenge || provider.single("code_challenge_method") != "S256") throw Failure(invalid)
                 writeAtomically(file, AbsJson.encodeToString(Pending.serializer(), Pending(address.canonical, verifier, providerState, authorize.cookies)).toByteArray())
                 browserOpen = true
                 CustomTabsIntent.Builder().setShowTitle(true).setEphemeralBrowsingEnabled(true).build().apply {
@@ -86,12 +87,12 @@ class OpenIdSignIn private constructor(private val context: Context) {
         browserOpen = false
         val pending = runCatching { AbsJson.decodeFromString(Pending.serializer(), file.readText()) }.getOrNull()
         file.delete()
-        if (pending == null) { error = INVALID; busy = false; return true }
+        if (pending == null) { error = invalid; busy = false; return true }
         busy = true; error = null
         graph.scope.launch {
             try {
                 val states = uri.getQueryParameters("state"); val codes = uri.getQueryParameters("code")
-                if (uri.path?.isNotEmpty() == true || uri.port != -1 || uri.fragment != null || states != listOf(pending.state) || codes.size != 1 || codes[0].isEmpty()) throw Failure(INVALID)
+                if (uri.path?.isNotEmpty() == true || uri.port != -1 || uri.fragment != null || states != listOf(pending.state) || codes.size != 1 || codes[0].isEmpty()) throw Failure(invalid)
                 val address = ServerAddress.parse(pending.server)
                 val request = Request.Builder().url(address.url("auth/openid/callback", listOf("state" to pending.state, "code" to codes[0], "code_verifier" to pending.verifier)))
                     .header("x-return-tokens", "true").apply { if (pending.cookies.isNotEmpty()) header("Cookie", pending.cookies.joinToString("; ")) }.build()
@@ -113,7 +114,7 @@ class OpenIdSignIn private constructor(private val context: Context) {
             browserOpen = false
             file.delete()
             busy = false
-            error = "Browser sign-in was canceled. Your saved accounts are retained."
+            error = context.getString(R.string.set_openid_canceled)
         }
     }
 
@@ -129,17 +130,18 @@ class OpenIdSignIn private constructor(private val context: Context) {
 
     private fun validateProvider(url: HttpUrl) {
         val loopback = url.host in setOf("127.0.0.1", "localhost", "::1")
-        if (url.username.isNotEmpty() || url.password.isNotEmpty() || url.fragment != null || !(url.isHttps || loopback)) throw Failure(INVALID)
+        if (url.username.isNotEmpty() || url.password.isNotEmpty() || url.fragment != null || !(url.isHttps || loopback)) throw Failure(invalid)
         url.single("client_id"); url.single("redirect_uri")
-        if ("openid" !in url.single("scope").split(' ')) throw Failure(INVALID)
+        if ("openid" !in url.single("scope").split(' ')) throw Failure(invalid)
     }
 
-    private fun HttpUrl.single(name: String): String = queryParameterValues(name).singleOrNull()?.takeIf { it.isNotEmpty() } ?: throw Failure(INVALID)
+    private fun HttpUrl.single(name: String): String = queryParameterValues(name).singleOrNull()?.takeIf { it.isNotEmpty() } ?: throw Failure(invalid)
 
     private class Failure(message: String) : Exception(message)
 
+    private val invalid get() = context.getString(R.string.set_openid_invalid)
+
     companion object {
-        private const val INVALID = "The browser sign-in response could not be verified. Retry sign-in and check the server's OpenID redirect settings."
         @Volatile private var instance: OpenIdSignIn? = null
         fun pending(context: Context): OpenIdSignIn = instance ?: synchronized(this) {
             instance ?: OpenIdSignIn(context.applicationContext).also { instance = it }

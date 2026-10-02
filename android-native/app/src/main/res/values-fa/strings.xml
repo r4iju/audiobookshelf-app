@@ -14,4 +14,11 @@
     <string name="action_show_more">خواندن بیشتر</string>
     <string name="action_show_less">خواندن کمتر</string>
     <string name="connect">اتصال</string>
+    <string name="set_remove">حذف</string>
+    <string name="dl_remove">حذف</string>
+    <string name="grp_delete">حذف</string>
+    <string name="grp_back">بازگشت</string>
+    <string name="item_open_feed">باز کردن فید</string>
+    <string name="item_close_feed">بستن فید</string>
+    <string name="item_send_to_ereader">ارسال کتاب الکترونیکی به دستگاه</string>
 </resources>

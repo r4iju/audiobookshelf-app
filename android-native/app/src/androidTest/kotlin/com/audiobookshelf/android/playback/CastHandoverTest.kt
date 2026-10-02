@@ -92,7 +92,7 @@ class CastHandoverTest {
             val receiver = ExoPlayer.Builder(context).build()
             playDownload(phone)
             var ended = 0
-            val notices = mutableListOf<String>()
+            val notices = mutableListOf<Int>()
             val title = Any()
             val handover = CastHandover(phone, endSession = { ended++ }, explain = { notices += it }, title = { title })
 
@@ -145,7 +145,7 @@ class CastHandoverTest {
             assertEquals("Play services provides casting on the QA emulator", null, routes.status.value.unavailable)
             routes.keepResumed = { false }
             routes.resumed()
-            assertEquals(CastRoutes.RESUMED_WITHOUT_TITLE, routes.status.value.problem)
+            assertEquals(InstrumentationRegistry.getInstrumentation().targetContext.getString(CastRoutes.RESUMED_WITHOUT_TITLE), routes.status.value.problem)
         }
     }
 }
