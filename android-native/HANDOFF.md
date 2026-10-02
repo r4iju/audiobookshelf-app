@@ -1,12 +1,14 @@
 # Native Android handoff
 
-Branch `fork/native-android`, based on `origin/fork/native-tv` at `39ad6af65715957c585e7b0f0d20238ebe60ee8f`.
-Not merged into `fork/native-tv`. The app installs as the preview identity
+`fork/native-android` was merged into `fork/native-tv` through #87 (79b31196). This work is on
+`fork/android-l10n-bookmarks`, branched from there. The app installs as the preview identity
 `com.audiobookshelf.app.nativepreview` beside the legacy `com.audiobookshelf.app`, which it never touches.
 
 ## Issue mapping (for ticket maintenance)
 
-Source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full run passed 80 of 81 journeys in 23 classes, plus `CastHandoverTest` 5 of 5 in the same run, so it is **not a clean full run**. The one failure, the bookmarks journey (`PlayerToolsJourney` a), is an unresolved automation signal; see Test runs at 83826111 below. Unit tests pass (core 59, app 6). The packaged APK has SHA-256 `e406678e3ba84167a5c1608867242ace7a4e27000794a6d1a412b1c8cc7975a9` (22214564 bytes, debug-key signed, `com.audiobookshelf.app.nativepreview` 0.15.0-native-preview; a copy is kept at `/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/audiobookshelf-native-preview-83826111.apk`; see `verification/android-evidence.json`). All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: casting (#49) has not been tried with a real receiver, localization is partial, and the physical gates below remain.
+Source `f256272b` (f256272b76251decaafd5099e6568f3a6b77d890, branch `fork/android-l10n-bookmarks` from `fork/native-tv` at 79b31196): one full run passed 88 of 88, that is 83 of 83 journeys in 23 classes plus `CastHandoverTest` 5 of 5. Unit tests pass (core 63, app 6). The two full runs before it on this branch each had one failure, both kept with their own XML: 2efb7f3d (87 of 88, the Chrome sign-in page; harness fixed in e3627918) and e3627918 (87 of 88, a lost listening write; fixed in f256272b); see Journey failures below. The bookmarks journey signal from 83826111 has not recurred but its cause is unknown, so it stays open. The APK is packaged from the merged source after root's merge and recorded on the pull request. All evidence is emulator plus synthetic fixture; nothing physical is claimed. Not a full replacement: casting (#49) has not been tried with a real receiver, localization is partial, and the physical gates below remain.
+
+Previous source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full run passed 80 of 81 journeys plus `CastHandoverTest` 5 of 5, not a clean full run; packaged APK SHA-256 `e406678e3ba84167a5c1608867242ace7a4e27000794a6d1a412b1c8cc7975a9` (22214564 bytes), kept at `/Volumes/ai-ssd/developer-caches/abs-android-native-claude/artifacts/audiobookshelf-native-preview-83826111.apk`.
 
 | Issue | Status | Evidence | Open follow-ups |
 | --- | --- | --- | --- |
@@ -16,7 +18,7 @@ Source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full run passe
 | #34 stream multi-file audio | Done (emulator) | PlaybackJourney | |
 | #35 durable listening progress | Done (emulator) | ListeningDurability, ListeningRecovery, LatePublication, ProgressReset | Listening held in memory while storage refuses writes is lost if the process dies first |
 | #36 background playback, system controls | Partial | PlaybackJourney (media session) | Lock screen, Bluetooth and headset controls on a device |
-| #37 chapters, speed, bookmarks | Done (emulator) | PlayerToolsJourney | Bookmark journey flaked once in a full run |
+| #37 chapters, speed, bookmarks | Done (emulator) | PlayerToolsJourney | Bookmark journey failed in two runs at 83826111, not since; cause unknown |
 | #38 sleep timers, advanced playback | Done (emulator) | PlayerToolsJourney, SettingsJourney | Shake and chime on a device |
 | #39 search and discovery | Done (emulator) | BrowseJourney | |
 | #40 collections and playlists | Done (emulator) | GroupsJourney | |
@@ -28,9 +30,9 @@ Source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full run passe
 | #49 casting | Implemented; receiver acceptance pending | `CastMediaTest` (3), `CastHandoverTest` (5), CastJourney (no receiver on the emulator network) | **Physical receiver journey not run**: connecting, remote controls, transfer back on receiver loss and progress while casting are untested on a real Chromecast/Google TV |
 | #50 Android Auto | Partial | CarJourney | Car or Desktop Head Unit |
 | #51 preferences, statistics, diagnostics | Done (emulator) | SettingsJourney | |
-| #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `ereaderSettings` and some preferences preserved but not applied; listening history and logs not exported |
+| #52 migrate accounts and listening | Done (emulator, synthetic archives) | MigrationJourney, MigrationSelectionJourney, LegacyImportTest, legacy `LegacyMigrationExportTest` | Owner device export and import; legacy export screen driven by hand; `ereaderSettings`, `playerSettings` and `lastLibraryId` preserved but not applied (the legacy app language is applied since 28cde313); listening history and logs not exported |
 | #53 migrate downloads and reading locations | Done for audio and PDF (emulator) | MigrationJourney c, d, f | EPUB and other locations preserved, applied when #45/#47/#48 exist; a file damaged after commit is fetched from the server, not the archive; legacy downloads in user-chosen (SAF) folders not exercised on a device |
-| #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization partial**: main screens carry legacy translations in 33 languages besides English (LocalizationJourney); about 350 UI lines are still English only (see Localization); TalkBack by a person; owner signing key; install on the owner's phone |
+| #54 internal readiness | Partial | `verification/android-evidence.json`, AccessibilityJourney (ATF), `scripts/package.sh` | **Localization partial**: all UI text is in resources (579 strings) with legacy translations for 146 in 33 languages besides English, right-to-left checked in Arabic (LocalizationJourney); copy the legacy app only had in English and the 11 `core` error messages stay English (see Localization); TalkBack by a person; owner signing key; install on the owner's phone |
 | #45, #47, #48 | Deferred (after #65) | | Files and locations are preserved by migration |
 
 
@@ -53,16 +55,32 @@ Source `83826111` (838261115c03b2bb67340191249f9f493d3132a9): one full run passe
 - RED: `CastMediaTest` failed 2 of 3 against a stub that returned the phone URL. `CastJourney` failed because the player had no cast button.
 - **Pending, physical only:** a real receiver journey, covering discovery, connecting, play/pause/seek/speed on the receiver, receiver loss, and progress reaching the server while casting.
 
-## Localization (#54, partial)
+## Localization (#54, partial) in 9756f68e
 
-- `app/src/main/strings/strings.tsv` lists the app's extracted strings. Each row names the legacy key in `/strings` whose meaning matches, or `-`. `scripts/import-legacy-strings.py` writes `res/values*/strings.xml` and `res/xml/locales_config.xml` from it. Only the legacy app's own translations are used; no service is involved.
-- 87 strings are extracted: navigation, library shelves, item actions, player, search sections, sign-in fields and the main settings. 72 of them have a legacy translation. A translation is used only when its placeholders match the English ones exactly. 33 languages translate at least 80% of those, and they are offered in the system's per-app language setting (Android 13 and later). `et`, `fa`, `gu`, `hi`, `is` and `lt` have partial files and fall back to English; `lv` and `uz` have no translations.
-- Rows stay English where the legacy wording means something else: the notification's jump buttons (legacy text is the setting "Jump forwards time"), screen orientation (legacy "Lock orientation"), "Read PDF" (legacy "Read" is translated as Play in some languages), and "Mark finished", whose "Mark unfinished" partner has no legacy text. The fourth table column excludes single languages whose legacy wording is wrong in this context: Japanese "More" (多い, "many") and German "Low" (Wenig, "little").
-- Known half-translated pairs: "Playing", "Resume" and "Edit" have no legacy equivalent and show in English next to translated neighbours.
-- The script deletes generated `values-*` files before writing, so a language that loses its translations does not keep a stale file.
-- **Not yet extracted:** about 350 lines of English text remain in the UI, most of them error and explanation messages, plus dialogs, downloads, PDF reader, podcasts, groups, migration, diagnostics, statistics and accessibility descriptions. They show in English in every language.
-- RED: `LocalizationJourney` with the app language set to German did not find "Verbinden" on the sign-in screen. GREEN: Localization, Accessibility, Settings, PlayerTools and Browse journeys pass 12 of 12.
+- `app/src/main/strings/strings.tsv` lists every UI string. Each row names the legacy key in `/strings` whose meaning matches, or `-`. `scripts/import-legacy-strings.py` writes `res/values*/strings.xml` and `res/xml/locales_config.xml` from it. Only the legacy app's own translations are used; no service is involved.
+- 579 strings are extracted: navigation, library, filters and sort, item, player and its tools, cast sheet, search, sign-in and accounts, settings, downloads, PDF reader, podcasts, collections and playlists, migration, Android Auto browsing and accessibility descriptions. 146 of them have a legacy translation. 33 languages translate at least 80% of those and are offered in the system's per-app language setting (Android 13 and later). `et`, `fa`, `gu`, `hi`, `is` and `lt` have partial files and fall back to English; `lv` and `uz` have no translations.
+- Placeholders: a legacy `{0}` becomes the English placeholder of the same position and type (`%1$d` or `%1$s`), so numbers are formatted for the language. A translation is used only when its placeholders match English exactly. Counts use `<plurals>`; a language gets a translated plural only when every quantity is translated, otherwise it falls back to English.
+- Rows stay English where the legacy wording means something else, for example the notification's jump buttons, screen orientation (legacy "Lock orientation"), "Read PDF" and "Mark finished". The fourth column excludes single languages whose legacy wording is wrong in this context, for example Japanese "More" (多い), German "Low" (Wenig) and the haptic "Light", which 18 languages translate as the colour.
+- Copy that the legacy app only had in English stays English in every language (about 430 strings, for example "Sort", "Ascending", "Playing", "Resume" and most explanations). No translation is promised for them.
+- Right-to-left: layouts mirror (checked in Arabic), and icons that point use the auto-mirrored variants.
+- **Still English:** messages built in `core` (`ApiError`: server unreachable, untrusted certificate, session no longer accepted, HTTP failures, 11 texts) are shown as is in about 20 failure paths, and diagnostics log entries are English by design. A few texts are resolved once and kept (a failed download's error, the playback save error, import issue details), so they stay in the previous language after the app language changes until they are produced again.
+- RED: with Arabic, `LocalizationJourney.libraryControlsReadRightToLeftInArabic` found the mirrored top bar but timed out waiting for the Arabic sort option (`artifacts/red-l10n-392b95e2/`). GREEN: Localization and Migration journeys 9 of 9 at 28cde313.
 
+## Legacy app language (#52) in 28cde313
+
+- The `lang` preference the legacy exporter copies is applied once with the other legacy settings: on Android 13 and later, when the app offers that language and the person has not already chosen an app language. Legacy codes map as in the importer (`no` to `nb`, `pt-br` to `pt-BR`, `vi-vn` to `vi`, `zh-cn` to `zh-CN`); `en-us` is the legacy default and changes nothing.
+- RED: `MigrationJourney.g_theLanguageChosenInTheLegacyAppCarriesOver`, importing the synthetic export with `lang: "de"`, stayed English ("Verbinden" never appeared). GREEN after the change.
+
+## Journey failures, session close, writes and the bookmark signal (f256272b)
+
+- Failure-only capture (942ece9c, a51b0dc5, e3627918): a failed wait, playback-position wait or browser step saves a screenshot to `/data/local/tmp/abs-journey-failures` and logs the Compose semantics tree, the window hierarchy (browser steps), the app's media session state and the last 40 fixture requests with their status (tag `JourneyFailure`). `verify-journeys.sh` pulls them with the fixture logs to `app/build/outputs/journey-failures` only when a failure happened.
+- Session close (392b95e2, corrected in 2efb7f3d): a stream close sent over a pooled keep-alive connection that the server was closing as idle failed as Offline, so the session stayed open (`PlaybackJourney` a, line 59) or the next listening went to a second session (line 62). In six exact-order runs (Cast, Playback, PlayerTools) before the change, PlaybackJourney a failed 4 times; after it, 0 of 6. Closing is idempotent (404 means closed), so only the close request itself is sent once more, with the same token. Root's review found that the first version repeated the whole operation, including a token refresh whose answer was lost, which would send the already replaced refresh token. `ApiClientTest.aCloseWhoseTokenRefreshLosesItsAnswerDoesNotRefreshAgain` failed on that version (2 refreshes) and passes at 2efb7f3d. A close that times out on a slow server is also sent again, so it can take up to about 60 s before it is deferred.
+- Chrome sign-in page (e3627918): the full run at 2efb7f3d passed 87 of 88 (journeys 82 of 83, `CastHandoverTest` 5 of 5). `AccountsJourney` c timed out waiting for the local OpenID page (line 77; lines 64 and 94 are frames of the same stack). That run's `summary.txt` is wrong: its totals came out empty and it lists those three frames. `summary-from-xml.txt` is rebuilt from the run's own XML; `run.log` is unchanged. Its browser screenshot went to the app's cache and was lost to the next test's reset.
+  - RED, harness unchanged except that browser failures now go through the capture: two runs in the full run's class order (Accessibility, Accounts) both failed. In the first, method a timed out at "Approve sign-in" and b and c failed after it because they build on a's accounts. The second failed exactly as the full run did (c, line 77). Both captures show the page drawn ("Local OpenID", "Approve sign-in" on screen) at the correct authorize address with fresh state and PKCE, while the window hierarchy holds only Chrome's toolbar and none of the page. Chrome logged that no accessibility service was enabled. The steps look the page up by its text, so they could not find it. Results: `artifacts/accounts-loop-2efb7f3d/` and `artifacts/accounts-loop-2efb7f3d-unchanged/`.
+  - Fix: `verify-journeys.sh` gives Chrome `--force-renderer-accessibility` (read from `/data/local/tmp/chrome-command-line` while Chrome is the debug app) and clears both afterwards. 3 of 3 runs passed (`artifacts/accounts-loop-chrome-a11y/`). No product cause.
+- Writes on idle connections (f256272b): the full run at e3627918 passed 87 of 88 (journeys 82 of 83, `CastHandoverTest` 5 of 5; `summary-from-xml.txt`, since that run's summary total is wrong). `PlaybackJourney` a reported two listening sessions instead of one (the assertion at the end of the method). The app logged "Listening kept for retry: Offline": a listening sync failed, so the next listening went to a new session, as designed for an unanswered write. Cause: writes reused pooled keep-alive connections. OkHttp checks an idle pooled connection for a close only after 10 s, while Node servers close idle connections after 5 s (checked against the fixture through `adb reverse`: Node closed the socket after about 6 s and a request sent on it after that got no answer). A write sent in that window went out on a closed connection and, as writes are never resent, failed. Writes now open a new connection each time. Their bodies are one-shot, so OkHttp still never resends a write once sending began, but a connection that cannot be made now tries the server's next address, which `retryOnConnectionFailure(false)` had also prevented. Both failed at e3627918 and pass since: `ApiClientTest.aWriteIsNotSentOnAConnectionTheServerClosedWhileIdle` (Offline, nothing reached the server) and `aWriteReachesTheServerWhenItsFirstAddressRefusesTheConnection` (an IPv6 address that refuses, then IPv4). Only the write client changed: the token refresh still goes through the ordinary client with OkHttp's automatic retry, as before, so OkHttp itself may resend a refresh whose connection failed (unchanged limit). Each write now costs a new connection, and with TLS a new handshake. Listening is published every 15 s while playing, longer than a Node server keeps an idle connection, so against such a server this adds little; the window was hit when another request had used the connection 5 to 10 s before the write.
+- **Bookmark signal still open.** `PlayerToolsJourney` a failed in the full and affected runs at 83826111. It has not failed since: 6 exact-order runs (Cast, Playback, PlayerTools) before the close change, 6 after it and 6 at f256272b, the interrupted run at 28cde313 (19 of 88 done) and the full runs at 2efb7f3d and e3627918 (PlayerTools 2 of 2 each). Its cause is unknown, and the close change is not claimed to fix it. With the capture in place, a further failure records the screen, sheet semantics and the bookmark requests.
+- One `CastJourney` timeout (line 38, phone position not advancing after closing the cast sheet) happened once in those 12 targeted runs, before the playback-position wait was captured. The emulator's audio output went to standby right after the sheet closed. Not reproduced since; cause unknown.
 
 ## Review blockers at 25f5116e, fixed in 2b3227dc
 
@@ -308,7 +326,7 @@ The import works in these stages:
 - anything the upstream app never sent to the server stays in that app. Open it online once first so it sends what it holds.
 
 **Exported but not applied:**
-- `playerSettings` and `lang` (the preview is English only, see Localization).
+- `playerSettings`.
 - `lastLibraryId`: the preview picks the library per account at sign-in.
 - EPUB and other non-page locations.
 - Reader settings.
@@ -364,15 +382,12 @@ Not covered:
 - large font scales;
 - the reader and import screens.
 
-**Localization: not met.**
-- The legacy app ships 38 locales (`strings/*.json`).
-- The native preview is English only, and its strings are written inline in Compose.
-- Moving them to resources and carrying over the legacy translations is required before replacement.
+**Localization: partial.** UI text is in resources with the legacy translations (see Localization). Messages built in `core` are still English.
 
 ## Known limits
 
 - Listening that is held in memory because storage refuses writes is lost if the process dies before storage recovers. The player pauses and warns as soon as a write fails, which bounds the loss to the listening already played.
-- `PlayerToolsJourney.a` (`delete-bookmark-0`) has flaked once in a full run. The fixture reset in 5068c1d3 removes the cross-class bookmark state behind the `bookmarks-empty` failure.
+- `PlayerToolsJourney.a` failed in two runs at 83826111 and has not failed since; cause unknown (see Journey failures).
 - While a discard is pending (offline, or listening not yet sent), the title does not play and shows "Discarding progress" until the server confirms.
 - Physical-only gates are not yet exercised:
   - Bluetooth, lock screen and Android Auto controls, and a physical car or Desktop Head Unit.
