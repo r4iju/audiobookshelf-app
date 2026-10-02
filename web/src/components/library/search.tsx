@@ -3,7 +3,7 @@
 import { Search as SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { CardGrid } from "@/components/media/item-card";
 import { QueryState } from "@/components/ui/query-state";
 import { EmptyState } from "@/components/ui/status";
@@ -21,6 +21,8 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
   const { library, shape } = useLibrary(libraryId);
   const results = useSearch(libraryId, q, limit);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // The browser timer must not outlive the search screen.
+  useEffect(() => () => clearTimeout(timer.current), []);
   // How many of each kind showed when More was pressed: the first new entry, in page order, takes the keyboard's
   // place instead of losing it.
   const revealedFrom = useRef<Record<ResultKind, number> | null>(null);
@@ -34,7 +36,10 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
   const onChange = (value: string) => {
     revealedFrom.current = null;
     clearTimeout(timer.current);
+    const address = window.location.pathname;
     timer.current = setTimeout(() => {
+      // Navigation updates the address before Next finishes removing this screen.
+      if (window.location.pathname !== address) return;
       router.replace(value.trim() ? `${pathname}?${new URLSearchParams({ q: value })}` : pathname);
     }, 250);
   };

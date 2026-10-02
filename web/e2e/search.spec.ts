@@ -1,6 +1,24 @@
 import { expect, test } from "@playwright/test";
 import { accounts, qa, serverApi, signIn } from "./qa";
 
+test("leaving search cancels a pending typed query", async ({ page }) => {
+  await signIn(page);
+  await page.goto(`/library/${qa.libraries.books}/search?q=catalog`);
+  await expect(page.getByRole("list", { name: "Search results" }).getByRole("listitem")).toHaveCount(12);
+  await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await page.getByRole("searchbox", { name: "Search" }).fill("salt");
+  await page
+    .getByRole("navigation", { name: "Main", exact: true })
+    .getByRole("link", { name: "Library", exact: true })
+    .click();
+  await expect(page).toHaveURL(new RegExp(`/library/${qa.libraries.books}/items$`));
+  await page.clock.runFor(500);
+  await page.clock.resume();
+  await expect(page.getByRole("searchbox", { name: "Search" })).toBeHidden();
+  await expect(page).toHaveURL(new RegExp(`/library/${qa.libraries.books}/items$`));
+});
+
 // The synthetic library's "Catalog Volume" books outnumber the server's default of 12 search results.
 
 test("a search matching more books than the first results can show them all, and keeps them on return", async ({
