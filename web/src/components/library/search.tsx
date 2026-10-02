@@ -128,7 +128,7 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                 )}
                 {data.more ? (
                   <Link
-                    href={`${pathname}?${new URLSearchParams({ q, limit: String(data.limit * 4) })}`}
+                    href={`${pathname}?${new URLSearchParams({ q, limit: String(limit * 4) })}`}
                     replace
                     scroll={false}
                     className="inline-flex min-h-11 items-center self-center rounded-full bg-surface-2 px-5 text-sm font-medium hover:bg-surface-3 focus-ring"
