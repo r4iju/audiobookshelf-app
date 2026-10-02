@@ -239,7 +239,7 @@ function NewPodcastForm({
         {path ? t("WebPodcastSavedTo", path) : t("WebNoPodcastFolder")}
       </p>
       <Toggle label={t("LabelAutoDownloadEpisodes")} name="autoDownloadEpisodes" />
-      <p className="text-sm text-muted">{t("LabelNumEpisodes", feed.podcast.episodes.length)}</p>
+      <p className="text-sm text-muted">{t("WebEpisodesCount", feed.podcast.episodes.length)}</p>
       {create.error ? <Alert>{errorMessage(t, create.error)}</Alert> : null}
       <div className="flex justify-end">
         <Button type="submit" variant="primary" disabled={!path || create.isPending}>

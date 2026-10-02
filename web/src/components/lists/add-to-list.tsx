@@ -137,7 +137,7 @@ export function AddToPlaylistDialog({
       <QueryState query={playlists}>
         {(data) => (
           <ListChooser
-            newLabel={t("HeaderNewPlaylist")}
+            newLabel={t("WebNewPlaylist")}
             emptyLabel={t("MessageNoUserPlaylists")}
             choices={data.map((playlist) => ({
               id: playlist.id,

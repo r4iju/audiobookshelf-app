@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog, Dialog } from "@/components/ui/dialog";
 import { TextField } from "@/components/ui/field";
+import { QueryState } from "@/components/ui/query-state";
 import { Alert } from "@/components/ui/status";
 import { useI18n } from "@/i18n/i18n";
 import { formatClock } from "@/lib/abs/media";
@@ -28,9 +29,6 @@ export function BookmarksDialog({
   const remove = useDeleteBookmark();
   const [renaming, setRenaming] = useState<Bookmark | null>(null);
   const [removing, setRemoving] = useState<Bookmark | null>(null);
-  const bookmarks = (me.data?.bookmarks ?? [])
-    .filter((bookmark) => bookmark.libraryItemId === itemId)
-    .sort((a, b) => a.time - b.time);
 
   return (
     <>
@@ -63,43 +61,57 @@ export function BookmarksDialog({
             </div>
           </form>
         ) : (
-          <>
-            {bookmarks.length ? (
-              <ul className="flex max-h-[60vh] flex-col gap-1 overflow-y-auto">
-                {bookmarks.map((bookmark) => (
-                  <li key={bookmark.time} className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => onPick(bookmark.time)}
-                      className="flex min-h-11 min-w-0 flex-1 flex-col items-start rounded-xl px-3 py-2 text-start hover:bg-surface-2 focus-ring"
-                    >
-                      <span className="w-full truncate text-sm font-medium">{bookmark.title}</span>
-                      <span className="text-xs text-muted tabular-nums">{formatClock(bookmark.time)}</span>
-                    </button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      aria-label={t("WebRenameBookmark", bookmark.title)}
-                      onClick={() => setRenaming(bookmark)}
-                    >
-                      <Pencil aria-hidden className="size-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      aria-label={`${t("ButtonRemove")} ${bookmark.title}`}
-                      onClick={() => setRemoving(bookmark)}
-                    >
-                      <Trash2 aria-hidden className="size-4" />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="py-6 text-center text-sm text-muted">{t("MessageNoBookmarks")}</p>
-            )}
-            {remove.isError ? <Alert>{t("ToastBookmarkRemoveFailed")}</Alert> : null}
-          </>
+          <QueryState query={me}>
+            {(data) => {
+              const bookmarks = data.bookmarks
+                .filter((bookmark) => bookmark.libraryItemId === itemId)
+                .sort((a, b) => a.time - b.time);
+              return (
+                <>
+                  {bookmarks.length ? (
+                    <ul className="flex max-h-[60vh] flex-col gap-1 overflow-y-auto">
+                      {bookmarks.map((bookmark) => (
+                        <li key={bookmark.time} className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => onPick(bookmark.time)}
+                            className="flex min-h-11 min-w-0 flex-1 flex-col items-start rounded-xl px-3 py-2 text-start hover:bg-surface-2 focus-ring"
+                          >
+                            <span className="w-full truncate text-sm font-medium">{bookmark.title}</span>
+                            <span className="text-xs text-muted tabular-nums">
+                              {formatClock(bookmark.time)}
+                            </span>
+                          </button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            aria-label={t("WebRenameBookmark", bookmark.title)}
+                            onClick={() => {
+                              update.reset();
+                              setRenaming(bookmark);
+                            }}
+                          >
+                            <Pencil aria-hidden className="size-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            aria-label={t("WebRemoveBookmark", bookmark.title)}
+                            onClick={() => setRemoving(bookmark)}
+                          >
+                            <Trash2 aria-hidden className="size-4" />
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="py-6 text-center text-sm text-muted">{t("MessageNoBookmarks")}</p>
+                  )}
+                  {remove.isError ? <Alert>{t("ToastBookmarkRemoveFailed")}</Alert> : null}
+                </>
+              );
+            }}
+          </QueryState>
         )}
       </Dialog>
       <ConfirmDialog

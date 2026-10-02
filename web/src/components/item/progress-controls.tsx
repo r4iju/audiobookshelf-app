@@ -94,7 +94,7 @@ export function ProgressControls({
       <ConfirmDialog
         open={confirming}
         title={t("MessageDiscardProgress")}
-        body={t("WebConfirm")}
+        body={t("MessageConfirmDiscardProgress")}
         confirmLabel={t("MessageDiscardProgress")}
         cancelLabel={t("ButtonCancel")}
         busy={discard.isPending}

@@ -299,26 +299,30 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               </Button>
             </div>
           ) : null}
-          <Button
-            size="sm"
-            disabled={createBookmark.isPending}
-            onClick={() =>
-              createBookmark.mutate({
-                itemId: media.itemId,
-                time: currentTime,
-                title: chapter
-                  ? `${chapter.title} ${formatClock(currentTime - chapter.start)}`
-                  : formatClock(currentTime),
-              })
-            }
-          >
-            <Bookmark aria-hidden className="size-4" />
-            {t("ButtonCreateBookmark")}
-          </Button>
-          <Button size="sm" onClick={() => setBookmarksOpen(true)}>
-            <BookmarkCheck aria-hidden className="size-4" />
-            {t("LabelYourBookmarks")}
-          </Button>
+          {media.episodeId ? null : (
+            <>
+              <Button
+                size="sm"
+                disabled={createBookmark.isPending}
+                onClick={() =>
+                  createBookmark.mutate({
+                    itemId: media.itemId,
+                    time: currentTime,
+                    title: chapter
+                      ? `${chapter.title} ${formatClock(currentTime - chapter.start)}`
+                      : formatClock(currentTime),
+                  })
+                }
+              >
+                <Bookmark aria-hidden className="size-4" />
+                {t("ButtonCreateBookmark")}
+              </Button>
+              <Button size="sm" onClick={() => setBookmarksOpen(true)}>
+                <BookmarkCheck aria-hidden className="size-4" />
+                {t("LabelYourBookmarks")}
+              </Button>
+            </>
+          )}
           {createBookmark.isSuccess ? (
             <span role="status" className="text-xs text-muted">
               {t("WebBookmarkAdded")}
