@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import { type ComponentProps, useId } from "react";
 
 export function TextField({
@@ -27,26 +28,46 @@ export function TextField({
   );
 }
 
+type SwitchSize = "md" | "sm";
+
+const tracks: Record<SwitchSize, string> = { md: "h-6 w-10", sm: "h-5 w-8" };
+const thumbs: Record<SwitchSize, string> = {
+  md: "size-4 peer-checked:translate-x-4 rtl:peer-checked:-translate-x-4",
+  sm: "size-3 peer-checked:translate-x-3 rtl:peer-checked:-translate-x-3",
+};
+
+/** The browser's own input keeps the label, Space, form and disabled behaviour; only its drawing is the app's. */
+function Switch({ size, ...props }: Omit<ComponentProps<"input">, "type" | "size"> & { size: SwitchSize }) {
+  return (
+    <span className="relative inline-flex shrink-0">
+      <input
+        type="checkbox"
+        role="switch"
+        aria-checked={props.checked}
+        className={`peer cursor-pointer appearance-none rounded-full border border-line bg-surface-3 transition-colors checked:border-accent-strong checked:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-50 focus-ring ${tracks[size]}`}
+        {...props}
+      />
+      <span
+        aria-hidden
+        className={`pointer-events-none absolute start-1 top-1 rounded-full bg-muted shadow-sm transition-transform peer-checked:bg-white peer-disabled:opacity-50 ${thumbs[size]}`}
+      />
+    </span>
+  );
+}
+
 export function Toggle({
   label,
   help,
   ...props
-}: Omit<ComponentProps<"input">, "type"> & { label: string; help?: string }) {
+}: Omit<ComponentProps<"input">, "type" | "size"> & { label: string; help?: string }) {
   const id = useId();
   return (
     <div className="flex items-start justify-between gap-4 py-2">
-      <label htmlFor={id} className="flex flex-col">
+      <label htmlFor={id} className="flex cursor-pointer flex-col">
         <span className="text-sm font-medium">{label}</span>
         {help ? <span className="text-xs text-muted">{help}</span> : null}
       </label>
-      <input
-        id={id}
-        type="checkbox"
-        role="switch"
-        aria-checked={props.checked}
-        className="mt-1 size-5 shrink-0 accent-[var(--accent-strong)] focus-ring"
-        {...props}
-      />
+      <Switch id={id} size="md" {...props} />
     </div>
   );
 }
@@ -62,16 +83,27 @@ export function InlineToggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex min-h-9 items-center gap-2 text-xs font-medium">
-      <input
-        type="checkbox"
-        role="switch"
-        aria-checked={checked}
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-        className="size-4 accent-[var(--accent-strong)] focus-ring"
-      />
+    <label className="flex min-h-9 cursor-pointer items-center gap-2 text-xs font-medium">
+      <Switch size="sm" checked={checked} onChange={(event) => onChange(event.target.checked)} />
       {label}
     </label>
+  );
+}
+
+/** A choice among many, such as episodes to download, drawn in the app's colours rather than the browser's. */
+export function Checkbox({ className = "", ...props }: Omit<ComponentProps<"input">, "type">) {
+  return (
+    <span className={`relative inline-flex size-5 shrink-0 ${className}`}>
+      <input
+        type="checkbox"
+        className="peer size-5 cursor-pointer appearance-none rounded-md border-2 border-muted bg-surface transition-colors checked:border-accent-strong checked:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-40 focus-ring"
+        {...props}
+      />
+      <Check
+        aria-hidden
+        strokeWidth={3}
+        className="pointer-events-none absolute inset-0.5 size-4 text-accent-fg opacity-0 peer-checked:opacity-100"
+      />
+    </span>
   );
 }

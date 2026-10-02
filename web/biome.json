@@ -9,7 +9,13 @@
       "recommended": true,
       "suspicious": { "noUnknownAtRules": "off" },
       "complexity": { "noImportantStyles": "off" },
-      "performance": { "noImgElement": "off" }
+      "performance": { "noImgElement": "off" },
+      "a11y": {
+        "noLabelWithoutControl": {
+          "level": "error",
+          "options": { "inputComponents": ["Checkbox", "Switch"] }
+        }
+      }
     }
   },
   "css": { "parser": { "tailwindDirectives": true } },

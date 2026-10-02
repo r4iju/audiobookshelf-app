@@ -9,6 +9,7 @@ import { AddToPlaylistDialog } from "@/components/lists/add-to-list";
 import { ProgressBar } from "@/components/media/cover";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog, Dialog } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/field";
 import { QueryState } from "@/components/ui/query-state";
 import { SelectField } from "@/components/ui/select";
 import { EmptyState } from "@/components/ui/status";
@@ -308,14 +309,13 @@ function FindEpisodesDialog({
               <ul className="flex max-h-80 flex-col gap-1 overflow-y-auto">
                 {offered.map(({ episode, downloaded }, index) => (
                   <li key={episode.enclosure?.url ?? index}>
-                    <label className="flex items-start gap-3 rounded-xl px-2 py-2 hover:bg-surface-2 has-disabled:opacity-60">
-                      <input
-                        type="checkbox"
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-surface-2 has-disabled:cursor-not-allowed has-disabled:opacity-60">
+                      <Checkbox
                         name="episode"
                         value={index}
                         disabled={downloaded || !episode.enclosure}
                         defaultChecked={false}
-                        className="mt-1 size-4 accent-[var(--accent-strong)]"
+                        className="mt-0.5"
                       />
                       <span className="flex min-w-0 flex-col">
                         <span className="text-sm font-medium break-words">{episode.title}</span>
