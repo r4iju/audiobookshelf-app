@@ -164,6 +164,9 @@ object Failures {
                 .onSuccess { tree -> tree.lines().forEach { android.util.Log.e(LOG, "semantics $it") } }
                 .onFailure { android.util.Log.e(LOG, "no semantics: $it") }
         }
+        if (compose == null) runCatching { java.io.ByteArrayOutputStream().also(Device.device::dumpWindowHierarchy).toString() }
+            .onSuccess { tree -> tree.replace("><", ">\n<").lines().filter { "text=\"\"" !in it || "content-desc=\"\"" !in it }.forEach { android.util.Log.e(LOG, "window $it") } }
+            .onFailure { android.util.Log.e(LOG, "no window hierarchy: $it") }
         runCatching { Device.device.executeShellCommand("dumpsys media_session") }
             .onSuccess { dump -> dump.lines().filter { "nativepreview" in it || "state=PlaybackState" in it }.forEach { android.util.Log.e(LOG, "media $it") } }
             .onFailure { android.util.Log.e(LOG, "no media sessions: $it") }
@@ -205,11 +208,7 @@ object Browser {
         fail("Browser never showed \"$link\"")
     }
 
-    private fun fail(message: String): Nothing {
-        val shot = File(InstrumentationRegistry.getInstrumentation().targetContext.externalCacheDir, "browser-failure.png")
-        device.takeScreenshot(shot)
-        throw AssertionError("$message (screenshot: ${shot.absolutePath})")
-    }
+    private fun fail(message: String): Nothing = Failures.capturing(null, "browser: $message") { throw AssertionError(message) }
 
     private fun dismissFirstRun() {
         for (label in firstRun) device.findObject(androidx.test.uiautomator.By.text(label))?.let { it.click(); return }

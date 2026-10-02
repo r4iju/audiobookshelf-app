@@ -28,6 +28,7 @@ cleanup() {
     fi
     for pid in "${pids[@]:-}"; do [[ -n "$pid" ]] && kill "$pid" 2>/dev/null || true; done
     for port in 28765 28766 28767; do "$adb" -s "$serial" reverse --remove tcp:$port >/dev/null 2>&1 || true; done
+    "$adb" -s "$serial" shell 'am clear-debug-app; rm -f /data/local/tmp/chrome-command-line' >/dev/null 2>&1 || true
     rm -rf "$fixture_dir"
 }
 trap 'status=$?; cleanup; exit $status' EXIT
@@ -72,6 +73,11 @@ rm -rf "$failures_dir"
 "$adb" -s "$serial" shell cmd notification set_dnd priority >/dev/null 2>&1 || true
 # Chrome's own notification prompt can cover the sign-in page during browser journeys.
 "$adb" -s "$serial" shell pm grant com.android.chrome android.permission.POST_NOTIFICATIONS >/dev/null 2>&1 || true
+# Without a screen reader Chrome may leave page content out of the accessibility tree, so the sign-in page
+# shows but its link cannot be found. The flag file is read only while Chrome is the debug app.
+"$adb" -s "$serial" shell 'echo "_ --force-renderer-accessibility" > /data/local/tmp/chrome-command-line' >/dev/null 2>&1 || true
+"$adb" -s "$serial" shell am set-debug-app --persistent com.android.chrome >/dev/null 2>&1 || true
+"$adb" -s "$serial" shell am force-stop com.android.chrome >/dev/null 2>&1 || true
 
 args=()
 if (( $# > 0 )); then
