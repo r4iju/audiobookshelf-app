@@ -95,6 +95,8 @@ interface PlayerStore {
   onTime: (time: number) => void;
   onPlaying: () => void;
   onPaused: () => void;
+  /** A file of the book ended; `next` is where the following file starts, or null after the last. */
+  onFileEnded: (next: number | null) => void;
   onEnded: () => void;
   onMediaError: (detail: string) => Promise<void>;
   onAutoplayBlocked: () => void;
@@ -396,6 +398,16 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
       if (get().player.phase === "active") set({ pausedAt: get().pausedAt ?? Date.now() });
       update((player) => (player.status === "loading" ? {} : { status: "paused" }));
       report(true);
+    },
+    onFileEnded: (next) => {
+      if (next === null) return get().onEnded();
+      const { sleep } = get();
+      // Time is reported only every quarter second or so, so a chapter ending with its file may never be seen ending.
+      const stop = sleep.kind === "chapter-end" && next >= sleep.at - 0.3;
+      if (stop) set({ sleep: { kind: "off" } });
+      get().seek(next);
+      if (stop) get().pause();
+      else void get().resume();
     },
     onEnded: () => {
       tick(false);

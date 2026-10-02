@@ -197,12 +197,8 @@ export function AudioEngine() {
         const state = store().player;
         const current = loaded.current;
         if (state.phase !== "active" || !state.source || !current) return;
-        const next = state.source.tracks[current.index + 1];
         // The element pauses at the end of each file; the book continues with the next one.
-        if (next) {
-          store().seek(next.startOffset);
-          void store().resume();
-        } else store().onEnded();
+        store().onFileEnded(state.source.tracks[current.index + 1]?.startOffset ?? null);
       }}
       onError={(event) => {
         const error = event.currentTarget.error;

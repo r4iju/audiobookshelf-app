@@ -246,3 +246,29 @@ describe("starting over after a discard", () => {
     expect(a.closed).toEqual(["/api/session/s-old/close"]);
   });
 });
+
+describe("the sleep timer at the end of a chapter", () => {
+  it("stops where the chapter ends with its file, though no time was reported at the very end", () => {
+    const chapters = [
+      { id: 0, start: 0, end: 30, title: "Arrival" },
+      { id: 1, start: 30, end: 60, title: "Crossing" },
+    ];
+    const tracks = [
+      { url: "/1.mp3", startOffset: 0, duration: 30, hls: false },
+      { url: "/2.mp3", startOffset: 30, duration: 30, hls: false },
+    ];
+    const at = playing("book-x", "s-1", 29.6);
+    usePlayerStore.setState({
+      player: { ...at, media: { ...at.media, chapters }, source: { ...at.source, tracks } },
+      sleep: { kind: "chapter-end", at: 30 },
+    });
+
+    usePlayerStore.getState().onFileEnded(30);
+
+    const { player, sleep } = usePlayerStore.getState();
+    expect({ status: player.phase === "active" && player.status, sleep }).toEqual({
+      status: "paused",
+      sleep: { kind: "off" },
+    });
+  });
+});
