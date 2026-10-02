@@ -163,7 +163,7 @@ fun ItemDetail(
             if (chapters.isNotEmpty()) {
                 item { Text(stringResource(R.string.chapters), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp).semantics { heading() }) }
                 itemsIndexed(chapters) { index, chapter ->
-                    Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceContainer) {
+                    Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                         Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.testTag("chapter-$index").padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(chapter.title.ifBlank { stringResource(R.string.item_chapter_number, index + 1) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                             Text(formatClock(chapter.start), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
