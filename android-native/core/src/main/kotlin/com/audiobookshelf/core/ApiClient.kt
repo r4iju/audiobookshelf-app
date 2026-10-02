@@ -141,13 +141,16 @@ class ApiClient(
     /** Ordinary stream sessions close with an empty body; listening is published separately through [syncLocal]. */
     /**
      * Closing is idempotent: a session the server already closed answers 404. So a close whose connection
-     * dropped, as a pooled connection the server is closing as idle does, is sent once more.
+     * dropped, as a pooled connection the server is closing as idle does, is sent once more with the same
+     * token. Only the close itself: a lost token refresh is not repeated, because the server already
+     * replaced the refresh token it was sent.
      */
     suspend fun closeSession(sessionId: String) {
-        suspend fun close() {
-            try { raw("api/session/$sessionId/close", "POST", JsonObject(emptyMap())) } catch (error: ApiError.Http) { if (error.status != 404) throw error }
+        try {
+            execute("api/session/$sessionId/close", "POST", emptyList(), JsonObject(emptyMap()), resendWhenDropped = true)
+        } catch (error: ApiError.Http) {
+            if (error.status != 404) throw error
         }
-        try { close() } catch (_: ApiError.Offline) { close() }
     }
 
     /**
@@ -251,12 +254,13 @@ class ApiClient(
     private fun <T> decode(value: String, serializer: KSerializer<T>): T =
         runCatching { AbsJson.decodeFromString(serializer, value) }.getOrElse { throw ApiError.InvalidResponse(it) }
 
-    private suspend fun execute(path: String, method: String, query: List<Pair<String, String>>, body: JsonElement?): String =
+    private suspend fun execute(path: String, method: String, query: List<Pair<String, String>>, body: JsonElement?, resendWhenDropped: Boolean = false): String =
         authorized(path) { token ->
             val payload = body?.toString()?.toRequestBody(JsonType)
             val request = Request.Builder().url(address.url(path, query)).header("Authorization", "Bearer $token")
                 .method(method, payload ?: if (method == "GET" || method == "DELETE") null else ByteArray(0).toRequestBody(JsonType)).build()
-            (if (method == "GET") http else writes).execute(request)
+            val client = if (method == "GET") http else writes
+            try { client.execute(request) } catch (dropped: ApiError.Offline) { if (resendWhenDropped) client.execute(request) else throw dropped }
         }
 
     /**

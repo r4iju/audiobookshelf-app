@@ -109,9 +109,11 @@ class ApiClientTest {
     @Test
     fun closingASessionIsSentAgainWhenItsConnectionDrops() = runBlocking {
         val closes = AtomicInteger()
+        val sent = CopyOnWriteArrayList<String>()
         server.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse {
                 if (request.method == "GET") return MockResponse().setBody("""{"libraries":[]}""")
+                sent += "${request.method} ${request.path} ${request.getHeader("Authorization")} ${request.body.readUtf8()}"
                 // A pooled connection the server is closing as idle drops the first close.
                 return if (closes.incrementAndGet() == 1) MockResponse().setSocketPolicy(okhttp3.mockwebserver.SocketPolicy.DISCONNECT_AFTER_REQUEST)
                 else MockResponse().setResponseCode(404)
@@ -123,6 +125,31 @@ class ApiClientTest {
         client.libraries()
         val outcome = runCatching { client.closeSession("s1") }
         assertTrue("A dropped close is sent again, and a session the first attempt closed counts as closed, got $outcome", outcome.isSuccess)
-        assertEquals(2, closes.get())
+        assertEquals(List(2) { "POST /abs/api/session/s1/close Bearer fresh {}" }, sent)
+    }
+
+    @Test
+    fun aCloseWhoseTokenRefreshLosesItsAnswerDoesNotRefreshAgain() = runBlocking {
+        val refreshes = AtomicInteger()
+        val closes = AtomicInteger()
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                if (request.path == "/abs/auth/refresh") {
+                    // The server rotates the refresh token before answering; the answer is lost.
+                    refreshes.incrementAndGet()
+                    return MockResponse().setSocketPolicy(okhttp3.mockwebserver.SocketPolicy.DISCONNECT_AFTER_REQUEST)
+                }
+                closes.incrementAndGet()
+                return MockResponse().setResponseCode(200)
+            }
+        }
+        server.start()
+        val address = ServerAddress.parse(server.url("/abs").toString())
+        val expired = "e30.${with(okio.ByteString) { """{"exp":1}""".encodeUtf8() }.base64Url().trimEnd('=')}.signature"
+        val client = ApiClient(OkHttpClient(), Credentials(address.canonical, "u1", "qa", expired, "refresh"), { _, _ -> }, DeviceInfo("device"))
+        val outcome = runCatching { client.closeSession("s1") }
+        assertTrue("A lost refresh answer is Offline, not a sign-in, got $outcome", outcome.exceptionOrNull() is ApiError.Offline)
+        assertEquals("The spent refresh token is not sent again", 1, refreshes.get())
+        assertEquals("No close was sent with the expired token", 0, closes.get())
     }
 }
