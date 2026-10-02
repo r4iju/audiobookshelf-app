@@ -1,5 +1,12 @@
 # Apple book progress and catalog layout
 
+## CURRENT (2026-10-02)
+
+Client source `d3152a5d3bc0eb7c23bf77e835088d650df514a3` includes merged localization PR #121.
+All five affected native cases passed once on the unchanged `cd703e87` packaged server, including offline
+finish publication and migration idempotence. Evidence and separate owner/hardware gates are recorded in [Apple packaged-server QA](APPLE-REAL-SERVER-QA.md#current-2026-10-02).
+Historical failures below remain evidence for their original source and server, not the current image.
+
 This is an incremental native preview slice, not Apple readiness or completed preference parity.
 
 ## Book completion

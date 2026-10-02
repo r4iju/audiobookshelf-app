@@ -1,5 +1,21 @@
 # Apple TV diagnostics, accessibility and localization
 
+## CURRENT (2026-10-02)
+
+Client source `d3152a5d3bc0eb7c23bf77e835088d650df514a3` includes merged localization PR #121.
+The affected native real-server gate is recorded in [Apple packaged-server QA](APPLE-REAL-SERVER-QA.md#current-2026-10-02).
+Historical failures below remain evidence for their original source and server, not the current image.
+
+TV fixes in PR #120 (`c36f3c13`) are installed and owner-confirmed: switching books keeps the newly
+selected book in Now Playing, and progress saving no longer raises the Application Support permission error.
+Scoped issues #112 and #114 are closed. The working `c36f3c13` TV build remains installed; the signed
+`d3152a5d` TV candidate is retained and intentionally not installed. The signed `d3152a5d` iPhone/iPad
+packages are installed without launch. Package and installation evidence is retained from the delivery work,
+not repeated here. Physical routes, remote/accessibility acceptance beyond the two confirmed reports,
+owner-library/migration acceptance, native-speaker review and server promotion remain separate gates.
+
+## Historical readiness slice
+
 Stories 52, 53 and 54 for the TV (`verification/parity.json`). The audit in `APPLE-PARITY-GAPS.md` found no TV evidence
 for them. This slice adds them where they apply to a remote-only, streaming-only client, and records what does not apply.
 
