@@ -2778,6 +2778,23 @@
       "preservation": "Keep legacy document files, associations, settings and locations intact; verify opening, navigation and resumed reading alongside audio.",
       "browserScope": "unchanged",
       "tvScope": "audio/podcast focused; no new document reader requirement"
+    },
+    {
+      "date": "2026-10-03",
+      "approvedBy": "owner",
+      "kind": "simulator-first-acceptance",
+      "platforms": [
+        "apple-mobile",
+        "android",
+        "tv",
+        "browser"
+      ],
+      "requiredVerification": "simulators/browser plus isolated local server, production-shaped synthetic data",
+      "physicalVerification": "optional when already available; deferred and not blocking current milestone",
+      "humanDevicePrerequisites": "Physical routes, receivers, vehicles, assistive walkthroughs and on-device owner-migration validation remain deferred physical evidence if hardware is unavailable.",
+      "requiredSoftware": "all applicable features, all native reader formats, migration/recovery correctness, accessibility/localization behavior, local signing/builds and internal delivery",
+      "destructiveCutover": "not implicitly authorized",
+      "notWaived": "Software migration correctness, owner-data preservation, translation quality and cutover safety; no claim of native-speaker or real-owner approval from simulations."
     }
   ]
 }
