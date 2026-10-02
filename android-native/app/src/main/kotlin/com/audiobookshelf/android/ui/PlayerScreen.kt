@@ -55,6 +55,9 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -86,6 +89,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.audiobookshelf.android.graph
 import com.audiobookshelf.android.playback.PlaySource
+import com.audiobookshelf.android.playback.PlaybackEngine
 import com.audiobookshelf.android.playback.PlayerState
 import com.audiobookshelf.android.playback.itemKey
 import com.audiobookshelf.core.Chapter
@@ -101,7 +105,6 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
     val now = state.now
     val artworkFraction = 0.65f / LocalDensity.current.fontScale.coerceAtLeast(1f)
     var speedSheet by remember { mutableStateOf(false) }
-    var more by remember { mutableStateOf(false) }
     var castSheet by remember { mutableStateOf(false) }
     var tool by remember { mutableStateOf<String?>(null) }
     val graph = LocalContext.current.graph
@@ -114,24 +117,25 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onCollapse, modifier = Modifier.testTag("player-collapse")) { Icon(Icons.Outlined.KeyboardArrowDown, stringResource(R.string.pl_minimize_player)) }
-                TextButton(onClick = {
-                    preferenceError = try { graph.settings.update { it.copy(lockUi = !it.lockUi) }; null }
-                    catch (_: java.io.IOException) { saveFailed }
-                }, modifier = Modifier.weight(1f).testTag("player-lock")) {
-                    Text(stringResource(if (settings.lockUi) R.string.pl_unlock else R.string.pl_lock))
+                Spacer(Modifier.weight(1f))
+                IconToggleButton(
+                    checked = settings.lockUi,
+                    onCheckedChange = { locked ->
+                        preferenceError = try { graph.settings.update { it.copy(lockUi = locked) }; null }
+                        catch (_: java.io.IOException) { saveFailed }
+                    },
+                    modifier = Modifier.size(48.dp).testTag("player-lock"),
+                    colors = IconButtonDefaults.iconToggleButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        checkedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    ),
+                ) {
+                    Icon(if (settings.lockUi) Icons.Outlined.Lock else Icons.Outlined.LockOpen,
+                        stringResource(if (settings.lockUi) R.string.pl_unlock else R.string.pl_lock))
                 }
                 CastButton(graph.casting) { castSheet = true }
-                Box {
-                    IconButton(onClick = { more = true }, modifier = Modifier.testTag("player-more")) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.menu_more)) }
-                    DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.action_close_player)) },
-                            leadingIcon = { Icon(Icons.Outlined.Close, null) },
-                            onClick = { more = false; engine.close(); onClosed() },
-                            modifier = Modifier.testTag("player-close"),
-                        )
-                    }
-                }
+                PlayerOverflow(engine, onClosed = onClosed)
             }
             if (now == null) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -293,6 +297,24 @@ private fun ChapterRow(index: Int, chapter: Chapter, current: Boolean, enabled: 
     }
 }
 
+@Composable
+private fun PlayerOverflow(engine: PlaybackEngine, tagPrefix: String = "player", onClosed: () -> Unit = {}) {
+    var more by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { more = true }, modifier = Modifier.size(48.dp).testTag("$tagPrefix-more")) {
+            Icon(Icons.Outlined.MoreVert, stringResource(R.string.menu_more))
+        }
+        DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_close_player)) },
+                leadingIcon = { Icon(Icons.Outlined.Close, null) },
+                onClick = { more = false; engine.close(); onClosed() },
+                modifier = Modifier.testTag("$tagPrefix-close"),
+            )
+        }
+    }
+}
+
 /** Compact player above the bottom navigation; tapping it opens the full player. */
 @Composable
 fun MiniPlayer(onOpen: () -> Unit) {
@@ -328,6 +350,7 @@ fun MiniPlayer(onOpen: () -> Unit) {
                         Icon(if (state.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, if (state.playing) stringResource(R.string.action_pause) else stringResource(R.string.action_play))
                     }
                 }
+                PlayerOverflow(engine, tagPrefix = "mini-player")
             }
         }
     }

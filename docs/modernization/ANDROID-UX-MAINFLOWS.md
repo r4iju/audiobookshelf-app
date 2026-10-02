@@ -7,7 +7,8 @@ UI lane supplies the shared neutral surfaces and orange accent.
 | Before | After |
 | --- | --- |
 | Accounts and settings only on Library | Available on Search and Downloads too; Back returns to the originating tab |
-| Unlabelled visual close icon beside minimize | Overflow contains the explicit “Stop and close player” action |
+| Unlabelled visual close icon beside minimize; no mini-player close | Shared overflow in both modes contains “Stop and close player” |
+| Prominent orange lock text competes with playback | Neutral labelled lock icon toggle exposes checked state |
 | Large artwork pushes player actions down at scaled text | Artwork shrinks as text grows; transport targets remain at least 48 dp |
 | Player tools and active timer compete in one row | Tools wrap; remaining time belongs to the Sleep action |
 | Five speed presets squeeze into equal widths | Wrapping chips show the selected rate |
