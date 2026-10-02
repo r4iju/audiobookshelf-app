@@ -95,6 +95,7 @@ export const webStrings = {
   WebPlayFromStart: "Play from start",
   WebPlayer: "Player",
   WebSeek: "Seek",
+  WebRenameBookmark: "Rename {0}",
   WebSlower: "Slower by 0.1",
   WebFaster: "Faster by 0.1",
   WebJumpBack: "Jump back {0}",

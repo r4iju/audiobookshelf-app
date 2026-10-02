@@ -2,6 +2,7 @@
 
 import {
   Bookmark,
+  BookmarkCheck,
   ChevronDown,
   ChevronUp,
   Loader2,
@@ -24,6 +25,7 @@ import { useCreateBookmark } from "@/lib/abs/mutations";
 import { type Player, type Sleep, usePlayer, usePlayerStore } from "@/lib/player/store";
 import { chapterIndexAt, nextChapterStart, previousChapterStart } from "@/lib/player/timeline";
 import { ratePresets, sleepPresetsMinutes, useSettings, useSettingsStore } from "@/lib/settings/store";
+import { BookmarksDialog } from "./bookmarks";
 import { useProgressSync } from "./progress-sync";
 
 type Active = Extract<Player, { phase: "active" }>;
@@ -71,6 +73,7 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
   const actions = usePlayerStore.getState;
   const createBookmark = useCreateBookmark();
   const [expanded, setExpanded] = useState(false);
+  const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const ids = useId();
   const { media, currentTime, status } = player;
   const chapters = media.chapters;
@@ -308,6 +311,10 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
             <Bookmark aria-hidden className="size-4" />
             {t("ButtonCreateBookmark")}
           </Button>
+          <Button size="sm" onClick={() => setBookmarksOpen(true)}>
+            <BookmarkCheck aria-hidden className="size-4" />
+            {t("LabelYourBookmarks")}
+          </Button>
           {createBookmark.isSuccess ? (
             <span role="status" className="text-xs text-muted">
               {t("WebBookmarkAdded")}
@@ -326,6 +333,16 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
           </div>
         </div>
       </div>
+      {bookmarksOpen ? (
+        <BookmarksDialog
+          itemId={media.itemId}
+          onPick={(time) => {
+            setBookmarksOpen(false);
+            actions().seek(time);
+          }}
+          onClose={() => setBookmarksOpen(false)}
+        />
+      ) : null}
     </section>
   );
 }
