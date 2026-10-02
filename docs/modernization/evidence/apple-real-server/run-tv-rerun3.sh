@@ -1,8 +1,8 @@
 #!/bin/bash
-# TV resume case after the chapter-step correction (Previous restarts a chapter more than 3 s in).
-set -uo pipefail
-cd "$(dirname "$0")/../../.."
-E=apple/build-qa/real-server
-trap 'git checkout -q -- apple/AudiobookshelfNative.xcodeproj/project.pbxproj tvos/AudiobookshelfTV.xcodeproj/project.pbxproj 2>/dev/null' EXIT
-ABS_TV_RESULT_BUNDLE="$PWD/$E/tv-resume-rerun3.xcresult" tvos/scripts/verify-ui.sh -only-testing:TVJourneyTests/RealServerProbe/test1ResumeAnotherClientsPositionAndCrossFiles > "$E/tv-resume-rerun3.log" 2>&1
-echo "tv-resume-rerun3 exit=$?"; grep -E "Test Case .*(passed|failed)|error: -\[|TV_RESUME" "$E/tv-resume-rerun3.log"
+# Attempt 4 of the TV resume case.
+source "$(dirname "$0")/common.sh"
+# Needs the owned server up (run-all.sh, or `source common.sh; server_fresh`). Runs the final probe sources in this
+# folder, so it repeats the steps of that attempt, not the probe faults recorded for it in APPLE-REAL-SERVER-QA.md.
+resolve_ids || exit 1
+install_probes
+tv resume-rerun3 test1ResumeAnotherClientsPositionAndCrossFiles

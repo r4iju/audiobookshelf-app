@@ -5,13 +5,15 @@ import XCTest
 /// side first: it opens two streamed sessions and reports some listening, restarts the container after the first,
 /// and saves a newer server position for Catalog Volume 03. Session ids arrive as ABS_RS_OPEN and ABS_RS_RESTARTED.
 @MainActor final class RealServerAdoptionProbe: XCTestCase {
-    static let server = "http://127.0.0.1:19890"
-    static let user = "dec9bf27-e818-46e2-a99f-0a6fe335eaf8"
-    static let salt = "880c5e1a-475a-40ea-b68c-7b86d320472d"
-    static let longStory = "1d853118-1beb-41d1-85d2-21f699e55a79"
-    static let volume1 = "5b4b730d-54a0-430d-8bbe-b63b8f018007"
-    static let volume2 = "636e9611-c7a6-490a-8cfa-d2a27766f8ca"
-    static let volume3 = "fe3e135c-afb7-4f1a-8cb0-b40d86c452cb"
+    /// Seeded ids differ per server; `common.sh` resolves them by title and passes them as `TEST_RUNNER_ABS_RS_*`.
+    private static let env = ProcessInfo.processInfo.environment
+    static let server = env["ABS_RS_SERVER"] ?? "http://127.0.0.1:19890"
+    static let user = env["ABS_RS_OTHER_USER"] ?? ""
+    static let salt = env["ABS_RS_SALT"] ?? ""
+    static let longStory = env["ABS_RS_LONG_STORY"] ?? ""
+    static let volume1 = env["ABS_RS_VOLUME1"] ?? ""
+    static let volume2 = env["ABS_RS_VOLUME2"] ?? ""
+    static let volume3 = env["ABS_RS_VOLUME3"] ?? ""
 
     private var base: URL!
 

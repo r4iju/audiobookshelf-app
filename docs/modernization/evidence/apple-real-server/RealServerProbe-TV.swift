@@ -4,9 +4,11 @@ import XCTest
 /// Audiobookshelf 2.30.0 container `abs-apple-qa` (19890). Runs after the phone probe, so the same synthetic account
 /// already has progress saved by another client. Results are read from the server's own API.
 @MainActor final class RealServerProbe: TVJourney {
-    static let server = "http://127.0.0.1:19890"
-    static let longTide = "262f4900-6cbf-4dc0-a751-109bf5a13939"
-    static let eveningStories = "d9e7cd92-91e4-449a-8ca0-6e66f60fe35a"
+    /// Seeded ids differ per server; `common.sh` resolves them by title and passes them as `TEST_RUNNER_ABS_RS_*`.
+    private static let env = ProcessInfo.processInfo.environment
+    static let server = env["ABS_RS_SERVER"] ?? "http://127.0.0.1:19890"
+    static let longTide = env["ABS_RS_LONG_TIDE"] ?? ""
+    static let eveningStories = env["ABS_RS_EVENING_STORIES"] ?? ""
 
     /// The real server has no fixture modes to reset.
     override func setUp() async throws { continueAfterFailure = false }

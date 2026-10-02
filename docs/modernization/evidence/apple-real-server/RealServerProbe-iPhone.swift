@@ -4,12 +4,14 @@ import XCTest
 /// (`web/qa/server.mjs` as `abs-apple-qa` on 19890) with its synthetic library and accounts. Results are read from the
 /// server's own API. The offline steps are separate methods so the runner can stop and start the container between them.
 @MainActor final class RealServerProbe: NativeJourney {
-    static let server = "http://127.0.0.1:19890"
-    static let books = "4907887a-4719-440e-b093-956f6d4064e8"
-    static let podcasts = "3c415745-73f5-41f6-9daa-7b639cf83bec"
-    static let longTide = "262f4900-6cbf-4dc0-a751-109bf5a13939"
-    static let fieldGuide = "f6fefe50-3fc3-4afd-ba73-1f85c6086729"
-    static let eveningStories = "d9e7cd92-91e4-449a-8ca0-6e66f60fe35a"
+    /// Seeded ids differ per server; `common.sh` resolves them by title and passes them as `TEST_RUNNER_ABS_RS_*`.
+    private static let env = ProcessInfo.processInfo.environment
+    static let server = env["ABS_RS_SERVER"] ?? "http://127.0.0.1:19890"
+    static let books = env["ABS_RS_BOOKS"] ?? ""
+    static let podcasts = env["ABS_RS_PODCASTS"] ?? ""
+    static let longTide = env["ABS_RS_LONG_TIDE"] ?? ""
+    static let fieldGuide = env["ABS_RS_FIELD_GUIDE"] ?? ""
+    static let eveningStories = env["ABS_RS_EVENING_STORIES"] ?? ""
 
     // MARK: Server API (synthetic account)
 
@@ -217,7 +219,6 @@ import XCTest
         let position = 60
         capture("real-server-offline-player")
         app.buttons["Close playback"].tap()
-        try String(position).write(toFile: NSTemporaryDirectory() + "abs-real-server-offline-position", atomically: true, encoding: .utf8)
         print("OFFLINE_POSITION=\(position)")
     }
 
@@ -231,5 +232,42 @@ import XCTest
         XCTAssertGreaterThanOrEqual((progress["currentTime"] as? Double) ?? 0, 60, "The offline position must reach the server")
         let sessions = try await sessions(for: Self.longTide)
         XCTAssertTrue(sessions.contains { ($0["mediaPlayer"] as? String)?.isEmpty == false && (($0["currentTime"] as? Double) ?? 0) >= 60 }, "The offline session must be recorded: \(sessions.map { [$0["currentTime"], $0["timeListening"], $0["playMethod"]] })")
+    }
+
+    /// Finish, step 1 of 2, with the server container stopped: the downloaded book plays offline from an unfinished
+    /// position to its end.
+    func test4dFinishOfflineWithServerStopped() async throws {
+        let app = XCUIApplication()
+        app.launchArguments = []
+        app.launch()
+        XCTAssertTrue(app.buttons["Open downloads"].waitForExistence(timeout: 20), "With the server unreachable the app must offer downloads")
+        app.buttons["Open downloads"].tap()
+        app.buttons["offline-" + Self.longTide].tap()
+        app.buttons["Play offline"].tap()
+        app.buttons["mini-player"].tap()
+        XCTAssertTrue(app.buttons["pause-playback"].waitForExistence(timeout: 10), "Playback must start from an unfinished position")
+        print("FINISH_START=\(bookElapsed(app).label) \(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'File '")).firstMatch.label)")
+        for _ in 0..<12 where app.buttons["pause-playback"].exists { app.buttons["Forward 10 seconds"].tap() }
+        XCTAssertTrue(app.buttons["resume-playback"].waitForExistence(timeout: 20), "Playback must stop at the end of the book")
+        XCTAssertTrue(app.staticTexts["File 3 of 3"].exists)
+        print("FINISH_END=\(bookElapsed(app).label)")
+        capture("real-server-offline-finished")
+        app.buttons["Close playback"].tap()
+    }
+
+    /// Finish, step 2 of 2, server started again: relaunch publishes the finished offline session, and the server
+    /// reports the book finished at its end.
+    func test4eReconnectPublishesTheFinish() async throws {
+        let app = XCUIApplication()
+        app.launchArguments = []
+        app.launch()
+        XCTAssertTrue(app.staticTexts["Audiobooks"].firstMatch.waitForExistence(timeout: 30))
+        let progress = try await serverProgress(Self.longTide, timeout: 60) { ($0["isFinished"] as? Bool) == true }
+        print("FINISH_SERVER=\(progress)")
+        let duration = (progress["duration"] as? Double) ?? 0
+        XCTAssertEqual(progress["isFinished"] as? Bool, true, "The server must report the book finished")
+        XCTAssertGreaterThanOrEqual((progress["currentTime"] as? Double) ?? 0, duration - 1, "The server position must be the end of the book")
+        let sessions = try await sessions(for: Self.longTide)
+        XCTAssertTrue(sessions.contains { (($0["currentTime"] as? Double) ?? 0) >= duration - 1 }, "The finished offline session must be recorded")
     }
 }
