@@ -131,27 +131,33 @@ function ItemView({ item }: { item: LibraryItem }) {
 
           <ProgressSummary progress={progress} duration={item.media.duration ?? 0} />
 
-          {isBook ? <ProgressControls itemId={item.id} progress={progress} /> : null}
-
-          <div className="flex flex-wrap gap-3">
-            {hasAudio ? (
-              <Button
-                variant="primary"
-                onClick={() => (playing ? usePlayerStore.getState().pause() : void play())}
-              >
-                {playing ? <Pause aria-hidden className="size-4" /> : <Play aria-hidden className="size-4" />}
-                {playing ? t("ButtonPause") : t("ButtonPlay")}
-                {!playing && remaining !== null ? (
-                  <span className="font-normal opacity-80">{formatClock(remaining)}</span>
-                ) : null}
-              </Button>
-            ) : null}
-            {item.media.ebookFile ? (
-              <ButtonLink href={`/read/${item.id}`} variant={hasAudio ? "secondary" : "primary"}>
-                <BookOpen aria-hidden className="size-4" />
-                {t("ButtonRead")}
-              </ButtonLink>
-            ) : null}
+          {hasAudio || item.media.ebookFile ? (
+            <div className="flex gap-3 *:flex-1 sm:*:flex-none">
+              {hasAudio ? (
+                <Button
+                  variant="primary"
+                  onClick={() => (playing ? usePlayerStore.getState().pause() : void play())}
+                >
+                  {playing ? (
+                    <Pause aria-hidden className="size-4" />
+                  ) : (
+                    <Play aria-hidden className="size-4" />
+                  )}
+                  {playing ? t("ButtonPause") : t("ButtonPlay")}
+                  {!playing && remaining !== null ? (
+                    <span className="font-normal opacity-80">{formatClock(remaining)}</span>
+                  ) : null}
+                </Button>
+              ) : null}
+              {item.media.ebookFile ? (
+                <ButtonLink href={`/read/${item.id}`} variant={hasAudio ? "secondary" : "primary"}>
+                  <BookOpen aria-hidden className="size-4" />
+                  {t("ButtonRead")}
+                </ButtonLink>
+              ) : null}
+            </div>
+          ) : null}
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             {isBook ? (
               <Button onClick={() => setAdding("playlist")}>
                 <ListPlus aria-hidden className="size-4" />
@@ -176,6 +182,7 @@ function ItemView({ item }: { item: LibraryItem }) {
               />
             ) : null}
           </div>
+          {isBook ? <ProgressControls itemId={item.id} progress={progress} /> : null}
           {notice ? <Alert tone={notice.tone}>{notice.text}</Alert> : null}
 
           {description ? <Description text={description} /> : null}
