@@ -84,9 +84,9 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
       ? { min: chapter.start, max: chapter.end }
       : { min: 0, max: media.duration };
   const speed = settings.playbackRate;
-  const scale = settings.scaleElapsedTimeBySpeed ? speed : 1;
-  const elapsed = (currentTime - range.min) / scale;
-  const remaining = (range.max - currentTime) / scale;
+  // As in the legacy player, remaining time is always at the current speed; the setting changes elapsed time only.
+  const elapsed = (currentTime - range.min) / (settings.scaleElapsedTimeBySpeed ? speed : 1);
+  const remaining = (range.max - currentTime) / speed;
   const error = errorText(t, player);
   const rateOptions = (ratePresets as readonly number[]).includes(speed)
     ? ratePresets
@@ -299,6 +299,20 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
               </Button>
             </div>
           ) : null}
+          <div className="flex flex-col gap-1 text-xs font-medium">
+            {chapters.length ? (
+              <TrackSwitch
+                label={t("LabelChapterTrack")}
+                checked={settings.useChapterTrack}
+                onChange={(checked) => updateSettings({ useChapterTrack: checked })}
+              />
+            ) : null}
+            <TrackSwitch
+              label={t("LabelScaleElapsedTimeBySpeed")}
+              checked={settings.scaleElapsedTimeBySpeed}
+              onChange={(checked) => updateSettings({ scaleElapsedTimeBySpeed: checked })}
+            />
+          </div>
           {media.episodeId ? null : (
             <>
               <Button
@@ -352,5 +366,29 @@ function Dock({ player, pending, fullWindow }: { player: Active; pending: number
         />
       ) : null}
     </section>
+  );
+}
+
+function TrackSwitch({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex min-h-9 items-center gap-2">
+      <input
+        type="checkbox"
+        role="switch"
+        aria-checked={checked}
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="size-4 accent-[var(--accent-strong)] focus-ring"
+      />
+      {label}
+    </label>
   );
 }
