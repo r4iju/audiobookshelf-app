@@ -5,14 +5,10 @@
     <string name="tab_search">શોધો</string>
     <string name="title_collections">સંગ્રહ</string>
     <string name="title_playlists">પ્લેલિસ્ટ</string>
-    <string name="action_back">પાછા</string>
     <string name="action_cancel">રદ કરો</string>
     <string name="action_save">સાચવો</string>
-    <string name="action_remove">કાઢી નાખો</string>
-    <string name="action_delete">કાઢી નાખો</string>
     <string name="action_play">ચલાવો</string>
     <string name="action_pause">વિરામ</string>
-    <string name="action_read">વાંચો</string>
     <string name="action_clear_filter">ફિલ્ટર જતુ કરો</string>
     <string name="action_show_more">વધારે વાંચો</string>
     <string name="action_show_less">ઓછું વાંચો</string>

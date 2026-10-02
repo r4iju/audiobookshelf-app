@@ -10,17 +10,12 @@
     <string name="title_statistics">Ваша статыстыка</string>
     <string name="title_new_playlist">Новы плэй-ліст</string>
     <string name="menu_more">Больш</string>
-    <string name="action_back">Назад</string>
     <string name="action_cancel">Скасаваць</string>
     <string name="action_save">Захаваць</string>
-    <string name="action_remove">Выдаліць</string>
-    <string name="action_delete">Выдаліць</string>
     <string name="action_play">Прайграць</string>
     <string name="action_pause">Прыпыніць</string>
     <string name="action_stream">Трансліраваць</string>
     <string name="action_download">Спампаваць</string>
-    <string name="action_read">Чытаць</string>
-    <string name="action_mark_finished">Пазначыць як завершаную</string>
     <string name="action_discard_progress">Скінуць прагрэс</string>
     <string name="action_clear_filter">Ачысціць фільтр</string>
     <string name="action_show_more">Чытаць больш</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Сярэдняя</string>
     <string name="level_high">Высокая</string>
     <string name="level_very_high">Вельмі высокая</string>
-    <string name="level_off">Выключына</string>
     <string name="auto_sleep_timer">Аўтаматычны таймер сну</string>
     <string name="downloads_on_mobile_data">Спампоўваць праз мабільны інтэрнэт</string>
     <string name="streaming_on_mobile_data">Трансляцыя праз мабільную сетку</string>

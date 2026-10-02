@@ -10,17 +10,12 @@
     <string name="title_statistics">Din statistik</string>
     <string name="title_new_playlist">Ny spellista</string>
     <string name="menu_more">Mer</string>
-    <string name="action_back">Tillbaka</string>
     <string name="action_cancel">Avbryt</string>
     <string name="action_save">Spara</string>
-    <string name="action_remove">Ta bort</string>
-    <string name="action_delete">Ta bort</string>
     <string name="action_play">Spela upp</string>
     <string name="action_pause">Pausa</string>
     <string name="action_stream">Strömma</string>
     <string name="action_download">Hämta</string>
-    <string name="action_read">Läs</string>
-    <string name="action_mark_finished">Markera som avslutad</string>
     <string name="action_discard_progress">Återställ uppspelningspositionen</string>
     <string name="action_clear_filter">Rensa filter</string>
     <string name="action_show_more">Visa mer</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Medel</string>
     <string name="level_high">Hög</string>
     <string name="level_very_high">Mycket hög</string>
-    <string name="level_off">Av</string>
     <string name="auto_sleep_timer">Automatisk insomningstimer</string>
     <string name="downloads_on_mobile_data">Hämta med mobildata</string>
     <string name="streaming_on_mobile_data">Strömma över mobildata</string>

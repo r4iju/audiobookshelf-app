@@ -10,17 +10,12 @@
     <string name="title_statistics">Τα Στατιστικά Σας</string>
     <string name="title_new_playlist">Νέα Λίστα Αναπαραγωγής</string>
     <string name="menu_more">Περισσότερα</string>
-    <string name="action_back">Πίσω</string>
     <string name="action_cancel">Ακύρωση</string>
     <string name="action_save">Αποθήκευση</string>
-    <string name="action_remove">Αφαίρεση</string>
-    <string name="action_delete">Διαγραφή</string>
     <string name="action_play">Αναπαραγωγή</string>
     <string name="action_pause">Παύση</string>
     <string name="action_stream">Μετάδοση</string>
     <string name="action_download">Λήψη</string>
-    <string name="action_read">Ανάγνωση</string>
-    <string name="action_mark_finished">Σήμανση ως Ολοκληρωμένο</string>
     <string name="action_clear_filter">Διαγραφή Φίλτρου</string>
     <string name="action_show_more">Διάβασε περισσότερα</string>
     <string name="action_show_less">Ανάγνωση λιγότερων</string>
@@ -66,7 +61,6 @@
     <string name="level_medium">Μεσαίο</string>
     <string name="level_high">Υψηλή</string>
     <string name="level_very_high">Πολύ Ψηλά</string>
-    <string name="level_off">Ανενεργό</string>
     <string name="auto_sleep_timer">Αυτόματος Χρονοδιακόπτης Ύπνου</string>
     <string name="downloads_on_mobile_data">Λήψη με χρήση δεδομένων</string>
     <string name="policy_ask">Ερώτηση για επιβεβαίωση</string>

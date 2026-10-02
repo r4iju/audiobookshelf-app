@@ -10,17 +10,12 @@
     <string name="title_statistics">Din statistik</string>
     <string name="title_new_playlist">Ny playliste</string>
     <string name="menu_more">Mere</string>
-    <string name="action_back">Tilbage</string>
     <string name="action_cancel">Annuller</string>
     <string name="action_save">Gem</string>
-    <string name="action_remove">Fjern</string>
-    <string name="action_delete">Slet</string>
     <string name="action_play">Afspil</string>
     <string name="action_pause">Pause</string>
     <string name="action_stream">Stream</string>
     <string name="action_download">Hent</string>
-    <string name="action_read">Læs</string>
-    <string name="action_mark_finished">Markér som afsluttet</string>
     <string name="action_discard_progress">Kassér fremgang</string>
     <string name="action_clear_filter">Ryd filter</string>
     <string name="action_show_more">Se mere</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Mellem</string>
     <string name="level_high">Høj</string>
     <string name="level_very_high">Meget Højt</string>
-    <string name="level_off">Slukket</string>
     <string name="auto_sleep_timer">Auto søvnfunktion</string>
     <string name="downloads_on_mobile_data">Download med mobildata</string>
     <string name="streaming_on_mobile_data">Streaming ved brug af Mobildata</string>

@@ -10,17 +10,12 @@
     <string name="title_statistics">Din statistikk</string>
     <string name="title_new_playlist">Ny spilleliste</string>
     <string name="menu_more">Mer</string>
-    <string name="action_back">Tilbake</string>
     <string name="action_cancel">Avbryt</string>
     <string name="action_save">Lagre</string>
-    <string name="action_remove">Fjern</string>
-    <string name="action_delete">Slett</string>
     <string name="action_play">Spill av</string>
     <string name="action_pause">Pause</string>
     <string name="action_stream">Strøm</string>
     <string name="action_download">Last ned</string>
-    <string name="action_read">Les</string>
-    <string name="action_mark_finished">Marker som Fullført</string>
     <string name="action_discard_progress">Forkast framdrift</string>
     <string name="action_clear_filter">Fjern filter</string>
     <string name="action_show_more">Vis mer</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Middels</string>
     <string name="level_high">Høy</string>
     <string name="level_very_high">Veldig høy</string>
-    <string name="level_off">Av</string>
     <string name="auto_sleep_timer">Automatisk søvntidsur</string>
     <string name="downloads_on_mobile_data">Last ned med mobildata</string>
     <string name="streaming_on_mobile_data">Strømmer via mobildata</string>

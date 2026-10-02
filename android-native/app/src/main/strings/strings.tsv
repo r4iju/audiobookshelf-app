@@ -1,4 +1,4 @@
-# name	legacy key in /strings (- when the legacy app has no equivalent)	English
+# name	legacy key in /strings (- when the legacy app has no equivalent)	English	languages whose legacy wording means something else
 app_name	-	Audiobookshelf Preview
 tab_library	ButtonLibrary	Library
 tab_search	ButtonSearch	Search
@@ -10,21 +10,17 @@ title_playlists	ButtonPlaylists	Playlists
 title_statistics	HeaderYourStats	Statistics
 title_new_playlist	HeaderNewPlaylist	New playlist
 title_new_collection	-	New collection
-menu_more	LabelMore	More
-action_back	ButtonBack	Back
+menu_more	LabelMore	More	ja
 action_retry	-	Retry
 action_cancel	ButtonCancel	Cancel
 action_save	ButtonSave	Save
-action_remove	ButtonRemove	Remove
-action_delete	ButtonDelete	Delete
 action_play	ButtonPlay	Play
 action_pause	ButtonPause	Pause
 action_stream	ButtonStream	Stream
 action_download	LabelDownload	Download
-action_read	ButtonRead	Read %1$s
-action_mark_finished	MessageMarkAsFinished	Mark finished
+action_read	-	Read %1$s
+action_mark_finished	-	Mark finished
 action_discard_progress	MessageDiscardProgress	Discard progress
-action_add_to_group	-	Add to playlist or collection
 action_clear_filter	ButtonClearFilter	Clear filter
 action_show_more	ButtonReadMore	Show more
 action_show_less	ButtonReadLess	Show less
@@ -79,11 +75,10 @@ jump_forward_time	LabelJumpForwardsTime	Jump forward
 jump_back_time	LabelJumpBackwardsTime	Jump back
 shake_sensitivity	LabelShakeSensitivity	Shake sensitivity
 level_very_low	LabelVeryLow	Very low
-level_low	LabelLow	Low
+level_low	LabelLow	Low	de
 level_medium	LabelMedium	Medium
 level_high	LabelHigh	High
 level_very_high	LabelVeryHigh	Very high
-level_off	LabelOff	Off
 auto_sleep_timer	LabelAutoSleepTimer	Automatic sleep timer
 downloads_on_mobile_data	LabelDownloadUsingCellular	Downloads on mobile data
 streaming_on_mobile_data	LabelStreamingUsingCellular	Streaming on mobile data

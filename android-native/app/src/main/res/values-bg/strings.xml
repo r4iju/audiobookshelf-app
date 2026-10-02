@@ -10,17 +10,12 @@
     <string name="title_statistics">Вашата статистика</string>
     <string name="title_new_playlist">Нов плейлист</string>
     <string name="menu_more">Повече</string>
-    <string name="action_back">Назад</string>
     <string name="action_cancel">Отказ</string>
     <string name="action_save">Запази</string>
-    <string name="action_remove">Премахни</string>
-    <string name="action_delete">Изтрий</string>
     <string name="action_play">Пусни</string>
     <string name="action_pause">Паузирай</string>
     <string name="action_stream">Стрийм</string>
     <string name="action_download">Свали</string>
-    <string name="action_read">Прочети</string>
-    <string name="action_mark_finished">Маркирай като завършено</string>
     <string name="action_discard_progress">Нулирай прогреса</string>
     <string name="action_clear_filter">Изчисти филтър</string>
     <string name="action_show_more">Прочети дълго</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Средно</string>
     <string name="level_high">Висока</string>
     <string name="level_very_high">Много високо</string>
-    <string name="level_off">Изключено</string>
     <string name="auto_sleep_timer">Автоматичен таймер на изключване</string>
     <string name="downloads_on_mobile_data">Свали ползвайки мобилни данни</string>
     <string name="streaming_on_mobile_data">Стриймвай ползвайки мобилни данни</string>

@@ -10,17 +10,12 @@
     <string name="title_statistics">Tilastosi</string>
     <string name="title_new_playlist">Uusi soittolista</string>
     <string name="menu_more">Lisää</string>
-    <string name="action_back">Takaisin</string>
     <string name="action_cancel">Peruuta</string>
     <string name="action_save">Tallenna</string>
-    <string name="action_remove">Poista</string>
-    <string name="action_delete">Poista</string>
     <string name="action_play">Toista</string>
     <string name="action_pause">Pysäytä</string>
     <string name="action_stream">Suoratoisto</string>
     <string name="action_download">Lataa</string>
-    <string name="action_read">Lue</string>
-    <string name="action_mark_finished">Merkitse valmiiksi</string>
     <string name="action_discard_progress">Hylkää edistyminen</string>
     <string name="action_clear_filter">Poista suodatus</string>
     <string name="action_show_more">Lue enemmän</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Keskitaso</string>
     <string name="level_high">Korkea</string>
     <string name="level_very_high">Erittäin korkea</string>
-    <string name="level_off">Pois päältä</string>
     <string name="auto_sleep_timer">Automaattinen uniajastin</string>
     <string name="downloads_on_mobile_data">Lataa käyttäen mobiilidataa</string>
     <string name="streaming_on_mobile_data">Suoratoisto mobiilia käyttäen</string>

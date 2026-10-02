@@ -10,17 +10,12 @@
     <string name="title_statistics">Vaše statistiky</string>
     <string name="title_new_playlist">Nový seznam skladeb</string>
     <string name="menu_more">Více</string>
-    <string name="action_back">Zpět</string>
     <string name="action_cancel">Zrušit</string>
     <string name="action_save">Uložit</string>
-    <string name="action_remove">Odstranit</string>
-    <string name="action_delete">Smazat</string>
     <string name="action_play">Přehrát</string>
     <string name="action_pause">Pozastavit</string>
     <string name="action_stream">Streamovat</string>
     <string name="action_download">Stáhnout</string>
-    <string name="action_read">Číst</string>
-    <string name="action_mark_finished">Označit jako dokončené</string>
     <string name="action_discard_progress">Zahodit pokrok</string>
     <string name="action_clear_filter">Vymazat filtr</string>
     <string name="action_show_more">Číst více</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Střední</string>
     <string name="level_high">Vysoké</string>
     <string name="level_very_high">Velmi vysoké</string>
-    <string name="level_off">Vypnutá</string>
     <string name="auto_sleep_timer">Automatický časovač spánku</string>
     <string name="downloads_on_mobile_data">Stáhnout přes mobilní data</string>
     <string name="streaming_on_mobile_data">Přehrávání přes mobilní data</string>

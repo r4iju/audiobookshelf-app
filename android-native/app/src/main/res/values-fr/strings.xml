@@ -10,17 +10,12 @@
     <string name="title_statistics">Vos statistiques</string>
     <string name="title_new_playlist">Nouvelle liste de lecture</string>
     <string name="menu_more">Plus</string>
-    <string name="action_back">Retour</string>
     <string name="action_cancel">Annuler</string>
     <string name="action_save">Sauvegarder</string>
-    <string name="action_remove">Retirer</string>
-    <string name="action_delete">Supprimer</string>
     <string name="action_play">Lire</string>
     <string name="action_pause">Pause</string>
     <string name="action_stream">Flux</string>
     <string name="action_download">Télécharger</string>
-    <string name="action_read">Lire</string>
-    <string name="action_mark_finished">Marquer comme terminé</string>
     <string name="action_discard_progress">Supprimer la progression</string>
     <string name="action_clear_filter">Effacer le filtre</string>
     <string name="action_show_more">Lire plus</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Moyenne</string>
     <string name="level_high">Importante</string>
     <string name="level_very_high">Très importante</string>
-    <string name="level_off">Éteint</string>
     <string name="auto_sleep_timer">Minuteur nocturne automatique</string>
     <string name="downloads_on_mobile_data">Télécharger via les données mobiles</string>
     <string name="streaming_on_mobile_data">Diffuser via les données mobiles</string>

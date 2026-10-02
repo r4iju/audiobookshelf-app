@@ -5,15 +5,11 @@
     <string name="tab_search">جستجو</string>
     <string name="title_collections">مجموعه ها</string>
     <string name="title_playlists">لیست پخش</string>
-    <string name="action_back">بازگشت</string>
     <string name="action_cancel">انصراف</string>
     <string name="action_save">ذخیره</string>
-    <string name="action_remove">حذف</string>
-    <string name="action_delete">حذف</string>
     <string name="action_play">پخش</string>
     <string name="action_pause">توقف</string>
     <string name="action_stream">پخش آنلاین</string>
-    <string name="action_read">خواندن</string>
     <string name="action_clear_filter">حذف صافی</string>
     <string name="action_show_more">خواندن بیشتر</string>
     <string name="action_show_less">خواندن کمتر</string>

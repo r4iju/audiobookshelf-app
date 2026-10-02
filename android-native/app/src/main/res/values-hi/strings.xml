@@ -5,13 +5,9 @@
     <string name="tab_search">खोजें</string>
     <string name="title_collections">संग्रह</string>
     <string name="title_playlists">प्लेलिस्ट्स</string>
-    <string name="action_back">पीछे</string>
     <string name="action_cancel">रद्द करें</string>
     <string name="action_save">सहेजें</string>
-    <string name="action_remove">हटाएं</string>
-    <string name="action_delete">हटाएं</string>
     <string name="action_play">चलाएँ</string>
-    <string name="action_read">पढ़ लिया</string>
     <string name="action_clear_filter">लागू फ़िल्टर साफ़ करें</string>
     <string name="connect">जोड़ना</string>
 </resources>

@@ -10,17 +10,12 @@
     <string name="title_statistics">Vaša statistika</string>
     <string name="title_new_playlist">Novi popis za izvođenje</string>
     <string name="menu_more">Više</string>
-    <string name="action_back">Natrag</string>
     <string name="action_cancel">Odustani</string>
     <string name="action_save">Spremi</string>
-    <string name="action_remove">Ukloni</string>
-    <string name="action_delete">Izbriši</string>
     <string name="action_play">Reproduciraj</string>
     <string name="action_pause">Pauziraj</string>
     <string name="action_stream">Reproduciraj strujanjem</string>
     <string name="action_download">Preuzmi</string>
-    <string name="action_read">Pročitaj</string>
-    <string name="action_mark_finished">Označi kao završeno</string>
     <string name="action_discard_progress">Zanemari napredak</string>
     <string name="action_clear_filter">Poništi filter</string>
     <string name="action_show_more">Pročitaj više</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Srednje</string>
     <string name="level_high">Jako</string>
     <string name="level_very_high">Vrlo jako</string>
-    <string name="level_off">Isključeno</string>
     <string name="auto_sleep_timer">Automatski timer za spavanje</string>
     <string name="downloads_on_mobile_data">Preuzmi koristeći mobilne podatke</string>
     <string name="streaming_on_mobile_data">Strujanje preko mobilnih podataka</string>

@@ -10,17 +10,12 @@
     <string name="title_statistics">Les vostres estadístiques</string>
     <string name="title_new_playlist">Llista de reproducció nova</string>
     <string name="menu_more">Més</string>
-    <string name="action_back">Enrere</string>
     <string name="action_cancel">Cancel·la</string>
     <string name="action_save">Desar</string>
-    <string name="action_remove">Eliminar</string>
-    <string name="action_delete">Suprimeix</string>
     <string name="action_play">Reproduir</string>
     <string name="action_pause">Pausa</string>
     <string name="action_stream">En directe</string>
     <string name="action_download">Descarregar</string>
-    <string name="action_read">Llegir</string>
-    <string name="action_mark_finished">Marcar com acabat</string>
     <string name="action_discard_progress">Descarta el progrés</string>
     <string name="action_clear_filter">Neteja el filtre</string>
     <string name="action_show_more">Llig més</string>
@@ -69,7 +64,6 @@
     <string name="level_medium">Mitjà</string>
     <string name="level_high">Alt</string>
     <string name="level_very_high">Molt alt</string>
-    <string name="level_off">Apagat</string>
     <string name="auto_sleep_timer">Temporitzador de desconnexió automàtic</string>
     <string name="downloads_on_mobile_data">Descarregar utilitzant dades mòbils</string>
     <string name="policy_ask">Demana confirmació</string>

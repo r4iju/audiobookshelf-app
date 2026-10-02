@@ -10,17 +10,12 @@
     <string name="title_statistics">Progresul tău</string>
     <string name="title_new_playlist">Listă nouă</string>
     <string name="menu_more">Mai multe</string>
-    <string name="action_back">Înapoi</string>
     <string name="action_cancel">Anulează</string>
     <string name="action_save">Salvează</string>
-    <string name="action_remove">Elimină</string>
-    <string name="action_delete">Șterge</string>
     <string name="action_play">Redă</string>
     <string name="action_pause">Pauză</string>
     <string name="action_stream">Redare online</string>
     <string name="action_download">Descarcă</string>
-    <string name="action_read">Citește</string>
-    <string name="action_mark_finished">Marchează ca finalizat</string>
     <string name="action_discard_progress">Resetează progresul</string>
     <string name="action_clear_filter">Șterge filtrul</string>
     <string name="action_show_more">Afișează mai mult</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Mediu</string>
     <string name="level_high">Ridicat</string>
     <string name="level_very_high">Foarte ridicat</string>
-    <string name="level_off">Oprit</string>
     <string name="auto_sleep_timer">Timer de somn automat</string>
     <string name="downloads_on_mobile_data">Descarcă prin date mobile</string>
     <string name="streaming_on_mobile_data">Redare online prin date mobile</string>

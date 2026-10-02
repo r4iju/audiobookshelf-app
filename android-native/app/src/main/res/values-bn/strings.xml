@@ -10,17 +10,12 @@
     <string name="title_statistics">আপনার পরিসংখ্যান</string>
     <string name="title_new_playlist">নতুন প্লেলিস্ট</string>
     <string name="menu_more">আরো</string>
-    <string name="action_back">পেছনে যান</string>
     <string name="action_cancel">বাতিল করুন</string>
     <string name="action_save">সংরক্ষণ করুন</string>
-    <string name="action_remove">মুছে ফেলুন</string>
-    <string name="action_delete">মুছুন</string>
     <string name="action_play">বাজান</string>
     <string name="action_pause">বিরতি</string>
     <string name="action_stream">স্ট্রীম</string>
     <string name="action_download">ডাউনলোড করুন</string>
-    <string name="action_read">পড়ুন</string>
-    <string name="action_mark_finished">সমাপ্ত হিসাবে চিহ্নিত করুন</string>
     <string name="action_discard_progress">অগ্রগতি বাতিল করুন</string>
     <string name="action_clear_filter">ফিল্টার পরিষ্কার করুন</string>
     <string name="action_show_more">আরও পড়ুন</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">মাঝারি</string>
     <string name="level_high">উচু</string>
     <string name="level_very_high">অত্যন্ত উচ্চ</string>
-    <string name="level_off">বন্ধ</string>
     <string name="auto_sleep_timer">স্বয়ংক্রিয় ঘুমের টাইমার</string>
     <string name="downloads_on_mobile_data">সেলুলার ব্যবহার করে ডাউনলোড করুন</string>
     <string name="streaming_on_mobile_data">সেলুলার ব্যবহার করে স্ট্রিমিং</string>

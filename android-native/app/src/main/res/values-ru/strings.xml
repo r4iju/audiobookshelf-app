@@ -10,17 +10,12 @@
     <string name="title_statistics">Ваша статистика</string>
     <string name="title_new_playlist">Новый плейлист</string>
     <string name="menu_more">Еще</string>
-    <string name="action_back">Назад</string>
     <string name="action_cancel">Отмена</string>
     <string name="action_save">Сохранить</string>
-    <string name="action_remove">Удалить</string>
-    <string name="action_delete">Удалить</string>
     <string name="action_play">Слушать</string>
     <string name="action_pause">Пауза</string>
     <string name="action_stream">Стрим</string>
     <string name="action_download">Скачать</string>
-    <string name="action_read">Читать</string>
-    <string name="action_mark_finished">Отметить, как завершенную</string>
     <string name="action_discard_progress">Отбросить прогресс</string>
     <string name="action_clear_filter">Очистить фильтр</string>
     <string name="action_show_more">Читать больше</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Средний</string>
     <string name="level_high">Сильно</string>
     <string name="level_very_high">Очень сильно</string>
-    <string name="level_off">Выключить</string>
     <string name="auto_sleep_timer">Таймер сна</string>
     <string name="downloads_on_mobile_data">Загрузка с помощью сотовой связи</string>
     <string name="streaming_on_mobile_data">Потоковая передача с использованием сотовой связи</string>

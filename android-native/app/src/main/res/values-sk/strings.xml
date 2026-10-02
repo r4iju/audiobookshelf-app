@@ -10,17 +10,12 @@
     <string name="title_statistics">Vaše štatistiky</string>
     <string name="title_new_playlist">Nový playlist</string>
     <string name="menu_more">Viac</string>
-    <string name="action_back">Späť</string>
     <string name="action_cancel">Zrušiť</string>
     <string name="action_save">Uložiť</string>
-    <string name="action_remove">Odstrániť</string>
-    <string name="action_delete">Zmazať</string>
     <string name="action_play">Prehrať</string>
     <string name="action_pause">Pozastaviť</string>
     <string name="action_stream">Všeobecný</string>
     <string name="action_download">Stiahnuť</string>
-    <string name="action_read">Načítať</string>
-    <string name="action_mark_finished">Označiť ako dokončené</string>
     <string name="action_discard_progress">Odstrániť aktuálny stav počúvania</string>
     <string name="action_clear_filter">Zrušiť filter</string>
     <string name="action_show_more">Načítať viac</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Stredný</string>
     <string name="level_high">Vysoký</string>
     <string name="level_very_high">Veľmi vysoká</string>
-    <string name="level_off">Vypnuté</string>
     <string name="auto_sleep_timer">Auto časovač spánku</string>
     <string name="downloads_on_mobile_data">Stiahnuť cez mobilné dáta</string>
     <string name="streaming_on_mobile_data">Streamovanie na mobilných dátach</string>

@@ -10,15 +10,11 @@
     <string name="title_statistics">Sinu statistika</string>
     <string name="title_new_playlist">Uus playlist</string>
     <string name="menu_more">Rohkem</string>
-    <string name="action_back">Tagasi</string>
     <string name="action_cancel">Katkesta</string>
     <string name="action_save">Salvesta</string>
-    <string name="action_remove">Kustuta</string>
-    <string name="action_delete">Kustuta</string>
     <string name="action_play">Play</string>
     <string name="action_pause">Paus</string>
     <string name="action_download">Lae alla</string>
-    <string name="action_read">Loe</string>
     <string name="action_clear_filter">Tühista filter</string>
     <string name="action_show_more">Loe rohkem</string>
     <string name="action_show_less">Loe vähem</string>
@@ -48,7 +44,6 @@
     <string name="haptic_feedback">Haptiline tagasiside</string>
     <string name="level_low">Madal</string>
     <string name="level_medium">Keskmine</string>
-    <string name="level_off">Väljalülitatud</string>
     <string name="auto_sleep_timer">Automaatne unetaimer</string>
     <string name="downloads_on_mobile_data">Lae alla kasutades andmesidet</string>
     <string name="policy_ask">Küsi kinnitust</string>

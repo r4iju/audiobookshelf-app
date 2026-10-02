@@ -10,17 +10,12 @@
     <string name="title_statistics">Je statistieken</string>
     <string name="title_new_playlist">Nieuwe afspeellijst</string>
     <string name="menu_more">Meer</string>
-    <string name="action_back">Terug</string>
     <string name="action_cancel">Annuleren</string>
     <string name="action_save">Opslaan</string>
-    <string name="action_remove">Verwijder</string>
-    <string name="action_delete">Verwijder</string>
     <string name="action_play">Afspelen</string>
     <string name="action_pause">Pauze</string>
     <string name="action_stream">Streamen</string>
     <string name="action_download">Download</string>
-    <string name="action_read">Lezen</string>
-    <string name="action_mark_finished">Markeer als Voltooid</string>
     <string name="action_discard_progress">Voortgang negeren</string>
     <string name="action_clear_filter">Filter verwijderen</string>
     <string name="action_show_more">Lees meer</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Medium</string>
     <string name="level_high">Hoog</string>
     <string name="level_very_high">Zeer Hoog</string>
-    <string name="level_off">Uit</string>
     <string name="auto_sleep_timer">Automatische sleep timer</string>
     <string name="downloads_on_mobile_data">Download met mobiele data</string>
     <string name="streaming_on_mobile_data">Streamen met Mobiele Data</string>

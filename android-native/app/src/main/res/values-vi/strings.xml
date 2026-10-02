@@ -10,17 +10,12 @@
     <string name="title_statistics">Thống Kê Của Bạn</string>
     <string name="title_new_playlist">Danh Sách Phát Mới</string>
     <string name="menu_more">Thêm</string>
-    <string name="action_back">Quay lại</string>
     <string name="action_cancel">Hủy</string>
     <string name="action_save">Lưu</string>
-    <string name="action_remove">Xóa</string>
-    <string name="action_delete">Xóa</string>
     <string name="action_play">Phát</string>
     <string name="action_pause">Tạm Dừng</string>
     <string name="action_stream">Phát Trực Tiếp</string>
     <string name="action_download">Tải Xuống</string>
-    <string name="action_read">Đọc</string>
-    <string name="action_mark_finished">Đánh dấu là Hoàn Thành</string>
     <string name="action_discard_progress">Hủy Bỏ Tiến Độ</string>
     <string name="action_clear_filter">Xóa Bộ Lọc</string>
     <string name="action_show_more">Đọc thêm</string>
@@ -70,7 +65,6 @@
     <string name="level_medium">Trung Bình</string>
     <string name="level_high">Cao</string>
     <string name="level_very_high">Rất Cao</string>
-    <string name="level_off">Tắt</string>
     <string name="auto_sleep_timer">Bộ Đếm Thời Gian Ngủ Tự Động</string>
     <string name="downloads_on_mobile_data">Tải xuống với dữ liệu di động</string>
     <string name="policy_ask">Yêu cầu xác nhận</string>

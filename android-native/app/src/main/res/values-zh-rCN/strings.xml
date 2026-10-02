@@ -10,17 +10,12 @@
     <string name="title_statistics">你的统计数据</string>
     <string name="title_new_playlist">新建播放列表</string>
     <string name="menu_more">更多</string>
-    <string name="action_back">返回</string>
     <string name="action_cancel">取消</string>
     <string name="action_save">保存</string>
-    <string name="action_remove">移除</string>
-    <string name="action_delete">删除</string>
     <string name="action_play">播放</string>
     <string name="action_pause">暂停</string>
     <string name="action_stream">串流播放</string>
     <string name="action_download">下载</string>
-    <string name="action_read">阅读</string>
-    <string name="action_mark_finished">标记为已完成</string>
     <string name="action_discard_progress">放弃进度</string>
     <string name="action_clear_filter">清除过滤器</string>
     <string name="action_show_more">阅读更多</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">中等</string>
     <string name="level_high">高</string>
     <string name="level_very_high">很高</string>
-    <string name="level_off">关闭</string>
     <string name="auto_sleep_timer">自动睡眠定时器</string>
     <string name="downloads_on_mobile_data">使用移动数据网络进行下载</string>
     <string name="streaming_on_mobile_data">使用移动数据进行流媒体播放</string>

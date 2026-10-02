@@ -10,17 +10,12 @@
     <string name="title_statistics">உங்கள் புள்ளிவிவரங்கள்</string>
     <string name="title_new_playlist">புதிய பிளேலிச்ட்</string>
     <string name="menu_more">மேலும்</string>
-    <string name="action_back">பின்</string>
     <string name="action_cancel">ரத்துசெய்</string>
     <string name="action_save">சேமி</string>
-    <string name="action_remove">அகற்று</string>
-    <string name="action_delete">நீக்கு</string>
     <string name="action_play">விளையாடு</string>
     <string name="action_pause">இடைநிறுத்தம்</string>
     <string name="action_stream">ச்ட்ரீம்</string>
     <string name="action_download">பதிவிறக்கம்</string>
-    <string name="action_read">படிக்கவும்</string>
-    <string name="action_mark_finished">முடிந்ததாகக் குறிக்கவும்</string>
     <string name="action_discard_progress">முன்னேற்றத்தை நிராகரிக்கவும்</string>
     <string name="action_clear_filter">Clear வடிப்பி</string>
     <string name="action_show_more">மேலும் படிக்கவும்</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">சராசரி</string>
     <string name="level_high">உயர்</string>
     <string name="level_very_high">மிக உயர்ந்தது</string>
-    <string name="level_off">அணை</string>
     <string name="auto_sleep_timer">ஆட்டோ ச்லீப் நேரங்குறிகருவி</string>
     <string name="downloads_on_mobile_data">செல்லுலார் பயன்படுத்தி பதிவிறக்கவும்</string>
     <string name="streaming_on_mobile_data">செல்லுலார் பயன்படுத்தி ச்ட்ரீமிங்</string>

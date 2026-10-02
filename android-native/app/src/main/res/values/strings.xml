@@ -13,12 +13,9 @@
     <string name="title_new_playlist">New playlist</string>
     <string name="title_new_collection">New collection</string>
     <string name="menu_more">More</string>
-    <string name="action_back">Back</string>
     <string name="action_retry">Retry</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
-    <string name="action_remove">Remove</string>
-    <string name="action_delete">Delete</string>
     <string name="action_play">Play</string>
     <string name="action_pause">Pause</string>
     <string name="action_stream">Stream</string>
@@ -26,7 +23,6 @@
     <string name="action_read">Read %1$s</string>
     <string name="action_mark_finished">Mark finished</string>
     <string name="action_discard_progress">Discard progress</string>
-    <string name="action_add_to_group">Add to playlist or collection</string>
     <string name="action_clear_filter">Clear filter</string>
     <string name="action_show_more">Show more</string>
     <string name="action_show_less">Show less</string>
@@ -85,7 +81,6 @@
     <string name="level_medium">Medium</string>
     <string name="level_high">High</string>
     <string name="level_very_high">Very high</string>
-    <string name="level_off">Off</string>
     <string name="auto_sleep_timer">Automatic sleep timer</string>
     <string name="downloads_on_mobile_data">Downloads on mobile data</string>
     <string name="streaming_on_mobile_data">Streaming on mobile data</string>

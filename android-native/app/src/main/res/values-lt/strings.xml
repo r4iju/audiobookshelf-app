@@ -10,17 +10,12 @@
     <string name="title_statistics">Jūsų statistika</string>
     <string name="title_new_playlist">Naujas grojaraštis</string>
     <string name="menu_more">Daugiau</string>
-    <string name="action_back">Atgal</string>
     <string name="action_cancel">Atšaukti</string>
     <string name="action_save">Išsaugoti</string>
-    <string name="action_remove">Pašalinti</string>
-    <string name="action_delete">Ištrinti</string>
     <string name="action_play">Groti</string>
     <string name="action_pause">Pauzė</string>
     <string name="action_stream">Srautas</string>
     <string name="action_download">Atsisiųsti</string>
-    <string name="action_read">Skaityti</string>
-    <string name="action_mark_finished">Pažymėti kaip užbaigtą</string>
     <string name="action_discard_progress">Ištrinti progresą</string>
     <string name="action_clear_filter">Valyti filtrą</string>
     <string name="action_show_more">Skaityti daugiau</string>

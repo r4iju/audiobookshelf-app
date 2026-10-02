@@ -10,17 +10,12 @@
     <string name="title_statistics">내 통계</string>
     <string name="title_new_playlist">새로운 플레이리스트</string>
     <string name="menu_more">더보기</string>
-    <string name="action_back">뒤로</string>
     <string name="action_cancel">취소</string>
     <string name="action_save">저장</string>
-    <string name="action_remove">제거</string>
-    <string name="action_delete">삭제</string>
     <string name="action_play">재생</string>
     <string name="action_pause">일시정지</string>
     <string name="action_stream">스트림</string>
     <string name="action_download">다운로드</string>
-    <string name="action_read">읽기</string>
-    <string name="action_mark_finished">완료로 표시</string>
     <string name="action_discard_progress">진행 상황 삭제</string>
     <string name="action_clear_filter">필터 지우기</string>
     <string name="action_show_more">더 읽기</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">중간</string>
     <string name="level_high">높게</string>
     <string name="level_very_high">매우 높음</string>
-    <string name="level_off">오프</string>
     <string name="auto_sleep_timer">자동 슬립 타이머</string>
     <string name="downloads_on_mobile_data">셀룰러를 사용하여 다운로드</string>
     <string name="streaming_on_mobile_data">셀룰러를 이용한 스트리밍</string>

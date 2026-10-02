@@ -10,17 +10,12 @@
     <string name="title_statistics">Saját statisztikák</string>
     <string name="title_new_playlist">Új lejátszási lista</string>
     <string name="menu_more">Több</string>
-    <string name="action_back">Vissza</string>
     <string name="action_cancel">Mégsem</string>
     <string name="action_save">Mentés</string>
-    <string name="action_remove">Eltávolítás</string>
-    <string name="action_delete">Törlés</string>
     <string name="action_play">Lejátszás</string>
     <string name="action_pause">Szünet</string>
     <string name="action_stream">Streamelés</string>
     <string name="action_download">Letöltés</string>
-    <string name="action_read">Olvasás</string>
-    <string name="action_mark_finished">Befejezettnek jelölés</string>
     <string name="action_discard_progress">Haladás elvetése</string>
     <string name="action_clear_filter">Szűrő törlése</string>
     <string name="action_show_more">Mutass többet</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Közepes</string>
     <string name="level_high">Magas</string>
     <string name="level_very_high">Nagyon magas</string>
-    <string name="level_off">Kikapcsolva</string>
     <string name="auto_sleep_timer">Automatikus alvásidőzítő</string>
     <string name="downloads_on_mobile_data">Letöltés mobilinternettel</string>
     <string name="streaming_on_mobile_data">Streamelés mobilinternettel</string>

@@ -10,17 +10,12 @@
     <string name="title_statistics">Sus estadísticas</string>
     <string name="title_new_playlist">Nueva lista de reproducción</string>
     <string name="menu_more">Más</string>
-    <string name="action_back">Atrás</string>
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>
-    <string name="action_remove">Quitar</string>
-    <string name="action_delete">Eliminar</string>
     <string name="action_play">Reproducir</string>
     <string name="action_pause">Pausar</string>
     <string name="action_stream">En directo</string>
     <string name="action_download">Descargar</string>
-    <string name="action_read">Leer</string>
-    <string name="action_mark_finished">Marcar como terminado</string>
     <string name="action_discard_progress">Descartar progreso</string>
     <string name="action_clear_filter">Vaciar filtro</string>
     <string name="action_show_more">Leer más</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">Medio</string>
     <string name="level_high">Alto</string>
     <string name="level_very_high">Muy alto</string>
-    <string name="level_off">Apagado</string>
     <string name="auto_sleep_timer">Cronómetro de auto‐apagado</string>
     <string name="downloads_on_mobile_data">Descargar usando el móvil</string>
     <string name="streaming_on_mobile_data">Streaming por móvil</string>

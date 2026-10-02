@@ -10,17 +10,12 @@
     <string name="title_statistics">إحصائياتك</string>
     <string name="title_new_playlist">قائمة تشغيل جديدة</string>
     <string name="menu_more">أكثر</string>
-    <string name="action_back">الرجوع</string>
     <string name="action_cancel">إلغاء</string>
     <string name="action_save">حفظ</string>
-    <string name="action_remove">إزالة</string>
-    <string name="action_delete">حذف</string>
     <string name="action_play">تشغيل</string>
     <string name="action_pause">إيقاف مؤقت</string>
     <string name="action_stream">بث</string>
     <string name="action_download">تنزيل</string>
-    <string name="action_read">اقرأ</string>
-    <string name="action_mark_finished">وضع علامة \"تم الإنتهاء\"</string>
     <string name="action_discard_progress">إلغاء التقدم</string>
     <string name="action_clear_filter">تصفية الفرز</string>
     <string name="action_show_more">اقرأ أكثر</string>
@@ -71,7 +66,6 @@
     <string name="level_medium">متوسط</string>
     <string name="level_high">مرتفع</string>
     <string name="level_very_high">عالي جدًا</string>
-    <string name="level_off">ايقاف</string>
     <string name="auto_sleep_timer">مؤقت النوم التلقائي</string>
     <string name="downloads_on_mobile_data">التنزيل عبر بيانات الهاتف</string>
     <string name="streaming_on_mobile_data">البث عبر شبكة الجوال</string>
