@@ -293,7 +293,9 @@ test("Tab is never held in one place by a MOBI book", async ({ page }) => {
   expect(reached.size).toBeGreaterThan(1);
 });
 
-test("after Tabbing into a MOBI book, a click in its text gives the page keys back to the reader", async ({ page }) => {
+test("after Tabbing into a MOBI book, a click in its text gives the page keys back to the reader", async ({
+  page,
+}) => {
   const api = await serverApi(accounts.user);
   const id = await bookId(api, "Night Ferry");
   await resetProgress(api, id);
@@ -306,7 +308,11 @@ test("after Tabbing into a MOBI book, a click in its text gives the page keys ba
   // Tab reaches the book itself, or a link in it where the browser tabs to links.
   const frame = page.locator("main iframe");
   await page.getByRole("link", { name: "Back" }).focus();
-  for (let press = 0; press < 10 && !(await frame.evaluate((element) => element === document.activeElement)); press++)
+  for (
+    let press = 0;
+    press < 10 && !(await frame.evaluate((element) => element === document.activeElement));
+    press++
+  )
     await page.keyboard.press("Tab");
   await expect(frame).toBeFocused();
 
