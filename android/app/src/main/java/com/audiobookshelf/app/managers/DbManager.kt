@@ -355,6 +355,9 @@ class DbManager {
     return Paper.book("mediaItemHistory").read(id)
   }
 
+  fun getAllMediaItemHistory(): List<MediaItemHistory> =
+    Paper.book("mediaItemHistory").allKeys.mapNotNull { id -> Paper.book("mediaItemHistory").read<MediaItemHistory>(id) }
+
   fun savePlaybackSession(playbackSession: PlaybackSession) {
     Paper.book("playbackSession").write(playbackSession.id, playbackSession)
   }

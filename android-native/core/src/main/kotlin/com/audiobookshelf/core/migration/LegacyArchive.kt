@@ -151,7 +151,7 @@ sealed class MigrationError(message: String) : java.io.IOException(message) {
 }
 
 /** An export archive from the legacy Android app (format 1, zipped). */
-class LegacyArchive private constructor(val file: File, val manifest: LegacyManifest, val fingerprint: String) {
+class LegacyArchive private constructor(val file: File, val manifest: LegacyManifest, val fingerprint: String, val snapshotDocument: JsonObject) {
     fun <T> read(stored: String, block: (InputStream) -> T): T = ZipFile(file).use { zip ->
         val entry = zip.getEntry(stored) ?: throw MigrationError.Unreadable()
         zip.getInputStream(entry).use(block)
@@ -181,7 +181,7 @@ class LegacyArchive private constructor(val file: File, val manifest: LegacyMani
             if (manifest.digests.values.any { !DIGEST.matches(it) }) throw MigrationError.Unreadable()
             if (manifest.storedPaths.any { (path, stored) -> path !in manifest.digests || !STORED.matches(stored) || ".." in stored.split('/') || stored !in entries }) throw MigrationError.Unreadable()
             val fingerprint = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
-            return LegacyArchive(file, manifest, fingerprint)
+            return LegacyArchive(file, manifest, fingerprint, document["snapshot"]?.jsonObject ?: JsonObject(emptyMap()))
         }
     }
 }

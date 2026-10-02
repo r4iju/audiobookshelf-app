@@ -3,6 +3,8 @@ package com.audiobookshelf.core.migration
 import com.audiobookshelf.core.AbsJson
 import com.audiobookshelf.core.AccountIdentity
 import com.audiobookshelf.core.LibraryItem
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.JsonObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -51,6 +53,27 @@ class LegacyImportTest {
     private val root get() = folder.root.resolve("migration")
 
     private fun importer() = LegacyImport(root)
+
+    @Test
+    fun committedImportPreservesHistoryAndUnknownSnapshotFieldsAcrossRepeatAndSave() {
+        val archive = altered("history.absmigration") { name, bytes ->
+            if (name == "archive.json") String(bytes).replace("\"snapshot\":{", "\"snapshot\":{\"mediaItemHistory\":[{\"id\":\"local_book-0\",\"events\":[{\"name\":\"Seek\",\"currentTime\":9.5}]}],\"futureReader\":{\"position\":\"opaque\"},").toByteArray() else bytes
+        }
+        val before = archive.readBytes()
+        importer().run(LegacyArchive.open(archive))
+        val sourceSnapshot = ZipFile(archive).use { zip ->
+            AbsJson.parseToJsonElement(zip.getInputStream(zip.getEntry("archive.json")).reader().readText()).jsonObject.getValue("snapshot")
+        }
+        val persisted = AbsJson.parseToJsonElement(root.resolve("outcome.json").readText()).jsonObject
+        assertEquals("Every exported field survives the public archive/import boundary", sourceSnapshot, persisted["legacySnapshot"])
+        val oldOutcome = JsonObject(persisted.filterKeys { it != "legacySnapshot" })
+        assertNull("Older committed imports remain readable", AbsJson.decodeFromJsonElement(Outcome.serializer(), oldOutcome).legacySnapshot)
+        val committed = importer().outcome()!!
+        importer().save(committed.copy(settingsApplied = true))
+        assertEquals(committed.copy(settingsApplied = true), importer().run(LegacyArchive.open(archive)))
+        assertTrue(root.resolve("outcome.json").readText().contains("opaque"))
+        assertTrue("The source archive is unchanged", before.contentEquals(archive.readBytes()))
+    }
 
     @Test
     fun preflightDescribesTheArchiveAndWritesNothing() {

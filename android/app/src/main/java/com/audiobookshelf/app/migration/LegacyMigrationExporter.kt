@@ -118,6 +118,7 @@ class LegacyMigrationExporter(private val context: Context, private val db: DbMa
       set<JsonNode>("localLibraryItems", mapper.valueToTree(db.getLocalLibraryItems()))
       set<JsonNode>("localMediaProgress", mapper.valueToTree(db.getAllLocalMediaProgress()))
       set<JsonNode>("playbackSessions", mapper.valueToTree(db.getPlaybackSessions()))
+      set<JsonNode>("mediaItemHistory", mapper.valueToTree(db.getAllMediaItemHistory()))
       set<JsonNode>("downloadItems", mapper.valueToTree(db.getDownloadItems()))
     }.also(::scrub)
   }
