@@ -65,8 +65,9 @@ default from a choice.
 
 ## 4. Strings still owned elsewhere
 
-`Playback/AppleNetworkPolicy.swift` (the cellular consent alert) and `Playback/ApplePlayback.swift` messages stay English.
-They can use `NativeStrings.current("…")` the same way as `ConnectionStore`, followed by `generate.py`.
+None. The cellular consent alert (`Playback/AppleNetworkPolicy.swift`), the `Playback/ApplePlayback.swift` and
+`Playback/PublicationLedger.swift` messages, and the download, reading and saved-account messages in `App/` go through
+`NativeStrings.current("…")`. They have no legacy key with the same meaning, so they show English until a translation exists.
 
 ## 5. Year export copy contract
 
