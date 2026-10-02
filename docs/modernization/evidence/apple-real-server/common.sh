@@ -65,6 +65,21 @@ remove_probes() {
   return 0
 }
 
+# Runners wrap each case in `step`: every case runs even after a failure, so all logs and result bundles exist, and
+# `finish` exits non-zero when any case or server step failed (results.txt lists each one).
+failed=0
+step() { "$@" || { failed=1; echo "FAILED: $*" | tee -a "$OUT/results.txt"; }; }
+finish() { echo "overall exit=$failed"; exit "$failed"; }
+
+# Prints a case's outcome and appends it to results.txt; returns the test command's own exit status.
+record() { # name status log extra-pattern
+  local name=$1 rc=$2 log=$3
+  echo "$name exit=$rc"
+  grep -E "Test Case .*(passed|failed)|error: -\[|$4" "$log"
+  echo "$name $rc" >> "$OUT/results.txt"
+  return "$rc"
+}
+
 # A pooled iPhone, leased once per runner and erased first.
 phone_lease() {
   RS_PHONE="$(sim acquire iphone --fresh --no-boot --for 'audiobookshelf apple real-server probe' | tail -1)"
@@ -76,8 +91,7 @@ xcode_phone() { # result-name scheme xcodebuild-args...
   xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme "$scheme" -destination "id=$RS_PHONE" \
     -derivedDataPath apple/build CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 \
     -collect-test-diagnostics never -resultBundlePath "$OUT/$name.xcresult" "$@" test > "$OUT/$name.log" 2>&1
-  echo "$name exit=$?"
-  grep -E "Test Case .*(passed|failed)|error: -\[|OFFLINE_|FINISH_|ADOPTION_REPORT|SYNC_|SERVER " "$OUT/$name.log"
+  record "$name" $? "$OUT/$name.log" "OFFLINE_|FINISH_|ADOPTION_REPORT|SYNC_|SERVER "
 }
 phone() { # result-name test-method...
   local name=$1 args=() t; shift
@@ -88,9 +102,8 @@ phone() { # result-name test-method...
 tv() { # result-name test-method...
   local name=$1 args=() t; shift
   for t in "$@"; do args+=("-only-testing:TVJourneyTests/RealServerProbe/$t"); done
-  ABS_TV_RESULT_BUNDLE="$OUT/tv-$name.xcresult" tvos/scripts/verify-ui.sh "${args[@]}" > "$OUT/tv-$name.log" 2>&1
-  echo "tv-$name exit=$?"
-  grep -E "Test Case .*(passed|failed)|error: -\[|TV_RESUME|TV_EPISODE" "$OUT/tv-$name.log"
+  ABS_TV_RESULT_BUNDLE="$OUT/tv-$name.xcresult" "${RS_TV_RUNNER:-tvos/scripts/verify-ui.sh}" "${args[@]}" > "$OUT/tv-$name.log" 2>&1
+  record "tv-$name" $? "$OUT/tv-$name.log" "TV_RESUME|TV_EPISODE"
 }
 
 # The legacy app's server side as qa-other, then the adoption probe. A streamed session syncs 5 s and is closed by a

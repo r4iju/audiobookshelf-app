@@ -6,9 +6,10 @@ source "$(dirname "$0")/common.sh"
 resolve_ids || exit 1
 install_probes
 phone_lease
-phone online test1SignInBrowseAndStreamAcrossFiles test2PDFPageSavedToServerAndRestored test3PodcastEpisodeProgress
-phone download test4aDownloadForOffline
-server_stop
-phone offline test4bPlayOfflineWithServerStopped
-server_start
-phone reconnect test4cReconnectPublishesOfflineListening
+step phone online test1SignInBrowseAndStreamAcrossFiles test2PDFPageSavedToServerAndRestored test3PodcastEpisodeProgress
+step phone download test4aDownloadForOffline
+step server_stop
+step phone offline test4bPlayOfflineWithServerStopped
+step server_start
+step phone reconnect test4cReconnectPublishesOfflineListening
+finish

@@ -1,0 +1,19 @@
+Server log lines for "The Long Tide" (media item ecba2576-78e2-483f-9a5f-4a4a4317ae6d) from the first real-server run,
+container abs-apple-qa on 127.0.0.1:19890, synthetic account qa. The container was later recreated by `server_fresh`, so
+these lines are copied from this run's saved tool output (07:52) and the fresh-context reviewer's read-only
+`docker logs` output (07:57), not from a live container.
+
+[2026-10-02 07:51:56.927] INFO: [Server] Init v2.30.0
+[2026-10-02 07:52:18.402] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (c0400b50-9a95-4f24-8637-3e0073c88e80) (updatedAt: 1790927500824.584)
+[2026-10-02 07:52:18.419] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 90.2008167755102 (previously 37.414833578)
+[2026-10-02 07:52:18.422] INFO: [MediaProgress] Marking media progress as finished because time remaining (2.2448979564160254e-7) is less than 10 seconds (media item ecba2576-78e2-483f-9a5f-4a4a4317ae6d)
+[2026-10-02 07:52:18.425] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 07:51:40.824 +00:00' (media item ecba2576-78e2-483f-9a5f-4a4a4317ae6d)
+(container stopped 07:56:04 and started 07:56:49 for the second offline attempt)
+[2026-10-02 07:57:11.772] INFO: [PlaybackSessionManager] Syncing local session "The Long Tide" (d0da19f0-7a59-4bd2-85f1-336028a943fd) (updatedAt: 1790927802964.437)
+[2026-10-02 07:57:11.783] INFO: [PlaybackSessionManager] Updating progress for "The Long Tide" with current time 74.556058689 (previously 90.2008167755102)
+[2026-10-02 07:57:11.787] INFO: [MediaProgress] Manually setting updatedAt to '2026-10-02 07:56:42.964 +00:00' (media item ecba2576-78e2-483f-9a5f-4a4a4317ae6d)
+
+Reads of GET /api/me/progress/262f4900-6cbf-4dc0-a751-109bf5a13939 as qa in between, from the process started at
+07:51:56: the probe polled once a second from 07:52:20 to 07:53:20, and a manual read was made before the 07:56:04 stop. All
+returned currentTime 37.414833578, isFinished false, lastUpdate 1790927209351 (07:46:49). The second attempt's download
+at 07:55:53, still in that process, resumed offline at 39 s (OFFLINE_START=39).

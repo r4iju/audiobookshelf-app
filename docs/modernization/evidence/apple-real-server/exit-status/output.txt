@@ -1,0 +1,21 @@
+# fail-demo.sh against the runner at 386fed27, before its step and finish lines were added:
+phone-fake exit=65
+Test Case '-[NativeJourneyTests.RealServerProbe testFake]' failed (0.1 seconds).
+phone() returned 0
+
+# fail-demo.sh against the corrected runner (exit status 1):
+phone-fake exit=65
+Test Case '-[NativeJourneyTests.RealServerProbe testFake]' failed (0.1 seconds).
+phone() returned 65
+phone-fake2 exit=65
+Test Case '-[NativeJourneyTests.RealServerProbe testFake]' failed (0.1 seconds).
+FAILED: phone fake2 testFake
+tv-fake exit=1
+FAILED: tv fake testFake
+overall exit=1
+
+# pass-demo.sh against the corrected runner (exit status 0):
+phone-fake exit=0
+Test Case '-[NativeJourneyTests.RealServerProbe testFake]' passed (0.1 seconds).
+tv-fake exit=0
+overall exit=0

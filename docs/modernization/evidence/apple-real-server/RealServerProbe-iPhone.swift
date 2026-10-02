@@ -250,7 +250,9 @@ import XCTest
         for _ in 0..<12 where app.buttons["pause-playback"].exists { app.buttons["Forward 10 seconds"].tap() }
         XCTAssertTrue(app.buttons["resume-playback"].waitForExistence(timeout: 20), "Playback must stop at the end of the book")
         XCTAssertTrue(app.staticTexts["File 3 of 3"].exists)
-        print("FINISH_END=\(bookElapsed(app).label)")
+        // At the end the player shows the last file's own time, with nothing left.
+        XCTAssertEqual(app.staticTexts["playback-remaining"].label, "−0 sec")
+        print("FINISH_END=\(app.staticTexts["playback-elapsed"].label) remaining \(app.staticTexts["playback-remaining"].label)")
         capture("real-server-offline-finished")
         app.buttons["Close playback"].tap()
     }

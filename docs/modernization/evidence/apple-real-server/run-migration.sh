@@ -6,4 +6,5 @@ source "$(dirname "$0")/common.sh"
 resolve_ids || exit 1
 install_probes
 phone_lease
-migration migration-rerun
+step migration migration-rerun
+finish

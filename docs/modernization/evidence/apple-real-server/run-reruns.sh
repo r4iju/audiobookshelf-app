@@ -6,5 +6,6 @@ source "$(dirname "$0")/common.sh"
 resolve_ids || exit 1
 install_probes
 phone_lease
-phone podcast-rerun2 test3PodcastEpisodeProgress
-tv resume-rerun test1ResumeAnotherClientsPositionAndCrossFiles
+step phone podcast-rerun2 test3PodcastEpisodeProgress
+step tv resume-rerun test1ResumeAnotherClientsPositionAndCrossFiles
+finish

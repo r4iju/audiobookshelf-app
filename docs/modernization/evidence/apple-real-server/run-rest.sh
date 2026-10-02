@@ -6,11 +6,12 @@ source "$(dirname "$0")/common.sh"
 resolve_ids || exit 1
 install_probes
 phone_lease
-phone download-rerun test4aDownloadForOffline
-server_stop
-phone offline-rerun test4bPlayOfflineWithServerStopped
-server_start
-phone reconnect-rerun test4cReconnectPublishesOfflineListening
-phone podcast-rerun test3PodcastEpisodeProgress
-tv all test1ResumeAnotherClientsPositionAndCrossFiles test2SearchAndPodcastEpisode
-migration migration
+step phone download-rerun test4aDownloadForOffline
+step server_stop
+step phone offline-rerun test4bPlayOfflineWithServerStopped
+step server_start
+step phone reconnect-rerun test4cReconnectPublishesOfflineListening
+step phone podcast-rerun test3PodcastEpisodeProgress
+step tv all test1ResumeAnotherClientsPositionAndCrossFiles test2SearchAndPodcastEpisode
+step migration migration
+finish
