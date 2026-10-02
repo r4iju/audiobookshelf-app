@@ -1,5 +1,57 @@
 # Apple native apps against a real Audiobookshelf 2.30.0 server
 
+## CURRENT (2026-10-02)
+
+**The affected Apple native software gate passes: 5/5 on the exact session-scoped packaged server.**
+Client source: `d3152a5d3bc0eb7c23bf77e835088d650df514a3` (merged PR #121).
+Server source amendment: merged PR #119 (`481acf981c6438033cde1f9ef5205e1221638b34`), packaged image
+`sha256:cd703e87399f76f4e887282ca219013f99eeb7b7f24cc028990b07b71b39eba4`.
+The cached image was used unchanged, without a network pull, `docker cp`, source overlays or bind overrides.
+Inspection before and after the cases pins the image and allows only `/library`, `/podcasts`, `/config`
+and `/metadata` mounts, all synthetic disposable data. The library is read-only.
+
+| Existing affected case | Native exit | Observed result |
+| --- | ---: | --- |
+| `test1SignInBrowseAndStreamAcrossFiles` | 0 | Restored sign-in, multi-file streaming, first progress 37.473 s, unfinished |
+| `test4aDownloadForOffline` | 0 | Multi-file book available offline |
+| `test4dFinishOfflineWithServerStopped` | 0 | Starts unfinished in file 2, reaches file 3/end with zero remaining |
+| `test4eReconnectPublishesTheFinish` | 0 | Server returns 90.2008167755102 s, finished; unchanged after another restart |
+| `testPendingLegacyListeningReachesTheRealServerExactlyOnce` | 0 | Three sessions acknowledged; second sync has nothing pending or unconfirmed; listening totals 25/11/3 s, positions 25/11/3.5 s; newer legacy position 2 s uploaded, newer server position 3 s preserved |
+
+The runner exits 0 and records every native command's own status. One pass does not demonstrate that a
+cache race occurred. Existing controlled/race, browser and Android passes are retained from their original
+sources and were not rerun. The old `c649a2bd` 5/5 is historical and cannot count for this image; that image
+is held because of its browser first-PATCH regression.
+
+Unchanged packaged source SHA-256:
+
+- `/app/server/models/User.js`: `d36db80057337ae071a436a7753cb3aa024e97373e8d4cc9e805d1c048486097`.
+- `/app/server/managers/PlaybackSessionManager.js`: `a140b5679a81e8b48b3485f6bd7e2bee0c20fb6bd79819a61279e465c8f685ae`.
+
+Reproduce using the cached image, local Xcode/XcodeGen and `sim`, from an external-SSD checkout:
+
+```sh
+ABS_RS_OUT=/path/on/external-ssd/unique-evidence \
+ABS_RS_DERIVED=/path/on/external-ssd/owned-derived \
+  docs/modernization/evidence/apple-real-server/server-combined/run-packaged-native.sh
+```
+
+No new tests or app fixes were added. The runner reuses the existing probe sources and seeded fixtures,
+leases a pooled iPhone, then releases it and removes only its owned container/volumes. Logs, result bundles,
+exact source hashes and both Arabic failures remain private. Public proof hashes:
+
+- Five-case `results.txt`: `a5e6324f90d010101f45dae597440151be7af26c08190ab6279dd1f089b8f1d8`.
+- `runner-output.txt`: `8a504175f0446a982dd01f044f629314de6bfb38906fbf7612dc4ac3cede982a`.
+- `source-hashes.txt`: `d56577d72f893a14b7106fc3e8a0b3beb43d3712ef09f48ed2d5d2823bedd9fe`.
+- Executed runner: `cbc6f4187f366f38b08904eeeecc0a148c68cb2d53a6b7e0dafda14fd3e7f6f6`.
+
+**Separate open gates:** owner server promotion/acceptance, physical audio routes/system controls,
+owner-library and real legacy migration/rollback acceptance, assistive-technology and native-speaker review.
+The [Arabic render failure](APPLE-LOCALIZATION-READINESS.md#current-2026-10-02) remains excluded from acceptance.
+The owner server was not changed, and this bounded pass does not close Phase 1 or replace the original criteria.
+
+## Historical real-server evidence
+
 Before this run, every native journey had been tested only against the Python and Node fixtures. This run uses the production iPhone app, the production TV app and the production migration adoption code against the real server image recorded in `SERVER-COMPATIBILITY.md`.
 
 The setup is local, isolated and synthetic. It establishes no owner-library, owner-device, physical-hardware, OpenID-provider, SMTP or real-legacy-data acceptance.

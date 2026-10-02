@@ -15,7 +15,7 @@ import { OIDC_PORT } from "./oidc.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const runtime = join(here, ".runtime");
 export const container = process.env.ABS_QA_CONTAINER ?? "abs-web-qa";
-export const image =
+export const image = process.env.ABS_QA_IMAGE ??
   "ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03";
 export const QA_PORT = Number(process.env.ABS_QA_PORT ?? 19880);
 const origin = `http://127.0.0.1:${QA_PORT}`;

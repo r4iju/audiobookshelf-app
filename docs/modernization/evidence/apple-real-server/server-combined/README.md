@@ -1,5 +1,14 @@
 # Apple native cases against the combined server candidate
 
+## CURRENT (2026-10-02)
+
+The unchanged session-scoped packaged image `sha256:cd703e87399f76f4e887282ca219013f99eeb7b7f24cc028990b07b71b39eba4`
+passes the same five native cases at client `d3152a5d`. Use `run-packaged-native.sh`, which pins image identity,
+source hashes and the allowed synthetic data mounts before and after the run. No source files are replaced
+inside the container. [Current evidence and limits](../../../APPLE-REAL-SERVER-QA.md#current-2026-10-02).
+
+## Historical source-overlay candidate
+
 The two reviewed 2.30.0 server candidates together, Apple's user-cache patch (`../server-usercache/`) then Android's
 first-progress patch (`../../android-real-server/server-first-progress/`), in the owned diagnostic container only. Only the
 Apple cases the two patches affect are run, against a freshly seeded synthetic library:

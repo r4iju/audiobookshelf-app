@@ -1,5 +1,35 @@
 # Apple localization readiness (#22)
 
+## CURRENT (2026-10-02)
+
+PR #121 is merged at `d3152a5d3bc0eb7c23bf77e835088d650df514a3`. The generated
+[coverage inventory](../../apple/Localization/COVERAGE.md) lists 699 native texts, with available entries
+for every supported language. Maintained translations are machine-drafted; coverage is not native-speaker
+approval. Saved generator/placeholder, localization 18/18, shared-core text 2/2 and TVCore 72/72 evidence
+belongs to the localization integration work. Those unchanged suites and signed packages were not rebuilt
+for this bounded server gate.
+
+The saved Arabic render walk on the pre-integration localization checkout failed at the second sign-in,
+before `library-books` appeared. Its screenshot and accessibility hierarchy show fully visible server,
+username, password and Connect controls, with the localized rejection message. They do not demonstrate
+clipping of the main controls. The production form clears its password on submission; the old probe then
+sends five deletion keys before entering the retry password. A single follow-up on `d3152a5d`, removing
+those deletion keys, still failed at the same library assertion (exit 65). Thus a simple deletion-key mismatch
+is not a demonstrated explanation. No app defect or correction is established, and neither failed walk counts
+as Arabic main-screen acceptance. No further Arabic rerun or translation sweep was performed.
+
+Retained private evidence hashes (SHA-256):
+
+- Saved `render-ar-large/probe.log`: `c5b9e6cb3c6fee0f673957deb65c1b715a5679ee926f6c794f1e32fd32874025`.
+- Current follow-up `probe.log`: `d078f6234f36721c5b9fd37f9876e7db1b869551101a6ec714998a522bf07b85`.
+- Follow-up probe source: `ab9c5213bddcc4dc572899bb1f74bb73a7427b775cd62446f7c87dcba6f9d779`.
+
+Native-speaker quality, Arabic post-sign-in rendering, physical VoiceOver/reduced-motion and hardware
+acceptance remain open. Historical partial-coverage counts and earlier failures below describe their original
+source; they do not override the current coverage inventory.
+
+## Historical localization slice
+
 Bounded audit of the native iPhone, iPad and TV text against the legacy localizable journeys, on `fork/apple-localization-readiness` from `origin/fork/native-tv` (79b31196). Code commits 5d7c2c0d, 01d91bc7, 98cf1729 and c0a271ca were cleared by two root review axes at c0a271ca. Translation readiness is partial, by design and not waived: native text without a legacy key that means the same stays English, and the Language screen says so.
 
 ## Coverage counts
