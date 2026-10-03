@@ -498,7 +498,7 @@ struct AdoptionProgress: Equatable {
         }
         var ebook: EbookFile?
         if let book = download.ebook {
-            if ["pdf", "epub"].contains(book.format) {
+            if ["pdf", "epub", "mobi", "azw3", "cbz", "cbr"].contains(book.format) {
                 ebook = EbookFile(ino: book.ino, ebookFormat: book.format, metadata: .init(filename: legacy.ebook?.filename ?? book.file?.filename, ext: book.format))
                 files.append(book.file)
             } else {
@@ -616,7 +616,7 @@ struct AdoptionProgress: Equatable {
             let format = (filename as NSString).pathExtension.lowercased()
             var row = AdoptionReport.Download(account: download.account, libraryItemID: download.libraryItemID, episodeID: nil, supplementaryFile: filename, title: download.title,
                                               status: .deferredFormat, nativeEntryID: nil, adoptedParts: file.file == nil ? 0 : 1, totalParts: 1, message: nil)
-            guard ["pdf", "epub"].contains(format) else {
+            guard ["pdf", "epub", "mobi", "azw3", "cbz", "cbr"].contains(format) else {
                 row.message = "\(filename) is kept on this device; this app does not open its format yet."
                 result.append(.done(row))
                 continue
@@ -686,14 +686,17 @@ struct AdoptionProgress: Equatable {
             guard let account = progress.account, let itemID = progress.libraryItemID, let identity = identity(account) else { row.status = .unattached; continue }
             let value: String
             switch (location.kind, location.format) {
+            case (.invalid, "pdf"), (.invalid, "epub"), (.invalid, "mobi"), (.invalid, "azw3"), (.invalid, "cbz"), (.invalid, "cbr"):
+                value = location.raw; row.status = .invalid
             case (.invalid, _): row.status = .invalid; continue
-            case (.page, "pdf"): guard let page = location.page else { row.status = .invalid; continue }; value = String(page)
+            case (.page, "pdf"), (.page, "cbz"), (.page, "cbr"): guard let page = location.page else { row.status = .invalid; continue }; value = String(page)
             case (.cfi, "epub"): value = location.raw
+            case (.opaque, "mobi"), (.opaque, "azw3"): value = location.raw
             default: row.status = .deferredFormat; continue
             }
             let fraction = location.fraction.flatMap { $0.isFinite ? min(max($0, 0), 1) : nil } ?? 0
             let position = ReadingStore.Position(account: identity, itemID: itemID, format: location.format!, location: value, fraction: fraction,
-                                                 updatedAt: progress.lastUpdate, revision: "legacy:" + progress.legacyID, pending: true, rotation: 0)
+                                                 updatedAt: progress.lastUpdate, revision: "legacy:" + progress.legacyID, pending: location.kind != .invalid && (location.kind != .opaque || location.raw.range(of: "^mobi:1:[0-9]+:[0-9]+$", options: .regularExpression) != nil), rotation: 0)
             row.location = value
             if let existing = reading.position(account: identity, itemID: itemID, format: position.format) {
                 row.status = existing.revision == position.revision ? .adopted : .keptNative

@@ -162,8 +162,8 @@ public struct MigratedReadingLocation: Codable, Equatable {
         case page
         /// epub.js CFI.
         case cfi
-        /// Format whose location semantics belong to a deferred reader (MOBI, AZW3) or an
-        /// unknown format; preserved verbatim.
+        /// Location whose semantics are not interpreted by migration (MOBI, AZW3 or an
+        /// unknown format); preserved verbatim for the reader.
         case opaque
         /// The stored value does not match its format; preserved verbatim and reported.
         case invalid

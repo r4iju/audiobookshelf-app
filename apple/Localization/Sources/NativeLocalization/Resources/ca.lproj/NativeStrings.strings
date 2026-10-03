@@ -180,6 +180,8 @@
 "Find your next chapter." = "Trobeu el vostre proper capítol.";
 "Find your next listen." = "Trobeu la vostra propera escolta.";
 "Finished" = "Acabat";
+"Fit page" = "Ajusta la pàgina";
+"Fit width" = "Ajusta a l’amplada";
 "Font" = "Família tipogràfica";
 "Font size" = "Escala de la lletra";
 "Font size {0}%" = "Mida de la lletra {0} %";
@@ -296,7 +298,6 @@
 "Open downloads" = "Obre les baixades";
 "Open feed" = "Obrir font";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "L'inici de sessió amb OpenID no està activat en aquest servidor. Feu servir el nom d'usuari i la contrasenya.";
-"Opening EPUB…" = "Obrint l'EPUB…";
 "Opening PDF…" = "Obrint el PDF…";
 "Opening collections…" = "Obrint les col·leccions…";
 "Opening episodes…" = "Obrint els episodis…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Obrint la vostra biblioteca…";
 "Opening your statistics…" = "Obrint les vostres estadístiques…";
 "Opening your year…" = "Obrint el vostre any…";
+"Opening {0}…" = "Obrint l'{0}…";
 "Opens the share sheet with this image and a text summary." = "Obre el full de compartir amb aquesta imatge i un resum de text.";
 "Page" = "Pàgina";
+"Page fit" = "Ajust de pàgina";
 "Page saved on this device. Sync follows when listening closes." = "Pàgina desada en aquest dispositiu. Se sincronitzarà en tancar l'escolta.";
 "Page {0} of {1}" = "Pàgina {0} de {1}";
 "Passage saved on this device. Sync follows when listening closes." = "Passatge desat en aquest dispositiu. Se sincronitzarà en tancar l'escolta.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "No s'ha pogut llegir el registre dels desaments anteriors, de manera que el servidor encara en podria aplicar qualsevol. L'escolta més recent es queda en aquest televisor fins que es confirmi un reinici del servidor.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "No s'ha pogut llegir ni actualitzar el registre del progrés enviat al servidor, així que no s'enviarà res més. Conserveu les dades de l'aplicació i torneu-ho a provar.";
 "The recorded problems are removed from this device." = "Els problemes registrats s'eliminen d'aquest dispositiu.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Aquest lector no reconeix la posició desada. Es conserva fins que trieu un passatge nou.";
 "The saved values are not valid numbers and are kept on this device." = "Els valors desats no són números vàlids i es conserven en aquest dispositiu.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "No s'ha trobat l'adreça del servidor. Comproveu el nom d'amfitrió i que el televisor sigui a la mateixa xarxa.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "No s'ha pogut accedir al servidor. Comproveu-ne l'adreça, la Wi-Fi o la VPN, i torneu-ho a provar. L'inici de sessió desat es conserva.";
@@ -553,10 +557,9 @@
 "Theme" = "Tema";
 "There is not enough storage on this device for this download. Free up space, then retry." = "No hi ha prou espai en aquest dispositiu per a aquesta baixada. Allibereu espai i torneu-ho a provar.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Aquest Apple TV no confia en el certificat HTTPS del servidor. Instal·leu el perfil de l'autoritat de certificació al televisor i doneu-li confiança, o feu servir l'adreça HTTP local del servidor.";
-"This EPUB could not be opened: {0}" = "No s'ha pogut obrir aquest EPUB: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "Aquest EPUB està malmès o no és un arxiu EPUB compatible.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "No s'ha pogut obrir aquest PDF. Pot ser que estigui malmès o que requereixi una contrasenya. Comproveu el fitxer original i torneu-ho a provar.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "La configuració HTTP de l'aplicació ha bloquejat aquesta adreça. Feu servir HTTPS o actualitzeu a una versió compatible amb el vostre servidor HTTP local.";
+"This document is empty or too large to open." = "Aquest document és buit o massa gran per obrir-lo.";
 "This episode is no longer available on the server." = "Aquest episodi ja no està disponible al servidor.";
 "This episode is no longer on the server." = "Aquest episodi ja no és al servidor.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "Aquesta exportació fa servir una versió de base de dades no compatible. Conserveu-la i actualitzeu l'importador abans de tornar-ho a provar.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Aquesta biblioteca és buida.";
 "This library is empty. Add titles on your server, then refresh." = "Aquesta biblioteca és buida. Afegiu títols al servidor i després actualitzeu.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "El certificat d'aquest servidor no és de confiança. Comproveu-ne la data i el nom d'amfitrió. Per a la vostra autoritat de certificació pròpia, instal·leu-ne el perfil i activeu la confiança total a Configuració → General → Informació → Configuració de confiança de certificats, i torneu-ho a provar.";
+"This {0} could not be opened: {1}" = "No s'ha pogut obrir aquest {0}: {1}";
 "Time listening" = "Temps d'escolta";
 "Title" = "Títol";
 "Title A–Z" = "Títol A–Z";

@@ -180,6 +180,8 @@
 "Find your next chapter." = "Finn ditt neste kapittel.";
 "Find your next listen." = "Finn din neste lytteopplevelse.";
 "Finished" = "Fullført";
+"Fit page" = "Hele siden";
+"Fit width" = "Tilpass bredden";
 "Font" = "Skriftfamilie";
 "Font size" = "Font størrelse";
 "Font size {0}%" = "Skriftstørrelse {0} %";
@@ -296,7 +298,6 @@
 "Open downloads" = "Åpne nedlastinger";
 "Open feed" = "Åpne Feed";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "Pålogging med OpenID er ikke aktivert på denne tjeneren. Bruk brukernavnet og passordet ditt.";
-"Opening EPUB…" = "Åpner EPUB …";
 "Opening PDF…" = "Åpner PDF …";
 "Opening collections…" = "Åpner samlinger …";
 "Opening episodes…" = "Åpner episoder …";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Åpner biblioteket ditt …";
 "Opening your statistics…" = "Åpner statistikken din …";
 "Opening your year…" = "Åpner året ditt …";
+"Opening {0}…" = "Åpner {0} …";
 "Opens the share sheet with this image and a text summary." = "Åpner delingsarket med dette bildet og et tekstsammendrag.";
 "Page" = "Side";
+"Page fit" = "Sidetilpasning";
 "Page saved on this device. Sync follows when listening closes." = "Siden er lagret på denne enheten. Synkronisering følger når lyttingen avsluttes.";
 "Page {0} of {1}" = "Side {0} av {1}";
 "Passage saved on this device. Sync follows when listening closes." = "Avsnittet er lagret på denne enheten. Synkronisering følger når lyttingen avsluttes.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "Registeret over tidligere lagringer kunne ikke leses, så tjeneren kan fortsatt bruke hvilken som helst av dem. Nyere lytting blir værende på denne TV-en til en omstart av tjeneren er bekreftet.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "Registeret over fremdrift sendt til tjeneren kunne ikke leses eller oppdateres, så ingenting mer sendes. Behold appens data, og prøv på nytt.";
 "The recorded problems are removed from this device." = "De registrerte problemene fjernes fra denne enheten.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Denne leseren gjenkjenner ikke den lagrede posisjonen. Den beholdes til du velger et nytt avsnitt.";
 "The saved values are not valid numbers and are kept on this device." = "De lagrede verdiene er ikke gyldige tall og beholdes på denne enheten.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "Tjeneradressen ble ikke funnet. Sjekk vertsnavnet og at TV-en er på samme nettverk.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "Tjeneren kunne ikke nås. Sjekk adressen, wifi eller VPN, og prøv på nytt. Den lagrede påloggingen din beholdes.";
@@ -553,10 +557,9 @@
 "Theme" = "Tema";
 "There is not enough storage on this device for this download. Free up space, then retry." = "Det er ikke nok lagringsplass på denne enheten for denne nedlastingen. Frigjør plass, og prøv på nytt.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Denne Apple TV-en klarerer ikke tjenerens HTTPS-sertifikat. Installer og klarer profilen for sertifikatutstederen din på TV-en, eller bruk tjenerens lokale HTTP-adresse.";
-"This EPUB could not be opened: {0}" = "Denne EPUB-filen kunne ikke åpnes: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "Denne EPUB-filen er skadet eller ikke et støttet EPUB-arkiv.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "Denne PDF-filen kunne ikke åpnes. Den kan være skadet eller kreve et passord. Sjekk originalfilen, og prøv på nytt.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "Denne adressen ble blokkert av appens HTTP-konfigurasjon. Bruk HTTPS, eller oppdater til en versjon som støtter den lokale HTTP-tjeneren din.";
+"This document is empty or too large to open." = "Dette dokumentet er tomt eller for stort til å åpnes.";
 "This episode is no longer available on the server." = "Denne episoden er ikke lenger tilgjengelig på tjeneren.";
 "This episode is no longer on the server." = "Denne episoden finnes ikke lenger på tjeneren.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "Denne eksporten bruker en databaseversjon som ikke støttes. Behold den, og oppdater importfunksjonen før du prøver på nytt.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Dette biblioteket er tomt.";
 "This library is empty. Add titles on your server, then refresh." = "Dette biblioteket er tomt. Legg til titler på tjeneren din, og oppdater deretter.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "Tjenerens sertifikat er ikke klarert. Sjekk dato og vertsnavn. For homelab-CA-en din må du installere profilen og slå på full klarering i Innstillinger → Generelt → Om → Innstillinger for sertifikatklarering, og deretter prøve på nytt.";
+"This {0} could not be opened: {1}" = "Denne {0}-filen kunne ikke åpnes: {1}";
 "Time listening" = "Lyttetid";
 "Title" = "Tittel";
 "Title A–Z" = "Tittel A–Å";

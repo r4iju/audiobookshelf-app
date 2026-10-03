@@ -180,6 +180,8 @@
 "Find your next chapter." = "اعثر على فصلك التالي.";
 "Find your next listen." = "اعثر على ما ستستمع إليه تاليًا.";
 "Finished" = "المنجزة";
+"Fit page" = "ملاءمة الصفحة كاملة";
+"Fit width" = "ملاءمة العرض";
 "Font" = "عائلة الخطوط";
 "Font size" = "نطاق الخط";
 "Font size {0}%" = "حجم الخط {0}٪";
@@ -296,7 +298,6 @@
 "Open downloads" = "فتح التنزيلات";
 "Open feed" = "فتح التغذية";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "تسجيل الدخول عبر OpenID غير مفعّل على هذا الخادم. استخدم اسم المستخدم وكلمة المرور.";
-"Opening EPUB…" = "جارٍ فتح EPUB…";
 "Opening PDF…" = "جارٍ فتح PDF…";
 "Opening collections…" = "جارٍ فتح المجموعات…";
 "Opening episodes…" = "جارٍ فتح الحلقات…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "جارٍ فتح مكتبتك…";
 "Opening your statistics…" = "جارٍ فتح إحصائياتك…";
 "Opening your year…" = "جارٍ فتح عامك…";
+"Opening {0}…" = "جارٍ فتح {0}…";
 "Opens the share sheet with this image and a text summary." = "يفتح ورقة المشاركة مع هذه الصورة وملخص نصي.";
 "Page" = "الصفحة";
+"Page fit" = "ملاءمة الصفحة";
 "Page saved on this device. Sync follows when listening closes." = "تم حفظ الصفحة على هذا الجهاز. تتم المزامنة عند إغلاق الاستماع.";
 "Page {0} of {1}" = "الصفحة {0} من {1}";
 "Passage saved on this device. Sync follows when listening closes." = "تم حفظ المقطع على هذا الجهاز. تتم المزامنة عند إغلاق الاستماع.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "تعذّرت قراءة سجل عمليات الحفظ السابقة، لذا قد يطبّق الخادم أيًّا منها لاحقًا. يبقى الاستماع الأحدث على هذا التلفزيون إلى أن يتم تأكيد إعادة تشغيل الخادم.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "تعذّرت قراءة سجل التقدّم المُرسل إلى الخادم أو تحديثه، لذا لن يُرسل أي شيء آخر. احتفظ ببيانات التطبيق وحاول مرة أخرى.";
 "The recorded problems are removed from this device." = "تُزال المشكلات المسجّلة من هذا الجهاز.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "لا يفهم هذا القارئ الموضع المحفوظ. سيُحتفظ به حتى تختار مقطعًا جديدًا.";
 "The saved values are not valid numbers and are kept on this device." = "القيم المحفوظة ليست أرقامًا صالحة، لذا يُحتفظ بها على هذا الجهاز.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "تعذّر العثور على عنوان الخادم. تحقق من اسم المضيف ومن أن التلفزيون على الشبكة نفسها.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "تعذّر الوصول إلى الخادم. تحقق من عنوانه أو Wi-Fi أو VPN، ثم أعد المحاولة. تم الاحتفاظ بتسجيل دخولك المحفوظ.";
@@ -553,10 +557,9 @@
 "Theme" = "النمط";
 "There is not enough storage on this device for this download. Free up space, then retry." = "لا توجد مساحة تخزين كافية على هذا الجهاز لهذا التنزيل. حرّر بعض المساحة، ثم أعد المحاولة.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "لا يثق جهاز Apple TV هذا بشهادة HTTPS الخاصة بالخادم. ثبّت ملف تعريف مرجع الشهادات الخاص بك على التلفزيون وامنحه الثقة، أو استخدم عنوان HTTP المحلي للخادم.";
-"This EPUB could not be opened: {0}" = "تعذّر فتح ملف EPUB هذا: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "ملف EPUB هذا تالف أو ليس أرشيف EPUB مدعومًا.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "تعذّر فتح ملف PDF هذا. ربما يكون تالفًا أو يتطلب كلمة مرور. تحقق من الملف الأصلي وأعد المحاولة.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "تم حظر هذا العنوان بواسطة إعدادات HTTP في التطبيق. استخدم HTTPS أو حدّث إلى إصدار يدعم خادم HTTP المحلي الخاص بك.";
+"This document is empty or too large to open." = "هذا المستند فارغ أو كبير جدًا لفتحه.";
 "This episode is no longer available on the server." = "لم تعد هذه الحلقة متاحة على الخادم.";
 "This episode is no longer on the server." = "لم تعد هذه الحلقة موجودة على الخادم.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "يستخدم ملف التصدير هذا إصدار قاعدة بيانات غير مدعوم. احتفظ به وحدّث أداة الاستيراد قبل المحاولة مرة أخرى.";
@@ -565,6 +568,7 @@
 "This library is empty." = "هذه المكتبة فارغة.";
 "This library is empty. Add titles on your server, then refresh." = "هذه المكتبة فارغة. أضِف عناوين على خادمك، ثم حدّث.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "شهادة هذا الخادم غير موثوقة. تحقق من تاريخها واسم المضيف. بالنسبة إلى مرجع الشهادات الخاص بمختبرك المنزلي، ثبّت ملف التعريف الخاص به وفعّل الثقة الكاملة في الإعدادات ← عام ← حول ← إعدادات الثقة في الشهادات، ثم أعد المحاولة.";
+"This {0} could not be opened: {1}" = "تعذّر فتح ملف {0} هذا: {1}";
 "Time listening" = "وقت الاستماع";
 "Title" = "عنوان";
 "Title A–Z" = "العنوان أ–ي";

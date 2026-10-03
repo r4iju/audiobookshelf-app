@@ -180,6 +180,8 @@
 "Find your next chapter." = "למצוא את הפרק הבא שלך.";
 "Find your next listen." = "למצוא את ההאזנה הבאה שלך.";
 "Finished" = "הושלם";
+"Fit page" = "עמוד שלם";
+"Fit width" = "התאמה לרוחב";
 "Font" = "גופן";
 "Font size" = "גודל פונט";
 "Font size {0}%" = "גודל גופן {0}%";
@@ -296,7 +298,6 @@
 "Open downloads" = "פתיחת ההורדות";
 "Open feed" = "פתח פיד";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "התחברות באמצעות OpenID אינה מופעלת בשרת זה. יש להשתמש בשם המשתמש ובסיסמה.";
-"Opening EPUB…" = "פותח EPUB…";
 "Opening PDF…" = "פותח PDF…";
 "Opening collections…" = "פותח אוספים…";
 "Opening episodes…" = "פותח פרקים…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "פותח את הספרייה שלך…";
 "Opening your statistics…" = "פותח את הנתונים הסטטיסטיים שלך…";
 "Opening your year…" = "פותח את השנה שלך…";
+"Opening {0}…" = "פותח {0}…";
 "Opens the share sheet with this image and a text summary." = "פותח את גיליון השיתוף עם התמונה הזו וסיכום טקסטואלי.";
 "Page" = "עמוד";
+"Page fit" = "התאמת עמוד";
 "Page saved on this device. Sync follows when listening closes." = "העמוד נשמר במכשיר זה. הסנכרון יתבצע כשההאזנה תיסגר.";
 "Page {0} of {1}" = "עמוד {0} מתוך {1}";
 "Passage saved on this device. Sync follows when listening closes." = "הקטע נשמר במכשיר זה. הסנכרון יתבצע כשההאזנה תיסגר.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "לא ניתן היה לקרוא את רישום השמירות הקודמות, ולכן השרת עדיין עשוי להחיל כל אחת מהן. ההאזנה החדשה יותר נשארת בטלוויזיה הזו עד לאישור הפעלה מחדש של השרת.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "לא ניתן היה לקרוא או לעדכן את רישום ההתקדמות שנשלחה לשרת, ולכן לא יישלח דבר נוסף. יש לשמור את נתוני היישום ולנסות שוב.";
 "The recorded problems are removed from this device." = "הבעיות שנרשמו יוסרו ממכשיר זה.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "הקורא הזה אינו מזהה את המיקום השמור. הוא יישמר עד לבחירת קטע חדש.";
 "The saved values are not valid numbers and are kept on this device." = "הערכים השמורים אינם מספרים חוקיים, ולכן הם נשמרים במכשיר זה.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "לא ניתן היה למצוא את כתובת השרת. יש לבדוק את שם המארח ושהטלוויזיה מחוברת לאותה רשת.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "לא ניתן היה להגיע לשרת. יש לבדוק את הכתובת, את ה-Wi-Fi או את ה-VPN, ולנסות שוב. פרטי ההתחברות השמורים נשמרים.";
@@ -553,10 +557,9 @@
 "Theme" = "ערכת נושא";
 "There is not enough storage on this device for this download. Free up space, then retry." = "אין מספיק אחסון במכשיר זה עבור ההורדה. יש לפנות מקום ולנסות שוב.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "ה-Apple TV הזה אינו נותן אמון באישור ה-HTTPS של השרת. יש להתקין את פרופיל רשות האישורים בטלוויזיה ולתת בו אמון, או להשתמש בכתובת ה-HTTP המקומית של השרת.";
-"This EPUB could not be opened: {0}" = "לא ניתן היה לפתוח את קובץ ה-EPUB: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "קובץ ה-EPUB פגום או שאינו ארכיון EPUB נתמך.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "לא ניתן היה לפתוח את קובץ ה-PDF. ייתכן שהוא פגום או מוגן בסיסמה. יש לבדוק את הקובץ המקורי ולנסות שוב.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "הכתובת נחסמה על ידי תצורת ה-HTTP של היישום. יש להשתמש ב-HTTPS או לעדכן לגרסה שתומכת בשרת ה-HTTP המקומי שלך.";
+"This document is empty or too large to open." = "המסמך הזה ריק או גדול מדי לפתיחה.";
 "This episode is no longer available on the server." = "הפרק הזה כבר לא זמין בשרת.";
 "This episode is no longer on the server." = "הפרק הזה כבר לא נמצא בשרת.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "הייצוא הזה משתמש בגרסת מסד נתונים שאינה נתמכת. יש לשמור אותו ולעדכן את כלי הייבוא לפני שמנסים שוב.";
@@ -565,6 +568,7 @@
 "This library is empty." = "הספרייה ריקה.";
 "This library is empty. Add titles on your server, then refresh." = "הספרייה ריקה. יש להוסיף כותרים בשרת ואז לרענן.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "האישור של שרת זה אינו מהימן. יש לבדוק את התאריך ואת שם המארח. עבור רשות אישורים ביתית, יש להתקין את הפרופיל שלה ולהפעיל אמון מלא ב״הגדרות ← כללי ← אודות ← הגדרות אמון באישורים״, ולנסות שוב.";
+"This {0} could not be opened: {1}" = "לא ניתן היה לפתוח את קובץ ה-{0}: {1}";
 "Time listening" = "זמן האזנה";
 "Title" = "כותרת";
 "Title A–Z" = "כותר א–ת";

@@ -180,6 +180,8 @@
 "Find your next chapter." = "Raskite savo kitą skyrių.";
 "Find your next listen." = "Raskite, ko klausytis toliau.";
 "Finished" = "Baigta";
+"Fit page" = "Visas puslapis";
+"Fit width" = "Pagal plotį";
 "Font" = "Šriftas";
 "Font size" = "Šrifto mastelis";
 "Font size {0}%" = "Šrifto dydis {0} %";
@@ -296,7 +298,6 @@
 "Open downloads" = "Atidaryti atsisiuntimus";
 "Open feed" = "Atidaryti srautą";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "Šiame serveryje prisijungimas per OpenID neįjungtas. Naudokite vartotojo vardą ir slaptažodį.";
-"Opening EPUB…" = "Atidaromas EPUB…";
 "Opening PDF…" = "Atidaromas PDF…";
 "Opening collections…" = "Atidaromos kolekcijos…";
 "Opening episodes…" = "Atidaromi epizodai…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Atidaroma biblioteka…";
 "Opening your statistics…" = "Atidaroma statistika…";
 "Opening your year…" = "Atidaroma metų apžvalga…";
+"Opening {0}…" = "Atidaromas {0}…";
 "Opens the share sheet with this image and a text summary." = "Atidaro bendrinimo langą su šiuo vaizdu ir tekstine santrauka.";
 "Page" = "Puslapis";
+"Page fit" = "Puslapio pritaikymas";
 "Page saved on this device. Sync follows when listening closes." = "Puslapis išsaugotas šiame įrenginyje. Sinchronizuojama, kai klausymas baigiamas.";
 "Page {0} of {1}" = "Puslapis {0} iš {1}";
 "Passage saved on this device. Sync follows when listening closes." = "Vieta tekste išsaugota šiame įrenginyje. Sinchronizuojama, kai klausymas baigiamas.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "Nepavyko nuskaityti ankstesnių išsaugojimų žurnalo, todėl serveris vis dar gali pritaikyti bet kurį iš jų. Naujesnis klausymas lieka šiame televizoriuje, kol bus patvirtintas serverio paleidimas iš naujo.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "Nepavyko nuskaityti ar atnaujinti į serverį išsiųsto progreso žurnalo, todėl daugiau nieko nesiunčiama. Neištrinkite programos duomenų ir bandykite dar kartą.";
 "The recorded problems are removed from this device." = "Užfiksuotos problemos bus pašalintos iš šio įrenginio.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Ši skaityklė neatpažįsta išsaugotos vietos. Ji išliks, kol pasirinksite naują ištrauką.";
 "The saved values are not valid numbers and are kept on this device." = "Išsaugotos reikšmės nėra tinkami skaičiai, todėl saugomos šiame įrenginyje.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "Serverio adreso rasti nepavyko. Patikrinkite pagrindinio kompiuterio vardą ir ar televizorius prijungtas prie to paties tinklo.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "Serverio pasiekti nepavyko. Patikrinkite jo adresą, Wi-Fi ar VPN, tada bandykite dar kartą. Išsaugoti prisijungimo duomenys nepakeisti.";
@@ -553,10 +557,9 @@
 "Theme" = "Tema";
 "There is not enough storage on this device for this download. Free up space, then retry." = "Šiame įrenginyje nepakanka vietos šiam atsisiuntimui. Atlaisvinkite vietos ir bandykite dar kartą.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Šis Apple TV nepasitiki serverio HTTPS sertifikatu. Įdiekite savo sertifikatų įstaigos profilį televizoriuje ir suteikite jam pasitikėjimą arba naudokite vietinį serverio HTTP adresą.";
-"This EPUB could not be opened: {0}" = "Nepavyko atidaryti šio EPUB: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "Šis EPUB sugadintas arba nėra palaikomas EPUB archyvas.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "Nepavyko atidaryti šio PDF. Jis gali būti sugadintas arba apsaugotas slaptažodžiu. Patikrinkite pradinį failą ir bandykite dar kartą.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "Šį adresą užblokavo programos HTTP konfigūracija. Naudokite HTTPS arba atnaujinkite į versiją, palaikančią jūsų vietinį HTTP serverį.";
+"This document is empty or too large to open." = "Šis dokumentas tuščias arba per didelis atidaryti.";
 "This episode is no longer available on the server." = "Šis epizodas serveryje nebepasiekiamas.";
 "This episode is no longer on the server." = "Šio epizodo serveryje nebėra.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "Šiame eksporte naudojama nepalaikoma duomenų bazės versija. Išsaugokite jį ir atnaujinkite importavimo įrankį prieš bandydami dar kartą.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Ši biblioteka tuščia.";
 "This library is empty. Add titles on your server, then refresh." = "Ši biblioteka tuščia. Pridėkite kūrinių serveryje, tada atnaujinkite.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "Šio serverio sertifikatas nėra patikimas. Patikrinkite jo datą ir pagrindinio kompiuterio vardą. Savo sertifikatų įstaigai įdiekite jos profilį ir įjunkite visišką pasitikėjimą skiltyje „Nustatymai“ → „Bendrieji“ → „Apie“ → „Sertifikatų patikimumo nustatymai“, tada bandykite dar kartą.";
+"This {0} could not be opened: {1}" = "Nepavyko atidaryti šio {0}: {1}";
 "Time listening" = "Klausymo laikas";
 "Title" = "Pavadinimas";
 "Title A–Z" = "Pavadinimas A–Ž";

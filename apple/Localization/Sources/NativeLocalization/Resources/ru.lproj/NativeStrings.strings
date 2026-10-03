@@ -180,6 +180,8 @@
 "Find your next chapter." = "Найдите свою следующую главу.";
 "Find your next listen." = "Найдите, что послушать дальше.";
 "Finished" = "Закончен";
+"Fit page" = "Вся страница";
+"Fit width" = "По ширине";
 "Font" = "Семейство шрифта";
 "Font size" = "Масштаб шрифта";
 "Font size {0}%" = "Размер шрифта {0} %";
@@ -296,7 +298,6 @@
 "Open downloads" = "Открыть загрузки";
 "Open feed" = "Открыть ленту";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "Вход через OpenID на этом сервере не включен. Используйте имя пользователя и пароль.";
-"Opening EPUB…" = "Открытие EPUB…";
 "Opening PDF…" = "Открытие PDF…";
 "Opening collections…" = "Открытие коллекций…";
 "Opening episodes…" = "Открытие выпусков…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Открытие библиотеки…";
 "Opening your statistics…" = "Открытие статистики…";
 "Opening your year…" = "Открытие итогов года…";
+"Opening {0}…" = "Открытие {0}…";
 "Opens the share sheet with this image and a text summary." = "Открывает меню «Поделиться» с этим изображением и текстовой сводкой.";
 "Page" = "Страница";
+"Page fit" = "Масштаб страницы";
 "Page saved on this device. Sync follows when listening closes." = "Страница сохранена на этом устройстве. Синхронизация произойдет после завершения прослушивания.";
 "Page {0} of {1}" = "Страница {0} из {1}";
 "Passage saved on this device. Sync follows when listening closes." = "Место в тексте сохранено на этом устройстве. Синхронизация произойдет после завершения прослушивания.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "Не удалось прочитать журнал прошлых сохранений, поэтому сервер все еще может применить любое из них. Более новое прослушивание остается на этом телевизоре, пока не будет подтвержден перезапуск сервера.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "Не удалось прочитать или обновить журнал прогресса, отправленного на сервер, поэтому отправка остановлена. Не удаляйте данные приложения и повторите попытку.";
 "The recorded problems are removed from this device." = "Записанные проблемы будут удалены с этого устройства.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Эта читалка не распознаёт сохранённое место. Оно сохранится, пока вы не выберете новый отрывок.";
 "The saved values are not valid numbers and are kept on this device." = "Сохраненные значения не являются допустимыми числами, поэтому они хранятся на этом устройстве.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "Адрес сервера не найден. Проверьте имя хоста и что телевизор подключен к той же сети.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "Сервер недоступен. Проверьте его адрес, Wi-Fi или VPN, затем повторите попытку. Сохраненные данные входа не изменены.";
@@ -553,10 +557,9 @@
 "Theme" = "Тема";
 "There is not enough storage on this device for this download. Free up space, then retry." = "На этом устройстве недостаточно места для этой загрузки. Освободите место и повторите попытку.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Эта Apple TV не доверяет сертификату HTTPS сервера. Установите на телевизор профиль своего центра сертификации и включите доверие к нему или используйте локальный адрес HTTP сервера.";
-"This EPUB could not be opened: {0}" = "Не удалось открыть этот EPUB: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "Этот EPUB поврежден или не является поддерживаемым архивом EPUB.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "Не удалось открыть этот PDF. Возможно, он поврежден или защищен паролем. Проверьте исходный файл и повторите попытку.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "Этот адрес заблокирован настройками HTTP приложения. Используйте HTTPS или обновите приложение до версии, поддерживающей ваш локальный сервер HTTP.";
+"This document is empty or too large to open." = "Этот документ пуст или слишком велик для открытия.";
 "This episode is no longer available on the server." = "Этот выпуск больше не доступен на сервере.";
 "This episode is no longer on the server." = "Этого выпуска больше нет на сервере.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "В этом экспорте используется неподдерживаемая версия базы данных. Сохраните его и обновите средство импорта, прежде чем повторить попытку.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Эта библиотека пуста.";
 "This library is empty. Add titles on your server, then refresh." = "Эта библиотека пуста. Добавьте произведения на сервер, затем обновите.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "Сертификат этого сервера не является доверенным. Проверьте его дату и имя хоста. Для собственного центра сертификации установите его профиль и включите полное доверие в разделе «Настройки» → «Основные» → «Об этом устройстве» → «Доверие сертификатам», затем повторите попытку.";
+"This {0} could not be opened: {1}" = "Не удалось открыть этот {0}: {1}";
 "Time listening" = "Время прослушивания";
 "Title" = "Название";
 "Title A–Z" = "Название А–Я";

@@ -79,11 +79,11 @@ import XCTest
         XCTAssertEqual(try Data(contentsOf: try h.downloads.ebookURL(epubEntry)), try h.legacyBytes("li-epub/book.epub"))
         XCTAssertEqual(h.reading.position(account: alice, itemID: "li-epub", format: "epub")?.location, "epubcfi(/6/14!/4/2/1:0)")
 
-        // A deferred reader's format stays in the outcome, unconverted, and is reported as such.
-        XCTAssertNil(h.entry("li-cbz"))
-        XCTAssertNil(h.reading.position(account: alice, itemID: "li-cbz", format: "cbz"))
-        XCTAssertEqual(report.downloads.first { $0.libraryItemID == "li-cbz" }?.status, .deferredFormat)
-        XCTAssertEqual(report.reading.first { $0.libraryItemID == "li-cbz" }?.status, .deferredFormat)
+        // Comic bytes and their legacy page now reopen through the same adopted download contract.
+        XCTAssertNotNil(h.entry("li-cbz"))
+        XCTAssertEqual(h.reading.position(account: alice, itemID: "li-cbz", format: "cbz")?.location, "7")
+        XCTAssertEqual(report.downloads.first { $0.libraryItemID == "li-cbz" }?.status, .ready)
+        XCTAssertEqual(report.reading.first { $0.libraryItemID == "li-cbz" }?.status, .adopted)
         XCTAssertEqual(report.reading.first { $0.libraryItemID == "li-cbz" }?.location, "7")
         XCTAssertEqual(try h.migrator.committedOutcome(), outcome)
     }

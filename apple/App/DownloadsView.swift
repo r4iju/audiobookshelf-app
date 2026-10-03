@@ -55,7 +55,7 @@ private struct OfflineDetails: View {
                 Text(entry.media.title).font(.system(.largeTitle, design: .serif).bold())
                 Text(entry.media.author).foregroundColor(ShelfStyle.secondaryText)
                 Label(l10n("Available offline"), systemImage: "checkmark.circle.fill")
-                if let ebook = entry.ebook, entry.ebookAvailable, ["pdf", "epub"].contains(ebook.format) {
+                if let ebook = entry.ebook, entry.ebookAvailable, ["pdf", "epub", "mobi", "azw3", "cbz", "cbr"].contains(ebook.format) {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         do { reader = ReadingSource(account: entry.account, itemID: entry.media.libraryItemID, title: entry.media.title, ebook: ebook, file: try downloads.ebookURL(entry), progress: entry.readingProgress, fileID: entry.supplementaryID) }
                         catch { self.error = error.localizedDescription }

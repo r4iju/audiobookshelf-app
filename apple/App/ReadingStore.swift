@@ -74,7 +74,7 @@ import Combine
     // the confirmation are kept; supplementary documents keep their own locations.
     func discardProgress(account: AccountIdentity, itemID: String, confirmedAt: Double) throws {
         var next = positions
-        for format in ["epub", "pdf"] {
+        for format in ["pdf", "epub", "mobi", "azw3", "cbz", "cbr"] {
             let old = position(account: account, itemID: itemID, format: format)
             if let old, old.updatedAt > confirmedAt { continue }
             let reset = Position(account: account, itemID: itemID, format: format, location: "", fraction: 0, updatedAt: confirmedAt, revision: UUID().uuidString, pending: false, rotation: old?.rotation ?? 0)
