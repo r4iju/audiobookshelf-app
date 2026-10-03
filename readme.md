@@ -1,3 +1,46 @@
+# Audiobookshelf clients
+
+This fork maintains the Next.js browser client in `web/`, the SwiftUI Apple clients in
+`apple/` and `tvos/`, and the native Android client in `android-native/`. Builds, signing
+and internal delivery run locally. Connect them to your existing Audiobookshelf server.
+
+## Browser entrypoints
+
+Use Node.js 22 or later. From the repository root:
+
+```sh
+npm ci --prefix web
+npm run dev
+# Production build and local start:
+npm run build
+npm run start
+```
+
+The default port is 19881. Arguments pass through, for example `npm run dev -- --port 19901`.
+Set `ABS_WEB_BASE_PATH=/web` for both build and local start when using the documented subpath deployment.
+See [web/README.md](web/README.md) and [self-hosted deployment](web/docs/DEPLOYMENT.md).
+The upstream server's Vue administration interface remains unchanged.
+
+## Native builds and recovery
+
+Use the maintained [Apple](apple/README.md), [TV](tvos/README.md) and
+[Android](android-native/HANDOFF.md) entrypoints, with root coordinating signing,
+installation and internal distribution. Never replace the upstream app before migration
+and rollback are validated.
+
+The Nuxt/Capacitor fork is retained for recovery and migration export. It is no longer the
+default client or a hosted build target. Its source, dependencies, native shells, artifacts,
+[GPL license](LICENSE), upstream attribution and third-party notices remain intact.
+See [legacy recovery and export](docs/modernization/LEGACY-RECOVERY.md) for the pinned tag,
+explicit `legacy:*` commands, reauthentication, native import and rollback.
+
+<details>
+<summary>Historical upstream Nuxt/Capacitor client documentation</summary>
+
+The following upstream instructions describe the retained legacy client and public upstream
+apps. They are historical information, not this fork's delivery or maintenance entrypoints.
+Run recovery commands only in a separate recovery checkout.
+
 # Audiobookshelf Mobile App
 
 Audiobookshelf is a self-hosted audiobook and podcast server.
@@ -103,7 +146,7 @@ npm install
 Generate static web app:
 
 ```shell
-npm run generate
+npm run legacy:generate
 ```
 
 <details>
@@ -117,7 +160,7 @@ npm run generate
 Copy web app into native android/ios folders:
 
 ```shell
-npx cap sync
+npm run legacy:sync
 ```
 
 <details>
@@ -131,7 +174,7 @@ npx cap sync
 Open Android Studio:
 
 ```shell
-npx cap open android
+npm run legacy:open-android
 ```
 
 <details>
@@ -147,7 +190,7 @@ Start coding!
 After making changes to the JS layer you need to rebuild the nuxt pages and sync them to the native shells:
 
 ```shell
-npm run sync
+npm run legacy:sync
 ```
 
 ### Mac Environment Setup for iOS
@@ -179,7 +222,7 @@ npm install
 Generate static web app:
 
 ```shell
-npm run generate
+npm run legacy:generate
 ```
 
 <details>
@@ -193,7 +236,7 @@ npm run generate
 Copy web app into native android/ios folders:
 
 ```shell
-npx cap sync
+npm run legacy:sync
 ```
 
 <details>
@@ -207,7 +250,7 @@ npx cap sync
 Open Xcode:
 
 ```shell
-npx cap open ios
+npm run legacy:open-ios
 ```
 
 <details>
@@ -223,5 +266,7 @@ Start coding!
 After making changes to the JS layer you need to rebuild the nuxt pages and sync them to the native shells:
 
 ```shell
-npm run sync
+npm run legacy:sync
 ```
+
+</details>

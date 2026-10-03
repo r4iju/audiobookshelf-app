@@ -63,7 +63,7 @@ export function SelectField({
       >
         <Select.Trigger
           id={id}
-          className={`flex items-center justify-between gap-2 border border-line bg-surface text-start text-fg hover:border-muted focus-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-accent ${triggers[size]}`}
+          className={`flex items-center justify-between gap-2 border border-muted bg-surface text-start text-fg hover:border-muted focus-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-accent ${triggers[size]}`}
         >
           <span className="min-w-0 truncate">
             <Select.Value />
