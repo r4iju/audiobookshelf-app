@@ -1,5 +1,12 @@
 # Current bounded web candidate, October 3, 2026
 
+Current follow-up after merged PR143 / `bbac469a` is recorded in
+[ACCESSIBILITY-RETIREMENT.md](../../web/docs/ACCESSIBILITY-RETIREMENT.md).
+It supersedes the dated English-metadata/initial-language and blanket physical/provider
+limitations below only where concrete current evidence is recorded. Native reader deferral
+in the historical section is superseded by SPEC amendments #141/#142; all native formats
+are required. Historical source/check/deployment reports remain intact.
+
 This increment starts from merged PR #124, `32c8316fd21f8c4c164b9fd656c64174cd814d1f`.
 It finishes the two concrete software gaps recorded below: bookmark creation/current-time marking and missing
 in-use translation-table entries. Root posted its final source review on PR #126 and cleared exact source

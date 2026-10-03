@@ -3,15 +3,17 @@
   "version": "0.14.2-beta",
   "author": "advplyr",
   "scripts": {
-    "dev": "nuxt --hostname 0.0.0.0 --port 1337",
-    "build": "nuxt build",
-    "start": "nuxt --hostname 0.0.0.0 --port 1337",
-    "generate": "nuxt generate",
-    "sync": "nuxt generate && npx cap sync",
-    "icons-android": "cordova-res android --skip-config --copy",
-    "ionic:build": "npm run build",
-    "ionic:serve": "npm run dev",
-    "devlive": "ionic cap run -l --external --port=1337"
+    "dev": "npm --prefix web run dev --",
+    "build": "npm --prefix web run build --",
+    "start": "npm --prefix web run start --",
+    "legacy:dev": "nuxt --hostname 0.0.0.0 --port 1337",
+    "legacy:build": "nuxt build",
+    "legacy:start": "nuxt start --hostname 0.0.0.0 --port 1337",
+    "legacy:generate": "nuxt generate",
+    "legacy:sync": "npm run legacy:generate && cap sync",
+    "legacy:icons-android": "cordova-res android --skip-config --copy",
+    "legacy:open-android": "cap open android",
+    "legacy:open-ios": "cap open ios"
   },
   "dependencies": {
     "@webnativellc/capacitor-filesharer": "7.0.4",

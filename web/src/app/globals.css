@@ -12,9 +12,11 @@
   --fg-muted: #b4b4bb;
   --border: #38383c;
   --accent: #e0643f;
-  --accent-strong: #cc4f2b;
+  --accent-strong: #b8431f;
+  --accent-hover: #a33a1a;
   --accent-fg: #ffffff;
   --danger: #ff6b5e;
+  --danger-strong: #c4271b;
   --success: #4cd38a;
   --focus: #ffb59e;
   --overlay: rgb(0 0 0 / 0.6);
@@ -40,8 +42,10 @@
   --border: #d1d1d6;
   --accent: #b8431f;
   --accent-strong: #a33a1a;
+  --accent-hover: #8e2f15;
   --accent-fg: #ffffff;
   --danger: #c4271b;
+  --danger-strong: #c4271b;
   --success: #1d7a46;
   --focus: #a33a1a;
   --overlay: rgb(0 0 0 / 0.4);
@@ -57,8 +61,10 @@
   --color-line: var(--border);
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);
   --color-danger: var(--danger);
+  --color-danger-strong: var(--danger-strong);
   --color-success: var(--success);
   --color-overlay: var(--overlay);
   --font-sans:

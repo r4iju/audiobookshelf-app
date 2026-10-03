@@ -90,7 +90,7 @@ export function ConfirmDialog({
           type="button"
           disabled={busy}
           onClick={onConfirm}
-          className="min-h-11 rounded-xl bg-danger px-4 text-sm font-semibold text-white disabled:opacity-50 focus-ring"
+          className="min-h-11 rounded-xl bg-danger-strong px-4 text-sm font-semibold text-white disabled:opacity-50 focus-ring"
         >
           {confirmLabel}
         </button>

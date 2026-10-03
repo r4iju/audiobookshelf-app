@@ -185,7 +185,12 @@ selectable. The deployment journeys run on a plain-HTTP host name to keep these 
 - Downloads use the server's `?token=` query parameter, as the server's own interface does, so that large files
   stream to disk. That puts the access token into the download's address. Prefer HTTPS, and keep server access logs
   private.
-- The client has no server-side storage, cookies or sessions of its own. Its container is read-only.
+- The client has no server-side account storage or sessions of its own. Its container is read-only.
+  A language-only `abs-web-language` cookie lets the first server-rendered page use the selected language:
+  one year, SameSite=Lax, scoped to the configured base path, and Secure on HTTPS. It contains a language
+  code, never credentials or progress. Browser settings remain authoritative after hydration; a first
+  visit without that cookie uses the default language. The Audiobookshelf server's OpenID session
+  cookie is separate.
 
 ## Media and reachability
 

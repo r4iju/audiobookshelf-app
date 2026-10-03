@@ -157,7 +157,7 @@ export function PageControls({
             min={1}
             max={pages}
             defaultValue={page}
-            className="w-16 rounded-lg border border-line bg-surface px-2 py-1 text-center tabular-nums focus-ring"
+            className="w-16 rounded-lg border border-muted bg-surface px-2 py-1 text-center tabular-nums focus-ring"
           />
           <output aria-live="polite" className="text-muted tabular-nums">
             {t("WebReaderPage", page, pages)}

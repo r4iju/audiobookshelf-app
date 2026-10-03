@@ -16,7 +16,7 @@ export function TextField({
       <input
         id={id}
         aria-describedby={help ? `${id}-help` : undefined}
-        className="min-h-11 rounded-xl border border-line bg-surface px-3 text-base text-fg placeholder:text-muted focus-ring"
+        className="min-h-11 rounded-xl border border-muted bg-surface px-3 text-base text-fg placeholder:text-muted focus-ring"
         {...props}
       />
       {help ? (
@@ -44,7 +44,7 @@ function Switch({ size, ...props }: Omit<ComponentProps<"input">, "type" | "size
         type="checkbox"
         role="switch"
         aria-checked={props.checked}
-        className={`peer cursor-pointer appearance-none rounded-full border border-line bg-surface-3 transition-colors checked:border-accent-strong checked:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-50 focus-ring ${tracks[size]}`}
+        className={`peer cursor-pointer appearance-none rounded-full border border-muted bg-surface-3 transition-colors checked:border-muted checked:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-50 focus-ring ${tracks[size]}`}
         {...props}
       />
       <span
@@ -96,7 +96,7 @@ export function Checkbox({ className = "", ...props }: Omit<ComponentProps<"inpu
     <span className={`relative inline-flex size-5 shrink-0 ${className}`}>
       <input
         type="checkbox"
-        className="peer size-5 cursor-pointer appearance-none rounded-md border-2 border-muted bg-surface transition-colors checked:border-accent-strong checked:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-40 focus-ring"
+        className="peer size-5 cursor-pointer appearance-none rounded-md border-2 border-muted bg-surface transition-colors checked:border-muted checked:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-40 focus-ring"
         {...props}
       />
       <Check
