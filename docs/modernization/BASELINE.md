@@ -1,5 +1,7 @@
 # Native modernization baseline
 
+Current October 3 milestone status and superseding delivery evidence: [Final readiness](FINAL-READINESS.md). Dated candidate, hardware-gate and deferral statements below describe their original source; they do not override the current reader and simulator-first amendments.
+
 Current acceptance (October 3, 2026): simulator/browser and isolated local-server evidence is required for this milestone; physical checks are deferred and optional when already available. Missing hardware does not block completion. Preserve honest physical/owner/native-speaker caveats, synthetic migration correctness and all required software behavior. No destructive owner-data cutover follows from this amendment. See latest `SPEC.md`.
 
 Current reader scope (October 3, 2026): EPUB, MOBI/AZW3 and CBZ/CBR are reactivated Phase 1 requirements for iPhone/iPad and Android alongside PDF, without a dependency on Next.js readiness. The dated October 1 deferral below is historical and superseded. Preserve existing files, associations, settings and saved locations; validate actual opening and resumed reading. TV remains audio/podcast focused. See the latest amendment in `SPEC.md`.

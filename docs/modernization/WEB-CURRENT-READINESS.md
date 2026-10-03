@@ -1,5 +1,7 @@
 # Current bounded web candidate, October 3, 2026
 
+Current October 3 milestone status and superseding delivery evidence: [Final readiness](FINAL-READINESS.md). Dated candidate, hardware-gate and deferral statements below describe their original source; they do not override the current reader and simulator-first amendments.
+
 Current follow-up after merged PR143 / `bbac469a` is recorded in
 [ACCESSIBILITY-RETIREMENT.md](../../web/docs/ACCESSIBILITY-RETIREMENT.md).
 It supersedes the dated English-metadata/initial-language and blanket physical/provider

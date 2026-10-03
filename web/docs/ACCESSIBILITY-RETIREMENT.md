@@ -1,8 +1,9 @@
 # Bounded browser accessibility and legacy entrypoint retirement
 
 October 3, 2026. Base: merged `bbac469a`, live image `9cde1a07`.
-This candidate is not merged or deployed. Root owns fresh independent review, installation
-and rollout. SPEC's amendments #141/#142 apply: physical setup may be deferred, while
+Merged PR #144 (`de59fc53`, reviewed source `99ce105d`) is deployed as image
+`sha256:38bb9ab2b28737ac4d1e1b09c8c961182b1ad15b3964bcf8c58c606dbb21effc`.
+Root verified unchanged web inputs, healthy deployment, HTTP/HTTPS 4/4 smoke, initial German/Arabic/invalid-language rendering and live sign-in contrast. See [Final readiness](../../docs/modernization/FINAL-READINESS.md). SPEC's amendments #141/#142 apply: physical setup may be deferred, while
 software migration, translation quality and safe cutover remain required.
 
 ## Measured failure and correction

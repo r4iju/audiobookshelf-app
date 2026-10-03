@@ -1,5 +1,7 @@
 # Apple parity gaps before cutover
 
+Current October 3 milestone status and superseding delivery evidence: [Final readiness](FINAL-READINESS.md). Dated candidate, hardware-gate and deferral statements below describe their original source; they do not override the current reader and simulator-first amendments.
+
 Reconciled October 2, 2026 against merged `cbddbc36` (PR #83) and root final-client integration `f868f8c4`. Evidence is local and synthetic unless expressly stated otherwise. These checks do not establish owner-device, live-server, iOS 14 runtime, or whole-platform acceptance.
 
 ## Integrated evidence

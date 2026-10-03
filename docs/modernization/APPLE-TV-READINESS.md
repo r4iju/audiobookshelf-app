@@ -1,5 +1,7 @@
 # Apple TV diagnostics, accessibility and localization
 
+Current October 3 milestone status and superseding delivery evidence: [Final readiness](FINAL-READINESS.md). Dated candidate, hardware-gate and deferral statements below describe their original source; they do not override the current reader and simulator-first amendments.
+
 ## CURRENT (2026-10-02)
 
 Client source `d3152a5d3bc0eb7c23bf77e835088d650df514a3` includes merged localization PR #121.
