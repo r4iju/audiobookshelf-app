@@ -461,3 +461,13 @@ err_no_audio	Questo elemento non ha audio riproducibile.
 err_login_rejected	Nome utente o password non accettati.
 err_publications_unreadable	Impossibile leggere i registri dei salvataggi dei progressi senza risposta. Risolvili prima in Diagnostica.
 err_discards_unreadable	Impossibile leggere le eliminazioni dei progressi salvate. Risolvile prima in Diagnostica.
+rd_publication_conflict	Un altro dispositivo ha salvato una posizione di lettura diversa. Scegli quale conservare.
+rd_use_saved_location	Usa l’altra posizione
+rd_keep_this_location	Conserva questa posizione
+rd_location_unresolved	Scegli la posizione salvata
+rd_location_preserved	Questo documento non può mostrare la posizione salvata. Verrà conservata finché non scegli di salvare una nuova posizione di lettura.
+rd_start_new_location	Salva una nuova posizione
+rd_search_results	Risultati di ricerca
+rd_font_mono	Monospazio
+rd_saved_documents	Documenti salvati
+rd_available_offline	Disponibile offline su questo dispositivo

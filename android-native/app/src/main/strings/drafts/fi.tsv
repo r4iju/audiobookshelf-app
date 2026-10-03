@@ -446,3 +446,13 @@ err_no_audio	Tässä kohteessa ei ole toistettavaa ääntä.
 err_login_rejected	Käyttäjätunnusta tai salasanaa ei hyväksytty.
 err_publications_unreadable	Tietoja vastaamatta jääneistä edistymisen tallennuksista ei voitu lukea. Ratkaise ne ensin Diagnostiikassa.
 err_discards_unreadable	Tallennettuja edistymisen hylkäyksiä ei voitu lukea. Ratkaise ne ensin Diagnostiikassa.
+rd_publication_conflict	Toinen laite on tallentanut eri lukukohdan. Valitse, kumman haluat säilyttää.
+rd_use_saved_location	Käytä toista kohtaa
+rd_keep_this_location	Säilytä tämä kohta
+rd_location_unresolved	Valitse tallennettu kohta
+rd_location_preserved	Asiakirja ei pystynyt näyttämään tallennettua kohtaa. Se säilytetään, kunnes päätät tallentaa uuden lukukohdan.
+rd_start_new_location	Tallenna uusi kohta
+rd_search_results	Hakutulokset
+rd_font_mono	Tasalevyinen
+rd_saved_documents	Tallennetut asiakirjat
+rd_available_offline	Käytettävissä offline-tilassa tällä laitteella

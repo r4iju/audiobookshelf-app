@@ -461,3 +461,13 @@ err_no_audio	Ova stavka nema zvuka koji se može reproducirati.
 err_login_rejected	Korisničko ime ili zaporka nisu prihvaćeni.
 err_publications_unreadable	Zapise o neodgovorenim spremanjima napretka nije bilo moguće pročitati. Najprije ih riješite u Dijagnostici.
 err_discards_unreadable	Spremljena odbacivanja napretka nije bilo moguće pročitati. Najprije ih riješite u Dijagnostici.
+rd_publication_conflict	Drugi uređaj spremio je drugačiji položaj čitanja. Odaberite koji želite zadržati.
+rd_use_saved_location	Upotrijebi drugi položaj
+rd_keep_this_location	Zadrži ovaj položaj
+rd_location_unresolved	Odaberite spremljeni položaj
+rd_location_preserved	Ovaj dokument ne može prikazati spremljeni položaj. Bit će sačuvan dok ne odlučite spremiti novi položaj čitanja.
+rd_start_new_location	Spremi novi položaj
+rd_search_results	Rezultati pretraživanja
+rd_font_mono	Fiksna širina
+rd_saved_documents	Spremljeni dokumenti
+rd_available_offline	Dostupno izvan mreže na ovom uređaju

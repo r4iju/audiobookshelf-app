@@ -455,3 +455,13 @@ err_no_audio	このアイテムには再生可能なオーディオがありま�
 err_login_rejected	ユーザー名またはパスワードが受け付けられませんでした。
 err_publications_unreadable	応答のない進捗書き込みの記録を読み込めませんでした。先に「診断」で解決してください。
 err_discards_unreadable	保存された進捗の破棄を読み込めませんでした。先に「診断」で解決してください。
+rd_publication_conflict	別の端末に異なる読書位置が保存されています。残す位置を選んでください。
+rd_use_saved_location	別の位置を使う
+rd_keep_this_location	この位置を残す
+rd_location_unresolved	保存された位置を選んでください
+rd_location_preserved	この文書では保存された位置を表示できません。新しい読書位置を保存することを選ぶまで、元の位置を保持します。
+rd_start_new_location	新しい位置を保存
+rd_search_results	検索結果
+rd_font_mono	等幅
+rd_saved_documents	保存済みの文書
+rd_available_offline	この端末でオフライン利用可能

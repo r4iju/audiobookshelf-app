@@ -81,6 +81,7 @@ class AppGraph internal constructor(val context: Context) {
             com.audiobookshelf.android.download.DownloadFolder(context), http, diagnostics::record)
     }
 
+    val readerFiles by lazy { com.audiobookshelf.android.reader.ReaderFiles(File(context.filesDir, "reader-documents")) }
     val reading by lazy { com.audiobookshelf.android.reader.ReadingStore(File(context.filesDir, "reading-positions.json")) }
     val readingSync by lazy {
         com.audiobookshelf.android.reader.ReadingSync(scope, reading, remoteFor = { account ->

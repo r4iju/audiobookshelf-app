@@ -126,4 +126,12 @@
     <string name="pl_scale_elapsed">Scale elapsed time by speed</string>
     <string name="pl_lock">Lock player</string>
     <string name="pl_unlock">Unlock player</string>
+    <string name="rd_contents">Turinys</string>
+    <string name="rd_search_book">Ieškoti</string>
+    <string name="rd_reading_settings">Elektroninių skaitytuvų nustatymai</string>
+    <string name="rd_text_size">Šrifto mastelis</string>
+    <string name="rd_page_theme">Tema</string>
+    <string name="rd_light">Šviesi</string>
+    <string name="rd_dark">Tamsi</string>
+    <string name="rd_line_spacing">Tarpas tarp eilučių</string>
 </resources>

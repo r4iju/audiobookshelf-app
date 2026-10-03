@@ -446,3 +446,13 @@ err_no_audio	Mục này không có âm thanh phát được.
 err_login_rejected	Tên người dùng hoặc mật khẩu không được chấp nhận.
 err_publications_unreadable	Không đọc được bản ghi các lần ghi tiến độ chưa có phản hồi. Hãy xử lý chúng trong Chẩn đoán trước.
 err_discards_unreadable	Không đọc được các lệnh hủy tiến độ đã lưu. Hãy xử lý chúng trong Chẩn đoán trước.
+rd_publication_conflict	Thiết bị khác đã lưu một vị trí đọc khác. Hãy chọn vị trí muốn giữ.
+rd_use_saved_location	Dùng vị trí khác
+rd_keep_this_location	Giữ vị trí này
+rd_location_unresolved	Chọn vị trí đã lưu
+rd_location_preserved	Tài liệu này không thể hiển thị vị trí đã lưu. Vị trí đó được giữ cho đến khi bạn chọn lưu một vị trí đọc mới.
+rd_start_new_location	Lưu vị trí mới
+rd_search_results	Kết quả tìm kiếm
+rd_font_mono	Đơn cách
+rd_saved_documents	Tài liệu đã lưu
+rd_available_offline	Có thể đọc ngoại tuyến trên thiết bị này

@@ -43,6 +43,19 @@ class ReadingSyncTest {
         ReadingSync(CoroutineScope(Dispatchers.Unconfined), store, remoteFor = { server }, onSignInRequired = {})
 
     @Test
+    fun legacyCfiSurvivesRestartAndBlocksAnUnreviewedPageReplacement() {
+        val file = File(Files.createTempDirectory("cfi-position").toFile(), "positions.json")
+        val store = ReadingStore(file)
+        val cfi = "epubcfi(/6/4!/4/2/8:12)"
+        store.adoptRemote(account, "book", PRIMARY, MediaProgress(libraryItemId = "book", ebookLocation = cfi, lastUpdate = 1000.0))
+        assertTrue("A legacy CFI must be retained on disk", file.exists())
+        val restored = ReadingStore(file)
+        restored.record(account, "book", PRIMARY, primary = true, page = 2, pages = 10)
+        assertEquals("Unknown locations need an explicit reader choice before replacement", ReadingStore.Preflight.CONFLICT,
+            restored.preflight(restored.entry(account, "book", PRIMARY)!!, MediaProgress(libraryItemId = "book", ebookLocation = cfi, lastUpdate = 2000.0)))
+    }
+
+    @Test
     fun anotherDevicesNewerPageIsNeverOverwrittenByAPendingLocalPage() = runBlocking {
         val store = store(); val server = Server()
         server.otherDeviceReads(page = 1, at = 1_000.0)

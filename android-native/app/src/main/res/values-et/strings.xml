@@ -107,4 +107,17 @@
     <string name="pl_scale_elapsed">Scale elapsed time by speed</string>
     <string name="pl_lock">Lock player</string>
     <string name="pl_unlock">Unlock player</string>
+    <string name="rd_contents">Sisukord</string>
+    <string name="rd_search_book">Otsi</string>
+    <string name="rd_reading_settings">E-lugeja sätted</string>
+    <string name="rd_text_size">Fondi suurus</string>
+    <string name="rd_light">Hele</string>
+    <string name="rd_dark">Pime</string>
+    <string name="rd_black">Must</string>
+    <string name="rd_text_weight">Fondi paksus</string>
+    <string name="rd_spread_auto">Auto</string>
+    <string name="rd_keep_awake">Hoia ekraan ärkvel</string>
+    <string name="rd_off">Väljalülitatud</string>
+    <string name="rd_on">Sisselülitatud</string>
+    <string name="rd_mirrored">Peegeldatud</string>
 </resources>

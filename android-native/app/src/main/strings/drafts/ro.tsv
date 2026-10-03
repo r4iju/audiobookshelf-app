@@ -463,3 +463,13 @@ err_no_audio	Acest element nu are audio care poate fi redat.
 err_login_rejected	Numele de utilizator sau parola nu au fost acceptate.
 err_publications_unreadable	Înregistrările salvărilor de progres fără răspuns nu au putut fi citite. Rezolvă-le mai întâi în Diagnosticare.
 err_discards_unreadable	Ștergerile de progres salvate nu au putut fi citite. Rezolvă-le mai întâi în Diagnosticare.
+rd_publication_conflict	Alt dispozitiv a salvat o altă poziție de lectură. Alegeți pe care o păstrați.
+rd_use_saved_location	Folosește cealaltă poziție
+rd_keep_this_location	Păstrează această poziție
+rd_location_unresolved	Alegeți poziția salvată
+rd_location_preserved	Acest document nu a putut afișa poziția salvată. Ea este păstrată până când alegeți să salvați o nouă poziție de lectură.
+rd_start_new_location	Salvează o nouă poziție
+rd_search_results	Rezultatele căutării
+rd_font_mono	Lățime fixă
+rd_saved_documents	Documente salvate
+rd_available_offline	Disponibil offline pe acest dispozitiv

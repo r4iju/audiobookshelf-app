@@ -478,3 +478,13 @@ err_no_audio	Ten element nie ma dźwięku do odtworzenia.
 err_login_rejected	Nazwa użytkownika lub hasło nie zostały zaakceptowane.
 err_publications_unreadable	Nie udało się odczytać rejestru zapisów postępu bez odpowiedzi. Najpierw rozwiąż je w Diagnostyce.
 err_discards_unreadable	Nie udało się odczytać zapisanych resetów postępu. Najpierw rozwiąż je w Diagnostyce.
+rd_publication_conflict	Inne urządzenie zapisało inną pozycję czytania. Wybierz, którą zachować.
+rd_use_saved_location	Użyj innej pozycji
+rd_keep_this_location	Zachowaj tę pozycję
+rd_location_unresolved	Wybierz zapisaną pozycję
+rd_location_preserved	Ten dokument nie może wyświetlić zapisanej pozycji. Zostanie ona zachowana, dopóki nie zdecydujesz się zapisać nowej pozycji czytania.
+rd_start_new_location	Zapisz nową pozycję
+rd_search_results	Wyniki wyszukiwania
+rd_font_mono	Stała szerokość
+rd_saved_documents	Zapisane dokumenty
+rd_available_offline	Dostępne offline na tym urządzeniu

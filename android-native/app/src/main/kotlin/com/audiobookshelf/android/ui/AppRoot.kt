@@ -151,7 +151,7 @@ private fun SignedIn(active: SessionState.Active) {
                         if (route.id == null) model.push(Route.Group(route.kind, id))
                     })
                 }
-                is Route.Reader -> PdfReaderScreen(route, active, catalog, onClose = pop)
+                is Route.Reader -> if (route.format == "pdf") PdfReaderScreen(route, active, catalog, onClose = pop) else PublicationReaderScreen(route, active, catalog, onClose = pop)
                 Route.AddPodcast -> RouteScaffold(stringResource(R.string.set_add_podcast), pop) { padding -> AddPodcastScreen(active, catalog, padding, onCreated = pop) }
                 is Route.Filtered -> RouteScaffold(route.label, pop) { padding ->
                     val libraryId = catalog.library?.id

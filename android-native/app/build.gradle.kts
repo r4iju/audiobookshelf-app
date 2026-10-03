@@ -30,6 +30,7 @@ android {
 
     buildTypes {
         debug {
+            applicationIdSuffix = providers.gradleProperty("qaApplicationIdSuffix").orNull
             isMinifyEnabled = false
         }
         release {

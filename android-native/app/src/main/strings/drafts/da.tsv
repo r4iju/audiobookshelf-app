@@ -447,3 +447,13 @@ err_no_audio	Dette element har ingen lyd, der kan afspilles.
 err_login_rejected	Brugernavnet eller adgangskoden blev ikke accepteret.
 err_publications_unreadable	Registreringer af ubesvarede gemninger af fremgang kunne ikke læses. Løs dem først under Diagnosticering.
 err_discards_unreadable	Gemte anmodninger om at kassere fremgang kunne ikke læses. Løs dem først under Diagnosticering.
+rd_publication_conflict	En anden enhed har gemt en anden læseposition. Vælg hvilken du vil beholde.
+rd_use_saved_location	Brug den anden position
+rd_keep_this_location	Behold denne position
+rd_location_unresolved	Vælg gemt position
+rd_location_preserved	Dette dokument kunne ikke vise den gemte position. Den bevares, indtil du vælger at gemme en ny læseposition.
+rd_start_new_location	Gem en ny position
+rd_search_results	Søgeresultater
+rd_font_mono	Fast tegnbredde
+rd_saved_documents	Gemte dokumenter
+rd_available_offline	Tilgængelig offline på denne enhed

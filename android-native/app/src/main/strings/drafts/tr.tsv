@@ -451,3 +451,13 @@ err_no_audio	Bu öğede oynatılabilir ses yok.
 err_login_rejected	Kullanıcı adı veya şifre kabul edilmedi.
 err_publications_unreadable	Yanıt alınamayan ilerleme yazma işlemlerinin kayıtları okunamadı. Önce bunları Tanılama'da çözün.
 err_discards_unreadable	Kaydedilmiş ilerleme sıfırlamaları okunamadı. Önce bunları Tanılama'da çözün.
+rd_publication_conflict	Başka bir cihaz farklı bir okuma konumu kaydetmiş. Hangi konumu koruyacağınızı seçin.
+rd_use_saved_location	Diğer konumu kullan
+rd_keep_this_location	Bu konumu koru
+rd_location_unresolved	Kayıtlı konumu seçin
+rd_location_preserved	Bu belge kayıtlı konumu gösteremedi. Yeni bir okuma konumu kaydetmeyi seçene kadar mevcut konum korunur.
+rd_start_new_location	Yeni konum kaydet
+rd_search_results	Arama sonuçları
+rd_font_mono	Eş aralıklı
+rd_saved_documents	Kaydedilen belgeler
+rd_available_offline	Bu cihazda çevrimdışı kullanılabilir

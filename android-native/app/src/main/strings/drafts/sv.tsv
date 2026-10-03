@@ -445,3 +445,13 @@ err_no_audio	Det här objektet har inget spelbart ljud.
 err_login_rejected	Användarnamnet eller lösenordet godtogs inte.
 err_publications_unreadable	Poster om obesvarade sparningar av förlopp kunde inte läsas. Lös dem i Diagnostik först.
 err_discards_unreadable	Sparade rensningar av förlopp kunde inte läsas. Lös dem i Diagnostik först.
+rd_publication_conflict	En annan enhet har sparat en annan läsposition. Välj vilken du vill behålla.
+rd_use_saved_location	Använd den andra positionen
+rd_keep_this_location	Behåll denna position
+rd_location_unresolved	Välj sparad position
+rd_location_preserved	Det här dokumentet kunde inte visa den sparade positionen. Den bevaras tills du väljer att spara en ny läsposition.
+rd_start_new_location	Spara en ny position
+rd_search_results	Sökresultat
+rd_font_mono	Fast teckenbredd
+rd_saved_documents	Sparade dokument
+rd_available_offline	Tillgängligt offline på den här enheten

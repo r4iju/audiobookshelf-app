@@ -477,3 +477,13 @@ err_no_audio	Tato položka nemá žádný přehratelný zvuk.
 err_login_rejected	Uživatelské jméno nebo heslo nebylo přijato.
 err_publications_unreadable	Záznamy o nepotvrzených zápisech pokroku nelze přečíst. Nejprve je vyřešte v Diagnostice.
 err_discards_unreadable	Uložená zahození pokroku nelze přečíst. Nejprve je vyřešte v Diagnostice.
+rd_publication_conflict	Jiné zařízení uložilo jinou pozici čtení. Vyberte, kterou chcete zachovat.
+rd_use_saved_location	Použít jinou pozici
+rd_keep_this_location	Zachovat tuto pozici
+rd_location_unresolved	Vyberte uloženou pozici
+rd_location_preserved	Tento dokument nedokázal zobrazit uloženou pozici. Zůstane zachována, dokud se nerozhodnete uložit novou pozici čtení.
+rd_start_new_location	Uložit novou pozici
+rd_search_results	Výsledky hledání
+rd_font_mono	Neproporcionální
+rd_saved_documents	Uložené dokumenty
+rd_available_offline	Dostupné offline na tomto zařízení

@@ -110,24 +110,26 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
     var error by remember { mutableStateOf<String?>(null) }
     var page by remember { mutableIntStateOf(1) }
     var rotation by remember { mutableIntStateOf(0) }
+    var unresolvedLocation by remember { mutableStateOf<String?>(null) }
     var saveError by remember { mutableStateOf(if (graph.reading.writable) null else context.getString(R.string.rd_positions_not_restored)) }
 
     LaunchedEffect(attempt) {
         error = null
         opened = null
         try {
-            val file = resolve(graph, active.client, route)
+            val file = resolveReaderFile(graph, active.client, route)
             val document = withContext(Dispatchers.IO) {
                 runCatching { PdfDocument.open(file()) }.getOrElse { throw IOException(context.getString(R.string.rd_not_a_pdf)) }
             }
             if (!route.supplementary) {
                 // A fresh server position is worth a short wait; offline, the last known one is used.
-                val progress = if (route.downloadId == null) withTimeoutOrNull(4_000) { runCatching { catalog.freshUser() }.getOrNull() }
+                val progress = if (route.downloadId == null && !route.localOnly) withTimeoutOrNull(4_000) { runCatching { catalog.freshUser() }.getOrNull() }
                     ?.mediaProgress?.firstOrNull { it.libraryItemId == route.itemId && it.episodeId == null }
                     else null
                 runCatching { graph.reading.adoptRemote(account, route.itemId, fileKey, progress ?: catalog.progressFor(route.itemId)) }
             }
             val start = graph.reading.entry(account, route.itemId, fileKey)?.page?.coerceIn(1, document.pageCount.coerceAtLeast(1)) ?: 1
+            unresolvedLocation = graph.reading.entry(account, route.itemId, fileKey)?.savedLocation
             page = start
             opened = Opened(document, start)
         } catch (failure: Exception) {
@@ -148,8 +150,9 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
     val document = opened?.document
     LaunchedEffect(document) {
         val current = document ?: return@LaunchedEffect
-        snapshotFlow { page }.distinctUntilChanged().collect { shown ->
-            if (graph.reading.entry(account, route.itemId, fileKey)?.page == shown) return@collect
+        snapshotFlow { page to unresolvedLocation }.distinctUntilChanged().collect { (shown, unresolved) ->
+            if (unresolved != null) return@collect
+            if (graph.reading.entry(account, route.itemId, fileKey)?.let { it.page == shown && it.savedLocation == null } == true) return@collect
             try {
                 graph.reading.record(account, route.itemId, fileKey, primary = !route.supplementary, page = shown, pages = current.pageCount)
                 if (!route.supplementary) graph.readingSync.publishAll()
@@ -166,7 +169,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
         fun resolve(keepLocal: Boolean) {
             try {
                 graph.reading.resolveConflict(account, route.itemId, fileKey, keepLocal)
-                if (keepLocal) graph.readingSync.publishAll() else if (conflict != null) page = conflict.coerceIn(1, document.pageCount)
+                if (keepLocal) graph.readingSync.publishAll() else if (conflict != null) page = conflict.coerceIn(1, document.pageCount) else unresolvedLocation = conflictEntry.conflictLocation
             } catch (failure: Exception) {
                 saveError = storeFailure(context, graph, failure) ?: context.getString(R.string.rd_choice_not_saved)
             }
@@ -187,6 +190,13 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
             modifier = Modifier.testTag("reading-conflict"),
         )
     }
+
+    if (unresolvedLocation != null) AlertDialog(
+        onDismissRequest = {}, title = { Text(stringResource(R.string.rd_location_unresolved)) },
+        text = { Text(stringResource(R.string.rd_location_preserved)) },
+        confirmButton = { TextButton(onClick = { unresolvedLocation = null }) { Text(stringResource(R.string.rd_start_new_location)) } },
+        dismissButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.rd_close_reader)) } },
+    )
 
     Scaffold(
         topBar = {
@@ -344,10 +354,15 @@ private fun storeFailure(context: android.content.Context, graph: AppGraph, fail
     if (failure is IllegalStateException && !graph.reading.writable) context.getString(R.string.rd_positions_not_overwritten) else failure.localizedMessage
 
 /** The downloaded copy when there is one, otherwise the server's file streamed to the cache. */
-private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Reader): () -> ParcelFileDescriptor {
+internal suspend fun resolveReaderFile(graph: AppGraph, client: ApiClient, route: Route.Reader): () -> ParcelFileDescriptor {
+    val saved = graph.readerFiles.file(client.account, route.itemId, route.ino, route.supplementary)
+    if (route.localOnly) {
+        if (!saved.isFile) throw IOException(graph.context.getString(R.string.rd_downloaded_document_missing))
+        return { ParcelFileDescriptor.open(saved, ParcelFileDescriptor.MODE_READ_ONLY) }
+    }
     val records = graph.downloads.records.value
-    val local = records.firstOrNull { it.id == route.downloadId }
-        ?: records.firstOrNull { it.account == client.account && it.itemId == route.itemId && it.episodeId == null && it.state == DownloadStore.State.COMPLETE && it.ebook?.ebookFileId == route.ino }
+    val local = records.firstOrNull { it.id == route.downloadId && it.account == client.account }
+        ?: records.firstOrNull { it.account == client.account && it.itemId == route.itemId && it.episodeId == null && it.state == DownloadStore.State.COMPLETE && it.ebook?.ebookFileId == route.ino && it.ebook?.ebookFormat?.lowercase() == route.format }
     if (local != null && local.ebook != null) when (val opened = graph.downloads.openPart(local, local.ebook!!)) {
         is Downloads.Opened.Readable -> return opened.open
         is Downloads.Opened.FolderLost -> if (route.downloadId != null) throw IOException(graph.context.getString(R.string.rd_download_folder_lost, opened.name))
@@ -355,46 +370,54 @@ private suspend fun resolve(graph: AppGraph, client: ApiClient, route: Route.Rea
     }
     if (route.downloadId != null) throw IOException(graph.context.getString(R.string.rd_downloaded_document_missing))
     return withContext(Dispatchers.IO) {
-        val name = MessageDigest.getInstance("SHA-256").digest("${client.account.server}\n${route.itemId}\n${route.ino}".toByteArray()).take(12).joinToString("") { "%02x".format(it) }
-        val directory = File(graph.context.cacheDir, "reader").apply { mkdirs() }
-        val target = File(directory, "$name.pdf")
-        val staging = File(directory, "$name.part")
+        check(graph.readerFiles.writable) { "Unreadable saved document associations are preserved" }
+        val target = saved
+        target.parentFile?.mkdirs()
+        val staging = File.createTempFile(target.name + ".", ".part", target.parentFile)
+        try {
         val url = client.mediaUrl("/api/items/${route.itemId}/file/${route.ino}")
         var token = client.bearer()
         for (round in 0..1) {
             val request = okhttp3.Request.Builder().url(url).header("Authorization", "Bearer $token").build()
-            graph.http.newCall(request).await().use { response ->
+            val response = try { graph.http.newCall(request).await() } catch (failure: IOException) {
+                if (target.isFile && target.length() > 0 && graph.readerFiles.entries.value.any { it.account == client.account && it.itemId == route.itemId && it.fileId == route.ino && it.supplementary == route.supplementary && it.format == route.format }) return@withContext { ParcelFileDescriptor.open(target, ParcelFileDescriptor.MODE_READ_ONLY) }
+                throw failure
+            }
+            response.use { response ->
                 if (response.code == 401 && round == 0) { token = client.bearerAfterRejection(token); return@use }
                 if (response.code == 401) throw ApiError.SignInRequired(client.account, token)
                 if (!response.isSuccessful) throw ApiError.Http(response.code)
                 val body = response.body ?: throw IOException("Empty response")
                 staging.outputStream().use { output -> body.byteStream().use { it.copyTo(output) } }
-                target.delete()
                 if (!staging.renameTo(target)) throw IOException(graph.context.getString(R.string.rd_document_not_stored))
+                graph.readerFiles.retain(com.audiobookshelf.android.reader.ReaderFiles.Entry(client.account, route.itemId, route.ino, route.supplementary, route.title, route.format))
                 return@withContext { ParcelFileDescriptor.open(target, ParcelFileDescriptor.MODE_READ_ONLY) }
             }
         }
         throw ApiError.SignInRequired(client.account, token)
+        } finally { staging.delete() }
     }
 }
 
-/** Opens the item's PDF and its supplementary PDFs. Other ebook formats wait for their native readers. */
+val readableFormats = setOf("pdf", "epub", "mobi", "azw3", "cbz", "cbr")
+
+/** The file association stays the same for primary and supplementary readers. */
 @Composable
 fun ReadButtons(item: com.audiobookshelf.core.LibraryItem, onRead: (Route) -> Unit) {
     val ebook = item.media.ebookFile
     val supplementaryPdf = stringResource(R.string.rd_supplementary_pdf)
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        if (ebook != null && ebook.format == "pdf") {
-            androidx.compose.material3.OutlinedButton(onClick = { onRead(Route.Reader(item.id, ebook.ino, supplementary = false, title = item.title)) }, modifier = Modifier.fillMaxWidth().testTag("read-ebook")) {
-                Icon(Icons.AutoMirrored.Outlined.MenuBook, null); Text(stringResource(R.string.action_read, "PDF"), Modifier.padding(start = 6.dp))
+        if (ebook != null && ebook.format?.lowercase() in readableFormats) {
+            androidx.compose.material3.OutlinedButton(onClick = { onRead(Route.Reader(item.id, ebook.ino, supplementary = false, title = item.title, format = ebook.format!!.lowercase())) }, modifier = Modifier.fillMaxWidth().testTag("read-ebook")) {
+                Icon(Icons.AutoMirrored.Outlined.MenuBook, null); Text(stringResource(R.string.action_read, ebook.format!!.uppercase()), Modifier.padding(start = 6.dp))
             }
         } else if (ebook != null) {
             Text(ebook.format?.let { stringResource(R.string.rd_format_not_available, it.uppercase()) } ?: stringResource(R.string.rd_ebook_not_available),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("ebook-unsupported"))
         }
-        item.libraryFiles.filter { it.isSupplementary == true && it.format == "pdf" }.forEach { file ->
+        item.libraryFiles.filter { it.isSupplementary == true && it.format?.lowercase() in readableFormats }.forEach { file ->
             val name = file.metadata?.filename ?: supplementaryPdf
-            androidx.compose.material3.TextButton(onClick = { onRead(Route.Reader(item.id, file.ino, supplementary = true, title = name)) }, modifier = Modifier.testTag("read-file-${file.ino}")) {
+            androidx.compose.material3.TextButton(onClick = { onRead(Route.Reader(item.id, file.ino, supplementary = true, title = name, format = file.format!!.lowercase())) }, modifier = Modifier.testTag("read-file-${file.ino}")) {
                 Text(stringResource(R.string.action_read, name))
             }
         }

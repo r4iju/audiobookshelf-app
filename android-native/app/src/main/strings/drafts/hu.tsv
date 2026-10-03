@@ -445,3 +445,13 @@ err_no_audio	Ennek az elemnek nincs lejátszható hanganyaga.
 err_login_rejected	A felhasználónevet vagy a jelszót nem fogadta el a szerver.
 err_publications_unreadable	A megválaszolatlan haladásmentések nyilvántartása nem olvasható. Előbb oldja meg a Diagnosztikában.
 err_discards_unreadable	A mentett haladás-elvetések nem olvashatók. Előbb oldja meg őket a Diagnosztikában.
+rd_publication_conflict	Egy másik eszköz más olvasási helyet mentett. Válassza ki, melyiket tartja meg.
+rd_use_saved_location	Másik hely használata
+rd_keep_this_location	E hely megtartása
+rd_location_unresolved	Válasszon mentett helyet
+rd_location_preserved	A dokumentum nem tudta megjeleníteni a mentett helyet. Megőrizzük, amíg új olvasási hely mentését nem választja.
+rd_start_new_location	Új hely mentése
+rd_search_results	Keresési eredmények
+rd_font_mono	Rögzített szélesség
+rd_saved_documents	Mentett dokumentumok
+rd_available_offline	Offline elérhető ezen az eszközön

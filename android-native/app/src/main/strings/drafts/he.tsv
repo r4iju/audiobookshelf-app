@@ -465,3 +465,13 @@ err_no_audio	לפריט הזה אין שמע שניתן לנגן.
 err_login_rejected	שם המשתמש או הסיסמה לא התקבלו.
 err_publications_unreadable	לא ניתן היה לקרוא רשומות של כתיבות התקדמות שלא נענו. טפל בהן קודם באבחון.
 err_discards_unreadable	לא ניתן היה לקרוא את איפוסי ההתקדמות השמורים. טפל בהם קודם באבחון.
+rd_publication_conflict	מכשיר אחר שמר מיקום קריאה שונה. בחרו איזה מיקום לשמור.
+rd_use_saved_location	שימוש במיקום האחר
+rd_keep_this_location	שמירת המיקום הזה
+rd_location_unresolved	בחרו מיקום שמור
+rd_location_preserved	לא ניתן להציג את המיקום השמור במסמך זה. הוא יישמר עד שתבחרו לשמור מיקום קריאה חדש.
+rd_start_new_location	שמירת מיקום חדש
+rd_search_results	תוצאות חיפוש
+rd_font_mono	רוחב קבוע
+rd_saved_documents	מסמכים שמורים
+rd_available_offline	זמין במכשיר זה ללא חיבור לרשת

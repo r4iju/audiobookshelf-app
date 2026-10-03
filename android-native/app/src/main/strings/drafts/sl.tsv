@@ -479,3 +479,13 @@ err_no_audio	Ta element nima zvoka, ki bi ga bilo mogoče predvajati.
 err_login_rejected	Uporabniško ime ali geslo ni bilo sprejeto.
 err_publications_unreadable	Zapisov neodgovorjenih shranjevanj napredka ni bilo mogoče prebrati. Najprej jih razrešite v Diagnostiki.
 err_discards_unreadable	Shranjenih zavrženj napredka ni bilo mogoče prebrati. Najprej jih razrešite v Diagnostiki.
+rd_publication_conflict	Druga naprava je shranila drug položaj branja. Izberite, katerega želite ohraniti.
+rd_use_saved_location	Uporabi drug položaj
+rd_keep_this_location	Ohrani ta položaj
+rd_location_unresolved	Izberite shranjeni položaj
+rd_location_preserved	Ta dokument ni mogel prikazati shranjenega položaja. Ohrani se, dokler ne izberete shranjevanja novega položaja branja.
+rd_start_new_location	Shrani nov položaj
+rd_search_results	Rezultati iskanja
+rd_font_mono	Enaka širina
+rd_saved_documents	Shranjeni dokumenti
+rd_available_offline	Na voljo brez povezave v tej napravi
