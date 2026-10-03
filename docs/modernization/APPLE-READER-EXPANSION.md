@@ -1,6 +1,6 @@
 # Apple reader expansion, October 3
 
-The Oct 3 reader amendment requires EPUB, MOBI/AZW3 and CBZ/CBR on iPhone/iPad. This candidate extends the existing EPUB host and retains PDFKit. The owner checkout, installed legacy identity and production server are unchanged.
+The Oct 3 reader amendment requires EPUB, MOBI/AZW3 and CBZ/CBR on iPhone/iPad. Merged PR #145 (`d306de24`, reviewed source `83fc39c1`) extends the existing EPUB host and retains PDFKit. The owner checkout, installed legacy identity and production server are unchanged.
 
 ## Behavior
 
@@ -28,6 +28,6 @@ One post-sign-in Arabic catalog/details/player/settings walk completed at `acces
 
 ## Delivery limits
 
-Local signed internal preview retains its separate bundle identity and existing profile. Root independently reviews before merge, then owns installation and delivery. Real-owner migration/cutover, hardware audio routes and iCloud/provider behavior remain unverified physical evidence. iOS 14 runtime remains unavailable; Xcode 27 uses the existing build-only iOS 15 override. Legacy retirement or identity replacement is not authorized by these results.
+Local signed internal preview retains its separate bundle identity and existing profile. Fresh independent review cleared the source before merge. Root signed and delivered the reviewed package (SHA-256 `55edc3e95e000ad783b3adfbb305441b15aa33c1652f524e93bf37b6762068da`) and installed it on both paired iPhone and iPad without launch or reset. Apple/tvOS inputs are unchanged between reviewed and merged source. See [Final readiness](FINAL-READINESS.md). Real-owner migration/cutover, hardware audio routes and iCloud/provider behavior remain unverified physical evidence. iOS 14 runtime remains unavailable; Xcode 27 uses the existing build-only iOS 15 override. Legacy retirement or identity replacement is not authorized by these results.
 
 Reproduce scoped reader journeys with `apple/scripts/run-expanded-readers.sh`; fixture generation uses locally installed calibre and rar. Do not target owner production as a mutation fixture.

@@ -1,5 +1,17 @@
 # Android current readiness, October 3, 2026
 
+## Current accepted milestone
+
+PR #146 merged at `775ffcff6f01d15f8d3c62d8aa451c5dfd0777a9`, fresh-reviewed source `66d64906101ac71910919aaa98dd71f965a3e83f`, with unchanged Android build inputs. The final signed APK is verified and installed in place without launch/reset; installed bytes match retained package SHA-256 `fd7ddb957c068640fbc834001a202c1b026898ffe5c58b4a31f6e8893d990914`. All six readers are required and delivered; the final direct EPUB-link runtime outcome opens Chapter 2 and resumes that readable page after reopening. See [Final readiness](FINAL-READINESS.md) for bounded evidence, package provenance and exact Cast/Auto limitations.
+
+Simulator/emulator and isolated-server evidence is the accepted baseline under #141/#142. Missing physical receivers, vehicles, controls or assistive-device walkthroughs do not block this milestone. Machine-draft provenance, provider/owner-data limitations and unreproduced historical automation signals remain honest limitations, not invented new certification gates. Real-owner migration or destructive cutover is not implied. Manual PDF page-2 evidence is retained; failed historical PdfJourney instrumentation is not reported as a pass.
+
+Final bounded production probes now verify actual independently authenticated second-client decoded progress/resume, real timer reduced-volume/expiry/pause/restoration with durable listening, and oversized-download NoSpace refusal preserving completed audio/PDF bytes and offline decoding. [Final readiness](FINAL-READINESS.md) records exact values and unsampled fade/hardware/paragraph-traversal limits. Production inputs matched merged source; no product rebuild was required for this evidence.
+
+## Historical scoped finishing report
+
+The candidate/readiness/deferral statements below describe their dated source and are superseded by the current record above. Retain their failures and limited proof rather than treating them as final acceptance claims.
+
 <!-- android-current-status:start -->
 **Status: scoped software finishing merged and locally packaged; focused player-preference emulator acceptance passed. Replacement acceptance remains pending.**
 
@@ -33,7 +45,7 @@ Base: `d3152a5d`. Implementation: `125634de7da2b00bc5d59c75f860d48e8c5260ca`. Th
 - Android RealServerJourney 4/4 at client `4bbbacde` against the session-only server candidate `cd703e87`, [PR #119](https://github.com/r4iju/audiobookshelf-app/pull/119). Owner server unchanged. The earlier first-progress candidate was held because it marked first PATCH progress finished with less than 10 seconds remaining.
 - Earlier full 88/88 at `f256272b`, postmerge 18/19 Chrome accessibility failure and the unknown bookmark/Chrome/SystemUI lookup signals remain recorded in `verification/android-evidence.json` and `android-native/HANDOFF.md`. Nine diagnostic attempts did not establish the original bookmark cause. No new reruns or closure of those signals.
 
-## Open acceptance gates
+## Historical open acceptance gates
 
 - The scoped implementation was merged through [PR #123](https://github.com/r4iju/audiobookshelf-app/pull/123), with the reviewed merged-head local signed package retained. Focused player controls now have emulator evidence above; retained legacy player-preference mapping still has compile/static evidence only. Replacement acceptance remains pending.
 - Native-speaker review of machine-drafted language resources, including the reused Lithuanian texts; full localization acceptance is not claimed.
