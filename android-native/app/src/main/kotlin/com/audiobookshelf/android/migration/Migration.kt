@@ -15,7 +15,6 @@ import com.audiobookshelf.android.data.Diagnostics
 import com.audiobookshelf.android.data.SettingsStore
 import com.audiobookshelf.android.download.Downloads
 import com.audiobookshelf.android.reader.ReadingStore
-import com.audiobookshelf.android.ui.PRIMARY_EBOOK
 import com.audiobookshelf.core.AbsJson
 import com.audiobookshelf.core.ApiClient
 import com.audiobookshelf.core.ApiError
@@ -251,13 +250,14 @@ class Migration(
         val progress = outcome.progress.map { imported ->
             val entry = imported.progress
             val itemId = entry.libraryItemId
-            if (imported.account != account || imported.attached || itemId == null) return@map imported
+            if (imported.account != account || itemId == null) return@map imported
+            // Older commits attached these records while retaining CFI only in the recovery archive.
+            if (entry.episodeId == null && !entry.ebookLocation.isNullOrBlank()) {
+                reading.adoptLegacy(account, itemId, entry.ebookLocation!!, entry.ebookProgress, entry.lastUpdate)
+            }
+            if (imported.attached) return@map imported
             val updated = entry.lastUpdate.toDouble()
             if (entry.currentTime > 0) journal().adoptRemotePosition(account, itemId, entry.episodeId, entry.currentTime, updated)
-            // Only a page number is a PDF position; other formats' locations stay in the import until their readers exist.
-            if (entry.episodeId == null && entry.ebookLocation?.toIntOrNull()?.let { it > 0 } == true) {
-                reading.adoptRemote(account, itemId, PRIMARY_EBOOK, MediaProgress(libraryItemId = itemId, ebookLocation = entry.ebookLocation, lastUpdate = updated))
-            }
             imported.copy(attached = true)
         }
         import.save(outcome.copy(titles = titles, sessions = sessions, progress = progress, issues = outcome.issues + issues))
@@ -267,6 +267,7 @@ class Migration(
 
     /** The previous app's device settings and display preferences, applied once. */
     private fun applySettings(outcome: Outcome): Outcome {
+        com.audiobookshelf.android.reader.ReaderPreferences(context).adoptLegacy(outcome.webStorage["ereaderSettings"])
         if (outcome.settingsApplied && outcome.playerSettingsApplied) return outcome
         settings.update { current ->
             val migrated = if (outcome.settingsApplied) current else legacySettings(current, outcome)

@@ -445,3 +445,13 @@ err_no_audio	Dette elementet har ingen lyd som kan spilles av.
 err_login_rejected	Brukernavnet eller passordet ble ikke godtatt.
 err_publications_unreadable	Oppføringer om ubesvarte lagringer av fremdrift kunne ikke leses. Løs dem i Diagnostikk først.
 err_discards_unreadable	Lagrede forkastinger av fremdrift kunne ikke leses. Løs dem i Diagnostikk først.
+rd_publication_conflict	En annen enhet har lagret en annen leseposisjon. Velg hvilken du vil beholde.
+rd_use_saved_location	Bruk den andre posisjonen
+rd_keep_this_location	Behold denne posisjonen
+rd_location_unresolved	Velg lagret posisjon
+rd_location_preserved	Dette dokumentet kunne ikke vise den lagrede posisjonen. Den beholdes til du velger å lagre en ny leseposisjon.
+rd_start_new_location	Lagre en ny posisjon
+rd_search_results	Søkeresultater
+rd_font_mono	Fast tegnbredde
+rd_saved_documents	Lagrede dokumenter
+rd_available_offline	Tilgjengelig frakoblet på denne enheten

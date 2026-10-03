@@ -435,3 +435,13 @@ err_no_audio	이 항목에는 재생할 수 있는 오디오가 없습니다.
 err_login_rejected	사용자 이름 또는 비밀번호가 올바르지 않습니다.
 err_publications_unreadable	응답 없는 진행 상황 기록을 읽을 수 없습니다. 먼저 진단에서 해결하세요.
 err_discards_unreadable	저장된 진행 상황 삭제 기록을 읽을 수 없습니다. 먼저 진단에서 해결하세요.
+rd_publication_conflict	다른 기기에 다른 읽기 위치가 저장되어 있습니다. 유지할 위치를 선택하세요.
+rd_use_saved_location	다른 위치 사용
+rd_keep_this_location	이 위치 유지
+rd_location_unresolved	저장된 위치 선택
+rd_location_preserved	이 문서에서 저장된 위치를 표시할 수 없습니다. 새 읽기 위치를 저장하기로 선택할 때까지 기존 위치가 유지됩니다.
+rd_start_new_location	새 위치 저장
+rd_search_results	검색 결과
+rd_font_mono	고정폭
+rd_saved_documents	저장된 문서
+rd_available_offline	이 기기에서 오프라인으로 사용 가능

@@ -232,10 +232,14 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
     val context = LocalContext.current
     val graph = context.graph
     val notSaved = stringResource(R.string.dl_not_saved)
+    val savedDocuments by graph.readerFiles.entries.collectAsState()
+    val saved = savedDocuments.filter { it.account == active.client.account }
+    var message by remember { mutableStateOf<String?>(null) }
+    var removingDocument by remember { mutableStateOf<com.audiobookshelf.android.reader.ReaderFiles.Entry?>(null) }
+    removingDocument?.let { entry -> RemoveDialog(entry.title, onDismiss = { removingDocument = null }, onConfirm = { try { graph.readerFiles.remove(entry) } catch (failure: Exception) { message = context.getString(R.string.dl_not_saved) }; removingDocument = null }) }
     val all by graph.downloads.records.collectAsState()
     val records = all.filter { it.account == active.client.account }.sortedByDescending { it.createdAt }
     var removing by remember { mutableStateOf<DownloadStore.Record?>(null) }
-    var message by remember { mutableStateOf<String?>(null) }
     // Grants and files can change outside the app, so they are looked at again whenever it returns.
     var looked by remember { mutableIntStateOf(0) }
     LifecycleResumeEffect(Unit) { looked++; onPauseOrDispose {} }
@@ -249,7 +253,7 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
         } catch (failure: SecurityException) { context.getString(R.string.dl_folder_access_not_kept) }
         looked++
     }
-    if (records.isEmpty()) {
+    if (records.isEmpty() && saved.isEmpty()) {
         MessageState(stringResource(R.string.dl_no_downloads), stringResource(R.string.dl_no_downloads_message), Modifier.padding(padding), icon = Icons.Outlined.DownloadForOffline, tag = "downloads-empty")
         return
     }
@@ -265,6 +269,17 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
         }
         message?.let { text -> Text(text, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp).testTag("downloads-message")) }
         LazyColumn(Modifier.weight(1f).testTag("downloads"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (saved.isNotEmpty()) item { Text(stringResource(R.string.rd_saved_documents), style = MaterialTheme.typography.titleMedium) }
+            items(saved, key = { "document-${it.id}" }) { entry ->
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(entry.title, style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.rd_available_offline), style = MaterialTheme.typography.bodySmall)
+                    Row {
+                        OutlinedButton(onClick = { onRead(Route.Reader(entry.itemId, entry.fileId, entry.supplementary, entry.title, format = entry.format, localOnly = true)) }, enabled = entry.format in readableFormats, modifier = Modifier.testTag("read-saved-${entry.fileId}")) { Text(stringResource(R.string.action_read, entry.format.uppercase())) }
+                        TextButton(onClick = { removingDocument = entry }, modifier = Modifier.testTag("remove-saved-${entry.fileId}")) { Text(stringResource(R.string.dl_remove)) }
+                    }
+                }
+            }
             items(records, key = { it.id }) { record ->
                 val key = record.key
                 val tag = when (record.state) {
@@ -291,9 +306,9 @@ fun DownloadsScreen(active: SessionState.Active, catalog: CatalogModel, padding:
                         }
                     }
                     FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        val readable = record.ebook?.takeIf { record.state == DownloadStore.State.COMPLETE && it.ebookFormat == "pdf" }
+                        val readable = record.ebook?.takeIf { record.state == DownloadStore.State.COMPLETE && it.ebookFormat?.lowercase() in readableFormats }
                         if (readable != null) IconButton(
-                            onClick = { onRead(Route.Reader(record.itemId, readable.ebookFileId!!, supplementary = false, title = record.title, downloadId = record.id)) },
+                            onClick = { onRead(Route.Reader(record.itemId, readable.ebookFileId!!, supplementary = false, title = record.title, downloadId = record.id, format = readable.ebookFormat!!.lowercase())) },
                             modifier = Modifier.testTag("read-offline-$key"),
                         ) { Icon(Icons.AutoMirrored.Outlined.MenuBook, stringResource(R.string.action_read, record.title)) }
                         if (record.state == DownloadStore.State.COMPLETE && record.ebook != null && record.id !in missing) IconButton(

@@ -450,3 +450,13 @@ lib_search_failed	Suche fehlgeschlagen
 lib_search_idle_title	Finde etwas zum Anhören
 lib_search_idle_message	Durchsuche Titel, Autoren, Serien, Erzähler und Episoden.
 lib_search_no_match	Nichts passt zu „%1$s“. Versuche es mit weniger Wörtern oder einer anderen Schreibweise.
+rd_publication_conflict	Ein anderes Gerät hat eine andere Leseposition gespeichert. Wählen Sie die Position, die Sie behalten möchten.
+rd_use_saved_location	Andere Position verwenden
+rd_keep_this_location	Diese Position behalten
+rd_location_unresolved	Gespeicherte Position auswählen
+rd_location_preserved	Die gespeicherte Position konnte in diesem Dokument nicht angezeigt werden. Sie bleibt erhalten, bis Sie eine neue Leseposition speichern möchten.
+rd_start_new_location	Neue Position speichern
+rd_search_results	Suchergebnisse
+rd_font_mono	Monospace
+rd_saved_documents	Gespeicherte Dokumente
+rd_available_offline	Auf diesem Gerät offline verfügbar

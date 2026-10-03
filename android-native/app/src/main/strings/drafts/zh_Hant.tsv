@@ -430,3 +430,13 @@ err_no_audio	此項目沒有可播放的音訊。
 err_login_rejected	使用者名稱或密碼未被接受。
 err_publications_unreadable	無法讀取未獲回應的進度寫入記錄。請先在「診斷」中解決。
 err_discards_unreadable	無法讀取已儲存的進度放棄記錄。請先在「診斷」中解決。
+rd_publication_conflict	另一台裝置儲存了不同的閱讀位置。請選擇要保留的位置。
+rd_use_saved_location	使用另一個位置
+rd_keep_this_location	保留此位置
+rd_location_unresolved	請選擇已儲存的位置
+rd_location_preserved	此文件無法顯示已儲存的位置。在您選擇儲存新的閱讀位置之前，原位置會被保留。
+rd_start_new_location	儲存新位置
+rd_search_results	搜尋結果
+rd_font_mono	等寬
+rd_saved_documents	已儲存的文件
+rd_available_offline	可在此裝置上離線使用

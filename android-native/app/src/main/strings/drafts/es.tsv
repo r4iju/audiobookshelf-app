@@ -464,3 +464,13 @@ err_no_audio	Este elemento no tiene audio reproducible.
 err_login_rejected	No se aceptó el nombre de usuario o la contraseña.
 err_publications_unreadable	No se pudieron leer los registros de escrituras de progreso sin respuesta. Resuélvalos primero en Diagnóstico.
 err_discards_unreadable	No se pudieron leer los descartes de progreso guardados. Resuélvalos primero en Diagnóstico.
+rd_publication_conflict	Otro dispositivo ha guardado una posición de lectura diferente. Elige cuál conservar.
+rd_use_saved_location	Usar la otra posición
+rd_keep_this_location	Conservar esta posición
+rd_location_unresolved	Elige la posición guardada
+rd_location_preserved	Este documento no pudo mostrar la posición guardada. Se conservará hasta que decidas guardar una nueva posición de lectura.
+rd_start_new_location	Guardar una nueva posición
+rd_search_results	Resultados de búsqueda
+rd_font_mono	Monoespaciada
+rd_saved_documents	Documentos guardados
+rd_available_offline	Disponible sin conexión en este dispositivo

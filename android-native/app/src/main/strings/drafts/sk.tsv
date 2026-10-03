@@ -479,3 +479,13 @@ err_no_audio	Táto položka nemá prehrateľný zvuk.
 err_login_rejected	Používateľské meno alebo heslo nebolo prijaté.
 err_publications_unreadable	Záznamy o nepotvrdených zápisoch priebehu sa nepodarilo prečítať. Najprv ich vyriešte v Diagnostike.
 err_discards_unreadable	Uložené zahodenia priebehu sa nepodarilo prečítať. Najprv ich vyriešte v Diagnostike.
+rd_publication_conflict	Iné zariadenie uložilo inú pozíciu čítania. Vyberte, ktorú chcete zachovať.
+rd_use_saved_location	Použiť inú pozíciu
+rd_keep_this_location	Zachovať túto pozíciu
+rd_location_unresolved	Vyberte uloženú pozíciu
+rd_location_preserved	Tento dokument nedokázal zobraziť uloženú pozíciu. Zostane zachovaná, kým sa nerozhodnete uložiť novú pozíciu čítania.
+rd_start_new_location	Uložiť novú pozíciu
+rd_search_results	Výsledky vyhľadávania
+rd_font_mono	Pevná šírka
+rd_saved_documents	Uložené dokumenty
+rd_available_offline	Dostupné offline na tomto zariadení

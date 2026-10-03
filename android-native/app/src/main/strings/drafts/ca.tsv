@@ -474,3 +474,13 @@ err_no_audio	Aquest element no té àudio reproduïble.
 err_login_rejected	No s'ha acceptat el nom d'usuari o la contrasenya.
 err_publications_unreadable	No s'han pogut llegir els registres de desaments de progrés sense resposta. Resoleu-los primer a Diagnòstic.
 err_discards_unreadable	No s'han pogut llegir els descarts de progrés desats. Resoleu-los primer a Diagnòstic.
+rd_publication_conflict	Un altre dispositiu ha desat una posició de lectura diferent. Trieu quina voleu conservar.
+rd_use_saved_location	Utilitza l’altra posició
+rd_keep_this_location	Conserva aquesta posició
+rd_location_unresolved	Trieu la posició desada
+rd_location_preserved	Aquest document no ha pogut mostrar la posició desada. Es conservarà fins que decidiu desar una nova posició de lectura.
+rd_start_new_location	Desa una nova posició
+rd_search_results	Resultats de la cerca
+rd_font_mono	Monoespaiada
+rd_saved_documents	Documents desats
+rd_available_offline	Disponible sense connexió en aquest dispositiu

@@ -39,4 +39,5 @@
     <string name="pl_scale_elapsed">Scale elapsed time by speed</string>
     <string name="pl_lock">Lock player</string>
     <string name="pl_unlock">Unlock player</string>
+    <string name="rd_search_book">શોધો</string>
 </resources>

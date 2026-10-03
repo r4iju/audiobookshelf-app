@@ -601,3 +601,36 @@ pl_chapter_track	LabelChapterTrack	Chapter track
 pl_scale_elapsed	LabelScaleElapsedTimeBySpeed	Scale elapsed time by speed
 pl_lock	LabelLockPlayer	Lock player
 pl_unlock	LabelUnlockPlayer	Unlock player
+rd_publication_conflict	-	Another device has a different saved location. Choose which location to keep.
+rd_use_saved_location	-	Use other location
+rd_keep_this_location	-	Keep this location
+rd_location_unresolved	-	Saved location needs a choice
+rd_location_preserved	-	This document could not resolve the saved location. It is preserved until you choose to save a new reading location.
+rd_start_new_location	-	Save a new location
+rd_contents	HeaderTableOfContents	Contents
+rd_search_results	-	Search results
+rd_search_book	ButtonSearch	Search book
+rd_reading_settings	HeaderEreaderSettings	Reading settings
+rd_text_size	LabelFontScale	Text size
+rd_page_theme	LabelTheme	Page theme
+rd_light	LabelThemeLight	Light
+rd_dark	LabelThemeDark	Dark
+rd_black	LabelThemeBlack	Black
+rd_font	LabelFontFamily	Font
+rd_line_spacing	LabelLineSpacing	Line spacing
+rd_text_weight	LabelFontBoldness	Text weight
+rd_spread	LabelLayout	Page spread
+rd_spread_auto	LabelLayoutAuto	Automatic
+rd_spread_single	LabelLayoutSinglePage	Single page
+rd_keep_awake	LabelKeepScreenAwake	Keep screen awake
+rd_volume_navigation	LabelNavigateWithVolume	Navigate with volume buttons
+rd_off	LabelNavigateWithVolumeWhilePlayingDisabled	Off
+rd_on	LabelNavigateWithVolumeWhilePlayingEnabled	On
+rd_mirrored	LabelNavigateWithVolumeMirrored	Mirrored
+rd_volume_with_audio	LabelNavigateWithVolumeWhilePlaying	Navigate with volume while playing audio
+rd_font_serif	LabelFontFamilySerif	Serif
+rd_font_sans	LabelFontFamilySans	Sans
+rd_font_mono	-	Monospace
+dl_cancelled	-	Download cancelled. Completed files are kept. Retry to finish.
+rd_saved_documents	-	Saved documents
+rd_available_offline	-	Available offline on this device

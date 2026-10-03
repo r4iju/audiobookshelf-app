@@ -462,3 +462,13 @@ err_no_audio	Cet élément n’a pas d’audio lisible.
 err_login_rejected	Le nom d’utilisateur ou le mot de passe n’a pas été accepté.
 err_publications_unreadable	Les enregistrements de progression restés sans réponse n’ont pas pu être lus. Résolvez-les d’abord dans Diagnostics.
 err_discards_unreadable	Les suppressions de progression enregistrées n’ont pas pu être lues. Résolvez-les d’abord dans Diagnostics.
+rd_publication_conflict	Un autre appareil a enregistré une autre position de lecture. Choisissez celle à conserver.
+rd_use_saved_location	Utiliser l’autre position
+rd_keep_this_location	Conserver cette position
+rd_location_unresolved	Choisir la position enregistrée
+rd_location_preserved	Ce document ne peut pas afficher la position enregistrée. Elle est conservée jusqu’à ce que vous choisissiez d’enregistrer une nouvelle position de lecture.
+rd_start_new_location	Enregistrer une nouvelle position
+rd_search_results	Résultats de recherche
+rd_font_mono	Chasse fixe
+rd_saved_documents	Documents enregistrés
+rd_available_offline	Disponible hors ligne sur cet appareil

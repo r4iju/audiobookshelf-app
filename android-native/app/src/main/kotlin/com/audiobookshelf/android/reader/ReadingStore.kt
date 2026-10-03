@@ -49,10 +49,13 @@ class ReadingStore(private val file: File) {
         val conflictUpdatedAt: Double? = null,
         /** The other device's position when it is not a page number, such as another format's location. */
         val conflictLocation: String? = null,
+        val savedLocation: String? = null,
+        val savedProgress: Double? = null,
     ) {
         val pending get() = primary && revision > acknowledged
         val inConflict get() = conflictUpdatedAt != null || conflictPage != null
-        val progress get() = if (pages > 0) ((page - 1).toDouble() / pages).coerceIn(0.0, 1.0) else 0.0
+        val location get() = savedLocation ?: page.toString()
+        val progress get() = savedProgress ?: if (pages > 0) ((page - 1).toDouble() / pages).coerceIn(0.0, 1.0) else 0.0
     }
 
     @Serializable private data class Document(val version: Int = 1, val entries: List<Entry> = emptyList())
@@ -79,9 +82,29 @@ class ReadingStore(private val file: File) {
     @Synchronized
     fun record(account: AccountIdentity, itemId: String, fileId: String, primary: Boolean, page: Int, pages: Int, now: Long = System.currentTimeMillis()) {
         val current = entry(account, itemId, fileId)
-        val next = current?.copy(page = page, pages = pages, updatedAt = now.toDouble(), revision = current.revision + 1, primary = primary)
+        val next = current?.copy(savedLocation = null, savedProgress = null, page = page, pages = pages, updatedAt = now.toDouble(), revision = current.revision + 1, primary = primary)
             ?: Entry(account, itemId, fileId, primary, page, pages, now.toDouble(), revision = 1)
         save(next)
+    }
+
+    @Synchronized
+    fun recordLocation(account: AccountIdentity, itemId: String, fileId: String, primary: Boolean, location: String, progress: Double) {
+        require(location.isNotBlank() && progress.isFinite())
+        val current = entry(account, itemId, fileId)
+        val next = current?.copy(savedLocation = location, savedProgress = progress.coerceIn(0.0, 1.0),
+            updatedAt = System.currentTimeMillis().toDouble(), revision = current.revision + 1, primary = primary)
+            ?: Entry(account, itemId, fileId, primary, page = location.toIntOrNull() ?: 1,
+                updatedAt = System.currentTimeMillis().toDouble(), revision = 1, savedLocation = location, savedProgress = progress.coerceIn(0.0, 1.0))
+        save(next)
+    }
+
+    /** An exported local position has not been confirmed by this client's server, so keep it pending. */
+    @Synchronized
+    fun adoptLegacy(account: AccountIdentity, itemId: String, location: String, progress: Double?, updatedAt: Long) {
+        if (location.isBlank() || entry(account, itemId, "primary") != null) return
+        val page = location.toIntOrNull()?.takeIf { it > 0 }
+        save(Entry(account, itemId, "primary", true, page ?: 1, updatedAt = updatedAt.toDouble(), revision = 1,
+            savedLocation = location.takeIf { page == null }, savedProgress = progress))
     }
 
     /**
@@ -95,12 +118,11 @@ class ReadingStore(private val file: File) {
         val page = location.toIntOrNull()?.takeIf { it > 0 }
         val current = entry(account, itemId, fileId)
         if (current == null) {
-            if (page == null) return false
-            save(Entry(account, itemId, fileId, primary = true, page = page, updatedAt = updated, remoteUpdatedAt = updated))
+            save(Entry(account, itemId, fileId, primary = true, page = page ?: 1, updatedAt = updated, remoteUpdatedAt = updated, savedLocation = location.takeIf { page == null }, savedProgress = progress.ebookProgress))
             return true
         }
         if (updated <= current.remoteUpdatedAt) return false
-        if (location == current.page.toString() || location in current.unconfirmed) {
+        if (location == current.location || location in current.unconfirmed) {
             save(current.copy(remoteUpdatedAt = updated))
             return false
         }
@@ -109,9 +131,8 @@ class ReadingStore(private val file: File) {
             save(current.copy(conflictPage = page, conflictUpdatedAt = updated, conflictLocation = location.takeIf { page == null }))
             return false
         }
-        // Nothing here to replace it with; the newer position stays news, so a later page asks first.
-        if (page == null) return false
-        save(current.copy(page = page, updatedAt = updated, primary = true, acknowledged = current.revision, remoteUpdatedAt = updated,
+        // Opaque locations stay intact until the matching reader can interpret them.
+        save(current.copy(page = page ?: 1, savedLocation = location.takeIf { page == null }, savedProgress = progress.ebookProgress, updatedAt = updated, primary = true, acknowledged = current.revision, remoteUpdatedAt = updated,
             unconfirmed = emptyList(), conflictPage = null, conflictUpdatedAt = null, conflictLocation = null))
         return true
     }
@@ -123,7 +144,7 @@ class ReadingStore(private val file: File) {
         val location = server?.ebookLocation?.trim()
         val updated = server?.lastUpdate
         if (location == null || updated == null || updated <= current.remoteUpdatedAt || location in current.unconfirmed) return Preflight.SEND
-        if (location == sending.page.toString()) return Preflight.ALREADY_THERE
+        if (location == sending.location) return Preflight.ALREADY_THERE
         adoptRemote(sending.account, sending.itemId, sending.fileId, server)
         return Preflight.CONFLICT
     }
@@ -132,7 +153,7 @@ class ReadingStore(private val file: File) {
     @Synchronized
     fun sending(sending: Entry) {
         val current = entry(sending.account, sending.itemId, sending.fileId) ?: return
-        val location = sending.page.toString()
+        val location = sending.location
         if (location !in current.unconfirmed) save(current.copy(unconfirmed = current.unconfirmed + location))
     }
 
@@ -142,7 +163,7 @@ class ReadingStore(private val file: File) {
         val current = entry(sent.account, sent.itemId, sent.fileId) ?: return
         val acknowledged = maxOf(current.acknowledged, minOf(sent.revision, current.revision))
         // A later write by another device is not this publication's result and stays news.
-        val confirmed = server?.lastUpdate?.takeIf { server.ebookLocation?.trim() == sent.page.toString() }
+        val confirmed = server?.lastUpdate?.takeIf { server.ebookLocation?.trim() == sent.location }
         save(current.copy(
             acknowledged = acknowledged,
             remoteUpdatedAt = maxOf(current.remoteUpdatedAt, confirmed ?: 0.0),
@@ -160,7 +181,7 @@ class ReadingStore(private val file: File) {
         val updated = current.conflictUpdatedAt ?: current.remoteUpdatedAt
         val resolved = current.copy(remoteUpdatedAt = updated, conflictPage = null, conflictUpdatedAt = null, conflictLocation = null)
         save(if (keepLocal) resolved
-            else resolved.copy(page = current.conflictPage ?: current.page, updatedAt = updated, acknowledged = current.revision, unconfirmed = emptyList()))
+            else resolved.copy(page = current.conflictPage ?: current.page, savedLocation = current.conflictLocation, savedProgress = null, updatedAt = updated, acknowledged = current.revision, unconfirmed = emptyList()))
     }
 
     /** Forgets the item's reading progress after it was discarded; supplementary documents keep their page. */
@@ -184,7 +205,7 @@ class ReadingStore(private val file: File) {
 
     private fun read(): List<Entry> {
         if (!file.exists()) return emptyList()
-        return runCatching { AbsJson.decodeFromString(Document.serializer(), file.readText()).entries }
+        return runCatching { AbsJson.decodeFromString(Document.serializer(), file.readText()).also { check(it.version == 1) }.entries }
             .getOrElse { writable = false; Log.w("AbsReading", "Reading positions unreadable", it); emptyList() }
     }
 }
@@ -237,7 +258,7 @@ class ReadingSync(
                         ReadingStore.Preflight.ALREADY_THERE -> store.acknowledge(next, null)
                         ReadingStore.Preflight.SEND -> {
                             store.sending(next)
-                            remote.save(next.itemId, next.page.toString(), next.progress)
+                            remote.save(next.itemId, next.location, next.progress)
                             store.acknowledge(next, runCatching { remote.progress(next.itemId) }.getOrNull())
                         }
                     }

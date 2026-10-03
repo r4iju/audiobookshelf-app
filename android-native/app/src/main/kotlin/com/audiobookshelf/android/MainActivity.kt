@@ -15,6 +15,22 @@ import com.audiobookshelf.android.auth.OpenIdSignIn
 import com.audiobookshelf.android.ui.AppRoot
 
 class MainActivity : ComponentActivity() {
+    var readerVolumeNavigation: ((Int) -> Boolean)? = null
+    private val readerVolumeKeys = mutableSetOf<Int>()
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+        if (event.keyCode in setOf(android.view.KeyEvent.KEYCODE_VOLUME_UP, android.view.KeyEvent.KEYCODE_VOLUME_DOWN)) {
+            if (event.action == android.view.KeyEvent.ACTION_UP && readerVolumeKeys.remove(event.keyCode)) return true
+            if (event.action == android.view.KeyEvent.ACTION_DOWN) {
+                if (event.keyCode in readerVolumeKeys) return true
+                if (event.repeatCount == 0 && readerVolumeNavigation?.invoke(event.keyCode) == true) {
+                    readerVolumeKeys.add(event.keyCode)
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)

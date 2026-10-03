@@ -446,3 +446,13 @@ err_no_audio	Dit item heeft geen afspeelbare audio.
 err_login_rejected	De gebruikersnaam of het wachtwoord werd niet geaccepteerd.
 err_publications_unreadable	Gegevens over onbeantwoorde voortgangsopslag konden niet worden gelezen. Los dit eerst op in Diagnose.
 err_discards_unreadable	Opgeslagen verzoeken om voortgang te wissen konden niet worden gelezen. Los dit eerst op in Diagnose.
+rd_publication_conflict	Een ander apparaat heeft een andere leespositie opgeslagen. Kies welke positie u wilt behouden.
+rd_use_saved_location	Andere positie gebruiken
+rd_keep_this_location	Deze positie behouden
+rd_location_unresolved	Kies de opgeslagen positie
+rd_location_preserved	Dit document kan de opgeslagen positie niet weergeven. Deze blijft bewaard totdat u ervoor kiest een nieuwe leespositie op te slaan.
+rd_start_new_location	Nieuwe positie opslaan
+rd_search_results	Zoekresultaten
+rd_font_mono	Monospace
+rd_saved_documents	Opgeslagen documenten
+rd_available_offline	Offline beschikbaar op dit apparaat

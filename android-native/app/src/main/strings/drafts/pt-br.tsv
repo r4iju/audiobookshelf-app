@@ -462,3 +462,13 @@ err_no_audio	Este item não tem áudio reproduzível.
 err_login_rejected	O nome de usuário ou a senha não foi aceito.
 err_publications_unreadable	Não foi possível ler os registros de salvamentos de progresso sem resposta. Resolva-os primeiro em Diagnóstico.
 err_discards_unreadable	Não foi possível ler os descartes de progresso salvos. Resolva-os primeiro em Diagnóstico.
+rd_publication_conflict	Outro dispositivo salvou uma posição de leitura diferente. Escolha qual manter.
+rd_use_saved_location	Usar a outra posição
+rd_keep_this_location	Manter esta posição
+rd_location_unresolved	Escolha a posição salva
+rd_location_preserved	Este documento não conseguiu exibir a posição salva. Ela será mantida até você escolher salvar uma nova posição de leitura.
+rd_start_new_location	Salvar uma nova posição
+rd_search_results	Resultados da busca
+rd_font_mono	Monoespaçada
+rd_saved_documents	Documentos salvos
+rd_available_offline	Disponível offline neste dispositivo
