@@ -1181,7 +1181,9 @@
         "apple-mobile": [
           "ListeningControlsJourney: testShortSleepTimerActuallyStopsAndPersistsPositionAfterLeavingPlayer, testTimerAdjustmentChangesActualStopAndResetKeepsOriginalDuration, testSeekingPastChapterSleepBoundaryStopsAudioInsteadOfLeavingTimerStranded. Background and relaunch timer behaviour on a device remain open (#9/#11)."
         ],
-        "android": [],
+        "android": [
+          "Final bounded Android decoded-audio proof: real 4s SleepTimer, decoded 7.418s to paused 11.926s; actual output volume reduced to 0.16, restored 1.0 at expiry/resume; paused position frozen, durable 12.75s/listening 7.012s. Source input unchanged bbac469a..775ffcff. Full 60s curve/shake/chime/nightly not newly sampled. See docs/modernization/FINAL-READINESS.md; private android-cast-auto/final-software-results.json retains scoped results and QA cleanup."
+        ],
         "browser": [
           "Journey e2e/playback.spec.ts \"the sleep timer can stop at the end of the chapter\" stops between 28 and 31 s in a 30 s chapter; fixed in a2db7a36 and passed 3 of 3 in Firefox and WebKit and in Chromium (sleep-fix.log); Chromium on de8958cd. Unit: store.test.ts \"stops where the chapter ends with its file...\". Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
           "Not verified: a duration timer (no journey), the fade-out, and stopping while the tab is backgrounded or the device sleeps."
@@ -1425,7 +1427,9 @@
         "apple-mobile": [
           "DurableProgressJourney 4/4 (newer remote progress kept, a new client resumes it; APPLE-OFFLINE.md); RealtimeJourney progress from another client; PausedRealtimeJourney 2/2 on the integrated app at 7404b027 with total-elapsed assertions (/tmp/abs-root-paused-realtime-green-total.log), and RED with root event forwarding removed (/tmp/abs-root-paused-realtime-mutation.log); book completion through relaunch (APPLE-BOOK-PROGRESS.md). Physical cross-device and live-server sync remain open."
         ],
-        "android": [],
+        "android": [
+          "Final bounded Android software proof: source bbac469a inputs unchanged at merged 775ffcff. Independently authenticated second client actually decoded/published 13.401s; native old 7.414s reopened at exactly 13.401s. Journal/server retained. Local 2.30-shaped fixture, not physical or new live-server certification. See docs/modernization/FINAL-READINESS.md; private android-cast-auto/final-software-results.json retains scoped results and QA cleanup."
+        ],
         "browser": [
           "Journeys on de8958cd: e2e/session.spec.ts \"progress from another device appears without reloading\" (another client's PATCH shows live at 50%) and \"finishing and discarding progress reach the server\"; e2e/readers.spec.ts resume journeys follow places saved by another client. Session journeys also ran in Firefox and WebKit at 74d63f16 (one Firefox flake, then 2 of 2). Fixture: synthetic Audiobookshelf 2.30.0 QA server on loopback with synthetic accounts and library.",
           "The other device is the server API driven by the test, not a second real client UI. Not verified: finishing on a native app and resuming in the browser."
@@ -1574,7 +1578,9 @@
         "apple-mobile": [
           "OfflineJourney 3 cases on iPhone (download, server unavailable, cross-file seek, relaunch, publication on reconnect; newer remote rewind adopted) and the focused case on iPad (APPLE-OFFLINE.md); downloaded collection/playlist members play without server access (CollectionJourney). Server unavailability is HTTP 503, not airplane mode."
         ],
-        "android": []
+        "android": [
+          "Final bounded Android production storage refusal: completed audio/PDF then oversized metadata NoSpace needed 2000000000001509 bytes; manifest/all completed hashes unchanged, PDF 1509 bytes, no new download request. Local audio actually decoded offline with no server-stream request. Disk not filled; source inputs unchanged bbac469a..775ffcff. See docs/modernization/FINAL-READINESS.md; private android-cast-auto/final-software-results.json retains scoped results and QA cleanup."
+        ]
       },
       "gates": {
         "permissions": "Server download permission plus platform network/storage policy.",
@@ -1606,7 +1612,9 @@
           "Partial: OfflineJourney.testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload (retry survives relaunch); Downloads screen with progress, cancel and retry (apple/README.md). Background transfer interruption, device restart and insufficient storage are not tested.",
           "Remaining local QA (APPLE-REMAINING-QA.md, NativeTests 67/67): a transfer meeting a full mounted volume fails once with a storage message instead of restarting endlessly (RED 33eb9455, fix 3efb624c; non-storage write failures stay generic, RED 63ed02cf, fix 553fd012). Finished audio stays playable offline when a later PDF fails (RED 02bbb418, fix b405a805). A lost connection with retry recovery was probed correct. Device restart, whole-device full and cellular transitions remain untested. Round 2: an unsized transfer shorter than the server's listed metadata.size is rejected while unknown-length transfers stay accepted (RED 7e21dbc2, fix a39281f1); an ephemeral probe showed a slow background transfer continuing through XCUIApplication.terminate() and adopted after relaunch with one request per part. User force-quit and device behaviour unverified."
         ],
-        "android": []
+        "android": [
+          "Final bounded Android production storage refusal: completed audio/PDF then oversized metadata NoSpace needed 2000000000001509 bytes; manifest/all completed hashes unchanged, PDF 1509 bytes, no new download request. Local audio actually decoded offline with no server-stream request. Disk not filled; source inputs unchanged bbac469a..775ffcff. See docs/modernization/FINAL-READINESS.md; private android-cast-auto/final-software-results.json retains scoped results and QA cleanup."
+        ]
       },
       "gates": {
         "permissions": "Server download permission plus platform network/storage policy.",
@@ -2564,6 +2572,9 @@
       "replacementEvidence": {
         "apple-mobile": [
           "Rewind and fade: ListeningControlsJourney.testResumeRewindsAfterAPauseAndCanBeDisabledPersistently and testDisablingAnActiveSleepFadeRestoresActualAudioVolume. Auto-sleep window, shake sensitivity, chime and reset feedback are Android-only in the baseline (apple/README.md). iOS 27 simulator against the synthetic 2.30.0-fixture."
+        ],
+        "android": [
+          "Final bounded Android decoded-audio proof: real 4s SleepTimer, decoded 7.418s to paused 11.926s; actual output volume reduced to 0.16, restored 1.0 at expiry/resume; paused position frozen, durable 12.75s/listening 7.012s. Source input unchanged bbac469a..775ffcff. Full 60s curve/shake/chime/nightly not newly sampled. See docs/modernization/FINAL-READINESS.md; private android-cast-auto/final-software-results.json retains scoped results and QA cleanup."
         ]
       },
       "verification": {

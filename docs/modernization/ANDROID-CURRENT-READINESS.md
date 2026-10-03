@@ -6,6 +6,8 @@ PR #146 merged at `775ffcff6f01d15f8d3c62d8aa451c5dfd0777a9`, fresh-reviewed sou
 
 Simulator/emulator and isolated-server evidence is the accepted baseline under #141/#142. Missing physical receivers, vehicles, controls or assistive-device walkthroughs do not block this milestone. Machine-draft provenance, provider/owner-data limitations and unreproduced historical automation signals remain honest limitations, not invented new certification gates. Real-owner migration or destructive cutover is not implied. Manual PDF page-2 evidence is retained; failed historical PdfJourney instrumentation is not reported as a pass.
 
+Final bounded production probes now verify actual independently authenticated second-client decoded progress/resume, real timer reduced-volume/expiry/pause/restoration with durable listening, and oversized-download NoSpace refusal preserving completed audio/PDF bytes and offline decoding. [Final readiness](FINAL-READINESS.md) records exact values and unsampled fade/hardware/paragraph-traversal limits. Production inputs matched merged source; no product rebuild was required for this evidence.
+
 ## Historical scoped finishing report
 
 The candidate/readiness/deferral statements below describe their dated source and are superseded by the current record above. Retain their failures and limited proof rather than treating them as final acceptance claims.
