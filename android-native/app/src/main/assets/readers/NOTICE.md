@@ -7,3 +7,5 @@ Bundled reader engines reuse the browser and legacy clients' pinned engines, wit
 - libarchive.js 2.0.2, MIT, `libarchive/LICENSE`; the distributed WASM is the package’s libarchive 3.7.2 build (`LIBARCHIVE-COPYING`).
 
 Engine sources are copied from the existing local dependency caches; `reader.js` and `index.html` are the Android host. Book frames cannot run scripts. All document/asset requests stay inside the intercepted local origin; native authenticated downloads supply document bytes. No DRM removal is implemented.
+
+Android-only amendments to the cached EPUB.js 0.3.88 bundle (original SHA-256 `c7a842da856d511938cba1ba64d90743c318ac02c13e47bc84ae4834fe94c945`): iframe creation sets `sandbox=allow-same-origin` immediately before any src/srcdoc/document.write load, excluding `allow-scripts`; handleLinks forwards content `linkClicked` to the rendition before display so the native host can retain direct-link reading positions. Automatic initial restoration does not emit that navigation intent. These are narrow local modifications, not upstream capabilities; the unsupported `allowScriptedContent` option is not used. BSD notice retained.

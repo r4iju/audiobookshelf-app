@@ -40,8 +40,10 @@ async function open(format, start) {
  kind=format;area.style.cssText='position:fixed;inset:0;overflow:auto;width:'+window.innerWidth+'px;height:'+window.innerHeight+'px';const response=await fetch('document');if(!response.ok)throw Error('Document could not be read');const bytes=await response.arrayBuffer();
  if(format==='epub'){
   book=ePub(bytes);await book.ready;await book.loaded.navigation;
-  rendition=book.renderTo(area,{width:window.innerWidth,height:window.innerHeight,flow:'paginated',allowScriptedContent:false});
+  rendition=book.renderTo(area,{width:window.innerWidth,height:window.innerHeight,flow:'paginated'});
   rendition.hooks.content.register(content=>{styleDoc(content.document)});
+  // The local engine forwards content link intent before its own display call.
+  rendition.on('linkClicked',()=>{moved=true});
   const epubPlace=loc=>{if(loc?.start?.cfi)notify(loc.start.cfi,book.locations.length()?book.locations.percentageFromCfi(loc.start.cfi):(book.spine.length?loc.start.index/book.spine.length:0))};
   rendition.on('relocated',loc=>{if(ready)epubPlace(loc)});
   book.locations.generate(100).then(()=>{if(ready)epubPlace(rendition.currentLocation())}).catch(()=>{});
