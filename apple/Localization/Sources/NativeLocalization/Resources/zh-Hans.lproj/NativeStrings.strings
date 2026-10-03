@@ -180,6 +180,8 @@
 "Find your next chapter." = "寻找你的下一章。";
 "Find your next listen." = "寻找你下一部想听的作品。";
 "Finished" = "已听完";
+"Fit page" = "适合整页";
+"Fit width" = "适合宽度";
 "Font" = "字体";
 "Font size" = "字体比例";
 "Font size {0}%" = "字体比例 {0}%";
@@ -296,7 +298,6 @@
 "Open downloads" = "打开下载";
 "Open feed" = "打开源";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "此服务器未启用 OpenID 登录。请使用你的用户名和密码。";
-"Opening EPUB…" = "正在打开 EPUB…";
 "Opening PDF…" = "正在打开 PDF…";
 "Opening collections…" = "正在打开收藏…";
 "Opening episodes…" = "正在打开剧集…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "正在打开你的媒体库…";
 "Opening your statistics…" = "正在打开你的统计数据…";
 "Opening your year…" = "正在打开你的年度回顾…";
+"Opening {0}…" = "正在打开 {0}…";
 "Opens the share sheet with this image and a text summary." = "打开共享表单，附带此图像和文字摘要。";
 "Page" = "页面";
+"Page fit" = "页面适配";
 "Page saved on this device. Sync follows when listening closes." = "页面已保存在此设备上。收听结束后会进行同步。";
 "Page {0} of {1}" = "第 {0} 页，共 {1} 页";
 "Passage saved on this device. Sync follows when listening closes." = "阅读位置已保存在此设备上。收听结束后会进行同步。";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "无法读取之前的保存记录，因此服务器仍可能应用其中任何一次。在确认服务器重启之前，较新的收听记录会保留在这台电视上。";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "无法读取或更新已发送到服务器的进度记录，因此不再发送任何内容。请保留 App 的数据，然后重试。";
 "The recorded problems are removed from this device." = "已记录的问题会从此设备上移除。";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "此阅读器无法识别已保存的位置。在您选择新的段落之前，该位置会被保留。";
 "The saved values are not valid numbers and are kept on this device." = "已存储的值不是有效数字，已保留在此设备上。";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "找不到服务器地址。请检查主机名，并确认电视连接在同一网络上。";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "无法连接服务器。请检查服务器地址、无线局域网或 VPN，然后重试。你已存储的登录信息会保留。";
@@ -553,10 +557,9 @@
 "Theme" = "主题";
 "There is not enough storage on this device for this download. Free up space, then retry." = "此设备上没有足够的存储空间进行此下载。请释放空间后重试。";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "这台 Apple TV 不信任服务器的 HTTPS 证书。请在电视上安装并信任你的证书颁发机构描述文件，或使用服务器的本地 HTTP 地址。";
-"This EPUB could not be opened: {0}" = "无法打开此 EPUB：{0}";
-"This EPUB is damaged or not a supported EPUB archive." = "此 EPUB 已损坏或不是受支持的 EPUB 归档。";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "无法打开此 PDF。它可能已损坏或需要密码。请检查原始文件后重试。";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "此地址已被 App 的 HTTP 配置阻止。请使用 HTTPS，或更新到支持你的本地 HTTP 服务器的版本。";
+"This document is empty or too large to open." = "此文档为空或过大，无法打开。";
 "This episode is no longer available on the server." = "服务器上已不再提供此剧集。";
 "This episode is no longer on the server." = "服务器上已没有此剧集。";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "此导出文件使用了不受支持的数据库版本。请保留该文件，并在更新导入工具后重试。";
@@ -565,6 +568,7 @@
 "This library is empty." = "此媒体库为空。";
 "This library is empty. Add titles on your server, then refresh." = "此媒体库为空。请在服务器上添加项目，然后刷新。";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "此服务器的证书不受信任。请检查其日期和主机名。对于自建 CA，请安装其描述文件，并在“设置”→“通用”→“关于本机”→“证书信任设置”中启用完全信任，然后重试。";
+"This {0} could not be opened: {1}" = "无法打开此 {0}：{1}";
 "Time listening" = "收听时间";
 "Title" = "标题";
 "Title A–Z" = "标题 A–Z";

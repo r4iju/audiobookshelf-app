@@ -84,7 +84,7 @@ struct BookDetails: View {
                     }
                 }
                 if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
-                if let ebook = book.media.ebookFile, ["pdf", "epub"].contains(ebook.format), episode == nil {
+                if let ebook = book.media.ebookFile, ["pdf", "epub", "mobi", "azw3", "cbz", "cbr"].contains(ebook.format), episode == nil {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         Task {
                             do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil) }
@@ -93,7 +93,7 @@ struct BookDetails: View {
                     }
                 }
                 if episode == nil {
-                    ForEach(book.supplementaryEbooks.filter { ["pdf", "epub"].contains($0.ebook?.format ?? "") }) { file in
+                    ForEach(book.supplementaryEbooks.filter { ["pdf", "epub", "mobi", "azw3", "cbz", "cbr"].contains($0.ebook?.format ?? "") }) { file in
                         if let ebook = file.ebook {
                             VStack(alignment: .leading, spacing: 12) {
                                 Button(l10n("Read {0}", file.metadata?.filename ?? l10n("supplementary PDF"))) {

@@ -31,6 +31,8 @@ struct ReadingSource: Identifiable {
     @Published private(set) var count = 0
     @Published private(set) var rotation = 0
     @Published private(set) var error: String?
+    @Published private(set) var locationWarning: String?
+    private var unknownLocation = false
     @Published var continuous = UserDefaults.standard.bool(forKey: "previewPDFContinuous") {
         didSet { UserDefaults.standard.set(continuous, forKey: "previewPDFContinuous"); configureDisplay() }
     }
@@ -69,7 +71,11 @@ struct ReadingSource: Identifiable {
             guard let document = PDFDocument(data: data), document.pageCount > 0, !document.isLocked else { throw ReaderFailure.invalidPDF }
             count = document.pageCount
             let saved = store.position(account: source.account, itemID: source.itemID, format: "pdf", fileID: source.fileID)
-            page = min(max(Int(saved?.location ?? "1") ?? 1, 1), count)
+            let location = saved?.location ?? ""
+            let restoredPage = Int(location)
+            unknownLocation = !location.isEmpty && !(restoredPage.map { (1...count).contains($0) } ?? false)
+            locationWarning = unknownLocation ? NativeStrings.current("The saved location is not understood by this reader. It is kept until you choose a new passage.") : nil
+            page = unknownLocation ? 1 : restoredPage ?? 1
             rotation = saved?.rotation ?? 0
             originalRotations = (0..<count).map { document.page(at: $0)?.rotation ?? 0 }
             for index in 0..<count { document.page(at: index)?.rotation = (originalRotations[index] + rotation) % 360 }
@@ -105,6 +111,7 @@ struct ReadingSource: Identifiable {
     }
     func go(to number: Int) {
         guard number >= 1, number <= count, let target = document?.page(at: number - 1) else { return }
+        unknownLocation = false
         view?.go(to: target); changedPage()
     }
     func rotate() {
@@ -115,11 +122,16 @@ struct ReadingSource: Identifiable {
     }
     private func changedPage() {
         guard !restoring, let document, let current = view?.currentPage else { return }
-        page = document.index(for: current) + 1
+        let next = document.index(for: current) + 1
+        if unknownLocation && next == page { return }
+        unknownLocation = false
+        page = next
         view?.accessibilityValue = current.string
         save()
     }
     private func save() {
+        guard !unknownLocation else { return }
+        locationWarning = nil
         do {
             try store.update(account: source.account, itemID: source.itemID, format: "pdf", location: String(page), fraction: Double(page - 1) / Double(max(count, 1)), rotation: rotation, fileID: source.fileID)
             store.sync(api: api)
@@ -195,6 +207,7 @@ struct PDFReader: View {
                                 .accessibilityLabel(l10n("Stop listening"))
                         }.padding(.horizontal).padding(.bottom, 8)
                     }
+                    if let warning = reading.locationWarning { Text(warning).font(.caption).padding(.horizontal).accessibilityIdentifier("reading-location-warning") }
                     if let error = reading.error ?? store.error ?? player.error { Text(error).font(.caption).foregroundColor(.red).padding(.horizontal) }
                     else if store.waitingForListening { Text(l10n("Page saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding(.horizontal) }
                 } else if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding() }

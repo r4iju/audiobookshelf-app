@@ -180,6 +180,8 @@
 "Find your next chapter." = "Poiščite svoje naslednje poglavje.";
 "Find your next listen." = "Poiščite kaj novega za poslušanje.";
 "Finished" = "Zaključeno";
+"Fit page" = "Cela stran";
+"Fit width" = "Prilagodi širini";
 "Font" = "Družina pisav";
 "Font size" = "Merilo pisave";
 "Font size {0}%" = "Velikost pisave {0} %";
@@ -296,7 +298,6 @@
 "Open downloads" = "Odpri prenose";
 "Open feed" = "Odpri vir";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "Prijava z OpenID na tem strežniku ni omogočena. Uporabite uporabniško ime in geslo.";
-"Opening EPUB…" = "Odpiranje EPUB …";
 "Opening PDF…" = "Odpiranje PDF …";
 "Opening collections…" = "Odpiranje zbirk …";
 "Opening episodes…" = "Odpiranje epizod …";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Odpiranje knjižnice …";
 "Opening your statistics…" = "Odpiranje statistike …";
 "Opening your year…" = "Odpiranje vašega leta …";
+"Opening {0}…" = "Odpiranje {0} …";
 "Opens the share sheet with this image and a text summary." = "Odpre meni za deljenje s to sliko in besedilnim povzetkom.";
 "Page" = "Stran";
+"Page fit" = "Prilagoditev strani";
 "Page saved on this device. Sync follows when listening closes." = "Stran je shranjena v tej napravi. Sinhronizacija sledi, ko se poslušanje konča.";
 "Page {0} of {1}" = "Stran {0} od {1}";
 "Passage saved on this device. Sync follows when listening closes." = "Odlomek je shranjen v tej napravi. Sinhronizacija sledi, ko se poslušanje konča.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "Zapisa prejšnjih shranjevanj ni bilo mogoče prebrati, zato lahko strežnik še vedno uporabi katero koli od njih. Novejše poslušanje ostane na tem televizorju, dokler ni potrjen ponovni zagon strežnika.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "Zapisa napredka, poslanega na strežnik, ni bilo mogoče prebrati ali posodobiti, zato se nič več ne pošilja. Obdržite podatke aplikacije in poskusite znova.";
 "The recorded problems are removed from this device." = "Zabeležene težave bodo odstranjene iz te naprave.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Ta bralnik ne prepozna shranjenega mesta. To ostane ohranjeno, dokler ne izberete novega odlomka.";
 "The saved values are not valid numbers and are kept on this device." = "Shranjene vrednosti niso veljavna števila in ostanejo v tej napravi.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "Naslova strežnika ni bilo mogoče najti. Preverite ime gostitelja in ali je televizor v istem omrežju.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "Strežnik ni dosegljiv. Preverite njegov naslov, Wi-Fi ali VPN in poskusite znova. Shranjena prijava se ohrani.";
@@ -553,10 +557,9 @@
 "Theme" = "Tema";
 "There is not enough storage on this device for this download. Free up space, then retry." = "V tej napravi ni dovolj prostora za ta prenos. Sprostite prostor in poskusite znova.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Ta Apple TV ne zaupa potrdilu HTTPS strežnika. V televizor namestite profil svojega overitelja potrdil in mu zaupajte ali pa uporabite lokalni naslov HTTP strežnika.";
-"This EPUB could not be opened: {0}" = "Te datoteke EPUB ni bilo mogoče odpreti: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "Ta datoteka EPUB je poškodovana ali ni podprt arhiv EPUB.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "Te datoteke PDF ni bilo mogoče odpreti. Morda je poškodovana ali zahteva geslo. Preverite izvirno datoteko in poskusite znova.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "Ta naslov je blokirala konfiguracija HTTP aplikacije. Uporabite HTTPS ali posodobite aplikacijo na različico, ki podpira vaš lokalni strežnik HTTP.";
+"This document is empty or too large to open." = "Ta dokument je prazen ali prevelik za odpiranje.";
 "This episode is no longer available on the server." = "Ta epizoda na strežniku ni več na voljo.";
 "This episode is no longer on the server." = "Te epizode ni več na strežniku.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "Ta izvoz uporablja nepodprto različico zbirke podatkov. Obdržite ga in pred ponovnim poskusom posodobite uvoznik.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Ta knjižnica je prazna.";
 "This library is empty. Add titles on your server, then refresh." = "Ta knjižnica je prazna. Dodajte naslove na strežnik in nato osvežite.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "Potrdilo tega strežnika ni zaupanja vredno. Preverite njegov datum in ime gostitelja. Za lastnega overitelja potrdil namestite njegov profil in vključite polno zaupanje v Nastavitve → Splošno → Opis → Nastavitve zaupanja potrdil ter poskusite znova.";
+"This {0} could not be opened: {1}" = "Te datoteke {0} ni bilo mogoče odpreti: {1}";
 "Time listening" = "Čas poslušanja";
 "Title" = "Naslov";
 "Title A–Z" = "Naslov A–Ž";

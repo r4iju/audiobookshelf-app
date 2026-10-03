@@ -180,6 +180,8 @@
 "Find your next chapter." = "Tìm chương tiếp theo của bạn.";
 "Find your next listen." = "Tìm nội dung tiếp theo để nghe.";
 "Finished" = "Hoàn Thành";
+"Fit page" = "Toàn trang";
+"Fit width" = "Vừa chiều rộng";
 "Font" = "Phông chữ";
 "Font size" = "Tỷ Lệ Phông Chữ";
 "Font size {0}%" = "Cỡ chữ {0}%";
@@ -296,7 +298,6 @@
 "Open downloads" = "Mở tải xuống";
 "Open feed" = "Mở Feed";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "Máy chủ này chưa bật đăng nhập OpenID. Hãy dùng tên người dùng và mật khẩu.";
-"Opening EPUB…" = "Đang mở EPUB…";
 "Opening PDF…" = "Đang mở PDF…";
 "Opening collections…" = "Đang mở bộ sưu tập…";
 "Opening episodes…" = "Đang mở các tập…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Đang mở thư viện của bạn…";
 "Opening your statistics…" = "Đang mở thống kê của bạn…";
 "Opening your year…" = "Đang mở năm của bạn…";
+"Opening {0}…" = "Đang mở {0}…";
 "Opens the share sheet with this image and a text summary." = "Mở bảng chia sẻ với hình ảnh này và một bản tóm tắt văn bản.";
 "Page" = "Trang";
+"Page fit" = "Vừa trang";
 "Page saved on this device. Sync follows when listening closes." = "Đã lưu trang trên thiết bị này. Đồng bộ sẽ diễn ra khi kết thúc nghe.";
 "Page {0} of {1}" = "Trang {0}/{1}";
 "Passage saved on this device. Sync follows when listening closes." = "Đã lưu vị trí đọc trên thiết bị này. Đồng bộ sẽ diễn ra khi kết thúc nghe.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "Không thể đọc bản ghi các lần lưu trước đó, nên máy chủ vẫn có thể áp dụng bất kỳ lần nào trong số đó. Dữ liệu nghe mới hơn được giữ trên TV này cho đến khi xác nhận máy chủ đã khởi động lại.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "Không thể đọc hoặc cập nhật bản ghi tiến độ đã gửi đến máy chủ, nên sẽ không gửi thêm gì nữa. Hãy giữ lại dữ liệu của ứng dụng và thử lại.";
 "The recorded problems are removed from this device." = "Các sự cố đã ghi nhận sẽ bị xóa khỏi thiết bị này.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Trình đọc này không nhận ra vị trí đã lưu. Vị trí đó được giữ lại cho đến khi bạn chọn đoạn mới.";
 "The saved values are not valid numbers and are kept on this device." = "Các giá trị đã lưu không phải là số hợp lệ và được giữ trên thiết bị này.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "Không tìm thấy địa chỉ máy chủ. Hãy kiểm tra tên máy chủ và đảm bảo TV ở cùng mạng.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "Không thể kết nối máy chủ. Hãy kiểm tra địa chỉ, Wi-Fi hoặc VPN, rồi thử lại. Thông tin đăng nhập đã lưu vẫn được giữ lại.";
@@ -553,10 +557,9 @@
 "Theme" = "Giao Diện";
 "There is not enough storage on this device for this download. Free up space, then retry." = "Thiết bị này không đủ dung lượng cho bản tải xuống này. Hãy giải phóng dung lượng, rồi thử lại.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Apple TV này không tin cậy chứng nhận HTTPS của máy chủ. Hãy cài đặt và tin cậy hồ sơ tổ chức cấp chứng nhận của bạn trên TV, hoặc dùng địa chỉ HTTP cục bộ của máy chủ.";
-"This EPUB could not be opened: {0}" = "Không thể mở EPUB này: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "EPUB này bị hỏng hoặc không phải là kho lưu trữ EPUB được hỗ trợ.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "Không thể mở PDF này. Tệp có thể bị hỏng hoặc cần mật khẩu. Hãy kiểm tra tệp gốc và thử lại.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "Địa chỉ này bị chặn bởi cấu hình HTTP của ứng dụng. Hãy dùng HTTPS hoặc cập nhật lên bản hỗ trợ máy chủ HTTP cục bộ của bạn.";
+"This document is empty or too large to open." = "Tài liệu này trống hoặc quá lớn để mở.";
 "This episode is no longer available on the server." = "Tập này không còn trên máy chủ.";
 "This episode is no longer on the server." = "Tập này không còn trên máy chủ.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "Bản xuất này dùng phiên bản cơ sở dữ liệu không được hỗ trợ. Hãy giữ lại và cập nhật công cụ nhập trước khi thử lại.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Thư viện này trống.";
 "This library is empty. Add titles on your server, then refresh." = "Thư viện này trống. Hãy thêm mục trên máy chủ, rồi làm mới.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "Chứng nhận của máy chủ này không được tin cậy. Hãy kiểm tra ngày và tên máy chủ. Với CA homelab, hãy cài đặt hồ sơ của CA và bật tin cậy hoàn toàn trong Cài đặt → Cài đặt chung → Giới thiệu → Cài đặt tin cậy chứng nhận, rồi thử lại.";
+"This {0} could not be opened: {1}" = "Không thể mở {0} này: {1}";
 "Time listening" = "Thời gian nghe";
 "Title" = "Tiêu Đề";
 "Title A–Z" = "Tiêu đề A–Z";

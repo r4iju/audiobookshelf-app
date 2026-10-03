@@ -431,7 +431,7 @@ extension NativeMigrationAdoption {
         case .supplementary:
             guard let file = record.files.first,
                   let library = item.supplementaryEbooks.first(where: { $0.metadata?.filename == file.filename }),
-                  let ebook = library.ebook, ["pdf", "epub"].contains(ebook.format)
+                  let ebook = library.ebook, ["pdf", "epub", "mobi", "azw3", "cbz", "cbr"].contains(ebook.format)
             else { throw SyncFailure.rejected(NativeStrings.current("The server no longer lists this file for the item.")) }
             let media = ListeningMedia(itemID: item.id, episodeID: nil, title: file.filename, author: item.author, mediaType: item.mediaType, duration: 0, startTime: 0)
             entry = NativeDownloads.Entry(id: record.entryID, account: identity, media: media, tracks: [], chapters: [], ebook: ebook, supplementaryID: library.ino,
@@ -443,7 +443,7 @@ extension NativeMigrationAdoption {
             let tracks = episode.map { $0.audioTrack.map { [$0] } ?? [] } ?? item.media.tracks ?? []
             guard tracks.allSatisfy({ $0.duration.isFinite && $0.duration > 0 && $0.startOffset.isFinite && $0.startOffset >= 0 }) else { throw SyncFailure.rejected(NativeStrings.current("The server's copy has no playable audio.")) }
             let ebookFile = record.files.first { $0.role == .ebook }
-            let ebook = episode == nil ? item.media.ebookFile.flatMap { ["pdf", "epub"].contains($0.format) && $0.metadata?.filename == ebookFile?.filename ? $0 : nil } : nil
+            let ebook = episode == nil ? item.media.ebookFile.flatMap { ["pdf", "epub", "mobi", "azw3", "cbz", "cbr"].contains($0.format) && $0.metadata?.filename == ebookFile?.filename ? $0 : nil } : nil
             for file in record.files where file.role != .ebook {
                 if let index = tracks.firstIndex(where: { $0.metadata?.filename == file.filename }), !sources.contains(where: { $0.part == index }) { sources.append((index, file)) }
             }

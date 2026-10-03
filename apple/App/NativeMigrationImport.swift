@@ -240,12 +240,9 @@ struct NativeMigrationImport: View {
                 }
             }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Import your data")).navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $choosing, onDismiss: {
-                if let token = selectionToken {
-                    selectionToken = nil
-                    Task { await store.finishSelection(nil, token: token) }
-                }
-            }) {
+            // The picker delegate completes both selection and cancellation. UIKit may dismiss
+            // the sheet before delivering didPickDocumentsAt; onDismiss must not cancel its token.
+            .sheet(isPresented: $choosing) {
                 MigrationFilePicker { url in
                     choosing = false
                     if let token = selectionToken {

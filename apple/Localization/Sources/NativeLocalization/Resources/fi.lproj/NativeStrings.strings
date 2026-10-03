@@ -180,6 +180,8 @@
 "Find your next chapter." = "Löydä seuraava lukusi.";
 "Find your next listen." = "Löydä seuraava kuunneltavasi.";
 "Finished" = "Valmis";
+"Fit page" = "Sovita sivu";
+"Fit width" = "Sovita leveyteen";
 "Font" = "Fonttiperhe";
 "Font size" = "Kirjasintyyppien skaalautuminen";
 "Font size {0}%" = "Fonttikoko {0} %";
@@ -296,7 +298,6 @@
 "Open downloads" = "Avaa lataukset";
 "Open feed" = "Avaa syöte";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "OpenID-kirjautuminen ei ole käytössä tällä palvelimella. Käytä käyttäjätunnustasi ja salasanaasi.";
-"Opening EPUB…" = "Avataan EPUBia…";
 "Opening PDF…" = "Avataan PDF:ää…";
 "Opening collections…" = "Avataan kokoelmia…";
 "Opening episodes…" = "Avataan jaksoja…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Avataan kirjastoasi…";
 "Opening your statistics…" = "Avataan tilastojasi…";
 "Opening your year…" = "Avataan vuottasi…";
+"Opening {0}…" = "Avataan {0}ia…";
 "Opens the share sheet with this image and a text summary." = "Avaa jakovalikon tällä kuvalla ja tekstiyhteenvedolla.";
 "Page" = "Sivu";
+"Page fit" = "Sivun sovitus";
 "Page saved on this device. Sync follows when listening closes." = "Sivu tallennettu tähän laitteeseen. Synkronointi tehdään, kun kuuntelu päättyy.";
 "Page {0} of {1}" = "Sivu {0}/{1}";
 "Passage saved on this device. Sync follows when listening closes." = "Kohta tallennettu tähän laitteeseen. Synkronointi tehdään, kun kuuntelu päättyy.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "Aiempien tallennusten kirjanpitoa ei voitu lukea, joten palvelin voi yhä ottaa minkä tahansa niistä käyttöön. Uudempi kuuntelu pysyy tässä televisiossa, kunnes palvelimen uudelleenkäynnistys on vahvistettu.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "Palvelimelle lähetetyn edistymisen kirjanpitoa ei voitu lukea tai päivittää, joten mitään ei enää lähetetä. Säilytä sovelluksen tiedot ja yritä uudelleen.";
 "The recorded problems are removed from this device." = "Kirjatut ongelmat poistetaan tästä laitteesta.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Tämä lukija ei tunnista tallennettua kohtaa. Se säilytetään, kunnes valitset uuden kohdan.";
 "The saved values are not valid numbers and are kept on this device." = "Tallennetut arvot eivät ole kelvollisia lukuja, ja ne säilytetään tässä laitteessa.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "Palvelimen osoitetta ei löytynyt. Tarkista isäntänimi ja että televisio on samassa verkossa.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "Palvelimeen ei saatu yhteyttä. Tarkista sen osoite, Wi-Fi tai VPN ja yritä sitten uudelleen. Tallennettu kirjautumisesi säilyy.";
@@ -553,10 +557,9 @@
 "Theme" = "Teema";
 "There is not enough storage on this device for this download. Free up space, then retry." = "Tässä laitteessa ei ole tarpeeksi tallennustilaa tälle lataukselle. Vapauta tilaa ja yritä sitten uudelleen.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Tämä Apple TV ei luota palvelimen HTTPS-varmenteeseen. Asenna varmentajasi profiili televisioon ja luota siihen, tai käytä palvelimen paikallista HTTP-osoitetta.";
-"This EPUB could not be opened: {0}" = "Tätä EPUB-tiedostoa ei voitu avata: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "Tämä EPUB-tiedosto on vioittunut tai ei ole tuettu EPUB-arkisto.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "Tätä PDF-tiedostoa ei voitu avata. Se voi olla vioittunut tai vaatia salasanan. Tarkista alkuperäinen tiedosto ja yritä uudelleen.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "Sovelluksen HTTP-määritykset estivät tämän osoitteen. Käytä HTTPS:ää tai päivitä versioon, joka tukee paikallista HTTP-palvelintasi.";
+"This document is empty or too large to open." = "Tämä asiakirja on tyhjä tai liian suuri avattavaksi.";
 "This episode is no longer available on the server." = "Tämä jakso ei ole enää saatavilla palvelimella.";
 "This episode is no longer on the server." = "Tätä jaksoa ei enää ole palvelimella.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "Tämä vienti käyttää tietokantaversiota, jota ei tueta. Säilytä se ja päivitä tuontityökalu ennen kuin yrität uudelleen.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Tämä kirjasto on tyhjä.";
 "This library is empty. Add titles on your server, then refresh." = "Tämä kirjasto on tyhjä. Lisää nimikkeitä palvelimellesi ja päivitä sitten.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "Tämän palvelimen varmenteeseen ei luoteta. Tarkista sen päivämäärä ja isäntänimi. Asenna kotilaboratorion varmentajasi profiili ja ota täysi luottamus käyttöön kohdassa Asetukset → Yleiset → Tietoja → Varmenteiden luottamusasetukset ja yritä sitten uudelleen.";
+"This {0} could not be opened: {1}" = "Tätä {0}-tiedostoa ei voitu avata: {1}";
 "Time listening" = "Kuunteluaika";
 "Title" = "Nimi";
 "Title A–Z" = "Nimi A–Ö";

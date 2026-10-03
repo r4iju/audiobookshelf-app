@@ -180,6 +180,8 @@
 "Find your next chapter." = "Nájdite svoju ďalšiu kapitolu.";
 "Find your next listen." = "Nájdite si ďalšie počúvanie.";
 "Finished" = "Ukončené";
+"Fit page" = "Celá stránka";
+"Fit width" = "Na šírku";
 "Font" = "písmo";
 "Font size" = "Veľkosť písma";
 "Font size {0}%" = "Veľkosť písma {0} %";
@@ -296,7 +298,6 @@
 "Open downloads" = "Otvoriť stiahnuté";
 "Open feed" = "Otvoriť zdroj";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "Prihlásenie cez OpenID nie je na tomto serveri zapnuté. Použite prihlasovacie meno a heslo.";
-"Opening EPUB…" = "Otváranie EPUB…";
 "Opening PDF…" = "Otváranie PDF…";
 "Opening collections…" = "Otváranie kolekcií…";
 "Opening episodes…" = "Otváranie epizód…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Otváranie knižnice…";
 "Opening your statistics…" = "Otváranie štatistík…";
 "Opening your year…" = "Otváranie vášho roka…";
+"Opening {0}…" = "Otváranie {0}…";
 "Opens the share sheet with this image and a text summary." = "Otvorí ponuku zdieľania s týmto obrázkom a textovým zhrnutím.";
 "Page" = "Strana";
+"Page fit" = "Prispôsobenie stránky";
 "Page saved on this device. Sync follows when listening closes." = "Strana uložená v tomto zariadení. Synchronizácia prebehne po ukončení počúvania.";
 "Page {0} of {1}" = "Strana {0} z {1}";
 "Passage saved on this device. Sync follows when listening closes." = "Pasáž uložená v tomto zariadení. Synchronizácia prebehne po ukončení počúvania.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "Záznam skorších uložení sa nepodarilo prečítať, preto server môže ktorékoľvek z nich stále použiť. Novšie počúvanie zostáva v tomto televízore, kým sa nepotvrdí reštart servera.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "Záznam stavu odoslaného na server sa nepodarilo prečítať ani aktualizovať, preto sa nič ďalšie neodosiela. Ponechajte údaje aplikácie a skúste to znova.";
 "The recorded problems are removed from this device." = "Zaznamenané problémy sa z tohto zariadenia odstránia.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Táto čítačka nerozpozná uloženú pozíciu. Zostane zachovaná, kým nevyberiete novú pasáž.";
 "The saved values are not valid numbers and are kept on this device." = "Uložené hodnoty nie sú platné čísla a zostávajú v tomto zariadení.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "Adresu servera sa nepodarilo nájsť. Skontrolujte názov hostiteľa a či je televízor v tej istej sieti.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "Server je nedostupný. Skontrolujte jeho adresu, Wi-Fi alebo VPN a skúste to znova. Uložené prihlásenie zostáva zachované.";
@@ -553,10 +557,9 @@
 "Theme" = "Téma";
 "There is not enough storage on this device for this download. Free up space, then retry." = "V tomto zariadení nie je na toto sťahovanie dosť miesta. Uvoľnite miesto a skúste to znova.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Toto Apple TV nedôveruje certifikátu HTTPS servera. Nainštalujte do televízora profil svojej certifikačnej autority a nastavte mu dôveru, alebo použite lokálnu adresu HTTP servera.";
-"This EPUB could not be opened: {0}" = "Tento súbor EPUB sa nepodarilo otvoriť: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "Tento súbor EPUB je poškodený alebo nie je podporovaným archívom EPUB.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "Tento súbor PDF sa nepodarilo otvoriť. Môže byť poškodený alebo vyžadovať heslo. Skontrolujte pôvodný súbor a skúste to znova.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "Táto adresa bola zablokovaná konfiguráciou HTTP aplikácie. Použite HTTPS alebo aplikáciu aktualizujte na verziu, ktorá podporuje váš lokálny server HTTP.";
+"This document is empty or too large to open." = "Tento dokument je prázdny alebo príliš veľký na otvorenie.";
 "This episode is no longer available on the server." = "Táto epizóda už na serveri nie je dostupná.";
 "This episode is no longer on the server." = "Táto epizóda už na serveri nie je.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "Tento export používa nepodporovanú verziu databázy. Ponechajte si ho a pred ďalším pokusom aktualizujte importér.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Táto knižnica je prázdna.";
 "This library is empty. Add titles on your server, then refresh." = "Táto knižnica je prázdna. Pridajte tituly na server a potom obnovte.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "Certifikát tohto servera nie je dôveryhodný. Skontrolujte jeho dátum a názov hostiteľa. Pri vlastnej certifikačnej autorite nainštalujte jej profil a zapnite úplnú dôveru v Nastavenia → Všeobecné → Informácie → Nastavenia dôveryhodnosti certifikátov a skúste to znova.";
+"This {0} could not be opened: {1}" = "Tento súbor {0} sa nepodarilo otvoriť: {1}";
 "Time listening" = "Čas počúvania";
 "Title" = "Názov";
 "Title A–Z" = "Názov A – Z";

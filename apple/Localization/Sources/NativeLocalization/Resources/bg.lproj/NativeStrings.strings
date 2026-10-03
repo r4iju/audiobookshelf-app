@@ -180,6 +180,8 @@
 "Find your next chapter." = "Открий следващата си глава.";
 "Find your next listen." = "Открий какво да слушаш след това.";
 "Finished" = "Дата на приключване";
+"Fit page" = "Цяла страница";
+"Fit width" = "По ширина";
 "Font" = "Шрифт";
 "Font size" = "Мащаб на шрифта";
 "Font size {0}%" = "Размер на шрифта {0}%";
@@ -296,7 +298,6 @@
 "Open downloads" = "Отвори свалените";
 "Open feed" = "Отвори стената";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "Влизането с OpenID не е включено на този сървър. Използвай потребителското си име и парола.";
-"Opening EPUB…" = "Отваряне на EPUB…";
 "Opening PDF…" = "Отваряне на PDF…";
 "Opening collections…" = "Отваряне на колекциите…";
 "Opening episodes…" = "Отваряне на епизодите…";
@@ -308,8 +309,10 @@
 "Opening your library…" = "Отваряне на библиотеката…";
 "Opening your statistics…" = "Отваряне на статистиката…";
 "Opening your year…" = "Отваряне на годината ти…";
+"Opening {0}…" = "Отваряне на {0}…";
 "Opens the share sheet with this image and a text summary." = "Отваря менюто за споделяне с това изображение и текстово обобщение.";
 "Page" = "Страница";
+"Page fit" = "Мащаб на страницата";
 "Page saved on this device. Sync follows when listening closes." = "Страницата е запазена на това устройство. Синхронизирането ще последва, когато слушането приключи.";
 "Page {0} of {1}" = "Страница {0} от {1}";
 "Passage saved on this device. Sync follows when listening closes." = "Мястото в текста е запазено на това устройство. Синхронизирането ще последва, когато слушането приключи.";
@@ -519,6 +522,7 @@
 "The record of earlier saves could not be read, so the server may still apply any of them. Newer listening stays on this TV until a server restart is confirmed." = "Записът на предишните запазвания не може да бъде прочетен, затова сървърът все още може да приложи всяко от тях. По-новото слушане остава на този телевизор, докато не бъде потвърдено рестартиране на сървъра.";
 "The record of progress sent to the server could not be read or updated, so nothing more is sent. Keep the app's data and try again." = "Записът на изпратения към сървъра напредък не може да бъде прочетен или обновен, затова нищо повече не се изпраща. Запази данните на приложението и опитай отново.";
 "The recorded problems are removed from this device." = "Записаните проблеми ще бъдат премахнати от това устройство.";
+"The saved location is not understood by this reader. It is kept until you choose a new passage." = "Този четец не разпознава запазеното място. То се пази, докато изберете нов пасаж.";
 "The saved values are not valid numbers and are kept on this device." = "Запазените стойности не са валидни числа и се пазят на това устройство.";
 "The server address could not be found. Check the host name and that the TV is on the same network." = "Адресът на сървъра не може да бъде намерен. Провери името на хоста и дали телевизорът е в същата мрежа.";
 "The server could not be reached. Check its address, Wi-Fi or VPN, then retry. Your saved login is retained." = "Сървърът е недостъпен. Провери адреса му, Wi-Fi или VPN, след което опитай отново. Запазените данни за вход не са променени.";
@@ -553,10 +557,9 @@
 "Theme" = "Тема";
 "There is not enough storage on this device for this download. Free up space, then retry." = "Няма достатъчно място на това устройство за това сваляне. Освободи място и опитай отново.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "Този Apple TV няма доверие на HTTPS сертификата на сървъра. Инсталирай профила на своя сертифициращ орган на телевизора и му дай доверие или използвай локалния HTTP адрес на сървъра.";
-"This EPUB could not be opened: {0}" = "Този EPUB не може да бъде отворен: {0}";
-"This EPUB is damaged or not a supported EPUB archive." = "Този EPUB е повреден или не е поддържан EPUB архив.";
 "This PDF could not be opened. It may be damaged or require a password. Check the original file and retry." = "Този PDF не може да бъде отворен. Може да е повреден или да изисква парола. Провери оригиналния файл и опитай отново.";
 "This address was blocked by the app's HTTP configuration. Use HTTPS or update to a build supporting your local HTTP server." = "Този адрес е блокиран от HTTP настройките на приложението. Използвай HTTPS или обнови до версия, която поддържа локалния ти HTTP сървър.";
+"This document is empty or too large to open." = "Този документ е празен или твърде голям за отваряне.";
 "This episode is no longer available on the server." = "Този епизод вече не е наличен на сървъра.";
 "This episode is no longer on the server." = "Този епизод вече не е на сървъра.";
 "This export uses an unsupported database version. Keep it and update the importer before trying again." = "Този експорт използва неподдържана версия на базата данни. Запази го и обнови инструмента за импорт, преди да опиташ отново.";
@@ -565,6 +568,7 @@
 "This library is empty." = "Тази библиотека е празна.";
 "This library is empty. Add titles on your server, then refresh." = "Тази библиотека е празна. Добави заглавия на сървъра си, след което обнови.";
 "This server's certificate is not trusted. Check its date and hostname. For your homelab CA, install its profile and enable full trust in Settings → General → About → Certificate Trust Settings, then retry." = "Сертификатът на този сървър не е доверен. Провери датата му и името на хоста. За собствен сертифициращ орган инсталирай профила му и включи пълно доверие в Настройки → Общи → Информация → Настройки за доверие на сертификати, след което опитай отново.";
+"This {0} could not be opened: {1}" = "Този {0} не може да бъде отворен: {1}";
 "Time listening" = "Време за слушане";
 "Title" = "Заглавие";
 "Title A–Z" = "Заглавие А–Я";
