@@ -14,7 +14,8 @@ The replacement owns these settings; no old administrator frontend or backend is
 | OpenID provider and client secret | OpenID sign-in | Encrypted secrets, validated discovery/PKCE, exact callbacks and issuer/subject identity (#166); original migration mappings remain #172 |
 | RSS shares, SMTP and e-reader access | Item RSS controls, E-reader delivery, Migration and backups | Explicit public shares, current publisher authority, confined range media, bounded TLS SMTP, encrypted settings and archived configuration, original feed/device import (#167) |
 | Book uploads, covers, metadata and removal | Upload and metadata; item management | Current upload/update/delete authority, managed uploads, persisted overrides/covers, bounded optional provider, reversible catalog removal retaining source/history (#168) |
-| Listening/year statistics | #169 | Existing progress history is retained; remaining views pending |
-| Backup schedule, restore, diagnostics and logging controls | #170 | Manual migration backup/restore exists; remaining controls pending |
+| Listening/year statistics | Statistics and native annual views | Current media policy, numeric contracts, UTC partitioning, personal recent pages and role-gated anonymous server totals (#169) |
+| Backup schedule, restore and diagnostics | Migration and backups; image maintenance CLI | Private database/key snapshots, explicit media scope, durable scheduling, manual-preserving retention, empty-volume restore and bounded secret-free diagnostics (#170) |
+| Original logging controls | Migration inventory (#172) | Product logs report error categories without settings or credentials; original log settings need explicit migration disposition |
 
 No secret is accepted by the general server settings schema. Provider/mail secrets require dedicated private storage and masked administrator projections in their tickets. Unsupported original settings must remain reported by migration, never silently counted as complete. Deprecated Cast settings have no effect in the public Cast-free candidate. Full migration rehearsal remains #172.

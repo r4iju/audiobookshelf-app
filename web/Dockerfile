@@ -18,6 +18,7 @@ COPY --from=build --chown=node:node /app/.next ./.next
 COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/server.mjs ./
 COPY --from=build --chown=node:node /app/realtime.mjs ./
+COPY --from=build --chown=node:node /app/maintenance.mjs /app/backup-format.mjs /app/diagnostics.mjs ./
 RUN dpkg-query -W -f='${binary:Package}\t${source:Package}\t${source:Version}\n' > /app/public/ffmpeg-packages.tsv && \
     cp /usr/share/doc/ffmpeg/copyright /app/public/ffmpeg-copyright.txt && \
     mkdir -p /data /media && chown node:node /data /media
