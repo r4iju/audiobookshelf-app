@@ -97,7 +97,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
             } else Spacer(Modifier.height(48.dp))
             Column(Modifier.widthIn(max = 480.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Icon(Icons.AutoMirrored.Outlined.LibraryBooks, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
-                Text(if (state.adding) stringResource(R.string.set_add_an_account) else "Audiobookshelf", style = MaterialTheme.typography.headlineMedium)
+                Text(if (state.adding) stringResource(R.string.set_add_an_account) else stringResource(R.string.product_name), style = MaterialTheme.typography.headlineMedium)
                 Text(stringResource(R.string.set_connect_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 state.notice?.let {
                     Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium) {
@@ -157,6 +157,7 @@ fun ConnectScreen(state: SessionState.SignedOut) {
                 }
                 openId.error?.let { ErrorText(it, "openid-error") }
                 if (!state.adding) ImportLegacyButton()
+                if (com.audiobookshelf.android.BuildConfig.PUBLIC_RELEASE) LeafwakeLegal()
                 if (state.connections.isNotEmpty()) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
                     Text(stringResource(R.string.set_saved_accounts), style = MaterialTheme.typography.titleMedium)

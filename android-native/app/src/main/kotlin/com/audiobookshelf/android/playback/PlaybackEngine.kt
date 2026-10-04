@@ -23,8 +23,6 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.cast.CastPlayer
-import androidx.media3.cast.RemoteCastPlayer
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.extractor.DefaultExtractorsFactory
@@ -157,7 +155,7 @@ class PlaybackEngine(
 
     // Read off the main thread by the reading gate.
     @Volatile private var loaded: Loaded? = null
-    private var handover: CastHandover? = null
+    private var pauseTransfer: (() -> Unit)? = null
     private val readingPublication = Mutex()
     private val ended = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     /** Emitted when listening stops, so reading held back by it can be published. */
@@ -210,7 +208,7 @@ class PlaybackEngine(
 
     private fun start(source: PlaySource) {
         if (source is PlaySource.Local && casting?.status?.value?.connectedTo != null) {
-            mutable.value = mutable.value.copy(openError = itemKey(source.itemId, source.episodeId) to context.getString(CastHandover.DOWNLOAD_NOT_CASTABLE))
+            mutable.value = mutable.value.copy(openError = itemKey(source.itemId, source.episodeId) to context.getString(R.string.cast_download_not_castable))
             return
         }
         val current = loaded
@@ -279,7 +277,7 @@ class PlaybackEngine(
     }
 
     fun pause() {
-        handover?.pause()
+        pauseTransfer?.invoke()
         player.pause()
     }
 
@@ -456,7 +454,7 @@ class PlaybackEngine(
         if (at == null && duration - start < 5) start = 0.0
         Log.i(TAG, "Opening at $start (requested $at, journal $cached, server ${session.currentTime})")
         val now = NowPlaying(source.itemId, source.episodeId, title, author, source.coverUrl, session.chapters, duration, source.episodeId != null, local = false)
-        val castable = casting?.castContext != null
+        val castable = casting?.available == true
         val version = if (castable) serverVersion(source.client) else null
         val token = if (castable) source.client.bearer() else ""
         val items = tracks.mapIndexed { index, track ->
@@ -480,15 +478,12 @@ class PlaybackEngine(
             ?.also { serverVersions[client.address.canonical] = it }
 
     private fun castPlayer(): Player? {
-        casting?.castContext ?: return null
-        val remote = RemoteCastPlayer.Builder(context)
-            .setMediaItemConverter(CastConverter())
-            .setSeekBackIncrementMs(settings.current.jumpBackwardsTime * 1000L)
-            .setSeekForwardIncrementMs(settings.current.jumpForwardTime * 1000L)
-            .build()
-        val handover = CastHandover(exo, endSession = { main.post { casting?.disconnect() } }, explain = { main.post { casting?.explain(context.getString(it)) } }, title = { loaded })
-        this.handover = handover
-        return CastPlayer.Builder(context).setLocalPlayer(exo).setRemotePlayer(remote).setTransferCallback(handover::transfer).build()
+        val output = casting?.createPlayer(exo, settings.current.jumpBackwardsTime * 1000L,
+            settings.current.jumpForwardTime * 1000L,
+            explain = { main.post { casting.explain(context.getString(it)) } },
+            title = { loaded }, endSession = { main.post { casting.disconnect() } })
+        pauseTransfer = output?.pauseTransfer
+        return output?.player
     }
 
     private fun mediaItem(id: String, uri: String, now: NowPlaying, mime: String?, cast: android.os.Bundle? = null): MediaItem = MediaItem.Builder()

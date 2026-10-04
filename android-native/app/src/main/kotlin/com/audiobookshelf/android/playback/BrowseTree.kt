@@ -45,7 +45,7 @@ class BrowseTree(private val context: Context) {
             putInt("android.media.browse.CONTENT_STYLE_BROWSABLE_HINT", 1)
             putInt("android.media.browse.CONTENT_STYLE_PLAYABLE_HINT", 1)
         }
-        return Futures.immediateFuture(LibraryResult.ofItem(folder(ROOT, "Audiobookshelf"), LibraryParams.Builder().setExtras(extras).build()))
+        return Futures.immediateFuture(LibraryResult.ofItem(folder(ROOT, context.getString(R.string.product_name)), LibraryParams.Builder().setExtras(extras).build()))
     }
 
     fun children(parentId: String, page: Int, pageSize: Int, params: LibraryParams?): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> =
