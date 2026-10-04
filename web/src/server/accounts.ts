@@ -1,5 +1,6 @@
 import "server-only";
 import { createHash, createHmac, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
+import { compare } from "bcryptjs";
 import { z } from "zod";
 import { database, initialized, setupKey, tokenSigningKey, transaction } from "./data";
 import { allProgress } from "./progress";
@@ -40,6 +41,7 @@ const userRow = z.object({
   libraries: z.string(),
   tags: z.string(),
   created_at: z.number(),
+  archive: z.string().optional(),
 });
 export type Account = z.infer<typeof userRow>;
 const rootPermissions = {
@@ -80,11 +82,15 @@ export async function hashPassword(password: string) {
   return `scrypt$${salt}$${key.toString("hex")}`;
 }
 async function matchesPassword(password: string, encoded: string) {
+  if (/^\$2[aby]\$(0[4-9]|1[0-2])\$[./A-Za-z0-9]{53}$/.test(encoded)) return compare(password, encoded);
   const [algorithm, salt, hash] = encoded.split("$");
   if (algorithm !== "scrypt" || !salt || !hash) return false;
   const key = await derive(password, salt, 64);
   const expected = Buffer.from(hash, "hex");
   return key.length === expected.length && timingSafeEqual(key, expected);
+}
+export function requireSetupKey(value: string) {
+  if (!equal(value, setupKey())) throw new DomainError(403, "The setup key is required");
 }
 export async function createOwner(input: z.infer<typeof setupSchema>) {
   if (initialized()) throw new DomainError(409, "This server is already initialized");
@@ -107,6 +113,11 @@ export async function createOwner(input: z.infer<typeof setupSchema>) {
 }
 function visibleUser(user: Account) {
   return {
+    ...(user.archive
+      ? z
+          .object({ email: z.string().nullable().optional(), isLocked: z.boolean().optional() })
+          .parse(JSON.parse(user.archive))
+      : {}),
     id: user.id,
     username: user.username,
     type: user.type,

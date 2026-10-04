@@ -263,6 +263,12 @@ function Shell({ children }: { children: ReactNode }) {
               </Link>
             ) : null}
             {admin ? (
+              <Link href="/admin/migration" className={navClass(pathname.startsWith("/admin/migration"))}>
+                <Users aria-hidden className="size-4" />
+                Migration and backups
+              </Link>
+            ) : null}
+            {admin ? (
               <Link href="/admin/accounts" className={navClass(pathname.startsWith("/admin"))}>
                 <Users aria-hidden className="size-4" />
                 Accounts
