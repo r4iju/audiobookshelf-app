@@ -2,6 +2,8 @@
 
 One image serves the browser, REST API, Socket.IO, persistent jobs and bounded FFmpeg work on port 3000. The original backend and browser are replaced. The image runs as an unprivileged user. Keep `/data` on a persistent private volume, and mount original media and import snapshots read-only.
 
+For a published version, retain its image checksum and matching source/material archives. See [WEB-MATERIALS.md](../../releases/leafwake/WEB-MATERIALS.md) for the pinned runtime-input release build. The default local Docker build resolves current Debian packages and is not the recorded release package set.
+
 ## Docker Compose
 
 From `web/`, set these privately in your environment or an untracked environment file:

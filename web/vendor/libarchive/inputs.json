@@ -1,0 +1,17 @@
+[
+  {
+    "name": "libarchivejs.tar.gz",
+    "url": "https://github.com/nika-begiashvili/libarchivejs/archive/0989c1a6db20d030d793b1763e20d880068091bd.tar.gz",
+    "sha256": "0c6d745b4a63835aba4af45166d7d0c7e73a437be16f43def2d3b69c0b36a992"
+  },
+  {
+    "name": "libarchive-3.7.2.tar.xz",
+    "url": "https://github.com/libarchive/libarchive/releases/download/v3.7.2/libarchive-3.7.2.tar.xz",
+    "sha256": "04357661e6717b6941682cde02ad741ae4819c67a260593dfb2431861b251acb"
+  },
+  {
+    "name": "xz-5.2.11.tar.gz",
+    "url": "https://github.com/tukaani-project/xz/releases/download/v5.2.11/xz-5.2.11.tar.gz",
+    "sha256": "0089d47b966bd9ab48f1d01baf7ce146a3b591716c7477866b807010de3d96ab"
+  }
+]

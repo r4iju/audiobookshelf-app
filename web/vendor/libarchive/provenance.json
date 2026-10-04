@@ -1,0 +1,33 @@
+{
+  "sourceSha": "0989c1a6db20d030d793b1763e20d880068091bd",
+  "emsdkImage": "emscripten/emsdk:3.1.51@sha256:fde95518821ccc1b629ee674a7a068a809fda47ea16814b0ed53bd646555147b",
+  "openssl": false,
+  "inputs": [
+    {
+      "name": "libarchivejs.tar.gz",
+      "url": "https://github.com/nika-begiashvili/libarchivejs/archive/0989c1a6db20d030d793b1763e20d880068091bd.tar.gz",
+      "sha256": "0c6d745b4a63835aba4af45166d7d0c7e73a437be16f43def2d3b69c0b36a992"
+    },
+    {
+      "name": "libarchive-3.7.2.tar.xz",
+      "url": "https://github.com/libarchive/libarchive/releases/download/v3.7.2/libarchive-3.7.2.tar.xz",
+      "sha256": "04357661e6717b6941682cde02ad741ae4819c67a260593dfb2431861b251acb"
+    },
+    {
+      "name": "xz-5.2.11.tar.gz",
+      "url": "https://github.com/tukaani-project/xz/releases/download/v5.2.11/xz-5.2.11.tar.gz",
+      "sha256": "0089d47b966bd9ab48f1d01baf7ce146a3b591716c7477866b807010de3d96ab"
+    }
+  ],
+  "artifacts": {
+    "worker-bundle.js": "4776763a015944ddb516362b1ac1692c96a5a88252f27bab301cffe34a9acfac",
+    "bundler-package-lock.json": "8fe510ff2d974948a007d4dace5fbdb822bde4633a963d3423e3fa8f74140727",
+    "libarchivejs-LICENSE": "cd2233ededca3500350239c4995a3bf4f57cb810b77074d266b0fb0d781dc161",
+    "libarchive-COPYING": "b2cdf763345de2de34cebf54394df3c61a105c3b71288603c251f2fa638200ba",
+    "libarchive.wasm": "dbf8a3c240d8050882b2b669c313a7ee1f4dbe4c95d639d6cd6019b6fbd23f54",
+    "xz-COPYING": "bcb02973ef6e87ea73d331b3a80df7748407f17efdb784b61b47e0e610d3bb5c",
+    "source-file-notices.txt": "ecb4d785dccd5ed8935c5595326b6dc0ef7ff184d1a4241f01d486cf4c2c860d",
+    "emscripten-NOTICES.txt": "af2dd41c5da3a2f4a0e6cdbec042bcfcb14138c1c5e63db1bb551d17ccbdc309",
+    "comlink-LICENSE": "bcf29b4fd3ec2cb5f9d40a0866da446f6da62170d2ccedf4aeca9cf9406dd20c"
+  }
+}
