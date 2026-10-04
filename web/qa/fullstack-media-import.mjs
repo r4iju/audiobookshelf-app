@@ -281,6 +281,16 @@ test("read-only media import preserves original identities, files, progress, boo
   assert.equal(scan.status, "complete");
   const rescanned = await json(`/api/items/${ids.item}`, undefined, user.accessToken);
   assert.equal(rescanned.media.id, ids.book, "rescan retains imported media identity");
+  assert.equal(
+    rescanned.media.metadata.authors[0].id,
+    ids.author,
+    "rescan preserves the original server-managed author association",
+  );
+  assert.equal(
+    rescanned.media.metadata.series[0].id,
+    ids.series,
+    "rescan preserves the original server-managed series association",
+  );
   assert.equal(rescanned.libraryFiles[0].ino, ids.file, "rescan retains imported native file association");
   assert.equal(await sha(filename), digest, "original source remains byte-for-byte unchanged");
   console.log(

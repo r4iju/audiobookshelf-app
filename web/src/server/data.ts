@@ -52,6 +52,7 @@ export function database() {
     CREATE TABLE IF NOT EXISTS libraries (id TEXT PRIMARY KEY, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS catalog_items (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(library_id, source_path));
+    CREATE TABLE IF NOT EXISTS metadata_overrides (item_id TEXT PRIMARY KEY REFERENCES catalog_items(id) ON DELETE CASCADE, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS media_files (id TEXT PRIMARY KEY, item_id TEXT NOT NULL REFERENCES catalog_items(id),
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(item_id, source_path));
     CREATE TABLE IF NOT EXISTS playback_sessions (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -108,6 +109,14 @@ export function database() {
       COMMIT;`);
   }
   db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (7);");
+  if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 8) {
+    db.exec(`BEGIN IMMEDIATE;
+      INSERT OR IGNORE INTO metadata_overrides(item_id,content)
+        SELECT c.id,json_object('metadata',json_extract(c.content,'$.media.metadata'),'tags',json_extract(c.content,'$.media.tags'))
+        FROM catalog_items c WHERE EXISTS(SELECT 1 FROM migration_archive a WHERE a.table_name='libraryItems' AND a.row_key=c.id);
+      INSERT INTO schema_version(version) VALUES(8);
+      COMMIT;`);
+  }
   return db;
 }
 

@@ -73,7 +73,7 @@ function ItemView({ item }: { item: LibraryItem }) {
                 {metadata.series.map((series) => (
                   <Link
                     key={series.id}
-                    href={`/library/${item.libraryId}/series/${series.id}`}
+                    href={`/library/${item.libraryId}/series/${encodeURIComponent(series.id)}`}
                     className="rounded text-accent hover:underline focus-ring"
                   >
                     {series.sequence ? `${series.name} #${series.sequence}` : series.name}
@@ -88,7 +88,7 @@ function ItemView({ item }: { item: LibraryItem }) {
                 {metadata.authors.map((author, index) => (
                   <span key={author.id}>
                     <Link
-                      href={`/library/${item.libraryId}/authors/${author.id}`}
+                      href={`/library/${item.libraryId}/authors/${encodeURIComponent(author.id)}`}
                       className="rounded hover:underline focus-ring"
                     >
                       {author.name}

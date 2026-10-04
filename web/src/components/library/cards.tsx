@@ -46,7 +46,7 @@ export function ItemCard({
   if (collapsed) {
     return (
       <MediaCard
-        href={`/library/${item.libraryId}/series/${collapsed.id}`}
+        href={`/library/${item.libraryId}/series/${encodeURIComponent(collapsed.id)}`}
         title={collapsed.name}
         subtitle={t("WebItemsCount", collapsed.numBooks)}
         cover={coverUrl(client, item)}
@@ -198,7 +198,7 @@ export function SeriesCard({
   const first = series.books[0];
   return (
     <MediaCard
-      href={`/library/${libraryId}/series/${series.id}`}
+      href={`/library/${libraryId}/series/${encodeURIComponent(series.id)}`}
       title={series.name}
       subtitle={t("WebItemsCount", series.books.length)}
       cover={first ? coverUrl(client, first) : null}
@@ -216,7 +216,7 @@ export function AuthorCard({ author, libraryId }: { author: Author; libraryId: s
   const { client } = useAbs();
   return (
     <MediaCard
-      href={`/library/${libraryId}/authors/${author.id}`}
+      href={`/library/${libraryId}/authors/${encodeURIComponent(author.id)}`}
       title={author.name}
       subtitle={author.numBooks ? t("WebItemsCount", author.numBooks) : undefined}
       cover={authorImageUrl(client, author)}
