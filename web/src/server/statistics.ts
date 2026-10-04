@@ -25,13 +25,27 @@ function historyItem(actor: Account, id: string) {
     throw error;
   }
 }
-function* reports(actor: Account, all = false) {
-  const statement = database().prepare(
-    all
-      ? "SELECT content FROM listening_reports ORDER BY CAST(json_extract(content,'$.updatedAt') AS REAL) DESC,id"
-      : "SELECT content FROM listening_reports WHERE user_id=? ORDER BY CAST(json_extract(content,'$.updatedAt') AS REAL) DESC,id",
-  );
-  for (const row of all ? statement.iterate() : statement.iterate(actor.id)) {
+function* reports(actor: Account, all = false, itemId?: string, episodeId?: string) {
+  const filters: string[] = [],
+    values: string[] = [];
+  if (!all) {
+    filters.push("user_id=?");
+    values.push(actor.id);
+  }
+  if (itemId !== undefined) {
+    filters.push("item_id=?");
+    values.push(itemId);
+  }
+  if (episodeId !== undefined) {
+    filters.push("episode_id=?");
+    values.push(episodeId);
+  }
+  const rows = database()
+    .prepare(
+      `SELECT content FROM listening_reports${filters.length ? ` WHERE ${filters.join(" AND ")}` : ""} ORDER BY CAST(json_extract(content,'$.updatedAt') AS REAL) DESC,id`,
+    )
+    .iterate(...values);
+  for (const row of rows) {
     const report = reportSchema.parse(JSON.parse(z.string().parse(row.content))),
       item = historyItem(actor, report.libraryItemId);
     if (item) yield { report, item };
@@ -204,10 +218,10 @@ export function serverYear(actor: Account, year: number) {
     topGenres: ranked(listened.genres).map(({ name, time }) => ({ genre: name, time })),
   };
 }
-export function recentSessions(actor: Account, limit: number, page: number) {
+function sessionPage(actor: Account, limit: number, page: number, itemId?: string, episodeId?: string) {
   let total = 0;
   const sessions = [];
-  for (const { report, item } of reports(actor)) {
+  for (const { report, item } of reports(actor, false, itemId, episodeId)) {
     if (total >= page * limit && sessions.length < limit)
       sessions.push({
         ...report,
@@ -218,4 +232,18 @@ export function recentSessions(actor: Account, limit: number, page: number) {
     total++;
   }
   return { total, limit, page, sessions };
+}
+export function recentSessions(actor: Account, limit: number, page: number) {
+  return sessionPage(actor, limit, page);
+}
+export function itemSessions(
+  actor: Account,
+  itemId: string,
+  limit: number,
+  page: number,
+  episodeId?: string,
+) {
+  historyItemFor(actor, itemId);
+  const result = sessionPage(actor, limit, page, itemId, episodeId);
+  return { ...result, itemsPerPage: limit, numPages: Math.ceil(result.total / limit) };
 }
