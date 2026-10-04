@@ -31,6 +31,33 @@ class ProgressResetsTest {
         ProgressResets(folder.root.resolve("resets.json"), remoteFor = { servers[it] }, exclusive = { _, block -> block(); true }, cleanup = cleanup)
 
     @Test
+    fun aDeletedResetRetriesManifestRefreshBeforeClearingItsDurableIntent() = runBlocking {
+        var progress: MediaProgress? = MediaProgress(id = "p1", libraryItemId = "book", lastUpdate = 2000.0)
+        var attempts = 0
+        var manifestGeneration = 0
+        val remote = object : ProgressRemote {
+            override suspend fun progress(itemId: String, episodeId: String?) = progress
+            override suspend fun remove(progressId: String) { progress = null }
+            override suspend fun committed(reset: ProgressResets.Reset) {
+                attempts++
+                if (attempts == 1) throw IOException("item fetch lost after successful delete")
+                manifestGeneration = 1
+            }
+        }
+        val file = folder.root.resolve("resets.json")
+        fun open() = ProgressResets(file, remoteFor = { remote }, exclusive = { _, block -> block(); true }, cleanup = { _, _ -> })
+        val reset = open()
+        reset.request(qa, "book", null, now = 5000)
+        assertTrue(runCatching { reset.complete(qa) }.isFailure)
+        assertTrue(reset.pending(qa, "book", null))
+        val restarted = open()
+        assertTrue(restarted.complete(qa))
+        assertEquals(2, attempts)
+        assertEquals(1, manifestGeneration)
+        assertFalse(restarted.pending(qa, "book", null))
+    }
+
+    @Test
     fun aRequestedResetSurvivesRelaunchAndCompletesForItsOwnAccountOnly() = runBlocking {
         val mine = Server(MediaProgress(id = "p1", libraryItemId = "book-0", currentTime = 10.0, lastUpdate = 2_000.0))
         val theirs = Server(MediaProgress(id = "p9", libraryItemId = "book-0", currentTime = 4.0, lastUpdate = 2_000.0))

@@ -206,6 +206,8 @@ export type PodcastEpisode = z.infer<typeof podcastEpisodeSchema>;
 const episodeDownloadSchema = z.looseObject({ id: z.string(), episodeDisplayTitle: nullableString });
 
 export const libraryItemSchema = z.looseObject({
+  progressGeneration: z.number().int().nonnegative().optional(),
+  progressGenerations: z.record(z.string(), z.number().int().nonnegative()).optional(),
   id: z.string(),
   libraryId: z.string(),
   mediaType: z.enum(["book", "podcast"]),
@@ -380,6 +382,7 @@ export const recentEpisodesSchema = z.looseObject({
 });
 
 export const playbackSessionSchema = z.looseObject({
+  progressGeneration: z.number().int().nonnegative().optional(),
   id: z.string(),
   libraryItemId: z.string(),
   episodeId: nullableString,

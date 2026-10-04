@@ -24,10 +24,12 @@ public struct ListeningMedia: Codable, Sendable {
     public let mediaType: String
     public let duration: Double
     public let startTime: Double
+    public let progressGeneration: Int?
 
-    public init(itemID: String, episodeID: String?, title: String, author: String, mediaType: String, duration: Double, startTime: Double) {
+    public init(itemID: String, episodeID: String?, title: String, author: String, mediaType: String, duration: Double, startTime: Double, progressGeneration: Int? = nil) {
         self.libraryItemID = itemID; self.episodeID = episodeID; self.title = title; self.author = author
         self.mediaType = mediaType; self.duration = duration; self.startTime = startTime
+        self.progressGeneration = progressGeneration
     }
 
     public init(item: LibraryItem, episode: Episode? = nil, session: PlaybackSession) {
@@ -38,6 +40,7 @@ public struct ListeningMedia: Codable, Sendable {
         mediaType = item.mediaType
         duration = session.duration
         startTime = session.currentTime
+        progressGeneration = session.progressGeneration ?? item.progressGenerations?[episode?.id ?? ""] ?? item.progressGeneration
     }
 }
 
@@ -59,7 +62,8 @@ public struct ListeningRecord: Codable, Identifiable, Sendable {
          "mediaType": media.mediaType, "mediaMetadata": ["title": media.title, "authorName": media.author],
          "displayTitle": media.title, "displayAuthor": media.author, "duration": media.duration,
          "playMethod": 0, "mediaPlayer": "AVPlayer", "startTime": media.startTime,
-         "currentTime": currentTime, "timeListening": timeListening, "startedAt": startedAt, "updatedAt": updatedAt]
+         "currentTime": currentTime, "timeListening": timeListening, "startedAt": startedAt, "updatedAt": updatedAt,
+         "revision": revision, "progressGeneration": media.progressGeneration as Any? ?? 0]
     }
 }
 

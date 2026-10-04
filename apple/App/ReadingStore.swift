@@ -16,6 +16,7 @@ import Combine
         var serverLocation: String? = nil
         var issuedLocation: String? = nil
         var issuedRevision: String? = nil
+        var progressGeneration: Int? = nil
     }
     private struct Document: Codable { let version: Int; let positions: [Position] }
     static var file: URL { ListeningSync.file.deletingLastPathComponent().appendingPathComponent("reading.json") }
@@ -59,7 +60,7 @@ import Combine
         try remember(position)
         return true
     }
-    func update(account: AccountIdentity, itemID: String, format: String, location: String, fraction: Double, rotation: Int, fileID: String? = nil) throws {
+    func update(account: AccountIdentity, itemID: String, format: String, location: String, fraction: Double, rotation: Int, fileID: String? = nil, progressGeneration: Int? = nil) throws {
         let old = position(account: account, itemID: itemID, format: format, fileID: fileID)
         if old?.location == location && old?.rotation == rotation && old?.fraction == fraction { return }
         let changed = old?.location != location
@@ -67,7 +68,7 @@ import Combine
         try remember(Position(account: account, itemID: itemID, format: format, fileID: fileID, location: location, fraction: fraction,
                               updatedAt: changed ? Date().timeIntervalSince1970 * 1000 : old!.updatedAt,
                               revision: changed || correctedFraction ? UUID().uuidString : old!.revision, pending: fileID == nil && (changed || correctedFraction || old?.pending == true),
-                              rotation: rotation, serverLocation: old?.serverLocation, issuedLocation: old?.issuedLocation, issuedRevision: old?.issuedRevision))
+                              rotation: rotation, serverLocation: old?.serverLocation, issuedLocation: old?.issuedLocation, issuedRevision: old?.issuedRevision, progressGeneration: progressGeneration ?? old?.progressGeneration))
     }
     // The server's progress row holds the ebook location too. An empty location dated at the reset's
     // confirmation opens at the start and outranks older pending pages and snapshots. Pages read after
@@ -134,7 +135,7 @@ import Combine
                     }
                     guard let reconciled = self.position(account: account, itemID: position.itemID, format: position.format),
                           reconciled.pending, reconciled.revision == position.revision else { continue }
-                    guard try await player.publishReading(account: account, itemID: position.itemID, location: position.location, fraction: position.fraction, beforePublication: {
+                    guard try await player.publishReading(account: account, itemID: position.itemID, location: position.location, fraction: position.fraction, updatedAt: position.updatedAt, progressGeneration: position.progressGeneration, beforePublication: {
                         guard var issued = self.position(account: account, itemID: position.itemID, format: position.format) else { throw CancellationError() }
                         issued.issuedLocation = position.location; issued.issuedRevision = position.revision
                         try self.remember(issued)

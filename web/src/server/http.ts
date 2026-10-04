@@ -35,6 +35,17 @@ import {
 import { database, initialized, setupKey } from "./data";
 
 import { closePlayback, openPlayback, playSchema, serveFile, serveTrack } from "./playback";
+import {
+  listeningStats,
+  localReportsSchema,
+  patchProgress,
+  progressFor,
+  progressPatchSchema,
+  removeProgress,
+  resetProgress,
+  resetProgressSchema,
+  syncLocal,
+} from "./progress";
 
 const MAX_BODY = 16_384;
 export function json(value: unknown, status = 200) {
@@ -69,11 +80,11 @@ function sameOrigin(request: Request) {
     throw new DomainError(403, "This browser origin is not allowed");
   }
 }
-async function body(request: Request): Promise<unknown> {
+async function body(request: Request, maximum = MAX_BODY): Promise<unknown> {
   sameOrigin(request);
   if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json"))
     throw new DomainError(415, "JSON request required");
-  if (Number(request.headers.get("content-length")) > MAX_BODY)
+  if (Number(request.headers.get("content-length")) > maximum)
     throw new DomainError(413, "Request too large");
   const reader = request.body?.getReader();
   if (!reader) throw new DomainError(400, "JSON request required");
@@ -83,7 +94,7 @@ async function body(request: Request): Promise<unknown> {
     const { done, value } = await reader.read();
     if (done) break;
     size += value.length;
-    if (size > MAX_BODY) {
+    if (size > maximum) {
       await reader.cancel();
       throw new DomainError(413, "Request too large");
     }
@@ -142,6 +153,43 @@ export async function api(request: Request) {
     const fileRoute = path.match(/^\/api\/items\/([^/]+)\/file\/([^/]+)(?:\/(download))?$/);
     const token = bearer(request) ?? (fileRoute ? new URL(request.url).searchParams.get("token") : null);
     const user = authenticate(token);
+    if (path === "/api/session/local-all" && request.method === "POST") {
+      const input = localReportsSchema.parse(await body(request, 262144));
+      return json(syncLocal(authenticate(token), input));
+    }
+    if (path === "/api/me/listening-stats" && request.method === "GET") return json(listeningStats(user));
+    const resetRoute = path.match(/^\/api\/me\/progress\/([^/]+)(?:\/([^/]+))?\/reset$/);
+    if (resetRoute && request.method === "POST") {
+      sameOrigin(request);
+      const input = resetProgressSchema.parse(await body(request));
+      return json(
+        resetProgress(
+          authenticate(token),
+          z.string().parse(resetRoute[1]),
+          resetRoute[2] ?? "",
+          input.resetId,
+        ),
+      );
+    }
+    const progressRoute = path.match(/^\/api\/me\/progress\/([^/]+)(?:\/([^/]+))?$/);
+    if (progressRoute) {
+      const id = z.string().parse(progressRoute[1]);
+      const episode = progressRoute[2] ?? "";
+      if (request.method === "GET") {
+        const progress = progressFor(user, id, episode);
+        if (!progress) throw new DomainError(404, "Not found");
+        return json(progress);
+      }
+      if (request.method === "PATCH") {
+        const input = progressPatchSchema.parse(await body(request));
+        return json(patchProgress(authenticate(token), id, episode, input));
+      }
+      if (request.method === "DELETE" && !episode) {
+        sameOrigin(request);
+        removeProgress(user, id);
+        return json({ success: true });
+      }
+    }
     if (fileRoute && ["GET", "HEAD"].includes(request.method))
       return serveFile(
         request,

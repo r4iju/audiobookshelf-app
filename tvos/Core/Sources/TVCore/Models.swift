@@ -103,6 +103,8 @@ public struct ItemsResponse: Decodable {
     public let total: Int
 }
 public struct LibraryItem: Decodable, Identifiable, Hashable {
+    public let progressGeneration: Int?
+    public let progressGenerations: [String: Int]?
     public let id: String
     public let libraryId: String?
     public let isMissing: Bool?
@@ -194,6 +196,7 @@ public struct AudioTrack: Codable, Sendable {
     public let duration: Double
 }
 public struct PlaybackSession: Decodable {
+    public var progressGeneration: Int? = nil
     public let id: String
     public let currentTime: Double
     public let duration: Double

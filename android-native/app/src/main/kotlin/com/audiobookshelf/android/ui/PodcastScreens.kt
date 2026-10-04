@@ -242,7 +242,7 @@ fun EpisodeScreen(item: LibraryItem, episodeId: String, active: SessionState.Act
         }
         PlayButton({ preferDownloaded(graph, active, item.id, episode.id, progress) ?: PlaySource.Stream(active.client, item.id, episode.id, cover, progress?.lastUpdate) }, item.id, episode.id, onOpened = onPlayer)
         DownloadButton(item, episode, active, catalog)
-        ProgressActions(item.id, episode.id, active, catalog, tagPrefix = "episode")
+        ProgressActions(item.id, episode.id, active, catalog, tagPrefix = "episode", progressGeneration = item.progressGenerations[episode.id] ?: 0)
         AddToGroupButton(item.id, episode.id, active, catalog)
         description?.let { ExpandableText(it) }
     }

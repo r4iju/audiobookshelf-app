@@ -122,7 +122,7 @@ private fun SignedIn(active: SessionState.Active) {
                                 AddToGroupButton(item.id, null, active, catalog)
                                 SendEbookButton(item, active)
                                 FeedButton(item, active, catalog)
-                                ProgressActions(item.id, null, active, catalog)
+                                ProgressActions(item.id, null, active, catalog, progressGeneration = item.progressGeneration)
                             }
                         })
                     }

@@ -86,6 +86,12 @@ class Downloads(
 
     fun find(account: AccountIdentity, itemId: String, episodeId: String?) = store.get(recordId(account, itemId, episodeId))
 
+    fun updateProgressGeneration(account: AccountIdentity, item: LibraryItem, episodeId: String?) {
+        val epoch = item.progressGenerations[episodeId.orEmpty()] ?: item.progressGeneration ?: return
+        records.value.filter { it.account == account && it.itemId == item.id && it.episodeId == episodeId }
+            .forEach { record -> store.update(record.id) { it.copy(progressGeneration = epoch) } }
+    }
+
     /** Starts or restarts a download. [allowMetered] records the user's answer to the cellular question. */
     fun request(client: ApiClient, item: LibraryItem, episode: Episode?, canDownload: Boolean, allowMetered: Boolean = false): Request {
         if (!canDownload) return Request.NotAllowed
@@ -138,6 +144,7 @@ class Downloads(
             tracks = tracks.mapIndexed { index, track -> track.copy(index = index, startOffset = tracks.take(index).sumOf { it.duration }) },
             parts = parts,
             directory = File(context.filesDir, "downloads/$id").path,
+            progressGeneration = item.progressGenerations[episode?.id.orEmpty()] ?: item.progressGeneration,
         )
     }
 
@@ -259,6 +266,7 @@ class Downloads(
             record.account, record.itemId, record.episodeId, record.title, record.author, cover, record.mediaType,
             record.tracks, record.audio.map { part -> part.uri?.let(Uri::parse) ?: Uri.fromFile(File(directory, part.name)) }, record.chapters,
             startTime = journal.cachedPosition(record.account, record.itemId, record.episodeId, newerThan = Double.NEGATIVE_INFINITY) ?: 0.0,
+            progressGeneration = record.progressGeneration,
         )
     }
 

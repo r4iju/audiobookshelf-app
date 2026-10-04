@@ -91,6 +91,10 @@ class AppGraph internal constructor(val context: Context) {
                         publications.publish(account, com.audiobookshelf.core.PublicationLedger.Kind.READING, listOf(com.audiobookshelf.core.PublicationLedger.Title(itemId, null))) {
                             client.saveEbookProgress(itemId, location, progress)
                         }
+                    override suspend fun saveIntent(entry: com.audiobookshelf.android.reader.ReadingStore.Entry) =
+                        publications.publish(account, com.audiobookshelf.core.PublicationLedger.Kind.READING, listOf(com.audiobookshelf.core.PublicationLedger.Title(entry.itemId, null))) {
+                            client.saveEbookProgress(entry.itemId, entry.page.toString(), entry.progress, entry.updatedAt, entry.progressGeneration)
+                        }
                 }
             }
         }, onSignInRequired = accounts::handle, report = diagnostics::record,
@@ -109,7 +113,20 @@ class AppGraph internal constructor(val context: Context) {
             accounts.clientFor(account)?.let { client ->
                 object : com.audiobookshelf.core.ProgressRemote {
                     override suspend fun progress(itemId: String, episodeId: String?) = client.progress(itemId, episodeId)
-                    override suspend fun remove(progressId: String) = client.removeProgress(progressId)
+                    override suspend fun resetMissing(reset: com.audiobookshelf.core.ProgressResets.Reset) {
+                        val item = client.item(reset.itemId)
+                        if (item.progressGeneration != null) {
+                            val identity = "${reset.itemId}:${reset.episodeId.orEmpty()}:${reset.requestedAt}"
+                            val resetId = java.util.UUID.nameUUIDFromBytes(identity.toByteArray(Charsets.UTF_8)).toString()
+                            client.resetMissingProgress(reset.itemId, reset.episodeId, resetId)
+                        }
+                    }
+                    override suspend fun remove(progressId: String) {
+                        client.removeProgress(progressId)
+                    }
+                    override suspend fun committed(reset: com.audiobookshelf.core.ProgressResets.Reset) {
+                        downloads.updateProgressGeneration(account, client.item(reset.itemId), reset.episodeId)
+                    }
                 }
             }
         }, exclusive = { reset, block ->
@@ -165,9 +182,9 @@ class AppGraph internal constructor(val context: Context) {
     }
 
     /** Marks a title finished or not; the write is recorded so a discard cannot be overtaken by it. */
-    suspend fun setFinished(client: ApiClient, itemId: String, episodeId: String?, finished: Boolean) =
+    suspend fun setFinished(client: ApiClient, itemId: String, episodeId: String?, finished: Boolean, progressGeneration: Long? = null) =
         publications.publish(client.account, com.audiobookshelf.core.PublicationLedger.Kind.FINISHED, listOf(com.audiobookshelf.core.PublicationLedger.Title(itemId, episodeId))) {
-            client.setFinished(itemId, episodeId, finished)
+            client.setFinished(itemId, episodeId, finished, progressGeneration)
         }
 
     /**

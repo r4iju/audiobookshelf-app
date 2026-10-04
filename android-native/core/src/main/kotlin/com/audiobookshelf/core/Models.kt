@@ -225,6 +225,8 @@ object SeriesListSerializer : JsonTransformingSerializer<List<SeriesRef>>(ListSe
     val isInvalid: Boolean = false,
     val rssFeed: RssFeed? = null,
     val collapsedSeries: CollapsedSeries? = null,
+    val progressGeneration: Long? = null,
+    val progressGenerations: Map<String, Long> = emptyMap(),
 ) {
     val isPodcast get() = mediaType == "podcast"
     val title get() = media.metadata.title?.takeIf { it.isNotBlank() } ?: "Untitled"
@@ -308,6 +310,7 @@ object SeriesListSerializer : JsonTransformingSerializer<List<SeriesRef>>(ListSe
     val displayAuthor: String? = null,
     val audioTracks: List<AudioTrack> = emptyList(),
     val chapters: List<Chapter> = emptyList(),
+    val progressGeneration: Long? = null,
 )
 
 @Serializable data class Collection(

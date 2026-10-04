@@ -10,6 +10,8 @@ import java.io.File
 /** The server calls a progress reset needs, for one account. */
 interface ProgressRemote {
     suspend fun progress(itemId: String, episodeId: String?): MediaProgress?
+    suspend fun resetMissing(reset: ProgressResets.Reset) {}
+    suspend fun committed(reset: ProgressResets.Reset) {}
     suspend fun remove(progressId: String)
 }
 
@@ -134,6 +136,8 @@ class ProgressResets(
                 if (gone.status != 404) throw gone
             }
         }
+        if (reset.progressId == null) remote.resetMissing(reset)
+        remote.committed(reset)
         synchronized(this) { commit(state.value.filterNot { it.matches(reset.account, reset.itemId, reset.episodeId) }) }
     }
 

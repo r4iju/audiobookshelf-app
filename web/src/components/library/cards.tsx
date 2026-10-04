@@ -122,7 +122,12 @@ function PlayableCard({
             finished ? t("WebMarkNotFinished") : t("WebMarkFinished"),
             finished ? Undo2 : CheckCircle2,
             () =>
-              setFinished.mutate({ itemId: item.id, episodeId: episode?.id ?? null, finished: !finished }),
+              setFinished.mutate({
+                itemId: item.id,
+                episodeId: episode?.id ?? null,
+                finished: !finished,
+                progressGeneration: item.progressGenerations?.[episode?.id ?? ""] ?? item.progressGeneration,
+              }),
             setFinished.isPending,
           ),
         ]

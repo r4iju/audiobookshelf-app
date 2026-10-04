@@ -13,7 +13,7 @@ import {
   mediaProgressSchema,
 } from "@/lib/abs/schemas";
 import { type Account, canReadLibrary, canReadMedia, DomainError, requireAdministrator } from "./accounts";
-import { database, transaction } from "./data";
+import { database, progressGeneration, progressGenerations, transaction } from "./data";
 export const createLibrarySchema = z.object({
   name: z.string().trim().min(1).max(256),
   mediaType: z.enum(["book", "podcast"]).default("book"),
@@ -112,7 +112,11 @@ export function itemFor(actor: Account, id: string) {
   if (!row) throw new DomainError(404, "Not found");
   const item = itemRow(row);
   if (!allowed(actor, item)) throw new DomainError(404, "Not found");
-  return item;
+  return {
+    ...item,
+    progressGeneration: progressGeneration(actor.id, id),
+    progressGenerations: progressGenerations(actor.id, id),
+  };
 }
 export function itemsFor(actor: Account, id: string) {
   findLibrary(id);
@@ -121,7 +125,12 @@ export function itemsFor(actor: Account, id: string) {
     .prepare("SELECT content FROM catalog_items WHERE library_id = ?")
     .all(id)
     .map(itemRow)
-    .filter((item) => allowed(actor, item));
+    .filter((item) => allowed(actor, item))
+    .map((item) => ({
+      ...item,
+      progressGeneration: progressGeneration(actor.id, item.id),
+      progressGenerations: progressGenerations(actor.id, item.id),
+    }));
 }
 export function pagedItems(actor: Account, id: string, params: URLSearchParams) {
   const limit = z.coerce

@@ -46,3 +46,15 @@ The replacement opens durable account-bound playback sessions from scanned media
 The HTTP journey and native expiry regression were observed red before their fixes. Browser interaction exposed missing media authorization; regression tests were observed red for initial refresh and two later rotations before fixes. Track loads use current credentials, and successful audio playback clears the bounded recovery guard. Production image tests passed. Android emulator playback advanced across two real files and browser audio advanced with no media error. These are streaming acceptance only; durable progress remains #156.
 
 Typecheck, lint, 118 unit tests and production image build passed. Independent source review cleared streaming and repeated browser credential renewal. Evidence: `/tmp/leafwake-streaming-final-image-green.log`, `/tmp/leafwake-native-streaming-155.log`, `/tmp/leafwake-browser-media-red.log`, `/tmp/leafwake-browser-media-renewal-red.log`. Image `leafwake:streaming-155` config digest: `sha256:aa82932d835abab05afdf1b5443f98f9f38e6d0e1b0e750c59c798f79e9fa826`.
+
+## #156 durable progress foundation
+
+The replacement persists account-bound cumulative listening history, ordered position/finish updates and primary reader places. First offline completion marks newly created progress finished. Session revisions survive clock rollback. Manual intents reject stale position updates. Reset generations fence old listening and reader writes while preserving listening totals. Persisted reset command IDs are idempotent even without a previous progress row.
+
+Browser, Android and Apple capture the generation with listening/reading intents and downloads. Android retries download-manifest refresh before clearing a reset. Browser reset holds preserve offline intent and use the generation command when the cached item advertises it; legacy servers retain the existing coordination behavior.
+
+Four production HTTP cases passed and progress/history/reader state survived restart. Browser finish/unfinish/discard passed through the shared preview. Preview snapshot capture failed; DOM and interaction evidence remains available. Typecheck, lint, 119 browser unit tests, Android core/app unit tests and instrumentation compilation, 72 Swift Core tests and an iOS simulator build passed. The simulator build explicitly used deployment target 15 because the installed SDK rejects the project’s current target 14; release target adjustment remains #177. Fresh backend and client reviews cleared fixes after reset-retry and offline-intent findings.
+
+Evidence: `/tmp/leafwake-progress-final-green.log`, `/tmp/leafwake-progress-restart.log`, `/tmp/leafwake-progress-reset-retry-red.log`, `/tmp/leafwake-progress-browser-reset-red.log`. Image `leafwake:progress-156` config digest: `sha256:f19af47d8194f5fc1907be46bd650d8d7215b1d00fb4f71cecc54dbe4431cd19`.
+
+#156 remains open for the unchanged complete native journeys and episode acceptance as the remaining ebook/download/podcast contracts land. These checks do not yet establish full backend migration or store readiness.
