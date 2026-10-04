@@ -134,7 +134,7 @@ import {
   syncLocal,
 } from "./progress";
 import { searchLibrary } from "./search";
-import { personalYear, recentSessions, serverYear, yearInput } from "./statistics";
+import { itemSessions, personalYear, recentSessions, serverYear, yearInput } from "./statistics";
 import { cancelTranscode, serveHls, startTranscode } from "./transcode";
 
 const MAX_BODY = 16_384;
@@ -417,6 +417,30 @@ export async function api(request: Request) {
           ? personalYear(user, yearInput.parse(yearRoute[2]))
           : serverYear(user, yearInput.parse(yearRoute[2])),
       );
+    const itemHistoryRoute =
+      path.match(/^\/api\/me\/item\/([^/]+)\/listening-sessions$/) ??
+      path.match(/^\/api\/me\/item\/listening-sessions\/([^/]+)(?:\/([^/]+))?$/);
+    if (itemHistoryRoute && request.method === "GET") {
+      const params = new URL(request.url).searchParams;
+      const input = z
+        .object({
+          limit: z.coerce.number().int().min(1).max(100),
+          page: z.coerce.number().int().min(0).max(100000),
+        })
+        .parse({
+          limit: params.get("itemsPerPage") ?? params.get("limit") ?? 50,
+          page: params.get("page") ?? 0,
+        });
+      return json(
+        itemSessions(
+          user,
+          z.string().max(256).parse(itemHistoryRoute[1]),
+          input.limit,
+          input.page,
+          z.string().max(256).optional().parse(itemHistoryRoute[2]),
+        ),
+      );
+    }
     if (path === "/api/me/listening-sessions" && request.method === "GET") {
       const params = new URL(request.url).searchParams;
       const input = z
