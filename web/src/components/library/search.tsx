@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/status";
 import { useI18n } from "@/i18n/i18n";
 import { encodeFilter } from "@/lib/abs/browse";
 import { useSearch } from "@/lib/abs/queries";
+import { MAX_SEARCH_RESULTS } from "@/lib/abs/search-limits";
 import { AuthorCard, ItemCard, SeriesCard } from "./cards";
 import { useLibrary } from "./use-library";
 
@@ -136,9 +137,9 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                     </ResultSection>
                   ) : null,
                 )}
-                {data.more ? (
+                {data.more && limit < MAX_SEARCH_RESULTS ? (
                   <Link
-                    href={`${pathname}?${new URLSearchParams({ q, limit: String(limit * 4) })}`}
+                    href={`${pathname}?${new URLSearchParams({ q, limit: String(Math.min(limit * 4, MAX_SEARCH_RESULTS)) })}`}
                     replace
                     scroll={false}
                     onClick={() => {
@@ -155,6 +156,8 @@ export function LibrarySearch({ libraryId, q, limit }: { libraryId: string; q: s
                   >
                     {t("LabelMore")}
                   </Link>
+                ) : data.more ? (
+                  <p className="text-sm text-muted">Refine your search to see more matches.</p>
                 ) : null}
               </div>
             );

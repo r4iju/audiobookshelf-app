@@ -58,3 +58,9 @@ Four production HTTP cases passed and progress/history/reader state survived res
 Evidence: `/tmp/leafwake-progress-final-green.log`, `/tmp/leafwake-progress-restart.log`, `/tmp/leafwake-progress-reset-retry-red.log`, `/tmp/leafwake-progress-browser-reset-red.log`. Image `leafwake:progress-156` config digest: `sha256:f19af47d8194f5fc1907be46bd650d8d7215b1d00fb4f71cecc54dbe4431cd19`.
 
 #156 remains open for the unchanged complete native journeys and episode acceptance as the remaining ebook/download/podcast contracts land. These checks do not yet establish full backend migration or store readiness.
+
+## #152 search authorization completion
+
+Search matches and counts only media already permitted by current library, explicit-content and tag restrictions. Unauthorized libraries return 404 without media metadata. Browser search consumes the compatible grouped result shape. The More control and URL/API limits now share a bounded maximum and request refinement when reached. Author/series destination pages and the remaining discovery contracts stay under #161.
+
+Both missing search and the large More request were demonstrated red before fixes. Production search-policy and progress regression journeys passed. Browser search rendered a scanned item. Typecheck, lint and 119 browser units passed. Independent catalog review cleared authorization and the coordinated limit. Evidence: `/tmp/leafwake-search-policy-red.log`, `/tmp/leafwake-search-more-red.log`, `/tmp/leafwake-search-policy-final-green.log`, `/tmp/leafwake-search-progress-regression.log`. Image `leafwake:search-152` config digest `sha256:494fb0797fc94409dc2f977ebd9c24347db01923e971a52535744cde62812c0c`.

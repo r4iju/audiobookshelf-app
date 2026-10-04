@@ -33,7 +33,6 @@ import {
   scanLibrary,
 } from "./catalog";
 import { database, initialized, setupKey } from "./data";
-
 import { closePlayback, openPlayback, playSchema, serveFile, serveTrack } from "./playback";
 import {
   listeningStats,
@@ -46,6 +45,7 @@ import {
   resetProgressSchema,
   syncLocal,
 } from "./progress";
+import { searchLibrary } from "./search";
 
 const MAX_BODY = 16_384;
 export function json(value: unknown, status = 200) {
@@ -258,6 +258,7 @@ export async function api(request: Request) {
             issues: items.filter((item) => item.isMissing || item.isInvalid).length,
             numUserPlaylists: 0,
           });
+        if (action === "search") return json(searchLibrary(user, id, new URL(request.url).searchParams));
         if (action === "items") return json(pagedItems(user, id, new URL(request.url).searchParams));
         if (action === "personalized")
           return json([
