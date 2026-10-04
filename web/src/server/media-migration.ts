@@ -432,6 +432,13 @@ async function inventory(input: Input, authorize: () => Account) {
                 }
               : null,
             episodes,
+            autoDownloadEpisodes:
+              item.mediaType === "podcast"
+                ? z
+                    .union([z.boolean(), z.literal(0), z.literal(1)])
+                    .nullish()
+                    .parse(media.autoDownloadEpisodes) === true || media.autoDownloadEpisodes === 1
+                : undefined,
             ebookFormat: ebook?.metadata.ext.replace(/^\./, "") ?? null,
           },
         });
