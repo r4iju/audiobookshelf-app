@@ -130,6 +130,9 @@ export function database() {
   db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (9);");
   db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (10);");
   db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (11);");
+  db.exec(`CREATE TABLE IF NOT EXISTS openid_flows (id TEXT PRIMARY KEY, state TEXT NOT NULL UNIQUE, expires_at INTEGER NOT NULL, content TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS openid_identities (issuer TEXT NOT NULL, subject TEXT NOT NULL, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, PRIMARY KEY(issuer,subject));
+    INSERT OR IGNORE INTO schema_version(version) VALUES(12);`);
   return db;
 }
 

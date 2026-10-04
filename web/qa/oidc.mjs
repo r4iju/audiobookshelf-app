@@ -16,7 +16,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const OIDC_PORT = Number(process.env.ABS_QA_OIDC_PORT ?? 19884);
-export const issuer = `http://127.0.0.1:${OIDC_PORT}`;
+export const issuer = process.env.LEAFWAKE_QA_OIDC_ISSUER ?? `http://127.0.0.1:${OIDC_PORT}`;
 export const backchannel = `http://host.docker.internal:${OIDC_PORT}`;
 export const client = { id: "abs-web-qa", secret: "abs-web-qa-secret" };
 export const person = {
@@ -86,7 +86,7 @@ const server = createServer(async (request, response) => {
   if (route === "GET /.well-known/openid-configuration") {
     return json(response, 200, {
       issuer,
-      authorization_endpoint: `${issuer}/authorize`,
+      authorization_endpoint: `http://127.0.0.1:${OIDC_PORT}/authorize`,
       token_endpoint: `${backchannel}/token`,
       userinfo_endpoint: `${backchannel}/userinfo`,
       jwks_uri: `${backchannel}/jwks`,

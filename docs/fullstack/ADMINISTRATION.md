@@ -11,7 +11,7 @@ The replacement owns these settings; no old administrator frontend or backend is
 | Password attempt count/window | Server settings | Persisted attempt buckets; changing the window atomically resets old buckets (#165) |
 | Browser origins | Server settings | Exact HTTP(S) origins, HTTP CORS/preflight and Socket.IO handshake policy (#165) |
 | Podcast discovery, schedules, queue, retention and transfer bounds | Podcast settings | Persisted jobs/timers and current account/media authority (#163–164) |
-| OpenID provider and client secret | OpenID, #166 | Not yet implemented; cannot silently import or claim cutover |
+| OpenID provider and client secret | OpenID sign-in | Encrypted secrets, validated discovery/PKCE, exact callbacks and issuer/subject identity (#166); original migration mappings remain #172 |
 | RSS shares and SMTP secrets | #167 | Not yet implemented |
 | Covers, metadata providers and editing | #168 | Not yet implemented |
 | Listening/year statistics | #169 | Existing progress history is retained; remaining views pending |
