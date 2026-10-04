@@ -1,9 +1,18 @@
-# Licensing permission request draft
+# Licensing permission request
 
-This is a local draft only. No message has been sent.
+Posted October 4, 2026 by the owner account `r4iju` at [upstream discussion #2051](https://github.com/advplyr/audiobookshelf-app/discussions/2051). The owner authorized seeking this permission. **No approval has been received.**
 
-We are preparing Leafwake, an independently branded native Audiobookshelf client based on our modernization fork. The inherited repository license is GPLv3. We would like to clarify whether there is an existing additional permission covering proprietary Google Cast SDK linking and Apple App Store distribution.
+I'm preparing **Leafwake**, an independently branded native client in [my Audiobookshelf modernization fork](https://github.com/r4iju/audiobookshelf-app). I want to preserve the inherited GPLv3 terms, copyright notices, recipients' rights, and complete corresponding-source access.
 
-If there is no existing grant, would the relevant rights holders consider a written additional permission covering those distribution paths while retaining GPL rights and corresponding-source access for recipients? Please identify the covered files, copyright holders, scope of the grant, any conditions, and whether you have authority to grant it for other contributors' code.
+I haven't found an explicit additional permission addressing either of these distribution paths:
 
-We are also replacing upstream branding and application identifiers. For a Cast-enabled release, we will use an independently registered receiver unless its owner separately grants permission to use the existing receiver. We will not treat store approval or upstream's existing distribution as a license grant.
+1. Linking the Android client with Google's proprietary Cast SDK (via Media3 Cast and Play Services Cast).
+2. Distributing covered builds through Apple's App Store or public TestFlight under the applicable Apple terms.
+
+Is there an existing written exception or other grant covering these cases? If there isn't, would the relevant copyright holders consider a narrowly scoped written additional permission?
+
+For any grant, it would help to identify the covered code/files, distribution paths, conditions, and the rights holders who authorize it. If some contributors retain rights that a maintainer cannot grant, please point me toward the appropriate process or contacts. I'm not requesting a unilateral license change or treating an existing store approval as permission.
+
+For now, I am preparing a Cast-free Android beta and holding public Apple distribution while this is clarified. A future Cast-enabled version would use an independently registered receiver; I am not requesting or assuming permission to reuse the upstream receiver ID.
+
+Thank you for helping clarify the route that respects the project's licensing.

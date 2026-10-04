@@ -1,5 +1,7 @@
 ## Approved scope amendment — October 1, 2026
 
+> Scope amendment, October 4, 2026: [the full-stack replacement spec](../fullstack/SPEC.md) and GitHub issue #150 supersede the client-only backend exclusion below. The new target is one image serving the Next.js UI and replacement backend, with obsolete runtime code removed after migration acceptance. Other native/data preservation criteria remain applicable.
+
 For iPhone/iPad and Android, PDF is the required reader for the current modernization, including primary and supplementary companion documents, online/offline opening, saved pages, applicable controls and reading alongside audio. Remaining EPUB acceptance/features, MOBI/AZW3 and CBZ/CBR work is deferred until after Phase 2 (Next.js readiness, issue #65). These deferred mobile capabilities do not block Apple/Android readiness, Android implementation or Next.js implementation. Already delivered Apple EPUB code remains an incremental preview; no completed acceptance is implied.
 
 The legacy ebook files, associations, settings and saved locations must still be preserved without destructive conversion or mandatory redownloads during migration. Actual opening/resume acceptance for deferred formats is completed with their later reader tickets. PDF migration and audiobook/podcast functionality remain current requirements. Existing browser Phase 2 reader scope is unchanged. This explicit owner-approved amendment overrides earlier blanket mobile reader-parity statements.

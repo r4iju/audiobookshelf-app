@@ -34,6 +34,11 @@ class RealServerJourney {
         val book = RealServer.itemId("The Long Tide")
         ActivityScenario.launch(MainActivity::class.java).use {
             compose.signIn(RealServer.address!!, RealServer.USER, RealServer.PASSWORD)
+            // Compare the visible whole-book clock to server progress across file/chapter boundaries.
+            compose.tap("open-settings")
+            compose.scrollTo("settings", "chapter-track")
+            compose.tap("chapter-track")
+            compose.pressBack()
             compose.openItem(book)
             compose.tap("play")
             compose.waitForTag("player-screen", 20_000)

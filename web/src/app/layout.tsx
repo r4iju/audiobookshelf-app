@@ -4,8 +4,8 @@ import { AppProviders } from "@/components/app/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Audiobookshelf", template: "%s · Audiobookshelf" },
-  description: "Browser client for your own Audiobookshelf server",
+  title: { default: "Leafwake", template: "%s · Leafwake" },
+  description: "Your self-hosted library, wherever you listen",
   robots: { index: false, follow: false },
 };
 

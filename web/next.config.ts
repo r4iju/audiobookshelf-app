@@ -10,7 +10,6 @@ const { version } = JSON.parse(readFileSync(new URL("./package.json", import.met
 
 const config: NextConfig = {
   basePath,
-  output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
   env: { NEXT_PUBLIC_BASE_PATH: basePath, NEXT_PUBLIC_CLIENT_VERSION: version },
