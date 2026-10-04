@@ -1,4 +1,5 @@
 import { editLibrary, editLibrarySchema, managedLibraries, removeLibrary } from "./catalog";
+import { openIdInput, openIdSettings, saveOpenIdSettings } from "./openid";
 import {
   allSchedules,
   checkPodcast,
@@ -151,9 +152,12 @@ export function serverStatus() {
     isInit: ready,
     language: serverSettings().language,
     serverName: serverSettings().serverName,
-    authFormDataMessage: serverSettings().loginMessage,
-    authMethods: ["local"],
-    authFormData: {},
+    authMethods: openIdSettings().enabled ? ["local", "openid"] : ["local"],
+    authFormData: {
+      authLoginCustomMessage: serverSettings().loginMessage,
+      authOpenIDButtonText: openIdSettings().buttonText,
+      authOpenIDAutoLaunch: openIdSettings().enabled && openIdSettings().autoLaunch,
+    },
   });
 }
 export function health() {
@@ -213,6 +217,14 @@ export async function api(request: Request) {
       return serveEbook(request, () => authenticate(token), z.string().parse(ebookRoute[1]), ebookRoute[2]);
     if ((request.method === "GET" || request.method === "HEAD") && downloadRoute)
       return downloadItem(request, () => authenticate(token), z.string().parse(downloadRoute[1]));
+    if (path === "/api/admin/openid/settings") {
+      requireAdministrator(user);
+      if (request.method === "GET") return json(openIdSettings());
+      if (request.method === "PATCH")
+        return json(
+          await saveOpenIdSettings(user, openIdInput.parse(await body(request)), () => authenticate(token)),
+        );
+    }
     if (path === "/api/settings") {
       requireAdministrator(user);
       if (request.method === "GET") return json(serverSettings());

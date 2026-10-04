@@ -388,3 +388,35 @@ export function canReadMedia(actor: Account, item: { libraryId: string; explicit
   const intersects = item.tags.some((tag) => selected.includes(tag));
   return policy.selectedTagsNotAccessible ? !intersects : intersects;
 }
+
+export function openIdSession(issuer: string, subject: string, registration: boolean, preferred: string) {
+  return transaction((db) => {
+    let identity = db
+      .prepare("SELECT user_id FROM openid_identities WHERE issuer=? AND subject=?")
+      .get(issuer, subject);
+    if (!identity) {
+      if (!registration) throw new DomainError(403, "OpenID account registration is disabled");
+      const id = randomUUID();
+      const prefix = preferred.replace(/[^\p{L}\p{N}._-]/gu, "").slice(0, 40) || "openid";
+      const username = `${prefix}-${randomBytes(6).toString("hex")}`;
+      const policy = {
+        download: true,
+        update: false,
+        delete: false,
+        upload: false,
+        accessExplicitContent: false,
+        accessAllLibraries: true,
+        accessAllTags: true,
+        selectedTagsNotAccessible: false,
+      };
+      db.prepare(
+        "INSERT INTO users(id,username,username_key,password_hash,type,permissions,created_at) VALUES(?,?,?,'!openid','user',?,?)",
+      ).run(id, username, username.toLowerCase(), JSON.stringify(policy), Date.now());
+      db.prepare("INSERT INTO openid_identities VALUES(?,?,?)").run(issuer, subject, id);
+      identity = { user_id: id };
+    }
+    const user = findAccount(z.string().parse(identity.user_id));
+    if (!user.active) throw new DomainError(403, "This account is disabled");
+    return issueSession(user);
+  });
+}

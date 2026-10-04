@@ -53,10 +53,17 @@ export async function remoteStream(
   maxBytes: number,
   signal: AbortSignal,
   redirects = 0,
+  options: {
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string;
+    allowedHosts?: string;
+    rawStatus?: boolean;
+  } = {},
 ): Promise<IncomingMessage> {
   const url = remoteUrl(value),
     host = url.hostname.replace(/^\[|\]$/g, "");
-  const lan = (process.env.LEAFWAKE_FEED_ALLOWED_HOSTS ?? "")
+  const lan = (options.allowedHosts ?? process.env.LEAFWAKE_FEED_ALLOWED_HOSTS ?? "")
     .split(",")
     .map((h) => h.trim().toLowerCase())
     .includes(host.toLowerCase());
@@ -84,22 +91,23 @@ export async function remoteStream(
         family: selected.family,
         lookup: (_host, options, callback) =>
           callback(null, options.all ? [selected] : selected.address, selected.family),
-        headers: { "user-agent": "Leafwake/1.0", "accept-encoding": "identity" },
+        method: options.method ?? "GET",
+        headers: { ...options.headers, "user-agent": "Leafwake/1.0", "accept-encoding": "identity" },
         timeout: 20000,
       },
       resolve,
     );
     request.once("error", reject);
     request.once("timeout", () => request.destroy(new Error("Remote request timed out")));
-    request.end();
+    request.end(options.body);
   });
-  if ([301, 302, 303, 307, 308].includes(response.statusCode ?? 0)) {
+  if (!options.rawStatus && [301, 302, 303, 307, 308].includes(response.statusCode ?? 0)) {
     const location = response.headers.location;
     response.destroy();
     if (!location || redirects >= 5) throw new DomainError(400, "Feed redirect limit exceeded");
-    return remoteStream(new URL(location, url).toString(), maxBytes, signal, redirects + 1);
+    return remoteStream(new URL(location, url).toString(), maxBytes, signal, redirects + 1, options);
   }
-  if (response.statusCode !== 200) {
+  if (!options.rawStatus && response.statusCode !== 200) {
     response.destroy();
     throw new DomainError(400, `Remote server returned ${response.statusCode ?? 0}`);
   }
