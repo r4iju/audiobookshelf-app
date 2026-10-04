@@ -51,6 +51,9 @@ export function database() {
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(library_id, source_path));
     CREATE TABLE IF NOT EXISTS media_files (id TEXT PRIMARY KEY, item_id TEXT NOT NULL REFERENCES catalog_items(id),
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(item_id, source_path));
+    CREATE TABLE IF NOT EXISTS playback_sessions (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      item_id TEXT NOT NULL REFERENCES catalog_items(id), content TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1,
+      expires_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS media_progress (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       item_id TEXT NOT NULL REFERENCES catalog_items(id), episode_id TEXT NOT NULL DEFAULT '', content TEXT NOT NULL,
       UNIQUE(user_id, item_id, episode_id));
@@ -91,6 +94,17 @@ export function setupKey() {
   }
   database();
   const filename = resolve(dataDirectory(), "setup-key");
+  try {
+    writeFileSync(filename, randomBytes(32).toString("base64url"), { flag: "wx", mode: 0o600 });
+  } catch (error) {
+    if (!(error instanceof Error && "code" in error && error.code === "EEXIST")) throw error;
+  }
+  chmodSync(filename, 0o600);
+  return readFileSync(filename, "utf8").trim();
+}
+
+export function tokenSigningKey() {
+  const filename = resolve(dataDirectory(), "token-signing-key");
   try {
     writeFileSync(filename, randomBytes(32).toString("base64url"), { flag: "wx", mode: 0o600 });
   } catch (error) {

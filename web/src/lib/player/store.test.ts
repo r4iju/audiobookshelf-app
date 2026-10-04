@@ -114,6 +114,13 @@ beforeEach(() => {
 });
 
 describe("starting over after a discard", () => {
+  it("allows a later media renewal after recovered audio actually plays", async () => {
+    const current = playing("book-x", "renewed-session", 42);
+    usePlayerStore.setState({ player: { ...current, source: { ...current.source, recovery: true } } });
+    usePlayerStore.getState().onPlaying();
+    const state = usePlayerStore.getState().player;
+    expect(state.phase === "active" && state.source?.recovery).toBe(false);
+  });
   it("leaves another book alone when that one started while the old session was closing", async () => {
     const a = slowClient("conn-a");
     usePlayerStore.getState().attach(a.client);

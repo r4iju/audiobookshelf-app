@@ -1,7 +1,7 @@
 import "server-only";
-import { createHash, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
-import { database, initialized, setupKey, transaction } from "./data";
+import { database, initialized, setupKey, tokenSigningKey, transaction } from "./data";
 
 function derive(password: string, salt: string, length: number): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -120,7 +120,13 @@ function visibleUser(user: Account) {
   };
 }
 function issueSession(user: Account) {
-  const accessToken = randomBytes(32).toString("base64url");
+  const issued = Math.floor(Date.now() / 1000);
+  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
+  const payload = Buffer.from(
+    JSON.stringify({ sub: user.id, iat: issued, exp: issued + 15 * 60, jti: randomUUID() }),
+  ).toString("base64url");
+  const signed = `${header}.${payload}`;
+  const accessToken = `${signed}.${createHmac("sha256", tokenSigningKey()).update(signed).digest("base64url")}`;
   const refreshToken = randomBytes(48).toString("base64url");
   const now = Date.now();
   database()
@@ -174,7 +180,7 @@ export async function passwordLogin(input: z.infer<typeof credentialsSchema>) {
   });
 }
 export function authenticate(token: string | null) {
-  if (!token || token.length > 256) throw new DomainError(401, "Sign-in required");
+  if (!token || token.length > 1024) throw new DomainError(401, "Sign-in required");
   const row = database()
     .prepare(`SELECT u.* FROM users u JOIN auth_sessions s ON s.user_id = u.id
     WHERE s.access_hash = ? AND s.access_expires_at > ? AND u.active = 1`)
@@ -186,7 +192,7 @@ export function accountResponse(user: Account) {
   return visibleUser(user);
 }
 export function refreshSession(token: string | null) {
-  if (!token || token.length > 256) throw new DomainError(401, "Sign-in required");
+  if (!token || token.length > 1024) throw new DomainError(401, "Sign-in required");
   return transaction((db) => {
     const row = db
       .prepare(`SELECT u.* FROM users u JOIN auth_sessions s ON s.user_id = u.id
