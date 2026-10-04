@@ -18,7 +18,7 @@ import { resolve } from "node:path";
 import { backup, DatabaseSync } from "node:sqlite";
 import { z } from "zod";
 import { type Account, DomainError, findAccount } from "./accounts";
-import { database, dataDirectory, transaction } from "./data";
+import { catalogChanged, database, dataDirectory, transaction } from "./data";
 
 declare global {
   var leafwakeMaintenance: boolean | undefined;
@@ -191,6 +191,7 @@ export function restoreBackup(actor: Account, id: string) {
         if (db.prepare("PRAGMA foreign_key_check").all().length)
           throw new DomainError(409, "Restored relationships failed validation");
       });
+      catalogChanged();
       return { success: true, signInAgain: true };
     } finally {
       copy.close();
