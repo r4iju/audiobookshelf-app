@@ -105,7 +105,7 @@ async function inventory(input: Input, authorize: () => Account) {
     const rows = new Map<Table, z.infer<typeof record>[]>();
     const objects = source.db
       .prepare(
-        "SELECT name,type FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' AND type IN ('table','view','trigger')",
+        "SELECT name,type,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' AND type IN ('table','view','trigger')",
       )
       .all();
     const errors: MediaImportReport["errors"] = [],
@@ -118,6 +118,11 @@ async function inventory(input: Input, authorize: () => Account) {
         .regex(/^[A-Za-z][A-Za-z0-9_]*$/)
         .parse(object.name);
       if (object.type !== "table") {
+        archive.push({
+          table: "sqlite_master",
+          key: `${object.type}:${name}`,
+          content: JSON.stringify(object),
+        });
         remainingData.push({ table: `${object.type}:${name}`, rows: 1 });
         continue;
       }
@@ -884,7 +889,7 @@ export async function commitMedia(input: z.infer<typeof mediaCommitSchema>, auth
         input.expectedDigest,
         row.table,
         row.key,
-        row.table === "settings" ? sealArchive(JSON.parse(row.content)) : row.content,
+        ["settings", "sessions"].includes(row.table) ? sealArchive(JSON.parse(row.content)) : row.content,
       );
     const completed = completionSchema.parse({
       id: randomUUID(),
