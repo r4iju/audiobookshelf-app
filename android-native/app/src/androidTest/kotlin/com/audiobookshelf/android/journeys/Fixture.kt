@@ -223,6 +223,8 @@ fun ComposeTestRule.scrollTo(container: String, tag: String, timeoutMs: Long = 3
     if (runCatching { onNodeWithTag(container).performScrollToNode(hasTestTag(tag)) }.isSuccess) return
     while (!isShown(tag)) {
         if (System.currentTimeMillis() > deadline) throw ComposeTimeoutException("$tag never appeared in $container")
+        // Pagination may load the target above the viewport reached by the previous search.
+        if (runCatching { onNodeWithTag(container).performScrollToNode(hasTestTag(tag)) }.isSuccess) return
         onNodeWithTag(container).performTouchInput { swipeUp() }
         waitForIdle()
     }
