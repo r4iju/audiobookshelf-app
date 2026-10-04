@@ -1,3 +1,4 @@
+import { editLibrary, editLibrarySchema, managedLibraries, removeLibrary } from "./catalog";
 import {
   allSchedules,
   checkPodcast,
@@ -24,6 +25,7 @@ import {
   removeEpisode,
   startPodcasts,
 } from "./podcasts";
+import { originAllowed, saveServerSettings, serverSettings, serverSettingsSchema } from "./server-settings";
 import "server-only";
 import "./realtime";
 import { z } from "zod";
@@ -115,20 +117,8 @@ export async function boundary(work: () => Promise<Response> | Response) {
 function sameOrigin(request: Request) {
   const origin = request.headers.get("origin");
   if (!origin) return;
-  let parsed: URL;
-  try {
-    parsed = new URL(origin);
-  } catch {
+  if (!originAllowed(origin, request.headers.get("host") ?? ""))
     throw new DomainError(403, "This browser origin is not allowed");
-  }
-  // Next constructs request.url with the internal listener address. Browsers use the public Host.
-  if (
-    origin !== parsed.origin ||
-    !["http:", "https:"].includes(parsed.protocol) ||
-    parsed.host !== request.headers.get("host")
-  ) {
-    throw new DomainError(403, "This browser origin is not allowed");
-  }
 }
 async function body(request: Request, maximum = MAX_BODY): Promise<unknown> {
   sameOrigin(request);
@@ -159,7 +149,9 @@ export function serverStatus() {
     app: "Leafwake",
     serverVersion: "1.0.0-dev",
     isInit: ready,
-    language: "en",
+    language: serverSettings().language,
+    serverName: serverSettings().serverName,
+    authFormDataMessage: serverSettings().loginMessage,
     authMethods: ["local"],
     authFormData: {},
   });
@@ -221,6 +213,16 @@ export async function api(request: Request) {
       return serveEbook(request, () => authenticate(token), z.string().parse(ebookRoute[1]), ebookRoute[2]);
     if ((request.method === "GET" || request.method === "HEAD") && downloadRoute)
       return downloadItem(request, () => authenticate(token), z.string().parse(downloadRoute[1]));
+    if (path === "/api/settings") {
+      requireAdministrator(user);
+      if (request.method === "GET") return json(serverSettings());
+      if (request.method === "PATCH") {
+        sameOrigin(request);
+        return json(saveServerSettings(user, serverSettingsSchema.parse(await body(request))));
+      }
+    }
+    if (path === "/api/admin/libraries" && request.method === "GET")
+      return json({ libraries: managedLibraries(user) });
     if (path === "/api/admin/podcasts/subscriptions" && request.method === "GET") {
       requireAdministrator(user);
       return json(allSchedules(user));
@@ -473,6 +475,17 @@ export async function api(request: Request) {
     if (libraryRoute) {
       const id = z.string().parse(libraryRoute[1]);
       const action = libraryRoute[2];
+      if (!action && request.method === "PATCH")
+        return json(
+          await editLibrary(user, id, editLibrarySchema.parse(await body(request)), () =>
+            authenticate(token),
+          ),
+        );
+      if (!action && request.method === "DELETE") {
+        sameOrigin(request);
+        removeLibrary(user, id);
+        return json({ success: true });
+      }
       if (action === "scan" && request.method === "POST") {
         sameOrigin(request);
         return json(await scanLibrary(user, id));

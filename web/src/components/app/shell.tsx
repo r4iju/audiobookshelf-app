@@ -263,6 +263,12 @@ function Shell({ children }: { children: ReactNode }) {
               </Link>
             ) : null}
             {admin ? (
+              <Link href="/admin/server" className={navClass(pathname.startsWith("/admin/server"))}>
+                <LibraryIcon aria-hidden className="size-4" />
+                Server settings
+              </Link>
+            ) : null}
+            {admin ? (
               <Link href="/admin/podcasts" className={navClass(pathname.startsWith("/admin/podcasts"))}>
                 <LibraryIcon aria-hidden className="size-4" />
                 Podcast settings

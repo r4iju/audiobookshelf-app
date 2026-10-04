@@ -4,6 +4,12 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
   const io = new Server(server, {
     path,
     serveClient: false,
+    cors: {
+      origin(origin, done) {
+        done(null, Boolean(origin && globalThis.leafwakeOriginAllowed?.(origin, "")));
+      },
+      methods: ["GET", "POST"],
+    },
     maxHttpBufferSize: 16_384,
     connectTimeout: 10_000,
     allowRequest(request, done) {
@@ -11,11 +17,7 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
       let allowed = isReady() && io.engine.clientsCount < 256;
       if (origin) {
         try {
-          const url = new URL(origin);
-          allowed &&=
-            ["http:", "https:"].includes(url.protocol) &&
-            url.origin === origin &&
-            url.host === request.headers.host;
+          allowed &&= Boolean(globalThis.leafwakeOriginAllowed?.(origin, request.headers.host ?? ""));
         } catch {
           allowed = false;
         }
@@ -159,7 +161,7 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
         socket.emit("init", {
           userId: current.user.id,
           user: current.user,
-          serverSettings: { version: "1.0.0-dev" },
+          serverSettings: state.snapshot.serverSettings,
         });
       } catch {
         denied(socket, state);

@@ -92,6 +92,7 @@ export const librarySchema = z.looseObject({
   mediaType: z.enum(["book", "podcast"]),
   icon: z.string().nullish(),
   displayOrder: z.number().default(0),
+  isArchived: z.boolean().default(false),
   folders: z.array(z.looseObject({ id: z.string(), fullPath: z.string() })).default([]),
   settings: z.looseObject({ coverAspectRatio: z.number().default(1) }).nullish(),
 });

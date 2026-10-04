@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useActionState } from "react";
 import { z } from "zod";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { TextField } from "@/components/ui/field";
+import { TextField, Toggle } from "@/components/ui/field";
 import { Section } from "@/components/ui/section";
 import { SelectField } from "@/components/ui/select";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
@@ -25,8 +25,8 @@ type Result = { kind: "idle" } | { kind: "error"; message: string } | { kind: "s
 export function LibrariesScreen() {
   const { connection, client } = useAbs();
   const libraries = useQuery({
-    queryKey: [connection.id, "libraries"],
-    queryFn: ({ signal }) => client.get("/api/libraries", librariesResponseSchema, signal),
+    queryKey: [connection.id, "managed-libraries"],
+    queryFn: ({ signal }) => client.get("/api/admin/libraries", librariesResponseSchema, signal),
   });
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
@@ -63,7 +63,7 @@ function CreateLibrary() {
           { name: fields.name, mediaType: fields.mediaType, folders: [{ fullPath: fields.folder }] },
           librarySchema,
         );
-        await queries.invalidateQueries({ queryKey: [connection.id, "libraries"] });
+        await queries.invalidateQueries({ queryKey: [connection.id] });
         return { kind: "saved", message: "Library created. Scan its mounted folder to find media." };
       } catch (error) {
         return {
@@ -134,13 +134,14 @@ function LibraryScan({ library }: { library: Library }) {
     { kind: "idle" },
   );
   return (
-    <Section title={library.name}>
+    <Section title={`${library.name}${library.isArchived ? " (archived)" : ""}`}>
+      <LibraryEditor library={library} />
       <p className="text-sm text-muted break-all">
         {library.folders.map((folder) => folder.fullPath).join(", ")}
       </p>
       <div className="flex flex-wrap gap-3">
         <form action={submit}>
-          <Button type="submit" disabled={pending} variant="primary">
+          <Button type="submit" disabled={pending || library.isArchived} variant="primary">
             {pending ? "Scanning…" : "Scan mounted folders"}
           </Button>
         </form>
@@ -176,5 +177,115 @@ function LibraryScan({ library }: { library: Library }) {
         <p className="text-sm text-muted">No scans yet</p>
       )}
     </Section>
+  );
+}
+
+function LibraryEditor({ library }: { library: Library }) {
+  const { client, connection } = useAbs();
+  const queries = useQueryClient();
+  const [result, action, pending] = useActionState<Result, FormData>(
+    async (_old, form) => {
+      try {
+        if (form.get("mode") === "delete") {
+          if (form.get("confirmation") !== library.name)
+            return {
+              kind: "error",
+              message: "Type the library name to confirm deletion. Populated libraries can be archived.",
+            };
+          await client.command("DELETE", `/api/libraries/${encodeURIComponent(library.id)}`);
+        } else {
+          const fields = z
+            .object({
+              name: z.string().trim().min(1).max(256),
+              displayOrder: z.coerce.number().int().min(0).max(10000),
+              coverAspectRatio: z.coerce.number().min(0.3).max(3),
+              folders: z.string().min(1),
+            })
+            .parse(Object.fromEntries(form));
+          const folders = fields.folders
+            .split(/\r?\n/)
+            .map((fullPath) => fullPath.trim())
+            .filter(Boolean)
+            .map((fullPath) => ({
+              id: library.folders.find((folder) => folder.fullPath === fullPath)?.id,
+              fullPath,
+            }));
+          await client.send(
+            "PATCH",
+            `/api/libraries/${encodeURIComponent(library.id)}`,
+            {
+              name: fields.name,
+              displayOrder: fields.displayOrder,
+              settings: { coverAspectRatio: fields.coverAspectRatio },
+              folders,
+              isArchived: form.get("isArchived") === "on",
+            },
+            librarySchema,
+          );
+        }
+        await queries.invalidateQueries({ queryKey: [connection.id] });
+        return { kind: "saved", message: "Library updated. Media files and history are retained." };
+      } catch (error) {
+        return {
+          kind: "error",
+          message:
+            error instanceof z.ZodError
+              ? "Check the library fields"
+              : error instanceof Error
+                ? error.message
+                : "Library update failed",
+        };
+      }
+    },
+    { kind: "idle" },
+  );
+  return (
+    <details className="rounded-xl border border-line p-4">
+      <summary className="cursor-pointer font-medium">Edit library</summary>
+      <form action={action} className="mt-4 flex flex-col gap-3">
+        <TextField name="name" label="Library name" defaultValue={library.name} required />
+        <TextField
+          name="displayOrder"
+          label="Display order"
+          type="number"
+          min={0}
+          max={10000}
+          defaultValue={library.displayOrder}
+        />
+        <TextField
+          name="coverAspectRatio"
+          label="Cover aspect ratio"
+          type="number"
+          min={0.3}
+          max={3}
+          step="0.1"
+          defaultValue={library.settings?.coverAspectRatio ?? 1}
+        />
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Mounted folders (one per line)
+          <textarea
+            name="folders"
+            className="min-h-24 rounded-xl border border-line bg-surface p-3 font-normal"
+            defaultValue={library.folders.map((folder) => folder.fullPath).join("\n")}
+            required
+          />
+        </label>
+        <Toggle name="isArchived" label="Archive this library" defaultChecked={library.isArchived} />
+        <p className="text-sm text-muted">
+          Archived libraries are hidden and their media cannot be accessed. Media files, progress and lists
+          are retained. Keep any folder containing existing items.
+        </p>
+        <Button type="submit" name="mode" value="save" disabled={pending}>
+          Save library
+        </Button>
+        <TextField name="confirmation" label="Library name to confirm empty-library deletion" />
+        <Button type="submit" name="mode" value="delete" disabled={pending}>
+          Delete empty library
+        </Button>
+        {result.kind !== "idle" ? (
+          <Alert tone={result.kind === "saved" ? "info" : "danger"}>{result.message}</Alert>
+        ) : null}
+      </form>
+    </details>
   );
 }
