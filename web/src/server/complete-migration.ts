@@ -21,6 +21,7 @@ import { inventoryJson } from "./migration-json-inventory";
 import { openIdInput, prepareOpenIdImport } from "./openid";
 import { podcastSettings, podcastSettingsSchema } from "./podcast-settings";
 import { serverSettings, serverSettingsSchema } from "./server-settings";
+import { knownDerivedTrigger } from "./source-schema";
 
 export { completeImportInput } from "@/lib/abs/complete-import";
 
@@ -53,7 +54,18 @@ const columns: Record<string, string[]> = {
     "bookmarks",
     "extraData",
   ],
-  libraries: [...common, "name", "mediaType", "displayOrder", "settings", "icon", "provider"],
+  libraries: [
+    ...common,
+    "name",
+    "mediaType",
+    "displayOrder",
+    "settings",
+    "icon",
+    "provider",
+    "lastScan",
+    "lastScanVersion",
+    "extraData",
+  ],
   libraryFolders: [...common, "libraryId", "path"],
   libraryItems: [
     ...common,
@@ -74,6 +86,15 @@ const columns: Record<string, string[]> = {
     "birthtimeMs",
     "extraData",
     "numFiles",
+    "title",
+    "titleIgnorePrefix",
+    "authorNamesFirstLast",
+    "authorNamesLastFirst",
+    "birthtime",
+    "ctime",
+    "mtime",
+    "lastScan",
+    "lastScanVersion",
   ],
   books: [
     ...common,
@@ -104,6 +125,7 @@ const columns: Record<string, string[]> = {
     "numMissingParts",
     "lastCoverSearch",
     "lastCoverSearchQuery",
+    "titleIgnorePrefix",
   ],
   podcasts: [
     ...common,
@@ -150,7 +172,7 @@ const columns: Record<string, string[]> = {
     "chapters",
     "oldEpisodeId",
   ],
-  authors: [...common, "name", "description", "asin", "imagePath"],
+  authors: [...common, "name", "description", "asin", "imagePath", "lastFirst", "libraryId"],
   series: [...common, "name", "description"],
   bookAuthors: [...common, "bookId", "authorId"],
   bookSeries: [...common, "bookId", "seriesId", "sequence"],
@@ -168,6 +190,7 @@ const columns: Record<string, string[]> = {
     "extraData",
     "finishedAt",
     "startedAt",
+    "podcastId",
   ],
   playbackSessions: [
     ...common,
@@ -189,6 +212,8 @@ const columns: Record<string, string[]> = {
     "chapters",
     "date",
     "dayOfWeek",
+    "deviceId",
+    "coverPath",
   ],
   collections: [...common, "name", "description", "libraryId"],
   collectionBooks: [...common, "collectionId", "bookId", "order"],
@@ -225,7 +250,43 @@ const columns: Record<string, string[]> = {
     "description",
   ],
   settings: ["id", "key", "value", "createdAt", "updatedAt"],
+  devices: [
+    ...common,
+    "deviceId",
+    "clientName",
+    "clientVersion",
+    "ipAddress",
+    "deviceName",
+    "deviceVersion",
+    "extraData",
+    "userId",
+  ],
+  sessions: [...common, "userId", "refreshToken", "ipAddress", "userAgent", "expiresAt"],
+  migrationsMeta: ["key", "value"],
 };
+const archiveTables = new Set(["devices", "sessions", "migrationsMeta"]);
+const archiveColumns = new Set([
+  "authors.lastFirst",
+  "authors.libraryId",
+  "books.titleIgnorePrefix",
+  "libraries.lastScan",
+  "libraries.lastScanVersion",
+  "libraries.extraData",
+  ...[
+    "title",
+    "titleIgnorePrefix",
+    "authorNamesFirstLast",
+    "authorNamesLastFirst",
+    "birthtime",
+    "ctime",
+    "mtime",
+    "lastScan",
+    "lastScanVersion",
+  ].map((field) => `libraryItems.${field}`),
+  "mediaProgresses.podcastId",
+  "playbackSessions.deviceId",
+  "playbackSessions.coverPath",
+]);
 const archived = new Set([
   "createdAt",
   "updatedAt",
@@ -347,11 +408,12 @@ async function inventory(input: CompleteImportInput, authorize: () => Account) {
     const errors: CompleteImportReport["errors"] = [],
       unsupported: CompleteImportReport["unsupported"] = [],
       tables = new Map<string, z.infer<typeof rowSchema>[]>(),
+      schemaArchive: { name: string; type: string; sql: string }[] = [],
       tableInventory: CompleteImportReport["inventory"] = [];
     let sourceRows = 0;
     for (const entry of source.db
       .prepare(
-        "SELECT name,type FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' AND type IN ('table','view','trigger') ORDER BY name",
+        "SELECT name,type,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' AND type IN ('table','view','trigger') ORDER BY name",
       )
       .all()) {
       const name = z
@@ -359,6 +421,11 @@ async function inventory(input: CompleteImportInput, authorize: () => Account) {
         .regex(/^[A-Za-z][A-Za-z0-9_]*$/)
         .parse(entry.name);
       if (entry.type !== "table") {
+        if (knownDerivedTrigger(name, entry.type, entry.sql)) {
+          schemaArchive.push({ name, type: z.string().parse(entry.type), sql: z.string().parse(entry.sql) });
+          tableInventory.push({ table: name, rows: 1, disposition: "archived", fields: [] });
+          continue;
+        }
         unsupported.push({
           table: name,
           fields: [],
@@ -378,10 +445,14 @@ async function inventory(input: CompleteImportInput, authorize: () => Account) {
       tableInventory.push({
         table: name,
         rows: count,
-        disposition: known ? "mapped" : "unsupported",
+        disposition: known ? (archiveTables.has(name) ? "archived" : "mapped") : "unsupported",
         fields: fields.map((field) => ({
           name: field,
-          disposition: !known?.includes(field) ? "unsupported" : archived.has(field) ? "archived" : "mapped",
+          disposition: !known?.includes(field)
+            ? "unsupported"
+            : archiveTables.has(name) || archiveColumns.has(`${name}.${field}`) || archived.has(field)
+              ? "archived"
+              : "mapped",
         })),
       });
       if (!known) {
@@ -829,11 +900,12 @@ async function inventory(input: CompleteImportInput, authorize: () => Account) {
         "Original IDs, account roles, passwords, progress, history, lists and published-feed relations are preserved by the prior stages. OpenID links use the validated original issuer and subject; names and emails never create links.",
         "Imported covers are copied into private SQLite storage. Original database and media remain read-only and unchanged. Keep original media and this snapshot for rollback.",
         "Legacy token secrets and sign-in sessions are retired. Leafwake issues new sign-ins. Legacy file-writing/scanner-watcher options are replaced by bounded explicit scans and managed metadata; originals remain in the private archive.",
+        "Source device records, migration bookkeeping and scanner/name/title caches remain archived. New playback records device information supplied by the client. Exact recognized cache-maintenance triggers remain archived as schema text and never execute in Leafwake; catalog names and titles come from canonical media relationships.",
         "Legacy log levels and file retention are retired in favor of sanitized container logs and bounded product diagnostics. Configure container log rotation outside the image.",
         "Every unsupported table, field or active setting blocks full cutover. Archive retention alone does not claim feature migration.",
       ],
     });
-    return { report, configuration, openId, subjects, covers };
+    return { report, configuration, openId, subjects, covers, schemaArchive };
   } finally {
     source?.close();
     preparations--;
@@ -867,6 +939,10 @@ export async function commitComplete(input: CompleteImportInput, authorize: () =
     if (pinned.digest !== input.digest) throw new DomainError(409, "Source snapshot changed before commit");
     const result = transaction((db) => {
       const actor = owner(authorize);
+      for (const schema of prepared.schemaArchive)
+        db.prepare(
+          "INSERT INTO migration_archive VALUES(?,?,?,?) ON CONFLICT(digest,table_name,row_key) DO UPDATE SET content=excluded.content",
+        ).run(input.digest, "sqlite_master", `${schema.type}:${schema.name}`, JSON.stringify(schema));
       for (const [key, value] of prepared.configuration) {
         if (db.prepare("SELECT key FROM product_settings WHERE key=?").get(key))
           throw new DomainError(409, "Destination configuration changed during inventory");

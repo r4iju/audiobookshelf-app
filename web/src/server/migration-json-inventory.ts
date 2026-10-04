@@ -32,6 +32,8 @@ const file = [
   "discNumFromFilename",
   "isManualDuration",
   "isManualIndex",
+  "language",
+  "manuallyVerified",
 ];
 const metadata = [
   "filename",
@@ -86,6 +88,7 @@ const rules: Record<string, Record<string, readonly string[]>> = {
     extraData: ["authOpenIDSub", "seriesHideFromContinueListening"],
   },
   libraries: {
+    extraData: ["lastScanMetadataPrecedence"],
     settings: [
       "coverAspectRatio",
       "disableWatcher",
@@ -126,6 +129,7 @@ const rules: Record<string, Record<string, readonly string[]>> = {
       "tagLanguage",
       "tagASIN",
       "tagISBN",
+      "tagEncoder",
     ],
     ebookFile: file,
     "ebookFile.metadata": metadata,
@@ -147,7 +151,13 @@ const rules: Record<string, Record<string, readonly string[]>> = {
     "mediaMetadata.authors": ["id", "name"],
     "mediaMetadata.series": ["id", "name", "sequence"],
   },
+  devices: { extraData: ["browserName", "manufacturer", "model", "osName", "osVersion"] },
 };
+const archivePaths = new Set([
+  "books.audioFiles[].language",
+  "books.audioFiles[].manuallyVerified",
+  "books.audioFiles[].metaTags.tagEncoder",
+]);
 const parsedJson = z.union([z.array(z.unknown()), z.record(z.string(), z.unknown()), z.null()]);
 export function inventoryJson(
   table: string,
@@ -157,7 +167,7 @@ export function inventoryJson(
 ) {
   const tableRules = rules[table];
   if (!tableRules) return;
-  const paths = new Map<string, "mapped" | "unsupported">();
+  const paths = new Map<string, "mapped" | "archived" | "unsupported">();
   for (const row of rows) {
     const missing = new Set<string>();
     const visit = (value: unknown, path: string, depth = 0) => {
@@ -171,7 +181,16 @@ export function inventoryJson(
       for (const [key, child] of Object.entries(value)) {
         const name = path + "." + key,
           known = allowed?.includes(key) ?? false;
-        paths.set(name, known ? "mapped" : "unsupported");
+        paths.set(
+          name,
+          known
+            ? table === "devices" ||
+              (table === "libraries" && name.startsWith("extraData.")) ||
+              archivePaths.has(`${table}.${name}`)
+              ? "archived"
+              : "mapped"
+            : "unsupported",
+        );
         if (!known) missing.add(name);
         visit(child, name, depth + 1);
       }
