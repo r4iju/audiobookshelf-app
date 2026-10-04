@@ -257,6 +257,12 @@ function Shell({ children }: { children: ReactNode }) {
           ) : null}
           <div className="mt-auto flex flex-col gap-0.5">
             {admin ? (
+              <Link href="/admin/libraries" className={navClass(pathname.startsWith("/admin/libraries"))}>
+                <LibraryIcon aria-hidden className="size-4" />
+                Manage libraries
+              </Link>
+            ) : null}
+            {admin ? (
               <Link href="/admin/accounts" className={navClass(pathname.startsWith("/admin"))}>
                 <Users aria-hidden className="size-4" />
                 Accounts

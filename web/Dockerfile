@@ -9,14 +9,15 @@ COPY . .
 RUN npm run build && npm prune --omit=dev --no-audit --no-fund
 
 FROM ${NODE_IMAGE}
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0 PORT=3000 LEAFWAKE_DATA_DIR=/data ABS_WEB_SERVER=/
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0 PORT=3000 LEAFWAKE_DATA_DIR=/data LEAFWAKE_MEDIA_ROOTS=/media ABS_WEB_SERVER=/
 COPY --from=build --chown=node:node /app/package.json ./
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/.next ./.next
 COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/server.mjs ./
-RUN mkdir -p /data && chown node:node /data
+RUN mkdir -p /data /media && chown node:node /data /media
 USER node
 VOLUME ["/data"]
 EXPOSE 3000

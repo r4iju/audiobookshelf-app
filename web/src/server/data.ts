@@ -45,6 +45,21 @@ export function database() {
       INSERT INTO schema_version(version) VALUES (2);
       COMMIT;`);
   }
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS libraries (id TEXT PRIMARY KEY, content TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS catalog_items (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
+      source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(library_id, source_path));
+    CREATE TABLE IF NOT EXISTS media_files (id TEXT PRIMARY KEY, item_id TEXT NOT NULL REFERENCES catalog_items(id),
+      source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(item_id, source_path));
+    CREATE TABLE IF NOT EXISTS media_progress (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      item_id TEXT NOT NULL REFERENCES catalog_items(id), episode_id TEXT NOT NULL DEFAULT '', content TEXT NOT NULL,
+      UNIQUE(user_id, item_id, episode_id));
+    CREATE TABLE IF NOT EXISTS scan_runs (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
+      status TEXT NOT NULL, started_at INTEGER NOT NULL, completed_at INTEGER, report TEXT);
+    INSERT OR IGNORE INTO schema_version(version) VALUES (3);
+    UPDATE scan_runs SET status = 'interrupted', completed_at = CAST(strftime('%s','now') AS INTEGER) * 1000
+      WHERE status = 'running';
+  `);
   globalThis.leafwakeDatabase = db;
   return db;
 }

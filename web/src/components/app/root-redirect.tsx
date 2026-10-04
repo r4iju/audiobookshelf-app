@@ -42,7 +42,12 @@ function LibraryRedirect({ connectionId }: { connectionId: string }) {
   if (libraries.isSuccess && !target)
     return (
       <EmptyState title={t("WebNoLibraries")}>
-        {admin ? <ButtonLink href="/admin/accounts">Manage accounts</ButtonLink> : null}
+        {admin ? (
+          <>
+            <ButtonLink href="/admin/libraries">Create library</ButtonLink>
+            <ButtonLink href="/admin/accounts">Manage accounts</ButtonLink>
+          </>
+        ) : null}
       </EmptyState>
     );
   return <Spinner label={t("MessageLoading")} />;
