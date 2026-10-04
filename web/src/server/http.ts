@@ -1,4 +1,5 @@
 import "server-only";
+import "./realtime";
 import { z } from "zod";
 import {
   accountResponse,
@@ -148,7 +149,10 @@ export function bearer(request: Request) {
 }
 export async function api(request: Request) {
   return boundary(async () => {
-    const path = new URL(request.url).pathname;
+    const incomingPath = new URL(request.url).pathname;
+    const prefix = globalThis.leafwakeBasePath ?? "";
+    const path =
+      prefix && incomingPath.startsWith(`${prefix}/`) ? incomingPath.slice(prefix.length) : incomingPath;
     if (path === "/api/setup" && request.method === "POST") {
       if (initialized()) throw new DomainError(409, "This server is already initialized");
       const input = await body(request);

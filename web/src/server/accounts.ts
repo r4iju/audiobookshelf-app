@@ -223,6 +223,7 @@ export function endSession(access: string | null, refresh: string | null) {
   database()
     .prepare("DELETE FROM auth_sessions WHERE access_hash = ? OR refresh_hash = ?")
     .run(digest(access ?? ""), digest(refresh ?? ""));
+  globalThis.leafwakeRealtimeChanged?.();
 }
 export function findAccount(id: string) {
   const row = database().prepare("SELECT * FROM users WHERE id = ?").get(id);

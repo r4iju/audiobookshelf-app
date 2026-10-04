@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import next from "next";
+import { attachRealtime } from "./realtime.mjs";
 
 const port = Number(process.env.PORT || 19881);
 const hostname = process.env.HOSTNAME || "127.0.0.1";
@@ -22,12 +23,30 @@ const server = createServer((request, response) => {
   });
 });
 server.requestTimeout = 60_000;
-server.listen(port, hostname, () => console.log(`Leafwake listening on port ${port}`));
+let realtimeReady = false;
+const basePath = conf?.basePath ?? process.env.ABS_WEB_BASE_PATH?.replace(/\/+$/, "") ?? "";
+globalThis.leafwakeBasePath = basePath;
+const stopRealtime = attachRealtime(server, () => realtimeReady, `${basePath}/socket.io`);
+server.listen(port, hostname, async () => {
+  try {
+    // Load the domain through its public Next route before accepting socket authentication.
+    const warmHost = hostname === "0.0.0.0" ? "127.0.0.1" : hostname === "::" ? "::1" : hostname;
+    const warmAddress = warmHost.includes(":") ? `[${warmHost}]` : warmHost;
+    const response = await fetch(`http://${warmAddress}:${port}${basePath}/healthz`);
+    if (!response.ok || !globalThis.leafwakeRealtimeSnapshot) throw new Error("Domain not ready");
+    realtimeReady = true;
+    console.log(`Leafwake listening on port ${port}`);
+  } catch {
+    console.error("Leafwake initialization failed");
+    process.exit(1);
+  }
+});
 let stopping = false;
 for (const signal of ["SIGINT", "SIGTERM"])
   process.on(signal, () => {
     if (stopping) return;
     stopping = true;
+    stopRealtime();
     const deadline = setTimeout(() => process.exit(1), 10_000);
     deadline.unref();
     server.close(async () => {

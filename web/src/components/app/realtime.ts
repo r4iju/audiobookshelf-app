@@ -59,6 +59,11 @@ export function useRealtime() {
       void queryClient.invalidateQueries({ queryKey: [connection.id, "library"] });
       void queryClient.invalidateQueries({ queryKey: [connection.id, "item"] });
     };
+    socket.on("init", () => {
+      void queryClient.invalidateQueries({ queryKey: keys.me(connection.id) });
+      refreshLibrary();
+      void queryClient.invalidateQueries({ queryKey: [connection.id, "lists"] });
+    });
     for (const event of [
       "item_added",
       "item_updated",

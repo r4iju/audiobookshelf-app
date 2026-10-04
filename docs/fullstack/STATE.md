@@ -19,7 +19,7 @@ Image config digest: `sha256:5b0c1f1af6c3a7a54e310a611c1cd347c1b1467f7f511e07eab
 
 ## Remaining work
 
-Tickets #151, #152, #154 and #155 are complete. The sections below track subsequent slices and their remaining acceptance. Realtime, full migration, administration, legacy removal, final deployment and store acceptance still require the remaining tickets. Existing deployment examples still describe the superseded two-server configuration until the deployment and cleanup tickets replace them.
+Tickets #151–156 are complete. The sections below track subsequent slices and their remaining acceptance. Realtime, full migration, administration, legacy removal, final deployment and store acceptance still require the remaining tickets. Existing deployment examples still describe the superseded two-server configuration until the deployment and cleanup tickets replace them.
 
 Apple and Cast permission remains pending at https://github.com/advplyr/audiobookshelf-app/discussions/2051. The backend rewrite does not relicense inherited native code. No public store artifact has been uploaded or rolled out.
 
@@ -57,7 +57,7 @@ Four production HTTP cases passed and progress/history/reader state survived res
 
 Evidence: `/tmp/leafwake-progress-final-green.log`, `/tmp/leafwake-progress-restart.log`, `/tmp/leafwake-progress-reset-retry-red.log`, `/tmp/leafwake-progress-browser-reset-red.log`. Image `leafwake:progress-156` config digest: `sha256:f19af47d8194f5fc1907be46bd650d8d7215b1d00fb4f71cecc54dbe4431cd19`.
 
-#156 remains open for the unchanged complete native journeys and episode acceptance as the remaining ebook/download/podcast contracts land. These checks do not yet establish full backend migration or store readiness.
+All four unchanged Android RealServerJourney assertions subsequently passed on the replacement image: cross-file playback, PDF page persistence, offline reconnect and first offline completion. Evidence: `/tmp/leafwake-native-real-journeys-clean.log`. A reused synthetic PDF fixture initially resumed its saved page 2; resetting only synthetic progress restored the required initial state. Assertions were unchanged. #156 is complete; podcast integration remains #163 and final device/release acceptance remains #174–177.
 
 ## #152 search authorization completion
 
@@ -75,3 +75,12 @@ Owner-only product backups preserve SQLite data and migration records. Restore v
 Production HTTP import, failure atomicity, safe retry, original-source digest, backup/restore and revoked-session checks passed. Imported identifiers, original passwords and completion records survived restart. Shared browser inspection/import, backup creation, restore and fresh sign-in passed. Preview screenshot capture remained unavailable; interaction and DOM evidence was available. Typecheck, lint and 119 existing browser units passed. Fresh independent source review cleared backend and UI after inventory and session-revival fixes. Tests for missing operations, malformed archived fields, unknown account columns, default external-auth settings and session revival were observed red before fixes.
 
 Evidence: `/tmp/leafwake-import-red.log`, `/tmp/leafwake-import-inventory-red.log`, `/tmp/leafwake-import-unknown-fields-red.log`, `/tmp/leafwake-import-default-auth-red.log`, `/tmp/leafwake-import-session-restore-red.log`, `/tmp/leafwake-import-green.log`, `/tmp/leafwake-import-restart.log`. Production image `leafwake:import-153` config digest `sha256:7243c8ee9f9fbea2a29ce5c43f98e09889f65d79130b94318526afaaa5e3e723`. All test sources and volumes were synthetic; owner media and credentials were not used.
+
+
+## #157 authenticated realtime on the product listener
+
+Socket.IO uses the same port as HTTP and Next.js. The custom entry warms the public health route before enabling socket handshakes. Native auth/init payloads use current persisted session authority. Post-commit notifications deliver account-scoped progress/user updates and policy-filtered catalog changes. Reset generations emit scoped item updates even when no progress exists. Shared catalog snapshots avoid rebuilding unchanged catalogs for routine account progress. Reconnect/init refreshes browser queries; current authority is checked at every dispatch and expiry/revocation checks bound idle credentials. Anonymous connections have a fixed authentication deadline and bounded capacity, message size and auth attempts.
+
+Production blackbox checks passed for WebSocket and polling auth, committed progress, catalog rescan, account/library isolation, revocation, reauthentication, reconnect, empty reset generation updates and the raw Apple/TV wire rejection payload. Missing sockets, absent reset events and malformed native rejection payloads were observed red before implementation/fixes. Repeated invalid authentication could not extend the anonymous deadline in manual production verification. Typecheck, lint and 119 browser units passed. Independent review cleared startup, reconnect, anonymous deadline, generation and snapshot-cost fixes. Browser another-client update and restart acceptance are recorded with PR evidence.
+
+Evidence: `/tmp/leafwake-realtime-red.log`, `/tmp/leafwake-realtime-native-wire-red.log`, `/tmp/leafwake-realtime-empty-reset-red.log`, `/tmp/leafwake-realtime-final-green.log`, `/tmp/leafwake-realtime-idle-check.log`. Image `leafwake:realtime-157` config digest `sha256:70f05644a1ff9dcee2d5f7c1988518299467ee1d89648c09c588a3175f74bb0b`. List, podcast and RSS-specific domain events will be connected as those domain tickets land; final native/store QA remains required.

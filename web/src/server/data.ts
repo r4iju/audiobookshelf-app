@@ -113,17 +113,27 @@ export function progressGenerations(userId: string, itemId: string) {
   );
 }
 
-export function transaction<T>(work: (db: DatabaseSync) => T): T {
+export function transaction<T>(
+  work: (db: DatabaseSync) => T,
+  change?: { userId: string; itemId?: string },
+): T {
   const db = database();
   db.exec("BEGIN IMMEDIATE");
+  let value: T;
   try {
-    const value = work(db);
+    value = work(db);
     db.exec("COMMIT");
-    return value;
   } catch (error) {
     db.exec("ROLLBACK");
     throw error;
   }
+  globalThis.leafwakeRealtimeChanged?.(change);
+  return value;
+}
+
+export function catalogChanged() {
+  globalThis.leafwakeCatalogRevision = (globalThis.leafwakeCatalogRevision ?? 0) + 1;
+  globalThis.leafwakeRealtimeChanged?.({ catalog: true });
 }
 
 export function initialized() {

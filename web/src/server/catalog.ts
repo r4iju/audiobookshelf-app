@@ -13,7 +13,7 @@ import {
   mediaProgressSchema,
 } from "@/lib/abs/schemas";
 import { type Account, canReadLibrary, canReadMedia, DomainError, requireAdministrator } from "./accounts";
-import { database, progressGeneration, progressGenerations, transaction } from "./data";
+import { catalogChanged, database, progressGeneration, progressGenerations, transaction } from "./data";
 export const createLibrarySchema = z.object({
   name: z.string().trim().min(1).max(256),
   mediaType: z.enum(["book", "podcast"]).default("book"),
@@ -70,7 +70,7 @@ export async function createLibrary(actor: Account, input: z.infer<typeof create
     )
       throw new DomainError(400, "Library folders cannot overlap");
   }
-  return transaction((db) => {
+  const library = transaction((db) => {
     requireAdministrator(actor);
     const library = librarySchema.parse({
       id: randomUUID(),
@@ -83,6 +83,8 @@ export async function createLibrary(actor: Account, input: z.infer<typeof create
     db.prepare("INSERT INTO libraries VALUES (?, ?)").run(library.id, JSON.stringify(library));
     return library;
   });
+  catalogChanged();
+  return library;
 }
 export function findLibrary(id: string) {
   const row = database().prepare("SELECT content FROM libraries WHERE id = ?").get(id);
@@ -118,7 +120,7 @@ export function itemFor(actor: Account, id: string) {
     progressGenerations: progressGenerations(actor.id, id),
   };
 }
-export function itemsFor(actor: Account, id: string) {
+export function itemsFor(actor: Account, id: string, includeGenerations = true) {
   findLibrary(id);
   if (!canReadLibrary(actor, id)) throw new DomainError(404, "Not found");
   return database()
@@ -126,11 +128,15 @@ export function itemsFor(actor: Account, id: string) {
     .all(id)
     .map(itemRow)
     .filter((item) => allowed(actor, item))
-    .map((item) => ({
-      ...item,
-      progressGeneration: progressGeneration(actor.id, item.id),
-      progressGenerations: progressGenerations(actor.id, item.id),
-    }));
+    .map((item) =>
+      includeGenerations
+        ? {
+            ...item,
+            progressGeneration: progressGeneration(actor.id, item.id),
+            progressGenerations: progressGenerations(actor.id, item.id),
+          }
+        : item,
+    );
 }
 export function pagedItems(actor: Account, id: string, params: URLSearchParams) {
   const limit = z.coerce
@@ -542,6 +548,7 @@ export async function scanLibrary(actor: Account, id: string) {
         scanId,
       );
     });
+    catalogChanged();
     return report;
   } catch (error) {
     const report = scanReportSchema.parse({
