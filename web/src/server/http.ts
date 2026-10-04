@@ -35,6 +35,7 @@ import {
   scanLibrary,
 } from "./catalog";
 import { database, initialized, setupKey } from "./data";
+import { downloadItem, serveEbook } from "./documents";
 import { commitMedia, inspectMedia, mediaCommitSchema, mediaInspectSchema } from "./media-migration";
 import {
   commitImport,
@@ -170,8 +171,16 @@ export async function api(request: Request) {
     if (path === "/api/setup/import" && request.method === "POST")
       return json(commitImport(commitImportSchema.parse(await body(request))));
     const fileRoute = path.match(/^\/api\/items\/([^/]+)\/file\/([^/]+)(?:\/(download))?$/);
-    const token = bearer(request) ?? (fileRoute ? new URL(request.url).searchParams.get("token") : null);
+    const ebookRoute = path.match(/^\/api\/items\/([^/]+)\/ebook(?:\/([^/]+))?$/);
+    const downloadRoute = path.match(/^\/api\/items\/([^/]+)\/download$/);
+    const token =
+      bearer(request) ??
+      (fileRoute || ebookRoute || downloadRoute ? new URL(request.url).searchParams.get("token") : null);
     const user = authenticate(token);
+    if ((request.method === "GET" || request.method === "HEAD") && ebookRoute)
+      return serveEbook(request, () => authenticate(token), z.string().parse(ebookRoute[1]), ebookRoute[2]);
+    if ((request.method === "GET" || request.method === "HEAD") && downloadRoute)
+      return downloadItem(request, () => authenticate(token), z.string().parse(downloadRoute[1]));
     if (path === "/api/admin/migrations/media/inspect" && request.method === "POST")
       return json(
         await inspectMedia(mediaInspectSchema.parse(await body(request)), () => authenticate(token)),

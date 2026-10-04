@@ -107,8 +107,7 @@ function range(headers: Headers, size: number) {
   if ((left === null && !right) || start < 0 || start >= size || end < start) return null;
   return { start, end, status: 206 };
 }
-export async function serveFile(
-  request: Request,
+export async function openMediaFile(
   authorize: () => Account,
   itemId: string,
   fileId: string,
@@ -146,6 +145,23 @@ export async function serveFile(
       throw new DomainError(404, "Not found");
     if (download && !permissions.parse(JSON.parse(current.permissions)).download)
       throw new DomainError(403, "Downloads are not allowed");
+    return { handle, content, stat };
+  } catch (error) {
+    await handle?.close();
+    if (error instanceof DomainError) throw error;
+    throw new DomainError(404, "Not found");
+  }
+}
+export async function serveFile(
+  request: Request,
+  authorize: () => Account,
+  itemId: string,
+  fileId: string,
+  download = false,
+) {
+  const opened = await openMediaFile(authorize, itemId, fileId, download);
+  const { handle, content, stat } = opened;
+  try {
     const selected = range(request.headers, stat.size);
     const headers = new Headers({
       "content-type": content.mimeType,

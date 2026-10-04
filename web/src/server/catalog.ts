@@ -32,7 +32,15 @@ const audio: Record<string, string> = {
   ".wav": "audio/wav",
   ".aac": "audio/aac",
 };
-const documents = new Set([".epub", ".pdf", ".mobi", ".azw3", ".cbz", ".cbr"]);
+const documentTypes: Record<string, string> = {
+  ".epub": "application/epub+zip",
+  ".pdf": "application/pdf",
+  ".mobi": "application/x-mobipocket-ebook",
+  ".azw3": "application/vnd.amazon.mobi8-ebook",
+  ".cbz": "application/vnd.comicbook+zip",
+  ".cbr": "application/vnd.comicbook-rar",
+};
+const documents = new Set(Object.keys(documentTypes));
 export function within(root: string, path: string) {
   const tail = relative(root, path);
   return tail === "" || (!tail.startsWith(`..${sep}`) && tail !== ".." && !isAbsolute(tail));
@@ -333,6 +341,7 @@ type ScannedFile = {
     index: number;
     duration: number;
     startOffset: number;
+    isSupplementary?: boolean;
   };
 };
 async function readMetadata(folder: string, path: string) {
@@ -421,7 +430,7 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[])
           ino,
           fileType: measured ? "audio" : "ebook",
           metadata: { filename: basename(path), ext: ext.slice(1), size: stat.size },
-          mimeType: audio[ext] ?? (ext === ".pdf" ? "application/pdf" : "application/octet-stream"),
+          mimeType: audio[ext] ?? documentTypes[ext] ?? "application/octet-stream",
           index: tracks.length + 1,
           duration: measured?.format.duration ?? 0,
           startOffset: duration,
@@ -454,9 +463,13 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[])
           duration += file.duration;
         }
       }
-      const ebook = files.find((file) => file.content.fileType === "ebook");
-      const authors = metadata.authors.length ? metadata.authors : embedded.artist ? [embedded.artist] : [];
       const prior = previous ? itemRow(previous) : null;
+      const ebook =
+        files.find((file) => file.content.fileType === "ebook" && file.id === prior?.media.ebookFile?.ino) ??
+        files.find((file) => file.content.fileType === "ebook");
+      for (const file of files)
+        file.content.isSupplementary = file.content.fileType === "ebook" && file !== ebook;
+      const authors = metadata.authors.length ? metadata.authors : embedded.artist ? [embedded.artist] : [];
       const directoryStat = await lstat(directory);
       const item = libraryItemSchema.parse({
         id,
