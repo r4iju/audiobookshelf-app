@@ -1,6 +1,6 @@
 # Replacement implementation status
 
-The authoritative scope is SPEC.md and GitHub issue #150. This is an incremental implementation, not the completed rewrite or a public release.
+The authoritative scope is SPEC.md and GitHub issue #150. The backend/browser replacement and active legacy removal have been implemented through #173. Final release acceptance and publishing are tracked in #174; live owner cutover and store work remain #175–177. The evidence below records each reviewed slice and its limits. A local fixture is not a live public deployment.
 
 ## #151: production bootstrap and persistent sign-in
 

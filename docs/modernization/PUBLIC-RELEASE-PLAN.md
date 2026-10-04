@@ -1,5 +1,7 @@
 # Leafwake public release plan
 
+> Superseded scope: the owner subsequently authorized a full replacement of the backend and browser. The active release contract is [the full-stack specification](../fullstack/SPEC.md) and [the replacement compatibility matrix](../fullstack/COMPATIBILITY.md). This document retains the earlier client-only research and historical gates; references to a required original backend or its patched acceptance are not the replacement release claim.
+
 Prepared October 4, 2026. The owner authorized an independent app under their developer accounts and asked for a name and licensing consideration. **Leafwake** is the working name. Public release is a new milestone beyond the original internal distribution scope; this plan does not declare the existing acceptance gates passed.
 
 ## Product and channels

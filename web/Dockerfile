@@ -9,10 +9,21 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build && \
     node --input-type=module -e 'import fs from "node:fs"; const {default:config}=await import("./next.config.ts"); fs.writeFileSync("next.config.mjs",`export default ${JSON.stringify(config)};\n`)' && \
-    npm prune --omit=dev --no-audit --no-fund
+    npm prune --omit=dev --no-audit --no-fund && \
+    find node_modules/libarchive.js -type f -name '*.wasm' -delete && \
+    node scripts/copy-notices.mjs
 
 FROM ${NODE_IMAGE}
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
+ARG LEAFWAKE_REVISION=development
+LABEL org.opencontainers.image.title="Leafwake" \
+      org.opencontainers.image.version="1.0.0-rc.1" \
+      org.opencontainers.image.source="https://github.com/r4iju/audiobookshelf-app" \
+      org.opencontainers.image.revision=${LEAFWAKE_REVISION} \
+      org.opencontainers.image.licenses="GPL-3.0-only"
+ARG LEAFWAKE_RUNTIME_INPUTS_URL=""
+ARG LEAFWAKE_RUNTIME_INPUTS_SHA256=""
+COPY scripts/install-runtime.mjs /tmp/install-runtime.mjs
+RUN node /tmp/install-runtime.mjs "${LEAFWAKE_RUNTIME_INPUTS_URL}" "${LEAFWAKE_RUNTIME_INPUTS_SHA256}" && rm /tmp/install-runtime.mjs
 WORKDIR /app
 ARG ABS_WEB_BASE_PATH=""
 ENV ABS_WEB_BASE_PATH=${ABS_WEB_BASE_PATH}
