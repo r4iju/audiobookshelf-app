@@ -15,7 +15,7 @@ import { createBackup } from "./backups";
 import { within } from "./catalog";
 import { catalogChanged, database, transaction } from "./data";
 import { validateFeedAddress } from "./feeds";
-import { imageType } from "./item-management";
+import { imageType } from "./image-format";
 import { sourceCopy } from "./migration";
 import { inventoryJson } from "./migration-json-inventory";
 import { openIdInput, prepareOpenIdImport } from "./openid";

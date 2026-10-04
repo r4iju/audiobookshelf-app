@@ -66,7 +66,7 @@ test("in December the year in review leads, with the account's and, for administ
   await expect(onServer).toContainText(String(server.numBooksAdded));
   await expect(onServer).toContainText(server.topGenres[0].genre);
   await expect(onServer).toContainText(server.topNarrators[0].name);
-  await expect(onServer).toContainText("2.6 MB");
+  await expect(onServer).toContainText(`${(server.totalBooksSize / 1024 ** 2).toFixed(1)} MB`);
   await expect(
     onServer.locator(`img[src*="/api/items/${server.booksAddedWithCovers[0]}/cover"]`),
   ).toHaveCount(1);

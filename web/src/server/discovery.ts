@@ -2,7 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { type LibraryItem, mediaProgressSchema } from "@/lib/abs/schemas";
 import { type Account, DomainError } from "./accounts";
-import { itemsFor, librariesFor } from "./catalog";
+import { findLibrary, itemsFor, librariesFor } from "./catalog";
 import { database } from "./data";
 
 function sequence(item: LibraryItem, id: string) {
@@ -84,6 +84,75 @@ export function personalized(actor: Account, libraryId: string, params: URLSearc
       .min(1)
       .max(200)
       .parse(params.get("limit") ?? 20);
+  if (findLibrary(libraryId).mediaType === "podcast") {
+    const states = new Map(
+      database()
+        .prepare("SELECT item_id,episode_id,content FROM media_progress WHERE user_id=? AND episode_id<>''")
+        .all(actor.id)
+        .map((row) => [
+          JSON.stringify([String(row.item_id), String(row.episode_id)]),
+          mediaProgressSchema.parse(JSON.parse(z.string().parse(row.content))),
+        ]),
+    );
+    const episodes = items
+      .filter((item) => !item.isMissing && !item.isInvalid)
+      .flatMap((item) =>
+        (item.media.episodes ?? [])
+          .filter((episode) => episode.audioFile)
+          .map((episode) => ({
+            item: { ...item, recentEpisode: episode },
+            state: states.get(JSON.stringify([item.id, episode.id])),
+          })),
+      );
+    const shelf = (id: string, label: string, labelStringKey: string, entries: typeof episodes) => ({
+      id,
+      label,
+      labelStringKey,
+      type: "episode",
+      entities: entries.slice(0, limit).map((entry) => entry.item),
+    });
+    return [
+      shelf(
+        "continue-listening",
+        "Continue listening",
+        "LabelContinueListening",
+        episodes
+          .filter(
+            ({ state }) =>
+              state &&
+              !state.isFinished &&
+              !state.hideFromContinueListening &&
+              (state.progress > 0 || state.currentTime > 0),
+          )
+          .sort(
+            (a, b) =>
+              (b.state?.lastUpdate ?? 0) - (a.state?.lastUpdate ?? 0) ||
+              a.item.recentEpisode.id.localeCompare(b.item.recentEpisode.id),
+          ),
+      ),
+      {
+        id: "recently-added",
+        label: "Recently added",
+        labelStringKey: "LabelRecentlyAdded",
+        type: "podcast",
+        entities: [...items]
+          .sort((a, b) => (b.addedAt ?? 0) - (a.addedAt ?? 0) || a.id.localeCompare(b.id))
+          .slice(0, limit),
+      },
+      shelf(
+        "recently-finished",
+        "Listen again",
+        "LabelListenAgain",
+        episodes
+          .filter(({ state }) => state?.isFinished)
+          .sort(
+            (a, b) =>
+              (b.state?.finishedAt ?? 0) - (a.state?.finishedAt ?? 0) ||
+              a.item.recentEpisode.id.localeCompare(b.item.recentEpisode.id),
+          ),
+      ),
+    ];
+  }
   const progress = new Map(
     database()
       .prepare("SELECT item_id,content FROM media_progress WHERE user_id=? AND episode_id=''")

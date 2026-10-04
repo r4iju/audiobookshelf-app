@@ -15,6 +15,7 @@ import { OIDC_PORT } from "./oidc.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const runtime = join(here, ".runtime");
 export const container = process.env.ABS_QA_CONTAINER ?? "leafwake-web-qa";
+const stateFile = join(runtime, `state-${container}.json`);
 export const image = process.env.LEAFWAKE_QA_IMAGE ?? "leafwake:qa";
 export const QA_PORT = Number(process.env.ABS_QA_PORT ?? 19880);
 const origin = `http://127.0.0.1:${QA_PORT}${process.env.ABS_WEB_BASE_PATH ?? ""}`;
@@ -85,7 +86,7 @@ function accountSnapshot() {
       key === "admin" ? "root" : "user",
       1,
       0,
-      JSON.stringify(flags),
+      JSON.stringify(key === "admin" ? { ...flags, delete: true } : flags),
       "[]",
       "{}",
       new Date().toISOString(),
@@ -115,6 +116,12 @@ async function seed(snapshot) {
       rateLimitLoginWindow: 60000,
     },
   });
+  const podcastSettings = await call("/api/admin/podcasts/settings", { token });
+  await call("/api/admin/podcasts/settings", {
+    token,
+    method: "PATCH",
+    body: { ...podcastSettings, maxConcurrent: 1 },
+  });
   const books = await call("/api/libraries", {
     token,
     method: "POST",
@@ -140,6 +147,17 @@ async function seed(snapshot) {
   for (const library of [books, podcasts]) {
     const scan = await call(`/api/libraries/${library.id}/scan`, { token, method: "POST", body: {} });
     if (scan.status !== "complete") throw new Error("QA library scan did not complete");
+  }
+  // Keep the original journey catalog titles; ComicInfo still names the issue inside the reader.
+  const catalog = await call(`/api/libraries/${books.id}/items?limit=0`, { token });
+  for (const issue of [1, 2]) {
+    const comic = catalog.results.find((item) => item.media.metadata.title === `Skyline Issue ${issue}`);
+    if (!comic) throw new Error(`Missing comic fixture ${issue}`);
+    await call(`/api/items/${comic.id}/media`, {
+      token,
+      method: "PATCH",
+      body: { metadata: { title: `Skyline ${issue}` } },
+    });
   }
   return {
     origin,
@@ -196,14 +214,14 @@ export function down() {
       docker(...args);
     } catch {}
   }
-  rmSync(join(runtime, "state.json"), { force: true });
+  rmSync(stateFile, { force: true });
 }
 export async function up({ fresh = false } = {}) {
   execFileSync(join(here, "make-library.sh"), { stdio: "inherit" });
   if (fresh) down();
   let existing = docker("ps", "-a", "--filter", `name=^${container}$`, "--format", "{{.Status}}");
-  if (existing && existsSync(join(runtime, "state.json"))) {
-    const state = JSON.parse(readFileSync(join(runtime, "state.json"), "utf8"));
+  if (existing && existsSync(stateFile)) {
+    const state = JSON.parse(readFileSync(stateFile, "utf8"));
     const currentImage = docker("inspect", "--format", "{{.Image}}", container);
     const requestedImage = docker("image", "inspect", "--format", "{{.Id}}", image);
     if (state.origin !== origin || currentImage !== requestedImage) {
@@ -235,7 +253,7 @@ export async function up({ fresh = false } = {}) {
       "-e",
       "LEAFWAKE_FEED_ALLOWED_HOSTS=127.0.0.1,host.docker.internal",
       "-e",
-      "LEAFWAKE_MAIL_ALLOWED_HOSTS=127.0.0.1,host.docker.internal",
+      "LEAFWAKE_SMTP_ALLOWED_HOSTS=127.0.0.1,host.docker.internal",
       "-v",
       `${join(runtime, "library")}:/library:ro`,
       "-v",
@@ -248,24 +266,23 @@ export async function up({ fresh = false } = {}) {
     const state =
       process.env.LEAFWAKE_QA_REUSE_VOLUME === "1"
         ? {
-            ...JSON.parse(readFileSync(join(runtime, "state.json"), "utf8")),
+            ...JSON.parse(readFileSync(stateFile, "utf8")),
             origin,
             image,
             serverVersion: (await call("/status")).serverVersion,
           }
         : await seed(snapshot);
-    writeFileSync(join(runtime, "state.json"), JSON.stringify(state, null, 2));
+    writeFileSync(stateFile, JSON.stringify(state, null, 2));
   } else {
     if (!existing.startsWith("Up")) docker("start", container);
     await ready();
   }
   await startFixtures();
-  console.log(JSON.stringify(JSON.parse(readFileSync(join(runtime, "state.json"), "utf8"))));
+  console.log(JSON.stringify(JSON.parse(readFileSync(stateFile, "utf8"))));
 }
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [command = "up", ...flags] = process.argv.slice(2);
   if (command === "down") down();
-  else if (command === "up")
-    await up({ fresh: flags.includes("--fresh") || !existsSync(join(runtime, "state.json")) });
+  else if (command === "up") await up({ fresh: flags.includes("--fresh") || !existsSync(stateFile) });
   else throw new Error(`Unknown command ${command}`);
 }

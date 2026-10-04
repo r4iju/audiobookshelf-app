@@ -10,7 +10,11 @@ async function eveningStories(api: Api) {
   const episodes = new Map<string, string>(
     item.media.episodes.map((episode: { title: string; id: string }) => [episode.title, episode.id]),
   );
-  return { id, episode: (title: string) => episodes.get(title) as string };
+  return {
+    id,
+    duration: item.media.episodes[0].duration as number,
+    episode: (title: string) => episodes.get(title) as string,
+  };
 }
 
 async function resetEpisodes(api: Api, itemId: string) {
@@ -127,7 +131,7 @@ test("an administrator adds a podcast from its feed and downloads an episode on 
 
   await expect(page.getByLabel("Title")).toHaveValue("QA Feed Show");
   await expect(page.getByLabel("Author")).toHaveValue("QA Feed Studio");
-  await choose(page, "Folder", "/podcasts");
+  await choose(page, "Folder", "/data/media");
   await page.getByRole("button", { name: "Create" }).click();
 
   await expect(page.getByRole("heading", { level: 1, name: "QA Feed Show" })).toBeVisible();
@@ -141,7 +145,7 @@ test("an administrator adds a podcast from its feed and downloads an episode on 
   await expect(episodes.getByRole("heading", { name: "Feed Episode 2" })).toBeVisible({ timeout: 30_000 });
   const created = (await admin.call(`/api/libraries/${qa.libraries.podcasts}/search?q=QA%20Feed`)).body
     .podcast[0].libraryItem;
-  expect(created.path).toBe("/podcasts/QA Feed Show");
+  expect(created.path).toBe("/data/media/QA Feed Show");
 
   await page.getByRole("button", { name: "Find new episodes" }).click();
   await expect(dialog.getByRole("checkbox", { name: "Feed Episode 2" })).toBeDisabled();
@@ -175,7 +179,7 @@ test("an episode being listened to continues from the home page's Continue Liste
   const third = podcast.episode("Episode 3: Evening 3");
   await api.call(`/api/me/progress/${podcast.id}/${third}`, {
     method: "PATCH",
-    body: { currentTime: 3, duration: 12, progress: 0.25 },
+    body: { currentTime: podcast.duration * 0.25 },
   });
 
   await signIn(page);
@@ -198,7 +202,7 @@ test("an episode has its own page with progress, finishing and discarding", asyn
   const third = podcast.episode("Episode 3: Evening 3");
   await api.call(`/api/me/progress/${podcast.id}/${third}`, {
     method: "PATCH",
-    body: { currentTime: 3, duration: 12, progress: 0.25 },
+    body: { currentTime: podcast.duration * 0.25 },
   });
 
   await signIn(page);
@@ -249,14 +253,14 @@ test("an administrator follows the server's download queue, clears it, and remov
   for (const result of existing)
     await admin.call(`/api/items/${result.libraryItem.id}?hard=1`, { method: "DELETE" });
   const library = (await admin.call(`/api/libraries/${qa.libraries.podcasts}`)).body;
-  const folder = library.folders.find((entry: { fullPath: string }) => entry.fullPath === "/podcasts");
+  const folder = library.folders.find((entry: { fullPath: string }) => entry.fullPath === "/data/media");
   const created = (
     await admin.call("/api/podcasts", {
       method: "POST",
       body: {
         libraryId: qa.libraries.podcasts,
         folderId: folder.id,
-        path: "/podcasts/QA Slow Show",
+        path: "/data/media/QA Slow Show",
         media: {
           metadata: {
             title: "QA Slow Show",
@@ -304,14 +308,14 @@ test("removing an episode returns to its podcast only if its page is still showi
   for (const result of existing)
     await admin.call(`/api/items/${result.libraryItem.id}?hard=1`, { method: "DELETE" });
   const library = (await admin.call(`/api/libraries/${qa.libraries.podcasts}`)).body;
-  const folder = library.folders.find((entry: { fullPath: string }) => entry.fullPath === "/podcasts");
+  const folder = library.folders.find((entry: { fullPath: string }) => entry.fullPath === "/data/media");
   const created = (
     await admin.call("/api/podcasts", {
       method: "POST",
       body: {
         libraryId: qa.libraries.podcasts,
         folderId: folder.id,
-        path: "/podcasts/QA Remove Show",
+        path: "/data/media/QA Remove Show",
         media: {
           metadata: {
             title: "QA Remove Show",

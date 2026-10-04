@@ -15,6 +15,7 @@ import { type Account, canReadLibrary, DomainError, findAccount, permissions } f
 import { findLibrary, itemFor, itemsFor, mountedPath, within } from "./catalog";
 import { catalogChanged, database, managedMediaDirectory, transaction } from "./data";
 import { listsChanged, storedSchema } from "./lists";
+import { allProgress } from "./progress";
 import { remoteStream, remoteText, remoteUrl } from "./remote";
 
 const episodeInput = z.object({
@@ -168,6 +169,7 @@ export async function createPodcast(
     id,
     libraryId: library.id,
     mediaType: "podcast",
+    path,
     addedAt: Date.now(),
     updatedAt: Date.now(),
     isMissing: false,
@@ -528,17 +530,13 @@ async function download(job: Job, controller: AbortController) {
 }
 export async function clearQueue(actor: Account, itemId: string) {
   writable(actor, itemId);
-  const jobs = database()
-    .prepare("SELECT id FROM podcast_jobs WHERE item_id=? AND state IN ('queued','running')")
-    .all(itemId);
   transaction((db) =>
     db
       .prepare(
-        "UPDATE podcast_jobs SET state='cancelled',lease_until=NULL,updated_at=? WHERE item_id=? AND state IN ('queued','running')",
+        "UPDATE podcast_jobs SET state='cancelled',lease_until=NULL,updated_at=? WHERE item_id=? AND state='queued'",
       )
       .run(Date.now(), itemId),
   );
-  for (const job of jobs) globalThis.leafwakePodcasts?.running.get(String(job.id))?.abort();
   event("episode_download_queue_cleared", itemId, { libraryItemId: itemId });
   return { success: true };
 }
@@ -623,18 +621,25 @@ export function recentEpisodes(actor: Account, libraryId: string, params: URLSea
       .min(0)
       .max(100000)
       .parse(params.get("page") ?? 0);
+  const finished = new Set(
+    allProgress(actor)
+      .filter((progress) => progress.isFinished && progress.episodeId)
+      .map((progress) => `${progress.libraryItemId}:${progress.episodeId}`),
+  );
   const episodes = itemsFor(actor, libraryId)
     .flatMap((item) =>
-      (item.media.episodes ?? []).map((episode) => ({
-        ...episode,
-        libraryId,
-        podcast: {
-          id: item.id,
-          libraryItemId: item.id,
-          metadata: item.media.metadata,
-          coverPath: item.media.coverPath,
-        },
-      })),
+      (item.media.episodes ?? [])
+        .filter((episode) => !finished.has(`${item.id}:${episode.id}`))
+        .map((episode) => ({
+          ...episode,
+          libraryId,
+          podcast: {
+            id: item.id,
+            libraryItemId: item.id,
+            metadata: item.media.metadata,
+            coverPath: item.media.coverPath,
+          },
+        })),
     )
     .sort((a, b) => (b.publishedAt ?? 0) - (a.publishedAt ?? 0) || a.id.localeCompare(b.id));
   return { episodes: episodes.slice(page * limit, (page + 1) * limit), total: episodes.length, limit, page };

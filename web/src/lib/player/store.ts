@@ -194,6 +194,10 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
       sleep: { kind: "off" },
       pausedAt: null,
     });
+    const afterResetIds = outboxFor(client.connection.id)
+      .holdsFor(media.itemId, media.episodeId)
+      .map((hold) => hold.id)
+      .slice(0, 32);
     try {
       const opened = await openPlayback(client, media.itemId, media.episodeId);
       const current = get().player;
@@ -229,6 +233,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
             startTime: currentTime,
             startedAt,
             progressGeneration: opened.session.progressGeneration,
+            ...(afterResetIds.length ? { afterResetIds } : {}),
           },
           timeListening: 0,
           serverOffset: opened.serverOffset,

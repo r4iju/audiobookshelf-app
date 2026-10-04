@@ -10,7 +10,15 @@ const stateSchema = z.object({
 });
 
 export const qa = stateSchema.parse(
-  JSON.parse(readFileSync(new URL("../qa/.runtime/state.json", import.meta.url), "utf8")),
+  JSON.parse(
+    readFileSync(
+      new URL(
+        `../qa/.runtime/state-${process.env.ABS_QA_CONTAINER ?? "leafwake-web-qa"}.json`,
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  ),
 );
 
 // The variables and defaults qa/server.mjs and its fixtures start from, so specs reach the stack this run set up.
@@ -32,7 +40,15 @@ export type Account = (typeof accounts)[keyof typeof accounts];
 /** Talks to the QA server directly, as another device would, to observe server-side state. */
 export async function serverApi(account: Account) {
   const origin = stateSchema.parse(
-    JSON.parse(readFileSync(new URL("../qa/.runtime/state.json", import.meta.url), "utf8")),
+    JSON.parse(
+      readFileSync(
+        new URL(
+          `../qa/.runtime/state-${process.env.ABS_QA_CONTAINER ?? "leafwake-web-qa"}.json`,
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    ),
   ).origin;
   const login = await fetch(`${origin}/login`, {
     method: "POST",
@@ -41,6 +57,21 @@ export async function serverApi(account: Account) {
   });
   const token: string = (await login.json()).user.accessToken;
   async function call(path: string, init: { method?: string; body?: unknown } = {}) {
+    const progressPath = path.match(/^\/api\/me\/progress\/([^/]+)(?:\/([^/]+))?$/);
+    if (
+      init.method === "PATCH" &&
+      progressPath &&
+      init.body &&
+      typeof init.body === "object" &&
+      !("progressGeneration" in init.body)
+    ) {
+      // Fixture setup is a fresh manual intent; capture the same reset generation as current clients.
+      const item = await call(`/api/items/${progressPath[1]}`);
+      const generation = progressPath[2]
+        ? (item.body?.progressGenerations?.[progressPath[2]] ?? 0)
+        : (item.body?.progressGeneration ?? 0);
+      init = { ...init, body: { ...init.body, progressGeneration: generation } };
+    }
     const response = await fetch(origin + path, {
       method: init.method ?? "GET",
       headers: {
@@ -68,7 +99,7 @@ export async function signIn(page: Page, account: Account = accounts.user, serve
   await page.goto(`${clientPath}/connect?server=${encodeURIComponent(serverUrl)}`);
   await page.getByLabel("Username").fill(account.username);
   await page.getByLabel("Password").fill(account.password);
-  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page.getByRole("navigation", { name: "Library" })).toBeVisible();
 }
 
@@ -77,7 +108,12 @@ export async function itemIdByTitle(title: string) {
   const { body } = await api.call(
     `/api/libraries/${qa.libraries.books}/search?q=${encodeURIComponent(title)}`,
   );
-  return body.book[0].libraryItem.id as string;
+  const match = body.book.find(
+    (entry: { libraryItem: { id: string; media: { metadata: { title: string } } } }) =>
+      entry.libraryItem.media.metadata.title === title,
+  );
+  if (!match) throw new Error(`No fixture item titled ${title}`);
+  return match.libraryItem.id as string;
 }
 
 export async function clearProgress(api: Awaited<ReturnType<typeof serverApi>>, itemId: string) {

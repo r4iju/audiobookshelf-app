@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { constants } from "node:fs";
 import { mkdir, open, realpath, rename, rm } from "node:fs/promises";
 import { basename, extname, resolve } from "node:path";
+import type { DatabaseSync } from "node:sqlite";
 import { z } from "zod";
 import { type metadataEditInput, providerSettingsInput } from "@/lib/abs/item-management";
 import { libraryItemSchema } from "@/lib/abs/schemas";
@@ -17,6 +18,7 @@ import {
 } from "./accounts";
 import { catalogUpload, findLibrary, itemFor, metadataIdentity, mountedPath, within } from "./catalog";
 import { catalogChanged, database, dataDirectory, managedMediaDirectory, transaction } from "./data";
+import { imageType } from "./image-format";
 import { remoteStream, remoteUrl } from "./remote";
 
 export { metadataEditInput, providerSettingsInput } from "@/lib/abs/item-management";
@@ -27,40 +29,59 @@ function authority(actor: Account, permission: "update" | "delete" | "upload") {
     throw new DomainError(403, `The ${permission} permission is required`);
   return current;
 }
-export function editMetadata(actor: Account, id: string, input: z.infer<typeof metadataEditInput>) {
-  const result = transaction((db) => {
-    const current = authority(actor, "update"),
-      item = itemFor(current, id);
-    const refs = (
-      kind: "authors" | "series",
-      entries: { id?: string; name: string; sequence?: string | null }[],
-    ) =>
-      entries.map((entry) => {
-        return { ...entry, ...metadataIdentity(kind, entry.name, item.media.metadata[kind] ?? []) };
-      });
-    const patch = input.metadata ?? {};
-    const metadata = {
-      ...item.media.metadata,
-      ...patch,
-      ...(patch.authors
-        ? { authors: refs("authors", patch.authors), authorName: patch.authors.map((a) => a.name).join(", ") }
-        : {}),
-      ...(patch.series ? { series: refs("series", patch.series) } : {}),
-    };
-    const value = libraryItemSchema.parse({
-      ...item,
-      updatedAt: Date.now(),
-      media: { ...item.media, metadata, tags: input.tags ?? item.media.tags },
+function editMetadataInTransaction(
+  db: DatabaseSync,
+  actor: Account,
+  id: string,
+  input: z.infer<typeof metadataEditInput>,
+) {
+  const current = authority(actor, "update"),
+    item = itemFor(current, id);
+  const refs = (
+    kind: "authors" | "series",
+    entries: { id?: string; name: string; sequence?: string | null }[],
+  ) =>
+    entries.map((entry) => {
+      return { ...entry, ...metadataIdentity(kind, entry.name, item.media.metadata[kind] ?? []) };
     });
-    db.prepare("UPDATE catalog_items SET content=? WHERE id=?").run(JSON.stringify(value), id);
-    db.prepare(
-      "INSERT INTO metadata_overrides VALUES(?,?) ON CONFLICT(item_id) DO UPDATE SET content=excluded.content",
-    ).run(id, JSON.stringify({ metadata: value.media.metadata, tags: value.media.tags }));
-    return value;
+  const patch = input.metadata ?? {};
+  const metadata = {
+    ...item.media.metadata,
+    ...patch,
+    ...(patch.authors
+      ? { authors: refs("authors", patch.authors), authorName: patch.authors.map((a) => a.name).join(", ") }
+      : {}),
+    ...(patch.series ? { series: refs("series", patch.series) } : {}),
+  };
+  const value = libraryItemSchema.parse({
+    ...item,
+    updatedAt: Date.now(),
+    media: { ...item.media, metadata, tags: input.tags ?? item.media.tags },
   });
+  db.prepare("UPDATE catalog_items SET content=? WHERE id=?").run(JSON.stringify(value), id);
+  db.prepare(
+    "INSERT INTO metadata_overrides VALUES(?,?) ON CONFLICT(item_id) DO UPDATE SET content=excluded.content",
+  ).run(id, JSON.stringify({ metadata: value.media.metadata, tags: value.media.tags }));
+  return value;
+}
+export function editMetadata(actor: Account, id: string, input: z.infer<typeof metadataEditInput>) {
+  const result = transaction((db) => editMetadataInTransaction(db, actor, id, input));
   catalogChanged();
   return result;
 }
+export function editMetadataBatch(
+  actor: Account,
+  entries: { id: string; mediaPayload: z.infer<typeof metadataEditInput> }[],
+) {
+  if (new Set(entries.map((entry) => entry.id)).size !== entries.length)
+    throw new DomainError(400, "Batch item IDs must be unique");
+  const result = transaction((db) =>
+    entries.map((entry) => editMetadataInTransaction(db, actor, entry.id, entry.mediaPayload)),
+  );
+  catalogChanged();
+  return result;
+}
+
 export function removeCatalogItem(actor: Account, id: string) {
   transaction((db) => {
     const current = authority(actor, "delete");
@@ -127,39 +148,6 @@ async function bodyBytes(request: Request, max: number) {
     await reader.cancel();
   }
   return Buffer.concat(chunks);
-}
-export function imageType(bytes: Buffer) {
-  let width = 0,
-    height = 0,
-    type = "";
-  if (
-    bytes.length >= 33 &&
-    bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) &&
-    bytes.toString("ascii", 12, 16) === "IHDR"
-  ) {
-    width = bytes.readUInt32BE(16);
-    height = bytes.readUInt32BE(20);
-    type = "image/png";
-  } else if (bytes[0] === 255 && bytes[1] === 216) {
-    let offset = 2;
-    while (offset + 4 < bytes.length) {
-      if (bytes[offset] !== 255) break;
-      const marker = bytes[offset + 1] ?? 0;
-      if (marker === 218 || marker === 217) break;
-      const length = bytes.readUInt16BE(offset + 2);
-      if (length < 2 || offset + length + 2 > bytes.length) break;
-      if ([192, 193, 194].includes(marker) && length >= 8) {
-        height = bytes.readUInt16BE(offset + 5);
-        width = bytes.readUInt16BE(offset + 7);
-        type = "image/jpeg";
-        break;
-      }
-      offset += length + 2;
-    }
-  }
-  if (!width || !height || width > 8192 || height > 8192 || width * height > 20000000)
-    throw new DomainError(400, "Use a valid PNG or JPEG cover under 20 million pixels");
-  return type;
 }
 let coverUploads = 0;
 export async function saveCover(request: Request, authorize: () => Account, id: string) {

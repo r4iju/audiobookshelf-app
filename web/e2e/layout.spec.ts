@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
-import { accounts, clearProgress, itemIdByTitle, serverApi, signIn } from "./qa";
+import { accounts, clearProgress, itemIdByTitle, qa, serverApi, signIn } from "./qa";
 
 // "The Long Tide": three 30 s chapters. The library page ends with its pager.
 
@@ -92,7 +92,8 @@ test("the expanded player on a phone moves between chapters", async ({ page }) =
 test("going back to a list returns to where it was scrolled", async ({ page }) => {
   await page.setViewportSize(phone);
   await play(page);
-  await openLibrary(page);
+  await page.goto(`/library/${qa.libraries.books}/items?sort=media.metadata.title`);
+  await expect(pager(page)).toBeVisible();
   await page
     .getByRole("link", { name: /Catalog Volume 10/ })
     .first()

@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { expect, type Page, test } from "@playwright/test";
+import { type BrowserContext, expect, type Page, test } from "@playwright/test";
 import { type Account, accounts, clearProgress, itemIdByTitle, qa, serverApi } from "./qa";
 
 // The prefixed one-image product on 19882. Plain-HTTP hostname journeys cover browser fallback APIs;
@@ -196,9 +196,28 @@ async function bookAt40() {
   return { api, id };
 }
 
+// These journeys exercise the client fallback for servers without generation fencing.
+// The replacement advertises fencing and can safely finish a reset before an older delivery answers.
+async function withoutGenerationFencing(context: BrowserContext) {
+  await context.route("**/api/items/*", async (route) => {
+    const url = new URL(route.request().url());
+    url.host = "127.0.0.1:19882";
+    const response = await route.fetch({ url: url.href });
+    if (!response.headers()["content-type"]?.includes("application/json")) {
+      await route.fulfill({ response });
+      return;
+    }
+    const body = await response.json();
+    delete body.progressGeneration;
+    delete body.progressGenerations;
+    await route.fulfill({ response, json: body });
+  });
+}
+
 test("on this plain-HTTP origin, a discard waits for listening another tab is sending, and finishes once that tab hears back", async ({
   context,
 }) => {
+  await withoutGenerationFencing(context);
   const { api, id } = await bookAt40();
   const discarding = await context.newPage();
   await signInHere(discarding, accounts.user);
@@ -237,6 +256,7 @@ test("on this plain-HTTP origin, a discard waits for listening another tab is se
 test("on this plain-HTTP origin, listening that failed without an answer leaves keeping or discarding to the user", async ({
   context,
 }) => {
+  await withoutGenerationFencing(context);
   const { api, id } = await bookAt40();
   const discarding = await context.newPage();
   await signInHere(discarding, accounts.user);

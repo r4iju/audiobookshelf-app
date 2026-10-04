@@ -9,6 +9,7 @@ import { type Begun, beginPublishing, finishSending, reattempt, thisPage } from 
 
 export const listeningReportSchema = z.object({
   progressGeneration: z.number().int().nonnegative().optional(),
+  afterResetIds: z.array(z.string().min(1).max(256)).max(32).optional(),
   id: z.string(),
   libraryItemId: z.string(),
   episodeId: z.string().nullable(),
@@ -42,6 +43,7 @@ export type ReportIdentity = Pick<
   | "startTime"
   | "startedAt"
   | "progressGeneration"
+  | "afterResetIds"
 >;
 
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -151,10 +153,31 @@ export function createOutbox(
   const holdPrefix = `abs-web:v1:outbox-hold:${connectionId}:`;
   const listeners = new Set<() => void>();
 
+  const resetPrefix = `abs-web:v1:reset-receipt:${connectionId}:`;
+  const receiptSchema = z.object({
+    libraryItemId: z.string(),
+    episodeId: z.string().nullable(),
+    progressGeneration: z.number().int().nonnegative(),
+  });
+  const rebase = (report: ListeningReport): ListeningReport => {
+    let generation = report.progressGeneration;
+    for (const id of report.afterResetIds ?? []) {
+      try {
+        const receipt = receiptSchema.safeParse(JSON.parse(storage.read(`${resetPrefix}${id}`) ?? "null"));
+        if (
+          receipt.success &&
+          receipt.data.libraryItemId === report.libraryItemId &&
+          receipt.data.episodeId === report.episodeId
+        )
+          generation = Math.max(generation ?? 0, receipt.data.progressGeneration);
+      } catch {}
+    }
+    return generation === report.progressGeneration ? report : { ...report, progressGeneration: generation };
+  };
   const load = (): ListeningReport[] => {
     try {
       const parsed = queueSchema.safeParse(JSON.parse(storage.read(key) ?? "[]"));
-      return parsed.success ? parsed.data : [];
+      return parsed.success ? parsed.data.map(rebase) : [];
     } catch {
       return [];
     }
@@ -196,7 +219,13 @@ export function createOutbox(
   return {
     pending: load,
     record(report: ListeningReport) {
-      save([...load().filter((entry) => entry.id !== report.id), report]);
+      save([...load().filter((entry) => entry.id !== report.id), rebase(report)]);
+    },
+    resetFinished(hold: Hold, progressGeneration: number) {
+      const receipt = receiptSchema.parse({ ...hold, progressGeneration });
+      storage.write(`${resetPrefix}${hold.id}`, JSON.stringify(receipt));
+      // Only new playback explicitly tied to this pending reset is rebased. Old offline sessions stay fenced.
+      notify();
     },
     forget(libraryItemId: string, episodeId: string | null) {
       save(load().filter((entry) => entry.libraryItemId !== libraryItemId || entry.episodeId !== episodeId));
@@ -318,7 +347,8 @@ export function createOutbox(
       return { kind: "sent", delivered: results.filter((result) => result.success).length };
     },
     /** Whether this outbox keeps its queue or holds under the storage key. */
-    stores: (storageKey: string) => storageKey === key || storageKey.startsWith(holdPrefix),
+    stores: (storageKey: string) =>
+      storageKey === key || storageKey.startsWith(holdPrefix) || storageKey.startsWith(resetPrefix),
     /** Tells listeners that another tab changed this outbox. */
     changed: notify,
     subscribe(listener: () => void) {

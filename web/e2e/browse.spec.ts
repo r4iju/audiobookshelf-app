@@ -202,16 +202,16 @@ test("the bookshelf and a series' books can be shown as a list with each book's 
 test("each page's title names what it shows, after loading it and after moving to it", async ({ page }) => {
   await signIn(page);
   await page.goto(`/library/${qa.libraries.books}/items?sort=media.metadata.title&desc=1`);
-  await expect(page).toHaveTitle("Audiobooks · Audiobookshelf");
+  await expect(page).toHaveTitle("Audiobooks · Leafwake");
 
   await grid(page)
     .getByRole("link", { name: /The Long Tide/ })
     .click();
   await expect(page.getByRole("heading", { level: 1, name: "The Long Tide" })).toBeVisible();
-  await expect(page).toHaveTitle("The Long Tide · Audiobookshelf");
+  await expect(page).toHaveTitle("The Long Tide · Leafwake");
 
   await page.getByRole("link", { name: "Settings" }).click();
-  await expect(page).toHaveTitle("Settings · Audiobookshelf");
+  await expect(page).toHaveTitle("Settings · Leafwake");
   await page.reload();
-  await expect(page).toHaveTitle("Settings · Audiobookshelf");
+  await expect(page).toHaveTitle("Settings · Leafwake");
 });

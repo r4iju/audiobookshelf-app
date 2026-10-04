@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { languages } from "../src/i18n/languages";
 import { accounts, choose, qa, serverApi, signIn } from "./qa";
@@ -528,9 +529,15 @@ for (const code of ["ar", "he"] as const) {
     const pageNumber = page.locator("#reader-page");
     await expect(pageNumber).toHaveValue("1");
 
+    const labels: Record<string, string> = Object.assign(
+      {},
+      ...["drafts", "native-strings"].map((folder) =>
+        JSON.parse(readFileSync(new URL(`../src/i18n/${folder}/${code}.json`, import.meta.url), "utf8")),
+      ),
+    );
     // Next sits at the left end of the bar, pointing left, and Previous at the right end, pointing right.
-    const next = page.getByRole("button", { name: "Next page" });
-    const previous = page.getByRole("button", { name: "Previous page" });
+    const next = page.getByRole("button", { name: labels.WebNextPage ?? "Next page" });
+    const previous = page.getByRole("button", { name: labels.WebPreviousPage ?? "Previous page" });
     expect((await next.boundingBox())?.x ?? 0).toBeLessThan((await previous.boundingBox())?.x ?? 0);
     await expect(next.locator("svg.lucide-chevron-left")).toHaveCount(1);
     await expect(previous.locator("svg.lucide-chevron-right")).toHaveCount(1);
@@ -543,13 +550,15 @@ for (const code of ["ar", "he"] as const) {
     await expect(pageNumber).toHaveValue("2");
 
     // A swipe towards the right brings the next page in from the left.
-    const image = page.getByRole("main").getByRole("img", { name: /^Page \d+$/ });
+    const image = page.getByRole("main").getByRole("img", {
+      name: (labels.WebPage ?? "Page {0}").replace("{0}", new Intl.NumberFormat(code).format(2)),
+    });
     await image.dispatchEvent("pointerdown", { pointerType: "touch", clientX: 100, clientY: 300 });
     await image.dispatchEvent("pointerup", { pointerType: "touch", clientX: 260, clientY: 310 });
     await expect(pageNumber).toHaveValue("3");
 
     // Keys in an open dialog stay with the dialog.
-    await page.getByRole("button", { name: "Pages" }).click();
+    await page.getByRole("button", { name: labels.WebComicPages ?? "Pages" }).click();
     await page.keyboard.press("ArrowLeft");
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);

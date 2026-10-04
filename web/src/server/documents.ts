@@ -3,7 +3,6 @@ import type { ReadStream } from "node:fs";
 import { basename } from "node:path";
 import { Readable } from "node:stream";
 import { ZipFile } from "yazl";
-import { z } from "zod";
 import { type Account, DomainError, permissions } from "./accounts";
 import { itemFor } from "./catalog";
 import { openMediaFile, serveFile } from "./playback";
@@ -31,7 +30,6 @@ export async function downloadItem(request: Request, authorize: () => Account, i
     throw new DomainError(403, "Downloads are not allowed");
   const files = item.libraryFiles ?? [];
   if (!files.length || item.isMissing) throw new DomainError(404, "Not found");
-  if (files.length === 1) return serveFile(request, authorize, itemId, z.string().parse(files[0]?.ino), true);
   if (files.length > 2048) throw new DomainError(422, "Too many archive files");
   // A generated archive has no stable byte layout for resumption; individual file downloads support ranges.
   if (request.headers.has("range")) throw new DomainError(416, "Use individual file downloads for ranges");

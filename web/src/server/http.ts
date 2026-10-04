@@ -1,3 +1,4 @@
+import { bookmarkInput, bookmarkTime, changeBookmark, deleteBookmark } from "./bookmarks";
 import { editLibrary, editLibrarySchema, managedLibraries, removeLibrary } from "./catalog";
 import {
   devicesFor,
@@ -44,6 +45,7 @@ import "./realtime";
 import { z } from "zod";
 import { backupConfigurationSchema } from "@/lib/abs/backup-settings";
 import { readiness } from "../../diagnostics.mjs";
+import { version } from "../../package.json";
 import {
   accountResponse,
   authenticate,
@@ -87,6 +89,7 @@ import { downloadItem, serveEbook } from "./documents";
 import {
   cover,
   editMetadata,
+  editMetadataBatch,
   metadataEditInput,
   metadataSearch,
   providerSettings,
@@ -99,6 +102,7 @@ import {
 } from "./item-management";
 import { importLists, inspectLists, listImportSchema } from "./list-migration";
 import {
+  allListsFor,
   changeList,
   createList,
   createListSchema,
@@ -193,7 +197,7 @@ export function serverStatus() {
   if (!ready) setupKey();
   return json({
     app: "Leafwake",
-    serverVersion: "1.0.0-dev",
+    serverVersion: version,
     isInit: ready,
     language: serverSettings().language,
     serverName: serverSettings().serverName,
@@ -421,6 +425,19 @@ export async function api(request: Request) {
       return json(recentSessions(user, input.limit, input.page));
     }
     if (path === "/api/me/listening-stats" && request.method === "GET") return json(listeningStats(user));
+    const bookmarkRoute = path.match(/^\/api\/me\/item\/([^/]+)\/bookmark(?:\/([^/]+))?$/);
+    if (bookmarkRoute) {
+      const id = z.string().parse(bookmarkRoute[1]);
+      if (!bookmarkRoute[2] && ["POST", "PATCH"].includes(request.method)) {
+        const input = bookmarkInput.parse(await body(request));
+        return json(changeBookmark(authenticate(token), id, input, request.method === "POST"));
+      }
+      if (bookmarkRoute[2] && request.method === "DELETE") {
+        sameOrigin(request);
+        deleteBookmark(user, id, bookmarkTime.parse(Number(bookmarkRoute[2])));
+        return json({ success: true });
+      }
+    }
     const resetRoute = path.match(/^\/api\/me\/progress\/([^/]+)(?:\/([^/]+))?\/reset$/);
     if (resetRoute && request.method === "POST") {
       sameOrigin(request);
@@ -526,6 +543,7 @@ export async function api(request: Request) {
       const kind = listRoute[1] === "collections" ? "collection" : "playlist";
       const id = listRoute[2],
         action = listRoute[3];
+      if (!id && request.method === "GET") return json({ [listRoute[1] as string]: allListsFor(user, kind) });
       if (!id && request.method === "POST")
         return json(createList(user, kind, createListSchema.parse(await body(request))));
       if (id && !action) {
@@ -620,6 +638,7 @@ export async function api(request: Request) {
       if (action === "scans" && request.method === "GET") return json({ scans: scanHistory(user, id) });
       if (request.method === "GET") {
         const items = itemsFor(user, id);
+        if (!action && !new URL(request.url).searchParams.has("include")) return json(findLibrary(id));
         if (!action)
           return json({
             library: findLibrary(id),
@@ -658,6 +677,15 @@ export async function api(request: Request) {
         sameOrigin(request);
         return json(await saveCover(request, () => authenticate(token), id));
       }
+    }
+    if (path === "/api/items/batch/update" && request.method === "POST") {
+      sameOrigin(request);
+      const entries = z
+        .array(z.object({ id: z.string().min(1).max(256), mediaPayload: metadataEditInput }).strict())
+        .min(1)
+        .max(100)
+        .parse(await body(request, 131072));
+      return json(editMetadataBatch(user, entries));
     }
     const editRoute = path.match(/^\/api\/items\/([^/]+)\/media$/);
     if (editRoute && request.method === "PATCH") {
