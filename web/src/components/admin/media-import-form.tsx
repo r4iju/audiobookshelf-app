@@ -1,10 +1,13 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Alert } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import { type MediaImportReport, mediaImportReportSchema, mediaInspectSchema } from "@/lib/abs/imports";
 import { useAbs } from "@/lib/session/store";
 
@@ -16,6 +19,8 @@ type Result =
   | { kind: "completed"; items: number };
 const completedSchema = z.object({ scope: z.literal("media"), report: mediaImportReportSchema });
 export function MediaImportForm() {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const [result, submit, pending] = useActionState<Result, FormData>(
@@ -63,55 +68,60 @@ export function MediaImportForm() {
     },
     { kind: "idle" },
   );
-  if (result.kind === "completed")
-    return (
-      <p role="status">
-        Imported {result.items} media items. Validate playback and remaining migration stages before cutover.
-      </p>
-    );
+  if (result.kind === "completed") return <p role="status">{t("WebMediaImportComplete", result.items)}</p>;
   const input = result.kind === "inspected" ? result.input : null;
   return (
-    <form action={submit} className="space-y-4">
-      <p>
-        Use the same closed SQLite copy as your account import. Map an original media folder onto an existing
-        mounted folder. The destination catalog must be empty.
-      </p>
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={submit}
+      className="space-y-4"
+    >
+      <p>{t("WebAdminUseTheSameClosedSQLiteCopyAs")}</p>
       <TextField
         name="sourcePath"
-        label="Source database copy"
+        label={t("WebAdminSourceDatabaseCopy")}
         required
         defaultValue={input?.sourcePath}
         placeholder="/imports/absdatabase.sqlite"
       />
       <TextField
         name="originalPrefix"
-        label="Original media folder"
+        label={t("WebAdminOriginalMediaFolder")}
         required
         defaultValue={input?.mappings[0]?.from}
         placeholder="/original/audiobooks"
       />
       <TextField
         name="mountedPrefix"
-        label="Mounted media folder"
+        label={t("WebAdminMountedMediaFolder")}
         required
         defaultValue={input?.mappings[0]?.to}
         placeholder="/media/audiobooks"
       />
-      {result.kind === "error" ? <Alert>{result.message}</Alert> : null}
+      {result.kind === "error" ? (
+        <FormFeedback submission={result} id={feedbackId}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
+      ) : null}
       {result.kind === "inspected" ? (
         <div className="space-y-3" role="status">
           <p>
-            {result.report.counts.libraries} libraries · {result.report.counts.items} items ·{" "}
-            {result.report.counts.files} files · {result.report.counts.progress} progress records ·{" "}
-            {result.report.counts.bookmarks} bookmarks · {result.report.counts.listeningSeconds} seconds
-            listened
+            {t(
+              "WebMediaCounts",
+              result.report.counts.libraries,
+              result.report.counts.items,
+              result.report.counts.files,
+              result.report.counts.progress,
+              result.report.counts.bookmarks,
+              result.report.counts.listeningSeconds,
+            )}
           </p>
           {result.report.errors.length ? (
             <Alert>
               <ul>
                 {result.report.errors.map((error) => (
                   <li key={JSON.stringify(error)}>
-                    {error.table}: {error.message}
+                    {error.table}: {adminMessage(error.message, t)}
                   </li>
                 ))}
               </ul>
@@ -119,7 +129,7 @@ export function MediaImportForm() {
           ) : null}
           {result.report.remainingData.length ? (
             <div>
-              <h3 className="font-semibold">Data requiring remaining migration stages</h3>
+              <h3 className="font-semibold">{t("WebAdminDataRequiringRemainingMigrationStages")}</h3>
               <ul>
                 {result.report.remainingData.map((row) => (
                   <li key={row.table}>
@@ -132,23 +142,23 @@ export function MediaImportForm() {
               </ul>
             </div>
           ) : (
-            <p>No unmapped records were found in this stage.</p>
+            <p>{t("WebAdminNoUnmappedRecordsWereFoundInThis")}</p>
           )}
           {result.report.notices.map((notice) => (
             <p key={notice} className="text-sm text-muted">
               {notice}
             </p>
           ))}
-          <p>Full cutover is not yet approved by this inventory.</p>
+          <p>{t("WebAdminFullCutoverIsNotYetApprovedBy")}</p>
         </div>
       ) : null}
       <div className="flex flex-wrap gap-3">
         <Button type="submit" name="intent" value="inspect" disabled={pending}>
-          Inspect source copy
+          {t("WebAdminInspectSourceCopy")}
         </Button>
         {result.kind === "inspected" && result.report.canImport ? (
           <Button type="submit" name="intent" value="commit" disabled={pending} variant="secondary">
-            Import media and history
+            {t("WebAdminImportMediaAndHistory")}
           </Button>
         ) : null}
       </div>

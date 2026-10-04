@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Napredak ostaje zadržan. Sada ponovno pokrenite poslužitelj Audiobookshelf{0}, zatim ovdje potvrdite. Preglednik ne može otkriti ponovno pokretanje; inače brisanje može ukloniti napredak poslan nakon potvrde. Potvrda se odnosi samo na zahtjeve ovog preglednika poslane prije odabira ponovnog pokretanja; kasniji ostaju zadržani.",
   "WebHeldRestartUnreadable": "Napredak je zadržan. Zapis zahtjeva za ponovno pokretanje nije čitljiv pa nije poznato koje će zahtjeve ponovno pokretanje završiti. Ponovno odaberite „Ponovno pokreni poslužitelj” i na upit ponovno pokrenite poslužitelj Audiobookshelf{0}.",
   "WebServerRestarted": "Ponovno sam pokrenuo/la poslužitelj",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Preskoči na sadržaj",
   "WebServerAddressHelp": "Adresa poslužitelja Audiobookshelf, uključujući eventualnu podputanju, primjerice https://home.example/audiobookshelf",
   "WebContinue": "Nastavi",

@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Průběh zůstává pozastaven. Nyní restartujte server Audiobookshelf{0} a poté to zde potvrďte. Prohlížeč restart nezjistí; jinak může probíhající mazání odstranit průběh odeslaný po potvrzení. Potvrzení se týká pouze požadavků tohoto prohlížeče odeslaných před volbou restartu; pozdější zůstávají pozastavené.",
   "WebHeldRestartUnreadable": "Průběh je pozastaven. Záznam požadavku na restart nelze přečíst, takže nelze určit, které požadavky restart ukončí. Znovu zvolte „Restartovat server“ a na výzvu restartujte server Audiobookshelf{0}.",
   "WebServerRestarted": "Restartoval(a) jsem server",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Přeskočit na obsah",
   "WebServerAddressHelp": "Adresa serveru Audiobookshelf včetně případné podcesty, například https://home.example/audiobookshelf",
   "WebContinue": "Pokračovat",

@@ -1,11 +1,14 @@
 "use client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Section } from "@/components/ui/section";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import { backupConfigurationSchema, backupSettingsSchema } from "@/lib/abs/backup-settings";
 import { useAbs } from "@/lib/session/store";
 import { DeliveryImportForm } from "./delivery-import-form";
@@ -57,6 +60,7 @@ type Result =
   | { kind: "saved"; message: string }
   | { kind: "restored" };
 export function MigrationScreen() {
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const backups = useQuery({
     queryKey: [connection.id, "backups"],
@@ -68,33 +72,27 @@ export function MigrationScreen() {
   });
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">Migration and backups</h1>
-      <p>
-        Account import is the first migration stage. Complete and validate media, progress, lists and
-        configuration before replacing your original installation.
-      </p>
-      <Section title="Import media and listening history">
+      <h1 className="text-2xl font-bold">{t("WebAdminMigrationAndBackups")}</h1>
+      <p>{t("WebAdminAccountImportIsTheFirstMigrationStage")}</p>
+      <Section title={t("WebAdminImportMediaAndListeningHistory")}>
         <MediaImportForm />
       </Section>
-      <Section title="Import original lists">
+      <Section title={t("WebAdminImportOriginalLists")}>
         <ListImportForm />
       </Section>
-      <Section title="Import feeds and ebook delivery">
+      <Section title={t("WebAdminImportFeedsAndEbookDelivery")}>
         <DeliveryImportForm />
       </Section>
-      <Section title="Product backups">
+      <Section title={t("WebAdminProductBackups")}>
         <p className="text-sm text-muted">
-          Backups preserve the database, configuration, metadata and private encryption key. Media files,
-          including uploads and downloaded podcast episodes, require a separate copy of their mounts and
-          managed media directory. Only the owner can create or restore backups. Treat the backup files as
-          private credentials.
+          {t("WebAdminBackupsPreserveTheDatabaseConfigurationMetadataAnd")}
         </p>
         <BackupScheduleForm />
         <BackupAction />
         {backups.isPending ? (
-          <Spinner label="Loading backups" />
+          <Spinner label={t("WebAdminLoadingBackups")} />
         ) : backups.isError ? (
-          <Alert>{backups.error.message}</Alert>
+          <Alert>{adminMessage(backups.error.message, t)}</Alert>
         ) : backups.data.backups.length ? (
           <ul className="space-y-4">
             {backups.data.backups.map((backup) => (
@@ -105,12 +103,12 @@ export function MigrationScreen() {
                 <code className="break-all text-xs">{backup.id}</code>
                 <p className="text-sm text-muted">
                   {backup.keyIncluded
-                    ? "Includes the encryption key; media files excluded."
-                    : "Earlier database-only backup. Preserve this installation’s key separately."}
+                    ? t("WebAdminIncludesTheEncryptionKeyMediaFilesExcluded")
+                    : t("WebAdminEarlierDatabaseOnlyBackupPreserveThisInstallation")}
                 </p>
                 {backup.media ? (
                   <details>
-                    <summary>Required media mounts</summary>
+                    <summary>{t("WebAdminRequiredMediaMounts")}</summary>
                     <ul className="break-all text-sm">
                       {[...new Set([...backup.media.requiredMounts, backup.media.managedDirectory])].map(
                         (path) => (
@@ -125,34 +123,40 @@ export function MigrationScreen() {
             ))}
           </ul>
         ) : (
-          <EmptyState title="No backups yet" />
+          <EmptyState title={t("WebAdminNoBackupsYet")} />
         )}
       </Section>
-      <Section title="Storage and job diagnostics">
+      <Section title={t("WebAdminStorageAndJobDiagnostics")}>
         <Diagnostics />
       </Section>
-      <Section title="Completed migration stages">
+      <Section title={t("WebAdminCompletedMigrationStages")}>
         {migrations.isPending ? (
-          <Spinner label="Loading migration records" />
+          <Spinner label={t("WebAdminLoadingMigrationRecords")} />
         ) : migrations.isError ? (
-          <Alert>{migrations.error.message}</Alert>
+          <Alert>{adminMessage(migrations.error.message, t)}</Alert>
         ) : migrations.data.migrations.length ? (
           <ul>
             {migrations.data.migrations.map((migration) => (
               <li key={migration.id}>
-                {migration.scope}: {migration.accountCount} accounts ·{" "}
-                {new Date(migration.completedAt).toLocaleString()}
+                {t(
+                  "WebMigrationReceipt",
+                  migration.accountCount,
+                  migration.scope,
+                  new Date(migration.completedAt).toLocaleString(),
+                )}
               </li>
             ))}
           </ul>
         ) : (
-          <EmptyState title="No migration records" />
+          <EmptyState title={t("WebAdminNoMigrationRecords")} />
         )}
       </Section>
     </div>
   );
 }
 function BackupAction({ backupId }: { backupId?: string }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const [result, submit, pending] = useActionState<Result, FormData>(
@@ -183,87 +187,94 @@ function BackupAction({ backupId }: { backupId?: string }) {
   if (result.kind === "restored")
     return (
       <div className="space-y-2">
-        <p>Backup restored. Sign in again with an account from that backup.</p>
-        <ButtonLink href="/connect">Sign in</ButtonLink>
+        <p>{t("WebAdminBackupRestoredSignInAgainWithAn")}</p>
+        <ButtonLink href="/connect">{t("WebSignIn")}</ButtonLink>
       </div>
     );
   return (
-    <form action={submit} className="space-y-3">
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={submit}
+      className="space-y-3"
+    >
       {backupId ? (
         <>
-          <p className="text-sm">
-            Restoring replaces the current database and signs out all sessions. Create a current backup first
-            and wait for scans and media jobs to finish, then enter RESTORE to confirm. For a new
-            installation, use the image maintenance CLI with an empty data volume and restore media mounts
-            separately.
-          </p>
-          <TextField name="confirmation" label="Restore confirmation" required autoComplete="off" />
+          <p className="text-sm">{t("WebAdminRestoringReplacesTheCurrentDatabaseAndSigns")}</p>
+          <TextField
+            name="confirmation"
+            label={t("WebAdminRestoreConfirmation")}
+            required
+            autoComplete="off"
+          />
         </>
       ) : null}
       {result.kind === "error" ? (
-        <Alert>{result.message}</Alert>
+        <FormFeedback submission={result} id={feedbackId}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
       ) : result.kind === "saved" ? (
-        <p role="status">{result.message}</p>
+        <p role="status">{adminMessage(result.message, t)}</p>
       ) : null}
       <Button type="submit" disabled={pending} variant={backupId ? "secondary" : "primary"}>
-        {pending ? "Working…" : backupId ? "Restore this backup" : "Create backup"}
+        {pending
+          ? t("WebAdminWorking")
+          : backupId
+            ? t("WebAdminRestoreThisBackup")
+            : t("WebAdminCreateBackup")}
       </Button>
     </form>
   );
 }
 
 function Diagnostics() {
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const query = useQuery({
     queryKey: [connection.id, "diagnostics"],
     queryFn: ({ signal }) => client.get("/api/admin/diagnostics", diagnosticsSchema, signal),
   });
-  if (query.isPending) return <Spinner label="Checking storage and tools" />;
-  if (query.isError) return <Alert>{query.error.message}</Alert>;
+  if (query.isPending) return <Spinner label={t("WebAdminCheckingStorageAndTools")} />;
+  if (query.isError) return <Alert>{adminMessage(query.error.message, t)}</Alert>;
   const data = query.data;
   return (
     <div className="space-y-3">
       <p role="status">
-        {data.ready ? "Storage and tools are ready." : "Some installation checks need attention."}
+        {data.ready ? t("WebAdminStorageAndToolsAreReady") : t("WebAdminSomeInstallationChecksNeedAttention")}
       </p>
       {data.issues.map((issue) => (
         <Alert key={issue}>{issue}</Alert>
       ))}
       <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
         <div>
-          <dt>Database</dt>
+          <dt>{t("WebAdminDatabase")}</dt>
           <dd>
-            {data.database.integrity} · schema {data.database.schemaVersion}
+            {data.database.integrity}
+            {t("WebAdminSchema")} {data.database.schemaVersion}
           </dd>
         </div>
         <div>
-          <dt>Free storage</dt>
+          <dt>{t("WebAdminFreeStorage")}</dt>
           <dd>{Math.floor(data.storage.freeBytes / (1024 * 1024))} MiB</dd>
         </div>
         <div>
           <dt>FFmpeg</dt>
-          <dd>{data.tools.ffmpeg.version ?? "Unavailable"}</dd>
+          <dd>{data.tools.ffmpeg.version ?? t("WebAdminUnavailable")}</dd>
         </div>
         <div>
           <dt>FFprobe</dt>
-          <dd>{data.tools.ffprobe.version ?? "Unavailable"}</dd>
+          <dd>{data.tools.ffprobe.version ?? t("WebAdminUnavailable")}</dd>
         </div>
       </dl>
       <details>
-        <summary>Media mount checks</summary>
+        <summary>{t("WebAdminMediaMountChecks")}</summary>
         <ul className="break-all text-sm">
           {data.mounts.map((mount) => (
             <li key={`${mount.libraryId}:${mount.path}`}>
-              {mount.readable ? "Available" : "Unavailable"}: {mount.path}
+              {mount.readable ? t("WebAdminAvailable") : t("WebAdminUnavailable")}: {mount.path}
             </li>
           ))}
         </ul>
-        {data.mountsTruncated ? (
-          <p>
-            Only the first100 libraries and ten folders per library are shown. Check the remaining mounts on
-            the host.
-          </p>
-        ) : null}
+        {data.mountsTruncated ? <p>{t("WebAdminOnlyTheFirst100LibrariesAndTenFolders")}</p> : null}
       </details>
       {data.recentFailures.length ? (
         <ul className="space-y-2 text-sm">
@@ -272,22 +283,24 @@ function Diagnostics() {
               <p>
                 {failure.kind} · {new Date(failure.occurredAt).toLocaleString()}
               </p>
-              <p>{failure.message}</p>
+              <p>{adminMessage(failure.message, t)}</p>
               <code className="break-all">{failure.id}</code>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-muted">No failed jobs recorded.</p>
+        <p className="text-sm text-muted">{t("WebAdminNoFailedJobsRecorded")}</p>
       )}
       <Button variant="secondary" onClick={() => query.refetch()} disabled={query.isFetching}>
-        Refresh diagnostics
+        {t("WebAdminRefreshDiagnostics")}
       </Button>
     </div>
   );
 }
 
 function BackupScheduleForm() {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const query = useQuery({
@@ -319,26 +332,24 @@ function BackupScheduleForm() {
     },
     { kind: "idle" },
   );
-  if (query.isPending) return <Spinner label="Loading backup schedule" />;
-  if (query.isError) return <Alert>{query.error.message}</Alert>;
+  if (query.isPending) return <Spinner label={t("WebAdminLoadingBackupSchedule")} />;
+  if (query.isError) return <Alert>{adminMessage(query.error.message, t)}</Alert>;
   const { configuration, schedule } = query.data;
   return (
     <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
       action={submit}
       className="space-y-3 rounded-lg border border-line p-3"
       key={`${configuration.enabled}:${configuration.intervalMinutes}:${configuration.keepLast}`}
     >
-      <label className="flex gap-2">
+      <label className="flex flex-wrap gap-2">
         <input name="enabled" type="checkbox" defaultChecked={configuration.enabled} />
-        Create scheduled backups
+        {t("WebAdminCreateScheduledBackups")}
       </label>
-      <p className="text-sm text-muted">
-        Off by default. Scheduled backups retain the private key and exclude media files. Retention removes
-        only scheduled backups; manual backups are preserved.
-      </p>
+      <p className="text-sm text-muted">{t("WebAdminOffByDefaultScheduledBackupsRetainThe")}</p>
       <TextField
         name="intervalMinutes"
-        label="Backup interval in minutes"
+        label={t("WebAdminBackupIntervalInMinutes")}
         type="number"
         min={60}
         max={43200}
@@ -347,7 +358,7 @@ function BackupScheduleForm() {
       />
       <TextField
         name="keepLast"
-        label="Scheduled backups to retain"
+        label={t("WebAdminScheduledBackupsToRetain")}
         type="number"
         min={1}
         max={50}
@@ -355,21 +366,25 @@ function BackupScheduleForm() {
         defaultValue={configuration.keepLast}
       />
       {schedule.nextAt != null ? (
-        <p className="text-sm">Next backup: {new Date(schedule.nextAt).toLocaleString()}</p>
+        <p className="text-sm">
+          {t("WebAdminNextBackup")} {new Date(schedule.nextAt).toLocaleString()}
+        </p>
       ) : null}
       {schedule.lastCompletedAt != null ? (
         <p className="text-sm">
-          Last scheduled backup: {new Date(schedule.lastCompletedAt).toLocaleString()}
+          {t("WebAdminLastScheduledBackup")} {new Date(schedule.lastCompletedAt).toLocaleString()}
         </p>
       ) : null}
       {schedule.lastError ? <Alert>{schedule.lastError}</Alert> : null}
       {result.kind === "error" ? (
-        <Alert>{result.message}</Alert>
+        <FormFeedback submission={result} id={feedbackId}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
       ) : result.kind === "saved" ? (
-        <p role="status">{result.message}</p>
+        <p role="status">{adminMessage(result.message, t)}</p>
       ) : null}
       <Button type="submit" disabled={pending}>
-        {pending ? "Saving…" : "Save backup schedule"}
+        {pending ? t("WebAdminSaving") : t("WebAdminSaveBackupSchedule")}
       </Button>
     </form>
   );

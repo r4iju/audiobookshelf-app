@@ -1,13 +1,16 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { TextField, Toggle } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Section } from "@/components/ui/section";
 import { SelectField } from "@/components/ui/select";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import { permissionsSchema, userSchema } from "@/lib/abs/schemas";
 import { useAbs } from "@/lib/session/store";
 
@@ -30,21 +33,6 @@ const formSchema = z.object({
   tags: z.string(),
 });
 type Result = { kind: "idle" } | { kind: "success"; message: string } | { kind: "error"; message: string };
-const choices = [
-  { value: "user", label: "User" },
-  { value: "guest", label: "Guest" },
-  { value: "admin", label: "Administrator" },
-];
-const policyFields = [
-  ["download", "Allow downloads"],
-  ["update", "Allow metadata edits"],
-  ["delete", "Allow media deletion"],
-  ["upload", "Allow uploads"],
-  ["accessExplicitContent", "Allow explicit content"],
-  ["accessAllLibraries", "Allow all libraries"],
-  ["accessAllTags", "Allow all tags"],
-  ["selectedTagsNotAccessible", "Exclude selected tags instead of allowing them"],
-] as const;
 const split = (value: string) =>
   value
     .split(",")
@@ -52,6 +40,7 @@ const split = (value: string) =>
     .filter(Boolean);
 
 export function AccountsScreen() {
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const accounts = useQuery({
     queryKey: [connection.id, "administration", "accounts"],
@@ -59,33 +48,29 @@ export function AccountsScreen() {
   });
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">Accounts</h1>
-      <p className="text-muted">
-        Account changes revoke existing sign-ins. Library and content restrictions apply to every client.
-      </p>
+      <h1 className="text-2xl font-bold">{t("WebAdminAccounts")}</h1>
+      <p className="text-muted">{t("WebAdminAccountChangesRevokeExistingSignInsLibrary")}</p>
       {accounts.isPending ? (
-        <Spinner label="Loading accounts" />
+        <Spinner label={t("WebAdminLoadingAccounts")} />
       ) : accounts.isError ? (
-        <Alert>{accounts.error.message}</Alert>
+        <Alert>{adminMessage(accounts.error.message, t)}</Alert>
       ) : (
         <>
-          <Section title="Create account">
+          <Section title={t("WebAdminCreateAccount")}>
             <AccountForm />
           </Section>
           {accounts.data.users.length ? (
             accounts.data.users.map((account) => (
               <Section key={account.id} title={account.username}>
                 {account.type === "root" ? (
-                  <p className="text-sm text-muted">
-                    Owner account, protected from removal and role changes.
-                  </p>
+                  <p className="text-sm text-muted">{t("WebAdminOwnerAccountProtectedFromRemovalAndRole")}</p>
                 ) : (
                   <AccountForm key={JSON.stringify(account)} account={account} />
                 )}
               </Section>
             ))
           ) : (
-            <EmptyState title="No accounts" />
+            <EmptyState title={t("WebAdminNoAccounts")} />
           )}
         </>
       )}
@@ -94,6 +79,23 @@ export function AccountsScreen() {
 }
 
 function AccountForm({ account }: { account?: ManagedAccount }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
+  const choices = [
+    { value: "user", label: t("LabelUser") },
+    { value: "guest", label: t("WebAdminGuest") },
+    { value: "admin", label: t("WebAdminAdministrator") },
+  ];
+  const policyFields = [
+    ["download", t("WebAdminAllowDownloads")],
+    ["update", t("WebAdminAllowMetadataEdits")],
+    ["delete", t("WebAdminAllowMediaDeletion")],
+    ["upload", t("WebAdminAllowUploads")],
+    ["accessExplicitContent", t("WebAdminAllowExplicitContent")],
+    ["accessAllLibraries", t("WebAdminAllowAllLibraries")],
+    ["accessAllTags", t("WebAdminAllowAllTags")],
+    ["selectedTagsNotAccessible", t("WebAdminExcludeSelectedTagsInsteadOfAllowingThem")],
+  ] as const;
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const [result, submit, pending] = useActionState<Result, FormData>(
@@ -151,12 +153,17 @@ function AccountForm({ account }: { account?: ManagedAccount }) {
     { kind: "idle" },
   );
   return (
-    <form action={submit} className="flex flex-col gap-4">
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      aria-label={account ? t("WebAccountForm", account.username) : t("WebAdminCreateAccount")}
+      action={submit}
+      className="flex flex-col gap-4"
+    >
       <fieldset disabled={pending} className="flex flex-col gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
             name="username"
-            label="Username"
+            label={t("LabelUsername")}
             required
             minLength={3}
             maxLength={64}
@@ -166,15 +173,26 @@ function AccountForm({ account }: { account?: ManagedAccount }) {
           <TextField
             name="password"
             type="password"
-            label={account ? "New password" : "Password"}
+            label={account ? t("WebAdminNewPassword") : t("LabelPassword")}
             required={!account}
             minLength={12}
             maxLength={512}
             autoComplete="new-password"
-            help={account ? "Leave empty to keep the existing password" : "Use at least 12 characters"}
+            help={
+              account ? t("WebAdminLeaveEmptyToKeepTheExistingPassword") : t("WebAdminUseAtLeast12Characters")
+            }
           />
-          <SelectField name="type" label="Role" options={choices} defaultValue={account?.type ?? "user"} />
-          <Toggle name="isActive" label="Account enabled" defaultChecked={account?.isActive ?? true} />
+          <SelectField
+            name="type"
+            label={t("WebAdminRole")}
+            options={choices}
+            defaultValue={account?.type ?? "user"}
+          />
+          <Toggle
+            name="isActive"
+            label={t("WebAdminAccountEnabled")}
+            defaultChecked={account?.isActive ?? true}
+          />
         </div>
         <div className="grid gap-x-6 sm:grid-cols-2">
           {policyFields.map(([key, label]) => (
@@ -192,34 +210,40 @@ function AccountForm({ account }: { account?: ManagedAccount }) {
         </div>
         <TextField
           name="libraries"
-          label="Allowed library IDs"
-          help="Separate IDs with commas. Used when all libraries are disabled."
+          label={t("WebAdminAllowedLibraryIDs")}
+          help={t("WebAdminSeparateIDsWithCommasUsedWhenAll")}
           defaultValue={account?.librariesAccessible.join(", ") ?? ""}
         />
         <TextField
           name="tags"
-          label="Selected tags"
-          help="Separate tags with commas. Used when all tags are disabled."
+          label={t("WebAdminSelectedTags")}
+          help={t("WebAdminSeparateTagsWithCommasUsedWhenAll")}
           defaultValue={account?.itemTagsSelected.join(", ") ?? ""}
         />
         <div className="flex flex-wrap gap-3">
           <Button type="submit" name="operation" value="save" variant="primary">
-            {pending ? "Saving…" : account ? "Save account" : "Create account"}
+            {pending ? t("WebAdminSaving") : account ? t("WebAdminSaveAccount") : t("WebAdminCreateAccount")}
           </Button>
           {account ? (
             <>
               <Button type="submit" name="operation" value="revoke" formNoValidate>
-                Revoke sign-ins
+                {t("WebAdminRevokeSignIns")}
               </Button>
               <Button type="submit" name="operation" value="remove" formNoValidate>
-                Remove account
+                {t("WebAdminRemoveAccount")}
               </Button>
             </>
           ) : null}
         </div>
       </fieldset>
       {result.kind !== "idle" ? (
-        <Alert tone={result.kind === "success" ? "info" : "danger"}>{result.message}</Alert>
+        <FormFeedback
+          submission={result}
+          id={feedbackId}
+          tone={result.kind === "success" ? "info" : "danger"}
+        >
+          {adminMessage(result.message, t)}
+        </FormFeedback>
       ) : null}
     </form>
   );

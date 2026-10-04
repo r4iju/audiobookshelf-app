@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Az adatok továbbra is vissza vannak tartva. Indítsa újra most az Audiobookshelf szervert{0}, majd itt erősítse meg. A böngésző nem érzékeli az újraindítást; különben a futó törlés a megerősítés után küldött adatokat is törölheti. A megerősítés csak e böngésző újraindítás választása előtt küldött kéréseire vonatkozik; a későbbiek visszatartva maradnak.",
   "WebHeldRestartUnreadable": "Az adatok vissza vannak tartva. Az újraindítási kérés bejegyzése nem olvasható, ezért nem tudható, mely kéréseket állítja le az újraindítás. Válassza ismét a „Szerver újraindítása” lehetőséget, majd a felszólításkor indítsa újra az Audiobookshelf szervert{0}.",
   "WebServerRestarted": "Újraindítottam a szervert",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Ugrás a tartalomra",
   "WebServerAddressHelp": "Az Audiobookshelf szerver címe az esetleges alútvonallal együtt, például https://home.example/audiobookshelf",
   "WebContinue": "Folytatás",

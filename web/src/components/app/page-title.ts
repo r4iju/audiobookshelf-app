@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const appName = "Audiobookshelf";
+const appName = "Leafwake";
 
 /**
  * Names each page after its main heading, which is already in the reader's language and follows the page's data as

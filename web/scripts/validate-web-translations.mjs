@@ -13,6 +13,10 @@ import {
 const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
 const snapshot = readTable("drafts", "english");
 const errors = [];
+const pendingEnglish = JSON.parse(readFileSync(`${webRoot}src/i18n/pending-english.json`, "utf8"));
+for (const [key, text] of Object.entries(pendingEnglish)) {
+  if (catalog[key] !== text) errors.push(`Stale English fallback: ${key}`);
+}
 const copiedProvenance = readTable("source-fallbacks", "provenance");
 for (const [path, hash] of Object.entries(copiedProvenance.sourceSha256)) {
   if (sha256(`${webRoot}../${path}`) !== hash) errors.push(`Copied source hash is stale: ${path}`);
@@ -55,7 +59,8 @@ for (const code of codes) {
   }
   const expected = Object.fromEntries(
     Object.entries(catalog).filter(
-      ([key, text]) => !usable(originals[key], text) && !usable(source[key], text),
+      ([key, text]) =>
+        !usable(originals[key], text) && !usable(source[key], text) && !(key in pendingEnglish),
     ),
   );
   if (!sameKeys(expected, drafts)) {
@@ -85,12 +90,19 @@ for (const code of codes) {
     entries: Object.keys(catalog).length,
     carried: Object.entries(catalog).filter(([key, text]) => usable(originals[key], text)).length,
     copiedGapSources: Object.keys(source).length,
+    pendingEnglishFallbacks: Object.entries(pendingEnglish).filter(
+      ([key, text]) =>
+        !usable(originals[key], text) && !usable(source[key], text) && !usable(drafts[key], text),
+    ).length,
     machineDrafts: Object.keys(drafts).length,
     englishIdenticalDrafts: Object.entries(drafts).filter(([key, text]) => text === catalog[key]).length,
     missing: Object.entries(catalog)
       .filter(
         ([key, text]) =>
-          !usable(originals[key], text) && !usable(source[key], text) && !usable(drafts[key], text),
+          !usable(originals[key], text) &&
+          !usable(source[key], text) &&
+          !usable(drafts[key], text) &&
+          !(key in pendingEnglish),
       )
       .map(([key]) => key),
   };
@@ -106,6 +118,7 @@ writeFileSync(
       origin: "Machine-drafted in this implementation session; not native-speaker approved.",
       policy:
         "Only actual missing web entries. Usable legacy/server/native and reviewed source-gap values take precedence. English-identical entries are counted separately, not as distinct translated wording.",
+      pendingEnglishSha256: sha256(`${webRoot}src/i18n/pending-english.json`),
       englishSha256: sha256(`${webRoot}src/i18n/drafts/english.json`),
       draftSha256: Object.fromEntries(
         codes.map((code) => [code, sha256(`${webRoot}src/i18n/drafts/${code}.json`)]),
@@ -117,5 +130,5 @@ writeFileSync(
   )}\n`,
 );
 console.log(
-  `Validated ${codes.length} languages × ${Object.keys(catalog).length} in-use entries; no missing/stale keys, placeholder or newline failures.`,
+  `Validated ${codes.length} languages × ${Object.keys(catalog).length} in-use entries; ${Object.keys(pendingEnglish).length} explicitly untranslated English fallbacks; no unaccounted missing/stale keys, placeholder or newline failures.`,
 );

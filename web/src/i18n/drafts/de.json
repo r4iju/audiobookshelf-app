@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Der Fortschritt bleibt zurückgehalten. Starte jetzt den Audiobookshelf-Server unter {0} neu und bestätige es danach hier. Dieser Browser erkennt keinen Neustart: Ohne ihn kann eine noch laufende Löschung nach der Bestätigung gesendeten Fortschritt entfernen. Die Bestätigung deckt nur Anfragen ab, die dieser Browser vor der Neustartanforderung gesendet hat; spätere bleiben zurückgehalten.",
   "WebHeldRestartUnreadable": "Der Fortschritt wird zurückgehalten, und der gespeicherte Neustartauftrag ist nicht lesbar. Deshalb ist unklar, welche Anfragen ein Neustart beenden würde. Wähle erneut „Server neu starten“ und starte den Audiobookshelf-Server unter {0} neu, wenn du dazu aufgefordert wirst.",
   "WebServerRestarted": "Ich habe den Server neu gestartet",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Zum Inhalt springen",
   "WebServerAddressHelp": "Die Adresse deines Audiobookshelf-Servers einschließlich Unterpfad, zum Beispiel https://home.example/audiobookshelf",
   "WebContinue": "Weiter",

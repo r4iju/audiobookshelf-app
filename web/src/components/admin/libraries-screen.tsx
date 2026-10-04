@@ -1,12 +1,15 @@
 "use client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { TextField, Toggle } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Section } from "@/components/ui/section";
 import { SelectField } from "@/components/ui/select";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import { type Library, librariesResponseSchema, librarySchema } from "@/lib/abs/schemas";
 import { useAbs } from "@/lib/session/store";
 
@@ -23,6 +26,7 @@ const reportSchema = z.object({
 });
 type Result = { kind: "idle" } | { kind: "error"; message: string } | { kind: "saved"; message: string };
 export function LibrariesScreen() {
+  const { t } = useI18n();
   const { connection, client } = useAbs();
   const libraries = useQuery({
     queryKey: [connection.id, "managed-libraries"],
@@ -30,27 +34,26 @@ export function LibrariesScreen() {
   });
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">Libraries</h1>
-      <p className="text-muted">
-        Add folders mounted inside the configured media roots. Scans read your media and retain missing items
-        and their history.
-      </p>
-      <Section title="Create library">
+      <h1 className="text-2xl font-bold">{t("HeaderLibraries")}</h1>
+      <p className="text-muted">{t("WebAdminAddFoldersMountedInsideTheConfiguredMedia")}</p>
+      <Section title={t("WebAdminCreateLibrary")}>
         <CreateLibrary />
       </Section>
       {libraries.isPending ? (
-        <Spinner label="Loading libraries" />
+        <Spinner label={t("WebAdminLoadingLibraries")} />
       ) : libraries.isError ? (
-        <Alert>{libraries.error.message}</Alert>
+        <Alert>{adminMessage(libraries.error.message, t)}</Alert>
       ) : libraries.data.libraries.length ? (
         libraries.data.libraries.map((library) => <LibraryScan key={library.id} library={library} />)
       ) : (
-        <EmptyState title="No libraries yet" />
+        <EmptyState title={t("WebAdminNoLibrariesYet")} />
       )}
     </div>
   );
 }
 function CreateLibrary() {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { connection, client } = useAbs();
   const queries = useQueryClient();
   const [result, submit, pending] = useActionState<Result, FormData>(
@@ -80,36 +83,44 @@ function CreateLibrary() {
     { kind: "idle" },
   );
   return (
-    <form action={submit} className="flex flex-col gap-4">
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={submit}
+      className="flex flex-col gap-4"
+    >
       <fieldset disabled={pending} className="grid gap-4 sm:grid-cols-2">
-        <TextField name="name" label="Library name" required />
+        <TextField name="name" label={t("WebAdminLibraryName")} required />
         <SelectField
           name="mediaType"
-          label="Media type"
+          label={t("WebAdminMediaType")}
           defaultValue="book"
           options={[
-            { value: "book", label: "Books" },
-            { value: "podcast", label: "Podcasts" },
+            { value: "book", label: t("LabelBooks") },
+            { value: "podcast", label: t("LabelPodcasts") },
           ]}
         />
         <TextField
           name="folder"
-          label="Mounted folder"
+          label={t("WebAdminMountedFolder")}
           required
-          help="Absolute path inside the container, for example /media/books"
+          help={t("WebAdminAbsolutePathInsideTheContainerForExample")}
           className="sm:col-span-2"
         />
         <Button type="submit" variant="primary">
-          {pending ? "Creating…" : "Create library"}
+          {pending ? t("WebAdminCreating") : t("WebAdminCreateLibrary")}
         </Button>
       </fieldset>
       {result.kind !== "idle" ? (
-        <Alert tone={result.kind === "saved" ? "info" : "danger"}>{result.message}</Alert>
+        <FormFeedback submission={result} id={feedbackId} tone={result.kind === "saved" ? "info" : "danger"}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
       ) : null}
     </form>
   );
 }
 function LibraryScan({ library }: { library: Library }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { connection, client } = useAbs();
   const queries = useQueryClient();
   const key = [connection.id, "administration", "scans", library.id];
@@ -134,26 +145,28 @@ function LibraryScan({ library }: { library: Library }) {
     { kind: "idle" },
   );
   return (
-    <Section title={`${library.name}${library.isArchived ? " (archived)" : ""}`}>
+    <Section title={library.isArchived ? t("WebArchivedLibrary", library.name) : library.name}>
       <LibraryEditor library={library} />
       <p className="text-sm text-muted break-all">
         {library.folders.map((folder) => folder.fullPath).join(", ")}
       </p>
       <div className="flex flex-wrap gap-3">
-        <form action={submit}>
+        <form aria-describedby={result.kind === "error" ? feedbackId : undefined} action={submit}>
           <Button type="submit" disabled={pending || library.isArchived} variant="primary">
-            {pending ? "Scanning…" : "Scan mounted folders"}
+            {pending ? t("WebAdminScanning") : t("WebAdminScanMountedFolders")}
           </Button>
         </form>
-        <ButtonLink href={`/library/${library.id}/items`}>Browse library</ButtonLink>
+        <ButtonLink href={`/library/${library.id}/items`}>{t("WebAdminBrowseLibrary")}</ButtonLink>
       </div>
       {result.kind !== "idle" ? (
-        <Alert tone={result.kind === "saved" ? "info" : "danger"}>{result.message}</Alert>
+        <FormFeedback submission={result} id={feedbackId} tone={result.kind === "saved" ? "info" : "danger"}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
       ) : null}
       {history.isPending ? (
-        <Spinner label="Loading scan history" />
+        <Spinner label={t("WebAdminLoadingScanHistory")} />
       ) : history.isError ? (
-        <Alert>{history.error.message}</Alert>
+        <Alert>{adminMessage(history.error.message, t)}</Alert>
       ) : history.data.scans.length ? (
         <ul className="flex flex-col gap-3">
           {history.data.scans.map((scan) => (
@@ -165,7 +178,7 @@ function LibraryScan({ library }: { library: Library }) {
                 <ul className="text-sm text-danger">
                   {scan.errors.map((error) => (
                     <li key={`${error.path}:${error.message}`} className="break-all">
-                      {error.path}: {error.message}
+                      {error.path}: {adminMessage(error.message, t)}
                     </li>
                   ))}
                 </ul>
@@ -174,13 +187,15 @@ function LibraryScan({ library }: { library: Library }) {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-muted">No scans yet</p>
+        <p className="text-sm text-muted">{t("WebAdminNoScansYet")}</p>
       )}
     </Section>
   );
 }
 
 function LibraryEditor({ library }: { library: Library }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const [result, action, pending] = useActionState<Result, FormData>(
@@ -241,12 +256,16 @@ function LibraryEditor({ library }: { library: Library }) {
   );
   return (
     <details className="rounded-xl border border-line p-4">
-      <summary className="cursor-pointer font-medium">Edit library</summary>
-      <form action={action} className="mt-4 flex flex-col gap-3">
-        <TextField name="name" label="Library name" defaultValue={library.name} required />
+      <summary className="cursor-pointer font-medium">{t("WebAdminEditLibrary")}</summary>
+      <form
+        aria-describedby={result.kind === "error" ? feedbackId : undefined}
+        action={action}
+        className="mt-4 flex flex-col gap-3"
+      >
+        <TextField name="name" label={t("WebAdminLibraryName")} defaultValue={library.name} required />
         <TextField
           name="displayOrder"
-          label="Display order"
+          label={t("WebAdminDisplayOrder")}
           type="number"
           min={0}
           max={10000}
@@ -254,7 +273,7 @@ function LibraryEditor({ library }: { library: Library }) {
         />
         <TextField
           name="coverAspectRatio"
-          label="Cover aspect ratio"
+          label={t("WebAdminCoverAspectRatio")}
           type="number"
           min={0.3}
           max={3}
@@ -262,7 +281,7 @@ function LibraryEditor({ library }: { library: Library }) {
           defaultValue={library.settings?.coverAspectRatio ?? 1}
         />
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Mounted folders (one per line)
+          {t("WebAdminMountedFoldersOnePerLine")}
           <textarea
             name="folders"
             className="min-h-24 rounded-xl border border-line bg-surface p-3 font-normal"
@@ -270,20 +289,27 @@ function LibraryEditor({ library }: { library: Library }) {
             required
           />
         </label>
-        <Toggle name="isArchived" label="Archive this library" defaultChecked={library.isArchived} />
-        <p className="text-sm text-muted">
-          Archived libraries are hidden and their media cannot be accessed. Media files, progress and lists
-          are retained. Keep any folder containing existing items.
-        </p>
+        <Toggle
+          name="isArchived"
+          label={t("WebAdminArchiveThisLibrary")}
+          defaultChecked={library.isArchived}
+        />
+        <p className="text-sm text-muted">{t("WebAdminArchivedLibrariesAreHiddenAndTheirMedia")}</p>
         <Button type="submit" name="mode" value="save" disabled={pending}>
-          Save library
+          {t("WebAdminSaveLibrary")}
         </Button>
-        <TextField name="confirmation" label="Library name to confirm empty-library deletion" />
+        <TextField name="confirmation" label={t("WebAdminLibraryNameToConfirmEmptyLibraryDeletion")} />
         <Button type="submit" name="mode" value="delete" disabled={pending}>
-          Delete empty library
+          {t("WebAdminDeleteEmptyLibrary")}
         </Button>
         {result.kind !== "idle" ? (
-          <Alert tone={result.kind === "saved" ? "info" : "danger"}>{result.message}</Alert>
+          <FormFeedback
+            submission={result}
+            id={feedbackId}
+            tone={result.kind === "saved" ? "info" : "danger"}
+          >
+            {adminMessage(result.message, t)}
+          </FormFeedback>
         ) : null}
       </form>
     </details>

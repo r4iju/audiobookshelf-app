@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "La progression reste retenue. Redémarrez maintenant le serveur Audiobookshelf à {0}, puis confirmez ici. Ce navigateur ne peut pas détecter le redémarrage : sans lui, une suppression encore en cours peut effacer la progression envoyée après confirmation. La confirmation ne couvre que les demandes envoyées par ce navigateur avant de demander le redémarrage ; les suivantes restent retenues.",
   "WebHeldRestartUnreadable": "La progression est retenue et le relevé du redémarrage demandé est illisible. Ce navigateur ne sait donc pas quelles demandes un redémarrage terminerait. Choisissez à nouveau « Redémarrer le serveur », puis redémarrez le serveur Audiobookshelf à {0} lorsque cela vous est demandé.",
   "WebServerRestarted": "J'ai redémarré le serveur",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Aller au contenu",
   "WebServerAddressHelp": "L'adresse de votre serveur Audiobookshelf, avec tout sous-chemin, par exemple https://home.example/audiobookshelf",
   "WebContinue": "Continuer",

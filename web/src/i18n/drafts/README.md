@@ -14,3 +14,10 @@ Run `python3 web/scripts/import-web-gap-sources.py` for allowlisted exact source
 The validator updates `provenance.json` with hashes and honest carried/copy/draft counts. These checks establish
 structural coverage, not linguistic or assistive-technology acceptance. Connection/OIDC page titles, client
 error copy and initial server-rendered English remain outside this table increment.
+
+Administration and setup additions in `../pending-english.json` have English wording only.
+They use the runtime's English fallback rather than duplicated locale drafts. Validation reports them separately
+as `pendingEnglishFallbacks`; they are not translated coverage. Add reviewed locale wording before removing a
+key from this registry. Leafwake is the independent product name in every locale. Existing translations remain.
+The initial public release is en-GB. Physical assistive-technology and native-speaker acceptance remain distinct
+from catalog structure, browser keyboard, responsive layout and reduced-motion checks.

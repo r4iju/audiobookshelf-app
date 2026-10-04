@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Tiến độ vẫn bị giữ lại. Hãy khởi động lại máy chủ Audiobookshelf{0} ngay, rồi xác nhận tại đây. Trình duyệt không thể phát hiện việc khởi động lại; nếu không, thao tác xóa đang chạy có thể xóa tiến độ gửi sau khi xác nhận. Xác nhận chỉ áp dụng cho các yêu cầu trình duyệt này đã gửi trước khi chọn khởi động lại; các yêu cầu sau vẫn bị giữ lại.",
   "WebHeldRestartUnreadable": "Tiến độ đang bị giữ lại. Không đọc được bản ghi yêu cầu khởi động lại nên không biết lần khởi động lại sẽ chấm dứt những yêu cầu nào. Chọn lại “Khởi động lại máy chủ” rồi khởi động lại máy chủ Audiobookshelf{0} khi được yêu cầu.",
   "WebServerRestarted": "Tôi đã khởi động lại máy chủ",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Chuyển đến nội dung",
   "WebServerAddressHelp": "Địa chỉ máy chủ Audiobookshelf, bao gồm đường dẫn con nếu có, ví dụ https://home.example/audiobookshelf",
   "WebContinue": "Tiếp tục",

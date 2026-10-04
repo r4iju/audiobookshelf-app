@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "ההתקדמות עדיין מושהית. יש להפעיל מחדש עכשיו את שרת Audiobookshelf{0} ואז לאשר כאן. הדפדפן אינו יכול לזהות הפעלה מחדש; אחרת המחיקה הפעילה עלולה למחוק התקדמות שנשלחה לאחר האישור. האישור חל רק על בקשות שהדפדפן הזה שלח לפני בחירת ההפעלה מחדש; בקשות מאוחרות יותר נשארות מושהות.",
   "WebHeldRestartUnreadable": "ההתקדמות מושהית. אי אפשר לקרוא את רישום בקשת ההפעלה מחדש, ולכן לא ידוע אילו בקשות היא תסיים. יש לבחור שוב „הפעלה מחדש של השרת” ולהפעיל מחדש את שרת Audiobookshelf{0} כשמופיעה ההנחיה.",
   "WebServerRestarted": "הפעלתי מחדש את השרת",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "דילוג לתוכן",
   "WebServerAddressHelp": "כתובת שרת Audiobookshelf, כולל נתיב משנה אם יש, לדוגמה https://home.example/audiobookshelf",
   "WebContinue": "המשך",

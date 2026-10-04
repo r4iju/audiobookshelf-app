@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Fremdriften holdes fortsatt tilbake. Start Audiobookshelf-serveren på {0} på nytt nå, og bekreft deretter her. Nettleseren kan ikke oppdage omstarten: Uten omstart kan en sletting som fortsatt kjører fjerne fremdrift sendt etter bekreftelsen. Bekreftelsen gjelder bare forespørsler denne nettleseren sendte før du ba om omstart; senere forespørsler holdes fortsatt tilbake.",
   "WebHeldRestartUnreadable": "Fremdriften holdes tilbake, og oppføringen om den forespurte omstarten kan ikke leses. Nettleseren vet derfor ikke hvilke forespørsler en omstart ville avslutte. Velg «Start serveren på nytt» igjen, og start Audiobookshelf-serveren på {0} på nytt når du blir bedt om det.",
   "WebServerRestarted": "Jeg har startet serveren på nytt",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Hopp til innhold",
   "WebServerAddressHelp": "Adressen til Audiobookshelf-serveren din, med eventuell understi, for eksempel https://home.example/audiobookshelf",
   "WebContinue": "Fortsett",
