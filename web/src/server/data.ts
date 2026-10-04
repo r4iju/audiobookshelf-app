@@ -13,6 +13,12 @@ export function dataDirectory() {
   return resolve(process.env.LEAFWAKE_DATA_DIR || ".data");
 }
 
+export function managedMediaDirectory() {
+  const path = resolve(dataDirectory(), "media");
+  mkdirSync(path, { recursive: true, mode: 0o700 });
+  return path;
+}
+
 export function database() {
   if (globalThis.leafwakeDatabase) return globalThis.leafwakeDatabase;
   const directory = dataDirectory();
@@ -52,6 +58,7 @@ export function database() {
     CREATE TABLE IF NOT EXISTS libraries (id TEXT PRIMARY KEY, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS catalog_items (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(library_id, source_path));
+    CREATE TABLE IF NOT EXISTS podcast_jobs (id TEXT PRIMARY KEY, item_id TEXT NOT NULL REFERENCES catalog_items(id) ON DELETE CASCADE, episode_key TEXT NOT NULL, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, state TEXT NOT NULL, attempts INTEGER NOT NULL, lease_until INTEGER, content TEXT NOT NULL, updated_at INTEGER NOT NULL, UNIQUE(item_id,episode_key));
     CREATE TABLE IF NOT EXISTS media_lists (id TEXT PRIMARY KEY, kind TEXT NOT NULL CHECK(kind IN ('collection','playlist')), library_id TEXT NOT NULL REFERENCES libraries(id), user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, created_at INTEGER NOT NULL, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS metadata_overrides (item_id TEXT PRIMARY KEY REFERENCES catalog_items(id) ON DELETE CASCADE, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS media_files (id TEXT PRIMARY KEY, item_id TEXT NOT NULL REFERENCES catalog_items(id),
@@ -119,6 +126,7 @@ export function database() {
       COMMIT;`);
   }
   db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (9);");
+  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (10);");
   return db;
 }
 

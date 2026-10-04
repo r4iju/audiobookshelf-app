@@ -14,7 +14,14 @@ import {
   mediaProgressSchema,
 } from "@/lib/abs/schemas";
 import { type Account, canReadLibrary, canReadMedia, DomainError, requireAdministrator } from "./accounts";
-import { catalogChanged, database, progressGeneration, progressGenerations, transaction } from "./data";
+import {
+  catalogChanged,
+  database,
+  managedMediaDirectory,
+  progressGeneration,
+  progressGenerations,
+  transaction,
+} from "./data";
 export const createLibrarySchema = z.object({
   name: z.string().trim().min(1).max(256),
   mediaType: z.enum(["book", "podcast"]).default("book"),
@@ -49,12 +56,13 @@ export function within(root: string, path: string) {
 export async function mountedPath(path: string) {
   if (!isAbsolute(path)) throw new DomainError(400, "An absolute mounted folder is required");
   try {
+    managedMediaDirectory();
     const canonical = await realpath(path);
     const roots = await Promise.all(
-      (process.env.LEAFWAKE_MEDIA_ROOTS || "/media")
-        .split(delimiter)
-        .filter(Boolean)
-        .map((path) => realpath(path)),
+      [
+        ...(process.env.LEAFWAKE_MEDIA_ROOTS || "/media").split(delimiter).filter(Boolean),
+        managedMediaDirectory(),
+      ].map((path) => realpath(path)),
     );
     if (!roots.some((root) => within(root, canonical)))
       throw new DomainError(400, "Folder is outside configured media roots");
@@ -117,6 +125,33 @@ function allowed(actor: Account, item: LibraryItem) {
     tags: item.media.tags,
   });
 }
+function withDownloads(item: LibraryItem) {
+  if (item.mediaType !== "podcast") return item;
+  const jobs = database()
+    .prepare(
+      "SELECT id,state,content FROM podcast_jobs WHERE item_id=? AND state IN ('queued','running') ORDER BY updated_at,id",
+    )
+    .all(item.id);
+  return {
+    ...item,
+    episodeDownloadsQueued: jobs
+      .filter((job) => job.state === "queued")
+      .map((job) => ({
+        id: job.id,
+        libraryItemId: item.id,
+        episodeDisplayTitle: JSON.parse(z.string().parse(job.content)).title ?? "",
+        ...JSON.parse(z.string().parse(job.content)),
+      })),
+    episodesDownloading: jobs
+      .filter((job) => job.state === "running")
+      .map((job) => ({
+        id: job.id,
+        libraryItemId: item.id,
+        episodeDisplayTitle: JSON.parse(z.string().parse(job.content)).title ?? "",
+        ...JSON.parse(z.string().parse(job.content)),
+      })),
+  };
+}
 export function itemFor(actor: Account, id: string) {
   if (!actor.active) throw new DomainError(401, "Sign-in required");
   const row = database().prepare("SELECT content FROM catalog_items WHERE id = ?").get(id);
@@ -124,7 +159,7 @@ export function itemFor(actor: Account, id: string) {
   const item = itemRow(row);
   if (!allowed(actor, item)) throw new DomainError(404, "Not found");
   return {
-    ...item,
+    ...withDownloads(item),
     progressGeneration: progressGeneration(actor.id, id),
     progressGenerations: progressGenerations(actor.id, id),
   };
@@ -136,6 +171,7 @@ export function itemsFor(actor: Account, id: string, includeGenerations = true) 
     .prepare("SELECT content FROM catalog_items WHERE library_id = ?")
     .all(id)
     .map(itemRow)
+    .map(withDownloads)
     .filter((item) => allowed(actor, item))
     .map((item) =>
       includeGenerations
@@ -477,7 +513,8 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
     }
   }
   await walk(folder, 0);
-  const records: { item: LibraryItem; path: string; files: ScannedFile[] }[] = [];
+  const records: { item: LibraryItem; path: string; files: ScannedFile[]; expectedContent: string | null }[] =
+    [];
   for (const [directory, paths] of groups) {
     try {
       const previous = database()
@@ -570,6 +607,7 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
         isMissing: false,
         isInvalid: false,
         media: {
+          ...prior?.media,
           id: prior?.media.id ?? id,
           metadata: {
             ...prior?.media.metadata,
@@ -602,7 +640,21 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
         },
         libraryFiles: files.map((file) => file.content),
       });
-      records.push({ item, path: directory, files });
+      if (library.mediaType === "podcast" && prior) {
+        item.media.metadata = prior.media.metadata;
+        item.media.episodes = (prior.media.episodes ?? []).filter((episode) =>
+          files.some((file) => file.id === episode.audioFile?.ino),
+        );
+        item.media.numEpisodes = item.media.episodes.length;
+        item.media.tracks = [];
+        item.media.chapters = [];
+      }
+      records.push({
+        item,
+        path: directory,
+        files,
+        expectedContent: previous ? z.string().parse(previous.content) : null,
+      });
     } catch (error) {
       errors.push({
         path: directory,
@@ -622,6 +674,12 @@ export async function scanLibrary(actor: Account, id: string) {
     db.prepare("INSERT INTO scan_runs VALUES (?, ?, 'running', ?, NULL, NULL)").run(scanId, id, Date.now());
   });
   const errors: ScanError[] = [];
+  const snapshots = new Map(
+    database()
+      .prepare("SELECT id,content FROM catalog_items WHERE library_id=?")
+      .all(id)
+      .map((row) => [z.string().parse(row.id), z.string().parse(row.content)]),
+  );
   try {
     const records: Awaited<ReturnType<typeof scanFolder>> = [];
     const pool = identityPool();
@@ -641,6 +699,8 @@ export async function scanLibrary(actor: Account, id: string) {
         .prepare("SELECT id, source_path, content FROM catalog_items WHERE library_id = ?")
         .all(id)) {
         const item = itemRow(row);
+        if (snapshots.get(item.id) !== row.content) continue;
+        if (!seen.has(item.id) && item.mediaType === "podcast" && !item.media.episodes?.length) continue;
         if (!seen.has(item.id) && !errors.some((error) => error.path === row.source_path))
           db.prepare("UPDATE catalog_items SET content = ? WHERE id = ?").run(
             JSON.stringify({ ...item, isMissing: true }),
@@ -648,6 +708,11 @@ export async function scanLibrary(actor: Account, id: string) {
           );
       }
       for (const record of records) {
+        const current = db
+          .prepare("SELECT content FROM catalog_items WHERE library_id=? AND source_path=?")
+          .get(id, record.path);
+        if ((current?.content ?? null) !== record.expectedContent) continue;
+        if (current && snapshots.get(record.item.id) !== current.content) continue;
         db.prepare(
           "INSERT INTO catalog_items VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET content = excluded.content",
         ).run(record.item.id, id, record.path, JSON.stringify(record.item));

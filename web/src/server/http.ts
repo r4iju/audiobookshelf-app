@@ -1,3 +1,16 @@
+import {
+  clearQueue,
+  createPodcast,
+  downloadsFor,
+  enqueue,
+  episodesInput,
+  feedInput,
+  newPodcastSchema,
+  readFeed,
+  recentEpisodes,
+  removeEpisode,
+  startPodcasts,
+} from "./podcasts";
 import "server-only";
 import "./realtime";
 import { z } from "zod";
@@ -140,6 +153,7 @@ export function serverStatus() {
 }
 export function health() {
   startTranscode();
+  startPodcasts();
   database().prepare("SELECT 1").get();
   return json({ status: "ready", app: "Leafwake" });
 }
@@ -193,6 +207,31 @@ export async function api(request: Request) {
       return serveEbook(request, () => authenticate(token), z.string().parse(ebookRoute[1]), ebookRoute[2]);
     if ((request.method === "GET" || request.method === "HEAD") && downloadRoute)
       return downloadItem(request, () => authenticate(token), z.string().parse(downloadRoute[1]));
+    if (path === "/api/podcasts/feed" && request.method === "POST") {
+      requireAdministrator(user);
+      return json(await readFeed(feedInput.parse(await body(request)).rssFeed));
+    }
+    if (path === "/api/podcasts" && request.method === "POST")
+      return json(
+        await createPodcast(user, newPodcastSchema.parse(await body(request)), () => authenticate(token)),
+        201,
+      );
+    const podcastRoute = path.match(
+      /^\/api\/podcasts\/([^/]+)\/(download-episodes|clear-queue|episode|downloads)(?:\/([^/]+))?$/,
+    );
+    if (podcastRoute) {
+      const id = z.string().parse(podcastRoute[1]);
+      if (podcastRoute[2] === "downloads" && request.method === "GET") return json(downloadsFor(user, id));
+      if (podcastRoute[2] === "download-episodes" && request.method === "POST")
+        return json(enqueue(authenticate(token), id, episodesInput.parse(await body(request))));
+      if (podcastRoute[2] === "clear-queue" && ["GET", "POST"].includes(request.method))
+        return json(await clearQueue(user, id));
+      if (podcastRoute[2] === "episode" && request.method === "DELETE")
+        return json(await removeEpisode(user, id, z.string().parse(podcastRoute[3])));
+    }
+    const recentRoute = path.match(/^\/api\/libraries\/([^/]+)\/recent-episodes$/);
+    if (recentRoute && request.method === "GET")
+      return json(recentEpisodes(user, z.string().parse(recentRoute[1]), new URL(request.url).searchParams));
     if (path === "/api/admin/migrations/media/inspect" && request.method === "POST")
       return json(
         await inspectMedia(mediaInspectSchema.parse(await body(request)), () => authenticate(token)),
@@ -260,9 +299,16 @@ export async function api(request: Request) {
         z.string().parse(fileRoute[2]),
         Boolean(fileRoute[3]),
       );
-    const playRoute = path.match(/^\/api\/items\/([^/]+)\/play$/);
+    const playRoute = path.match(/^\/api\/items\/([^/]+)\/play(?:\/([^/]+))?$/);
     if (playRoute && request.method === "POST")
-      return json(openPlayback(user, z.string().parse(playRoute[1]), playSchema.parse(await body(request))));
+      return json(
+        openPlayback(
+          user,
+          z.string().parse(playRoute[1]),
+          playSchema.parse(await body(request)),
+          playRoute[2],
+        ),
+      );
     const closeRoute = path.match(/^\/api\/session\/([^/]+)\/close$/);
     if (closeRoute && request.method === "POST") {
       sameOrigin(request);

@@ -8,7 +8,7 @@ import { z } from "zod";
 import { type Account, DomainError, findAccount } from "./accounts";
 import { findLibrary, itemFor, mountedPath, within } from "./catalog";
 import { database, dataDirectory } from "./data";
-import { sessionFor } from "./playback";
+import { playableMedia, sessionFor } from "./playback";
 
 const chunkSeconds = 6;
 const maxJobs = 32,
@@ -116,11 +116,12 @@ async function encode(job: Job) {
     const actor = sessionActor(job.session_id),
       session = sessionFor(actor, job.session_id);
     const item = itemFor(actor, session.libraryItemId);
-    if (session.playMethod !== 1 || Math.abs((item.media.duration ?? 0) - session.duration) > 0.1)
+    const media = playableMedia(item, session.episodeId);
+    if (session.playMethod !== 1 || Math.abs((media.duration ?? 0) - session.duration) > 0.1)
       throw Error("Media changed");
     const start = job.segment * chunkSeconds,
       end = Math.min(session.duration, start + chunkSeconds);
-    const tracks = (item.media.tracks ?? []).filter(
+    const tracks = media.tracks.filter(
       (track) => track.startOffset < end && track.startOffset + track.duration > start,
     );
     if (!tracks.length || tracks.length > 64) throw Error("Unsupported media layout");
