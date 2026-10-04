@@ -11,7 +11,15 @@ export function coverShapeOf(library: Pick<Library, "settings" | "mediaType"> | 
 
 export function coverUrl(client: AbsClient, item: Pick<LibraryItem, "id" | "updatedAt" | "media">) {
   if (!item.media.coverPath) return null;
-  return client.url(`/api/items/${item.id}/cover?ts=${item.updatedAt ?? 0}`);
+  return authenticatedCoverUrl(client, item.id, item.updatedAt ?? 0);
+}
+
+export function authenticatedCoverUrl(client: AbsClient, itemId: string, updatedAt = 0) {
+  // Image elements cannot attach headers, so use the same current-token contract as playback media.
+  const url = new URL(client.url(`/api/items/${itemId}/cover`));
+  url.searchParams.set("ts", String(updatedAt));
+  url.searchParams.set("token", client.bearer);
+  return url.toString();
 }
 
 export function authorImageUrl(

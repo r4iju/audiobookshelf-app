@@ -1,6 +1,6 @@
 import type { AbsClient } from "@/lib/abs/client";
 import { episodeDuration } from "@/lib/abs/episodes";
-import { authorLine, coverUrl } from "@/lib/abs/media";
+import { authenticatedCoverUrl, authorLine, coverUrl } from "@/lib/abs/media";
 import type { EpisodeWithPodcast, LibraryItem, PodcastEpisode } from "@/lib/abs/schemas";
 import type { PlayerMedia } from "@/lib/player/store";
 
@@ -37,5 +37,5 @@ export function playerMediaForEpisode(
 }
 
 export function episodeCoverUrl(client: AbsClient, episode: EpisodeWithPodcast) {
-  return episode.podcast?.coverPath ? client.url(`/api/items/${episode.libraryItemId}/cover`) : null;
+  return episode.podcast?.coverPath ? authenticatedCoverUrl(client, episode.libraryItemId) : null;
 }

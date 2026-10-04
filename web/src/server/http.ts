@@ -78,6 +78,7 @@ import {
   scanHistory,
   scanLibrary,
 } from "./catalog";
+import { commitComplete, completeImportInput, inspectComplete } from "./complete-migration";
 import { database, dataDirectory, initialized, setupKey } from "./data";
 import { deliveryImportInput, importDelivery, inspectDelivery } from "./delivery-migration";
 import { diagnostics } from "./diagnostics";
@@ -359,6 +360,17 @@ export async function api(request: Request) {
     const recentRoute = path.match(/^\/api\/libraries\/([^/]+)\/recent-episodes$/);
     if (recentRoute && request.method === "GET")
       return json(recentEpisodes(user, z.string().parse(recentRoute[1]), new URL(request.url).searchParams));
+    if (
+      ["/api/admin/migrations/complete", "/api/admin/migrations/complete/inspect"].includes(path) &&
+      request.method === "POST"
+    ) {
+      const input = completeImportInput.parse(await body(request));
+      return json(
+        path.endsWith("/inspect")
+          ? await inspectComplete(input, () => authenticate(token))
+          : await commitComplete(input, () => authenticate(token)),
+      );
+    }
     if (path === "/api/admin/migrations/media/inspect" && request.method === "POST")
       return json(
         await inspectMedia(mediaInspectSchema.parse(await body(request)), () => authenticate(token)),

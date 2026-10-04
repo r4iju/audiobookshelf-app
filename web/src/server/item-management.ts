@@ -128,7 +128,7 @@ async function bodyBytes(request: Request, max: number) {
   }
   return Buffer.concat(chunks);
 }
-function imageType(bytes: Buffer) {
+export function imageType(bytes: Buffer) {
   let width = 0,
     height = 0,
     type = "";

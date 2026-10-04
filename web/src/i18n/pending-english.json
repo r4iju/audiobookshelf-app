@@ -563,5 +563,17 @@
   "WebArchivedLibrary": "{0} (archived)",
   "WebImportRows_one": "{1}: {0} row",
   "WebMediaImportComplete": "Imported {0} media items. Validate playback and remaining migration stages before cutover.",
-  "WebMediaImportComplete_one": "Imported {0} media item. Validate playback and remaining migration stages before cutover."
+  "WebMediaImportComplete_one": "Imported {0} media item. Validate playback and remaining migration stages before cutover.",
+  "WebCompleteMigrationTitle": "Complete migration and cutover inventory",
+  "WebCompleteImportHelp": "Finish accounts, media, lists and delivery from one read-only snapshot first. Validate original OpenID identities, configuration and covers here before cutover.",
+  "WebOriginalCoverRoot": "Original cover folder",
+  "WebMountedCoverRoot": "Mounted cover folder",
+  "WebCoverMappingHelp": "Map the original metadata folder to a read-only import or media mount. Leave both empty when the source has no cover files.",
+  "WebMigrationCallbacks": "Exact OpenID callbacks, one per line",
+  "WebCompleteCounts": "OpenID identities: {0} · Covers: {1} · Configuration entries: {2} · Source rows: {3}",
+  "WebCutoverBlocked": "Cutover is blocked. These source fields or records have no supported replacement behavior.",
+  "WebSourceInventory": "Every source table and field",
+  "WebCompleteMigrationSaved": "Migration completed. Keep the original installation, source mounts and private rollback backup {0}.",
+  "WebInspectCompleteMigration": "Inspect complete migration",
+  "WebCompleteMigrationCommit": "Complete migration"
 }
