@@ -20,6 +20,7 @@ import {
   revokeAccount,
   setupSchema,
 } from "./accounts";
+import { createBackup, listBackups, restoreBackup } from "./backups";
 import {
   createLibrary,
   createLibrarySchema,
@@ -33,6 +34,13 @@ import {
   scanLibrary,
 } from "./catalog";
 import { database, initialized, setupKey } from "./data";
+import {
+  commitImport,
+  commitImportSchema,
+  inspectImport,
+  inspectImportSchema,
+  migrationHistory,
+} from "./migration";
 import { closePlayback, openPlayback, playSchema, serveFile, serveTrack } from "./playback";
 import {
   listeningStats,
@@ -150,9 +158,29 @@ export async function api(request: Request) {
       await createOwner(setupSchema.parse(input));
       return json({ initialized: true }, 201);
     }
+    if (path === "/api/setup/import/inspect" && request.method === "POST")
+      return json(inspectImport(inspectImportSchema.parse(await body(request))));
+    if (path === "/api/setup/import" && request.method === "POST")
+      return json(commitImport(commitImportSchema.parse(await body(request))));
     const fileRoute = path.match(/^\/api\/items\/([^/]+)\/file\/([^/]+)(?:\/(download))?$/);
     const token = bearer(request) ?? (fileRoute ? new URL(request.url).searchParams.get("token") : null);
     const user = authenticate(token);
+    if (path === "/api/admin/backups") {
+      if (request.method === "GET") return json(listBackups(user));
+      if (request.method === "POST") {
+        sameOrigin(request);
+        return json(await createBackup(user));
+      }
+    }
+    const restoreRoute = path.match(/^\/api\/admin\/backups\/([^/]+)\/restore$/);
+    if (restoreRoute && request.method === "POST") {
+      sameOrigin(request);
+      return json(restoreBackup(user, z.string().parse(restoreRoute[1])));
+    }
+    if (path === "/api/admin/migrations" && request.method === "GET") {
+      requireAdministrator(user);
+      return json(migrationHistory());
+    }
     if (path === "/api/session/local-all" && request.method === "POST") {
       const input = localReportsSchema.parse(await body(request, 262144));
       return json(syncLocal(authenticate(token), input));

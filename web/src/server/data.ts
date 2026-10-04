@@ -46,6 +46,7 @@ export function database() {
       COMMIT;`);
   }
   db.exec(`
+    CREATE TABLE IF NOT EXISTS migrations (id TEXT PRIMARY KEY, digest TEXT NOT NULL, scope TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(digest,scope));
     CREATE TABLE IF NOT EXISTS libraries (id TEXT PRIMARY KEY, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS catalog_items (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(library_id, source_path));
@@ -83,7 +84,16 @@ export function database() {
   ) {
     db.exec("ALTER TABLE progress_resets ADD COLUMN generation INTEGER NOT NULL DEFAULT 1;");
   }
-  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (4);");
+  if (
+    !db
+      .prepare("PRAGMA table_info(users)")
+      .all()
+      .some((column) => column.name === "archive")
+  )
+    db.exec("ALTER TABLE users ADD COLUMN archive TEXT NOT NULL DEFAULT '{}';");
+  db.exec(
+    "INSERT OR IGNORE INTO schema_version(version) VALUES (4); INSERT OR IGNORE INTO schema_version(version) VALUES (5);",
+  );
   return db;
 }
 

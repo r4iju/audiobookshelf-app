@@ -19,7 +19,7 @@ Image config digest: `sha256:5b0c1f1af6c3a7a54e310a611c1cd347c1b1467f7f511e07eab
 
 ## Remaining work
 
-All remaining tickets #152–177 remain required. Empty library responses currently permit bootstrap verification only. Catalog, media, progress, realtime, administration, import, legacy removal, final deployment and store acceptance are not implemented by #151. Existing deployment examples still describe the superseded two-server configuration until the deployment and cleanup tickets replace them.
+Tickets #151, #152, #154 and #155 are complete. The sections below track subsequent slices and their remaining acceptance. Realtime, full migration, administration, legacy removal, final deployment and store acceptance still require the remaining tickets. Existing deployment examples still describe the superseded two-server configuration until the deployment and cleanup tickets replace them.
 
 Apple and Cast permission remains pending at https://github.com/advplyr/audiobookshelf-app/discussions/2051. The backend rewrite does not relicense inherited native code. No public store artifact has been uploaded or rolled out.
 
@@ -64,3 +64,14 @@ Evidence: `/tmp/leafwake-progress-final-green.log`, `/tmp/leafwake-progress-rest
 Search matches and counts only media already permitted by current library, explicit-content and tag restrictions. Unauthorized libraries return 404 without media metadata. Browser search consumes the compatible grouped result shape. The More control and URL/API limits now share a bounded maximum and request refinement when reached. Author/series destination pages and the remaining discovery contracts stay under #161.
 
 Both missing search and the large More request were demonstrated red before fixes. Production search-policy and progress regression journeys passed. Browser search rendered a scanned item. Typecheck, lint and 119 browser units passed. Independent catalog review cleared authorization and the coordinated limit. Evidence: `/tmp/leafwake-search-policy-red.log`, `/tmp/leafwake-search-more-red.log`, `/tmp/leafwake-search-policy-final-green.log`, `/tmp/leafwake-search-progress-regression.log`. Image `leafwake:search-152` config digest `sha256:494fb0797fc94409dc2f977ebd9c24347db01923e971a52535744cde62812c0c`.
+
+
+## #153 read-only account migration and backup recovery
+
+Fresh setup can inspect a consistent SQLite source copy, report unsupported password hashes, policies, account fields and configured external authentication, and atomically import supported accounts. Original IDs, supported bcrypt passwords, active state, restrictions and archived fields survive. Inspection and commit pin the read-only source, verify its digest and reject changed or out-of-root copies. Repeated import returns the original completion record. This account stage explicitly does not authorize full cutover: remaining media, progress, lists and settings are reported for later stages.
+
+Owner-only product backups preserve SQLite data and migration records. Restore validates the snapshot and replaces data in one transaction, clears session authority and deactivates playback sessions. Restored accounts must sign in again. Media mounts and the original data folder need separate retention.
+
+Production HTTP import, failure atomicity, safe retry, original-source digest, backup/restore and revoked-session checks passed. Imported identifiers, original passwords and completion records survived restart. Shared browser inspection/import, backup creation, restore and fresh sign-in passed. Preview screenshot capture remained unavailable; interaction and DOM evidence was available. Typecheck, lint and 119 existing browser units passed. Fresh independent source review cleared backend and UI after inventory and session-revival fixes. Tests for missing operations, malformed archived fields, unknown account columns, default external-auth settings and session revival were observed red before fixes.
+
+Evidence: `/tmp/leafwake-import-red.log`, `/tmp/leafwake-import-inventory-red.log`, `/tmp/leafwake-import-unknown-fields-red.log`, `/tmp/leafwake-import-default-auth-red.log`, `/tmp/leafwake-import-session-restore-red.log`, `/tmp/leafwake-import-green.log`, `/tmp/leafwake-import-restart.log`. Production image `leafwake:import-153` config digest `sha256:7243c8ee9f9fbea2a29ce5c43f98e09889f65d79130b94318526afaaa5e3e723`. All test sources and volumes were synthetic; owner media and credentials were not used.
