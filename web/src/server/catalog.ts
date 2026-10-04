@@ -1,3 +1,4 @@
+import { feedForItem } from "./feeds";
 import { serverSettings } from "./server-settings";
 import "server-only";
 import { execFile } from "node:child_process";
@@ -206,7 +207,8 @@ function allowed(actor: Account, item: LibraryItem) {
     tags: item.media.tags,
   });
 }
-function withDownloads(item: LibraryItem) {
+function withDownloads(original: LibraryItem) {
+  const item = { ...original, rssFeed: feedForItem(original.id) };
   if (item.mediaType !== "podcast") return item;
   const jobs = database()
     .prepare(

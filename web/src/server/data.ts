@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { chmodSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { sealArchive } from "./secrets";
 
 // Next's development module reloads must share the same process-owned connection.
 declare global {
@@ -133,6 +134,28 @@ export function database() {
   db.exec(`CREATE TABLE IF NOT EXISTS openid_flows (id TEXT PRIMARY KEY, state TEXT NOT NULL UNIQUE, expires_at INTEGER NOT NULL, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS openid_identities (issuer TEXT NOT NULL, subject TEXT NOT NULL, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, PRIMARY KEY(issuer,subject));
     INSERT OR IGNORE INTO schema_version(version) VALUES(12);`);
+  db.exec(`CREATE TABLE IF NOT EXISTS rss_feeds (id TEXT PRIMARY KEY, item_id TEXT NOT NULL UNIQUE REFERENCES catalog_items(id), owner_id TEXT NOT NULL REFERENCES users(id), slug TEXT NOT NULL UNIQUE, content TEXT NOT NULL);
+    INSERT OR IGNORE INTO schema_version(version) VALUES(13);`);
+  if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 14) {
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      for (const row of db
+        .prepare("SELECT digest,row_key,content FROM migration_archive WHERE table_name='settings'")
+        .all()) {
+        const value = JSON.parse(String(row.content));
+        if (value._leafwakeEncryptedArchive !== 1)
+          db.prepare(
+            "UPDATE migration_archive SET content=? WHERE digest=? AND table_name='settings' AND row_key=?",
+          ).run(sealArchive(value), String(row.digest), String(row.row_key));
+      }
+      db.exec("INSERT INTO schema_version(version) VALUES(14); COMMIT;");
+    } catch (error) {
+      db.exec("ROLLBACK");
+      globalThis.leafwakeDatabase = undefined;
+      db.close();
+      throw error;
+    }
+  }
   return db;
 }
 

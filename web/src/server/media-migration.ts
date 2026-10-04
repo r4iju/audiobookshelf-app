@@ -25,6 +25,7 @@ import { type Account, DomainError } from "./accounts";
 import { mountedPath, within } from "./catalog";
 import { catalogChanged, database, transaction } from "./data";
 import { sourceCopy } from "./migration";
+import { sealArchive } from "./secrets";
 
 type Input = z.infer<typeof mediaInspectSchema>;
 const id = z.string().min(1).max(256),
@@ -796,7 +797,7 @@ export async function commitMedia(input: z.infer<typeof mediaCommitSchema>, auth
         input.expectedDigest,
         row.table,
         row.key,
-        row.content,
+        row.table === "settings" ? sealArchive(JSON.parse(row.content)) : row.content,
       );
     const completed = completionSchema.parse({
       id: randomUUID(),

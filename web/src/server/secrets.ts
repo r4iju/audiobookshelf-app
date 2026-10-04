@@ -23,3 +23,11 @@ export function unseal(value: string): unknown {
     Buffer.concat([decipher.update(Buffer.from(box.bytes, "base64")), decipher.final()]).toString("utf8"),
   );
 }
+
+export function sealArchive(value: unknown) {
+  return JSON.stringify({ _leafwakeEncryptedArchive: 1, content: seal(value) });
+}
+export function readArchive(value: string): unknown {
+  const record = JSON.parse(value);
+  return record._leafwakeEncryptedArchive === 1 ? unseal(record.content) : record;
+}
