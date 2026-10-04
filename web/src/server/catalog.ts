@@ -201,6 +201,7 @@ function itemRow(row: unknown) {
   return libraryItemSchema.parse(JSON.parse(z.object({ content: z.string() }).parse(row).content));
 }
 function allowed(actor: Account, item: LibraryItem) {
+  if (database().prepare("SELECT item_id FROM retired_items WHERE item_id=?").get(item.id)) return false;
   return canReadMedia(actor, {
     libraryId: item.libraryId,
     explicit: Boolean(item.media.metadata.explicit),
@@ -569,6 +570,13 @@ function identity(
   pool.set(`${kind}:${name}`, ref);
   return ref;
 }
+export function metadataIdentity(
+  kind: "authors" | "series",
+  name: string,
+  prior: { id: string; name: string }[],
+) {
+  return identity(identityPool(), kind, name, prior);
+}
 async function scanFolder(library: Library, folder: string, errors: ScanError[], pool: IdentityPool) {
   const groups = new Map<string, string[]>();
   let count = 0;
@@ -746,6 +754,38 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
     }
   }
   return records;
+}
+export async function catalogUpload(libraryId: string, path: string, authorize: () => Account) {
+  const library = findLibrary(libraryId),
+    errors: ScanError[] = [];
+  const records = await scanFolder(library, path, errors, identityPool());
+  if (records.length !== 1 || errors.length)
+    throw new DomainError(400, errors[0]?.message ?? "The uploaded file could not be indexed");
+  const record = records[0];
+  if (!record) throw new DomainError(400, "No uploaded item");
+  const item = transaction((db) => {
+    const current = authorize();
+    if (
+      !canReadLibrary(current, libraryId) ||
+      JSON.stringify(findLibrary(libraryId)) !== JSON.stringify(library)
+    )
+      throw new DomainError(409, "Library changed while indexing upload");
+    const existing = db
+      .prepare("SELECT content FROM catalog_items WHERE library_id=? AND source_path=?")
+      .get(libraryId, path);
+    if ((existing?.content ?? null) !== record.expectedContent)
+      throw new DomainError(409, "Catalog changed while indexing upload");
+    db.prepare(
+      "INSERT INTO catalog_items VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET content=excluded.content",
+    ).run(record.item.id, libraryId, path, JSON.stringify(record.item));
+    for (const file of record.files)
+      db.prepare(
+        "INSERT INTO media_files VALUES(?,?,?,?) ON CONFLICT(item_id,id) DO UPDATE SET content=excluded.content",
+      ).run(file.id, file.itemId, file.path, JSON.stringify(file.content));
+    return itemFor(current, record.item.id);
+  });
+  catalogChanged();
+  return item;
 }
 export async function scanLibrary(actor: Account, id: string) {
   requireAdministrator(actor);

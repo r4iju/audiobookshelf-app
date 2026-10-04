@@ -79,6 +79,19 @@ import { database, initialized, setupKey } from "./data";
 import { deliveryImportInput, importDelivery, inspectDelivery } from "./delivery-migration";
 import { authorFor, authorGroups, pagedSeries, personalized, seriesFor } from "./discovery";
 import { downloadItem, serveEbook } from "./documents";
+import {
+  cover,
+  editMetadata,
+  metadataEditInput,
+  metadataSearch,
+  providerSettings,
+  providerSettingsInput,
+  removeCatalogItem,
+  restoreCatalogItem,
+  saveCover,
+  saveProvider,
+  upload,
+} from "./item-management";
 import { importLists, inspectLists, listImportSchema } from "./list-migration";
 import {
   changeList,
@@ -144,15 +157,28 @@ async function body(request: Request, maximum = MAX_BODY): Promise<unknown> {
   if (!reader) throw new DomainError(400, "JSON request required");
   const chunks: Uint8Array[] = [];
   let size = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.length;
-    if (size > maximum) {
-      await reader.cancel();
-      throw new DomainError(413, "Request too large");
+  const deadline = Date.now() + 20000;
+  try {
+    for (;;) {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const { done, value } = await Promise.race([
+        reader.read(),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new DomainError(408, "JSON request timed out")),
+            Math.max(1, deadline - Date.now()),
+          );
+        }),
+      ]).finally(() => {
+        if (timer) clearTimeout(timer);
+      });
+      if (done) break;
+      size += value.length;
+      if (size > maximum) throw new DomainError(413, "Request too large");
+      chunks.push(value);
     }
-    chunks.push(value);
+  } finally {
+    await reader.cancel();
   }
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
@@ -222,9 +248,12 @@ export async function api(request: Request) {
     const fileRoute = path.match(/^\/api\/items\/([^/]+)\/file\/([^/]+)(?:\/(download))?$/);
     const ebookRoute = path.match(/^\/api\/items\/([^/]+)\/ebook(?:\/([^/]+))?$/);
     const downloadRoute = path.match(/^\/api\/items\/([^/]+)\/download$/);
+    const coverRoute = path.match(/^\/api\/items\/([^/]+)\/cover$/);
     const token =
       bearer(request) ??
-      (fileRoute || ebookRoute || downloadRoute ? new URL(request.url).searchParams.get("token") : null);
+      (fileRoute || ebookRoute || downloadRoute || (coverRoute && ["GET", "HEAD"].includes(request.method))
+        ? new URL(request.url).searchParams.get("token")
+        : null);
     const user = authenticate(token);
     if ((request.method === "GET" || request.method === "HEAD") && ebookRoute)
       return serveEbook(request, () => authenticate(token), z.string().parse(ebookRoute[1]), ebookRoute[2]);
@@ -572,7 +601,52 @@ export async function api(request: Request) {
         if (action === "filterdata") return json(filterData(items));
       }
     }
+    const uploadRoute = path.match(/^\/api\/libraries\/([^/]+)\/upload$/);
+    if (uploadRoute && request.method === "POST") {
+      sameOrigin(request);
+      return json(await upload(request, () => authenticate(token), z.string().parse(uploadRoute[1])));
+    }
+    if (coverRoute) {
+      const id = z.string().parse(coverRoute[1]);
+      if (["GET", "HEAD"].includes(request.method)) return cover(request, user, id);
+      if (request.method === "POST") {
+        sameOrigin(request);
+        return json(await saveCover(request, () => authenticate(token), id));
+      }
+    }
+    const editRoute = path.match(/^\/api\/items\/([^/]+)\/media$/);
+    if (editRoute && request.method === "PATCH") {
+      sameOrigin(request);
+      return json(
+        editMetadata(
+          user,
+          z.string().parse(editRoute[1]),
+          metadataEditInput.parse(await body(request, 131072)),
+        ),
+      );
+    }
+    const restoreItemRoute = path.match(/^\/api\/items\/([^/]+)\/restore$/);
+    if (restoreItemRoute && request.method === "POST") {
+      sameOrigin(request);
+      return json(restoreCatalogItem(user, z.string().parse(restoreItemRoute[1])));
+    }
+    if (path === "/api/admin/metadata-provider") {
+      if (request.method === "GET") return json(providerSettings(user));
+      if (request.method === "PATCH") {
+        sameOrigin(request);
+        return json(saveProvider(user, providerSettingsInput.parse(await body(request))));
+      }
+    }
+    if (path === "/api/search/books" && request.method === "GET")
+      return json(
+        await metadataSearch(() => authenticate(token), new URL(request.url).searchParams.get("query") ?? ""),
+      );
     const itemRoute = path.match(/^\/api\/items\/([^/]+)$/);
+    if (itemRoute && request.method === "DELETE") {
+      sameOrigin(request);
+      z.object({ confirmation: z.literal("REMOVE") }).parse(await body(request));
+      return json(removeCatalogItem(user, z.string().parse(itemRoute[1])));
+    }
     if (itemRoute && request.method === "GET") return json(itemFor(user, z.string().parse(itemRoute[1])));
     throw new DomainError(404, "Not found");
   });

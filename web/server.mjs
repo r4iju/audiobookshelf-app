@@ -36,7 +36,9 @@ const server = createServer((request, response) => {
     } else response.destroy();
   });
 });
-server.requestTimeout = 60_000;
+// The application bounds upload bodies to ten minutes and JSON bodies to twenty seconds.
+server.requestTimeout = 660_000;
+server.headersTimeout = 60_000;
 let realtimeReady = false;
 const basePath = conf?.basePath ?? process.env.ABS_WEB_BASE_PATH?.replace(/\/+$/, "") ?? "";
 globalThis.leafwakeBasePath = basePath;

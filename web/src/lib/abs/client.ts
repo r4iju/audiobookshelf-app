@@ -44,6 +44,7 @@ const refreshResponseSchema = z.object({
 interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
+  file?: Blob;
   signal?: AbortSignal;
   /** Runs before the request is sent again with a renewed sign-in; throwing stops it. */
   beforeRetry?: () => Promise<void>;
@@ -68,9 +69,13 @@ export function createAbsClient({
         method: options.method ?? "GET",
         headers: {
           Authorization: `Bearer ${bearer}`,
-          ...(options.body === undefined ? {} : { "Content-Type": "application/json" }),
+          ...(options.file
+            ? { "Content-Type": options.file.type || "application/octet-stream" }
+            : options.body === undefined
+              ? {}
+              : { "Content-Type": "application/json" }),
         },
-        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+        body: options.file ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
         // Bearer tokens only: the server answers cross-origin preflights with a wildcard that browsers reject for
         // credentialed requests.
         credentials: "omit",
@@ -189,6 +194,8 @@ export function createAbsClient({
     ) => {
       await send(path, { method, body, beforeRetry });
     },
+    upload: async <T extends z.ZodType>(path: string, file: Blob, schema: T, signal?: AbortSignal) =>
+      parse(await send(path, { method: "POST", file, signal }), schema),
     blob: async (path: string, signal?: AbortSignal) => (await send(path, { signal })).blob(),
   };
 }

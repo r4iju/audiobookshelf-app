@@ -156,6 +156,9 @@ export function database() {
       throw error;
     }
   }
+  db.exec(`CREATE TABLE IF NOT EXISTS retired_items (item_id TEXT PRIMARY KEY REFERENCES catalog_items(id), user_id TEXT NOT NULL, removed_at INTEGER NOT NULL);
+    CREATE TABLE IF NOT EXISTS item_covers (item_id TEXT PRIMARY KEY REFERENCES catalog_items(id), mime TEXT NOT NULL, bytes BLOB NOT NULL);
+    INSERT OR IGNORE INTO schema_version(version) VALUES(15);`);
   return db;
 }
 
