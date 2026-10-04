@@ -272,6 +272,10 @@ function Shell({ children }: { children: ReactNode }) {
                   <LibraryIcon aria-hidden className="size-4" />
                   OpenID sign-in
                 </Link>
+                <Link href="/admin/upload" className={navClass(pathname.startsWith("/admin/upload"))}>
+                  <LibraryIcon aria-hidden className="size-4" />
+                  Upload and metadata
+                </Link>
                 <Link href="/admin/delivery" className={navClass(pathname.startsWith("/admin/delivery"))}>
                   <LibraryIcon aria-hidden className="size-4" />
                   E-reader delivery

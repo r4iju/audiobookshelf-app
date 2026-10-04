@@ -56,6 +56,9 @@ function ItemView({ item }: { item: LibraryItem }) {
 
   return (
     <article className="flex flex-col gap-8">
+      {canUpdate ? (
+        <ButtonLink href={`/admin/items/${encodeURIComponent(item.id)}`}>Edit metadata and cover</ButtonLink>
+      ) : null}
       <div className="flex flex-col gap-6 md:flex-row md:items-start">
         <div className="w-44 shrink-0 self-center md:w-56 md:self-start">
           <Cover
