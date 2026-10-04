@@ -22,3 +22,9 @@ Image config digest: `sha256:5b0c1f1af6c3a7a54e310a611c1cd347c1b1467f7f511e07eab
 All remaining tickets #152–177 remain required. Empty library responses currently permit bootstrap verification only. Catalog, media, progress, realtime, administration, import, legacy removal, final deployment and store acceptance are not implemented by #151. Existing deployment examples still describe the superseded two-server configuration until the deployment and cleanup tickets replace them.
 
 Apple and Cast permission remains pending at https://github.com/advplyr/audiobookshelf-app/discussions/2051. The backend rewrite does not relicense inherited native code. No public store artifact has been uploaded or rolled out.
+
+## #152 account/auth portion
+
+Account create/edit/disable/remove and session revocation now have modern UI and authenticated endpoints. Root removal and non-admin management are denied. Sparse permission patches retain existing restrictions. Login revalidates the current password hash atomically before issuing a session. Browser logout uses rotated registry credentials. Persisted sign-in attempt limits return 429 after repeated failures.
+
+Account HTTP journeys were observed red before endpoints existed, and passed against the production image `leafwake:accounts-152` (`/tmp/leafwake-accounts-image-green.log`). Permission patch and rotated browser logout regressions were observed red before their fixes. Browser account creation passed. Fresh independent review cleared the account/auth portion. #152 remains open until catalog/search/stream policy enforcement is verified with #154/#155.

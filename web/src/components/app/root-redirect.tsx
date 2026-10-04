@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { ButtonLink } from "@/components/ui/button";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
 import { useI18n } from "@/i18n/i18n";
-import { useLibraries } from "@/lib/abs/queries";
+import { isAdmin } from "@/lib/abs/permissions";
+import { useLibraries, useMe } from "@/lib/abs/queries";
 import * as registry from "@/lib/session/registry";
 import { useSession } from "@/lib/session/store";
 import { errorMessage } from "./errors";
@@ -27,6 +29,7 @@ function LibraryRedirect({ connectionId }: { connectionId: string }) {
   const { t } = useI18n();
   const router = useRouter();
   const libraries = useLibraries();
+  const admin = isAdmin(useMe().data);
   const remembered = registry.lastLibraryId(connectionId);
   const target = libraries.data?.find((library) => library.id === remembered) ?? libraries.data?.[0];
 
@@ -36,6 +39,11 @@ function LibraryRedirect({ connectionId }: { connectionId: string }) {
   }, [target, router]);
 
   if (libraries.isError) return <Alert>{errorMessage(t, libraries.error)}</Alert>;
-  if (libraries.isSuccess && !target) return <EmptyState title={t("WebNoLibraries")} />;
+  if (libraries.isSuccess && !target)
+    return (
+      <EmptyState title={t("WebNoLibraries")}>
+        {admin ? <ButtonLink href="/admin/accounts">Manage accounts</ButtonLink> : null}
+      </EmptyState>
+    );
   return <Spinner label={t("MessageLoading")} />;
 }

@@ -3,11 +3,21 @@ import { z } from "zod";
 import {
   accountResponse,
   authenticate,
+  createAccount,
+  createAccountSchema,
   createOwner,
   credentialsSchema,
   DomainError,
+  editAccount,
+  editAccountSchema,
+  endSession,
+  findAccount,
+  listAccounts,
   passwordLogin,
   refreshSession,
+  removeAccount,
+  requireAdministrator,
+  revokeAccount,
   setupSchema,
 } from "./accounts";
 import { database, initialized, setupKey } from "./data";
@@ -92,6 +102,13 @@ export function refresh(request: Request) {
     return json(refreshSession(request.headers.get("x-refresh-token")));
   });
 }
+export function logout(request: Request) {
+  return boundary(() => {
+    sameOrigin(request);
+    endSession(bearer(request), request.headers.get("x-refresh-token"));
+    return json({ success: true });
+  });
+}
 export function bearer(request: Request) {
   const value = request.headers.get("authorization");
   return value?.startsWith("Bearer ") ? value.slice(7) : null;
@@ -109,6 +126,29 @@ export async function api(request: Request) {
       return json({ initialized: true }, 201);
     }
     const user = authenticate(bearer(request));
+    if (path.startsWith("/api/users")) {
+      requireAdministrator(user);
+      const segments = path.split("/");
+      if (segments.length === 3 && request.method === "GET") return json({ users: listAccounts(user) });
+      if (segments.length === 3 && request.method === "POST")
+        return json(await createAccount(user, createAccountSchema.parse(await body(request))));
+      const id = segments[3];
+      if (id && segments.length === 4) {
+        if (request.method === "GET") return json(accountResponse(findAccount(id)));
+        if (request.method === "PATCH")
+          return json(await editAccount(user, id, editAccountSchema.parse(await body(request))));
+        if (request.method === "DELETE") {
+          sameOrigin(request);
+          removeAccount(user, id);
+          return json({ success: true });
+        }
+      }
+      if (id && segments.length === 5 && segments[4] === "revoke" && request.method === "POST") {
+        sameOrigin(request);
+        revokeAccount(user, id);
+        return json({ success: true });
+      }
+    }
     if (path === "/api/me" && request.method === "GET") return json(accountResponse(user));
     if (path === "/api/authorize" && request.method === "POST")
       return json({ user: accountResponse(user), ereaderDevices: [] });
