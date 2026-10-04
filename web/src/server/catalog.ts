@@ -469,7 +469,7 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[])
         isMissing: false,
         isInvalid: false,
         media: {
-          id,
+          id: prior?.media.id ?? id,
           metadata: {
             ...metadata,
             title: metadata.title ?? embedded.album ?? embedded.title ?? basename(directory),
@@ -539,7 +539,7 @@ export async function scanLibrary(actor: Account, id: string) {
         ).run(record.item.id, id, record.path, JSON.stringify(record.item));
         for (const file of record.files)
           db.prepare(
-            "INSERT INTO media_files VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET content = excluded.content",
+            "INSERT INTO media_files VALUES (?, ?, ?, ?) ON CONFLICT(item_id,id) DO UPDATE SET content = excluded.content",
           ).run(file.id, file.itemId, file.path, JSON.stringify(file.content));
       }
       db.prepare("UPDATE scan_runs SET status = 'complete', completed_at = ?, report = ? WHERE id = ?").run(

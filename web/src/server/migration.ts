@@ -4,6 +4,7 @@ import { closeSync, constants, existsSync, fstatSync, openSync, readSync, realpa
 import { resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { z } from "zod";
+import { bookmarkSchema } from "@/lib/abs/schemas";
 import { DomainError, permissions, requireSetupKey } from "./accounts";
 import { within } from "./catalog";
 import { database, initialized, transaction } from "./data";
@@ -57,7 +58,7 @@ const completionSchema = z.object({
   completedAt: z.number(),
   report: reportSchema,
 });
-function sourceCopy(path: string) {
+export function sourceCopy(path: string) {
   const roots = (process.env.LEAFWAKE_IMPORT_ROOTS || "/imports")
     .split(":")
     .filter(Boolean)
@@ -193,9 +194,7 @@ function readInventory(source: ReturnType<typeof sourceCopy>) {
       if (usernames.has(user.username.toLowerCase())) throw new Error("Conflicting account names");
       usernames.add(user.username.toLowerCase());
       const { librariesAccessible, itemTagsSelected, ...flags } = policy;
-      const bookmarks = z.array(z.unknown()).parse(JSON.parse(user.bookmarks));
-      if (bookmarks.length)
-        errors.push({ accountId: user.id, message: "Bookmark import requires the progress migration stage" });
+      const bookmarks = z.array(bookmarkSchema).max(100000).parse(JSON.parse(user.bookmarks));
       users.push({
         id: user.id,
         username: user.username,
@@ -346,6 +345,17 @@ export function migrationHistory() {
     migrations: database()
       .prepare("SELECT content FROM migrations ORDER BY rowid")
       .all()
-      .map((row) => completionSchema.parse(JSON.parse(z.string().parse(row.content)))),
+      .map((row) =>
+        z
+          .looseObject({
+            id: z.string(),
+            digest: z.string(),
+            scope: z.string(),
+            accountCount: z.number(),
+            completedAt: z.number(),
+            report: z.unknown(),
+          })
+          .parse(JSON.parse(z.string().parse(row.content))),
+      ),
   };
 }

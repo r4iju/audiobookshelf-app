@@ -7,6 +7,7 @@ import { TextField } from "@/components/ui/field";
 import { Section } from "@/components/ui/section";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
 import { useAbs } from "@/lib/session/store";
+import { MediaImportForm } from "./media-import-form";
 
 const backupSchema = z.object({
   id: z.string().uuid(),
@@ -49,6 +50,9 @@ export function MigrationScreen() {
         Account import is the first migration stage. Complete and validate media, progress, lists and
         configuration before replacing your original installation.
       </p>
+      <Section title="Import media and listening history">
+        <MediaImportForm />
+      </Section>
       <Section title="Product backups">
         <p className="text-sm text-muted">
           Backups preserve this installation’s SQLite data. Keep your original media mounts and data folder

@@ -47,6 +47,8 @@ export function database() {
   }
   db.exec(`
     CREATE TABLE IF NOT EXISTS migrations (id TEXT PRIMARY KEY, digest TEXT NOT NULL, scope TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(digest,scope));
+    CREATE TABLE IF NOT EXISTS migration_archive (digest TEXT NOT NULL, table_name TEXT NOT NULL, row_key TEXT NOT NULL, content TEXT NOT NULL, PRIMARY KEY(digest,table_name,row_key));
+    CREATE TABLE IF NOT EXISTS bookmarks (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, item_id TEXT NOT NULL REFERENCES catalog_items(id), content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS libraries (id TEXT PRIMARY KEY, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS catalog_items (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(library_id, source_path));
@@ -94,6 +96,16 @@ export function database() {
   db.exec(
     "INSERT OR IGNORE INTO schema_version(version) VALUES (4); INSERT OR IGNORE INTO schema_version(version) VALUES (5);",
   );
+  if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 6) {
+    db.exec(`BEGIN IMMEDIATE;
+      CREATE TABLE media_files_v6 (id TEXT NOT NULL, item_id TEXT NOT NULL REFERENCES catalog_items(id),
+        source_path TEXT NOT NULL, content TEXT NOT NULL, PRIMARY KEY(item_id,id), UNIQUE(item_id,source_path));
+      INSERT INTO media_files_v6 SELECT id,item_id,source_path,content FROM media_files;
+      DROP TABLE media_files;
+      ALTER TABLE media_files_v6 RENAME TO media_files;
+      INSERT INTO schema_version(version) VALUES(6);
+      COMMIT;`);
+  }
   return db;
 }
 
