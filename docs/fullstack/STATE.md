@@ -19,7 +19,7 @@ Image config digest: `sha256:5b0c1f1af6c3a7a54e310a611c1cd347c1b1467f7f511e07eab
 
 ## Remaining work
 
-Tickets #151–159 are complete. The sections below track subsequent slices and their remaining acceptance. Realtime, full migration, administration, legacy removal, final deployment and store acceptance still require the remaining tickets. Existing deployment examples still describe the superseded two-server configuration until the deployment and cleanup tickets replace them.
+Tickets #151–160 are complete. The sections below track subsequent slices and their remaining acceptance. Realtime, full migration, administration, legacy removal, final deployment and store acceptance still require the remaining tickets. Existing deployment examples still describe the superseded two-server configuration until the deployment and cleanup tickets replace them.
 
 Apple and Cast permission remains pending at https://github.com/advplyr/audiobookshelf-app/discussions/2051. The backend rewrite does not relicense inherited native code. No public store artifact has been uploaded or rolled out.
 
@@ -102,3 +102,13 @@ The first-written HTTP journey failed on the previous image’s 422 negotiation 
 FFmpeg/FFprobe and Debian copyright/license texts are present in the image. Public notices include exact Debian source-package versions and FFmpeg copyright. Corresponding source archive bundling remains a mandatory final artifact check in #174 before public distribution.
 
 Evidence: `/tmp/leafwake-transcode-red.log`, `/tmp/leafwake-transcode-reviewed-green.log`, `/tmp/leafwake-transcode-restart.log`, `/tmp/leafwake-transcode-cancel.log`. Image `leafwake:transcode-159` config digest `sha256:1f7f3c7271adb4e74879077d8abec9113bab2923a2f89db269e56116c313729f`. Synthetic media only; final native/device acceptance remains #174.
+
+## #160 reader documents and authorized downloads
+
+Primary and supplementary ebook routes serve actual mounted documents through the same confined descriptor reader as native files. Scans preserve a previous primary document’s identity and mark other documents supplementary. Document MIME types cover PDF, EPUB, MOBI/AZW3 and comics. A single-file item download retains HEAD and byte ranges; multiple files stream a ZIP64 archive with bounded buffering, sequential descriptors and four concurrent archives. Generated archives do not support resumption ranges; individual file downloads do. Missing media and denied download permissions return compatible errors. Archive source/output failures and cancellation close streams and release capacity.
+
+First-written production checks failed on absent supplementary flags before implementation. The reviewed image passes real PDF/EPUB/comic files, primary/supplementary routes, ranges, invalid ranges, missing files, ZIP64 integrity and denied downloads while retaining reading access. Browser PDF resumed at page 4, saved page 5, rendered EPUB chapter text and opened/turned two comic pages. Supplementary PDF opened at page 1, turned to page 2 and left the primary saved page at 5. A real 32 MiB EPUB asset passed exact tail-range verification. All four unchanged Android RealServerJourney cases passed on this image: multi-file listening, primary PDF page persistence, offline reconnect and first offline finish. Typecheck, lint and 119 existing browser units pass; HLS output regression also passes. Fresh independent review reproduced archive error crashes before their fixes and cleared both error/cleanup paths afterward.
+
+Earlier mobile deferral remains unchanged: PDF is required; remaining EPUB acceptance and MOBI/AZW3/CBZ/CBR mobile opening/resume stay deferred as recorded in modernization/SPEC.md. These files and locations remain preserved, but this backend slice does not claim their native acceptance. Final physical-device/release QA remains #174–177.
+
+Evidence: `/tmp/leafwake-readers-downloads-red.log`, `/tmp/leafwake-readers-green.log`, `/tmp/leafwake-large-download.log`, `/tmp/leafwake-native-readers-160.log`, `/tmp/leafwake-readers-transcode-regression.log`. Image `leafwake:readers-160` config digest `sha256:e0e69e8a6ca69465817351748f712fd70f18a119d9735de08fff1ea588b91cb5`. All data and media are synthetic.
