@@ -94,7 +94,7 @@ import kotlin.math.abs
 /** Reading-position key of an item's primary ebook, which the server tracks per item rather than per file. */
 const val PRIMARY_EBOOK = "primary"
 
-private class Opened(val document: PdfDocument, val startPage: Int)
+private class Opened(val document: PdfDocument, val startPage: Int, val progressGeneration: Long? = null)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,7 +129,9 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
             }
             val start = graph.reading.entry(account, route.itemId, fileKey)?.page?.coerceIn(1, document.pageCount.coerceAtLeast(1)) ?: 1
             page = start
-            opened = Opened(document, start)
+            val epoch = if (route.downloadId != null) graph.downloads.records.value.firstOrNull { it.id == route.downloadId }?.progressGeneration
+                else runCatching { active.client.item(route.itemId).progressGeneration }.getOrNull()
+            opened = Opened(document, start, epoch)
         } catch (failure: Exception) {
             if (failure is kotlinx.coroutines.CancellationException) throw failure
             graph.accounts.handle(failure)
@@ -151,7 +153,7 @@ fun PdfReaderScreen(route: Route.Reader, active: SessionState.Active, catalog: C
         snapshotFlow { page }.distinctUntilChanged().collect { shown ->
             if (graph.reading.entry(account, route.itemId, fileKey)?.page == shown) return@collect
             try {
-                graph.reading.record(account, route.itemId, fileKey, primary = !route.supplementary, page = shown, pages = current.pageCount)
+                graph.reading.record(account, route.itemId, fileKey, primary = !route.supplementary, page = shown, pages = current.pageCount, progressGeneration = opened?.progressGeneration)
                 if (!route.supplementary) graph.readingSync.publishAll()
             } catch (failure: Exception) {
                 saveError = storeFailure(context, graph, failure) ?: context.getString(R.string.rd_page_not_saved)

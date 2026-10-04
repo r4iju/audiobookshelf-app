@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, createHmac, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { database, initialized, setupKey, tokenSigningKey, transaction } from "./data";
+import { allProgress } from "./progress";
 
 function derive(password: string, salt: string, length: number): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -111,7 +112,7 @@ function visibleUser(user: Account) {
     type: user.type,
     permissions: permissions.parse(JSON.parse(user.permissions)),
     librariesAccessible: z.array(z.string()).parse(JSON.parse(user.libraries)),
-    mediaProgress: [],
+    mediaProgress: allProgress(user),
     bookmarks: [],
     seriesHideFromContinueListening: [],
     itemTagsSelected: z.array(z.string()).parse(JSON.parse(user.tags)),

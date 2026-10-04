@@ -87,7 +87,7 @@ struct BookDetails: View {
                 if let ebook = book.media.ebookFile, ["pdf", "epub"].contains(ebook.format), episode == nil {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         Task {
-                            do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil) }
+                            do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil, progressGeneration: book.progressGeneration) }
                             catch { recordLoadFailure(error.localizedDescription) }
                         }
                     }
@@ -229,7 +229,8 @@ struct BookDetails: View {
         progressRequest = Task {
             defer { progressBusy = false }
             do {
-                let user = try await player.setFinished(itemID: book.id, episodeID: episode?.id, finished: finished)
+                let epoch = book.progressGenerations?[episode?.id ?? ""] ?? book.progressGeneration
+                let user = try await player.setFinished(itemID: book.id, episodeID: episode?.id, finished: finished, progressGeneration: epoch)
                 guard !Task.isCancelled else { return }
                 mediaProgress = user.mediaProgress
                 catalog.applyProgress(user)
@@ -255,6 +256,7 @@ struct BookDetails: View {
                 progressDiscarded = true
                 mediaProgress = user.mediaProgress
                 catalog.discardProgress(user, itemID: book.id, episodeID: episode?.id)
+                expanded = try await catalog.api.item(id: book.id)
             } catch is ApplePlayback.UnresolvedProgressWrites {
                 if !Task.isCancelled { self.error = .unresolvedWrites(l10n("Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart.")) }
             } catch { if !Task.isCancelled { self.error = .discard(ConnectionStore.recovery(for: error)) } }

@@ -63,7 +63,7 @@ struct ProgressResetIntent: Codable, Equatable {
     }
 
     func beginOffline(_ audio: OfflineAudio, position: Double, deviceID: String) throws -> String {
-        let media = ListeningMedia(itemID: audio.media.libraryItemID, episodeID: audio.media.episodeID, title: audio.media.title, author: audio.media.author, mediaType: audio.media.mediaType, duration: audio.media.duration, startTime: position)
+        let media = ListeningMedia(itemID: audio.media.libraryItemID, episodeID: audio.media.episodeID, title: audio.media.title, author: audio.media.author, mediaType: audio.media.mediaType, duration: audio.media.duration, startTime: position, progressGeneration: audio.media.progressGeneration)
         return try loaded().begin(account: audio.account, media: media, deviceID: deviceID)
     }
 

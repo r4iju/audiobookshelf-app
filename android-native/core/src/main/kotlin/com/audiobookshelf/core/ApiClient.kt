@@ -172,8 +172,11 @@ class ApiClient(
         return results.filter { it.success }.map { it.id }.toSet()
     }
 
-    suspend fun setFinished(itemId: String, episodeId: String?, finished: Boolean): MediaProgress? {
-        val response = raw("api/me/progress/$itemId" + (episodeId?.let { "/$it" } ?: ""), "PATCH", buildJsonObject { put("isFinished", finished) })
+    suspend fun setFinished(itemId: String, episodeId: String?, finished: Boolean, progressGeneration: Long? = null): MediaProgress? {
+        val response = raw("api/me/progress/$itemId" + (episodeId?.let { "/$it" } ?: ""), "PATCH", buildJsonObject {
+            put("isFinished", finished)
+            progressGeneration?.let { put("progressGeneration", it) }
+        })
         return runCatching { AbsJson.decodeFromString(MediaProgress.serializer(), response) }.getOrNull()
     }
 
@@ -197,6 +200,10 @@ class ApiClient(
     fun feedUrl(feed: RssFeed): String =
         if (feed.feedUrl.startsWith("/")) address.canonical.trimEnd('/') + feed.feedUrl else feed.feedUrl
 
+    suspend fun resetMissingProgress(itemId: String, episodeId: String?, resetId: String) {
+        raw("api/me/progress/$itemId" + (episodeId?.let { "/$it" } ?: "") + "/reset", "POST", buildJsonObject { put("resetId", resetId) })
+    }
+
     suspend fun removeProgress(progressId: String) { raw("api/me/progress/$progressId", "DELETE", null) }
 
     /** The account's progress for one item, or null when the server has none. */
@@ -206,8 +213,11 @@ class ApiClient(
         if (error.status == 404) null else throw error
     }
 
-    suspend fun saveEbookProgress(itemId: String, location: String, progress: Double) {
-        raw("api/me/progress/$itemId", "PATCH", buildJsonObject { put("ebookLocation", location); put("ebookProgress", progress) })
+    suspend fun saveEbookProgress(itemId: String, location: String, progress: Double, updatedAt: Double? = null, progressGeneration: Long? = null) {
+        raw("api/me/progress/$itemId", "PATCH", buildJsonObject {
+            put("ebookLocation", location); put("ebookProgress", progress)
+            updatedAt?.let { put("updatedAt", it) }; progressGeneration?.let { put("progressGeneration", it) }
+        })
     }
 
     suspend fun saveBookmark(itemId: String, time: Double, title: String, editing: Boolean): Bookmark =

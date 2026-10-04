@@ -9,6 +9,7 @@ import Foundation
     /// Changes on every sign-in, sign-out and credential restore (never on token refresh). Compare it before and
     /// after a sequence of requests to know they all ran for the same signed-in account.
     public var authorizationRevision: UUID { authGeneration }
+    public var progressResetCommitted: ((AccountIdentity, LibraryItem, String?) throws -> Void)?
 
     public init(store: CredentialStore, session: URLSession = .shared) {
         self.store = store
@@ -70,9 +71,11 @@ import Foundation
     public func me() async throws -> CurrentUser { try await get("api/me") }
 
     /// `issuing` as in `syncListening`.
-    public func setFinished(itemID: String, episodeID: String?, finished: Bool, issuing: IssuingHook? = nil) async throws {
+    public func setFinished(itemID: String, episodeID: String?, finished: Bool, progressGeneration: Int? = nil, issuing: IssuingHook? = nil) async throws {
         let path = "api/me/progress/\(itemID)" + (episodeID.map { "/" + $0 } ?? "")
-        _ = try await request(path, method: "PATCH", body: ["isFinished": finished], issuing: issuing)
+        var body: [String: Any] = ["isFinished": finished]
+        if let progressGeneration { body["progressGeneration"] = progressGeneration }
+        _ = try await request(path, method: "PATCH", body: body, issuing: issuing)
     }
 
     public func audioGroups(libraryID: String, kind: AudioGroupKind) async throws -> AudioGroupPage {
@@ -320,14 +323,21 @@ import Foundation
 
     /// Deletes a progress row, only for the sign-in identified by `authorization`. Server 2.30
     /// answers success for a row that is already gone.
+    public func resetMissingProgress(itemID: String, episodeID: String?, resetID: String, authorization: UUID) async throws {
+        _ = try await request("api/me/progress/\(itemID)" + (episodeID.map { "/\($0)" } ?? "") + "/reset", method: "POST", body: ["resetId": resetID], pinned: authorization)
+    }
+
     public func deleteProgress(rowID: String, authorization: UUID) async throws {
         _ = try await request("api/me/progress/\(rowID)", method: "DELETE", pinned: authorization)
     }
 
     /// `issuing` as in `syncListening`.
-    public func saveReading(account: AccountIdentity, itemID: String, location: String, progress: Double, issuing: IssuingHook? = nil) async throws {
+    public func saveReading(account: AccountIdentity, itemID: String, location: String, progress: Double, updatedAt: Double? = nil, progressGeneration: Int? = nil, issuing: IssuingHook? = nil) async throws {
         guard try await currentAccount() == account else { throw APIError.signInRequired }
-        _ = try await request("api/me/progress/\(itemID)", method: "PATCH", body: ["ebookLocation": location, "ebookProgress": progress], issuing: issuing)
+        var body: [String: Any] = ["ebookLocation": location, "ebookProgress": progress]
+        if let updatedAt { body["updatedAt"] = updatedAt }
+        if let progressGeneration { body["progressGeneration"] = progressGeneration }
+        _ = try await request("api/me/progress/\(itemID)", method: "PATCH", body: body, issuing: issuing)
     }
 
     public func coverData(itemID: String) async throws -> Data {

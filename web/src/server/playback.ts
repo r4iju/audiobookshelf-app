@@ -6,7 +6,8 @@ import { z } from "zod";
 import { playbackSessionSchema } from "@/lib/abs/schemas";
 import { type Account, DomainError, findAccount, permissions } from "./accounts";
 import { findLibrary, itemFor, mountedPath, within } from "./catalog";
-import { database, transaction } from "./data";
+import { database, progressGeneration, transaction } from "./data";
+import { progressFor } from "./progress";
 
 const fileSchema = z.object({ source_path: z.string(), content: z.string() });
 const fileContentSchema = z.object({
@@ -49,7 +50,8 @@ export function openPlayback(actor: Account, itemId: string, input: z.infer<type
     displayTitle: item.media.metadata.title,
     displayAuthor: item.media.metadata.authorName,
     duration: item.media.duration,
-    currentTime: 0,
+    currentTime: progressFor(actor, itemId)?.currentTime ?? 0,
+    progressGeneration: progressGeneration(actor.id, itemId),
     playMethod: 0,
     chapters: item.media.chapters,
     audioTracks: item.media.tracks,

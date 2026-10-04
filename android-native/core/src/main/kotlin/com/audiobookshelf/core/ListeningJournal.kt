@@ -20,6 +20,7 @@ import java.util.UUID
     val startTime: Double,
     /** 0 direct play (streamed), 3 local (downloaded), matching the server's PlayMethod values. */
     val playMethod: Int = 0,
+    val progressGeneration: Long? = null,
 )
 
 @Serializable data class ListeningRecord(
@@ -58,6 +59,8 @@ import java.util.UUID
         put("timeListening", timeListening)
         put("startedAt", startedAt)
         put("updatedAt", updatedAt)
+        put("revision", revision)
+        media.progressGeneration?.let { put("progressGeneration", it) }
     }
 }
 

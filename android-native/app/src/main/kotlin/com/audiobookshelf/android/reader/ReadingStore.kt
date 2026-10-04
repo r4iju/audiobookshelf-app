@@ -49,6 +49,7 @@ class ReadingStore(private val file: File) {
         val conflictUpdatedAt: Double? = null,
         /** The other device's position when it is not a page number, such as another format's location. */
         val conflictLocation: String? = null,
+        val progressGeneration: Long? = null,
     ) {
         val pending get() = primary && revision > acknowledged
         val inConflict get() = conflictUpdatedAt != null || conflictPage != null
@@ -77,10 +78,10 @@ class ReadingStore(private val file: File) {
     @Synchronized fun pendingAccounts() = entries.filter { it.pending && !it.inConflict }.map { it.account }.toSet()
 
     @Synchronized
-    fun record(account: AccountIdentity, itemId: String, fileId: String, primary: Boolean, page: Int, pages: Int, now: Long = System.currentTimeMillis()) {
+    fun record(account: AccountIdentity, itemId: String, fileId: String, primary: Boolean, page: Int, pages: Int, now: Long = System.currentTimeMillis(), progressGeneration: Long? = null) {
         val current = entry(account, itemId, fileId)
-        val next = current?.copy(page = page, pages = pages, updatedAt = now.toDouble(), revision = current.revision + 1, primary = primary)
-            ?: Entry(account, itemId, fileId, primary, page, pages, now.toDouble(), revision = 1)
+        val next = current?.copy(page = page, pages = pages, updatedAt = now.toDouble(), revision = current.revision + 1, primary = primary, progressGeneration = progressGeneration ?: current.progressGeneration)
+            ?: Entry(account, itemId, fileId, primary, page, pages, now.toDouble(), revision = 1, progressGeneration = progressGeneration)
         save(next)
     }
 
@@ -193,6 +194,7 @@ class ReadingStore(private val file: File) {
 interface ReadingRemote {
     suspend fun progress(itemId: String): MediaProgress?
     suspend fun save(itemId: String, location: String, progress: Double)
+    suspend fun saveIntent(entry: ReadingStore.Entry) = save(entry.itemId, entry.page.toString(), entry.progress)
 }
 
 /**
@@ -237,7 +239,7 @@ class ReadingSync(
                         ReadingStore.Preflight.ALREADY_THERE -> store.acknowledge(next, null)
                         ReadingStore.Preflight.SEND -> {
                             store.sending(next)
-                            remote.save(next.itemId, next.page.toString(), next.progress)
+                            remote.saveIntent(next)
                             store.acknowledge(next, runCatching { remote.progress(next.itemId) }.getOrNull())
                         }
                     }

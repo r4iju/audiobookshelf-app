@@ -23,6 +23,7 @@ struct ReadingSource: Identifiable {
     let file: URL?
     var progress: MediaProgress? = nil
     var fileID: String? = nil
+    var progressGeneration: Int? = nil
 }
 
 @MainActor private final class PDFReading: ObservableObject {
@@ -121,7 +122,7 @@ struct ReadingSource: Identifiable {
     }
     private func save() {
         do {
-            try store.update(account: source.account, itemID: source.itemID, format: "pdf", location: String(page), fraction: Double(page - 1) / Double(max(count, 1)), rotation: rotation, fileID: source.fileID)
+            try store.update(account: source.account, itemID: source.itemID, format: "pdf", location: String(page), fraction: Double(page - 1) / Double(max(count, 1)), rotation: rotation, fileID: source.fileID, progressGeneration: source.progressGeneration)
             store.sync(api: api)
         } catch { self.error = NativeStrings.current("Reading could not be saved on this device: {0}", error.localizedDescription) }
     }

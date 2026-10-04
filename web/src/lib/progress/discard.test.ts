@@ -264,6 +264,28 @@ afterEach(() => {
 });
 
 describe("discardProgress", () => {
+  it("uses a durable generation reset despite an older unanswered delivery", async () => {
+    const server = scriptedDeleteServer("generation-reset", ["ok"]);
+    const sending = await beginPublishing(
+      "generation-reset",
+      () => [report("old-reset", "book-x")],
+      "older-tab",
+    );
+    await finishSending(sending.sendingKey, "failed");
+    const hold = outboxFor("generation-reset").hold("book-x", null, "p-x", true);
+    expect(
+      await finishDiscard(
+        server.client,
+        { id: hold.id, libraryItemId: "book-x", episodeId: null, progressId: "p-x", generationReset: true },
+        {},
+      ),
+    ).toBe("done");
+    expect(server.client.command).toHaveBeenCalledWith("POST", "/api/me/progress/book-x/reset", {
+      resetId: hold.id,
+    });
+    expect(outboxFor("generation-reset").holds()[0]?.generationReset).toBe(true);
+    hold.settle();
+  });
   it("waits for listening already on its way to the server, so the old place cannot land after the discard", async () => {
     const server = slowServer("conn-a");
     usePlayerStore.getState().attach(server.client);

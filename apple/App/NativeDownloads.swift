@@ -47,7 +47,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     struct Entry: Codable, Identifiable {
         let id: String
         let account: AccountIdentity
-        let media: ListeningMedia
+        var media: ListeningMedia
         let tracks: [AudioTrack]
         let chapters: [Chapter]
         var ebook: EbookFile?
@@ -138,6 +138,15 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
                 try? FileManager.default.removeItem(at: file)
             }
         } catch { self.error = NativeStrings.current("Downloads could not be restored: {0}", error.localizedDescription); writable = false }
+        api.progressResetCommitted = { [weak self] account, item, episodeID in
+            guard let self, let epoch = item.progressGenerations?[episodeID ?? ""] ?? item.progressGeneration else { return }
+            var next = self.entries
+            for index in next.indices where next[index].account == account && next[index].media.libraryItemID == item.id && next[index].media.episodeID == episodeID {
+                let media = next[index].media
+                next[index].media = ListeningMedia(itemID: media.libraryItemID, episodeID: media.episodeID, title: media.title, author: media.author, mediaType: media.mediaType, duration: media.duration, startTime: media.startTime, progressGeneration: epoch)
+            }
+            try self.save(next)
+        }
         let config = configuration
         config.sessionSendsLaunchEvents = true; config.isDiscretionary = false
         config.allowsCellularAccess = true; config.httpMaximumConnectionsPerHost = 2
@@ -222,10 +231,17 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             let tracks = supplementaryID == nil ? (selected.map { $0.audioTrack.map { [$0] } ?? [] } ?? detail.media.tracks ?? []) : []
             let ebook = supplementaryID == nil ? (selected == nil ? detail.media.ebookFile : nil) : attachment
             let progress = supplementaryID == nil ? user.mediaProgress.first { $0.libraryItemId == item.id && $0.episodeId == episode?.id } : nil
+            let epoch = detail.progressGenerations?[episode?.id ?? ""] ?? detail.progressGeneration
             guard !tracks.isEmpty || ebook != nil else { throw APIError.noAudio }
             guard tracks.allSatisfy({ $0.duration.isFinite && $0.duration > 0 && $0.startOffset.isFinite && $0.startOffset >= 0 }) else { throw APIError.noAudio }
             for track in tracks { _ = try downloadURL(track, account: identity, itemID: item.id) }
             if let index = entries.firstIndex(where: { $0.account == identity && $0.media.libraryItemID == item.id && $0.media.episodeID == episode?.id && $0.supplementaryID == supplementaryID }) {
+                if entries[index].media.progressGeneration != epoch {
+                    var next = entries
+                    let media = next[index].media
+                    next[index].media = ListeningMedia(itemID: media.libraryItemID, episodeID: media.episodeID, title: media.title, author: media.author, mediaType: media.mediaType, duration: media.duration, startTime: media.startTime, progressGeneration: epoch)
+                    try save(next)
+                }
                 if entries[index].ebook == nil, let ebook {
                     _ = try downloadURL(path: "/api/items/" + item.id + "/file/" + ebook.ino, account: identity, itemID: item.id)
                     var next = entries
@@ -255,7 +271,7 @@ final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
             }
             if let ebook { _ = try downloadURL(path: "/api/items/" + item.id + "/file/" + ebook.ino, account: identity, itemID: item.id) }
             let duration = tracks.map { $0.startOffset + $0.duration }.max() ?? 0
-            let media = ListeningMedia(itemID: item.id, episodeID: episode?.id, title: attachment?.metadata?.filename ?? selected?.title ?? item.title, author: item.author, mediaType: item.mediaType, duration: duration, startTime: progress?.currentTime ?? 0)
+            let media = ListeningMedia(itemID: item.id, episodeID: episode?.id, title: attachment?.metadata?.filename ?? selected?.title ?? item.title, author: item.author, mediaType: item.mediaType, duration: duration, startTime: progress?.currentTime ?? 0, progressGeneration: epoch)
             let entry = Entry(id: UUID().uuidString, account: identity, media: media, tracks: tracks, chapters: supplementaryID == nil ? (selected?.chapters ?? detail.media.chapters ?? []) : [], ebook: ebook, readingProgress: progress, supplementaryID: supplementaryID, cellularConsent: policy == .ask ? consent : nil, networkPolicy: policy.rawValue, serverPosition: progress?.currentTime ?? 0, serverUpdatedAt: progress?.lastUpdate ?? 0, generation: UUID().uuidString, finished: [], state: .queued, error: nil)
             try FileManager.default.createDirectory(at: root.appendingPathComponent(entry.id), withIntermediateDirectories: true)
             try save(entries + [entry])

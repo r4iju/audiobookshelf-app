@@ -64,15 +64,21 @@ export function useSetFinished() {
       itemId,
       episodeId,
       finished,
+      progressGeneration,
     }: {
       itemId: string;
       episodeId?: string | null;
       finished: boolean;
+      progressGeneration?: number;
     }) =>
       changeProgress(
         client,
         { libraryItemId: itemId, episodeId: episodeId ?? null },
-        { isFinished: finished },
+        {
+          isFinished: finished,
+          ...progressIntent(queryClient.getQueryData(keys.item(connection.id, itemId)), episodeId),
+          ...(progressGeneration === undefined ? {} : { progressGeneration }),
+        },
       ),
     onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
   });
@@ -82,8 +88,16 @@ export function useDiscardProgress() {
   const { client, connection } = useAbs();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (target: DiscardTarget) => discardProgress(client, target),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: keys.me(connection.id) }),
+    mutationFn: (target: DiscardTarget) => {
+      const item = libraryItemSchema.safeParse(
+        queryClient.getQueryData(keys.item(connection.id, target.itemId)),
+      );
+      return discardProgress(client, {
+        ...target,
+        generationReset: item.success && item.data.progressGeneration !== undefined,
+      });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: [connection.id] }),
   });
 }
 
@@ -285,7 +299,29 @@ export function useSaveEbookPlace(itemId: string) {
   return {
     error: mutation.error,
     save: (place: EbookPlace) =>
-      mutation.mutate(issueChange(client, { libraryItemId: itemId, episodeId: null }, place)),
+      mutation.mutate(
+        issueChange(
+          client,
+          { libraryItemId: itemId, episodeId: null },
+          { ...place, ...progressIntent(queryClient.getQueryData(keys.item(connection.id, itemId))) },
+        ),
+      ),
+  };
+}
+
+function progressIntent(item: unknown, episodeId?: string | null) {
+  const parsed = libraryItemSchema.safeParse(item);
+  const snapshot = parsed.success ? parsed.data : null;
+  const generation = z
+    .object({
+      progressGeneration: z.number().optional(),
+      progressGenerations: z.record(z.string(), z.number()).optional(),
+    })
+    .parse(snapshot ?? {});
+  return {
+    updatedAt: Date.now(),
+    progressGeneration:
+      generation.progressGenerations?.[episodeId ?? ""] ?? generation.progressGeneration ?? 0,
   };
 }
 

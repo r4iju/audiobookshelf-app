@@ -109,6 +109,7 @@ sealed interface PlaySource {
         override val account: AccountIdentity, override val itemId: String, override val episodeId: String?,
         val title: String, val author: String, val coverUri: String?, val mediaType: String,
         val tracks: List<AudioTrack>, val files: List<Uri>, val chapters: List<Chapter>, val startTime: Double,
+        val progressGeneration: Long? = null,
     ) : PlaySource
 }
 
@@ -410,7 +411,7 @@ class PlaybackEngine(
         val recordId = withContext(io) {
             journal.begin(source.account, ListeningMedia(source.itemId, source.episodeId, media.now.title, media.now.author,
                 if (source.episodeId != null || media.now.isPodcast) "podcast" else "book", timeline.duration, media.start,
-                playMethod = if (source is PlaySource.Local) 3 else 0), device().deviceId)
+                playMethod = if (source is PlaySource.Local) 3 else 0, progressGeneration = media.progressGeneration), device().deviceId)
         }
         if (request != generation) {
             // Superseded while the journal was written: retire this session instead of installing it.
@@ -440,7 +441,7 @@ class PlaybackEngine(
         load(previous, media.items, position)
     }
 
-    private class Opened(val now: NowPlaying, val tracks: List<AudioTrack>, val items: List<MediaItem>, val start: Double, val streamSessionId: String?)
+    private class Opened(val now: NowPlaying, val tracks: List<AudioTrack>, val items: List<MediaItem>, val start: Double, val streamSessionId: String?, val progressGeneration: Long? = null)
 
     private suspend fun openStream(source: PlaySource.Stream, transcode: Boolean, at: Double?): Opened {
         val session = source.client.play(source.itemId, source.episodeId, transcode)
@@ -462,7 +463,7 @@ class PlaybackEngine(
             val cast = if (castable) CastExtras.of(castTrackUrl(source.client.address, version, session.id, track, transcode, token).toString(), track.mimeType, track.duration) else null
             mediaItem("${source.itemId}/${source.episodeId.orEmpty()}/$index", url.toString(), now, track.mimeType, cast)
         }
-        return Opened(now, tracks, items, start.coerceIn(0.0, duration), session.id)
+        return Opened(now, tracks, items, start.coerceIn(0.0, duration), session.id, session.progressGeneration)
     }
 
     private fun openLocal(source: PlaySource.Local, at: Double?): Opened {
@@ -470,7 +471,7 @@ class PlaybackEngine(
         val now = NowPlaying(source.itemId, source.episodeId, source.title, source.author, source.coverUri, source.chapters, timeline.duration, source.mediaType == "podcast", local = true)
         val items = source.files.mapIndexed { index, uri -> mediaItem("${source.itemId}/${source.episodeId.orEmpty()}/$index", uri.toString(), now, source.tracks.getOrNull(index)?.mimeType) }
         val start = at ?: source.startTime.let { if (timeline.duration - it < 5) 0.0 else it }
-        return Opened(now, source.tracks, items, start, null)
+        return Opened(now, source.tracks, items, start, null, source.progressGeneration)
     }
 
     private suspend fun serverVersion(client: ApiClient): String? = serverVersions[client.address.canonical]

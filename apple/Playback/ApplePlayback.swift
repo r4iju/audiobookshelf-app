@@ -619,13 +619,13 @@ import UIKit
 
     // Legacy servers timestamp audio and reading together. Publish reading only after
     // listening closes; new audio must wait so this write cannot age unsent listening.
-    func publishReading(account: AccountIdentity, itemID: String, location: String, fraction: Double, beforePublication: @escaping @MainActor () throws -> Void) async throws -> Bool {
+    func publishReading(account: AccountIdentity, itemID: String, location: String, fraction: Double, updatedAt: Double? = nil, progressGeneration: Int? = nil, beforePublication: @escaping @MainActor () throws -> Void) async throws -> Bool {
         guard canPublishReading, readingPublication == nil else { return false }
         let publication = Task { @MainActor in
             try await listening.flush()
             guard try await api.currentAccount() == account else { throw CancellationError() }
             try beforePublication()
-            try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction,
+            try await api.saveReading(account: account, itemID: itemID, location: location, progress: fraction, updatedAt: updatedAt, progressGeneration: progressGeneration,
                                       issuing: listening.publications.issuing(account: account, itemID: itemID, episodeID: nil))
         }
         readingPublication = publication
@@ -657,12 +657,12 @@ import UIKit
         try await closeCurrentSession()
     }
 
-    func setFinished(itemID: String, episodeID: String?, finished: Bool) async throws -> CurrentUser {
+    func setFinished(itemID: String, episodeID: String?, finished: Bool, progressGeneration: Int? = nil) async throws -> CurrentUser {
         let owner = try await api.currentAccount()
         try await prepareProgressEdit(itemID: itemID, episodeID: episodeID)
         try Task.checkCancellation()
         guard try await api.currentAccount() == owner else { throw CancellationError() }
-        try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished,
+        try await api.setFinished(itemID: itemID, episodeID: episodeID, finished: finished, progressGeneration: progressGeneration,
                                   issuing: listening.publications.issuing(account: owner, itemID: itemID, episodeID: episodeID))
         let user = try await api.me()
         guard try await api.currentAccount() == owner else { throw CancellationError() }
@@ -781,6 +781,19 @@ import UIKit
         do {
             guard api.authorizationRevision == authorization, try await api.currentAccount() == intent.account else { throw CancellationError() }
             if let rowID = intent.rowID { try await api.deleteProgress(rowID: rowID, authorization: authorization) }
+            else {
+                let item = try await api.item(id: intent.itemID)
+                guard api.authorizationRevision == authorization else { throw CancellationError() }
+                if item.progressGeneration != nil {
+                    let identity = "\(intent.itemID):\(intent.episodeID ?? ""):\(intent.requestedAt)"
+                    try await api.resetMissingProgress(itemID: intent.itemID, episodeID: intent.episodeID, resetID: identity, authorization: authorization)
+                }
+            }
+            if let notify = api.progressResetCommitted {
+                let item = try await api.item(id: intent.itemID)
+                guard api.authorizationRevision == authorization else { throw CancellationError() }
+                try notify(intent.account, item, intent.episodeID)
+            }
             try listening.forgetPosition(account: intent.account, itemID: intent.itemID, episodeID: intent.episodeID, at: intent.requestedAt)
             for cleanup in resetCleanups.values { try cleanup(intent) }
             try listening.finishReset(intent)

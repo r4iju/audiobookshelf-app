@@ -23,7 +23,10 @@ export interface Sent extends Target {
 
 /** A change to a book's or episode's progress (reader place, finished), as sent in one PATCH. */
 export interface ProgressChange extends Sent {
-  change: { isFinished: boolean } | { ebookLocation: string; ebookProgress?: number };
+  change: ({ isFinished: boolean } | { ebookLocation: string; ebookProgress?: number }) & {
+    progressGeneration?: number;
+    updatedAt?: number;
+  };
 }
 
 const targetSchema = z.object({ libraryItemId: z.string(), episodeId: z.string().nullable() });

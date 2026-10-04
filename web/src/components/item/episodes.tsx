@@ -197,7 +197,14 @@ function EpisodeRow({
           aria-label={
             finished ? t("WebMarkNamedNotFinished", episode.title) : t("WebMarkNamedFinished", episode.title)
           }
-          onClick={() => setFinished.mutate({ itemId: item.id, episodeId: episode.id, finished: !finished })}
+          onClick={() =>
+            setFinished.mutate({
+              itemId: item.id,
+              episodeId: episode.id,
+              finished: !finished,
+              progressGeneration: item.progressGenerations?.[episode.id] ?? 0,
+            })
+          }
         >
           {finished ? (
             <Undo2 aria-hidden className="size-5" />

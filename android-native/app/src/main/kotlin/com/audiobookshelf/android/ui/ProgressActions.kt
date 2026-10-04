@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 /** Marks a title or episode finished or unfinished, and discards its progress on the server. */
 @Composable
-fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Active, catalog: CatalogModel, tagPrefix: String = "item") {
+fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Active, catalog: CatalogModel, tagPrefix: String = "item", progressGeneration: Long? = null) {
     val context = LocalContext.current
     val graph = context.graph
     val scope = rememberCoroutineScope()
@@ -66,7 +66,9 @@ fun ProgressActions(itemId: String, episodeId: String?, active: SessionState.Act
         OutlinedButton(
             onClick = {
                 run {
-                    val saved = graph.setFinished(active.client, itemId, episodeId, !finished)
+                    val item = catalog.items.firstOrNull { it.id == itemId }
+                    val epoch = item?.progressGenerations?.get(episodeId.orEmpty()) ?: item?.progressGeneration ?: progressGeneration
+                    val saved = graph.setFinished(active.client, itemId, episodeId, !finished, epoch)
                     catalog.applyProgress(saved ?: MediaProgress(libraryItemId = itemId, episodeId = episodeId, isFinished = !finished, progress = if (finished) 0.0 else 1.0))
                 }
             },

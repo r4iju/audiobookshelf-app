@@ -228,6 +228,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
             duration: opened.session.duration || media.duration,
             startTime: currentTime,
             startedAt,
+            progressGeneration: opened.session.progressGeneration,
           },
           timeListening: 0,
           serverOffset: opened.serverOffset,

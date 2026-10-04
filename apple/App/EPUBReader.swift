@@ -123,7 +123,7 @@ private struct EPUBPreferences: Codable {
         }
         if let location = value["location"] as? String, location.hasPrefix("epubcfi("), let fraction = value["fraction"] as? Double {
             do {
-                try store.update(account: source.account, itemID: source.itemID, format: "epub", location: location, fraction: fraction, rotation: 0, fileID: source.fileID)
+                try store.update(account: source.account, itemID: source.itemID, format: "epub", location: location, fraction: fraction, rotation: 0, fileID: source.fileID, progressGeneration: source.progressGeneration)
                 store.sync(api: api)
                 savingError = nil
             } catch { self.savingError = NativeStrings.current("Reading could not be saved: {0}", error.localizedDescription) }

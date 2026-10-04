@@ -102,6 +102,7 @@ export async function finishDiscard(
   hold: Hold,
   { force = false, forgotten = [] }: { force?: boolean; forgotten?: ListeningReport[] },
 ): Promise<DiscardResult> {
+  force ||= hold.generationReset === true;
   const connectionId = client.connection.id;
   const phase = await block(connectionId, hold.id, hold, forgotten);
   if (phase === "finished" || phase === "kept") return ended(phase);
@@ -121,7 +122,13 @@ export async function finishDiscard(
     }
     outboxFor(connectionId).markUnconfirmed(hold.id, false);
   }
-  await client.command("DELETE", `/api/me/progress/${hold.progressId}`);
+  if (hold.generationReset)
+    await client.command(
+      "POST",
+      `/api/me/progress/${hold.libraryItemId}${hold.episodeId ? `/${hold.episodeId}` : ""}/reset`,
+      { resetId: hold.id },
+    );
+  else await client.command("DELETE", `/api/me/progress/${hold.progressId}`);
   await finishDelete(connectionId, hold.id, hold);
   return "done";
 }

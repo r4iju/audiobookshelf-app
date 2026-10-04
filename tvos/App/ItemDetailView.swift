@@ -37,10 +37,10 @@ import SwiftUI
         navigator.tab = .nowPlaying
     }
 
-    func setFinished(_ finished: Bool, itemID: String, episodeID: String?, player: TVPlayer, catalog: CatalogStore) async {
+    func setFinished(_ finished: Bool, itemID: String, episodeID: String?, progressGeneration: Int? = nil, player: TVPlayer, catalog: CatalogStore) async {
         busy = true; error = nil
         defer { busy = false }
-        do { catalog.remember(try await player.setFinished(itemID: itemID, episodeID: episodeID, finished: finished)) }
+        do { catalog.remember(try await player.setFinished(itemID: itemID, episodeID: episodeID, finished: finished, progressGeneration: progressGeneration)) }
         catch is CancellationError {}
         catch {
             catalog.noteAuthentication(error)
@@ -78,7 +78,7 @@ struct PlaybackActions: View {
                 .accessibilityLabel(action)
                 .disabled(player.preparing || player.seeking || detail.busy)
                 Button {
-                    Task { await detail.setFinished(!finished, itemID: item.id, episodeID: episode?.id, player: player, catalog: catalog) }
+                    Task { await detail.setFinished(!finished, itemID: item.id, episodeID: episode?.id, progressGeneration: item.progressGenerations?[episode?.id ?? ""] ?? item.progressGeneration, player: player, catalog: catalog) }
                 } label: {
                     Label(completion, systemImage: finished ? "arrow.uturn.backward" : "checkmark")
                 }

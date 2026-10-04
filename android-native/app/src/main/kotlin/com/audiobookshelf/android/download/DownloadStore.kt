@@ -43,6 +43,7 @@ class DownloadStore(private val file: File) {
         /** Folder tree the files are saved in; [directory] then only holds the cover and unfinished parts. */
         val folder: String? = null,
         val folderName: String? = null,
+        val progressGeneration: Long? = null,
     ) {
         /** Matches the UI's item key: the item id, or `item-episode` for an episode. */
         val key get() = if (episodeId == null) itemId else "$itemId-$episodeId"

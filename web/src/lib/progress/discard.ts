@@ -4,6 +4,7 @@ import { type DiscardResult, finishDiscard, outboxFor } from "./sync";
 
 export interface DiscardTarget {
   progressId: string;
+  generationReset?: boolean;
   itemId: string;
   episodeId: string | null;
 }
@@ -14,7 +15,7 @@ export interface DiscardTarget {
  */
 export async function discardProgress(
   client: AbsClient,
-  { progressId, itemId, episodeId }: DiscardTarget,
+  { progressId, itemId, episodeId, generationReset }: DiscardTarget,
 ): Promise<DiscardResult> {
   // Nothing may report the old position after the server forgets it. The hold keeps every tab from sending listening
   // for the book from now on, and this device lets go of the old position, before finishDiscard deletes.
@@ -23,7 +24,7 @@ export async function discardProgress(
   const forgotten = outbox
     .pending()
     .filter((entry) => entry.libraryItemId === itemId && entry.episodeId === episodeId);
-  const hold = outbox.hold(itemId, episodeId, progressId);
+  const hold = outbox.hold(itemId, episodeId, progressId, generationReset);
   try {
     await usePlayerStore.getState().startOver({ connectionId, itemId, episodeId });
   } catch (error) {
@@ -35,7 +36,7 @@ export async function discardProgress(
   try {
     result = await finishDiscard(
       client,
-      { id: hold.id, libraryItemId: itemId, episodeId, progressId },
+      { id: hold.id, libraryItemId: itemId, episodeId, progressId, generationReset },
       { forgotten },
     );
   } catch (error) {

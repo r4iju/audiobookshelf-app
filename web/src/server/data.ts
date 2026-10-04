@@ -57,6 +57,17 @@ export function database() {
     CREATE TABLE IF NOT EXISTS media_progress (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       item_id TEXT NOT NULL REFERENCES catalog_items(id), episode_id TEXT NOT NULL DEFAULT '', content TEXT NOT NULL,
       UNIQUE(user_id, item_id, episode_id));
+    CREATE TABLE IF NOT EXISTS listening_reports (user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      id TEXT NOT NULL, item_id TEXT NOT NULL REFERENCES catalog_items(id), episode_id TEXT NOT NULL DEFAULT '',
+      content TEXT NOT NULL, PRIMARY KEY(user_id, id));
+    CREATE TABLE IF NOT EXISTS progress_resets (user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      item_id TEXT NOT NULL REFERENCES catalog_items(id), episode_id TEXT NOT NULL DEFAULT '', cutoff INTEGER NOT NULL,
+      PRIMARY KEY(user_id, item_id, episode_id));
+    CREATE TABLE IF NOT EXISTS progress_reset_commands (user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      id TEXT NOT NULL, item_id TEXT NOT NULL REFERENCES catalog_items(id), episode_id TEXT NOT NULL DEFAULT '',
+      generation INTEGER NOT NULL, PRIMARY KEY(user_id,id));
+    CREATE TABLE IF NOT EXISTS deleted_progress (user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      id TEXT NOT NULL, PRIMARY KEY(user_id,id));
     CREATE TABLE IF NOT EXISTS scan_runs (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
       status TEXT NOT NULL, started_at INTEGER NOT NULL, completed_at INTEGER, report TEXT);
     INSERT OR IGNORE INTO schema_version(version) VALUES (3);
@@ -64,7 +75,32 @@ export function database() {
       WHERE status = 'running';
   `);
   globalThis.leafwakeDatabase = db;
+  if (
+    !db
+      .prepare("PRAGMA table_info(progress_resets)")
+      .all()
+      .some((column) => column.name === "generation")
+  ) {
+    db.exec("ALTER TABLE progress_resets ADD COLUMN generation INTEGER NOT NULL DEFAULT 1;");
+  }
+  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (4);");
   return db;
+}
+
+export function progressGeneration(userId: string, itemId: string, episodeId = "") {
+  const row = database()
+    .prepare("SELECT generation FROM progress_resets WHERE user_id=? AND item_id=? AND episode_id=?")
+    .get(userId, itemId, episodeId);
+  return row && typeof row.generation === "number" ? row.generation : 0;
+}
+
+export function progressGenerations(userId: string, itemId: string) {
+  return Object.fromEntries(
+    database()
+      .prepare("SELECT episode_id,generation FROM progress_resets WHERE user_id=? AND item_id=?")
+      .all(userId, itemId)
+      .map((row) => [String(row.episode_id), Number(row.generation)]),
+  );
 }
 
 export function transaction<T>(work: (db: DatabaseSync) => T): T {

@@ -8,6 +8,7 @@ import { type Begun, beginPublishing, finishSending, reattempt, thisPage } from 
 // already has, so reports are dated in server time.
 
 export const listeningReportSchema = z.object({
+  progressGeneration: z.number().int().nonnegative().optional(),
   id: z.string(),
   libraryItemId: z.string(),
   episodeId: z.string().nullable(),
@@ -40,6 +41,7 @@ export type ReportIdentity = Pick<
   | "duration"
   | "startTime"
   | "startedAt"
+  | "progressGeneration"
 >;
 
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -109,6 +111,7 @@ export interface Hold {
   libraryItemId: string;
   episodeId: string | null;
   progressId: string;
+  generationReset?: boolean;
 }
 
 export interface DeliveryResult {
@@ -127,6 +130,7 @@ const holdSchema = z.object({
   libraryItemId: z.string(),
   episodeId: z.string().nullable(),
   progressId: z.string(),
+  generationReset: z.boolean().optional(),
   /** Listening for it that another tab sent, or that failed without an answer, is not confirmed (see sync.ts). */
   unconfirmed: z.boolean().default(false),
   heartbeat: z.number(),
@@ -178,11 +182,12 @@ export function createOutbox(
     const { id: _, ...stored } = current;
     storage.write(`${holdPrefix}${holdId}`, JSON.stringify({ ...stored, ...fields }));
   };
-  const asHold = ({ id, libraryItemId, episodeId, progressId }: Hold): Hold => ({
+  const asHold = ({ id, libraryItemId, episodeId, progressId, generationReset }: Hold): Hold => ({
     id,
     libraryItemId,
     episodeId,
     progressId,
+    generationReset,
   });
   const notify = () => {
     for (const listener of listeners) listener();
@@ -202,12 +207,19 @@ export function createOutbox(
      * its owner (`settle`) or, once the owner has given up (`abandon`) or is gone, by whichever tab finishes it.
      * Sending it again is safe because it names the old progress row, which no later listening can be saved in.
      */
-    hold(libraryItemId: string, episodeId: string | null, progressId: string) {
+    hold(libraryItemId: string, episodeId: string | null, progressId: string, generationReset = false) {
       const id = randomId();
       const holdKey = `${holdPrefix}${id}`;
       storage.write(
         holdKey,
-        JSON.stringify({ libraryItemId, episodeId, progressId, heartbeat: Date.now(), abandoned: false }),
+        JSON.stringify({
+          libraryItemId,
+          episodeId,
+          progressId,
+          generationReset,
+          heartbeat: Date.now(),
+          abandoned: false,
+        }),
       );
       notify();
       const disown = owners.claim(id);
