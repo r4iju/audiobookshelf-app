@@ -171,11 +171,13 @@ export function pagedItems(actor: Account, id: string, params: URLSearchParams) 
       ]),
   );
   const filter = params.get("filter");
+  let selectedSeries: string | undefined;
   if (filter) {
     const dot = filter.indexOf(".");
     if (dot < 1) throw new DomainError(400, "Invalid item filter");
     const group = filter.slice(0, dot);
     const value = Buffer.from(decodeURIComponent(filter.slice(dot + 1)), "base64").toString("utf8");
+    if (group === "series") selectedSeries = value;
     items = items.filter((item) => {
       const metadata = item.media.metadata;
       switch (group) {
@@ -226,6 +228,14 @@ export function pagedItems(actor: Account, id: string, params: URLSearchParams) 
   const sort = params.get("sort") ?? "addedAt";
   const value = (item: LibraryItem): string | number => {
     switch (sort) {
+      case "sequence": {
+        const sequence = item.media.metadata.series?.find((series) => series.id === selectedSeries)?.sequence;
+        return sequence != null && sequence !== "" && Number.isFinite(Number(sequence))
+          ? Number(sequence)
+          : Infinity;
+      }
+      case "media.metadata.publisher":
+        return item.media.metadata.publisher ?? "";
       case "media.metadata.title":
         return item.media.metadata.title;
       case "media.metadata.author":

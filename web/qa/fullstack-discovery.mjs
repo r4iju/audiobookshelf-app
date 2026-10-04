@@ -79,6 +79,14 @@ test("permission-filtered author/series discovery, collapsed pages and committed
     group.books.map((b) => b.media.metadata.title),
     Array.from({ length: 12 }, (_, i) => `Book ${String(i).padStart(2, "0")}`),
   );
+  const sequencePage = await json(
+    `/api/libraries/${library.id}/items?sort=sequence&filter=series.${encodeURIComponent(encodeURIComponent(Buffer.from(group.id).toString("base64")))}&limit=24&page=0`,
+    owner.accessToken,
+  );
+  assert.deepEqual(
+    sequencePage.results.map((b) => b.id),
+    group.books.map((b) => b.id),
+  );
   const detail = await json(
     `/api/authors/${shared.id}?include=items,series&library=${library.id}`,
     owner.accessToken,
