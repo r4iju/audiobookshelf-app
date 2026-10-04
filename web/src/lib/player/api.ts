@@ -43,9 +43,16 @@ export async function openPlayback(client: AbsClient, itemId: string, episodeId:
   const tracks = session.audioTracks.map((track, position) => {
     const hls = track.contentUrl.includes("/hls/") || track.mimeType === "application/vnd.apple.mpegurl";
     return {
-      url: client.url(
-        hls ? track.contentUrl : `/public/session/${session.id}/track/${track.index ?? position + 1}`,
-      ),
+      // HTML media elements cannot attach headers. Each load uses credentials current after any refresh.
+      get url() {
+        const url = new URL(
+          client.url(
+            hls ? track.contentUrl : `/public/session/${session.id}/track/${track.index ?? position + 1}`,
+          ),
+        );
+        url.searchParams.set("token", client.bearer);
+        return url.toString();
+      },
       startOffset: track.startOffset,
       duration: track.duration,
       hls,

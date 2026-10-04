@@ -107,6 +107,7 @@ function allowed(actor: Account, item: LibraryItem) {
   });
 }
 export function itemFor(actor: Account, id: string) {
+  if (!actor.active) throw new DomainError(401, "Sign-in required");
   const row = database().prepare("SELECT content FROM catalog_items WHERE id = ?").get(id);
   if (!row) throw new DomainError(404, "Not found");
   const item = itemRow(row);

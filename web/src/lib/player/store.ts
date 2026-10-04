@@ -34,7 +34,7 @@ export interface PlayerTrack {
 interface Source {
   serverSessionId: string;
   tracks: PlayerTrack[];
-  /** Opened to recover from a media failure; a second failure is reported instead of retried. */
+  /** A retry must produce actual audio before another automatic retry is allowed. */
   recovery: boolean;
 }
 
@@ -391,7 +391,11 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
     onPlaying: () => {
       const { listening } = get();
       if (listening) set({ listening: { ...listening, lastTick: Date.now() } });
-      update(() => ({ status: "playing", error: null }));
+      update((player) => ({
+        status: "playing",
+        error: null,
+        source: player.source?.recovery ? { ...player.source, recovery: false } : player.source,
+      }));
     },
     onPaused: () => {
       tick(false);
@@ -417,7 +421,7 @@ export const usePlayerStore = create<PlayerStore>()((set, get) => {
     onMediaError: async (detail) => {
       const { player } = get();
       if (player.phase !== "active") return;
-      // The server forgets playback sessions on restart; one fresh session at the same position recovers from that.
+      // A fresh session renews expired media authorization; failed retries stop until audio actually plays.
       if (player.source && !player.source.recovery) {
         await start(player.media, player.currentTime, true);
         const after = get().player;

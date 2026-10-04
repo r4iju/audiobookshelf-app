@@ -38,3 +38,11 @@ The blackbox journey was observed red before implementation. Path and browse reg
 Evidence: `/tmp/leafwake-catalog-image-green.log`, `/tmp/leafwake-catalog-image-restart.log`, `/tmp/leafwake-catalog-roots-red.log`, `/tmp/leafwake-catalog-metadata-red.log`, `/tmp/leafwake-catalog-browse-red.log`. Image `leafwake:catalog-154` config digest: `sha256:4da150c3a07de8607c34838e5b54974f199a21bc8e9cf2b508589e808e978262`.
 
 The `media_progress` schema and browse readers enable progress filters; playback/progress writes remain #156. File streaming remains #155. No native playback or full migration acceptance is claimed by this slice.
+
+## #155 secured multi-file streaming
+
+The replacement opens durable account-bound playback sessions from scanned media, serves bounded file streams with HEAD/ranges and denies invalid ranges, unauthorized accounts, manipulated identifiers and changed symlinks. Account and session authority is rechecked after filesystem awaits. Access tokens expose native-compatible expiry while exact persisted token hashes remain authoritative. Sessions survive restart on the same volume.
+
+The HTTP journey and native expiry regression were observed red before their fixes. Browser interaction exposed missing media authorization; regression tests were observed red for initial refresh and two later rotations before fixes. Track loads use current credentials, and successful audio playback clears the bounded recovery guard. Production image tests passed. Android emulator playback advanced across two real files and browser audio advanced with no media error. These are streaming acceptance only; durable progress remains #156.
+
+Typecheck, lint, 118 unit tests and production image build passed. Independent source review cleared streaming and repeated browser credential renewal. Evidence: `/tmp/leafwake-streaming-final-image-green.log`, `/tmp/leafwake-native-streaming-155.log`, `/tmp/leafwake-browser-media-red.log`, `/tmp/leafwake-browser-media-renewal-red.log`. Image `leafwake:streaming-155` config digest: `sha256:aa82932d835abab05afdf1b5443f98f9f38e6d0e1b0e750c59c798f79e9fa826`.

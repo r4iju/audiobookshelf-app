@@ -34,6 +34,8 @@ import {
 } from "./catalog";
 import { database, initialized, setupKey } from "./data";
 
+import { closePlayback, openPlayback, playSchema, serveFile, serveTrack } from "./playback";
+
 const MAX_BODY = 16_384;
 export function json(value: unknown, status = 200) {
   return Response.json(value, { status, headers: { "cache-control": "no-store" } });
@@ -137,7 +139,26 @@ export async function api(request: Request) {
       await createOwner(setupSchema.parse(input));
       return json({ initialized: true }, 201);
     }
-    const user = authenticate(bearer(request));
+    const fileRoute = path.match(/^\/api\/items\/([^/]+)\/file\/([^/]+)(?:\/(download))?$/);
+    const token = bearer(request) ?? (fileRoute ? new URL(request.url).searchParams.get("token") : null);
+    const user = authenticate(token);
+    if (fileRoute && ["GET", "HEAD"].includes(request.method))
+      return serveFile(
+        request,
+        () => authenticate(token),
+        z.string().parse(fileRoute[1]),
+        z.string().parse(fileRoute[2]),
+        Boolean(fileRoute[3]),
+      );
+    const playRoute = path.match(/^\/api\/items\/([^/]+)\/play$/);
+    if (playRoute && request.method === "POST")
+      return json(openPlayback(user, z.string().parse(playRoute[1]), playSchema.parse(await body(request))));
+    const closeRoute = path.match(/^\/api\/session\/([^/]+)\/close$/);
+    if (closeRoute && request.method === "POST") {
+      sameOrigin(request);
+      closePlayback(user, z.string().parse(closeRoute[1]));
+      return json({ success: true });
+    }
     if (path.startsWith("/api/users")) {
       requireAdministrator(user);
       const segments = path.split("/");
@@ -206,5 +227,20 @@ export async function api(request: Request) {
     const itemRoute = path.match(/^\/api\/items\/([^/]+)$/);
     if (itemRoute && request.method === "GET") return json(itemFor(user, z.string().parse(itemRoute[1])));
     throw new DomainError(404, "Not found");
+  });
+}
+
+export function publicMedia(request: Request) {
+  return boundary(async () => {
+    const url = new URL(request.url);
+    const match = url.pathname.match(/^\/public\/session\/([^/]+)\/track\/(\d+)$/);
+    if (!match) throw new DomainError(404, "Not found");
+    const token = bearer(request) ?? url.searchParams.get("token");
+    return serveTrack(
+      request,
+      () => authenticate(token),
+      z.string().parse(match[1]),
+      z.coerce.number().int().min(1).parse(match[2]),
+    );
   });
 }
