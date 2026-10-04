@@ -123,6 +123,22 @@ export function listsFor(actor: Account, kind: ListKind, libraryId: string, para
     page,
   };
 }
+export function allListsFor(actor: Account, kind: ListKind) {
+  return database()
+    .prepare(
+      "SELECT content FROM media_lists WHERE kind=? AND (?='collection' OR user_id=?) ORDER BY created_at,id",
+    )
+    .all(kind, kind, actor.id)
+    .flatMap((record) => {
+      const list = storedSchema.parse(JSON.parse(z.string().parse(record.content)));
+      try {
+        return [expanded(actor, list)];
+      } catch (error) {
+        if (error instanceof DomainError && error.status === 404) return [];
+        throw error;
+      }
+    });
+}
 function normalize(
   actor: Account,
   kind: ListKind,

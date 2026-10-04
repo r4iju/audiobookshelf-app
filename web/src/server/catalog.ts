@@ -1,4 +1,5 @@
 import { feedForItem } from "./feeds";
+import { imageType } from "./image-format";
 import { serverSettings } from "./server-settings";
 import "server-only";
 import { execFile } from "node:child_process";
@@ -281,8 +282,8 @@ export function pagedItems(actor: Account, id: string, params: URLSearchParams) 
     .number()
     .int()
     .min(1)
-    .max(200)
-    .parse(params.get("limit") ?? 50);
+    .max(params.get("limit") === "0" ? 10000 : 200)
+    .parse(params.get("limit") === "0" ? 10000 : (params.get("limit") ?? 50));
   const page = z.coerce
     .number()
     .int()
@@ -530,7 +531,7 @@ type ScannedFile = {
     isSupplementary?: boolean;
   };
 };
-async function readMetadata(folder: string, path: string) {
+async function readSidecar(folder: string, path: string, limit: number) {
   const entry = await lstat(path);
   if (entry.isSymbolicLink()) throw new Error("Metadata symlink skipped");
   if (!entry.isFile()) throw new Error("Metadata is not a regular file");
@@ -542,21 +543,32 @@ async function readMetadata(folder: string, path: string) {
     const opened =
       process.platform === "linux" ? await realpath(`/proc/self/fd/${handle.fd}`) : await realpath(canonical);
     if (!within(folder, opened) || !stat.isFile()) throw new Error("Metadata escaped its mounted folder");
-    if (stat.size > 262144) throw new Error("Metadata exceeds 256 KiB");
-    const bytes = Buffer.alloc(262145);
+    if (stat.size > limit) throw new Error("Sidecar exceeds its size limit");
+    const bytes = Buffer.alloc(limit + 1);
     let total = 0;
     while (total < bytes.length) {
       const read = await handle.read(bytes, total, bytes.length - total, total);
       if (!read.bytesRead) break;
       total += read.bytesRead;
     }
-    if (total > 262144) throw new Error("Metadata exceeds 256 KiB");
-    return JSON.parse(bytes.subarray(0, total).toString("utf8"));
+    if (total > limit) throw new Error("Sidecar exceeds its size limit");
+    return bytes.subarray(0, total);
   } finally {
     await handle.close();
   }
 }
 type IdentityPool = Map<string, { id: string; name: string }>;
+async function readMetadata(folder: string, path: string) {
+  return JSON.parse((await readSidecar(folder, path, 262144)).toString("utf8"));
+}
+async function optionalSidecar(folder: string, path: string, limit: number) {
+  try {
+    return await readSidecar(folder, path, limit);
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") return null;
+    throw error;
+  }
+}
 function identityPool() {
   const pool: IdentityPool = new Map();
   for (const row of database().prepare("SELECT content FROM catalog_items").all()) {
@@ -587,15 +599,23 @@ export function metadataIdentity(
 ) {
   return identity(identityPool(), kind, name, prior);
 }
-async function scanFolder(library: Library, folder: string, errors: ScanError[], pool: IdentityPool) {
+type ScanBudget = { entries: number; covers: number; coverBytes: number };
+const scanBudget = (): ScanBudget => ({ entries: 0, covers: 0, coverBytes: 0 });
+async function scanFolder(
+  library: Library,
+  folder: string,
+  errors: ScanError[],
+  pool: IdentityPool,
+  budget = scanBudget(),
+) {
   const groups = new Map<string, string[]>();
-  let count = 0;
   async function walk(directory: string, depth: number) {
     if (!within(folder, await realpath(directory)) || (await lstat(directory)).isSymbolicLink())
       throw new Error("Scan directory escaped its mounted folder");
     if (depth > serverSettings().maxScanDepth) throw new Error("Folder nesting exceeds scan limit");
     for (const entry of await readdir(directory, { withFileTypes: true })) {
-      if (++count > serverSettings().maxScanEntries) throw new Error("Folder entry count exceeds scan limit");
+      if (++budget.entries > serverSettings().maxScanEntries)
+        throw new Error("Folder entry count exceeds scan limit");
       const path = resolve(directory, entry.name);
       if (entry.isSymbolicLink()) {
         errors.push({ path, message: "Symlink skipped" });
@@ -614,8 +634,13 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
     }
   }
   await walk(folder, 0);
-  const records: { item: LibraryItem; path: string; files: ScannedFile[]; expectedContent: string | null }[] =
-    [];
+  const records: {
+    item: LibraryItem;
+    path: string;
+    files: ScannedFile[];
+    expectedContent: string | null;
+    cover: { mime: string; bytes: Buffer } | null;
+  }[] = [];
   for (const [directory, paths] of groups) {
     try {
       const previous = database()
@@ -628,7 +653,30 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
       } catch (error) {
         if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
       }
+      const prior = previous ? itemRow(previous) : null;
+      const directories = relative(folder, directory).split(sep).filter(Boolean);
+      const namedBook = /^(?:book|vol(?:ume)?)\s*(\d+(?:\.\d+)?)\s*[-:.]\s*(.+)$/i.exec(basename(directory));
+      const inferredSeries =
+        directories.length >= 3
+          ? [{ name: directories[directories.length - 2] ?? "", sequence: namedBook?.[1] ?? null }]
+          : [];
+      const description = await optionalSidecar(folder, resolve(directory, "desc.txt"), 65536);
+      const narrator = await optionalSidecar(folder, resolve(directory, "reader.txt"), 16384);
+      let scannedCover: { mime: string; bytes: Buffer } | null = null;
+      if (!prior?.media.coverPath || prior.media.coverPath.startsWith("scanned:")) {
+        const bytes =
+          (await optionalSidecar(folder, resolve(directory, "cover.jpg"), 5242880)) ??
+          (await optionalSidecar(folder, resolve(directory, "cover.png"), 5242880));
+        if (bytes) {
+          budget.covers++;
+          budget.coverBytes += bytes.length;
+          if (budget.covers > 1000 || budget.coverBytes > 134217728)
+            throw new Error("Scan cover inventory exceeds its bounded limit");
+          scannedCover = { mime: imageType(bytes), bytes };
+        }
+      }
       const files: ScannedFile[] = [];
+      const localEpisodes: NonNullable<LibraryItem["media"]["episodes"]> = [];
       const tracks: NonNullable<LibraryItem["media"]["tracks"]> = [];
       const chapters: NonNullable<LibraryItem["media"]["chapters"]> = [];
       let duration = 0;
@@ -678,10 +726,30 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
               end: duration + file.duration,
               title: basename(path, ext),
             });
+          if (library.mediaType === "podcast") {
+            const previousEpisode = prior?.media.episodes?.find((episode) => episode.audioFile?.ino === ino);
+            const date = Date.parse(measured.format.tags?.date ?? "");
+            localEpisodes.push({
+              ...previousEpisode,
+              id: previousEpisode?.id ?? randomUUID(),
+              libraryItemId: id,
+              title: previousEpisode?.title || measured.format.tags?.title || basename(path, ext),
+              publishedAt: previousEpisode?.publishedAt ?? (Number.isFinite(date) ? date : stat.birthtimeMs),
+              addedAt: previousEpisode?.addedAt ?? stat.birthtimeMs,
+              duration: file.duration,
+              size: stat.size,
+              audioFile: file,
+              chapters: measured.chapters.map((chapter, index) => ({
+                id: index,
+                start: chapter.start_time,
+                end: chapter.end_time,
+                title: chapter.tags?.title ?? `Chapter ${index + 1}`,
+              })),
+            });
+          }
           duration += file.duration;
         }
       }
-      const prior = previous ? itemRow(previous) : null;
       const ebook =
         files.find((file) => file.content.fileType === "ebook" && file.id === prior?.media.ebookFile?.ino) ??
         files.find((file) => file.content.fileType === "ebook");
@@ -689,7 +757,13 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
         file.content.isSupplementary = file.content.fileType === "ebook" && file !== ebook;
       const authors =
         metadata.authors ??
-        (embedded.artist ? [embedded.artist] : (prior?.media.metadata.authors?.map((ref) => ref.name) ?? []));
+        (embedded.artist
+          ? [embedded.artist]
+          : prior?.media.metadata.authors?.length
+            ? prior.media.metadata.authors.map((ref) => ref.name)
+            : directories.length >= 2
+              ? [directories[0] ?? ""]
+              : []);
       const managedRow = database().prepare("SELECT content FROM metadata_overrides WHERE item_id=?").get(id);
       const managed = managedRow
         ? z
@@ -710,14 +784,25 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
         media: {
           ...prior?.media,
           id: prior?.media.id ?? id,
+          coverPath: scannedCover
+            ? `scanned:${id}`
+            : prior?.media.coverPath?.startsWith("scanned:")
+              ? null
+              : prior?.media.coverPath,
           metadata: {
             ...prior?.media.metadata,
             ...metadata,
-            title: metadata.title ?? embedded.album ?? embedded.title ?? basename(directory),
+            title:
+              metadata.title ?? embedded.album ?? embedded.title ?? namedBook?.[2] ?? basename(directory),
+            description:
+              metadata.description ?? prior?.media.metadata.description ?? description?.toString("utf8"),
             authors: authors.map((name) =>
               identity(pool, "authors", name, prior?.media.metadata.authors ?? []),
             ),
-            series: (metadata.series ?? prior?.media.metadata.series ?? []).map((entry) => {
+            series: (
+              metadata.series ??
+              (prior?.media.metadata.series?.length ? prior.media.metadata.series : inferredSeries)
+            ).map((entry) => {
               const ref = typeof entry === "string" ? { name: entry, sequence: null } : entry;
               return {
                 ...identity(pool, "series", ref.name, prior?.media.metadata.series ?? []),
@@ -725,7 +810,13 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
               };
             }),
             authorName: authors.join(", "),
-            narrators: metadata.narrators ?? prior?.media.metadata.narrators ?? [],
+            narrators:
+              metadata.narrators ??
+              (prior?.media.metadata.narrators?.length
+                ? prior.media.metadata.narrators
+                : narrator
+                  ? [narrator.toString("utf8").trim()]
+                  : []),
             genres:
               metadata.genres ?? (embedded.genre ? [embedded.genre] : (prior?.media.metadata.genres ?? [])),
             ...managed?.metadata,
@@ -741,11 +832,19 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
         },
         libraryFiles: files.map((file) => file.content),
       });
-      if (library.mediaType === "podcast" && prior) {
-        item.media.metadata = prior.media.metadata;
-        item.media.episodes = (prior.media.episodes ?? []).filter((episode) =>
-          files.some((file) => file.id === episode.audioFile?.ino),
-        );
+      if (library.mediaType === "podcast") {
+        item.media.metadata = {
+          ...item.media.metadata,
+          ...prior?.media.metadata,
+          type: prior?.media.metadata.type ?? "episodic",
+          author: prior?.media.metadata.author ?? embedded.artist ?? authors.join(", "),
+        };
+        item.media.episodes = [
+          ...(prior?.media.episodes ?? []).filter(
+            (episode) => !episode.audioFile && !localEpisodes.some((local) => local.id === episode.id),
+          ),
+          ...localEpisodes,
+        ];
         item.media.numEpisodes = item.media.episodes.length;
         item.media.tracks = [];
         item.media.chapters = [];
@@ -754,6 +853,7 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
         item,
         path: directory,
         files,
+        cover: scannedCover,
         expectedContent: previous ? z.string().parse(previous.content) : null,
       });
     } catch (error) {
@@ -788,6 +888,12 @@ export async function catalogUpload(libraryId: string, path: string, authorize: 
     db.prepare(
       "INSERT INTO catalog_items VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET content=excluded.content",
     ).run(record.item.id, libraryId, path, JSON.stringify(record.item));
+    if (record.cover)
+      db.prepare(
+        "INSERT INTO item_covers VALUES(?,?,?) ON CONFLICT(item_id) DO UPDATE SET mime=excluded.mime,bytes=excluded.bytes",
+      ).run(record.item.id, record.cover.mime, record.cover.bytes);
+    else if (!record.item.media.coverPath)
+      db.prepare("DELETE FROM item_covers WHERE item_id=?").run(record.item.id);
     for (const file of record.files)
       db.prepare(
         "INSERT INTO media_files VALUES(?,?,?,?) ON CONFLICT(item_id,id) DO UPDATE SET content=excluded.content",
@@ -816,9 +922,10 @@ export async function scanLibrary(actor: Account, id: string) {
   );
   try {
     const records: Awaited<ReturnType<typeof scanFolder>> = [];
-    const pool = identityPool();
+    const pool = identityPool(),
+      budget = scanBudget();
     for (const folder of library.folders)
-      records.push(...(await scanFolder(library, await mountedPath(folder.fullPath), errors, pool)));
+      records.push(...(await scanFolder(library, await mountedPath(folder.fullPath), errors, pool, budget)));
     const report = scanReportSchema.parse({
       id: scanId,
       status: "complete",
@@ -852,6 +959,12 @@ export async function scanLibrary(actor: Account, id: string) {
         db.prepare(
           "INSERT INTO catalog_items VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET content = excluded.content",
         ).run(record.item.id, id, record.path, JSON.stringify(record.item));
+        if (record.cover)
+          db.prepare(
+            "INSERT INTO item_covers VALUES(?,?,?) ON CONFLICT(item_id) DO UPDATE SET mime=excluded.mime,bytes=excluded.bytes",
+          ).run(record.item.id, record.cover.mime, record.cover.bytes);
+        else if (!record.item.media.coverPath)
+          db.prepare("DELETE FROM item_covers WHERE item_id=?").run(record.item.id);
         for (const file of record.files)
           db.prepare(
             "INSERT INTO media_files VALUES (?, ?, ?, ?) ON CONFLICT(item_id,id) DO UPDATE SET content = excluded.content",

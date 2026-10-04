@@ -116,8 +116,12 @@ test("a discard the server cannot take yet stays pending, keeps new listening ba
   });
   const server = async () => (await api.call(`/api/me/progress/${id}`)).body;
   const reachable = { delete: false };
-  await page.route("**/api/me/progress/*", (route) =>
-    route.request().method() === "DELETE" && !reachable.delete ? route.abort() : route.fallback(),
+  await page.route("**/api/me/progress/**", (route) =>
+    (route.request().method() === "DELETE" ||
+      (route.request().method() === "POST" && route.request().url().endsWith("/reset"))) &&
+    !reachable.delete
+      ? route.abort()
+      : route.fallback(),
   );
 
   await signIn(page);

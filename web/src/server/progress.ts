@@ -38,6 +38,8 @@ export const localReportsSchema = z.object({
 export const progressPatchSchema = z
   .object({
     currentTime: seconds.optional(),
+    duration: seconds.optional(),
+    progress: z.number().finite().min(0).max(1).optional(),
     isFinished: z.boolean().optional(),
     hideFromContinueListening: z.boolean().optional(),
     ebookLocation: z.string().max(8192).nullable().optional(),
@@ -45,7 +47,8 @@ export const progressPatchSchema = z
     updatedAt: timestamp.optional(),
     progressGeneration: z.number().int().nonnegative().optional(),
   })
-  .strict();
+  .strict()
+  .transform(({ duration: _duration, progress: _progress, ...intent }) => intent);
 function readContent(row: unknown) {
   return row
     ? mediaProgressSchema.parse(JSON.parse(z.object({ content: z.string() }).parse(row).content))

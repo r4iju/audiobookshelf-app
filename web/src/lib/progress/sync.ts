@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { type AbsClient, AbsError } from "@/lib/abs/client";
 import { localSyncResultSchema } from "@/lib/abs/schemas";
 import { deviceInfo } from "@/lib/device";
@@ -122,13 +123,15 @@ export async function finishDiscard(
     }
     outboxFor(connectionId).markUnconfirmed(hold.id, false);
   }
-  if (hold.generationReset)
-    await client.command(
+  if (hold.generationReset) {
+    const receipt = await client.send(
       "POST",
       `/api/me/progress/${hold.libraryItemId}${hold.episodeId ? `/${hold.episodeId}` : ""}/reset`,
       { resetId: hold.id },
+      z.object({ progressGeneration: z.number().int().nonnegative() }),
     );
-  else await client.command("DELETE", `/api/me/progress/${hold.progressId}`);
+    outboxFor(connectionId).resetFinished(hold, receipt.progressGeneration);
+  } else await client.command("DELETE", `/api/me/progress/${hold.progressId}`);
   await finishDelete(connectionId, hold.id, hold);
   return "done";
 }
@@ -236,7 +239,10 @@ export async function flushReports(client: AbsClient, onUnauthorized: () => void
       const response = await client.send(
         "POST",
         "/api/session/local-all",
-        { sessions, deviceInfo: deviceInfo() },
+        {
+          sessions: sessions.map(({ afterResetIds: _afterResetIds, ...session }) => session),
+          deviceInfo: deviceInfo(),
+        },
         localSyncResultSchema,
         undefined,
         beforeRetry,

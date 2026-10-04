@@ -157,7 +157,11 @@ test("marking a book finished from its card waits for the server and says when i
     await route.fulfill({ status, body: "Server error" });
   });
   await signIn(page);
-  await page.goto(`${clientPath}/library/${qa.libraries.books}/items`);
+  const item = (await (await serverApi(accounts.user)).call(`/api/items/${id}`)).body;
+  const author = Buffer.from(item.media.metadata.authors[0].id).toString("base64");
+  await page.goto(
+    `${clientPath}/library/${qa.libraries.books}/items?filter=authors.${encodeURIComponent(author)}`,
+  );
   const actions = grid(page).getByRole("button", { name: "Actions for Night Ferry" });
 
   await actions.click();

@@ -20,9 +20,7 @@ test("password sign-in reaches the library and survives a reload", async ({ page
 });
 
 test("a wrong password explains the failure and keeps the server", async ({ page }) => {
-  await page.goto("/connect");
-  await page.getByLabel("Server address").fill(qa.origin);
-  await page.getByRole("button", { name: "Continue" }).click();
+  await page.goto(`/connect?server=${encodeURIComponent(qa.origin)}`);
   await page.getByLabel("Username").fill(accounts.user.username);
   await page.getByLabel("Password").fill("not-the-password");
   await page.getByRole("button", { name: "Sign in" }).click();
@@ -31,8 +29,6 @@ test("a wrong password explains the failure and keeps the server", async ({ page
 });
 
 test("an unreachable server address is reported without signing in", async ({ page }) => {
-  await page.goto("/connect");
-  await page.getByLabel("Server address").fill("http://127.0.0.1:19899");
-  await page.getByRole("button", { name: "Continue" }).click();
+  await page.goto("/connect?server=http%3A%2F%2F127.0.0.1%3A19879");
   await expect(page.getByRole("main").getByRole("alert")).toContainText(/could not reach/i);
 });

@@ -27,18 +27,7 @@ export function searchLibrary(actor: Account, libraryId: string, params: URLSear
   };
   const found = items.filter((item) => {
     const metadata = item.media.metadata;
-    return matches(
-      [
-        metadata.title,
-        metadata.subtitle ?? "",
-        metadata.description ?? "",
-        ...(metadata.authors ?? []).map((author) => author.name),
-        ...(metadata.series ?? []).map((series) => series.name),
-        ...(metadata.narrators ?? []),
-        ...metadata.genres,
-        ...item.media.tags,
-      ].join(" "),
-    );
+    return matches([metadata.title, metadata.subtitle ?? "", metadata.description ?? ""].join(" "));
   });
   const authors = [
     ...new Map(

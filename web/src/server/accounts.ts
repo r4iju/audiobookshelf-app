@@ -4,6 +4,7 @@ import "server-only";
 import { createHash, createHmac, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 import { compare } from "bcryptjs";
 import { z } from "zod";
+import { version } from "../../package.json";
 import { bookmarksFor } from "./bookmarks";
 import { catalogChanged, database, initialized, setupKey, tokenSigningKey, transaction } from "./data";
 import { allProgress } from "./progress";
@@ -159,7 +160,7 @@ function issueSession(user: Account) {
     user: { ...visibleUser(user), accessToken, refreshToken },
     userDefaultLibraryId: null,
     serverSettings: {
-      version: "1.0.0-dev",
+      version,
       language: serverSettings().language,
       name: serverSettings().serverName,
     },

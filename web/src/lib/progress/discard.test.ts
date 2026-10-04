@@ -151,6 +151,7 @@ function scriptedDeleteServer(connectionId: string, script: ("hang" | "refuse" |
     url: (path: string) => `https://abs.example${path}`,
     send: vi.fn(async (_method: string, path: string, body: { sessions: ListeningReport[] }) => {
       if (path.includes("/play")) return playSession("s-new", 42);
+      if (path.endsWith("/reset")) return { progressGeneration: 1 };
       log.push(
         `listening ${body.sessions.map((session) => `${session.libraryItemId}@${session.currentTime}`).join(",")}`,
       );
@@ -280,9 +281,14 @@ describe("discardProgress", () => {
         {},
       ),
     ).toBe("done");
-    expect(server.client.command).toHaveBeenCalledWith("POST", "/api/me/progress/book-x/reset", {
-      resetId: hold.id,
-    });
+    expect(server.client.send).toHaveBeenCalledWith(
+      "POST",
+      "/api/me/progress/book-x/reset",
+      {
+        resetId: hold.id,
+      },
+      expect.anything(),
+    );
     expect(outboxFor("generation-reset").holds()[0]?.generationReset).toBe(true);
     hold.settle();
   });
