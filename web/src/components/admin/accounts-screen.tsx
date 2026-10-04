@@ -91,6 +91,7 @@ function AccountForm({ account }: { account?: ManagedAccount }) {
     ["update", t("WebAdminAllowMetadataEdits")],
     ["delete", t("WebAdminAllowMediaDeletion")],
     ["upload", t("WebAdminAllowUploads")],
+    ["createEreader", t("WebAdminAllowEreaderCreation")],
     ["accessExplicitContent", t("WebAdminAllowExplicitContent")],
     ["accessAllLibraries", t("WebAdminAllowAllLibraries")],
     ["accessAllTags", t("WebAdminAllowAllTags")],
