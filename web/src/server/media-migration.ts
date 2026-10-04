@@ -749,6 +749,11 @@ export async function commitMedia(input: z.infer<typeof mediaCommitSchema>, auth
         z.string().parse(loaded.paths.get(item.id)),
         JSON.stringify(item),
       );
+    for (const item of loaded.items)
+      db.prepare("INSERT INTO metadata_overrides VALUES(?,?)").run(
+        item.id,
+        JSON.stringify({ metadata: item.media.metadata, tags: item.media.tags }),
+      );
     for (const file of loaded.files)
       db.prepare("INSERT INTO media_files VALUES(?,?,?,?)").run(
         file.id,

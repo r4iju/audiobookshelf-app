@@ -1,11 +1,12 @@
 import "server-only";
 import { execFile } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";
 import { lstat, open, readdir, realpath } from "node:fs/promises";
 import { basename, delimiter, extname, isAbsolute, relative, resolve, sep } from "node:path";
 import { z } from "zod";
 import {
+  bookMetadataSchema,
   type Library,
   type LibraryItem,
   libraryItemSchema,
@@ -188,6 +189,8 @@ export function pagedItems(actor: Account, id: string, params: URLSearchParams) 
           return metadata.genres.includes(value);
         case "narrators":
           return metadata.narrators?.includes(value) ?? false;
+        case "publishers":
+          return metadata.publisher === value;
         case "languages":
           return metadata.language === value;
         case "progress": {
@@ -225,6 +228,8 @@ export function pagedItems(actor: Account, id: string, params: URLSearchParams) 
     switch (sort) {
       case "media.metadata.title":
         return item.media.metadata.title;
+      case "media.metadata.author":
+        return item.media.metadata.author ?? "";
       case "media.metadata.authorName":
         return item.media.metadata.authorName ?? "";
       case "media.metadata.authorNameLF":
@@ -258,7 +263,9 @@ export function pagedItems(actor: Account, id: string, params: URLSearchParams) 
       case "progress.finishedAt":
         return progress.get(item.id)?.finishedAt ?? 0;
       case "random":
-        return item.id;
+        return createHash("sha256")
+          .update(`${actor.id}:${id}:${Math.floor(Date.now() / 86400000)}:${item.id}`)
+          .digest("hex");
       default:
         throw new DomainError(400, "Unsupported item sort");
     }
@@ -273,6 +280,26 @@ export function pagedItems(actor: Account, id: string, params: URLSearchParams) 
     );
   });
   if (params.get("desc") === "1") items.reverse();
+  if (params.get("collapseseries") === "1" && !filter?.startsWith("series.")) {
+    const counts = new Map<string, number>();
+    for (const item of items) {
+      const series = item.media.metadata.series?.[0];
+      if (series) counts.set(series.id, (counts.get(series.id) ?? 0) + 1);
+    }
+    const seen = new Set<string>();
+    items = items.flatMap((item) => {
+      const series = item.media.metadata.series?.[0];
+      if (!series) return [item];
+      if (seen.has(series.id)) return [];
+      seen.add(series.id);
+      return [
+        {
+          ...item,
+          collapsedSeries: { id: series.id, name: series.name, numBooks: counts.get(series.id) ?? 1 },
+        },
+      ];
+    });
+  }
   return { results: items.slice(page * limit, (page + 1) * limit), total: items.length, page, limit };
 }
 const probeSchema = z.object({
@@ -315,11 +342,31 @@ const metadataSchema = z.object({
   title: z.string().optional(),
   subtitle: z.string().optional(),
   description: z.string().optional(),
-  explicit: z.boolean().default(false),
-  tags: z.array(z.string()).default([]),
-  authors: z.array(z.string()).default([]),
-  narrators: z.array(z.string()).default([]),
-  genres: z.array(z.string()).default([]),
+  explicit: z.boolean().optional(),
+  tags: z.array(z.string()).optional(),
+  authors: z.array(z.string()).optional(),
+  narrators: z.array(z.string()).optional(),
+  genres: z.array(z.string()).optional(),
+  series: z
+    .array(
+      z.union([
+        z.string(),
+        z.object({
+          name: z.string(),
+          sequence: z
+            .union([z.string(), z.number()])
+            .nullish()
+            .transform((value) => (value == null ? null : String(value))),
+        }),
+      ]),
+    )
+    .optional(),
+  publishedYear: z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((value) => (value == null ? undefined : String(value))),
+  publisher: z.string().optional(),
+  language: z.string().optional(),
 });
 const errorSchema = z.object({ path: z.string(), message: z.string() });
 export const scanReportSchema = z.object({
@@ -370,7 +417,30 @@ async function readMetadata(folder: string, path: string) {
     await handle.close();
   }
 }
-async function scanFolder(library: Library, folder: string, errors: ScanError[]) {
+type IdentityPool = Map<string, { id: string; name: string }>;
+function identityPool() {
+  const pool: IdentityPool = new Map();
+  for (const row of database().prepare("SELECT content FROM catalog_items").all()) {
+    const item = itemRow(row);
+    for (const kind of ["authors", "series"] as const)
+      for (const ref of item.media.metadata[kind] ?? [])
+        if (!pool.has(`${kind}:${ref.name}`)) pool.set(`${kind}:${ref.name}`, { id: ref.id, name: ref.name });
+  }
+  return pool;
+}
+function identity(
+  pool: IdentityPool,
+  kind: "authors" | "series",
+  name: string,
+  prior: { id: string; name: string }[],
+) {
+  const previous = prior.find((ref) => ref.name === name) ?? pool.get(`${kind}:${name}`);
+  if (previous) return { id: previous.id, name };
+  const ref = { id: createHash("sha256").update(`${kind}:${name}`).digest("hex").slice(0, 32), name };
+  pool.set(`${kind}:${name}`, ref);
+  return ref;
+}
+async function scanFolder(library: Library, folder: string, errors: ScanError[], pool: IdentityPool) {
   const groups = new Map<string, string[]>();
   let count = 0;
   async function walk(directory: string, depth: number) {
@@ -469,7 +539,15 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[])
         files.find((file) => file.content.fileType === "ebook");
       for (const file of files)
         file.content.isSupplementary = file.content.fileType === "ebook" && file !== ebook;
-      const authors = metadata.authors.length ? metadata.authors : embedded.artist ? [embedded.artist] : [];
+      const authors =
+        metadata.authors ??
+        (embedded.artist ? [embedded.artist] : (prior?.media.metadata.authors?.map((ref) => ref.name) ?? []));
+      const managedRow = database().prepare("SELECT content FROM metadata_overrides WHERE item_id=?").get(id);
+      const managed = managedRow
+        ? z
+            .object({ metadata: bookMetadataSchema, tags: z.array(z.string()) })
+            .parse(JSON.parse(z.string().parse(managedRow.content)))
+        : null;
       const directoryStat = await lstat(directory);
       const item = libraryItemSchema.parse({
         id,
@@ -484,14 +562,26 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[])
         media: {
           id: prior?.media.id ?? id,
           metadata: {
+            ...prior?.media.metadata,
             ...metadata,
             title: metadata.title ?? embedded.album ?? embedded.title ?? basename(directory),
-            authors: authors.map((name) => ({ id: name, name })),
+            authors: authors.map((name) =>
+              identity(pool, "authors", name, prior?.media.metadata.authors ?? []),
+            ),
+            series: (metadata.series ?? prior?.media.metadata.series ?? []).map((entry) => {
+              const ref = typeof entry === "string" ? { name: entry, sequence: null } : entry;
+              return {
+                ...identity(pool, "series", ref.name, prior?.media.metadata.series ?? []),
+                sequence: ref.sequence,
+              };
+            }),
             authorName: authors.join(", "),
-            narrators: metadata.narrators,
-            genres: metadata.genres.length ? metadata.genres : embedded.genre ? [embedded.genre] : [],
+            narrators: metadata.narrators ?? prior?.media.metadata.narrators ?? [],
+            genres:
+              metadata.genres ?? (embedded.genre ? [embedded.genre] : (prior?.media.metadata.genres ?? [])),
+            ...managed?.metadata,
           },
-          tags: metadata.tags,
+          tags: managed?.tags ?? metadata.tags ?? prior?.media.tags ?? [],
           duration,
           numTracks: tracks.length,
           numChapters: chapters.length,
@@ -524,8 +614,9 @@ export async function scanLibrary(actor: Account, id: string) {
   const errors: ScanError[] = [];
   try {
     const records: Awaited<ReturnType<typeof scanFolder>> = [];
+    const pool = identityPool();
     for (const folder of library.folders)
-      records.push(...(await scanFolder(library, await mountedPath(folder.fullPath), errors)));
+      records.push(...(await scanFolder(library, await mountedPath(folder.fullPath), errors, pool)));
     const report = scanReportSchema.parse({
       id: scanId,
       status: "complete",
@@ -605,6 +696,11 @@ export function filterData(items: LibraryItem[]) {
     authors: named(items.flatMap((item) => item.media.metadata.authors ?? [])),
     series: named(items.flatMap((item) => item.media.metadata.series ?? [])),
     genres: [...new Set(items.flatMap((item) => item.media.metadata.genres))],
+    publishers: [
+      ...new Set(
+        items.flatMap((item) => (item.media.metadata.publisher ? [item.media.metadata.publisher] : [])),
+      ),
+    ],
     tags: [...new Set(items.flatMap((item) => item.media.tags))],
     narrators: [...new Set(items.flatMap((item) => item.media.metadata.narrators ?? []))],
     languages: [

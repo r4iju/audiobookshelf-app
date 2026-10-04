@@ -6,5 +6,5 @@ export default async function AuthorPage({
   params: Promise<{ libraryId: string; authorId: string }>;
 }) {
   const { libraryId, authorId } = await params;
-  return <AuthorDetail libraryId={libraryId} authorId={authorId} />;
+  return <AuthorDetail libraryId={libraryId} authorId={decodeURIComponent(authorId)} />;
 }

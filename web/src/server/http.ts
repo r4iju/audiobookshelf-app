@@ -35,6 +35,7 @@ import {
   scanLibrary,
 } from "./catalog";
 import { database, initialized, setupKey } from "./data";
+import { authorFor, authorGroups, pagedSeries, personalized, seriesFor } from "./discovery";
 import { downloadItem, serveEbook } from "./documents";
 import { commitMedia, inspectMedia, mediaCommitSchema, mediaInspectSchema } from "./media-migration";
 import {
@@ -290,6 +291,24 @@ export async function api(request: Request) {
       if (request.method === "POST")
         return json(await createLibrary(user, createLibrarySchema.parse(await body(request))));
     }
+    const seriesRoute = path.match(/^\/api\/libraries\/([^/]+)\/series\/([^/]+)$/);
+    if (seriesRoute && request.method === "GET")
+      return json(
+        seriesFor(
+          user,
+          z.string().parse(seriesRoute[1]),
+          decodeURIComponent(z.string().parse(seriesRoute[2])),
+        ),
+      );
+    const authorRoute = path.match(/^\/api\/authors\/([^/]+)$/);
+    if (authorRoute && request.method === "GET")
+      return json(
+        authorFor(
+          user,
+          decodeURIComponent(z.string().parse(authorRoute[1])),
+          new URL(request.url).searchParams.get("library"),
+        ),
+      );
     const libraryRoute = path.match(/^\/api\/libraries\/([^/]+)(?:\/([^/]+))?$/);
     if (libraryRoute) {
       const id = z.string().parse(libraryRoute[1]);
@@ -312,16 +331,9 @@ export async function api(request: Request) {
           });
         if (action === "search") return json(searchLibrary(user, id, new URL(request.url).searchParams));
         if (action === "items") return json(pagedItems(user, id, new URL(request.url).searchParams));
-        if (action === "personalized")
-          return json([
-            {
-              id: "recently-added",
-              label: "Recently added",
-              labelStringKey: "LabelRecentlyAdded",
-              type: "book",
-              entities: items.slice(-20).reverse(),
-            },
-          ]);
+        if (action === "personalized") return json(personalized(user, id, new URL(request.url).searchParams));
+        if (action === "authors") return json({ authors: authorGroups(items) });
+        if (action === "series") return json(pagedSeries(user, id, new URL(request.url).searchParams));
         if (action === "filterdata") return json(filterData(items));
       }
     }

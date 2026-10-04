@@ -15,6 +15,7 @@ function applyProgress(queryClient: QueryClient, connectionId: string, payload: 
   const parsed = progressEventSchema.safeParse(payload);
   if (!parsed.success) return;
   const progress = parsed.data.data;
+  void queryClient.invalidateQueries({ queryKey: [connectionId, "library"] });
   queryClient.setQueryData<User>(keys.me(connectionId), (user) =>
     user
       ? {
@@ -53,7 +54,10 @@ export function useRealtime() {
     );
     socket.on("user_updated", (payload: unknown) => {
       const parsed = userSchema.safeParse(payload);
-      if (parsed.success) queryClient.setQueryData(keys.me(connection.id), parsed.data);
+      if (parsed.success) {
+        queryClient.setQueryData(keys.me(connection.id), parsed.data);
+        void queryClient.invalidateQueries({ queryKey: [connection.id, "library"] });
+      }
     });
     const refreshLibrary = () => {
       void queryClient.invalidateQueries({ queryKey: [connection.id, "library"] });

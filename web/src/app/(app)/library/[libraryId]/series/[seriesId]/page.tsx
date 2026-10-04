@@ -12,7 +12,7 @@ export default async function SeriesPage({
   return (
     <SeriesDetail
       libraryId={libraryId}
-      seriesId={seriesId}
+      seriesId={decodeURIComponent(seriesId)}
       page={Number.isInteger(page) && page > 0 ? page : 1}
     />
   );

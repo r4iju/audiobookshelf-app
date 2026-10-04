@@ -284,7 +284,11 @@ export function useSeries(libraryId: string, seriesId: string) {
   return useQuery({
     queryKey: keys.series(connection.id, libraryId, seriesId),
     queryFn: ({ signal }) =>
-      client.get(`/api/libraries/${libraryId}/series/${seriesId}?include=progress`, seriesSchema, signal),
+      client.get(
+        `/api/libraries/${libraryId}/series/${encodeURIComponent(seriesId)}?include=progress`,
+        seriesSchema,
+        signal,
+      ),
   });
 }
 
@@ -303,7 +307,7 @@ export function useAuthor(libraryId: string, authorId: string) {
     queryKey: keys.author(connection.id, libraryId, authorId),
     queryFn: ({ signal }) =>
       client.get(
-        `/api/authors/${authorId}?include=items,series&library=${libraryId}`,
+        `/api/authors/${encodeURIComponent(authorId)}?include=items,series&library=${libraryId}`,
         authorDetailSchema,
         signal,
       ),
