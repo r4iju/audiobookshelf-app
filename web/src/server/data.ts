@@ -71,6 +71,7 @@ export function database() {
       generation INTEGER NOT NULL, PRIMARY KEY(user_id,id));
     CREATE TABLE IF NOT EXISTS deleted_progress (user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       id TEXT NOT NULL, PRIMARY KEY(user_id,id));
+    CREATE TABLE IF NOT EXISTS transcode_jobs (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES playback_sessions(id) ON DELETE CASCADE, segment INTEGER NOT NULL, status TEXT NOT NULL, updated_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS scan_runs (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
       status TEXT NOT NULL, started_at INTEGER NOT NULL, completed_at INTEGER, report TEXT);
     INSERT OR IGNORE INTO schema_version(version) VALUES (3);
@@ -106,6 +107,7 @@ export function database() {
       INSERT INTO schema_version(version) VALUES(6);
       COMMIT;`);
   }
+  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (7);");
   return db;
 }
 
