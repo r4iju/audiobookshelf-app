@@ -1,4 +1,17 @@
 import {
+  allSchedules,
+  checkPodcast,
+  scheduleFor,
+  startPodcastSchedules,
+  updateSchedule,
+} from "./podcast-schedules";
+import {
+  podcastSettings,
+  podcastSettingsSchema,
+  savePodcastSettings,
+  searchPodcasts,
+} from "./podcast-settings";
+import {
   clearQueue,
   createPodcast,
   downloadsFor,
@@ -154,6 +167,7 @@ export function serverStatus() {
 export function health() {
   startTranscode();
   startPodcasts();
+  startPodcastSchedules();
   database().prepare("SELECT 1").get();
   return json({ status: "ready", app: "Leafwake" });
 }
@@ -207,6 +221,20 @@ export async function api(request: Request) {
       return serveEbook(request, () => authenticate(token), z.string().parse(ebookRoute[1]), ebookRoute[2]);
     if ((request.method === "GET" || request.method === "HEAD") && downloadRoute)
       return downloadItem(request, () => authenticate(token), z.string().parse(downloadRoute[1]));
+    if (path === "/api/admin/podcasts/subscriptions" && request.method === "GET") {
+      requireAdministrator(user);
+      return json(allSchedules(user));
+    }
+    if (path === "/api/admin/podcasts/settings") {
+      requireAdministrator(user);
+      if (request.method === "GET") return json(podcastSettings());
+      if (request.method === "PATCH") {
+        sameOrigin(request);
+        return json(savePodcastSettings(user, podcastSettingsSchema.parse(await body(request))));
+      }
+    }
+    if (path === "/api/search/podcast" && request.method === "GET")
+      return json(await searchPodcasts(user, new URL(request.url).searchParams.get("term") ?? ""));
     if (path === "/api/podcasts/feed" && request.method === "POST") {
       requireAdministrator(user);
       return json(await readFeed(feedInput.parse(await body(request)).rssFeed));
@@ -217,10 +245,22 @@ export async function api(request: Request) {
         201,
       );
     const podcastRoute = path.match(
-      /^\/api\/podcasts\/([^/]+)\/(download-episodes|clear-queue|episode|downloads)(?:\/([^/]+))?$/,
+      /^\/api\/podcasts\/([^/]+)\/(download-episodes|clear-queue|episode|downloads|check|schedule)(?:\/([^/]+))?$/,
     );
     if (podcastRoute) {
       const id = z.string().parse(podcastRoute[1]);
+      if (podcastRoute[2] === "check" && request.method === "POST") return json(await checkPodcast(user, id));
+      if (podcastRoute[2] === "schedule" && request.method === "PATCH") {
+        sameOrigin(request);
+        return json(
+          updateSchedule(
+            user,
+            id,
+            z.object({ autoDownloadEpisodes: z.boolean() }).parse(await body(request)).autoDownloadEpisodes,
+          ),
+        );
+      }
+      if (podcastRoute[2] === "schedule" && request.method === "GET") return json(scheduleFor(user, id));
       if (podcastRoute[2] === "downloads" && request.method === "GET") return json(downloadsFor(user, id));
       if (podcastRoute[2] === "download-episodes" && request.method === "POST")
         return json(enqueue(authenticate(token), id, episodesInput.parse(await body(request))));

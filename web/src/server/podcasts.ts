@@ -1,3 +1,5 @@
+import { retainEpisodes, subscribe } from "./podcast-schedules";
+import { podcastSettings } from "./podcast-settings";
 import "server-only";
 import { execFile } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
@@ -15,7 +17,6 @@ import { catalogChanged, database, managedMediaDirectory, transaction } from "./
 import { listsChanged, storedSchema } from "./lists";
 import { remoteStream, remoteText, remoteUrl } from "./remote";
 
-const maxBytes = 1024 * 1024 * 1024;
 const episodeInput = z.object({
   title: z.string().max(4096).nullish(),
   description: z.string().max(65536).nullish(),
@@ -113,6 +114,11 @@ export async function readFeed(value: string) {
           channel["itunes:author"] ?? (atom && channel.author ? object(channel.author).name : null),
         ),
         description: text(channel.description ?? channel.subtitle),
+        descriptionPlain: text(channel.description ?? channel.subtitle).replace(/<[^>]*>/g, ""),
+        categories: array(channel["itunes:category"])
+          .map((value) => text(object(value)["@_text"]))
+          .filter(Boolean),
+        image: channel["itunes:image"] ? text(object(channel["itunes:image"])["@_href"]) : null,
         language: text(channel.language),
         feedUrl: value,
         imageUrl: channel["itunes:image"] ? text(object(channel["itunes:image"])["@_href"]) : null,
@@ -190,9 +196,19 @@ export async function createPodcast(
     await rm(path, { recursive: true, force: true });
     throw error;
   }
+  subscribe(authorize(), id);
   catalogChanged();
   if (input.media.autoDownloadEpisodes && feed.podcast.episodes.length)
-    enqueue(authorize(), id, episodesInput.parse(feed.podcast.episodes.slice(0, 3)));
+    enqueue(
+      authorize(),
+      id,
+      episodesInput.parse(
+        feed.podcast.episodes.slice(
+          0,
+          Math.min(3, podcastSettings().maxQueue, podcastSettings().retentionEpisodes || 3),
+        ),
+      ),
+    );
   return item;
 }
 function key(episode: z.infer<typeof episodeInput>) {
@@ -231,7 +247,8 @@ export function enqueue(actor: Account, itemId: string, episodes: z.infer<typeof
       if (prior && ["queued", "running", "complete"].includes(String(prior.state))) continue;
       if (prior && globalThis.leafwakePodcasts?.running.has(String(prior.id)))
         throw new DomainError(409, "Previous download is still stopping; retry shortly");
-      if (current + created.length >= 128) throw new DomainError(429, "Podcast queue is full");
+      if (current + created.length >= podcastSettings().maxQueue)
+        throw new DomainError(429, "Podcast queue is full");
       const job: Job = {
         id: randomUUID(),
         item_id: itemId,
@@ -285,7 +302,7 @@ async function pump() {
   if (!worker || worker.pumping) return;
   worker.pumping = true;
   try {
-    while (worker.running.size < 2) {
+    while (worker.running.size < podcastSettings().maxConcurrent) {
       const row = database()
         .prepare("SELECT * FROM podcast_jobs WHERE state='queued' ORDER BY updated_at,id LIMIT 1")
         .get();
@@ -343,9 +360,10 @@ async function download(job: Job, controller: AbortController) {
   let partial: string | undefined,
     output: string | undefined,
     published = false;
+  const maxBytes = podcastSettings().maxEpisodeBytes;
   const expiry = setTimeout(
     () => controller.abort(new Error("Download time limit exceeded")),
-    10 * 60 * 1000,
+    podcastSettings().downloadTimeoutSeconds * 1000,
   );
   expiry.unref();
   const checks = setInterval(() => {
@@ -470,6 +488,11 @@ async function download(job: Job, controller: AbortController) {
       );
     });
     published = true;
+    await retainEpisodes(findAccount(job.user_id), item.id).catch(() => {
+      database()
+        .prepare("UPDATE podcast_subscriptions SET last_error=? WHERE item_id=?")
+        .run("Retention could not remove an episode; check delete permission and media storage", item.id);
+    });
     event("episode_download_finished", item.id, {
       id: job.id,
       libraryItemId: item.id,
