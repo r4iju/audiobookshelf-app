@@ -3,19 +3,28 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { type MediaProgress, mediaProgressSchema } from "@/lib/abs/schemas";
 import { type Account, DomainError, findAccount } from "./accounts";
-import { itemFor } from "./catalog";
+import { historyItemFor, itemFor } from "./catalog";
 import { database, progressGeneration, transaction } from "./data";
 
 const seconds = z.number().finite().min(0).max(1e9);
 const timestamp = z.number().finite().min(0).max(8.64e15);
 const identifier = z.string().min(1).max(256);
-const reportSchema = z.looseObject({
+const reportSeconds = z.union([
+  seconds,
+  z
+    .string()
+    .max(64)
+    .regex(/^\d+(?:\.\d+)?$/)
+    .transform(Number)
+    .pipe(seconds),
+]);
+export const reportSchema = z.looseObject({
   id: identifier,
   libraryItemId: identifier,
   episodeId: identifier.nullish(),
-  currentTime: seconds,
-  timeListening: seconds,
-  duration: seconds,
+  currentTime: reportSeconds,
+  timeListening: reportSeconds,
+  duration: reportSeconds,
   startedAt: timestamp,
   updatedAt: timestamp,
   startTime: seconds.default(0),
@@ -311,7 +320,7 @@ export function listeningStats(actor: Account) {
     .map((row) => reportSchema.parse(JSON.parse(z.string().parse(row.content))))
     .filter((report) => {
       try {
-        itemFor(actor, report.libraryItemId);
+        historyItemFor(actor, report.libraryItemId);
         return true;
       } catch (error) {
         if (error instanceof DomainError && error.status === 404) return false;
