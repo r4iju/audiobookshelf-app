@@ -5,6 +5,7 @@ import {
   devicesInput,
   managedDevices,
   saveDevices,
+  savePersonalDevices,
   saveSmtpSettings,
   sendEbook,
   sendEbookInput,
@@ -284,6 +285,8 @@ export async function api(request: Request) {
       if (request.method === "GET") return json(managedDevices(user));
       if (request.method === "POST") return json(saveDevices(user, devicesInput.parse(await body(request))));
     }
+    if (path === "/api/me/ereader-devices" && request.method === "POST")
+      return json(savePersonalDevices(user, devicesInput.parse(await body(request))));
     if (path === "/api/emails/send-ebook-to-device" && request.method === "POST")
       return json(await sendEbook(() => authenticate(token), sendEbookInput.parse(await body(request))));
     if (path === "/api/feeds" && request.method === "GET") return json(allFeeds(user));

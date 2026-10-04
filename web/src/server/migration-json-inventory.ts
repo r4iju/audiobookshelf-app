@@ -74,6 +74,7 @@ const rules: Record<string, Record<string, readonly string[]>> = {
       "update",
       "delete",
       "upload",
+      "createEreader",
       "accessExplicitContent",
       "accessAllLibraries",
       "accessAllTags",

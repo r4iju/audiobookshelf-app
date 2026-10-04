@@ -92,6 +92,33 @@ export function saveDevices(actor: Account, input: z.infer<typeof devicesInput>)
   });
   return managedDevices(actor);
 }
+export function savePersonalDevices(actor: Account, input: z.infer<typeof devicesInput>) {
+  transaction((db) => {
+    const current = findAccount(actor.id);
+    if (!current.active || !permissions.parse(JSON.parse(current.permissions)).createEreader)
+      throw new DomainError(403, "E-reader creation is not allowed");
+    for (const device of input.ereaderDevices)
+      if (
+        device.availabilityOption !== "specificUsers" ||
+        device.users.length !== 1 ||
+        device.users[0] !== current.id
+      )
+        throw new DomainError(400, "Personal e-readers must be available only to your account");
+    const others = devices().filter(
+      (device) =>
+        device.availabilityOption !== "specificUsers" ||
+        device.users.length !== 1 ||
+        device.users[0] !== current.id,
+    );
+    const combined = devicesInput.parse({ ereaderDevices: [...others, ...input.ereaderDevices] });
+    if (new Set(combined.ereaderDevices.map((device) => device.name)).size !== combined.ereaderDevices.length)
+      throw new DomainError(400, "Device names must be unique");
+    db.prepare(
+      "INSERT INTO product_settings VALUES('ereaders',?) ON CONFLICT(key) DO UPDATE SET content=excluded.content",
+    ).run(seal(combined));
+  });
+  return { ereaderDevices: devicesFor(findAccount(actor.id)) };
+}
 export const sendEbookInput = z.object({
   libraryItemId: z.string().max(256),
   deviceName: z.string().max(256),

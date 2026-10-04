@@ -239,6 +239,7 @@ export const webStrings = {
   WebAdminAllowMetadataEdits: "Allow metadata edits",
   WebAdminAllowMediaDeletion: "Allow media deletion",
   WebAdminAllowUploads: "Allow uploads",
+  WebAdminAllowEreaderCreation: "Allow personal e-reader creation",
   WebAdminAllowExplicitContent: "Allow explicit content",
   WebAdminAllowAllLibraries: "Allow all libraries",
   WebAdminAllowAllTags: "Allow all tags",

@@ -27,6 +27,7 @@ export const permissionsSchema = z.looseObject({
   update: z.boolean().default(false),
   delete: z.boolean().default(false),
   upload: z.boolean().default(false),
+  createEreader: z.boolean().default(false),
   accessExplicitContent: z.boolean().default(false),
 });
 
@@ -70,6 +71,7 @@ export const userSchema = z.looseObject({
     update: false,
     delete: false,
     upload: false,
+    createEreader: false,
     accessExplicitContent: false,
   }),
   librariesAccessible: z.array(z.string()).default([]),
