@@ -43,19 +43,6 @@ class CastOptionsProvider : OptionsProvider {
     override fun getAdditionalSessionProviders(context: Context): List<SessionProvider>? = null
 }
 
-/** Extras a streamed media item carries so it can be handed to a receiver. */
-internal object CastExtras {
-    const val URL = "abs.castUrl"
-    const val MIME = "abs.castMime"
-    const val DURATION = "abs.castDuration"
-
-    fun of(url: String, mime: String?, duration: Double) = Bundle().apply {
-        putString(URL, url); putString(MIME, mime); putDouble(DURATION, duration)
-    }
-
-    fun castable(item: MediaItem) = item.mediaMetadata.extras?.getString(URL) != null
-}
-
 /** Sends the receiver its own track URL and keeps the phone's URL to return to when casting ends. */
 internal class CastConverter : MediaItemConverter {
     override fun toMediaQueueItem(mediaItem: MediaItem): MediaQueueItem {
@@ -155,20 +142,22 @@ internal class CastHandover(
     }
 }
 
-data class CastReceiver(val id: String, val name: String, val description: String?)
-
-data class CastStatus(
-    /** Why casting cannot be offered on this device, or null when it can. */
-    val unavailable: String? = null,
-    val receivers: List<CastReceiver> = emptyList(),
-    val connectedTo: String? = null,
-    val connecting: String? = null,
-    /** The last connection that failed or dropped, explained for the listener. */
-    val problem: String? = null,
-)
-
 /** Receiver discovery and selection. Discovery scans actively only while someone is looking. */
 class CastRoutes(private val context: Context) {
+    val available: Boolean get() = castContext != null
+
+    internal fun createPlayer(phone: Player, back: Long, forward: Long, explain: (Int) -> Unit,
+                              title: () -> Any?, endSession: () -> Unit): CastOutput? {
+        castContext ?: return null
+        val remote = androidx.media3.cast.RemoteCastPlayer.Builder(context)
+            .setMediaItemConverter(CastConverter())
+            .setSeekBackIncrementMs(back).setSeekForwardIncrementMs(forward).build()
+        val handover = CastHandover(phone, endSession, explain, title)
+        val player = CastPlayer.Builder(context).setLocalPlayer(phone).setRemotePlayer(remote)
+            .setTransferCallback(handover::transfer).build()
+        return CastOutput(player, handover::pause)
+    }
+
     private val mutable = MutableStateFlow(CastStatus())
     val status: StateFlow<CastStatus> = mutable
 

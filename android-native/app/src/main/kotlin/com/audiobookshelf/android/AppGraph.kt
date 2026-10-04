@@ -35,7 +35,7 @@ class AppGraph internal constructor(val context: Context) {
         val file = File(context.filesDir, "device-id")
         val id = file.takeIf { it.exists() }?.readText()?.trim()?.takeIf { it.isNotEmpty() }
             ?: UUID.randomUUID().toString().also { file.parentFile?.mkdirs(); file.writeText(it) }
-        DeviceInfo(id, "Audiobookshelf Android", BuildConfig.VERSION_NAME, Build.MANUFACTURER, Build.MODEL, Build.VERSION.SDK_INT)
+        DeviceInfo(id, "${context.getString(R.string.product_name)} Android", BuildConfig.VERSION_NAME, Build.MANUFACTURER, Build.MODEL, Build.VERSION.SDK_INT)
     }
     val settings by lazy { SettingsStore(File(context.filesDir, "settings.json")) }
     val diagnostics by lazy { com.audiobookshelf.android.data.Diagnostics(File(context.filesDir, "diagnostics.json")) }

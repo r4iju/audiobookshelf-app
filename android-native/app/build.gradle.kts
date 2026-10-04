@@ -4,23 +4,43 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+val leafwake = providers.gradleProperty("leafwake").map { it.toBooleanStrict() }.getOrElse(false)
+val ownerKeystore = System.getenv("ABS_ANDROID_KEYSTORE")
+val leafwakeSourceUrl = providers.gradleProperty("leafwakeSourceUrl").getOrElse("https://github.com/r4iju/audiobookshelf-app/tree/fork/native-tv")
+gradle.taskGraph.whenReady {
+    if (leafwake && allTasks.any { it.name in setOf("packageRelease", "signReleaseBundle", "bundleRelease", "assembleRelease") }) {
+        require(!ownerKeystore.isNullOrBlank() && listOf("ABS_ANDROID_KEYSTORE_PASSWORD", "ABS_ANDROID_KEY_ALIAS", "ABS_ANDROID_KEY_PASSWORD").all { !System.getenv(it).isNullOrBlank() }) {
+            "Leafwake release tasks require an owner signing key; debug-key fallback is forbidden."
+        }
+        require(Regex("https://github\\.com/r4iju/audiobookshelf-app/tree/[0-9a-f]{40}").matches(leafwakeSourceUrl)) {
+            "Leafwake releases require leafwakeSourceUrl pointing to the exact 40-character source commit."
+        }
+    }
+}
+
 android {
     namespace = "com.audiobookshelf.android"
     compileSdk = 36
 
     defaultConfig {
         // Distinct preview identity: installs beside the working legacy app without touching its data.
-        applicationId = "com.audiobookshelf.app.nativepreview"
+        applicationId = if (leafwake) "com.forkzed.leafwake" else "com.audiobookshelf.app.nativepreview"
         minSdk = 24
         targetSdk = 36
-        versionCode = 200
-        versionName = "0.15.0-native-preview"
+        versionCode = if (leafwake) 1 else 200
+        versionName = if (leafwake) "1.0.0-beta.1" else "0.15.0-native-preview"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        manifestPlaceholders["oauthScheme"] = "audiobookshelf-native-preview"
-        buildConfigField("String", "OAUTH_REDIRECT", "\"audiobookshelf-native-preview://oauth\"")
+        val scheme = if (leafwake) "leafwake" else "audiobookshelf-native-preview"
+        manifestPlaceholders["oauthScheme"] = scheme
+        manifestPlaceholders["displayName"] = if (leafwake) "Leafwake" else "@string/app_name"
+        manifestPlaceholders["launcherIcon"] = if (leafwake) "@drawable/leafwake_icon" else "@mipmap/ic_launcher"
+        buildConfigField("String", "OAUTH_REDIRECT", "\"$scheme://oauth\"")
+        buildConfigField("boolean", "PUBLIC_RELEASE", leafwake.toString())
+        buildConfigField("boolean", "CAST_ENABLED", (!leafwake).toString())
+        buildConfigField("String", "SOURCE_URL", "\"${leafwakeSourceUrl}\"")
+        resValue("string", "product_name", if (leafwake) "Leafwake" else "Audiobookshelf")
     }
 
-    val ownerKeystore = System.getenv("ABS_ANDROID_KEYSTORE")
     if (ownerKeystore != null) signingConfigs.create("owner") {
         storeFile = file(ownerKeystore)
         storePassword = System.getenv("ABS_ANDROID_KEYSTORE_PASSWORD")
@@ -36,13 +56,15 @@ android {
             isMinifyEnabled = false
             // Internal distribution only: signed locally with the existing debug keystore unless
             // ABS_ANDROID_KEYSTORE points at an owner-provided keystore.
-            signingConfig = signingConfigs.getByName(if (ownerKeystore != null) "owner" else "debug")
+            signingConfig = if (ownerKeystore != null) signingConfigs.getByName("owner")
+                else if (leafwake) null else signingConfigs.getByName("debug")
         }
     }
 
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 
     compileOptions {
@@ -56,6 +78,13 @@ android {
 
     // The archive the legacy app's own exporter wrote, shared with the core import tests.
     sourceSets["androidTest"].assets.srcDir("../core/src/test/resources/migration")
+    if (!leafwake) sourceSets["androidTest"].kotlin.srcDir("src/withCastAndroidTest/kotlin")
+    if (leafwake) sourceSets["main"].assets.srcDir("src/noCast/assets")
+    sourceSets["main"].kotlin.srcDir(if (leafwake) "src/noCast/kotlin" else "src/withCast/kotlin")
+    if (!leafwake) {
+        sourceSets["debug"].manifest.srcFile("src/withCast/AndroidManifest.xml")
+        sourceSets["release"].manifest.srcFile("src/withCast/AndroidManifest.xml")
+    }
 
     testOptions {
         animationsDisabled = true
@@ -95,7 +124,7 @@ dependencies {
     implementation("androidx.media3:media3-session:1.9.0")
     implementation("androidx.media3:media3-datasource-okhttp:1.9.0")
     implementation("androidx.media3:media3-exoplayer-hls:1.9.0")
-    implementation("androidx.media3:media3-cast:1.9.0")
+    if (!leafwake) implementation("androidx.media3:media3-cast:1.9.0")
 
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
@@ -113,4 +142,14 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:4.1.1")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+tasks.register("writeRuntimeInventory") {
+    doLast {
+        val artifacts = configurations.getByName("releaseRuntimeClasspath").resolvedConfiguration.resolvedArtifacts
+        val output = layout.buildDirectory.file("reports/release-runtime.tsv").get().asFile
+        output.parentFile.mkdirs()
+        output.writeText(artifacts.map { "${it.moduleVersion.id}\t${it.file.absolutePath}" }.distinct().sorted().joinToString("\n") + "\n")
+        println("Runtime inventory: $output")
+    }
 }

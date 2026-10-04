@@ -42,6 +42,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun CastButton(casting: CastRoutes, onClick: () -> Unit) {
+    if (!com.audiobookshelf.android.BuildConfig.CAST_ENABLED) return
     val status by casting.status.collectAsState()
     IconButton(onClick = onClick, modifier = Modifier.testTag("player-cast")) {
         val connectedTo = status.connectedTo
