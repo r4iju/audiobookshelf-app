@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { chmodSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { maximumSchemaVersion } from "../../backup-format.mjs";
 import { sealArchive } from "./secrets";
 
 // Next's development module reloads must share the same process-owned connection.
@@ -28,7 +29,18 @@ export function database() {
   const db = new DatabaseSync(filename);
   chmodSync(filename, 0o600);
   db.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000; PRAGMA journal_mode = WAL;");
-  db.exec(`
+  if (db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'").get()) {
+    const existing = Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version);
+    if (existing > maximumSchemaVersion) {
+      db.close();
+      throw new Error(
+        "This database needs a newer Leafwake image. Preserve the volume and use a compatible image.",
+      );
+    }
+  }
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.exec(`
     CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY);
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY, username TEXT NOT NULL, username_key TEXT NOT NULL UNIQUE,
@@ -44,15 +56,15 @@ export function database() {
     CREATE INDEX IF NOT EXISTS auth_sessions_user ON auth_sessions(user_id);
     INSERT OR IGNORE INTO schema_version(version) VALUES (1);
   `);
-  const version = db.prepare("SELECT MAX(version) AS version FROM schema_version").get();
-  if (version && typeof version.version === "number" && version.version < 2) {
-    db.exec(`BEGIN IMMEDIATE;
+    const version = db.prepare("SELECT MAX(version) AS version FROM schema_version").get();
+    if (version && typeof version.version === "number" && version.version < 2) {
+      db.exec(`
       ALTER TABLE users ADD COLUMN tags TEXT NOT NULL DEFAULT '[]';
       CREATE TABLE login_attempts (key TEXT PRIMARY KEY, attempts INTEGER NOT NULL, expires_at INTEGER NOT NULL);
       INSERT INTO schema_version(version) VALUES (2);
-      COMMIT;`);
-  }
-  db.exec(`
+      `);
+    }
+    db.exec(`
     CREATE TABLE IF NOT EXISTS migrations (id TEXT PRIMARY KEY, digest TEXT NOT NULL, scope TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(digest,scope));
     CREATE TABLE IF NOT EXISTS migration_archive (digest TEXT NOT NULL, table_name TEXT NOT NULL, row_key TEXT NOT NULL, content TEXT NOT NULL, PRIMARY KEY(digest,table_name,row_key));
     CREATE TABLE IF NOT EXISTS bookmarks (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, item_id TEXT NOT NULL REFERENCES catalog_items(id), content TEXT NOT NULL);
@@ -90,55 +102,52 @@ export function database() {
     UPDATE scan_runs SET status = 'interrupted', completed_at = CAST(strftime('%s','now') AS INTEGER) * 1000
       WHERE status = 'running';
   `);
-  globalThis.leafwakeDatabase = db;
-  if (
-    !db
-      .prepare("PRAGMA table_info(progress_resets)")
-      .all()
-      .some((column) => column.name === "generation")
-  ) {
-    db.exec("ALTER TABLE progress_resets ADD COLUMN generation INTEGER NOT NULL DEFAULT 1;");
-  }
-  if (
-    !db
-      .prepare("PRAGMA table_info(users)")
-      .all()
-      .some((column) => column.name === "archive")
-  )
-    db.exec("ALTER TABLE users ADD COLUMN archive TEXT NOT NULL DEFAULT '{}';");
-  db.exec(
-    "INSERT OR IGNORE INTO schema_version(version) VALUES (4); INSERT OR IGNORE INTO schema_version(version) VALUES (5);",
-  );
-  if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 6) {
-    db.exec(`BEGIN IMMEDIATE;
+    if (
+      !db
+        .prepare("PRAGMA table_info(progress_resets)")
+        .all()
+        .some((column) => column.name === "generation")
+    ) {
+      db.exec("ALTER TABLE progress_resets ADD COLUMN generation INTEGER NOT NULL DEFAULT 1;");
+    }
+    if (
+      !db
+        .prepare("PRAGMA table_info(users)")
+        .all()
+        .some((column) => column.name === "archive")
+    )
+      db.exec("ALTER TABLE users ADD COLUMN archive TEXT NOT NULL DEFAULT '{}';");
+    db.exec(
+      "INSERT OR IGNORE INTO schema_version(version) VALUES (4); INSERT OR IGNORE INTO schema_version(version) VALUES (5);",
+    );
+    if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 6) {
+      db.exec(`
       CREATE TABLE media_files_v6 (id TEXT NOT NULL, item_id TEXT NOT NULL REFERENCES catalog_items(id),
         source_path TEXT NOT NULL, content TEXT NOT NULL, PRIMARY KEY(item_id,id), UNIQUE(item_id,source_path));
       INSERT INTO media_files_v6 SELECT id,item_id,source_path,content FROM media_files;
       DROP TABLE media_files;
       ALTER TABLE media_files_v6 RENAME TO media_files;
       INSERT INTO schema_version(version) VALUES(6);
-      COMMIT;`);
-  }
-  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (7);");
-  if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 8) {
-    db.exec(`BEGIN IMMEDIATE;
+      `);
+    }
+    db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (7);");
+    if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 8) {
+      db.exec(`
       INSERT OR IGNORE INTO metadata_overrides(item_id,content)
         SELECT c.id,json_object('metadata',json_extract(c.content,'$.media.metadata'),'tags',json_extract(c.content,'$.media.tags'))
         FROM catalog_items c WHERE EXISTS(SELECT 1 FROM migration_archive a WHERE a.table_name='libraryItems' AND a.row_key=c.id);
       INSERT INTO schema_version(version) VALUES(8);
-      COMMIT;`);
-  }
-  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (9);");
-  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (10);");
-  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (11);");
-  db.exec(`CREATE TABLE IF NOT EXISTS openid_flows (id TEXT PRIMARY KEY, state TEXT NOT NULL UNIQUE, expires_at INTEGER NOT NULL, content TEXT NOT NULL);
+      `);
+    }
+    db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (9);");
+    db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (10);");
+    db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (11);");
+    db.exec(`CREATE TABLE IF NOT EXISTS openid_flows (id TEXT PRIMARY KEY, state TEXT NOT NULL UNIQUE, expires_at INTEGER NOT NULL, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS openid_identities (issuer TEXT NOT NULL, subject TEXT NOT NULL, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, PRIMARY KEY(issuer,subject));
     INSERT OR IGNORE INTO schema_version(version) VALUES(12);`);
-  db.exec(`CREATE TABLE IF NOT EXISTS rss_feeds (id TEXT PRIMARY KEY, item_id TEXT NOT NULL UNIQUE REFERENCES catalog_items(id), owner_id TEXT NOT NULL REFERENCES users(id), slug TEXT NOT NULL UNIQUE, content TEXT NOT NULL);
+    db.exec(`CREATE TABLE IF NOT EXISTS rss_feeds (id TEXT PRIMARY KEY, item_id TEXT NOT NULL UNIQUE REFERENCES catalog_items(id), owner_id TEXT NOT NULL REFERENCES users(id), slug TEXT NOT NULL UNIQUE, content TEXT NOT NULL);
     INSERT OR IGNORE INTO schema_version(version) VALUES(13);`);
-  if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 14) {
-    db.exec("BEGIN IMMEDIATE");
-    try {
+    if (Number(db.prepare("SELECT MAX(version) AS version FROM schema_version").get()?.version) < 14) {
       for (const row of db
         .prepare("SELECT digest,row_key,content FROM migration_archive WHERE table_name='settings'")
         .all()) {
@@ -148,21 +157,30 @@ export function database() {
             "UPDATE migration_archive SET content=? WHERE digest=? AND table_name='settings' AND row_key=?",
           ).run(sealArchive(value), String(row.digest), String(row.row_key));
       }
-      db.exec("INSERT INTO schema_version(version) VALUES(14); COMMIT;");
-    } catch (error) {
-      db.exec("ROLLBACK");
-      globalThis.leafwakeDatabase = undefined;
-      db.close();
-      throw error;
+      db.exec("INSERT INTO schema_version(version) VALUES(14);");
     }
-  }
-  db.exec(`CREATE TABLE IF NOT EXISTS retired_items (item_id TEXT PRIMARY KEY REFERENCES catalog_items(id), user_id TEXT NOT NULL, removed_at INTEGER NOT NULL);
+    db.exec(`CREATE TABLE IF NOT EXISTS retired_items (item_id TEXT PRIMARY KEY REFERENCES catalog_items(id), user_id TEXT NOT NULL, removed_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS item_covers (item_id TEXT PRIMARY KEY REFERENCES catalog_items(id), mime TEXT NOT NULL, bytes BLOB NOT NULL);
     INSERT OR IGNORE INTO schema_version(version) VALUES(15);`);
-  db.exec(
-    `CREATE TABLE IF NOT EXISTS identity_creation (kind TEXT NOT NULL, id TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(kind,id)); INSERT OR IGNORE INTO schema_version(version) VALUES(16);`,
-  );
-  return db;
+    db.exec(
+      `CREATE TABLE IF NOT EXISTS identity_creation (kind TEXT NOT NULL, id TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(kind,id)); INSERT OR IGNORE INTO schema_version(version) VALUES(16);`,
+    );
+    db.exec("COMMIT");
+    globalThis.leafwakeDatabase = db;
+    return db;
+  } catch (error) {
+    try {
+      db.exec("ROLLBACK");
+    } catch {}
+    db.close();
+    console.error(
+      "Leafwake schema upgrade failed; preserve the volume and inspect it with the maintenance CLI.",
+      error instanceof Error ? error.name : "UnknownError",
+    );
+    throw new Error(
+      "Schema upgrade failed. The transaction was rolled back; preserve the volume and use a validated backup or compatible image.",
+    );
+  }
 }
 
 export function progressGeneration(userId: string, itemId: string, episodeId = "") {

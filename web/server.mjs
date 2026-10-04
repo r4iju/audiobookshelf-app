@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import next from "next";
 import { attachRealtime } from "./realtime.mjs";
@@ -6,6 +6,12 @@ import { attachRealtime } from "./realtime.mjs";
 const port = Number(process.env.PORT || 19881);
 const hostname = process.env.HOSTNAME || "127.0.0.1";
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("Invalid PORT");
+try {
+  await access(`${process.env.LEAFWAKE_DATA_DIR || ".data"}/.restore-in-progress`);
+  throw new Error("Restore is incomplete. Keep the original volume and retry into a new empty volume.");
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
 const dev = process.env.NODE_ENV !== "production";
 // The custom entry point is explicitly packaged; Next's generated standalone server is not used.
 const conf = dev
@@ -15,6 +21,28 @@ const app = next({ dev, hostname, port, conf });
 await app.prepare();
 const handle = app.getRequestHandler();
 const server = createServer((request, response) => {
+  let handlerFinished = () => {};
+  if (!request.url?.startsWith(`${basePath}/socket.io`)) {
+    globalThis.leafwakeInFlightRequests = (globalThis.leafwakeInFlightRequests ?? 0) + 1;
+    let settled = false,
+      ended = false,
+      released = false;
+    const release = () => {
+      if (!settled || !ended || released) return;
+      released = true;
+      globalThis.leafwakeInFlightRequests--;
+    };
+    handlerFinished = () => {
+      settled = true;
+      release();
+    };
+    const responseEnded = () => {
+      ended = true;
+      release();
+    };
+    response.once("finish", responseEnded);
+    response.once("close", responseEnded);
+  }
   const origin = request.headers.origin;
   const allowedOrigin = origin && globalThis.leafwakeOriginAllowed?.(origin, request.headers.host ?? "");
   if (allowedOrigin) {
@@ -27,14 +55,17 @@ const server = createServer((request, response) => {
   if (request.method === "OPTIONS") {
     response.statusCode = allowedOrigin ? 204 : 403;
     response.end();
+    handlerFinished();
     return;
   }
-  handle(request, response).catch(() => {
-    if (!response.headersSent) {
-      response.statusCode = 500;
-      response.end("Request failed");
-    } else response.destroy();
-  });
+  handle(request, response)
+    .catch(() => {
+      if (!response.headersSent) {
+        response.statusCode = 500;
+        response.end("Request failed");
+      } else response.destroy();
+    })
+    .finally(handlerFinished);
 });
 // The application bounds upload bodies to ten minutes and JSON bodies to twenty seconds.
 server.requestTimeout = 660_000;

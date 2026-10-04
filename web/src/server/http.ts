@@ -42,6 +42,8 @@ import { originAllowed, saveServerSettings, serverSettings, serverSettingsSchema
 import "server-only";
 import "./realtime";
 import { z } from "zod";
+import { backupConfigurationSchema } from "@/lib/abs/backup-settings";
+import { readiness } from "../../diagnostics.mjs";
 import {
   accountResponse,
   authenticate,
@@ -62,6 +64,7 @@ import {
   revokeAccount,
   setupSchema,
 } from "./accounts";
+import { backupSettings, startBackupSchedules, updateBackupSettings } from "./backup-schedules";
 import { createBackup, listBackups, restoreBackup } from "./backups";
 import {
   createLibrary,
@@ -75,8 +78,9 @@ import {
   scanHistory,
   scanLibrary,
 } from "./catalog";
-import { database, initialized, setupKey } from "./data";
+import { database, dataDirectory, initialized, setupKey } from "./data";
 import { deliveryImportInput, importDelivery, inspectDelivery } from "./delivery-migration";
+import { diagnostics } from "./diagnostics";
 import { authorFor, authorGroups, pagedSeries, personalized, seriesFor } from "./discovery";
 import { downloadItem, serveEbook } from "./documents";
 import {
@@ -200,12 +204,17 @@ export function serverStatus() {
     },
   });
 }
-export function health() {
+export async function health() {
   startTranscode();
   startPodcasts();
   startPodcastSchedules();
+  startBackupSchedules();
   database().prepare("SELECT 1").get();
-  return json({ status: "ready", app: "Leafwake" });
+  const current = await readiness(dataDirectory());
+  return json(
+    { status: current.ready ? "ready" : "unavailable", app: "Leafwake" },
+    current.ready ? 200 : 503,
+  );
 }
 export async function login(request: Request) {
   return boundary(async () => json(await passwordLogin(credentialsSchema.parse(await body(request)))));
@@ -356,11 +365,17 @@ export async function api(request: Request) {
       );
     if (path === "/api/admin/migrations/media" && request.method === "POST")
       return json(await commitMedia(mediaCommitSchema.parse(await body(request)), () => authenticate(token)));
+    if (path === "/api/admin/backups/settings") {
+      if (request.method === "GET") return json(backupSettings(user));
+      if (request.method === "PATCH")
+        return json(updateBackupSettings(user, backupConfigurationSchema.parse(await body(request))));
+    }
+    if (path === "/api/admin/diagnostics" && request.method === "GET") return json(await diagnostics(user));
     if (path === "/api/admin/backups") {
       if (request.method === "GET") return json(listBackups(user));
       if (request.method === "POST") {
         sameOrigin(request);
-        return json(await createBackup(user));
+        return json(await createBackup(user, () => authenticate(token)));
       }
     }
     const restoreRoute = path.match(/^\/api\/admin\/backups\/([^/]+)\/restore$/);
