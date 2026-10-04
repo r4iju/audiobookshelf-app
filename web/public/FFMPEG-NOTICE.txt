@@ -1,0 +1,14 @@
+Leafwake uses the Debian-packaged FFmpeg and FFprobe tools as separate processes.
+FFmpeg is copyright its contributors. Its configured optional GPL components
+make the packaged build GPL; consult the exact package copyright and license
+texts included in this image at /usr/share/doc/ffmpeg/copyright and
+/usr/share/common-licenses. Dependency notices remain under /usr/share/doc.
+
+Upstream licensing: https://ffmpeg.org/legal.html
+Upstream source: https://ffmpeg.org/download.html
+The exact Debian source package names and versions for this image are recorded
+in ffmpeg-packages.tsv. Corresponding Debian sources are available at
+https://sources.debian.org/src/<source-package>/<source-version>/
+Public image distribution must include the corresponding source archives in
+its release source bundle. The final release artifact check enforces this.
+No proprietary FFmpeg license or upstream permission is claimed.

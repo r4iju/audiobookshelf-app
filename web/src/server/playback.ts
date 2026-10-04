@@ -28,18 +28,19 @@ export const playSchema = z.object({
 export function openPlayback(actor: Account, itemId: string, input: z.infer<typeof playSchema>) {
   const item = itemFor(actor, itemId);
   if (item.isMissing || !item.media.tracks?.length) throw new DomainError(404, "Playable media not found");
-  if (
+  const transcode =
     input.forceTranscode ||
     (!input.forceDirectPlay &&
       input.supportedMimeTypes &&
       item.media.tracks.some(
         (track) => !track.mimeType || !input.supportedMimeTypes?.includes(track.mimeType),
-      ))
-  )
-    throw new DomainError(422, "This media requires transcoding");
+      ));
+  const sessionId = randomUUID();
+  if (transcode && (!item.media.duration || item.media.duration > 172800))
+    throw new DomainError(422, "Unsupported transcode duration");
   const now = Date.now();
   const session = playbackSessionSchema.parse({
-    id: randomUUID(),
+    id: sessionId,
     userId: actor.id,
     timeListening: 0,
     mediaMetadata: item.media.metadata,
@@ -52,9 +53,19 @@ export function openPlayback(actor: Account, itemId: string, input: z.infer<type
     duration: item.media.duration,
     currentTime: progressFor(actor, itemId)?.currentTime ?? 0,
     progressGeneration: progressGeneration(actor.id, itemId),
-    playMethod: 0,
+    playMethod: transcode ? 1 : 0,
     chapters: item.media.chapters,
-    audioTracks: item.media.tracks,
+    audioTracks: transcode
+      ? [
+          {
+            index: 1,
+            startOffset: 0,
+            duration: item.media.duration,
+            contentUrl: `/hls/${sessionId}/output.m3u8`,
+            mimeType: "application/vnd.apple.mpegurl",
+          },
+        ]
+      : item.media.tracks,
     startedAt: now,
     updatedAt: now,
   });

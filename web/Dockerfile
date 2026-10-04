@@ -18,7 +18,9 @@ COPY --from=build --chown=node:node /app/.next ./.next
 COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/server.mjs ./
 COPY --from=build --chown=node:node /app/realtime.mjs ./
-RUN mkdir -p /data /media && chown node:node /data /media
+RUN dpkg-query -W -f='${binary:Package}\t${source:Package}\t${source:Version}\n' > /app/public/ffmpeg-packages.tsv && \
+    cp /usr/share/doc/ffmpeg/copyright /app/public/ffmpeg-copyright.txt && \
+    mkdir -p /data /media && chown node:node /data /media
 USER node
 VOLUME ["/data"]
 EXPOSE 3000

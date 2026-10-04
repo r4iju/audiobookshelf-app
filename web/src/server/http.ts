@@ -56,6 +56,7 @@ import {
   syncLocal,
 } from "./progress";
 import { searchLibrary } from "./search";
+import { cancelTranscode, serveHls, startTranscode } from "./transcode";
 
 const MAX_BODY = 16_384;
 export function json(value: unknown, status = 200) {
@@ -125,6 +126,7 @@ export function serverStatus() {
   });
 }
 export function health() {
+  startTranscode();
   database().prepare("SELECT 1").get();
   return json({ status: "ready", app: "Leafwake" });
 }
@@ -243,7 +245,9 @@ export async function api(request: Request) {
     const closeRoute = path.match(/^\/api\/session\/([^/]+)\/close$/);
     if (closeRoute && request.method === "POST") {
       sameOrigin(request);
-      closePlayback(user, z.string().parse(closeRoute[1]));
+      const sessionId = z.string().parse(closeRoute[1]);
+      closePlayback(user, sessionId);
+      await cancelTranscode(sessionId);
       return json({ success: true });
     }
     if (path.startsWith("/api/users")) {
@@ -329,6 +333,24 @@ export function publicMedia(request: Request) {
       () => authenticate(token),
       z.string().parse(match[1]),
       z.coerce.number().int().min(1).parse(match[2]),
+    );
+  });
+}
+
+export function hlsMedia(request: Request) {
+  return boundary(async () => {
+    const url = new URL(request.url);
+    const prefix = globalThis.leafwakeBasePath ?? "";
+    const path =
+      prefix && url.pathname.startsWith(`${prefix}/`) ? url.pathname.slice(prefix.length) : url.pathname;
+    const match = path.match(/^\/hls\/([0-9a-f-]{36})\/([^/]+)$/);
+    if (!match) throw new DomainError(404, "Not found");
+    const token = bearer(request) ?? url.searchParams.get("token");
+    return serveHls(
+      request,
+      () => authenticate(token),
+      z.string().uuid().parse(match[1]),
+      z.string().parse(match[2]),
     );
   });
 }
