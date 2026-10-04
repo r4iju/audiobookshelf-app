@@ -1,18 +1,19 @@
 #!/bin/bash
 # Recovering progress saves a gateway gave up on (PublicationRecoveryJourney), against verification/fixture.py
 # in its held-sync mode on ABS_PUBLICATION_QA_PORT (63769 unless set). Runs on ABS_PUBLICATION_QA_SIMULATOR
-# ("ABS Mobile Publication Recovery iPhone" unless set), created on first use. Extra arguments pass to xcodebuild.
+# ("ABS Mobile Publication Recovery iPhone" unless set), leased from the shared pool. Extra arguments pass to xcodebuild.
 set -euo pipefail
 apple_root="$(cd "$(dirname "$0")/.." && pwd)"
 repo_root="$(cd "$apple_root/.." && pwd)"
 port="${ABS_PUBLICATION_QA_PORT:-63769}"
 project="$apple_root/AudiobookshelfNative.xcodeproj/project.pbxproj"
-simulator_name="${ABS_PUBLICATION_QA_SIMULATOR:-ABS Mobile Publication Recovery iPhone}"
 derived="${ABS_PUBLICATION_QA_DERIVED_DATA:-$apple_root/build-publication-recovery}"
 work="$(mktemp -d)"
 fixture_pid=""
+leased_simulator=""
 cp "$project" "$work/project.pbxproj"
 cleanup() {
+    if [[ -n "$leased_simulator" ]]; then sim release "$leased_simulator" || true; fi
     mkdir -p "$derived"
     curl -s "http://127.0.0.1:$port/abs/__fixture__/observations" > "$derived/publication-recovery-observations.json" 2>/dev/null || true
     [[ -n "$fixture_pid" ]] && { kill "$fixture_pid" 2>/dev/null || true; wait "$fixture_pid" 2>/dev/null || true; }
@@ -44,9 +45,10 @@ for attempt in range(50):
 else:
     raise SystemExit(f'Synthetic fixture on {port} did not start.')
 PY
-simulator="$(xcrun simctl list devices available | sed -n "s/^ *$simulator_name (\([0-9A-F-]*\)).*/\1/p" | head -1)"
+simulator="${ABS_PUBLICATION_QA_SIMULATOR:-}"
 if [[ -z "$simulator" ]]; then
-    simulator="$(xcrun simctl create "$simulator_name" com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro com.apple.CoreSimulator.SimRuntime.iOS-27-0)"
+    simulator="$(sim acquire iphone --no-boot --for "leafwake publication-recovery verification")"
+    leased_simulator="$simulator"
 fi
 xcodegen generate --spec "$apple_root/project.yml" > /dev/null
 TEST_RUNNER_ABS_PUBLICATION_FIXTURE="http://127.0.0.1:$port/abs" xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" \

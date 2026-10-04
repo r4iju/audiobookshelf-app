@@ -2,7 +2,7 @@ import Foundation
 import RealmSwift
 
 // The app types the legacy model sources call into, reduced to what those sources use. The
-// models themselves are the legacy app's own files (LegacyAppModels links to ios/App/Shared/models).
+// models themselves are the legacy app's own files (LegacyAppModels retains isolated original schema declarations).
 
 enum AbsDownloader {
     static var documents = FileManager.default.temporaryDirectory

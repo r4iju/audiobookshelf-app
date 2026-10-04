@@ -1,7 +1,7 @@
 // Run from the repository root: node --test apple/Migration/LegacyExportWebTests/
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { collectReaderStorage, progressFraction, progressLabel } from '../../../plugins/legacyMigrationExport.js'
+import { collectReaderStorage, progressFraction, progressLabel } from './legacyMigrationExport.js'
 
 function storage(entries) {
   const keys = Object.keys(entries)

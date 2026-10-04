@@ -1,11 +1,12 @@
 import { execFileSync } from "node:child_process";
 import { expect, type Page, test } from "@playwright/test";
-import { type Account, accounts, clearProgress, itemIdByTitle, serverApi } from "./qa";
+import { type Account, accounts, clearProgress, itemIdByTitle, qa, serverApi } from "./qa";
 
-// The self-hosted deployment from docs/DEPLOYMENT.md: the production image under /web behind nginx, on the
-// server's own origin (qa/deploy.mjs). The browser reaches the proxy on 19882 under a port-less host name.
+// The prefixed one-image product on 19882. Plain-HTTP hostname journeys cover browser fallback APIs;
+// OpenID uses its exact loopback URL because public authentication callbacks require HTTPS.
 const origin = "http://abs-web.test";
 const web = `${origin}/web`;
+const openIdWeb = "http://127.0.0.1:19882/web";
 
 test.describe.configure({ mode: "serial" });
 test.use({
@@ -22,6 +23,10 @@ test.beforeAll(() => {
   execFileSync("node", ["qa/deploy.mjs", "up"], { stdio: "inherit" });
 });
 
+test.afterAll(() => {
+  execFileSync("node", ["qa/deploy.mjs", "down"], { stdio: "inherit" });
+});
+
 /** Every request the page makes, by origin, so a journey can show nothing left the deployment's origin. */
 function originsOf(page: Page) {
   const seen = new Set<string>();
@@ -33,9 +38,11 @@ function originsOf(page: Page) {
 }
 
 /** The deployment names its own server, so a fresh visit is already at signing in to it. */
-async function chooseServer(page: Page) {
-  await page.goto(`${web}/connect`);
-  await expect(page.getByRole("heading", { level: 1, name: "Sign in to abs-web.test" })).toBeVisible();
+async function chooseServer(page: Page, address = web) {
+  await page.goto(`${address}/connect`);
+  await expect(
+    page.getByRole("heading", { level: 1, name: `Sign in to ${new URL(address).host}` }),
+  ).toBeVisible();
 }
 
 async function signInHere(page: Page, account: Account) {
@@ -51,8 +58,8 @@ test("a fresh visit finds the server the client is deployed beside and goes stra
 }) => {
   await page.goto(`${web}/connect`);
   await expect(page.getByRole("heading", { level: 1, name: "Sign in to abs-web.test" })).toBeVisible();
-  // The server is the origin's root, not the client's /web.
-  await expect(page.getByText(`${origin} · Server version 2.30.0`, { exact: true })).toBeVisible();
+  // Browser and backend share the image prefix.
+  await expect(page.getByText(`${web} · Server version ${qa.serverVersion}`, { exact: true })).toBeVisible();
   await page.getByLabel("Username").fill(accounts.user.username);
   await page.getByLabel("Password").fill(accounts.user.password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
@@ -63,7 +70,7 @@ test("another server can still be chosen by hand", async ({ page }) => {
   await page.goto(`${web}/connect`);
   await page.getByRole("button", { name: "Change server" }).click();
   const address = page.getByLabel("Server address");
-  await expect(address).toHaveValue(origin);
+  await expect(address).toHaveValue(web);
   // The QA server answers only its own origin, so the address typed here is checked and found unreachable.
   await address.fill("http://127.0.0.1:19880");
   await page.getByRole("button", { name: "Continue" }).click();
@@ -75,32 +82,42 @@ test("another server can still be chosen by hand", async ({ page }) => {
 test("signing in through the server's OpenID provider returns to the client signed in, and survives a reload", async ({
   page,
 }) => {
-  await chooseServer(page);
+  await chooseServer(page, openIdWeb);
   await page.getByRole("button", { name: "Sign in with QA SSO" }).click();
   await expect(page.getByRole("heading", { name: "QA identity provider" })).toBeVisible();
   await page.getByRole("button", { name: "Continue as QA OpenID" }).click();
 
   await expect(page.getByRole("navigation", { name: "Library" })).toBeVisible();
-  expect(page.url().startsWith(`${web}/`)).toBe(true);
+  expect(page.url().startsWith(`${openIdWeb}/`)).toBe(true);
   expect(new URL(page.url()).search).not.toContain("code=");
   const admin = await serverApi(accounts.admin);
-  const users: { username: string }[] = (await admin.call("/api/users")).body.users;
-  expect(users.map((user) => user.username)).toContain("qa-openid");
+  const users: { id: string; username: string; type: string }[] = (await admin.call("/api/users")).body.users;
+  // The replacement binds issuer/subject to an account and avoids provider-name collisions.
+  const signedInUserId = await page.evaluate(() => {
+    const registry = JSON.parse(localStorage.getItem("abs-web:v1:connections") ?? "null") as {
+      activeId: string;
+      connections: { id: string; userId: string }[];
+    };
+    return registry.connections.find((entry) => entry.id === registry.activeId)?.userId;
+  });
+  expect(signedInUserId).toBeTruthy();
+  expect(Object.values(qa.users)).not.toContain(signedInUserId);
+  expect(users.find((user) => user.id === signedInUserId)).toMatchObject({ type: "user" });
 
   await page.reload();
   await expect(page.getByRole("navigation", { name: "Library" })).toBeVisible();
   await page.getByRole("button", { name: "Sign out" }).click();
-  await expect(page).toHaveURL(new RegExp(`^${web}/connect`));
+  await expect(page).toHaveURL(new RegExp(`^${openIdWeb}/connect`));
 });
 
 test("a refused OpenID sign-in says so and leads back to signing in", async ({ page }) => {
-  await chooseServer(page);
+  await chooseServer(page, openIdWeb);
   await page.getByRole("button", { name: "Sign in with QA SSO" }).click();
   await page.getByRole("button", { name: "Deny" }).click();
 
-  // 2.30.0 drops the provider's "access_denied" and reports its own failed code exchange instead.
+  // The provider refusal is shown without establishing a session.
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
-    "OpenID sign-in did not complete: the server refused it (Error in callback)",
+    "OpenID sign-in did not complete: the identity provider refused (access_denied)",
   );
   await page.getByRole("link", { name: "Try again" }).click();
   await expect(page.getByRole("button", { name: "Sign in with QA SSO" })).toBeVisible();
@@ -142,10 +159,10 @@ test("pages, deep links, readers and media are all served from the one origin", 
 test("the production server answers on its own port under the base path, without framework headers", async ({
   request,
 }) => {
-  const response = await request.get("http://127.0.0.1:19883/web/connect");
+  const response = await request.get("http://127.0.0.1:19882/web/connect");
   expect(response.status()).toBe(200);
   expect(response.headers()["x-powered-by"]).toBeUndefined();
-  expect((await request.get("http://127.0.0.1:19883/connect")).status()).toBe(404);
+  expect((await request.get("http://127.0.0.1:19882/connect")).status()).toBe(404);
 });
 
 /** Plays a book in a tab for a few seconds from the server's place, pauses, and starts delivering that listening. */

@@ -15,7 +15,7 @@ export const qa = stateSchema.parse(
 
 // The variables and defaults qa/server.mjs and its fixtures start from, so specs reach the stack this run set up.
 export const stack = {
-  container: process.env.ABS_QA_CONTAINER ?? "abs-web-qa",
+  container: process.env.ABS_QA_CONTAINER ?? "leafwake-web-qa",
   feedPort: Number(process.env.ABS_QA_FEED_PORT ?? 19885),
   mailPort: Number(process.env.ABS_QA_MAIL_PORT ?? 19886),
 };
@@ -31,14 +31,17 @@ export type Account = (typeof accounts)[keyof typeof accounts];
 
 /** Talks to the QA server directly, as another device would, to observe server-side state. */
 export async function serverApi(account: Account) {
-  const login = await fetch(`${qa.origin}/login`, {
+  const origin = stateSchema.parse(
+    JSON.parse(readFileSync(new URL("../qa/.runtime/state.json", import.meta.url), "utf8")),
+  ).origin;
+  const login = await fetch(`${origin}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-return-tokens": "true" },
     body: JSON.stringify(account),
   });
   const token: string = (await login.json()).user.accessToken;
   async function call(path: string, init: { method?: string; body?: unknown } = {}) {
-    const response = await fetch(qa.origin + path, {
+    const response = await fetch(origin + path, {
       method: init.method ?? "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -57,15 +60,12 @@ export async function serverApi(account: Account) {
 }
 
 /** The path the client is mounted under, such as /web behind a proxy; empty when it serves from the root. */
-export const clientPath = new URL(process.env.ABS_WEB_URL ?? "http://127.0.0.1:19881").pathname.replace(
-  /\/+$/,
-  "",
-);
+export const clientPath = new URL(
+  process.env.ABS_WEB_URL ?? `http://127.0.0.1:${process.env.ABS_QA_PORT ?? 19880}`,
+).pathname.replace(/\/+$/, "");
 
 export async function signIn(page: Page, account: Account = accounts.user, serverUrl = qa.origin) {
-  await page.goto(`${clientPath}/connect`);
-  await page.getByLabel("Server address").fill(serverUrl);
-  await page.getByRole("button", { name: "Continue" }).click();
+  await page.goto(`${clientPath}/connect?server=${encodeURIComponent(serverUrl)}`);
   await page.getByLabel("Username").fill(account.username);
   await page.getByLabel("Password").fill(account.password);
   await page.getByRole("button", { name: "Sign in" }).click();

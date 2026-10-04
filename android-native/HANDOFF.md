@@ -1,3 +1,7 @@
+# Historical handoff
+
+This file records earlier implementation evidence. Current runtime, deployment and release scope is in `docs/fullstack/`. Original-server launch scripts and patches have been removed; their versions remain in Git history.
+
 # Native Android handoff
 
 `fork/native-android` was merged into `fork/native-tv` through #87 (79b31196). Current finishing work is on `fork/android-finish-gpt`, based on `d3152a5d`. The app installs as the preview identity
