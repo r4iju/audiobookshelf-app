@@ -1,19 +1,20 @@
 #!/bin/bash
 # Token renewal and server-side revocation during real playback (PlaybackAuthorizationTests) and the
 # reauthentication journey (PlaybackAuthorizationJourney), against verification/fixture.py on 51769.
-# Runs on the simulator "Audiobookshelf PlaybackFinal iPhone QA", created on first use. Extra arguments
+# Runs on the simulator "Audiobookshelf PlaybackFinal iPhone QA", leased from the shared pool. Extra arguments
 # pass to xcodebuild, for example -only-testing:NativeTests/PlaybackAuthorizationTests.
 set -euo pipefail
 apple_root="$(cd "$(dirname "$0")/.." && pwd)"
 repo_root="$(cd "$apple_root/.." && pwd)"
 port=51769
 project="$apple_root/AudiobookshelfNative.xcodeproj/project.pbxproj"
-simulator_name="${ABS_PLAYBACK_QA_SIMULATOR:-Audiobookshelf PlaybackFinal iPhone QA}"
 derived="${ABS_PLAYBACK_QA_DERIVED_DATA:-$apple_root/build-playback-authorization}"
 work="$(mktemp -d)"
 fixture_pid=""
+leased_simulator=""
 cp "$project" "$work/project.pbxproj"
 cleanup() {
+    if [[ -n "$leased_simulator" ]]; then sim release "$leased_simulator" || true; fi
     mkdir -p "$derived"
     curl -s "http://127.0.0.1:$port/abs/__fixture__/observations" > "$derived/playback-authorization-observations.json" 2>/dev/null || true
     [[ -n "$fixture_pid" ]] && { kill "$fixture_pid" 2>/dev/null || true; wait "$fixture_pid" 2>/dev/null || true; }
@@ -46,9 +47,10 @@ for attempt in range(50):
 else:
     raise SystemExit(f'Synthetic fixture on {port} did not start.')
 PY
-simulator="$(xcrun simctl list devices available | sed -n "s/^ *$simulator_name (\([0-9A-F-]*\)).*/\1/p" | head -1)"
+simulator="${ABS_PLAYBACK_QA_SIMULATOR:-}"
 if [[ -z "$simulator" ]]; then
-    simulator="$(xcrun simctl create "$simulator_name" com.apple.CoreSimulator.SimDeviceType.iPhone-17 com.apple.CoreSimulator.SimRuntime.iOS-27-0)"
+    simulator="$(sim acquire iphone --no-boot --for "leafwake playback-authorization verification")"
+    leased_simulator="$simulator"
 fi
 xcodegen generate --spec "$apple_root/project.yml" > /dev/null
 TEST_RUNNER_ABS_PLAYBACK_FIXTURE="http://127.0.0.1:$port/abs" xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" \

@@ -85,7 +85,7 @@ if (( $# > 0 )); then
     for name in "$@"; do classes+="${classes:+,}com.audiobookshelf.android.journeys.$name"; done
     args+=("-Pandroid.testInstrumentationRunnerArguments.class=$classes")
 fi
-# scripts/verify-real-server.sh names its throwaway 2.30.0 container; other journeys ignore it.
+# scripts/verify-real-server.sh names its throwaway Leafwake product container; other journeys ignore it.
 [[ -n "${ABS_REAL_SERVER:-}" ]] && args+=("-Pandroid.testInstrumentationRunnerArguments.absRealServer=$ABS_REAL_SERVER")
 cd "$android_root"
 ./gradlew :app:connectedDebugAndroidTest --console=plain ${args[@]+"${args[@]}"}

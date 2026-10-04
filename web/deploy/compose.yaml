@@ -1,41 +1,23 @@
-# The browser client and a same-origin proxy beside an existing Audiobookshelf server (docs/DEPLOYMENT.md).
-# This file never creates, stops or changes the server container or its data; it joins the server's Docker network.
-#   ABS_SERVER_NETWORK=<network of your server container> docker compose -f deploy/compose.yaml up -d --build --wait
-name: audiobookshelf-web
-
+name: leafwake
 services:
-  abs-web:
+  leafwake:
     build:
       context: ..
       args:
-        ABS_WEB_BASE_PATH: /web
-    image: ${ABS_WEB_IMAGE:-audiobookshelf-web:local}
+        ABS_WEB_BASE_PATH: ${ABS_WEB_BASE_PATH:-}
+    image: ${LEAFWAKE_IMAGE:-leafwake:local}
     restart: unless-stopped
     environment:
-      # The server the connect page checks and signs in to first: "/" is this origin's root, where the proxy below
-      # serves the server; a subpath such as /audiobookshelf or a full https:// address also works. Unset, people
-      # enter the address themselves.
-      ABS_WEB_SERVER: ${ABS_WEB_SERVER:-/}
+      LEAFWAKE_SETUP_KEY: ${LEAFWAKE_SETUP_KEY:?set a private first-owner setup key}
+      LEAFWAKE_MEDIA_ROOTS: /media
+    ports: ["${LEAFWAKE_BIND:-127.0.0.1:3000}:3000"]
+    volumes:
+      - leafwake-data:/data
+      - ${LEAFWAKE_MEDIA_DIR:?set the original media directory}:/media:ro
+      - ${LEAFWAKE_IMPORT_DIR:?set a private snapshot import directory}:/imports:ro
     read_only: true
-    # Next.js writes its runtime cache under .next/cache; nothing else in the image changes.
     tmpfs: [/tmp, /app/.next/cache]
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
-    # Only for checking the client directly; people use it through the proxy.
-    ports: ["${ABS_WEB_BIND:-127.0.0.1:3000}:3000"]
-    networks: [server]
-
-  proxy:
-    image: nginx@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de
-    restart: unless-stopped
-    ports: ["${ABS_PROXY_BIND:-80}:80"]
-    volumes: ["./nginx.conf:/etc/nginx/conf.d/default.conf:ro"]
-    depends_on:
-      abs-web:
-        condition: service_healthy
-    networks: [server]
-
-networks:
-  server:
-    external: true
-    name: ${ABS_SERVER_NETWORK:?set ABS_SERVER_NETWORK to the Docker network your Audiobookshelf container is on}
+volumes:
+  leafwake-data:

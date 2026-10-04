@@ -1,17 +1,18 @@
 #!/bin/bash
 # Discard progress journeys (ProgressResetJourney) against the owned progress reset fixture on 27765:
 # apple/scripts/progress_reset_fixture.py over verification/fixture.py.
-# Runs the app as built from this checkout on the simulator "Audiobookshelf ResetQA", created on first use.
+# Runs the app as built from this checkout on the simulator "Audiobookshelf ResetQA", leased from the shared pool.
 # Extra arguments pass to xcodebuild.
 set -euo pipefail
 apple_root="$(cd "$(dirname "$0")/.." && pwd)"
 repo_root="$(cd "$apple_root/.." && pwd)"
 project="$apple_root/AudiobookshelfNative.xcodeproj/project.pbxproj"
-simulator_name="${ABS_RESET_QA_SIMULATOR:-Audiobookshelf ResetQA}"
 work="$(mktemp -d)"
 fixture_pid=""
+leased_simulator=""
 cp "$project" "$work/project.pbxproj"
 cleanup() {
+    if [[ -n "$leased_simulator" ]]; then sim release "$leased_simulator" || true; fi
     mkdir -p "$apple_root/build-reset"
     curl -s http://127.0.0.1:27765/abs/__reset__/observations > "$apple_root/build-reset/progress-reset-observations.json" 2>/dev/null || true
     [[ -n "$fixture_pid" ]] && { kill "$fixture_pid" 2>/dev/null || true; wait "$fixture_pid" 2>/dev/null || true; }
@@ -42,9 +43,10 @@ for attempt in range(50):
 else:
     raise SystemExit('Progress reset fixture on 27765 did not start.')
 PY
-simulator="$(xcrun simctl list devices available | sed -n "s/^ *$simulator_name (\([0-9A-F-]*\)).*/\1/p" | head -1)"
+simulator="${ABS_RESET_QA_SIMULATOR:-}"
 if [[ -z "$simulator" ]]; then
-    simulator="$(xcrun simctl create "$simulator_name" com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro com.apple.CoreSimulator.SimRuntime.iOS-27-0)"
+    simulator="$(sim acquire iphone --no-boot --for "leafwake progress-reset verification")"
+    leased_simulator="$simulator"
 fi
 xcodegen generate --spec "$apple_root/project.yml" > /dev/null
 TEST_RUNNER_ABS_PROGRESS_RESET_QA=1 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative \

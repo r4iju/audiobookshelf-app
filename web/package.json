@@ -1,10 +1,10 @@
 {
-  "name": "audiobookshelf-web",
-  "version": "0.1.0",
+  "name": "leafwake-web",
+  "version": "1.0.0-rc.1",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "scripts": {
     "predev": "node scripts/copy-libarchive.mjs",

@@ -1,7 +1,7 @@
-// Read-only check of a deployed client and the server behind the same origin (docs/DEPLOYMENT.md). It only sends
+// Read-only check of the deployed product and the backend on the same origin (docs/DEPLOYMENT.md). It only sends
 // GET requests, signs in to nothing and changes nothing, so it may be pointed at a real deployment.
-//   node qa/smoke.mjs <origin> [base path, default /web]     for example: node qa/smoke.mjs https://abs.example
-const [origin, basePath = "/web"] = process.argv.slice(2);
+//   node qa/smoke.mjs <origin> [base path, default root]     for example: node qa/smoke.mjs https://abs.example
+const [origin, basePath = ""] = process.argv.slice(2);
 if (!origin) {
   console.error("usage: node qa/smoke.mjs <origin> [base path]");
   process.exit(2);
@@ -17,7 +17,7 @@ const checks = [
       if (response.headers.get("x-powered-by"))
         return `sends x-powered-by: ${response.headers.get("x-powered-by")}`;
       const html = await response.text();
-      const script = html.match(/<script[^>]+src="([^"]+\/_next\/static\/[^"]+\.js)"/)?.[1];
+      const script = html.match(/<script[^>]+src="([^"]*\/_next\/static\/[^"]+\.js)"/)?.[1];
       if (!script) return "names no script of the client";
       const asset = new URL(script, base);
       if (asset.origin !== base) return `loads its scripts from ${asset.origin}`;
@@ -28,7 +28,7 @@ const checks = [
   [
     "the server's status on the same origin",
     async () => {
-      const response = await fetch(`${base}/status`);
+      const response = await fetch(`${base}${basePath}/status`);
       if (response.status !== 200) return `answered ${response.status}`;
       const status = await response.json().catch(() => null);
       if (!status?.serverVersion) return "is not an Audiobookshelf status";
@@ -37,17 +37,17 @@ const checks = [
     },
   ],
   [
-    "the live updates channel through the proxy",
+    "the live updates channel",
     async () => {
-      const response = await fetch(`${base}/socket.io/?EIO=4&transport=polling`);
+      const response = await fetch(`${base}${basePath}/socket.io/?EIO=4&transport=polling`);
       const body = await response.text();
       return response.status === 200 && body.includes('"sid"') ? null : `answered ${response.status}`;
     },
   ],
   [
-    "the server's own interface at /",
+    "the product interface",
     async () => {
-      const response = await fetch(`${base}/`, { redirect: "manual" });
+      const response = await fetch(`${base}${basePath}/`, { redirect: "manual" });
       return response.status < 400 ? null : `answered ${response.status}`;
     },
   ],
@@ -62,6 +62,6 @@ for (const [name, check] of checks) {
 console.log(
   failed
     ? `${failed} of ${checks.length} checks failed`
-    : `All ${checks.length} checks passed. Now by hand: sign in at ${base}${basePath}, play a book for a minute, and see its progress in the server's own interface.`,
+    : `All ${checks.length} checks passed. Now by hand: sign in at ${base}${basePath}, play a book for a minute, and see its saved progress after reload.`,
 );
 process.exit(failed ? 1 : 0);

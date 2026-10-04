@@ -1,9 +1,6 @@
-# Server contract
+# Compatibility contract
 
-What this browser client relies on from the Audiobookshelf server. The browser journeys verify every entry against
-an unmodified **2.30.0** container
-(`ghcr.io/advplyr/audiobookshelf@sha256:6fbd7dc95d53c6e168ce69e760b87c334e3b9ba88bf7b8531ed5a116d5d6da03`, pinned in
-`qa/server.mjs`). No other server version has been tested.
+Leafwake implements the native and browser REST, media and Socket.IO contracts in its new backend. The active implementation is `src/server/` and the custom listener is `server.mjs`. Historical Audiobookshelf behavior is a compatibility reference, not a deployment dependency. Acceptance evidence is recorded in [STATE.md](../../docs/fullstack/STATE.md).
 
 Responses are parsed with zod schemas in `src/lib/abs/schemas.ts` and `src/lib/abs/feeds.ts`. Objects are loose, so
 fields a later server adds are ignored. A missing required field fails as "Unexpected server response" rather than
@@ -32,19 +29,7 @@ limit). A `text/plain` error body is shown as the server's own explanation, such
 4. The client checks `state`, then calls `GET /auth/openid/callback?state&code&code_verifier` with the cookie
    (same origin only) and reads the same payload as `/login`.
 
-2.30.0 quirks the client handles or documents:
-
-- **Return addresses with a port are rejected.** `authOpenIDMobileRedirectURIs` entries must match
-  `^\w+://[\w\.-]+(/[\w\./-]*)*$`. The only alternative is `*`, which must not be used.
-- **The server's address comes from the request.** It builds the provider return address from `Host` and from
-  `X-Forwarded-Proto` (or a TLS socket). Proxies must forward both.
-- **A failed exchange is a redirect.** It goes to `/login?error=<message>&autoLaunch=0` instead of an error status,
-  so the client reads `error` from the final URL of the followed redirect.
-- **A provider refusal is lost.** `access_denied` reaches the client as `code=undefined`. The exchange then fails
-  with "Error in callback".
-- **Provider keys are cached.** openid-client caches the provider's keys and refetches them at most about once a
-  minute. Only the QA provider is affected: it keeps its key across restarts.
-- **New accounts are named from the provider.** Auto-registration names accounts from `preferred_username`.
+Leafwake validates issuer discovery, signed tokens, PKCE, nonce and exact callback allowlists. Public provider returns require HTTPS; loopback HTTP is accepted for development. Identity is keyed by issuer and subject, never linked by an unverified email. The original account IDs are preserved by validated migration. Refused and forged flows never create a signed-in session.
 
 ### Cross-origin use
 

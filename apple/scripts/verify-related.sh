@@ -1,27 +1,21 @@
 #!/bin/bash
 # Mobile author and series journeys (RelatedAuthorSeriesJourney) against the owned related fixture on 27765:
 # verification/fixture.py extended with the 2.30 author and series endpoints by tvos/scripts/related_fixture.py.
-# Runs on its own simulator, "Audiobookshelf RelatedQA", created on first use.
-# --wired temporarily applies docs/modernization/apple-related-author-series-wiring.patch, the search and details links
-# the presentation owner applies for real, and reverts it on exit. Without it the journeys run against the app as it is.
+# Runs on a pooled iPhone simulator.
 # Extra arguments pass to xcodebuild.
 set -euo pipefail
 apple_root="$(cd "$(dirname "$0")/.." && pwd)"
 repo_root="$(cd "$apple_root/.." && pwd)"
-patch="$repo_root/docs/modernization/apple-related-author-series-wiring.patch"
 project="$apple_root/AudiobookshelfNative.xcodeproj/project.pbxproj"
-simulator_name="${ABS_RELATED_QA_SIMULATOR:-Audiobookshelf RelatedQA}"
-wired=0
-if [[ "${1:-}" == "--wired" ]]; then wired=1; shift; fi
 work="$(mktemp -d)"
 fixture_pid=""
-applied=0
+leased_simulator=""
 cp "$project" "$work/project.pbxproj"
 cleanup() {
+    if [[ -n "$leased_simulator" ]]; then sim release "$leased_simulator" || true; fi
     mkdir -p "$apple_root/build-related"
     curl -s http://127.0.0.1:27765/abs/__fixture__/observations > "$apple_root/build-related/observations.json" 2>/dev/null || true
     [[ -n "$fixture_pid" ]] && { kill "$fixture_pid" 2>/dev/null || true; wait "$fixture_pid" 2>/dev/null || true; }
-    if (( applied )); then git -C "$repo_root" apply -R "$patch"; fi
     cp "$work/project.pbxproj" "$project"
     rm -rf "$work"
 }
@@ -35,7 +29,6 @@ with socket.socket() as listener:
     except OSError:
         raise SystemExit('Related fixture port 27765 is already in use. Finish the previous related verification first.')
 PY
-if (( wired )); then git -C "$repo_root" apply "$patch"; applied=1; fi
 (cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port 27765) > "$work/fixture.log" 2>&1 &
 fixture_pid=$!
 python3 - <<'PY'
@@ -49,9 +42,10 @@ for attempt in range(50):
 else:
     raise SystemExit('Related fixture on 27765 did not start.')
 PY
-simulator="$(xcrun simctl list devices available | sed -n "s/^ *$simulator_name (\([0-9A-F-]*\)).*/\1/p" | head -1)"
+simulator="${ABS_RELATED_QA_SIMULATOR:-}"
 if [[ -z "$simulator" ]]; then
-    simulator="$(xcrun simctl create "$simulator_name" com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro com.apple.CoreSimulator.SimRuntime.iOS-27-0)"
+    simulator="$(sim acquire iphone --no-boot --for "leafwake related verification")"
+    leased_simulator="$simulator"
 fi
 xcodegen generate --spec "$apple_root/project.yml" > /dev/null
 TEST_RUNNER_ABS_RELATED_QA=1 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative \

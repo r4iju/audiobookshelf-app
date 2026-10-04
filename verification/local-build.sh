@@ -1,36 +1,29 @@
 #!/bin/bash
 set -euo pipefail
-abs_root="$(cd "$(dirname "$0")/.." && pwd)"
-abs_output="$abs_root/verification/outputs"
-mkdir -p "$abs_output"
-cd "$abs_root"
-abs_web() { npm run generate > "$abs_output/web.log" 2>&1; }
-abs_core() { (cd tvos/Core && swift test) > "$abs_output/core.log" 2>&1; }
-abs_tv() { ./tvos/scripts/deploy.sh --build-only > "$abs_output/tv.log" 2>&1; }
-abs_android() {
-  abs_java21="${ABS_JAVA21_HOME:-$(/usr/libexec/java_home -v 21)}"
-  (cd android && JAVA_HOME="$abs_java21" ./gradlew :app:assembleDebug) > "$abs_output/android.log" 2>&1
+leafwake_root="$(cd "$(dirname "$0")/.." && pwd)"
+leafwake_output="$leafwake_root/verification/outputs"
+mkdir -p "$leafwake_output"
+cd "$leafwake_root"
+leafwake_web() { npm --prefix web run build > "$leafwake_output/web.log" 2>&1; }
+leafwake_core() { (cd tvos/Core && swift test) > "$leafwake_output/core.log" 2>&1; }
+leafwake_tv() { ./tvos/scripts/deploy.sh --build-only > "$leafwake_output/tv.log" 2>&1; }
+leafwake_android() {
+  leafwake_java21="${ABS_JAVA21_HOME:-$(/usr/libexec/java_home -v 21)}"
+  (cd android-native && JAVA_HOME="$leafwake_java21" ./gradlew -Pleafwake=true :app:assembleDebug) > "$leafwake_output/android.log" 2>&1
 }
-abs_apple_legacy() {
-  abs_copy="$(mktemp -d "${TMPDIR:-/tmp}/abs-legacy-build.XXXXXX")"
-  trap 'rm -rf "$abs_copy"' EXIT
-  rsync -a --exclude Pods --exclude build ios/ "$abs_copy/ios/"
-  ln -s "$abs_root/node_modules" "$abs_copy/node_modules"
-  pod install --project-directory="$abs_copy/ios/App" > "$abs_output/pods.log" 2>&1
-  # SDK 27 cannot target iOS 14. This reference override does not change the app's minimum.
-  xcodebuild -workspace "$abs_copy/ios/App/App.xcworkspace" -scheme App -configuration Debug \
+leafwake_apple() {
+  xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -configuration Debug \
     -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-    -derivedDataPath "$abs_output/ios-derived" CODE_SIGNING_ALLOWED=NO \
-    IPHONEOS_DEPLOYMENT_TARGET=15.0 build > "$abs_output/ios.log" 2>&1
-  ditto "$abs_output/ios-derived/Build/Products/Debug-iphonesimulator/Audiobookshelf.app" "$abs_output/Audiobookshelf-legacy.app"
+    -derivedDataPath "$leafwake_output/apple-derived" CODE_SIGNING_ALLOWED=NO \
+    IPHONEOS_DEPLOYMENT_TARGET=15.0 build > "$leafwake_output/apple.log" 2>&1
 }
 case "${1:-all}" in
-  web) abs_web ;;
-  core) abs_core ;;
-  tv) abs_tv ;;
-  android-legacy) abs_android ;;
-  apple-legacy) abs_apple_legacy ;;
-  all) abs_web; abs_core; abs_tv; abs_android; abs_apple_legacy ;;
-  *) echo 'Usage: local-build.sh [web|core|tv|android-legacy|apple-legacy|all]' >&2; exit 2 ;;
+  web) leafwake_web ;;
+  core) leafwake_core ;;
+  tv) leafwake_tv ;;
+  android) leafwake_android ;;
+  apple) leafwake_apple ;;
+  all) leafwake_web; leafwake_core; leafwake_tv; leafwake_android; leafwake_apple ;;
+  *) echo 'Usage: local-build.sh [web|core|tv|android|apple|all]' >&2; exit 2 ;;
 esac
-echo "Local build succeeded; logs/artifacts: $abs_output"
+echo "Local build succeeded; logs/artifacts: $leafwake_output"
