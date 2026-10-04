@@ -346,6 +346,7 @@ export type SearchResults = z.infer<typeof searchResultsSchema>;
 
 export const collectionSchema = z.looseObject({
   id: z.string(),
+  userId: z.string().optional(),
   libraryId: z.string(),
   name: z.string(),
   description: nullableString,

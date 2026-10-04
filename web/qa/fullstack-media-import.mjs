@@ -204,6 +204,24 @@ test("read-only media import preserves original identities, files, progress, boo
   source
     .prepare("INSERT INTO books VALUES(?,?,?,?,?,?,?,?,?,0)")
     .run("unmapped-book", "Unmapped book", 0, "[]", null, "[]", "[]", "[]", "[]");
+  const collectionId = randomUUID(),
+    playlistId = randomUUID();
+  source.exec(
+    'CREATE TABLE collections(id TEXT,name TEXT,description TEXT,libraryId TEXT,createdAt TEXT,updatedAt TEXT); CREATE TABLE collectionBooks(id TEXT,collectionId TEXT,bookId TEXT,"order" INTEGER); CREATE TABLE playlists(id TEXT,name TEXT,description TEXT,libraryId TEXT,userId TEXT,createdAt TEXT,updatedAt TEXT); CREATE TABLE playlistMediaItems(id TEXT,playlistId TEXT,mediaItemId TEXT,mediaItemType TEXT,"order" INTEGER)',
+  );
+  source
+    .prepare("INSERT INTO collections VALUES(?,?,?,?,?,?)")
+    .run(collectionId, "Original collection", null, ids.library, date, updated);
+  source
+    .prepare("INSERT INTO collectionBooks VALUES(?,?,?,?)")
+    .run(randomUUID(), collectionId, secondBook, 0);
+  source.prepare("INSERT INTO collectionBooks VALUES(?,?,?,?)").run(randomUUID(), collectionId, ids.book, 1);
+  source
+    .prepare("INSERT INTO playlists VALUES(?,?,?,?,?,?,?)")
+    .run(playlistId, "Original private playlist", null, ids.library, ids.user, date, updated);
+  source
+    .prepare("INSERT INTO playlistMediaItems VALUES(?,?,?,?,?)")
+    .run(randomUUID(), playlistId, ids.book, "book", 0);
   source.close();
   await copyFile(staging, filename);
   await chmod(filename, 0o444);
@@ -262,6 +280,24 @@ test("read-only media import preserves original identities, files, progress, boo
   const user = (await json("/login", { username: "import-user", password: "synthetic-password-2026" })).user;
   assert.equal(user.id, ids.user);
   assert.ok(user.bookmarks.some((b) => b.title === "Original bookmark"));
+  const listReport = await json("/api/admin/migrations/lists/inspect", { digest }, owner.accessToken);
+  assert.equal(listReport.canImport, true);
+  assert.equal(listReport.counts.collections, 1);
+  assert.equal(listReport.counts.playlists, 1);
+  const listCommit = await json("/api/admin/migrations/lists", { digest }, owner.accessToken);
+  assert.deepEqual(await json("/api/admin/migrations/lists", { digest }, owner.accessToken), listCommit);
+  const importedCollection = await json(`/api/collections/${collectionId}`, undefined, user.accessToken);
+  assert.deepEqual(
+    importedCollection.books.map((b) => b.id),
+    [secondItem, ids.item],
+  );
+  const importedPlaylist = await json(`/api/playlists/${playlistId}`, undefined, user.accessToken);
+  assert.equal(importedPlaylist.userId, ids.user);
+  assert.deepEqual(
+    importedPlaylist.items.map((i) => i.libraryItemId),
+    [ids.item],
+  );
+  assert.equal((await call(`/api/playlists/${playlistId}`, undefined, owner.accessToken)).status, 404);
   const item = await json(`/api/items/${ids.item}`, undefined, user.accessToken);
   assert.equal(item.media.id, ids.book);
   assert.equal(item.media.metadata.authors[0].id, ids.author);

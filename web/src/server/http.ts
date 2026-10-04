@@ -37,6 +37,17 @@ import {
 import { database, initialized, setupKey } from "./data";
 import { authorFor, authorGroups, pagedSeries, personalized, seriesFor } from "./discovery";
 import { downloadItem, serveEbook } from "./documents";
+import { importLists, inspectLists, listImportSchema } from "./list-migration";
+import {
+  changeList,
+  createList,
+  createListSchema,
+  deleteList,
+  editListSchema,
+  listBatchSchema,
+  listFor,
+  listsFor,
+} from "./lists";
 import { commitMedia, inspectMedia, mediaCommitSchema, mediaInspectSchema } from "./media-migration";
 import {
   commitImport,
@@ -286,6 +297,69 @@ export async function api(request: Request) {
     if (path === "/api/me" && request.method === "GET") return json(accountResponse(user));
     if (path === "/api/authorize" && request.method === "POST")
       return json({ user: accountResponse(user), ereaderDevices: [] });
+    if (
+      ["/api/admin/migrations/lists", "/api/admin/migrations/lists/inspect"].includes(path) &&
+      request.method === "POST"
+    ) {
+      const input = listImportSchema.parse(await body(request));
+      return json(
+        path.endsWith("/inspect") ? inspectLists(user, input.digest) : importLists(user, input.digest),
+      );
+    }
+    const listRoute = path.match(/^\/api\/(collections|playlists)(?:\/([^/]+)(?:\/(.*))?)?$/);
+    if (listRoute) {
+      const kind = listRoute[1] === "collections" ? "collection" : "playlist";
+      const id = listRoute[2],
+        action = listRoute[3];
+      if (!id && request.method === "POST")
+        return json(createList(user, kind, createListSchema.parse(await body(request))));
+      if (id && !action) {
+        if (request.method === "GET") return json(listFor(user, kind, id));
+        if (request.method === "PATCH")
+          return json(changeList(user, kind, id, editListSchema.parse(await body(request))));
+        if (request.method === "DELETE") {
+          sameOrigin(request);
+          deleteList(user, kind, id);
+          return json({ success: true });
+        }
+      }
+      if (id && action?.match(/^batch\/(add|remove)$/) && request.method === "POST")
+        return json(
+          changeList(
+            user,
+            kind,
+            id,
+            listBatchSchema.parse(await body(request)),
+            action === "batch/add" ? "add" : "remove",
+          ),
+        );
+      if (id && kind === "collection" && action === "book" && request.method === "POST")
+        return json(
+          changeList(
+            user,
+            kind,
+            id,
+            { books: [z.object({ id: z.string() }).parse(await body(request)).id] },
+            "add",
+          ),
+        );
+      if (id && request.method === "DELETE") {
+        sameOrigin(request);
+        const member = action?.match(/^(?:book|item)\/([^/]+)(?:\/([^/]+))?$/);
+        if (member)
+          return json(
+            changeList(
+              user,
+              kind,
+              id,
+              kind === "collection"
+                ? { books: [z.string().parse(member[1])] }
+                : { items: [{ libraryItemId: z.string().parse(member[1]), episodeId: member[2] ?? null }] },
+              "remove",
+            ),
+          );
+      }
+    }
     if (path === "/api/libraries") {
       if (request.method === "GET") return json({ libraries: librariesFor(user) });
       if (request.method === "POST")
@@ -327,8 +401,17 @@ export async function api(request: Request) {
               ? { filterdata: filterData(items) }
               : {}),
             issues: items.filter((item) => item.isMissing || item.isInvalid).length,
-            numUserPlaylists: 0,
+            numUserPlaylists: listsFor(user, "playlist", id).total,
           });
+        if (action === "collections" || action === "playlists")
+          return json(
+            listsFor(
+              user,
+              action === "collections" ? "collection" : "playlist",
+              id,
+              new URL(request.url).searchParams,
+            ),
+          );
         if (action === "search") return json(searchLibrary(user, id, new URL(request.url).searchParams));
         if (action === "items") return json(pagedItems(user, id, new URL(request.url).searchParams));
         if (action === "personalized") return json(personalized(user, id, new URL(request.url).searchParams));

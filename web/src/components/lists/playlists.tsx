@@ -12,6 +12,7 @@ import { usePlaylist, usePlaylists } from "@/lib/abs/queries";
 import { useAbs } from "@/lib/session/store";
 import { playlistEntries } from "./entries";
 import { ListDetail } from "./list-detail";
+import { ListEditor } from "./list-editor";
 
 export function PlaylistList({ libraryId }: { libraryId: string }) {
   const { t } = useI18n();
@@ -67,6 +68,7 @@ export function PlaylistDetail({ playlistId }: { playlistId: string }) {
         const leave = () => router.replace(`/library/${data.libraryId}/playlists`);
         return (
           <ListDetail
+            editor={<ListEditor kind="playlist" list={data} />}
             name={data.name}
             description={data.description}
             label={t("HeaderPlaylistItems")}

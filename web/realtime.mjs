@@ -26,6 +26,7 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
   const clients = new Map();
   let queued = false;
   let catalogDirty = false;
+  let listsDirty = false;
   const usersDirty = new Set();
   const itemsDirty = new Map();
   const denied = (socket, state) => {
@@ -66,6 +67,15 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
         if (added.length) socket.emit("items_added", added);
         if (updated.length) socket.emit("items_updated", updated);
       }
+      const priorLists = new Map((before.lists ?? []).map((list) => [list.value.id, list]));
+      const nextIds = new Set(next.lists.map((list) => list.value.id));
+      for (const list of next.lists) {
+        const prior = priorLists.get(list.value.id);
+        if (!prior) socket.emit(`${list.kind}_added`, list.value);
+        else if (JSON.stringify(prior.value) !== JSON.stringify(list.value))
+          socket.emit(`${list.kind}_updated`, list.value);
+      }
+      for (const [id, list] of priorLists) if (!nextIds.has(id)) socket.emit(`${list.kind}_removed`, { id });
       state.snapshot = next;
     } catch {
       denied(socket, state);
@@ -73,6 +83,7 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
   }
   globalThis.leafwakeRealtimeChanged = (change) => {
     if (change?.catalog) catalogDirty = true;
+    if (change?.lists) listsDirty = true;
     if (change?.userId) usersDirty.add(change.userId);
     if (change?.userId && change?.itemId) {
       const items = itemsDirty.get(change.userId) ?? new Set();
@@ -91,7 +102,7 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
           denied(socket, state);
           continue;
         }
-        if (catalogDirty || usersDirty.has(state.snapshot?.user.id)) deliver(socket, state);
+        if (catalogDirty || listsDirty || usersDirty.has(state.snapshot?.user.id)) deliver(socket, state);
         if (state.token)
           for (const id of itemsDirty.get(state.snapshot?.user.id) ?? []) {
             try {
@@ -103,6 +114,7 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
           }
       }
       catalogDirty = false;
+      listsDirty = false;
       usersDirty.clear();
       itemsDirty.clear();
     });

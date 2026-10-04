@@ -1,7 +1,7 @@
 "use client";
 
 import { Pause, Play, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { InlineError } from "@/components/app/inline-error";
 import { MediaRow } from "@/components/media/media-row";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,9 @@ export function ListDetail({
   deletion,
   busy,
   error,
+  editor,
 }: {
+  editor?: ReactNode;
   name: string;
   description?: string | null;
   label: string;
@@ -77,6 +79,7 @@ export function ListDetail({
           ) : null}
         </div>
       </header>
+      {editor}
       {!next && entries.length ? <p className="text-sm text-muted">{t("WebNothingToPlay")}</p> : null}
       <InlineError error={error} />
 
