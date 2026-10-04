@@ -12,7 +12,7 @@ The replacement owns these settings; no old administrator frontend or backend is
 | Browser origins | Server settings | Exact HTTP(S) origins, HTTP CORS/preflight and Socket.IO handshake policy (#165) |
 | Podcast discovery, schedules, queue, retention and transfer bounds | Podcast settings | Persisted jobs/timers and current account/media authority (#163–164) |
 | OpenID provider and client secret | OpenID sign-in | Encrypted secrets, validated discovery/PKCE, exact callbacks and issuer/subject identity (#166); original migration mappings remain #172 |
-| RSS shares and SMTP secrets | #167 | Not yet implemented |
+| RSS shares, SMTP and e-reader access | Item RSS controls, E-reader delivery, Migration and backups | Explicit public shares, current publisher authority, confined range media, bounded TLS SMTP, encrypted settings and archived configuration, original feed/device import (#167) |
 | Covers, metadata providers and editing | #168 | Not yet implemented |
 | Listening/year statistics | #169 | Existing progress history is retained; remaining views pending |
 | Backup schedule, restore, diagnostics and logging controls | #170 | Manual migration backup/restore exists; remaining controls pending |

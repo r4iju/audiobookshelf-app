@@ -1,10 +1,11 @@
+import { devicesFor } from "./delivery";
 import { serverSettings } from "./server-settings";
 import "server-only";
 import { createHash, createHmac, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 import { compare } from "bcryptjs";
 import { z } from "zod";
 import { bookmarksFor } from "./bookmarks";
-import { database, initialized, setupKey, tokenSigningKey, transaction } from "./data";
+import { catalogChanged, database, initialized, setupKey, tokenSigningKey, transaction } from "./data";
 import { allProgress } from "./progress";
 
 function derive(password: string, salt: string, length: number): Promise<Buffer> {
@@ -162,7 +163,7 @@ function issueSession(user: Account) {
       language: serverSettings().language,
       name: serverSettings().serverName,
     },
-    ereaderDevices: [],
+    ereaderDevices: devicesFor(user),
   };
 }
 export async function passwordLogin(input: z.infer<typeof credentialsSchema>) {
@@ -359,8 +360,10 @@ export async function editAccount(actor: Account, id: string, input: z.infer<typ
 export function removeAccount(actor: Account, id: string) {
   transaction((db) => {
     ensureEditable(actor, findAccount(id));
+    db.prepare("DELETE FROM rss_feeds WHERE owner_id=?").run(id);
     db.prepare("DELETE FROM users WHERE id = ?").run(id);
   });
+  catalogChanged();
 }
 export function revokeAccount(actor: Account, id: string) {
   const target = findAccount(id);

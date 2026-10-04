@@ -45,3 +45,13 @@ export const listImportReportSchema = z.object({
   notices: z.array(z.string()),
 });
 export type ListImportReport = z.infer<typeof listImportReportSchema>;
+
+export const deliveryImportInput = z.object({
+  digest: z.string().regex(/^[a-f0-9]{64}$/),
+  serverAddress: z.string().max(2048),
+});
+export const deliveryImportReportSchema = listImportReportSchema.extend({
+  scope: z.literal("delivery"),
+  counts: z.object({ feeds: z.number(), episodes: z.number(), devices: z.number(), smtp: z.number() }),
+});
+export type DeliveryImportReport = z.infer<typeof deliveryImportReportSchema>;

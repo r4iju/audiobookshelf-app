@@ -1,4 +1,16 @@
 import { editLibrary, editLibrarySchema, managedLibraries, removeLibrary } from "./catalog";
+import {
+  devicesFor,
+  devicesInput,
+  managedDevices,
+  saveDevices,
+  saveSmtpSettings,
+  sendEbook,
+  sendEbookInput,
+  smtpInput,
+  smtpSettings,
+} from "./delivery";
+import { allFeeds, closeFeed, openFeed, openFeedSchema } from "./feeds";
 import { openIdInput, openIdSettings, saveOpenIdSettings } from "./openid";
 import {
   allSchedules,
@@ -64,6 +76,7 @@ import {
   scanLibrary,
 } from "./catalog";
 import { database, initialized, setupKey } from "./data";
+import { deliveryImportInput, importDelivery, inspectDelivery } from "./delivery-migration";
 import { authorFor, authorGroups, pagedSeries, personalized, seriesFor } from "./discovery";
 import { downloadItem, serveEbook } from "./documents";
 import { importLists, inspectLists, listImportSchema } from "./list-migration";
@@ -217,6 +230,27 @@ export async function api(request: Request) {
       return serveEbook(request, () => authenticate(token), z.string().parse(ebookRoute[1]), ebookRoute[2]);
     if ((request.method === "GET" || request.method === "HEAD") && downloadRoute)
       return downloadItem(request, () => authenticate(token), z.string().parse(downloadRoute[1]));
+    if (path === "/api/emails/settings") {
+      requireAdministrator(user);
+      if (request.method === "GET") return json(smtpSettings(user));
+      if (request.method === "PATCH")
+        return json(saveSmtpSettings(user, smtpInput.parse(await body(request))));
+    }
+    if (path === "/api/emails/ereader-devices") {
+      if (request.method === "GET") return json(managedDevices(user));
+      if (request.method === "POST") return json(saveDevices(user, devicesInput.parse(await body(request))));
+    }
+    if (path === "/api/emails/send-ebook-to-device" && request.method === "POST")
+      return json(await sendEbook(() => authenticate(token), sendEbookInput.parse(await body(request))));
+    if (path === "/api/feeds" && request.method === "GET") return json(allFeeds(user));
+    const feedOpen = path.match(/^\/api\/feeds\/item\/([^/]+)\/open$/),
+      feedClose = path.match(/^\/api\/feeds\/([^/]+)\/close$/);
+    if (feedOpen && request.method === "POST")
+      return json(openFeed(user, z.string().parse(feedOpen[1]), openFeedSchema.parse(await body(request))));
+    if (feedClose && request.method === "POST") {
+      sameOrigin(request);
+      return json(closeFeed(user, z.string().parse(feedClose[1])));
+    }
     if (path === "/api/admin/openid/settings") {
       requireAdministrator(user);
       if (request.method === "GET") return json(openIdSettings());
@@ -396,7 +430,7 @@ export async function api(request: Request) {
     }
     if (path === "/api/me" && request.method === "GET") return json(accountResponse(user));
     if (path === "/api/authorize" && request.method === "POST")
-      return json({ user: accountResponse(user), ereaderDevices: [] });
+      return json({ user: accountResponse(user), ereaderDevices: devicesFor(user) });
     if (
       ["/api/admin/migrations/lists", "/api/admin/migrations/lists/inspect"].includes(path) &&
       request.method === "POST"
@@ -405,6 +439,13 @@ export async function api(request: Request) {
       return json(
         path.endsWith("/inspect") ? inspectLists(user, input.digest) : importLists(user, input.digest),
       );
+    }
+    if (
+      ["/api/admin/migrations/delivery", "/api/admin/migrations/delivery/inspect"].includes(path) &&
+      request.method === "POST"
+    ) {
+      const input = deliveryImportInput.parse(await body(request));
+      return json(path.endsWith("/inspect") ? inspectDelivery(user, input) : importDelivery(user, input));
     }
     const listRoute = path.match(/^\/api\/(collections|playlists)(?:\/([^/]+)(?:\/(.*))?)?$/);
     if (listRoute) {

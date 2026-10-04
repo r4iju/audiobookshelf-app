@@ -48,22 +48,8 @@ export function remoteUrl(value: string) {
     throw new DomainError(400, "Only unauthenticated HTTP(S) feed URLs are supported");
   return url;
 }
-export async function remoteStream(
-  value: string,
-  maxBytes: number,
-  signal: AbortSignal,
-  redirects = 0,
-  options: {
-    method?: string;
-    headers?: Record<string, string>;
-    body?: string;
-    allowedHosts?: string;
-    rawStatus?: boolean;
-  } = {},
-): Promise<IncomingMessage> {
-  const url = remoteUrl(value),
-    host = url.hostname.replace(/^\[|\]$/g, "");
-  const lan = (options.allowedHosts ?? process.env.LEAFWAKE_FEED_ALLOWED_HOSTS ?? "")
+export async function remoteAddress(host: string, signal: AbortSignal, allowedHosts: string) {
+  const lan = allowedHosts
     .split(",")
     .map((h) => h.trim().toLowerCase())
     .includes(host.toLowerCase());
@@ -82,6 +68,28 @@ export async function remoteStream(
     throw new DomainError(400, "Private feed hosts require explicit server configuration");
   const selected = resolved[0];
   if (!selected) throw new DomainError(400, "Feed host is unavailable");
+  return selected;
+}
+export async function remoteStream(
+  value: string,
+  maxBytes: number,
+  signal: AbortSignal,
+  redirects = 0,
+  options: {
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string;
+    allowedHosts?: string;
+    rawStatus?: boolean;
+  } = {},
+): Promise<IncomingMessage> {
+  const url = remoteUrl(value),
+    host = url.hostname.replace(/^\[|\]$/g, "");
+  const selected = await remoteAddress(
+    host,
+    signal,
+    options.allowedHosts ?? process.env.LEAFWAKE_FEED_ALLOWED_HOSTS ?? "",
+  );
   const response = await new Promise<IncomingMessage>((resolve, reject) => {
     const request = (url.protocol === "https:" ? httpsRequest : httpRequest)(
       url,

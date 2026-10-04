@@ -7,6 +7,7 @@ import { TextField } from "@/components/ui/field";
 import { Section } from "@/components/ui/section";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
 import { useAbs } from "@/lib/session/store";
+import { DeliveryImportForm } from "./delivery-import-form";
 import { ListImportForm } from "./list-import-form";
 import { MediaImportForm } from "./media-import-form";
 
@@ -56,6 +57,9 @@ export function MigrationScreen() {
       </Section>
       <Section title="Import original lists">
         <ListImportForm />
+      </Section>
+      <Section title="Import feeds and ebook delivery">
+        <DeliveryImportForm />
       </Section>
       <Section title="Product backups">
         <p className="text-sm text-muted">
