@@ -200,8 +200,9 @@ export function librariesFor(actor: Account) {
 function itemRow(row: unknown) {
   return libraryItemSchema.parse(JSON.parse(z.object({ content: z.string() }).parse(row).content));
 }
-function allowed(actor: Account, item: LibraryItem) {
-  if (database().prepare("SELECT item_id FROM retired_items WHERE item_id=?").get(item.id)) return false;
+function allowed(actor: Account, item: LibraryItem, history = false) {
+  if (!history && database().prepare("SELECT item_id FROM retired_items WHERE item_id=?").get(item.id))
+    return false;
   return canReadMedia(actor, {
     libraryId: item.libraryId,
     explicit: Boolean(item.media.metadata.explicit),
@@ -247,6 +248,14 @@ export function itemFor(actor: Account, id: string) {
     progressGeneration: progressGeneration(actor.id, id),
     progressGenerations: progressGenerations(actor.id, id),
   };
+}
+export function historyItemFor(actor: Account, id: string) {
+  if (!actor.active) throw new DomainError(401, "Sign-in required");
+  const row = database().prepare("SELECT content FROM catalog_items WHERE id=?").get(id);
+  if (!row) throw new DomainError(404, "Not found");
+  const item = itemRow(row);
+  if (!allowed(actor, item, true)) throw new DomainError(404, "Not found");
+  return item;
 }
 export function itemsFor(actor: Account, id: string, includeGenerations = true) {
   findLibrary(id);
@@ -567,6 +576,7 @@ function identity(
   const previous = prior.find((ref) => ref.name === name) ?? pool.get(`${kind}:${name}`);
   if (previous) return { id: previous.id, name };
   const ref = { id: createHash("sha256").update(`${kind}:${name}`).digest("hex").slice(0, 32), name };
+  database().prepare("INSERT OR IGNORE INTO identity_creation VALUES(?,?,?)").run(kind, ref.id, Date.now());
   pool.set(`${kind}:${name}`, ref);
   return ref;
 }

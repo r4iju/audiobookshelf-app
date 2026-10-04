@@ -124,6 +124,7 @@ import {
   syncLocal,
 } from "./progress";
 import { searchLibrary } from "./search";
+import { personalYear, recentSessions, serverYear, yearInput } from "./statistics";
 import { cancelTranscode, serveHls, startTranscode } from "./transcode";
 
 const MAX_BODY = 16_384;
@@ -374,6 +375,23 @@ export async function api(request: Request) {
     if (path === "/api/session/local-all" && request.method === "POST") {
       const input = localReportsSchema.parse(await body(request, 262144));
       return json(syncLocal(authenticate(token), input));
+    }
+    const yearRoute = path.match(/^\/api\/(me\/)?stats\/year\/([^/]+)$/);
+    if (yearRoute && request.method === "GET")
+      return json(
+        yearRoute[1]
+          ? personalYear(user, yearInput.parse(yearRoute[2]))
+          : serverYear(user, yearInput.parse(yearRoute[2])),
+      );
+    if (path === "/api/me/listening-sessions" && request.method === "GET") {
+      const params = new URL(request.url).searchParams;
+      const input = z
+        .object({
+          limit: z.coerce.number().int().min(1).max(100),
+          page: z.coerce.number().int().min(0).max(100000),
+        })
+        .parse({ limit: params.get("limit") ?? 50, page: params.get("page") ?? 0 });
+      return json(recentSessions(user, input.limit, input.page));
     }
     if (path === "/api/me/listening-stats" && request.method === "GET") return json(listeningStats(user));
     const resetRoute = path.match(/^\/api\/me\/progress\/([^/]+)(?:\/([^/]+))?\/reset$/);
