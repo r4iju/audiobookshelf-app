@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Postęp pozostaje wstrzymany. Teraz uruchom ponownie serwer Audiobookshelf{0}, a potem potwierdź tutaj. Przeglądarka nie wykryje restartu; w przeciwnym razie trwające usuwanie może usunąć postęp wysłany po potwierdzeniu. Potwierdzenie dotyczy tylko żądań tej przeglądarki wysłanych przed wyborem restartu; późniejsze pozostają wstrzymane.",
   "WebHeldRestartUnreadable": "Postęp jest wstrzymany. Zapis żądania restartu jest nieczytelny, więc nie wiadomo, które żądania restart zakończy. Ponownie wybierz „Uruchom ponownie serwer” i na żądanie zrestartuj serwer Audiobookshelf{0}.",
   "WebServerRestarted": "Serwer został przeze mnie zrestartowany",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Przejdź do treści",
   "WebServerAddressHelp": "Adres serwera Audiobookshelf wraz z ewentualną podścieżką, np. https://home.example/audiobookshelf",
   "WebContinue": "Kontynuuj",

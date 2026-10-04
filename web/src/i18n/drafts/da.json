@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Fremskridtene holdes stadig tilbage. Genstart nu Audiobookshelf-serveren på {0}, og bekræft bagefter her. Browseren kan ikke registrere genstarten: uden den kan en igangværende sletning fjerne fremskridt sendt efter bekræftelsen. Bekræftelsen dækker kun anmodninger, denne browser sendte før din anmodning om genstart; senere anmodninger holdes stadig tilbage.",
   "WebHeldRestartUnreadable": "Fremskridtene holdes tilbage, og registreringen af den anmodede genstart kan ikke læses. Browseren ved derfor ikke, hvilke anmodninger en genstart ville afslutte. Vælg «Genstart serveren» igen, og genstart Audiobookshelf-serveren på {0}, når du bliver bedt om det.",
   "WebServerRestarted": "Jeg har genstartet serveren",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Spring til indhold",
   "WebServerAddressHelp": "Adressen på din Audiobookshelf-server, inklusive eventuelle understier, for eksempel https://home.example/audiobookshelf",
   "WebContinue": "Fortsæt",

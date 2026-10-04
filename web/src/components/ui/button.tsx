@@ -17,7 +17,7 @@ const sizes: Record<Size, string> = {
 };
 
 export function buttonClass(variant: Variant = "secondary", size: Size = "md") {
-  return `inline-flex items-center justify-center transition-colors focus-ring disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]}`;
+  return `inline-flex max-w-full items-center justify-center [overflow-wrap:anywhere] transition-colors focus-ring disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]}`;
 }
 
 export function Button({

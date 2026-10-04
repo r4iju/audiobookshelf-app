@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "De voortgang blijft tegengehouden. Herstart nu de Audiobookshelf-server op {0} en bevestig dit daarna hier. Deze browser kan een herstart niet detecteren: zonder herstart kan een lopende verwijdering voortgang wissen die na bevestiging wordt verstuurd. Bevestigen geldt alleen voor verzoeken die deze browser vóór de herstartaanvraag had verstuurd; latere verzoeken blijven tegengehouden.",
   "WebHeldRestartUnreadable": "De voortgang wordt tegengehouden en de opgeslagen herstartaanvraag is onleesbaar. Daardoor weet deze browser niet welke verzoeken een herstart zou beëindigen. Kies opnieuw «Server herstarten» en herstart de Audiobookshelf-server op {0} wanneer daarom wordt gevraagd.",
   "WebServerRestarted": "Ik heb de server herstart",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Naar de inhoud",
   "WebServerAddressHelp": "Het adres van je Audiobookshelf-server, inclusief eventuele subpaden, bijvoorbeeld https://home.example/audiobookshelf",
   "WebContinue": "Doorgaan",

@@ -1,10 +1,13 @@
 "use client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { TextField, Toggle } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Alert, Spinner } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import { useAbs } from "@/lib/session/store";
 
 const schema = z.object({
@@ -20,21 +23,19 @@ const schema = z.object({
 });
 type Result = { kind: "idle" } | { kind: "saved" } | { kind: "error"; message: string };
 export function PodcastSettingsScreen() {
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const settings = useQuery({
     queryKey: [connection.id, "podcast-settings"],
     queryFn: ({ signal }) => client.get("/api/admin/podcasts/settings", schema, signal),
   });
-  if (settings.isPending) return <Spinner label="Loading podcast settings" />;
-  if (settings.isError) return <Alert>{settings.error.message}</Alert>;
+  if (settings.isPending) return <Spinner label={t("WebAdminLoadingPodcastSettings")} />;
+  if (settings.isError) return <Alert>{adminMessage(settings.error.message, t)}</Alert>;
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">Podcast settings</h1>
-      <p>
-        Control discovery, automatic feed checks and server downloads. Downloads use the persistent media
-        volume. Retention affects managed podcast episodes and preserves listening history.
-      </p>
+      <h1 className="text-2xl font-bold">{t("WebAdminPodcastSettings")}</h1>
+      <p>{t("WebAdminControlDiscoveryAutomaticFeedChecksAndServer")}</p>
       <SettingsForm
         key={connection.id}
         initial={settings.data}
@@ -54,6 +55,8 @@ function SettingsForm({
   initial: z.infer<typeof schema>;
   save: (value: z.infer<typeof schema>) => Promise<void>;
 }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const [result, action, pending] = useActionState<Result, FormData>(
     async (_prior, form) => {
       const value = schema.safeParse({
@@ -84,26 +87,41 @@ function SettingsForm({
     { kind: "idle" },
   );
   return (
-    <form action={action} className="flex flex-col gap-4 rounded-xl bg-surface p-5">
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={action}
+      className="flex flex-col gap-4 rounded-xl bg-surface p-5"
+    >
       <Toggle
         name="discoveryEnabled"
-        label="Enable podcast discovery"
+        label={t("WebAdminEnablePodcastDiscovery")}
         defaultChecked={initial.discoveryEnabled}
       />
       <TextField
         name="providerUrl"
-        label="Discovery provider URL"
+        label={t("WebAdminDiscoveryProviderURL")}
         defaultValue={initial.providerUrl}
         required
       />
-      <TextField name="country" label="Country code" defaultValue={initial.country} required maxLength={2} />
+      <TextField
+        name="country"
+        label={t("WebAdminCountryCode")}
+        defaultValue={initial.country}
+        required
+        maxLength={2}
+      />
       {[
-        { name: "updateIntervalMinutes", label: "Feed check interval (minutes)", min: 1, max: 10080 },
-        { name: "maxQueue", label: "Maximum outstanding downloads", min: 1, max: 128 },
-        { name: "maxConcurrent", label: "Concurrent downloads", min: 1, max: 2 },
-        { name: "maxEpisodeBytes", label: "Maximum episode size (bytes)", min: 1048576, max: 1073741824 },
-        { name: "downloadTimeoutSeconds", label: "Download timeout (seconds)", min: 30, max: 3600 },
-        { name: "retentionEpisodes", label: "Episodes to keep (0 keeps all)", min: 0, max: 1000 },
+        { name: "updateIntervalMinutes", label: t("WebAdminFeedCheckIntervalMinutes"), min: 1, max: 10080 },
+        { name: "maxQueue", label: t("WebAdminMaximumOutstandingDownloads"), min: 1, max: 128 },
+        { name: "maxConcurrent", label: t("WebAdminConcurrentDownloads"), min: 1, max: 2 },
+        {
+          name: "maxEpisodeBytes",
+          label: t("WebAdminMaximumEpisodeSizeBytes"),
+          min: 1048576,
+          max: 1073741824,
+        },
+        { name: "downloadTimeoutSeconds", label: t("WebAdminDownloadTimeoutSeconds"), min: 30, max: 3600 },
+        { name: "retentionEpisodes", label: t("WebAdminEpisodesToKeep0KeepsAll"), min: 0, max: 1000 },
       ].map((field) => (
         <TextField
           key={field.name}
@@ -117,12 +135,14 @@ function SettingsForm({
         />
       ))}
       {result.kind === "error" ? (
-        <Alert>{result.message}</Alert>
+        <FormFeedback submission={result} id={feedbackId}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
       ) : result.kind === "saved" ? (
-        <p role="status">Settings saved.</p>
+        <p role="status">{t("WebAdminSettingsSaved")}</p>
       ) : null}
       <Button type="submit" variant="primary" disabled={pending}>
-        {pending ? "Saving…" : "Save settings"}
+        {pending ? t("WebAdminSaving") : t("WebAdminSaveSettings")}
       </Button>
     </form>
   );
@@ -138,6 +158,7 @@ const subscriptionSchema = z.object({
   lastError: z.string().nullable(),
 });
 function Subscriptions() {
+  const { t } = useI18n();
   const { connection, client } = useAbs();
   const subscriptions = useQuery({
     queryKey: [connection.id, "podcast-subscriptions"],
@@ -147,16 +168,13 @@ function Subscriptions() {
   });
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold">Subscriptions</h2>
+      <h2 className="text-xl font-semibold">{t("WebAdminSubscriptions")}</h2>
       {subscriptions.isPending ? (
-        <Spinner label="Loading subscriptions" />
+        <Spinner label={t("WebAdminLoadingSubscriptions")} />
       ) : subscriptions.isError ? (
-        <Alert>{subscriptions.error.message}</Alert>
+        <Alert>{adminMessage(subscriptions.error.message, t)}</Alert>
       ) : !subscriptions.data.length ? (
-        <p>
-          No podcast subscriptions yet. Add a podcast library in the persistent media folder, then subscribe
-          by search or feed URL.
-        </p>
+        <p>{t("WebAdminNoPodcastSubscriptionsYetAddAPodcast")}</p>
       ) : (
         subscriptions.data.map((subscription) => (
           <Subscription key={subscription.id} subscription={subscription} />
@@ -166,6 +184,8 @@ function Subscriptions() {
   );
 }
 function Subscription({ subscription }: { subscription: z.infer<typeof subscriptionSchema> }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const [result, action, pending] = useActionState<Result, FormData>(
@@ -190,34 +210,42 @@ function Subscription({ subscription }: { subscription: z.infer<typeof subscript
     { kind: "idle" },
   );
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-xl bg-surface p-5">
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={action}
+      className="flex flex-col gap-3 rounded-xl bg-surface p-5"
+    >
       <h3 className="font-semibold">{subscription.title}</h3>
       <p className="text-sm text-muted">
         {subscription.leaseUntil
-          ? "Checking feed…"
+          ? t("WebAdminCheckingFeed")
           : subscription.lastCheckedAt
             ? `Last checked ${new Date(subscription.lastCheckedAt).toLocaleString()}`
-            : "Not checked yet"}
+            : t("WebAdminNotCheckedYet")}
       </p>
       <Toggle
         name="autoDownloadEpisodes"
-        label="Automatically download new episodes"
+        label={t("WebAdminAutomaticallyDownloadNewEpisodes")}
         defaultChecked={subscription.autoDownloadEpisodes}
       />
       {subscription.lastError ? <Alert>{subscription.lastError}</Alert> : null}
       {result.kind === "error" ? (
-        <Alert>{result.message}</Alert>
+        <FormFeedback submission={result} id={feedbackId}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
       ) : result.kind === "saved" ? (
-        <p role="status">Subscription saved.</p>
+        <p role="status">{t("WebAdminSubscriptionSaved")}</p>
       ) : null}
       <div className="flex flex-wrap gap-2">
         <Button type="submit" name="mode" value="save" disabled={pending}>
-          Save subscription
+          {t("WebAdminSaveSubscription")}
         </Button>
         <Button type="submit" name="mode" value="check" disabled={pending}>
-          Check now
+          {t("WebAdminCheckNow")}
         </Button>
-        <ButtonLink href={`/item/${encodeURIComponent(subscription.id)}`}>Open podcast</ButtonLink>
+        <ButtonLink href={`/item/${encodeURIComponent(subscription.id)}`}>
+          {t("WebAdminOpenPodcast")}
+        </ButtonLink>
       </div>
     </form>
   );

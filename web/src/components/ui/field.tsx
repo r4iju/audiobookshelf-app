@@ -9,14 +9,14 @@ export function TextField({
 }: ComponentProps<"input"> & { label: string; help?: string }) {
   const id = useId();
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
+    <div className={`flex min-w-0 flex-col gap-1.5 ${className}`}>
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
       <input
         id={id}
         aria-describedby={help ? `${id}-help` : undefined}
-        className="min-h-11 rounded-xl border border-line bg-surface px-3 text-base text-fg placeholder:text-muted focus-ring"
+        className="min-h-11 min-w-0 w-full rounded-xl border border-line bg-surface px-3 text-base text-fg placeholder:text-muted focus-ring"
         {...props}
       />
       {help ? (
@@ -63,7 +63,7 @@ export function Toggle({
   const id = useId();
   return (
     <div className="flex items-start justify-between gap-4 py-2">
-      <label htmlFor={id} className="flex cursor-pointer flex-col">
+      <label htmlFor={id} className="min-w-0 flex cursor-pointer flex-col [overflow-wrap:anywhere]">
         <span className="text-sm font-medium">{label}</span>
         {help ? <span className="text-xs text-muted">{help}</span> : null}
       </label>

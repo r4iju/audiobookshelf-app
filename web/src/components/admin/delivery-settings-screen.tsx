@@ -1,10 +1,13 @@
 "use client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Alert, Spinner } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import { useAbs } from "@/lib/session/store";
 
 const smtpSchema = z.object({
@@ -27,14 +30,18 @@ type Result = { kind: "idle" } | { kind: "saved" } | { kind: "error"; message: s
 function message(error: unknown): Result {
   return { kind: "error", message: error instanceof Error ? error.message : "Settings could not be saved" };
 }
-function ResultMessage({ value }: { value: Result }) {
+function ResultMessage({ value, id }: { value: Result; id?: string }) {
+  const { t } = useI18n();
   return value.kind === "error" ? (
-    <Alert>{value.message}</Alert>
+    <FormFeedback submission={value} id={id}>
+      {adminMessage(value.message, t)}
+    </FormFeedback>
   ) : value.kind === "saved" ? (
-    <Alert tone="info">Settings saved.</Alert>
+    <Alert tone="info">{t("WebAdminSettingsSaved")}</Alert>
   ) : null;
 }
 export function DeliverySettingsScreen() {
+  const { t } = useI18n();
   const { client, connection } = useAbs(),
     queries = useQueryClient();
   const smtp = useQuery({
@@ -49,11 +56,11 @@ export function DeliverySettingsScreen() {
     queryKey: [connection.id, "delivery-accounts"],
     queryFn: ({ signal }) => client.get("/api/users", accountsSchema, signal),
   });
-  if (accounts.isPending) return <Spinner label="Loading delivery accounts" />;
-  if (accounts.isError) return <Alert>{accounts.error.message}</Alert>;
-  if (smtp.isPending || devices.isPending) return <Spinner label="Loading delivery settings" />;
-  if (smtp.isError) return <Alert>{smtp.error.message}</Alert>;
-  if (devices.isError) return <Alert>{devices.error.message}</Alert>;
+  if (accounts.isPending) return <Spinner label={t("WebAdminLoadingDeliveryAccounts")} />;
+  if (accounts.isError) return <Alert>{adminMessage(accounts.error.message, t)}</Alert>;
+  if (smtp.isPending || devices.isPending) return <Spinner label={t("WebAdminLoadingDeliverySettings")} />;
+  if (smtp.isError) return <Alert>{adminMessage(smtp.error.message, t)}</Alert>;
+  if (devices.isError) return <Alert>{adminMessage(devices.error.message, t)}</Alert>;
   async function saveDevices(value: z.infer<typeof devicesSchema>) {
     await client.send("POST", "/api/emails/ereader-devices", value, devicesSchema);
     await queries.invalidateQueries({ queryKey: [connection.id, "delivery-devices"] });
@@ -61,11 +68,8 @@ export function DeliverySettingsScreen() {
   }
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">E-reader delivery</h1>
-      <p>
-        Configure SMTP and trusted destination addresses. Readers can send the primary ebook only to devices
-        available to their account. Attachments are limited to 20 MiB.
-      </p>
+      <h1 className="text-2xl font-bold">{t("WebAdminEReaderDelivery")}</h1>
+      <p>{t("WebAdminConfigureSMTPAndTrustedDestinationAddressesReaders")}</p>
       <SmtpForm
         key={connection.id}
         initial={smtp.data}
@@ -74,7 +78,7 @@ export function DeliverySettingsScreen() {
           await queries.invalidateQueries({ queryKey: [connection.id, "smtp-settings"] });
         }}
       />
-      <h2 className="text-xl font-semibold">Devices</h2>
+      <h2 className="text-xl font-semibold">{t("WebAdminDevices")}</h2>
       {devices.data.ereaderDevices.length ? (
         devices.data.ereaderDevices.map((device) => (
           <DeviceForm
@@ -96,9 +100,9 @@ export function DeliverySettingsScreen() {
           />
         ))
       ) : (
-        <p>No delivery devices configured.</p>
+        <p>{t("WebAdminNoDeliveryDevicesConfigured")}</p>
       )}
-      <h2 className="text-xl font-semibold">Add device</h2>
+      <h2 className="text-xl font-semibold">{t("WebAdminAddDevice")}</h2>
       <DeviceForm
         key={connection.id + "new"}
         accounts={accounts.data.users}
@@ -115,6 +119,8 @@ function SmtpForm({
   initial: z.infer<typeof smtpSchema>;
   save: (value: unknown) => Promise<void>;
 }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const [result, action, pending] = useActionState<Result, FormData>(
     async (_old, form) => {
       try {
@@ -134,12 +140,16 @@ function SmtpForm({
     { kind: "idle" },
   );
   return (
-    <form action={action} className="flex flex-col gap-4 rounded-xl bg-surface p-5">
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={action}
+      className="flex flex-col gap-4 rounded-xl bg-surface p-5"
+    >
       <h2 className="text-xl font-semibold">SMTP</h2>
-      <TextField name="host" label="SMTP host" defaultValue={initial.host} maxLength={253} />
+      <TextField name="host" label={t("WebAdminSMTPHost")} defaultValue={initial.host} maxLength={253} />
       <TextField
         name="port"
-        label="SMTP port"
+        label={t("WebAdminSMTPPort")}
         type="number"
         min={1}
         max={65535}
@@ -147,36 +157,40 @@ function SmtpForm({
         required
       />
       <label>
-        <input name="secure" type="checkbox" defaultChecked={initial.secure} /> Use implicit TLS (usually port
-        465)
+        <input name="secure" type="checkbox" defaultChecked={initial.secure} />
+        {t("WebAdminUseImplicitTLSUsuallyPort465")}
       </label>
-      <p className="text-sm text-muted">
-        Other production connections require STARTTLS and valid certificates.
-      </p>
+      <p className="text-sm text-muted">{t("WebAdminOtherProductionConnectionsRequireSTARTTLSAndValid")}</p>
       <TextField
         name="fromAddress"
-        label="Sender email"
+        label={t("WebAdminSenderEmail")}
         type="email"
         defaultValue={initial.fromAddress}
         required
       />
-      <TextField name="username" label="SMTP username" defaultValue={initial.username} maxLength={256} />
+      <TextField
+        name="username"
+        label={t("WebAdminSMTPUsername")}
+        defaultValue={initial.username}
+        maxLength={256}
+      />
       <TextField
         name="password"
-        label="Replace SMTP password"
+        label={t("WebAdminReplaceSMTPPassword")}
         type="password"
         autoComplete="new-password"
         maxLength={4096}
         help={
-          initial.hasPassword ? "A password is stored. Leave blank to retain it." : "No password is stored."
+          initial.hasPassword ? t("WebAdminAPasswordIsStoredLeaveBlankTo") : t("WebAdminNoPasswordIsStored")
         }
       />
       <label>
-        <input name="clearPassword" type="checkbox" /> Remove stored password
+        <input name="clearPassword" type="checkbox" />
+        {t("WebAdminRemoveStoredPassword")}
       </label>
-      <ResultMessage value={result} />
+      <ResultMessage id={feedbackId} value={result} />
       <Button type="submit" disabled={pending}>
-        Save SMTP settings
+        {t("WebAdminSaveSMTPSettings")}
       </Button>
     </form>
   );
@@ -192,6 +206,8 @@ function DeviceForm({
   save: (value: z.infer<typeof deviceSchema>) => Promise<void>;
   remove?: () => Promise<void>;
 }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const [result, action, pending] = useActionState<Result, FormData>(
     async (_old, form) => {
       try {
@@ -209,24 +225,40 @@ function DeviceForm({
     { kind: "idle" },
   );
   return (
-    <form action={action} className="flex flex-col gap-4 rounded-xl bg-surface p-5">
-      <TextField name="name" label="Device name" defaultValue={initial.name} required maxLength={256} />
-      <TextField name="email" label="Device email" type="email" defaultValue={initial.email} required />
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={action}
+      className="flex flex-col gap-4 rounded-xl bg-surface p-5"
+    >
+      <TextField
+        name="name"
+        label={t("WebAdminDeviceName")}
+        defaultValue={initial.name}
+        required
+        maxLength={256}
+      />
+      <TextField
+        name="email"
+        label={t("WebAdminDeviceEmail")}
+        type="email"
+        defaultValue={initial.email}
+        required
+      />
       <label className="flex flex-col gap-2">
-        Available to
+        {t("WebAdminAvailableTo")}
         <select
           name="availabilityOption"
           defaultValue={initial.availabilityOption}
           className="rounded-xl border border-line bg-surface p-3"
         >
-          <option value="adminOrUp">Administrators</option>
-          <option value="userOrUp">Users and administrators</option>
-          <option value="guestOrUp">All signed-in accounts</option>
-          <option value="specificUsers">Selected accounts</option>
+          <option value="adminOrUp">{t("WebAdminAdministrators")}</option>
+          <option value="userOrUp">{t("WebAdminUsersAndAdministrators")}</option>
+          <option value="guestOrUp">{t("WebAdminAllSignedInAccounts")}</option>
+          <option value="specificUsers">{t("WebAdminSelectedAccounts")}</option>
         </select>
       </label>
       <label className="flex flex-col gap-2">
-        Selected accounts (when using selected availability)
+        {t("WebAdminSelectedAccountsWhenUsingSelectedAvailability")}
         <select
           multiple
           name="users"
@@ -240,14 +272,14 @@ function DeviceForm({
           ))}
         </select>
       </label>
-      <ResultMessage value={result} />
-      <div className="flex gap-3">
+      <ResultMessage id={feedbackId} value={result} />
+      <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={pending}>
-          Save device
+          {t("WebAdminSaveDevice")}
         </Button>
         {remove ? (
           <Button type="submit" name="intent" value="remove" variant="ghost" disabled={pending}>
-            Remove device
+            {t("WebAdminRemoveDevice")}
           </Button>
         ) : null}
       </div>

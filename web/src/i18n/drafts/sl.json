@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Napredek ostaja zadržan. Zdaj ponovno zaženite strežnik Audiobookshelf{0} in nato potrdite tukaj. Brskalnik ponovnega zagona ne zazna; sicer lahko potekajoče brisanje odstrani napredek, poslan po potrditvi. Potrditev velja le za zahteve tega brskalnika, poslane pred izbiro ponovnega zagona; poznejše ostajajo zadržane.",
   "WebHeldRestartUnreadable": "Napredek je zadržan. Zapisa zahteve za ponovni zagon ni mogoče prebrati, zato ni znano, katere zahteve bo zagon končal. Znova izberite »Ponovno zaženi strežnik« in ob pozivu ponovno zaženite strežnik Audiobookshelf{0}.",
   "WebServerRestarted": "Strežnik sem ponovno zagnal(a)",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Preskoči na vsebino",
   "WebServerAddressHelp": "Naslov strežnika Audiobookshelf skupaj z morebitno podpotjo, na primer https://home.example/audiobookshelf",
   "WebContinue": "Nadaljuj",

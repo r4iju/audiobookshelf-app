@@ -48,7 +48,7 @@ export function SelectField({
   const layer = usePopupLayer();
   const dir = useDirection();
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
+    <div className={`flex min-w-0 flex-col gap-1.5 ${className}`}>
       <label htmlFor={id} className={labels[size]}>
         {label}
       </label>

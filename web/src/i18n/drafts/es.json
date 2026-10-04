@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "El progreso sigue retenido. Reinicia ahora el servidor Audiobookshelf en {0} y confírmalo aquí después. Este navegador no puede detectar el reinicio: si no ocurrió, un borrado aún en curso puede eliminar el progreso enviado tras confirmar. La confirmación solo cubre las solicitudes enviadas por este navegador antes de pedir el reinicio; las posteriores siguen retenidas.",
   "WebHeldRestartUnreadable": "El progreso está retenido y no se puede leer el registro del reinicio solicitado, por lo que este navegador no sabe qué solicitudes terminaría un reinicio. Elige otra vez «Reiniciar el servidor» y reinicia el servidor Audiobookshelf en {0} cuando se te indique.",
   "WebServerRestarted": "He reiniciado el servidor",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "Saltar al contenido",
   "WebServerAddressHelp": "La dirección de tu servidor Audiobookshelf, incluida cualquier subruta, por ejemplo https://home.example/audiobookshelf",
   "WebContinue": "Continuar",

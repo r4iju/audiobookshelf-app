@@ -1,10 +1,13 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Alert } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import { type ListImportReport, listImportReportSchema, listImportSchema } from "@/lib/abs/imports";
 import { useAbs } from "@/lib/session/store";
 
@@ -14,6 +17,8 @@ type Result =
   | { kind: "inspected"; report: ListImportReport }
   | { kind: "completed"; report: ListImportReport };
 export function ListImportForm() {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const [result, submit, pending] = useActionState<Result, FormData>(
@@ -53,18 +58,33 @@ export function ListImportForm() {
   );
   const report = result.kind === "inspected" || result.kind === "completed" ? result.report : null;
   return (
-    <form action={submit} className="space-y-4">
-      <p>
-        Use the source digest from a completed media import. Original collections and private playlists are
-        restored from that archived snapshot.
-      </p>
-      <TextField name="digest" label="Source digest" required defaultValue={report?.digest ?? ""} />
-      {result.kind === "error" ? <Alert>{result.message}</Alert> : null}
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={submit}
+      className="space-y-4"
+    >
+      <p>{t("WebAdminUseTheSourceDigestFromACompletede4977a")}</p>
+      <TextField
+        name="digest"
+        label={t("WebAdminSourceDigest")}
+        required
+        defaultValue={report?.digest ?? ""}
+      />
+      {result.kind === "error" ? (
+        <FormFeedback submission={result} id={feedbackId}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
+      ) : null}
       {report ? (
         <div className="space-y-2">
           <p role="status">
-            {result.kind === "completed" ? "Imported" : "Found"} {report.counts.collections} collections,{" "}
-            {report.counts.playlists} playlists and {report.counts.members} members.
+            {t(
+              "WebListCounts",
+              result.kind === "completed" ? t("WebAdminImported") : t("WebAdminFound"),
+              report.counts.collections,
+              report.counts.playlists,
+              report.counts.members,
+            )}
           </p>
           {report.notices.map((notice) => (
             <p key={notice} className="text-sm text-muted">
@@ -73,11 +93,11 @@ export function ListImportForm() {
           ))}
           {report.errors.map((error) => (
             <Alert key={`${error.table}:${error.id}:${error.message}`}>
-              {error.table} {error.id}: {error.message}
+              {error.table} {error.id}: {adminMessage(error.message, t)}
             </Alert>
           ))}
           {report.unsupported.length ? (
-            <ul aria-label="Archived list fields">
+            <ul aria-label={t("WebAdminArchivedListFields")}>
               {report.unsupported.map((entry) => (
                 <li key={`${entry.table}:${entry.id}`}>
                   {entry.table} {entry.id}: {entry.fields.join(", ")}
@@ -88,13 +108,13 @@ export function ListImportForm() {
         </div>
       ) : null}
       {result.kind === "completed" ? null : (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button type="submit" name="intent" value="inspect" disabled={pending}>
-            Inspect lists
+            {t("WebAdminInspectLists")}
           </Button>
           {result.kind === "inspected" && result.report.canImport ? (
             <Button type="submit" name="intent" value="commit" disabled={pending} variant="primary">
-              Import lists
+              {t("WebAdminImportLists")}
             </Button>
           ) : null}
         </div>

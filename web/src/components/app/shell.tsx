@@ -240,7 +240,7 @@ function Shell({ children }: { children: ReactNode }) {
                   const href = section.href(current.id);
                   const Icon = section.icon;
                   return (
-                    <li key={section.key}>
+                    <li key={section.key} className="min-w-0 flex-1">
                       <Link
                         href={href}
                         aria-current={isActive(section, href) ? "page" : undefined}
@@ -259,45 +259,45 @@ function Shell({ children }: { children: ReactNode }) {
             {admin ? (
               <Link href="/admin/libraries" className={navClass(pathname.startsWith("/admin/libraries"))}>
                 <LibraryIcon aria-hidden className="size-4" />
-                Manage libraries
+                {t("WebAdminManageLibraries")}
               </Link>
             ) : null}
             {admin ? (
               <>
                 <Link href="/admin/server" className={navClass(pathname.startsWith("/admin/server"))}>
                   <LibraryIcon aria-hidden className="size-4" />
-                  Server settings
+                  {t("WebAdminServerSettings")}
                 </Link>
                 <Link href="/admin/openid" className={navClass(pathname.startsWith("/admin/openid"))}>
                   <LibraryIcon aria-hidden className="size-4" />
-                  OpenID sign-in
+                  {t("WebAdminOpenIDSignIn")}
                 </Link>
                 <Link href="/admin/upload" className={navClass(pathname.startsWith("/admin/upload"))}>
                   <LibraryIcon aria-hidden className="size-4" />
-                  Upload and metadata
+                  {t("WebAdminUploadAndMetadata")}
                 </Link>
                 <Link href="/admin/delivery" className={navClass(pathname.startsWith("/admin/delivery"))}>
                   <LibraryIcon aria-hidden className="size-4" />
-                  E-reader delivery
+                  {t("WebAdminEReaderDelivery")}
                 </Link>
               </>
             ) : null}
             {admin ? (
               <Link href="/admin/podcasts" className={navClass(pathname.startsWith("/admin/podcasts"))}>
                 <LibraryIcon aria-hidden className="size-4" />
-                Podcast settings
+                {t("WebAdminPodcastSettings")}
               </Link>
             ) : null}
             {admin ? (
               <Link href="/admin/migration" className={navClass(pathname.startsWith("/admin/migration"))}>
                 <Users aria-hidden className="size-4" />
-                Migration and backups
+                {t("WebAdminMigrationAndBackups")}
               </Link>
             ) : null}
             {admin ? (
               <Link href="/admin/accounts" className={navClass(pathname.startsWith("/admin/accounts"))}>
                 <Users aria-hidden className="size-4" />
-                Accounts
+                {t("WebAdminAccounts")}
               </Link>
             ) : null}
             <Link href="/stats" className={navClass(pathname === "/stats")}>
@@ -336,11 +336,16 @@ function Shell({ children }: { children: ReactNode }) {
         ) : (
           <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
             <header className="flex flex-col gap-2 pt-4 lg:hidden">
-              <div className="flex items-center justify-between gap-3 px-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4">
                 {brand}
-                <div className="flex items-center gap-1">
+                <div className="flex max-w-full flex-wrap items-center gap-1">
                   {admin ? (
-                    <ButtonLink href="/admin/accounts" variant="ghost" size="icon" aria-label="Accounts">
+                    <ButtonLink
+                      href="/admin/accounts"
+                      variant="ghost"
+                      size="icon"
+                      aria-label={t("WebAdminAccounts")}
+                    >
                       <Users aria-hidden className="size-5" />
                     </ButtonLink>
                   ) : null}
@@ -412,7 +417,7 @@ function Shell({ children }: { children: ReactNode }) {
             aria-label={t("WebNavPrimary")}
             className="border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
           >
-            <ul className="flex justify-around">
+            <ul className="flex flex-wrap justify-around">
               {visible
                 .filter((section) => section.phone === "bar")
                 .map((section) => {
@@ -420,11 +425,11 @@ function Shell({ children }: { children: ReactNode }) {
                   const Icon = section.icon;
                   const active = isActive(section, href);
                   return (
-                    <li key={section.key}>
+                    <li key={section.key} className="min-w-0 flex-1">
                       <Link
                         href={href}
                         aria-current={active ? "page" : undefined}
-                        className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-[0.7rem] font-medium focus-ring ${active ? "text-accent" : "text-muted hover:text-fg"}`}
+                        className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-[0.7rem] font-medium [overflow-wrap:anywhere] focus-ring ${active ? "text-accent" : "text-muted hover:text-fg"}`}
                       >
                         <Icon aria-hidden className="size-5 shrink-0" />
                         {t(section.label)}

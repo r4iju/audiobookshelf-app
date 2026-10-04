@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "进度仍被暂缓。请立即重启 Audiobookshelf 服务器{0}，然后在此确认。浏览器无法检测重启；否则仍在运行的删除操作可能删除确认后发送的进度。确认仅涵盖此浏览器在选择重启之前发送的请求；之后的请求仍被暂缓。",
   "WebHeldRestartUnreadable": "进度已暂缓。重启请求记录无法读取，因此无法确定重启会结束哪些请求。请再次选择“重启服务器”，并在提示时重启 Audiobookshelf 服务器{0}。",
   "WebServerRestarted": "我已重启服务器",
-  "WebAppName": "Audiobookshelf",
+  "WebAppName": "Leafwake",
   "WebSkipToContent": "跳转到内容",
   "WebServerAddressHelp": "Audiobookshelf 服务器的地址，包含子路径（如有），例如 https://home.example/audiobookshelf",
   "WebContinue": "继续",

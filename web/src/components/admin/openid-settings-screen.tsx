@@ -1,10 +1,13 @@
 "use client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Alert, Spinner } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import { useAbs } from "@/lib/session/store";
 
 const settingsSchema = z.object({
@@ -20,21 +23,19 @@ const settingsSchema = z.object({
 });
 type Result = { kind: "idle" } | { kind: "saved" } | { kind: "error"; message: string };
 export function OpenIdSettingsScreen() {
+  const { t } = useI18n();
   const { client, connection } = useAbs(),
     queries = useQueryClient();
   const settings = useQuery({
     queryKey: [connection.id, "openid-settings"],
     queryFn: ({ signal }) => client.get("/api/admin/openid/settings", settingsSchema, signal),
   });
-  if (settings.isPending) return <Spinner label="Loading OpenID settings" />;
-  if (settings.isError) return <Alert>{settings.error.message}</Alert>;
+  if (settings.isPending) return <Spinner label={t("WebAdminLoadingOpenIDSettings")} />;
+  if (settings.isError) return <Alert>{adminMessage(settings.error.message, t)}</Alert>;
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">OpenID sign-in</h1>
-      <p>
-        Configure your identity provider and exact client callbacks. Sign-in uses PKCE. Existing usernames are
-        never automatically linked to provider accounts.
-      </p>
+      <h1 className="text-2xl font-bold">{t("WebAdminOpenIDSignIn")}</h1>
+      <p>{t("WebAdminConfigureYourIdentityProviderAndExactClient")}</p>
       <OpenIdForm
         key={connection.id}
         initial={settings.data}
@@ -53,6 +54,8 @@ function OpenIdForm({
   initial: z.infer<typeof settingsSchema>;
   save: (value: unknown) => Promise<void>;
 }) {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const [result, action, pending] = useActionState<Result, FormData>(
     async (_old, form) => {
       const value = settingsSchema.omit({ hasClientSecret: true }).safeParse({
@@ -83,73 +86,83 @@ function OpenIdForm({
     { kind: "idle" },
   );
   return (
-    <form action={action} className="flex flex-col gap-4 rounded-xl bg-surface p-5">
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={action}
+      className="flex flex-col gap-4 rounded-xl bg-surface p-5"
+    >
       <label>
-        <input type="checkbox" name="enabled" defaultChecked={initial.enabled} /> Enable OpenID
+        <input type="checkbox" name="enabled" defaultChecked={initial.enabled} />
+        {t("WebAdminEnableOpenID")}
       </label>
-      <TextField name="issuer" label="Provider issuer URL" defaultValue={initial.issuer} maxLength={4096} />
+      <TextField
+        name="issuer"
+        label={t("WebAdminProviderIssuerURL")}
+        defaultValue={initial.issuer}
+        maxLength={4096}
+      />
       <TextField
         name="publicUrl"
-        label="Public server URL"
+        label={t("WebAdminPublicServerURL")}
         defaultValue={initial.publicUrl}
-        help="Exact HTTPS address including the configured subpath, without a trailing slash. Forwarded headers cannot change this address."
+        help={t("WebAdminExactHTTPSAddressIncludingTheConfiguredSubpath")}
         maxLength={2048}
       />
       <TextField
         name="clientId"
-        label="Provider client ID"
+        label={t("WebAdminProviderClientID")}
         defaultValue={initial.clientId}
         required
         maxLength={256}
       />
       <TextField
         name="clientSecret"
-        label="Replace client secret"
+        label={t("WebAdminReplaceClientSecret")}
         type="password"
         autoComplete="new-password"
         maxLength={4096}
         help={
           initial.hasClientSecret
-            ? "A secret is stored. Leave blank to retain it."
-            : "No client secret is stored."
+            ? t("WebAdminASecretIsStoredLeaveBlankTo")
+            : t("WebAdminNoClientSecretIsStored")
         }
       />
       <label>
-        <input type="checkbox" name="clearSecret" /> Remove stored secret (public provider client)
+        <input type="checkbox" name="clearSecret" />
+        {t("WebAdminRemoveStoredSecretPublicProviderClient")}
       </label>
       <label className="flex flex-col gap-2 text-sm font-medium">
-        Allowed client callbacks (one exact URI per line)
+        {t("WebAdminAllowedClientCallbacksOneExactURIPer")}
         <textarea
           name="redirectUris"
           className="min-h-28 rounded-xl border border-line bg-surface p-3 font-normal"
           defaultValue={initial.redirectUris.join("\n")}
         />
-        <span className="text-muted font-normal">
-          Include your browser URL ending in /oauth and the exact callback configured in each native app.
-          Wildcards are not accepted.
-        </span>
+        <span className="text-muted font-normal">{t("WebAdminIncludeYourBrowserURLEndingInOauth")}</span>
       </label>
       <label>
-        <input type="checkbox" name="allowRegistration" defaultChecked={initial.allowRegistration} /> Allow
-        new provider accounts to register as ordinary users
+        <input type="checkbox" name="allowRegistration" defaultChecked={initial.allowRegistration} />
+        {t("WebAdminAllowNewProviderAccountsToRegisterAs")}
       </label>
       <TextField
         name="buttonText"
-        label="Sign-in button text"
+        label={t("WebAdminSignInButtonText")}
         defaultValue={initial.buttonText}
         maxLength={256}
       />
       <label>
-        <input type="checkbox" name="autoLaunch" defaultChecked={initial.autoLaunch} /> Automatically open
-        provider sign-in
+        <input type="checkbox" name="autoLaunch" defaultChecked={initial.autoLaunch} />
+        {t("WebAdminAutomaticallyOpenProviderSignIn")}
       </label>
       {result.kind === "error" ? (
-        <Alert>{result.message}</Alert>
+        <FormFeedback submission={result} id={feedbackId}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
       ) : result.kind === "saved" ? (
-        <Alert tone="info">OpenID settings saved. Pending sign-ins were reset.</Alert>
+        <Alert tone="info">{t("WebAdminOpenIDSettingsSavedPendingSignInsWere")}</Alert>
       ) : null}
       <Button type="submit" disabled={pending}>
-        {pending ? "Validating provider…" : "Save OpenID settings"}
+        {pending ? t("WebAdminValidatingProvider") : t("WebAdminSaveOpenIDSettings")}
       </Button>
     </form>
   );

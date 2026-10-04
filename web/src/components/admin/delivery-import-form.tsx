@@ -1,10 +1,13 @@
 "use client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
+import { FormFeedback } from "@/components/ui/form-feedback";
 import { Alert } from "@/components/ui/status";
+import { useI18n } from "@/i18n/i18n";
+import { adminMessage } from "@/lib/abs/administration-messages";
 import {
   type DeliveryImportReport,
   deliveryImportInput,
@@ -18,6 +21,8 @@ type Result =
   | { kind: "inspected"; report: DeliveryImportReport; serverAddress: string }
   | { kind: "completed"; report: DeliveryImportReport };
 export function DeliveryImportForm() {
+  const feedbackId = useId();
+  const { t } = useI18n();
   const { client, connection } = useAbs();
   const queries = useQueryClient();
   const [result, submit, pending] = useActionState<Result, FormData>(
@@ -65,24 +70,39 @@ export function DeliveryImportForm() {
   );
   const report = result.kind === "inspected" || result.kind === "completed" ? result.report : null;
   return (
-    <form action={submit} className="space-y-4">
-      <p>
-        Use the source digest from a completed media import. Original feeds, SMTP settings and e-reader access
-        rules are restored from that archived snapshot. Choose the replacement public server URL explicitly.
-      </p>
+    <form
+      aria-describedby={result.kind === "error" ? feedbackId : undefined}
+      action={submit}
+      className="space-y-4"
+    >
+      <p>{t("WebAdminUseTheSourceDigestFromACompleted")}</p>
       <TextField
         name="serverAddress"
-        label="Replacement public server URL"
+        label={t("WebAdminReplacementPublicServerURL")}
         required
         defaultValue={result.kind === "inspected" ? result.serverAddress : ""}
       />
-      <TextField name="digest" label="Source digest" required defaultValue={report?.digest ?? ""} />
-      {result.kind === "error" ? <Alert>{result.message}</Alert> : null}
+      <TextField
+        name="digest"
+        label={t("WebAdminSourceDigest")}
+        required
+        defaultValue={report?.digest ?? ""}
+      />
+      {result.kind === "error" ? (
+        <FormFeedback submission={result} id={feedbackId}>
+          {adminMessage(result.message, t)}
+        </FormFeedback>
+      ) : null}
       {report ? (
         <div className="space-y-2">
           <p role="status">
-            {result.kind === "completed" ? "Imported" : "Found"} {report.counts.feeds} feeds,{" "}
-            {report.counts.episodes} episodes and {report.counts.devices} e-reader devices.
+            {t(
+              "WebDeliveryCounts",
+              result.kind === "completed" ? t("WebAdminImported") : t("WebAdminFound"),
+              report.counts.feeds,
+              report.counts.episodes,
+              report.counts.devices,
+            )}
           </p>
           {report.notices.map((notice) => (
             <p key={notice} className="text-sm text-muted">
@@ -91,11 +111,11 @@ export function DeliveryImportForm() {
           ))}
           {report.errors.map((error) => (
             <Alert key={`${error.table}:${error.id}:${error.message}`}>
-              {error.table} {error.id}: {error.message}
+              {error.table} {error.id}: {adminMessage(error.message, t)}
             </Alert>
           ))}
           {report.unsupported.length ? (
-            <ul aria-label="Archived delivery fields">
+            <ul aria-label={t("WebAdminArchivedDeliveryFields")}>
               {report.unsupported.map((entry) => (
                 <li key={`${entry.table}:${entry.id}`}>
                   {entry.table} {entry.id}: {entry.fields.join(", ")}
@@ -106,13 +126,13 @@ export function DeliveryImportForm() {
         </div>
       ) : null}
       {result.kind === "completed" ? null : (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button type="submit" name="intent" value="inspect" disabled={pending}>
-            Inspect feeds and delivery
+            {t("WebAdminInspectFeedsAndDelivery")}
           </Button>
           {result.kind === "inspected" && result.report.canImport ? (
             <Button type="submit" name="intent" value="commit" disabled={pending} variant="primary">
-              Import feeds and delivery
+              {t("WebAdminImportFeedsAndDelivery")}
             </Button>
           ) : null}
         </div>

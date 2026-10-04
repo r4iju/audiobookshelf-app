@@ -1,24 +1,26 @@
 import { AlertTriangle, Loader2 } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 export function Alert({
   children,
   tone = "danger",
   action,
+  ...props
 }: {
   children: ReactNode;
   tone?: "danger" | "info";
   action?: ReactNode;
-}) {
+} & Omit<ComponentProps<"div">, "children">) {
   return (
     <div
+      {...props}
       role={tone === "danger" ? "alert" : "status"}
       className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm ${tone === "danger" ? "border-danger/40 bg-danger/10" : "border-line bg-surface-2"}`}
     >
       {tone === "danger" ? (
         <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0 text-danger" />
       ) : null}
-      <div className="flex-1">{children}</div>
+      <div className="min-w-0 flex-1 break-words">{children}</div>
       {action}
     </div>
   );
