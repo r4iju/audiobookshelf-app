@@ -32,3 +32,16 @@ export const mediaImportReportSchema = z.object({
   notices: z.array(z.string()),
 });
 export type MediaImportReport = z.infer<typeof mediaImportReportSchema>;
+
+export const listImportSchema = z.object({ digest: z.string().regex(/^[a-f0-9]{64}$/) });
+export const listImportReportSchema = z.object({
+  digest: z.string(),
+  scope: z.literal("lists"),
+  canImport: z.boolean(),
+  canCutover: z.literal(false),
+  counts: z.object({ collections: z.number(), playlists: z.number(), members: z.number() }),
+  errors: z.array(z.object({ table: z.string(), id: z.string(), message: z.string() })),
+  unsupported: z.array(z.object({ table: z.string(), id: z.string(), fields: z.array(z.string()) })),
+  notices: z.array(z.string()),
+});
+export type ListImportReport = z.infer<typeof listImportReportSchema>;

@@ -7,6 +7,7 @@ import { TextField } from "@/components/ui/field";
 import { Section } from "@/components/ui/section";
 import { Alert, EmptyState, Spinner } from "@/components/ui/status";
 import { useAbs } from "@/lib/session/store";
+import { ListImportForm } from "./list-import-form";
 import { MediaImportForm } from "./media-import-form";
 
 const backupSchema = z.object({
@@ -52,6 +53,9 @@ export function MigrationScreen() {
       </p>
       <Section title="Import media and listening history">
         <MediaImportForm />
+      </Section>
+      <Section title="Import original lists">
+        <ListImportForm />
       </Section>
       <Section title="Product backups">
         <p className="text-sm text-muted">

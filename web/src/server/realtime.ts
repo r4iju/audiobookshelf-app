@@ -2,9 +2,10 @@ import "server-only";
 import type { LibraryItem, User } from "@/lib/abs/schemas";
 import { accountResponse, authenticate } from "./accounts";
 import { itemFor, itemsFor, librariesFor } from "./catalog";
+import { realtimeLists } from "./lists";
 
-type Snapshot = { user: User; items: LibraryItem[] };
-type Change = { userId: string; itemId?: string } | { catalog: true };
+type Snapshot = { user: User; items: LibraryItem[]; lists: ReturnType<typeof realtimeLists> };
+type Change = { userId: string; itemId?: string } | { catalog: true } | { lists: true };
 declare global {
   var leafwakeRealtimeSnapshot: ((token: string) => Snapshot) | undefined;
   var leafwakeRealtimeCheck: ((token: string) => void) | undefined;
@@ -32,5 +33,5 @@ globalThis.leafwakeRealtimeSnapshot = (token) => {
     if (catalogs.size >= 256) catalogs.clear();
     catalogs.set(key, catalog);
   }
-  return { user: accountResponse(actor), items: catalog.items };
+  return { user: accountResponse(actor), items: catalog.items, lists: realtimeLists(actor, catalog.items) };
 };

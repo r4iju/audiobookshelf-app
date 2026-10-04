@@ -13,6 +13,7 @@ import { useCollection, useCollections, useMe } from "@/lib/abs/queries";
 import { useAbs } from "@/lib/session/store";
 import { bookEntry } from "./entries";
 import { ListDetail } from "./list-detail";
+import { ListEditor } from "./list-editor";
 
 export function CollectionList({ libraryId }: { libraryId: string }) {
   const { t } = useI18n();
@@ -67,6 +68,7 @@ export function CollectionDetail({ collectionId }: { collectionId: string }) {
     <QueryState query={collection}>
       {(data) => (
         <ListDetail
+          editor={can(me, "update") ? <ListEditor kind="collection" list={data} /> : undefined}
           name={data.name}
           description={data.description}
           label={t("HeaderCollectionItems")}

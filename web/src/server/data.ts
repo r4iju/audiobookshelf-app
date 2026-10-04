@@ -52,6 +52,7 @@ export function database() {
     CREATE TABLE IF NOT EXISTS libraries (id TEXT PRIMARY KEY, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS catalog_items (id TEXT PRIMARY KEY, library_id TEXT NOT NULL REFERENCES libraries(id),
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(library_id, source_path));
+    CREATE TABLE IF NOT EXISTS media_lists (id TEXT PRIMARY KEY, kind TEXT NOT NULL CHECK(kind IN ('collection','playlist')), library_id TEXT NOT NULL REFERENCES libraries(id), user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, created_at INTEGER NOT NULL, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS metadata_overrides (item_id TEXT PRIMARY KEY REFERENCES catalog_items(id) ON DELETE CASCADE, content TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS media_files (id TEXT PRIMARY KEY, item_id TEXT NOT NULL REFERENCES catalog_items(id),
       source_path TEXT NOT NULL, content TEXT NOT NULL, UNIQUE(item_id, source_path));
@@ -117,6 +118,7 @@ export function database() {
       INSERT INTO schema_version(version) VALUES(8);
       COMMIT;`);
   }
+  db.exec("INSERT OR IGNORE INTO schema_version(version) VALUES (9);");
   return db;
 }
 
