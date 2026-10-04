@@ -2,7 +2,7 @@
 
 Effective date: October 4, 2026. Developer: Emanuel Franzen (GitHub account r4iju).
 
-Leafwake is an independent client for an Audiobookshelf server that you choose. This policy describes the planned Cast-free Android public build. Cast-enabled internal previews are not covered by its no-telemetry statement and are not offered as public Leafwake releases.
+Leafwake is an independent client for an Audiobookshelf server that you choose. This policy describes the Cast-free Android public build. Cast-enabled internal previews are not covered by its no-telemetry statement and are not offered as public Leafwake releases.
 
 ## Your server and local storage
 

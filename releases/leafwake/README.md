@@ -6,8 +6,8 @@ This directory holds the public release preparation. No binary is cleared for di
 
 | Channel | Status |
 | --- | --- |
-| Google Play | Barbellry's existing service-account token exchange and read access to `com.barbellry` pass. `com.forkzed.leafwake` returns package not found. The new app needs Play Console registration and initial setup; app-specific access must then be checked. |
-| Public Android APK | A separate Cast-free candidate is implemented behind `-Pleafwake=true`. No binary has been published. Its selection and product acceptance remain open. Do not publish the existing Cast-enabled preview APK as Leafwake. See [the dependency audit](ANDROID-LICENSE-AUDIT.md). |
+| Google Play | Leafwake is registered as a free app in the existing Barbellry developer account, with package `com.forkzed.leafwake` and default language `en-GB`. Automatic installer protection was disabled. App-specific service-account read access passes; no binary has been uploaded. This personal account requires 12 opted-in closed testers for 14 continuous days before applying for production access. |
+| Public Android APK | A separate Cast-free candidate is implemented behind `-Pleafwake=true`. No binary has been published. The owner selected it for the initial beta on October 4, 2026; product acceptance remains open. Do not publish the existing Cast-enabled preview APK as Leafwake. See [the dependency audit](ANDROID-LICENSE-AUDIT.md). |
 | Apple stores and public TestFlight | Existing App Store Connect API access works. The old `com.forkzed.audiobookshelf` app record is in `PREPARE_FOR_SUBMISSION`; it is not evidence of an approved public license grant. Resolve the GPL/current Apple terms gate before upload. |
 | Public product acceptance | Use the recorded platform gates in [the release plan](../../docs/modernization/PUBLIC-RELEASE-PLAN.md). A source or store preparation change does not close hardware, migration, localization or stock-server compatibility acceptance. |
 
@@ -34,7 +34,7 @@ Public build preparation must reject a missing owner signing configuration inste
 ## Licensing and metadata
 
 - [Android license audit](ANDROID-LICENSE-AUDIT.md): current linked libraries, Cast receiver and privacy gates.
-- [Permission request draft](PERMISSION-REQUEST-DRAFT.md): local draft only; no outreach has been sent.
+- [Permission request](PERMISSION-REQUEST-DRAFT.md): posted to upstream discussion #2051 with owner authorization; approval is pending.
 - [Privacy policy draft](PRIVACY.md): applies only to the proposed Cast-free public Android build and must be checked against its exact runtime graph.
 - [Store listing draft](STORE-LISTING.md): independent affiliation and beta scope; final metadata still requires artifact verification.
 - [GPLv3 license](LICENSE.txt): retain the upstream license and notices. Publish complete corresponding source/build materials matching every covered binary.
@@ -58,4 +58,4 @@ Public release packaging requires the owner signing environment variables docume
 
 Before distributing, archive the exact committed source and build materials with `git archive`, retain the dependency inventory and source access for included dependencies, check the signer and application ID, and complete the release plan's stock-server and device gates. An owner-signed build is still a candidate, not acceptance or publication clearance.
 
-Verification during preparation: public and preview debug compilation; preview core/unit tests; both instrumentation source sets compile; public release without an owner key fails as required. The Device panel could not boot either available emulator, so there is no new device/UI acceptance evidence from this change.
+Verification during preparation: public and preview debug compilation; preview core/unit tests; both instrumentation source sets compile; public release without an owner key fails as required. The owner-signed candidate installed on an API 36 emulator and a physical Android 16 phone. Manual emulator checks covered pre-login privacy access, sign-in, library browsing and streaming against an isolated stock 2.30.0 server. The physical phone was locked, so installation is not physical playback acceptance. Three stock-server journeys pass; offline-finish remains failing. See [the QA status](QA-STATUS.md) for scope and the remaining gates.

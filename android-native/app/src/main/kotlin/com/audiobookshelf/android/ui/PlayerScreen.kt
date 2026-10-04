@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -156,7 +157,7 @@ fun PlayerScreen(onCollapse: () -> Unit, onClosed: () -> Unit) {
                 }
                 item { Controls(state, engine::previousChapter, { engine.jump(false) }, engine::toggle, { engine.jump(true) }, engine::nextChapter, hasChapters = now.chapters.isNotEmpty()) }
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         TextButton(onClick = { speedSheet = true }, modifier = Modifier.testTag("player-speed")) { Text(stringResource(R.string.pl_speed_value, formatSpeed(state.speed))) }
                         val remaining = state.sleepRemaining
                         val sleepTimerLabel = stringResource(R.string.sleep_timer)

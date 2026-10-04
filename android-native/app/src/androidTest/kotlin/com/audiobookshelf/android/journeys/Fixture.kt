@@ -10,6 +10,7 @@ import androidx.compose.ui.test.printToString
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
@@ -120,7 +121,7 @@ fun ComposeTestRule.signIn(server: String = Fixture.server, username: String = "
     waitForTag("username")
     replaceText("username", username)
     replaceText("password", password)
-    tap("sign-in")
+    onNodeWithTag("sign-in").performScrollTo().performClick()
     waitForTag("library-home", 20_000)
 }
 
