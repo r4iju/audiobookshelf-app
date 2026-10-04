@@ -11,6 +11,7 @@ import { useI18n } from "@/i18n/i18n";
 import { adminMessage } from "@/lib/abs/administration-messages";
 import { backupConfigurationSchema, backupSettingsSchema } from "@/lib/abs/backup-settings";
 import { useAbs } from "@/lib/session/store";
+import { CompleteImportForm } from "./complete-import-form";
 import { DeliveryImportForm } from "./delivery-import-form";
 import { ListImportForm } from "./list-import-form";
 import { MediaImportForm } from "./media-import-form";
@@ -125,6 +126,9 @@ export function MigrationScreen() {
         ) : (
           <EmptyState title={t("WebAdminNoBackupsYet")} />
         )}
+      </Section>
+      <Section title={t("WebCompleteMigrationTitle")}>
+        <CompleteImportForm />
       </Section>
       <Section title={t("WebAdminStorageAndJobDiagnostics")}>
         <Diagnostics />

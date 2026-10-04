@@ -121,18 +121,7 @@ async function configuration(settings: ReturnType<typeof stored>) {
     if (endpoint) providerUrl(endpoint);
   return config;
 }
-export async function saveOpenIdSettings(
-  actor: Account,
-  input: z.infer<typeof openIdInput>,
-  authorize: () => Account,
-) {
-  requireAdministrator(actor);
-  const previous = stored();
-  const next = {
-    ...openIdSchema.parse(input),
-    clientSecret: input.clientSecret === null ? "" : (input.clientSecret ?? previous.clientSecret),
-    revision: randomBytes(16).toString("hex"),
-  };
+async function validatedSettings(next: z.infer<typeof storedSchema>) {
   if (next.enabled) {
     const publicUrl = new URL(next.publicUrl);
     if (
@@ -150,12 +139,36 @@ export async function saveOpenIdSettings(
       throw new DomainError(400, "Public URL must use this image’s configured base path");
     if (!next.redirectUris.length) throw new DomainError(400, "Configure an exact client callback");
     try {
-      await configuration(next);
+      return await configuration(next);
     } catch (error) {
       if (error instanceof DomainError) throw error;
       throw new DomainError(400, "Provider discovery could not be validated");
     }
   }
+  return null;
+}
+export async function prepareOpenIdImport(input: z.infer<typeof openIdInput>) {
+  const next = {
+    ...openIdSchema.parse(input),
+    clientSecret: input.clientSecret ?? "",
+    revision: randomBytes(16).toString("hex"),
+  };
+  const config = await validatedSettings(next);
+  return { content: seal(next), issuer: config?.serverMetadata().issuer ?? null };
+}
+export async function saveOpenIdSettings(
+  actor: Account,
+  input: z.infer<typeof openIdInput>,
+  authorize: () => Account,
+) {
+  requireAdministrator(actor);
+  const previous = stored();
+  const next = {
+    ...openIdSchema.parse(input),
+    clientSecret: input.clientSecret === null ? "" : (input.clientSecret ?? previous.clientSecret),
+    revision: randomBytes(16).toString("hex"),
+  };
+  await validatedSettings(next);
   transaction((db) => {
     requireAdministrator(authorize());
     if (stored().revision !== previous.revision)

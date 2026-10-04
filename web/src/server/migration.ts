@@ -27,7 +27,10 @@ const sourceUser = z.object({
   email: z.string().max(512).nullable().optional(),
   lastSeen: z.string().nullable().optional(),
   updatedAt: z.string().nullable().optional(),
-  pash: z.string().regex(/^\$2[aby]\$(0[4-9]|1[0-2])\$[./A-Za-z0-9]{53}$/),
+  pash: z
+    .string()
+    .regex(/^\$2[aby]\$(0[4-9]|1[0-2])\$[./A-Za-z0-9]{53}$/)
+    .nullable(),
   type: z.enum(["root", "admin", "user", "guest"]),
   isActive: z.number().int().min(0).max(1),
   isLocked: z.number().int().min(0).max(1),
@@ -59,6 +62,8 @@ const completionSchema = z.object({
   report: reportSchema,
 });
 export function sourceCopy(path: string) {
+  if (process.platform !== "linux")
+    throw new DomainError(400, "Run migration and snapshot restore inside the Leafwake product image");
   const roots = (process.env.LEAFWAKE_IMPORT_ROOTS || "/imports")
     .split(":")
     .filter(Boolean)
@@ -74,6 +79,8 @@ export function sourceCopy(path: string) {
     if (existsSync(`${actual}-wal`) || existsSync(`${actual}-journal`))
       throw new DomainError(400, "Use a closed, consistent SQLite copy without journal sidecars");
     fd = openSync(actual, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+    if (realpathSync(`/proc/self/fd/${fd}`) !== actual)
+      throw new DomainError(400, "Source descriptor escaped its configured mount");
     const stat = fstatSync(fd);
     if (!stat.isFile() || stat.size > 256 * 1024 * 1024)
       throw new DomainError(400, "Source must be a regular SQLite copy under 256 MiB");
@@ -188,7 +195,14 @@ function readInventory(source: ReturnType<typeof sourceCopy>) {
     try {
       const policy = legacyPolicy.parse(JSON.parse(user.permissions));
       const extra = z.record(z.string(), z.unknown()).parse(JSON.parse(user.extraData));
-      if (extra.authOpenIDSub) throw new Error("OpenID account mapping requires the OpenID migration stage");
+      const subject =
+        extra.authOpenIDSub === undefined || extra.authOpenIDSub === null
+          ? null
+          : z.string().min(1).max(1024).parse(extra.authOpenIDSub);
+      if (user.pash === null && (!subject || user.type === "root"))
+        throw new Error(
+          "A passwordless source account requires a linked OpenID subject and a local recovery owner",
+        );
       const created = Date.parse(user.createdAt);
       if (!Number.isFinite(created)) throw new Error("Invalid creation date");
       if (usernames.has(user.username.toLowerCase())) throw new Error("Conflicting account names");
@@ -198,7 +212,7 @@ function readInventory(source: ReturnType<typeof sourceCopy>) {
       users.push({
         id: user.id,
         username: user.username,
-        password: user.pash,
+        password: user.pash ?? "!openid",
         type: user.type,
         active: user.isActive,
         policy: JSON.stringify(flags),
@@ -239,19 +253,6 @@ function readInventory(source: ReturnType<typeof sourceCopy>) {
       .parse(table.name);
     const rows = Number(source.db.prepare(`SELECT COUNT(*) AS count FROM "${name}"`).get()?.count);
     if (rows) remainingData.push({ table: name, rows });
-    if (name === "settings") {
-      for (const setting of source.db.prepare("SELECT value FROM settings").all()) {
-        const value = z.record(z.string(), z.unknown()).parse(JSON.parse(z.string().parse(setting.value)));
-        if (
-          value.authOpenIDIssuerURL ||
-          value.authOpenIDClientID ||
-          value.authOpenIDClientSecret ||
-          (Array.isArray(value.authActiveAuthMethods) &&
-            value.authActiveAuthMethods.some((method) => method !== "local"))
-        )
-          errors.push({ message: "OpenID configuration requires the OpenID migration stage" });
-      }
-    }
   }
   const report = reportSchema.parse({
     digest: source.digest,

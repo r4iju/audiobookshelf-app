@@ -383,7 +383,17 @@ async function inventory(input: Input, authorize: () => Account) {
               size: audioFile?.metadata.size ?? 0,
               chapters: jsonArray(row.chapters).map((value) => chapterSchema.strip().parse(value)),
               publishedAt: row.publishedAt ? date.parse(row.publishedAt) : null,
-              enclosure: row.enclosureURL ? { url: z.string().parse(row.enclosureURL) } : null,
+              enclosure: row.enclosure
+                ? z
+                    .object({
+                      url: z.string().url(),
+                      type: z.string().optional(),
+                      length: z.union([z.number().nonnegative(), z.string()]).optional(),
+                    })
+                    .parse(JSON.parse(json.parse(row.enclosure)))
+                : row.enclosureURL
+                  ? { url: z.string().url().parse(row.enclosureURL) }
+                  : null,
             };
           });
         const metadata = {
@@ -580,6 +590,7 @@ async function inventory(input: Input, authorize: () => Account) {
             updatedAt: value.updatedAt,
             progressGeneration: 0,
             mediaMetadata: publicMetadataSchema.parse(jsonObject(raw.mediaMetadata)),
+            chapters: jsonArray(raw.chapters).map((value) => chapterSchema.strip().parse(value)),
             legacyArchive: true,
           },
         });
