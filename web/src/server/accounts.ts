@@ -1,3 +1,4 @@
+import { serverSettings } from "./server-settings";
 import "server-only";
 import { createHash, createHmac, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 import { compare } from "bcryptjs";
@@ -156,7 +157,11 @@ function issueSession(user: Account) {
   return {
     user: { ...visibleUser(user), accessToken, refreshToken },
     userDefaultLibraryId: null,
-    serverSettings: { version: "1.0.0-dev", language: "en" },
+    serverSettings: {
+      version: "1.0.0-dev",
+      language: serverSettings().language,
+      name: serverSettings().serverName,
+    },
     ereaderDevices: [],
   };
 }
@@ -166,10 +171,14 @@ export async function passwordLogin(input: z.infer<typeof credentialsSchema>) {
   const attempt = transaction((db) => {
     db.prepare("DELETE FROM login_attempts WHERE expires_at <= ?").run(now);
     db.prepare(`INSERT INTO login_attempts VALUES (?, 1, ?) ON CONFLICT(key)
-      DO UPDATE SET attempts = attempts + 1`).run(key, now + 5 * 60_000);
+      DO UPDATE SET attempts = attempts + 1`).run(key, now + serverSettings().rateLimitLoginWindow);
     return db.prepare("SELECT attempts FROM login_attempts WHERE key = ?").get(key);
   });
-  if (attempt && typeof attempt.attempts === "number" && attempt.attempts > 12)
+  if (
+    attempt &&
+    typeof attempt.attempts === "number" &&
+    attempt.attempts > serverSettings().rateLimitLoginRequests
+  )
     throw new DomainError(429, "Too many sign-in attempts. Try again later");
   const row = database()
     .prepare("SELECT * FROM users WHERE username_key = ? AND active = 1")
@@ -359,6 +368,12 @@ export function revokeAccount(actor: Account, id: string) {
   revokeSessions(id);
 }
 export function canReadLibrary(actor: Account, libraryId: string) {
+  if (
+    database()
+      .prepare("SELECT id FROM libraries WHERE id=? AND json_extract(content,'$.isArchived')=1")
+      .get(libraryId)
+  )
+    return false;
   const policy = permissions.parse(JSON.parse(actor.permissions));
   return (
     policy.accessAllLibraries || z.array(z.string()).parse(JSON.parse(actor.libraries)).includes(libraryId)

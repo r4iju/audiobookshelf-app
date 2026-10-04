@@ -190,6 +190,9 @@ export async function createPodcast(
     transaction((db) => {
       writable(authorize());
       if (!canReadLibrary(authorize(), input.libraryId)) throw new DomainError(404, "Not found");
+      const current = findLibrary(input.libraryId);
+      if (!current.folders.some((folder) => folder.id === input.folderId && within(folder.fullPath, path)))
+        throw new DomainError(409, "Library folders changed; select a current folder and try again");
       db.prepare("INSERT INTO catalog_items VALUES(?,?,?,?)").run(id, library.id, path, JSON.stringify(item));
     });
   } catch (error) {

@@ -1,10 +1,16 @@
+import { serverSettings } from "./server-settings";
 import "server-only";
 import type { LibraryItem, User } from "@/lib/abs/schemas";
 import { accountResponse, authenticate } from "./accounts";
 import { itemFor, itemsFor, librariesFor } from "./catalog";
 import { realtimeLists } from "./lists";
 
-type Snapshot = { user: User; items: LibraryItem[]; lists: ReturnType<typeof realtimeLists> };
+type Snapshot = {
+  user: User;
+  items: LibraryItem[];
+  lists: ReturnType<typeof realtimeLists>;
+  serverSettings: { version: string; language: string };
+};
 type Change =
   | { userId: string; itemId?: string }
   | { catalog: true }
@@ -37,5 +43,10 @@ globalThis.leafwakeRealtimeSnapshot = (token) => {
     if (catalogs.size >= 256) catalogs.clear();
     catalogs.set(key, catalog);
   }
-  return { user: accountResponse(actor), items: catalog.items, lists: realtimeLists(actor, catalog.items) };
+  return {
+    user: accountResponse(actor),
+    items: catalog.items,
+    lists: realtimeLists(actor, catalog.items),
+    serverSettings: { version: "1.0.0-dev", language: serverSettings().language },
+  };
 };

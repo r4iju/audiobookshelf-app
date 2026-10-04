@@ -1,3 +1,4 @@
+import { serverSettings } from "./server-settings";
 import "server-only";
 import { execFile } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
@@ -102,6 +103,86 @@ export async function createLibrary(actor: Account, input: z.infer<typeof create
   });
   catalogChanged();
   return library;
+}
+export const editLibrarySchema = z.object({
+  name: z.string().trim().min(1).max(256).optional(),
+  displayOrder: z.number().int().min(0).max(10000).optional(),
+  isArchived: z.boolean().optional(),
+  settings: z.object({ coverAspectRatio: z.number().min(0.3).max(3) }).optional(),
+  folders: z
+    .array(z.object({ id: z.string().optional(), fullPath: z.string().max(4096) }))
+    .min(1)
+    .max(32)
+    .optional(),
+});
+export function managedLibraries(actor: Account) {
+  requireAdministrator(actor);
+  return database()
+    .prepare("SELECT content FROM libraries")
+    .all()
+    .map((row) => librarySchema.parse(JSON.parse(z.string().parse(row.content))));
+}
+export async function editLibrary(
+  actor: Account,
+  id: string,
+  input: z.infer<typeof editLibrarySchema>,
+  authorize: () => Account,
+) {
+  requireAdministrator(actor);
+  const before = findLibrary(id);
+  const folders = input.folders
+    ? await Promise.all(
+        input.folders.map(async (folder) => ({
+          id: folder.id ?? before.folders.find((old) => old.fullPath === folder.fullPath)?.id ?? randomUUID(),
+          fullPath: await mountedPath(folder.fullPath),
+        })),
+      )
+    : before.folders;
+  if (new Set(folders.map((folder) => folder.id)).size !== folders.length)
+    throw new DomainError(400, "Duplicate folder identity");
+  for (const [index, folder] of folders.entries())
+    if (
+      folders
+        .slice(0, index)
+        .some((other) => within(other.fullPath, folder.fullPath) || within(folder.fullPath, other.fullPath))
+    )
+      throw new DomainError(400, "Library folders cannot overlap");
+  const value = transaction((db) => {
+    requireAdministrator(authorize());
+    const current = findLibrary(id);
+    if (db.prepare("SELECT id FROM scan_runs WHERE library_id=? AND status='running'").get(id))
+      throw new DomainError(409, "Wait for the running scan before changing this library");
+    if (JSON.stringify(current) !== JSON.stringify(before))
+      throw new DomainError(409, "Library changed; reload before saving");
+    for (const row of db.prepare("SELECT source_path FROM catalog_items WHERE library_id=?").all(id))
+      if (!folders.some((folder) => within(folder.fullPath, z.string().parse(row.source_path))))
+        throw new DomainError(
+          409,
+          "Keep folders containing existing items. Archive the library to retire it without losing history.",
+        );
+    const value = librarySchema.parse({ ...current, ...input, folders });
+    db.prepare("UPDATE libraries SET content=? WHERE id=?").run(JSON.stringify(value), id);
+    return value;
+  });
+  catalogChanged();
+  return value;
+}
+export function removeLibrary(actor: Account, id: string) {
+  requireAdministrator(actor);
+  findLibrary(id);
+  transaction((db) => {
+    requireAdministrator(actor);
+    if (db.prepare("SELECT id FROM scan_runs WHERE library_id=? AND status='running'").get(id))
+      throw new DomainError(409, "Wait for the running scan before removing this library");
+    if (
+      db.prepare("SELECT id FROM catalog_items WHERE library_id=? LIMIT 1").get(id) ||
+      db.prepare("SELECT id FROM media_lists WHERE library_id=? LIMIT 1").get(id)
+    )
+      throw new DomainError(409, "Archive populated libraries to retain their media, lists and history");
+    db.prepare("DELETE FROM scan_runs WHERE library_id=?").run(id);
+    db.prepare("DELETE FROM libraries WHERE id=?").run(id);
+  });
+  catalogChanged();
 }
 export function findLibrary(id: string) {
   const row = database().prepare("SELECT content FROM libraries WHERE id = ?").get(id);
@@ -365,7 +446,7 @@ const probeSchema = z.object({
 });
 let probes = 0;
 async function probe(path: string) {
-  if (probes >= 4) throw new Error("Media probe capacity exceeded");
+  if (probes >= serverSettings().maxMediaProbes) throw new Error("Media probe capacity exceeded");
   probes++;
   try {
     return probeSchema.parse(
@@ -492,9 +573,9 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
   async function walk(directory: string, depth: number) {
     if (!within(folder, await realpath(directory)) || (await lstat(directory)).isSymbolicLink())
       throw new Error("Scan directory escaped its mounted folder");
-    if (depth > 32) throw new Error("Folder nesting exceeds scan limit");
+    if (depth > serverSettings().maxScanDepth) throw new Error("Folder nesting exceeds scan limit");
     for (const entry of await readdir(directory, { withFileTypes: true })) {
-      if (++count > 20000) throw new Error("Folder entry count exceeds scan limit");
+      if (++count > serverSettings().maxScanEntries) throw new Error("Folder entry count exceeds scan limit");
       const path = resolve(directory, entry.name);
       if (entry.isSymbolicLink()) {
         errors.push({ path, message: "Symlink skipped" });
@@ -667,6 +748,7 @@ async function scanFolder(library: Library, folder: string, errors: ScanError[],
 export async function scanLibrary(actor: Account, id: string) {
   requireAdministrator(actor);
   const library = findLibrary(id);
+  if (library.isArchived) throw new DomainError(409, "Unarchive the library before scanning");
   const scanId = randomUUID();
   transaction((db) => {
     if (db.prepare("SELECT id FROM scan_runs WHERE library_id = ? AND status = 'running'").get(id))
@@ -693,6 +775,8 @@ export async function scanLibrary(actor: Account, id: string) {
     });
     transaction((db) => {
       requireAdministrator(actor);
+      if (JSON.stringify(findLibrary(id)) !== JSON.stringify(library))
+        throw new DomainError(409, "Library changed while scanning; run the scan again");
       const seen = new Set(records.map((record) => record.item.id));
       // Probe errors preserve previous records; unavailable roots abort before this transaction.
       for (const row of db
