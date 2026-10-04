@@ -15,7 +15,7 @@ export default async function ConnectPage({
       initialUsername={username ?? ""}
       next={safeNext(next)}
       // Read per request, so one image serves any deployment.
-      configuredServer={process.env.ABS_WEB_SERVER}
+      configuredServer={process.env.ABS_WEB_SERVER ?? "/"}
     />
   );
 }
