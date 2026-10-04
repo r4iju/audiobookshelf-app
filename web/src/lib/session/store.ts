@@ -39,7 +39,8 @@ export const useSessionStore = create<SessionStore>()((set, get) => ({
   signOut: () => {
     const { session } = get();
     if (session.phase === "signed-in") {
-      const refresh = session.connection.auth.kind === "token" ? session.connection.auth.refreshToken : null;
+      const auth = registry.loadAuth(session.connection.id) ?? session.connection.auth;
+      const refresh = auth.kind === "token" ? auth.refreshToken : null;
       // Best effort: tell the server to end this session. Local sign-out must not depend on reaching it.
       if (refresh) {
         fetch(`${session.connection.serverUrl}/logout`, {

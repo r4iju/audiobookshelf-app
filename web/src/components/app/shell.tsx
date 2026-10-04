@@ -256,6 +256,12 @@ function Shell({ children }: { children: ReactNode }) {
             </nav>
           ) : null}
           <div className="mt-auto flex flex-col gap-0.5">
+            {admin ? (
+              <Link href="/admin/accounts" className={navClass(pathname.startsWith("/admin"))}>
+                <Users aria-hidden className="size-4" />
+                Accounts
+              </Link>
+            ) : null}
             <Link href="/stats" className={navClass(pathname === "/stats")}>
               <BarChart3 aria-hidden className="size-4" />
               {t("WebStats")}
@@ -295,6 +301,11 @@ function Shell({ children }: { children: ReactNode }) {
               <div className="flex items-center justify-between gap-3 px-4">
                 {brand}
                 <div className="flex items-center gap-1">
+                  {admin ? (
+                    <ButtonLink href="/admin/accounts" variant="ghost" size="icon" aria-label="Accounts">
+                      <Users aria-hidden className="size-5" />
+                    </ButtonLink>
+                  ) : null}
                   <ButtonLink href="/stats" variant="ghost" size="icon" aria-label={t("WebStats")}>
                     <BarChart3 aria-hidden className="size-5" />
                   </ButtonLink>

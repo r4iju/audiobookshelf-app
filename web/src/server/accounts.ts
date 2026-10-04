@@ -19,12 +19,15 @@ export class DomainError extends Error {
     super(message);
   }
 }
-const permissions = z.object({
+export const permissions = z.object({
   download: z.boolean(),
   update: z.boolean(),
   delete: z.boolean(),
   upload: z.boolean(),
   accessExplicitContent: z.boolean(),
+  accessAllLibraries: z.boolean().default(true),
+  accessAllTags: z.boolean().default(true),
+  selectedTagsNotAccessible: z.boolean().default(false),
 });
 const userRow = z.object({
   id: z.string(),
@@ -34,6 +37,7 @@ const userRow = z.object({
   active: z.number(),
   permissions: z.string(),
   libraries: z.string(),
+  tags: z.string(),
   created_at: z.number(),
 });
 export type Account = z.infer<typeof userRow>;
@@ -43,6 +47,9 @@ const rootPermissions = {
   delete: true,
   upload: true,
   accessExplicitContent: true,
+  accessAllLibraries: true,
+  accessAllTags: true,
+  selectedTagsNotAccessible: false,
 };
 export const credentialsSchema = z.object({
   username: z.string().min(1).max(256),
@@ -66,7 +73,7 @@ function equal(left: string, right: string) {
   const b = Buffer.from(digest(right));
   return timingSafeEqual(a, b);
 }
-async function hashPassword(password: string) {
+export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const key = await derive(password, salt, 64);
   return `scrypt$${salt}$${key.toString("hex")}`;
@@ -107,6 +114,8 @@ function visibleUser(user: Account) {
     mediaProgress: [],
     bookmarks: [],
     seriesHideFromContinueListening: [],
+    itemTagsSelected: z.array(z.string()).parse(JSON.parse(user.tags)),
+    isActive: Boolean(user.active),
     createdAt: user.created_at,
   };
 }
@@ -133,6 +142,16 @@ function issueSession(user: Account) {
   };
 }
 export async function passwordLogin(input: z.infer<typeof credentialsSchema>) {
+  const key = digest(input.username.toLowerCase());
+  const now = Date.now();
+  const attempt = transaction((db) => {
+    db.prepare("DELETE FROM login_attempts WHERE expires_at <= ?").run(now);
+    db.prepare(`INSERT INTO login_attempts VALUES (?, 1, ?) ON CONFLICT(key)
+      DO UPDATE SET attempts = attempts + 1`).run(key, now + 5 * 60_000);
+    return db.prepare("SELECT attempts FROM login_attempts WHERE key = ?").get(key);
+  });
+  if (attempt && typeof attempt.attempts === "number" && attempt.attempts > 12)
+    throw new DomainError(429, "Too many sign-in attempts. Try again later");
   const row = database()
     .prepare("SELECT * FROM users WHERE username_key = ? AND active = 1")
     .get(input.username.toLowerCase());
@@ -141,7 +160,18 @@ export async function passwordLogin(input: z.infer<typeof credentialsSchema>) {
   const encoded = user?.password_hash ?? `scrypt$00000000000000000000000000000000$${"0".repeat(128)}`;
   if (!(await matchesPassword(input.password, encoded)) || !user)
     throw new DomainError(401, "Invalid username or password");
-  return issueSession(user);
+  return transaction((db) => {
+    const row = db.prepare("SELECT * FROM users WHERE id = ?").get(user.id);
+    const current = row ? userRow.parse(row) : null;
+    if (
+      !current?.active ||
+      current.password_hash !== user.password_hash ||
+      current.username.toLowerCase() !== input.username.toLowerCase()
+    )
+      throw new DomainError(401, "Invalid username or password");
+    db.prepare("DELETE FROM login_attempts WHERE key = ?").run(key);
+    return issueSession(current);
+  });
 }
 export function authenticate(token: string | null) {
   if (!token || token.length > 256) throw new DomainError(401, "Sign-in required");
@@ -166,4 +196,160 @@ export function refreshSession(token: string | null) {
     db.prepare("DELETE FROM auth_sessions WHERE refresh_hash = ?").run(digest(token));
     return issueSession(userRow.parse(row));
   });
+}
+
+export function revokeSessions(userId: string) {
+  database().prepare("DELETE FROM auth_sessions WHERE user_id = ?").run(userId);
+}
+export function endSession(access: string | null, refresh: string | null) {
+  database()
+    .prepare("DELETE FROM auth_sessions WHERE access_hash = ? OR refresh_hash = ?")
+    .run(digest(access ?? ""), digest(refresh ?? ""));
+}
+export function findAccount(id: string) {
+  const row = database().prepare("SELECT * FROM users WHERE id = ?").get(id);
+  if (!row) throw new DomainError(404, "Not found");
+  return userRow.parse(row);
+}
+export function requireAdministrator(actor: Account) {
+  // Re-read authority at the write boundary, including after asynchronous password derivation.
+  const current = findAccount(actor.id);
+  if (!current.active || !["root", "admin"].includes(current.type))
+    throw new DomainError(403, "Administrator required");
+  return current;
+}
+export function listAccounts(actor: Account) {
+  requireAdministrator(actor);
+  return database()
+    .prepare("SELECT * FROM users ORDER BY username_key")
+    .all()
+    .map((row) => visibleUser(userRow.parse(row)));
+}
+const permissionPatch = z
+  .object({
+    download: z.boolean().optional(),
+    update: z.boolean().optional(),
+    delete: z.boolean().optional(),
+    upload: z.boolean().optional(),
+    accessExplicitContent: z.boolean().optional(),
+    accessAllLibraries: z.boolean().optional(),
+    accessAllTags: z.boolean().optional(),
+    selectedTagsNotAccessible: z.boolean().optional(),
+  })
+  .strict();
+const editable = z
+  .object({
+    username: setupSchema.shape.username.optional(),
+    password: setupSchema.shape.password.optional(),
+    type: z.enum(["admin", "user", "guest"]).optional(),
+    isActive: z.boolean().optional(),
+    permissions: permissionPatch.optional(),
+    librariesAccessible: z.array(z.string().max(256)).max(1000).optional(),
+    itemTagsSelected: z.array(z.string().max(256)).max(1000).optional(),
+  })
+  .strict();
+export const createAccountSchema = editable.extend({
+  username: setupSchema.shape.username,
+  password: setupSchema.shape.password,
+});
+export const editAccountSchema = editable;
+function ensureEditable(actor: Account, target: Account) {
+  const current = requireAdministrator(actor);
+  if (target.type === "root" || (current.type !== "root" && target.type === "admin"))
+    throw new DomainError(403, "This account cannot be changed by this administrator");
+  return current;
+}
+function assertUnique(username: string, id = "") {
+  if (
+    database()
+      .prepare("SELECT id FROM users WHERE username_key = ? AND id != ?")
+      .get(username.toLowerCase(), id)
+  )
+    throw new DomainError(400, "Username already taken");
+}
+export async function createAccount(actor: Account, input: z.infer<typeof createAccountSchema>) {
+  requireAdministrator(actor);
+  const encoded = await hashPassword(input.password);
+  return transaction((db) => {
+    const current = requireAdministrator(actor);
+    const type = input.type ?? "user";
+    if (type === "admin" && current.type !== "root") throw new DomainError(403, "Owner required");
+    assertUnique(input.username);
+    const id = randomUUID();
+    const defaults = {
+      download: true,
+      update: false,
+      delete: false,
+      upload: false,
+      accessExplicitContent: false,
+      accessAllLibraries: true,
+      accessAllTags: true,
+      selectedTagsNotAccessible: false,
+    };
+    db.prepare(`INSERT INTO users(id, username, username_key, password_hash, type, active, permissions, libraries, tags, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+      id,
+      input.username,
+      input.username.toLowerCase(),
+      encoded,
+      type,
+      input.isActive === false ? 0 : 1,
+      JSON.stringify({ ...defaults, ...input.permissions }),
+      JSON.stringify(input.librariesAccessible ?? []),
+      JSON.stringify(input.itemTagsSelected ?? []),
+      Date.now(),
+    );
+    return visibleUser(findAccount(id));
+  });
+}
+export async function editAccount(actor: Account, id: string, input: z.infer<typeof editAccountSchema>) {
+  ensureEditable(actor, findAccount(id));
+  const encoded = input.password ? await hashPassword(input.password) : null;
+  return transaction((db) => {
+    const target = findAccount(id);
+    const current = ensureEditable(actor, target);
+    if (input.type === "admin" && current.type !== "root") throw new DomainError(403, "Owner required");
+    const username = input.username ?? target.username;
+    assertUnique(username, id);
+    db.prepare(`UPDATE users SET username = ?, username_key = ?, password_hash = ?, type = ?, active = ?,
+      permissions = ?, libraries = ?, tags = ? WHERE id = ?`).run(
+      username,
+      username.toLowerCase(),
+      encoded ?? target.password_hash,
+      input.type ?? target.type,
+      input.isActive === undefined ? target.active : Number(input.isActive),
+      JSON.stringify({ ...permissions.parse(JSON.parse(target.permissions)), ...input.permissions }),
+      input.librariesAccessible ? JSON.stringify(input.librariesAccessible) : target.libraries,
+      input.itemTagsSelected ? JSON.stringify(input.itemTagsSelected) : target.tags,
+      id,
+    );
+    revokeSessions(id);
+    return visibleUser(findAccount(id));
+  });
+}
+export function removeAccount(actor: Account, id: string) {
+  transaction((db) => {
+    ensureEditable(actor, findAccount(id));
+    db.prepare("DELETE FROM users WHERE id = ?").run(id);
+  });
+}
+export function revokeAccount(actor: Account, id: string) {
+  const target = findAccount(id);
+  if (id !== actor.id) ensureEditable(actor, target);
+  revokeSessions(id);
+}
+export function canReadLibrary(actor: Account, libraryId: string) {
+  const policy = permissions.parse(JSON.parse(actor.permissions));
+  return (
+    policy.accessAllLibraries || z.array(z.string()).parse(JSON.parse(actor.libraries)).includes(libraryId)
+  );
+}
+export function canReadMedia(actor: Account, item: { libraryId: string; explicit: boolean; tags: string[] }) {
+  if (!canReadLibrary(actor, item.libraryId)) return false;
+  const policy = permissions.parse(JSON.parse(actor.permissions));
+  if (item.explicit && !policy.accessExplicitContent) return false;
+  if (policy.accessAllTags) return true;
+  const selected = z.array(z.string()).parse(JSON.parse(actor.tags));
+  const intersects = item.tags.some((tag) => selected.includes(tag));
+  return policy.selectedTagsNotAccessible ? !intersects : intersects;
 }

@@ -37,6 +37,14 @@ export function database() {
     CREATE INDEX IF NOT EXISTS auth_sessions_user ON auth_sessions(user_id);
     INSERT OR IGNORE INTO schema_version(version) VALUES (1);
   `);
+  const version = db.prepare("SELECT MAX(version) AS version FROM schema_version").get();
+  if (version && typeof version.version === "number" && version.version < 2) {
+    db.exec(`BEGIN IMMEDIATE;
+      ALTER TABLE users ADD COLUMN tags TEXT NOT NULL DEFAULT '[]';
+      CREATE TABLE login_attempts (key TEXT PRIMARY KEY, attempts INTEGER NOT NULL, expires_at INTEGER NOT NULL);
+      INSERT INTO schema_version(version) VALUES (2);
+      COMMIT;`);
+  }
   globalThis.leafwakeDatabase = db;
   return db;
 }
