@@ -29,7 +29,7 @@ export const listBatchSchema = z.object({
   books: z.array(id).max(10000).optional(),
   items: members.optional(),
 });
-const storedSchema = z.object({
+export const storedSchema = z.object({
   id,
   kind: z.enum(["collection", "playlist"]),
   libraryId: id,

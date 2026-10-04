@@ -5,7 +5,11 @@ import { itemFor, itemsFor, librariesFor } from "./catalog";
 import { realtimeLists } from "./lists";
 
 type Snapshot = { user: User; items: LibraryItem[]; lists: ReturnType<typeof realtimeLists> };
-type Change = { userId: string; itemId?: string } | { catalog: true } | { lists: true };
+type Change =
+  | { userId: string; itemId?: string }
+  | { catalog: true }
+  | { lists: true }
+  | { podcast: { name: string; itemId: string; data: unknown } };
 declare global {
   var leafwakeRealtimeSnapshot: ((token: string) => Snapshot) | undefined;
   var leafwakeRealtimeCheck: ((token: string) => void) | undefined;

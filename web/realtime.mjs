@@ -82,6 +82,17 @@ export function attachRealtime(server, isReady, path = "/socket.io") {
     }
   }
   globalThis.leafwakeRealtimeChanged = (change) => {
+    if (change?.podcast) {
+      for (const [socket, state] of clients) {
+        if (!state.token) continue;
+        try {
+          globalThis.leafwakeRealtimeItem(state.token, change.podcast.itemId);
+          socket.emit(change.podcast.name, change.podcast.data);
+        } catch {
+          /* Events contain no data for an inaccessible item. */
+        }
+      }
+    }
     if (change?.catalog) catalogDirty = true;
     if (change?.lists) listsDirty = true;
     if (change?.userId) usersDirty.add(change.userId);

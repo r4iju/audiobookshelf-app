@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { constants } from "node:fs";
 import { lstat, open, realpath } from "node:fs/promises";
 import { z } from "zod";
-import { playbackSessionSchema } from "@/lib/abs/schemas";
+import { audioTrackSchema, type LibraryItem, playbackSessionSchema } from "@/lib/abs/schemas";
 import { type Account, DomainError, findAccount, permissions } from "./accounts";
 import { findLibrary, itemFor, mountedPath, within } from "./catalog";
 import { database, progressGeneration, transaction } from "./data";
@@ -25,18 +25,51 @@ export const playSchema = z.object({
   forceDirectPlay: nativeFlag.optional(),
   forceTranscode: nativeFlag.optional(),
 });
-export function openPlayback(actor: Account, itemId: string, input: z.infer<typeof playSchema>) {
+export function playableMedia(item: LibraryItem, episodeId?: string | null) {
+  if (!episodeId) {
+    if (item.mediaType === "podcast") throw new DomainError(400, "Select a podcast episode");
+    return {
+      tracks: item.media.tracks ?? [],
+      duration: item.media.duration,
+      chapters: item.media.chapters,
+      title: item.media.metadata.title,
+      author: item.media.metadata.authorName,
+    };
+  }
+  const episode = item.media.episodes?.find((value) => value.id === episodeId);
+  if (!episode) throw new DomainError(404, "Episode not found");
+  const fileId = z.string().parse(episode.audioFile?.ino);
+  const track = audioTrackSchema.parse({
+    index: 1,
+    startOffset: 0,
+    duration: episode.duration,
+    contentUrl: `/api/items/${item.id}/file/${fileId}`,
+    mimeType: episode.audioFile?.mimeType,
+  });
+  return {
+    tracks: [track],
+    duration: episode.duration,
+    chapters: episode.chapters,
+    title: episode.title,
+    author: item.media.metadata.author ?? item.media.metadata.authorName,
+  };
+}
+export function openPlayback(
+  actor: Account,
+  itemId: string,
+  input: z.infer<typeof playSchema>,
+  episodeId?: string,
+) {
   const item = itemFor(actor, itemId);
-  if (item.isMissing || !item.media.tracks?.length) throw new DomainError(404, "Playable media not found");
+  const media = playableMedia(item, episodeId);
+  if (item.isMissing || !media.tracks.length) throw new DomainError(404, "Playable media not found");
   const transcode =
     input.forceTranscode ||
     (!input.forceDirectPlay &&
       input.supportedMimeTypes &&
-      item.media.tracks.some(
-        (track) => !track.mimeType || !input.supportedMimeTypes?.includes(track.mimeType),
-      ));
+      media.tracks.some((track) => !track.mimeType || !input.supportedMimeTypes?.includes(track.mimeType)));
   const sessionId = randomUUID();
-  if (transcode && (!item.media.duration || item.media.duration > 172800))
+  if (transcode && (!media.duration || media.duration > 172800))
     throw new DomainError(422, "Unsupported transcode duration");
   const now = Date.now();
   const session = playbackSessionSchema.parse({
@@ -46,26 +79,26 @@ export function openPlayback(actor: Account, itemId: string, input: z.infer<type
     mediaMetadata: item.media.metadata,
     deviceInfo: input.deviceInfo ?? {},
     libraryItemId: itemId,
-    episodeId: null,
+    episodeId: episodeId ?? null,
     mediaType: item.mediaType,
-    displayTitle: item.media.metadata.title,
-    displayAuthor: item.media.metadata.authorName,
-    duration: item.media.duration,
-    currentTime: progressFor(actor, itemId)?.currentTime ?? 0,
-    progressGeneration: progressGeneration(actor.id, itemId),
+    displayTitle: media.title,
+    displayAuthor: media.author,
+    duration: media.duration,
+    currentTime: progressFor(actor, itemId, episodeId)?.currentTime ?? 0,
+    progressGeneration: progressGeneration(actor.id, itemId, episodeId),
     playMethod: transcode ? 1 : 0,
-    chapters: item.media.chapters,
+    chapters: media.chapters,
     audioTracks: transcode
       ? [
           {
             index: 1,
             startOffset: 0,
-            duration: item.media.duration,
+            duration: media.duration,
             contentUrl: `/hls/${sessionId}/output.m3u8`,
             mimeType: "application/vnd.apple.mpegurl",
           },
         ]
-      : item.media.tracks,
+      : media.tracks,
     startedAt: now,
     updatedAt: now,
   });
@@ -85,7 +118,9 @@ export function sessionFor(actor: Account, id: string) {
     .get(id, actor.id, Date.now());
   if (!row) throw new DomainError(404, "Not found");
   itemFor(actor, z.string().parse(row.item_id));
-  return playbackSessionSchema.parse(JSON.parse(z.string().parse(row.content)));
+  const session = playbackSessionSchema.parse(JSON.parse(z.string().parse(row.content)));
+  playableMedia(itemFor(actor, session.libraryItemId), session.episodeId);
+  return session;
 }
 export function closePlayback(actor: Account, id: string) {
   sessionFor(actor, id);
