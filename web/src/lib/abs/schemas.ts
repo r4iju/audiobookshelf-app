@@ -217,6 +217,8 @@ export const libraryItemSchema = z.looseObject({
   addedAt: z.number().nullish(),
   updatedAt: z.number().nullish(),
   isMissing: z.boolean().nullish(),
+  historyOnly: z.boolean().optional(),
+  historicalTagsUnknown: z.boolean().optional(),
   isInvalid: z.boolean().nullish(),
   media: z.looseObject({
     metadata: bookMetadataSchema,

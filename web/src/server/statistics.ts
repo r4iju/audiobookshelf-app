@@ -152,7 +152,7 @@ export function serverYear(actor: Account, year: number) {
     archivedAuthors = new Set<string>();
   for (const row of database().prepare("SELECT id FROM catalog_items").iterate()) {
     const item = historyItem(current, z.string().parse(row.id));
-    if (item?.mediaType !== "book") continue;
+    if (item?.mediaType !== "book" || item.historyOnly) continue;
     books++;
     const date = item.addedAt ?? 0,
       isAdded = date >= from && date < to,

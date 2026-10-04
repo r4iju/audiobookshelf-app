@@ -16,7 +16,14 @@ import {
   librarySchema,
   mediaProgressSchema,
 } from "@/lib/abs/schemas";
-import { type Account, canReadLibrary, canReadMedia, DomainError, requireAdministrator } from "./accounts";
+import {
+  type Account,
+  canReadLibrary,
+  canReadMedia,
+  DomainError,
+  permissions,
+  requireAdministrator,
+} from "./accounts";
 import {
   catalogChanged,
   database,
@@ -202,6 +209,13 @@ function itemRow(row: unknown) {
   return libraryItemSchema.parse(JSON.parse(z.object({ content: z.string() }).parse(row).content));
 }
 function allowed(actor: Account, item: LibraryItem, history = false) {
+  if (!history && item.historyOnly) return false;
+  if (
+    history &&
+    item.historicalTagsUnknown &&
+    !permissions.parse(JSON.parse(actor.permissions)).accessAllTags
+  )
+    return false;
   if (!history && database().prepare("SELECT item_id FROM retired_items WHERE item_id=?").get(item.id))
     return false;
   return canReadMedia(actor, {
