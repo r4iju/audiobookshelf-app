@@ -20,6 +20,18 @@ import {
   revokeAccount,
   setupSchema,
 } from "./accounts";
+import {
+  createLibrary,
+  createLibrarySchema,
+  filterData,
+  findLibrary,
+  itemFor,
+  itemsFor,
+  librariesFor,
+  pagedItems,
+  scanHistory,
+  scanLibrary,
+} from "./catalog";
 import { database, initialized, setupKey } from "./data";
 
 const MAX_BODY = 16_384;
@@ -152,7 +164,47 @@ export async function api(request: Request) {
     if (path === "/api/me" && request.method === "GET") return json(accountResponse(user));
     if (path === "/api/authorize" && request.method === "POST")
       return json({ user: accountResponse(user), ereaderDevices: [] });
-    if (path === "/api/libraries" && request.method === "GET") return json({ libraries: [] });
+    if (path === "/api/libraries") {
+      if (request.method === "GET") return json({ libraries: librariesFor(user) });
+      if (request.method === "POST")
+        return json(await createLibrary(user, createLibrarySchema.parse(await body(request))));
+    }
+    const libraryRoute = path.match(/^\/api\/libraries\/([^/]+)(?:\/([^/]+))?$/);
+    if (libraryRoute) {
+      const id = z.string().parse(libraryRoute[1]);
+      const action = libraryRoute[2];
+      if (action === "scan" && request.method === "POST") {
+        sameOrigin(request);
+        return json(await scanLibrary(user, id));
+      }
+      if (action === "scans" && request.method === "GET") return json({ scans: scanHistory(user, id) });
+      if (request.method === "GET") {
+        const items = itemsFor(user, id);
+        if (!action)
+          return json({
+            library: findLibrary(id),
+            ...(new URL(request.url).searchParams.get("include")?.split(",").includes("filterdata")
+              ? { filterdata: filterData(items) }
+              : {}),
+            issues: items.filter((item) => item.isMissing || item.isInvalid).length,
+            numUserPlaylists: 0,
+          });
+        if (action === "items") return json(pagedItems(user, id, new URL(request.url).searchParams));
+        if (action === "personalized")
+          return json([
+            {
+              id: "recently-added",
+              label: "Recently added",
+              labelStringKey: "LabelRecentlyAdded",
+              type: "book",
+              entities: items.slice(-20).reverse(),
+            },
+          ]);
+        if (action === "filterdata") return json(filterData(items));
+      }
+    }
+    const itemRoute = path.match(/^\/api\/items\/([^/]+)$/);
+    if (itemRoute && request.method === "GET") return json(itemFor(user, z.string().parse(itemRoute[1])));
     throw new DomainError(404, "Not found");
   });
 }
