@@ -41,7 +41,7 @@ const fileSchema = z.object({
   metadata: z.object({
     filename: z.string().min(1).max(4096),
     ext: z.string().max(32),
-    size: z.number().nonnegative(),
+    size: z.number().nonnegative().nullish(),
     path: z.string().optional(),
     relPath: z.string().optional(),
   }),
@@ -53,6 +53,7 @@ const fileSchema = z.object({
   index: z.number().optional(),
   exclude: z.boolean().optional(),
 });
+const missingFileSchema = fileSchema.omit({ ino: true }).extend({ ino: id.nullish() });
 const publicMetadataSchema = bookMetadataSchema.strip().extend({
   authors: z.array(z.object({ id, name: z.string() })).nullish(),
   series: z
@@ -236,6 +237,7 @@ async function inventory(input: Input, authorize: () => Account) {
     const series = new Map((rows.get("series") ?? []).map((row) => [id.parse(row.id), row]));
     const files: { id: string; itemId: string; path: string; content: unknown }[] = [];
     const items: z.infer<typeof libraryItemSchema>[] = [];
+    const historical = new Map<string, { userId: string; removedAt: number }>();
     const paths = new Map<string, string>(),
       mediaToItem = new Map<string, { itemId: string; episodeId: string }>();
     for (const raw of rows.get("libraryItems") ?? []) {
@@ -267,14 +269,28 @@ async function inventory(input: Input, authorize: () => Account) {
             throw Error("Item path is not regular");
           if ((await realpath(path)) !== path) throw Error("Item links are unsupported");
         }
-        const sourceFiles = jsonArray(item.libraryFiles).map((value) => fileSchema.parse(value));
+        function sourceFile(value: unknown) {
+          if (!item.isMissing) return fileSchema.parse(value);
+          const missing = missingFileSchema.parse(value);
+          return fileSchema.parse({
+            ...missing,
+            ino:
+              missing.ino ??
+              createHash("sha256")
+                .update(
+                  `missing:${item.id}:${missing.metadata.path ?? missing.metadata.relPath ?? missing.metadata.filename}`,
+                )
+                .digest("hex"),
+          });
+        }
+        const sourceFiles = jsonArray(item.libraryFiles).map(sourceFile);
         const media = item.mediaType === "book" ? books.get(item.mediaId) : podcasts.get(item.mediaId);
         if (!media) throw Error("Media identity is missing");
-        const mediaFiles = jsonArray(media.audioFiles).map((value) => fileSchema.parse(value));
-        if (media.ebookFile) mediaFiles.push(fileSchema.parse(JSON.parse(json.parse(media.ebookFile))));
+        const mediaFiles = jsonArray(media.audioFiles).map(sourceFile);
+        if (media.ebookFile) mediaFiles.push(sourceFile(JSON.parse(json.parse(media.ebookFile))));
         for (const episode of rows.get("podcastEpisodes") ?? [])
           if (episode.podcastId === item.mediaId && episode.audioFile)
-            mediaFiles.push(fileSchema.parse(JSON.parse(json.parse(episode.audioFile))));
+            mediaFiles.push(sourceFile(JSON.parse(json.parse(episode.audioFile))));
         const normalized: z.infer<typeof fileSchema>[] = [];
         for (const sourceFile of sourceFiles) {
           const details = mediaFiles.find((value) => value.ino === sourceFile.ino);
@@ -339,7 +355,7 @@ async function inventory(input: Input, authorize: () => Account) {
           });
         let offset = 0;
         const tracks = jsonArray(media.audioFiles)
-          .map((value) => fileSchema.parse(value))
+          .map(sourceFile)
           .filter((file) => !file.exclude)
           .map((file) => {
             const stored = normalized.find((f) => f.ino === file.ino);
@@ -355,7 +371,7 @@ async function inventory(input: Input, authorize: () => Account) {
             offset += duration;
             return track;
           });
-        const ebook = media.ebookFile ? fileSchema.parse(JSON.parse(json.parse(media.ebookFile))) : null;
+        const ebook = media.ebookFile ? sourceFile(JSON.parse(json.parse(media.ebookFile))) : null;
         if (ebook && !normalized.some((file) => file.ino === ebook.ino))
           throw Error("Ebook has no source association");
         const episodes = (rows.get("podcastEpisodes") ?? [])
@@ -556,14 +572,56 @@ async function inventory(input: Input, authorize: () => Account) {
             mediaItemType: z.enum(["book", "podcastEpisode"]),
             duration: seconds,
             currentTime: seconds,
-            timeListening: seconds,
+            timeListening: seconds.nullable(),
             startTime: seconds,
             createdAt: date,
             updatedAt: date,
           })
           .parse(raw);
-        const target = mediaToItem.get(value.mediaItemId),
-          extra = jsonObject(raw.extraData);
+        let target = mediaToItem.get(value.mediaItemId);
+        const extra = jsonObject(raw.extraData);
+        const metadata = publicMetadataSchema.parse(jsonObject(raw.mediaMetadata));
+        if (
+          !target &&
+          value.mediaItemType === "book" &&
+          !(rows.get("libraryItems") ?? []).some((item) => item.mediaId === value.mediaItemId)
+        ) {
+          const originalItemId = id.parse(extra.libraryItemId);
+          if (!libraries.some((library) => library.id === value.libraryId && library.mediaType === "book"))
+            throw Error();
+          const existing = items.find((item) => item.id === originalItemId);
+          if (existing && (existing.media.id !== value.mediaItemId || existing.libraryId !== value.libraryId))
+            throw Error("Conflicting historical item identity");
+          if (!existing) {
+            const path = `history:${originalItemId}`;
+            items.push(
+              libraryItemSchema.parse({
+                id: originalItemId,
+                libraryId: value.libraryId,
+                mediaType: "book",
+                path,
+                historyOnly: true,
+                historicalTagsUnknown: true,
+                isMissing: true,
+                addedAt: value.createdAt,
+                updatedAt: value.updatedAt,
+                libraryFiles: [],
+                media: {
+                  id: value.mediaItemId,
+                  metadata: { ...metadata, explicit: true },
+                  duration: value.duration,
+                  tracks: [],
+                  chapters: [],
+                  tags: [],
+                },
+              }),
+            );
+            paths.set(originalItemId, path);
+            historical.set(originalItemId, { userId: value.userId, removedAt: Date.now() });
+          }
+          target = { itemId: originalItemId, episodeId: "" };
+          mediaToItem.set(value.mediaItemId, target);
+        }
         if (
           !target ||
           !users.some((user) => user.id === value.userId) ||
@@ -580,7 +638,8 @@ async function inventory(input: Input, authorize: () => Account) {
             userId: value.userId,
             duration: value.duration,
             currentTime: value.currentTime,
-            timeListening: value.timeListening,
+            timeListening: value.timeListening ?? 0,
+            ...(value.timeListening === null ? { timeListeningUnavailable: true } : {}),
             startTime: value.startTime,
             libraryId: value.libraryId,
             mediaType: value.mediaItemType,
@@ -589,7 +648,7 @@ async function inventory(input: Input, authorize: () => Account) {
             startedAt: value.createdAt,
             updatedAt: value.updatedAt,
             progressGeneration: 0,
-            mediaMetadata: publicMetadataSchema.parse(jsonObject(raw.mediaMetadata)),
+            mediaMetadata: metadata,
             chapters: jsonArray(raw.chapters).map((value) => chapterSchema.strip().parse(value)),
             legacyArchive: true,
           },
@@ -704,7 +763,7 @@ async function inventory(input: Input, authorize: () => Account) {
     }
     const counts = {
       libraries: libraries.length,
-      items: items.length,
+      items: items.filter((item) => !item.historyOnly).length,
       files: files.length,
       progress: progress.length,
       sessions: sessions.length,
@@ -725,9 +784,24 @@ async function inventory(input: Input, authorize: () => Account) {
       notices: [
         "All source rows are retained privately in the migration archive. Listed fields include archival values; settings, lists and external-auth behavior need their migration stages.",
         "Keep the original snapshot, media and installation for rollback. Media files are never moved or changed by import.",
+        "Missing files without an original inode receive a stable logical identifier; their unknown size remains unknown and they stay unplayable.",
+        "Deleted-book listening history retains original identities in unplayable history-only records. Unknown historical tags and the deleted item's authoritative explicit-content policy fail closed under account restrictions; original session metadata remains archived.",
+        "A null source listening measurement retains timeListeningUnavailable and contributes zero to measured totals; the original source row remains archived.",
       ],
     });
-    return { report, users, libraries, items, files, paths, progress, sessions, bookmarks, archive };
+    return {
+      report,
+      users,
+      libraries,
+      items,
+      historical,
+      files,
+      paths,
+      progress,
+      sessions,
+      bookmarks,
+      archive,
+    };
   } finally {
     source.close();
   }
@@ -768,6 +842,8 @@ export async function commitMedia(input: z.infer<typeof mediaCommitSchema>, auth
         z.string().parse(loaded.paths.get(item.id)),
         JSON.stringify(item),
       );
+    for (const [itemId, value] of loaded.historical)
+      db.prepare("INSERT INTO retired_items VALUES(?,?,?)").run(itemId, value.userId, value.removedAt);
     for (const item of loaded.items)
       db.prepare("INSERT INTO metadata_overrides VALUES(?,?)").run(
         item.id,

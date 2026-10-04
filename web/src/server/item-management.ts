@@ -105,6 +105,8 @@ export function restoreCatalogItem(actor: Account, id: string) {
       row = db.prepare("SELECT content FROM catalog_items WHERE id=?").get(id);
     if (!row) throw new DomainError(404, "Not found");
     const item = libraryItemSchema.parse(JSON.parse(z.string().parse(row.content)));
+    if (item.historyOnly)
+      throw new DomainError(409, "Deleted source history cannot be restored as a catalog item");
     if (
       !canReadMedia(current, {
         libraryId: item.libraryId,
