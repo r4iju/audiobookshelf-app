@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, createHmac, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 import { compare } from "bcryptjs";
 import { z } from "zod";
+import { bookmarksFor } from "./bookmarks";
 import { database, initialized, setupKey, tokenSigningKey, transaction } from "./data";
 import { allProgress } from "./progress";
 
@@ -124,7 +125,7 @@ function visibleUser(user: Account) {
     permissions: permissions.parse(JSON.parse(user.permissions)),
     librariesAccessible: z.array(z.string()).parse(JSON.parse(user.libraries)),
     mediaProgress: allProgress(user),
-    bookmarks: [],
+    bookmarks: bookmarksFor(user),
     seriesHideFromContinueListening: [],
     itemTagsSelected: z.array(z.string()).parse(JSON.parse(user.tags)),
     isActive: Boolean(user.active),

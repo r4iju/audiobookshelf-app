@@ -35,6 +35,7 @@ import {
   scanLibrary,
 } from "./catalog";
 import { database, initialized, setupKey } from "./data";
+import { commitMedia, inspectMedia, mediaCommitSchema, mediaInspectSchema } from "./media-migration";
 import {
   commitImport,
   commitImportSchema,
@@ -169,6 +170,12 @@ export async function api(request: Request) {
     const fileRoute = path.match(/^\/api\/items\/([^/]+)\/file\/([^/]+)(?:\/(download))?$/);
     const token = bearer(request) ?? (fileRoute ? new URL(request.url).searchParams.get("token") : null);
     const user = authenticate(token);
+    if (path === "/api/admin/migrations/media/inspect" && request.method === "POST")
+      return json(
+        await inspectMedia(mediaInspectSchema.parse(await body(request)), () => authenticate(token)),
+      );
+    if (path === "/api/admin/migrations/media" && request.method === "POST")
+      return json(await commitMedia(mediaCommitSchema.parse(await body(request)), () => authenticate(token)));
     if (path === "/api/admin/backups") {
       if (request.method === "GET") return json(listBackups(user));
       if (request.method === "POST") {
