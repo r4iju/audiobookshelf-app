@@ -218,6 +218,7 @@ object Browser {
 
 /** Scrolls a lazy container until [tag] is composed, letting pagination load as a person would. */
 fun ComposeTestRule.scrollTo(container: String, tag: String, timeoutMs: Long = 30_000) {
+    waitForTag(container, timeoutMs)
     val deadline = System.currentTimeMillis() + timeoutMs
     // Lazy containers can scroll to any already-loaded key directly, in either direction.
     if (runCatching { onNodeWithTag(container).performScrollToNode(hasTestTag(tag)) }.isSuccess) return
