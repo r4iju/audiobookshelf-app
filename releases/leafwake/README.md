@@ -1,8 +1,8 @@
 # Leafwake release workspace
 
-This directory holds the public release preparation. No binary is cleared for distribution yet. The native applications, their internal preview identifiers and installed data remain separate from the proposed public product.
+The unified backend/browser prerelease is published with its matching source and build materials. The independent Cast-free Android beta is available to the selected internal Play testers; Apple distribution remains blocked on actual rights/terms and its app record. See [RELEASE-STATUS.md](RELEASE-STATUS.md) for current artifact identities, evidence and external gates. The candidate notes below record earlier preparation and are superseded by that status.
 
-## Current gates
+## Historical preparation gates (superseded by RELEASE-STATUS.md)
 
 | Channel | Status |
 | --- | --- |
