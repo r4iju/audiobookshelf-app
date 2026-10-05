@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create Leafwake's local Android signing identity without overwriting existing keys."""
+"""Create Audiobook Loft's local Android signing identity without overwriting existing keys."""
 import json
 import os
 from pathlib import Path

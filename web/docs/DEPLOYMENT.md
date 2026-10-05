@@ -1,4 +1,4 @@
-# Leafwake deployment
+# Audiobook Loft deployment
 
 One image serves the browser, REST API, Socket.IO, persistent jobs and bounded FFmpeg work on port 3000. The original backend and browser are replaced. The image runs as an unprivileged user. Keep `/data` on a persistent private volume, and mount original media and import snapshots read-only.
 

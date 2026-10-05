@@ -1,6 +1,6 @@
 # Compatibility contract
 
-Leafwake implements the native and browser REST, media and Socket.IO contracts in its new backend. The active implementation is `src/server/` and the custom listener is `server.mjs`. Historical Audiobookshelf behavior is a compatibility reference, not a deployment dependency. Acceptance evidence is recorded in [STATE.md](../../docs/fullstack/STATE.md).
+Audiobook Loft implements the native and browser REST, media and Socket.IO contracts in its new backend. The active implementation is `src/server/` and the custom listener is `server.mjs`. Historical Audiobookshelf behavior is a compatibility reference, not a deployment dependency. Acceptance evidence is recorded in [STATE.md](../../docs/fullstack/STATE.md).
 
 Responses are parsed with zod schemas in `src/lib/abs/schemas.ts` and `src/lib/abs/feeds.ts`. Objects are loose, so
 fields a later server adds are ignored. A missing required field fails as "Unexpected server response" rather than
@@ -29,7 +29,7 @@ limit). A `text/plain` error body is shown as the server's own explanation, such
 4. The client checks `state`, then calls `GET /auth/openid/callback?state&code&code_verifier` with the cookie
    (same origin only) and reads the same payload as `/login`.
 
-Leafwake validates issuer discovery, signed tokens, PKCE, nonce and exact callback allowlists. Public provider returns require HTTPS; loopback HTTP is accepted for development. Identity is keyed by issuer and subject, never linked by an unverified email. The original account IDs are preserved by validated migration. Refused and forged flows never create a signed-in session.
+Audiobook Loft validates issuer discovery, signed tokens, PKCE, nonce and exact callback allowlists. Public provider returns require HTTPS; loopback HTTP is accepted for development. Identity is keyed by issuer and subject, never linked by an unverified email. The original account IDs are preserved by validated migration. Refused and forged flows never create a signed-in session.
 
 ### Cross-origin use
 
@@ -141,17 +141,11 @@ again. It listens for:
 - `episode_added` and the `episode_download_*` events;
 - `collection_*` and `playlist_*` events.
 
-## Alignment needed after a server release
+## Verifying a product update
 
-Before a new server version reaches the owner's server, for this client and for the native apps, which call the
-same endpoints:
+The browser/backend and native clients consume these shared contracts. Before deploying an update:
 
-1. Change the image digest in `qa/server.mjs`. Run `node qa/server.mjs up --fresh` and the full suite
-   (`npm run lint && npm run typecheck && npm test && npm run e2e`).
-2. Check the release notes against each section above. These areas have changed between releases before: token
-   fields in `/login`, the OpenID redirect-URI check and error reporting, feed ids, and the progress `updatedAt`
-   rule.
-3. If the redirect-URI check starts accepting ports, port-addressed deployments can use OpenID. Update
-   [DEPLOYMENT.md](DEPLOYMENT.md).
-4. Report any change in a shared endpoint to the native app owners. `docs/modernization/SERVER-COMPATIBILITY.md` is
-   the shared record.
+1. Build the exact committed product image. Select it with `LEAFWAKE_QA_IMAGE=<built-tag>`; the QA runner consumes a local image rather than pulling an original server. Run `npm run lint`, `npm run typecheck`, `npm test` and `npm run e2e` from `web/` against synthetic data.
+2. Run the affected Android journeys with `android-native/scripts/verify-real-server.sh` against the same replacement image. Use the verification commands in the Apple and tvOS READMEs for those platforms, and record which checks exercised the exact replacement image. Check login/refresh fields, OpenID callback allowlists, media access, feed IDs, progress reset generations and realtime changes against the native clients.
+3. Verify the production image on the configured root or build-time subpath, including browser, API, media and Socket.IO. OpenID supports exact port-addressed callbacks; public callbacks require HTTPS. Follow [DEPLOYMENT.md](DEPLOYMENT.md).
+4. Record exact source/image identities, observed outcomes and unresolved gates in [the current release status](../../releases/leafwake/RELEASE-STATUS.md). The [full-stack compatibility matrix](../../docs/fullstack/COMPATIBILITY.md) is the shared replacement contract; older modernization reports remain historical evidence.

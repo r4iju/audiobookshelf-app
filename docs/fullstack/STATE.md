@@ -1,6 +1,6 @@
 # Replacement implementation status
 
-The authoritative scope is SPEC.md and GitHub issue #150. The backend/browser replacement and active legacy removal have been implemented through #173. The unified image and matching sources are published as 1.0.0-rc.4; the owner cutover and final rc.4 update are verified after NAS recovery. Final native compatibility passed; physical assistive acceptance remains in #174 and store work in #176–177. [RELEASE-STATUS.md](../../releases/leafwake/RELEASE-STATUS.md) records current identities, evidence and external gates. The notes below are historical evidence for each reviewed slice. A local fixture is not a live public deployment.
+The authoritative scope is SPEC.md and GitHub issue #150. The backend/browser replacement and active legacy removal have been implemented through #173. The unified image and matching sources are published under the Audiobook Loft name; the owner cutover and current rc.6 update are verified. Final native compatibility passed; physical assistive acceptance remains in #174 and store work in #176–177. [RELEASE-STATUS.md](../../releases/leafwake/RELEASE-STATUS.md) records current identities, evidence and external gates. The notes below are historical evidence for each reviewed slice. A local fixture is not a live public deployment.
 
 ## #151: production bootstrap and persistent sign-in
 

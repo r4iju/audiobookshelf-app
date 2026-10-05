@@ -18,7 +18,7 @@ import java.net.URL
 import kotlin.math.abs
 
 /**
- * Main journeys against the throwaway Leafwake product image with a synthetic library and
+ * Main journeys against the throwaway Audiobook Loft product image with a synthetic library and
  * synthetic accounts (`scripts/verify-real-server.sh`). Skipped unless that script passes the server's address.
  */
 @RunWith(AndroidJUnit4::class)

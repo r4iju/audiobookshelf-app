@@ -1,5 +1,7 @@
 # Licensing permission request
 
+This preserves the original request posted under the earlier Leafwake name. The current public name is Audiobook Loft; the [upstream discussion](https://github.com/advplyr/audiobookshelf-app/discussions/2051) and [release status](RELEASE-STATUS.md) are authoritative for replies and distribution gates.
+
 Posted October 4, 2026 by the owner account `r4iju` at [upstream discussion #2051](https://github.com/advplyr/audiobookshelf-app/discussions/2051). The owner authorized seeking this permission. **No approval has been received.**
 
 I'm preparing **Leafwake**, an independently branded native client in [my Audiobookshelf modernization fork](https://github.com/r4iju/audiobookshelf-app). I want to preserve the inherited GPLv3 terms, copyright notices, recipients' rights, and complete corresponding-source access.

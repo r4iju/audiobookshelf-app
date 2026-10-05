@@ -1,6 +1,6 @@
-# Leafwake replacement compatibility
+# Audiobook Loft replacement compatibility
 
-The supported release target is the Leafwake 1.0.0-rc.1 unified backend/browser and the independently branded Cast-free Android beta. This replaces the active Audiobookshelf backend as well as the browser. It is not a proxy to an original server. The inherited native clients and migration readers retain their licenses.
+The supported architecture is the Audiobook Loft unified backend/browser image and the independently branded Cast-free Android beta. Current image and native artifact identities, verified journeys and remaining gates are recorded in [RELEASE-STATUS.md](../../releases/leafwake/RELEASE-STATUS.md). This replaces the active Audiobookshelf backend as well as the browser. It is not a proxy to an original server. The inherited native clients and migration readers retain their licenses.
 
 ## Verified contracts
 

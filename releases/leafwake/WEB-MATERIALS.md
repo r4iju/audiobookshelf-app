@@ -6,7 +6,7 @@ The release manifest records the exact Git revision, architecture, image ID, Doc
 
 ## Build inputs
 
-- `git archive <revision>` supplies Leafwake source, native source, build recipes, checked comic decoder assets, migration readers and licenses.
+- `git archive <revision>` supplies Audiobook Loft source, native source, build recipes, checked comic decoder assets, migration readers and licenses.
 - `node releases/leafwake/prepare-web-materials.mjs <output>` downloads the lockfile's exact npm archives and verifies their integrity. Run it again with the decoder build's bundler lockfile as the second argument. The output manifests identify every archive.
 - Rebuild the comic worker with `web/vendor/libarchive/Dockerfile`. Its output includes the upstream archive descriptors, decoder hashes, bundler lock and Emscripten zlib/bzip2 port sources. Retain the three input source archives identified in `inputs.json` as well as these outputs.
 - Retain the exact Node source and official SHA256 manifest, plus the exact Next.js source tag. The npm package archives also contain Next's distributed compiled code and notices.

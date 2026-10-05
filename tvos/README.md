@@ -1,8 +1,8 @@
-# Audiobookshelf for Apple TV
+# Audiobook Loft for Apple TV
 
-Native SwiftUI streaming client for tvOS 17 or later. The iOS/Android app and its existing local changes are separate from this target.
+Native SwiftUI streaming client for tvOS 17 or later. The TV target shares Apple API/playback code with the iPhone/iPad client and connects to the unified Audiobook Loft backend or a compatible Audiobookshelf server. Stable Xcode target names and preview signing identities retain their technical names. Current architecture and release gates are in [the full-stack docs](../docs/fullstack/STATE.md) and [RELEASE-STATUS.md](../releases/leafwake/RELEASE-STATUS.md).
 
-## Install tomorrow
+## Local installation
 
 1. Keep the Mac and Apple TV on the same network.
 2. On the TV, open **Settings → Remotes and Devices → Remote App and Devices**.
@@ -15,7 +15,7 @@ Native SwiftUI streaming client for tvOS 17 or later. The iOS/Android app and it
 
 The command identifies the paired physical Apple TV, registers its UDID with your existing developer account, downloads a tvOS development profile using the existing App Store Connect API key, signs the release build, verifies the signature, installs it, and launches it. It does not need an Apple ID added to Xcode or a TestFlight upload. If more than one Apple TV is paired, pass the TV name or UDID as the first argument.
 
-Sign in on the TV with your Audiobookshelf server address, username, and password. An iPhone's Apple TV Remote keyboard makes entry easier. HTTPS, local HTTP addresses, and reverse-proxy subpaths are supported. Passwords are not persisted; access and refresh tokens are kept in Keychain.
+Sign in on the TV with your Audiobook Loft or compatible Audiobookshelf server address, username, and password. An iPhone's Apple TV Remote keyboard makes entry easier. HTTPS, local HTTP addresses, and reverse-proxy subpaths are supported. Passwords are not persisted; access and refresh tokens are kept in Keychain.
 
 Apple's [pairing instructions](https://help.apple.com/xcode/mac/current/en.lproj/devbc48d1bad.html) describe the required TV-side step. The bundled project can also be opened directly as `tvos/AudiobookshelfTV.xcodeproj`.
 

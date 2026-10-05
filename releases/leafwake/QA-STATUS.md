@@ -6,7 +6,7 @@ This is preparation evidence, not public release clearance.
 
 ## Stock server
 
-The Cast-free Android variant was exercised on an API 36 emulator against the isolated, unmodified Audiobookshelf 2.30.0 image pinned in `android-native/scripts/verify-real-server.sh`. Synthetic accounts/media only; the owner's server was not modified.
+The Cast-free Android variant was exercised on an API 36 emulator against the isolated, unmodified Audiobookshelf 2.30.0 image used by the historical version of `android-native/scripts/verify-real-server.sh`. Synthetic accounts/media only; the owner's server was not modified.
 
 The existing `RealServerJourney` assertions produced three passes and one failure:
 
