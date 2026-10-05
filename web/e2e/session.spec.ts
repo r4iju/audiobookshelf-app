@@ -1,6 +1,24 @@
 import { expect, test } from "@playwright/test";
 import { accounts, clearProgress, itemIdByTitle, serverApi, signIn } from "./qa";
 
+test("a rejected saved session on home offers recovery without a dead-end error", async ({ page }) => {
+  await signIn(page);
+  await page.evaluate(() => {
+    const key = "abs-web:v1:connections";
+    const registry = JSON.parse(localStorage.getItem(key) ?? "{}");
+    const active = registry.connections.find((entry: { id: string }) => entry.id === registry.activeId);
+    active.auth = { kind: "token", accessToken: "expired", refreshToken: "revoked" };
+    localStorage.setItem(key, JSON.stringify(registry));
+  });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1, name: "Sign in" })).toBeVisible();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
+  await expect(page.getByLabel("Username")).toHaveValue(accounts.user.username);
+  await page.getByLabel("Password").fill(accounts.user.password);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("navigation", { name: "Library" })).toBeVisible();
+});
+
 test("an ended session asks to sign in again and returns to the same page", async ({ page }) => {
   await signIn(page);
   const id = await itemIdByTitle("Salt and Signal");

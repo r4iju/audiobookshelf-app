@@ -10,6 +10,7 @@ import { useLibraries, useMe } from "@/lib/abs/queries";
 import * as registry from "@/lib/session/registry";
 import { useSession } from "@/lib/session/store";
 import { errorMessage } from "./errors";
+import { SessionRecovery } from "./session-recovery";
 
 export function RootRedirect() {
   const session = useSession();
@@ -22,6 +23,7 @@ export function RootRedirect() {
   }, [session.phase, router]);
 
   if (session.phase !== "signed-in") return <Spinner label={t("MessageLoading")} />;
+  if (session.reauthRequired) return <SessionRecovery connection={session.connection} next="/" />;
   return <LibraryRedirect connectionId={session.connection.id} />;
 }
 
