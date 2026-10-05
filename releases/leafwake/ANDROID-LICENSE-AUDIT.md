@@ -1,4 +1,6 @@
-# Leafwake Android distribution audit
+# Historical Android distribution audit, October 4, 2026
+
+This audit describes the earlier Cast-enabled preview under the Leafwake working name. The public product is now Audiobook Loft; its Cast-free beta 2 artifact verification and outstanding permission gates are recorded in [RELEASE-STATUS.md](RELEASE-STATUS.md). The SDK/distribution concerns below remain relevant to any future Cast-enabled build.
 
 2026-10-04. Bounded inspection of `android-native` Gradle files, Kotlin/manifest and locally cached published POMs/AARs, plus current primary distribution terms. No repository changes, credential reads, external messages or final APK inspection. Findings concern the current Cast-enabled native code; re-audit the exact final release graph and packaged files after changes.
 

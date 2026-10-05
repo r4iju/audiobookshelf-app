@@ -18,6 +18,6 @@ error copy and initial server-rendered English remain outside this table increme
 Administration and setup additions in `../pending-english.json` have English wording only.
 They use the runtime's English fallback rather than duplicated locale drafts. Validation reports them separately
 as `pendingEnglishFallbacks`; they are not translated coverage. Add reviewed locale wording before removing a
-key from this registry. Leafwake is the independent product name in every locale. Existing translations remain.
+key from this registry. Audiobook Loft is the independent product name in every locale. Existing translations remain.
 The initial public release is en-GB. Physical assistive-technology and native-speaker acceptance remain distinct
 from catalog structure, browser keyboard, responsive layout and reduced-motion checks.

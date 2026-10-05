@@ -1,4 +1,4 @@
-// Runs the Leafwake product image on one listener with a private synthetic volume and read-only library.
+// Runs the Audiobook Loft product image on one listener with a private synthetic volume and read-only library.
 // QA fixtures use the same image as bounded local helpers; no original backend is launched.
 // node qa/server.mjs up [--fresh] | down
 import { execFileSync } from "node:child_process";

@@ -18,13 +18,13 @@ The developer receives no automatic telemetry or library data. The app neverthel
 
 User-directed transfers to a chosen server or chosen sharing destination are disclosed in the policy. Their sharing classification must follow the actual Console definitions and the user-initiated-transfer exception. Do not claim advertising, fraud analysis, developer analytics, sale, or automatic crash reporting. Do not claim all traffic is encrypted: user-selected plain HTTP servers are supported. Local diagnostics stay on the device unless the user chooses to share them.
 
-Leafwake does not create a developer-hosted account. Users authenticate to an existing self-hosted account. Server-side deletion is controlled by that server's administrator; local deletion instructions are in the privacy policy. Do not promise a developer deletion service for data the developer does not possess.
+Audiobook Loft does not create a developer-hosted account. Users authenticate to an existing self-hosted account. Server-side deletion is controlled by that server's administrator; local deletion instructions are in the privacy policy. Do not promise a developer deletion service for data the developer does not possess.
 
 Definitions: [Google Play Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en-GB). Recheck the final form against the uploaded binary and all distributed versions.
 
 ## Review and account gates
 
-Use only synthetic media in screenshots and a reachable review server. A loopback QA server is not review access. The owner cutover reached Leafwake at `audiobookshelf.nginx.lan`, and the NAS has recovered. The existing public hostname has restrictive access rules; a separate globally reachable synthetic review server remains necessary. Do not supply private owner credentials to reviewers.
+Use only synthetic media in screenshots and a reachable review server. A loopback QA server is not review access. The owner cutover reached Audiobook Loft at `audiobookshelf.nginx.lan`, and the NAS has recovered. The existing public hostname has restrictive access rules; a separate globally reachable synthetic review server remains necessary. Do not supply private owner credentials to reviewers.
 
 The personal Play account requires12 opted-in closed testers for14 continuous days before applying for production access. Upload, internal testing, closed testing, production application, review approval and public availability are separate states. Record each actual Console/API result. No tester enrollment or elapsed testing period is inferred from an uploaded artifact.
 

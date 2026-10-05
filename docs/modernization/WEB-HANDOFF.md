@@ -1,7 +1,8 @@
-# Next.js browser client handoff
+# Historical Next.js browser-only handoff
 
-Current bounded finishing results and remaining rows: [WEB-CURRENT-READINESS.md](WEB-CURRENT-READINESS.md).
-The historical source/check/deployment reports below remain preserved.
+This report predates the full-stack replacement. The active `web/` package now contains both the Next.js browser and TypeScript backend in one image. The Nuxt/Capacitor runtime and original backend launch/patch dependencies are removed. Use [web/README.md](../../web/README.md), [full-stack compatibility](../fullstack/COMPATIBILITY.md) and [current release status](../../releases/leafwake/RELEASE-STATUS.md). Earlier branch, command, original-server and acceptance references below describe their recorded historical commits only.
+
+## Earlier browser-only implementation
 
 Branch `fork/nextjs-client`, based on `origin/fork/native-tv` at `39ad6af65715957c585e7b0f0d20238ebe60ee8f`. The
 client is the isolated `web/` package. It does not touch the legacy Nuxt app, the native apps, the server, or the

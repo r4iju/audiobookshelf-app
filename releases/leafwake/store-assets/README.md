@@ -1,6 +1,6 @@
 # Audiobook Loft Android store assets
 
-`icon.svg` reproduces the original Leafwake vector packaged in the public Android app. `feature-graphic.svg` is an original graphic; PNG outputs meet Play dimensions (512 square and 1024 by 500).
+`icon.svg` reproduces the original independent product vector packaged in the public Android app. `feature-graphic.svg` is an original graphic; PNG outputs meet Play dimensions (512 square and 1024 by 500).
 
 Four 1080 by 1920 phone screenshots show the exact Cast-free Android release from source `f1dde807055e76ea60b2e9545b880ef5430699ba`, installed with the local QA signer. All media, accounts and progress shown are synthetic. Screenshots are unretouched captures with the emulator rendered at the required aspect ratio. They cover the library, book details, player and podcast episodes. They do not demonstrate tablet or TV support.
 

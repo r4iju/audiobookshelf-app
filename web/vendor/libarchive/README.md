@@ -1,6 +1,6 @@
 # Comic decoder build materials
 
-The npm libarchive.js 2.0.2 decoder links OpenSSL 1.0.2s. Leafwake serves this independently rebuilt decoder without OpenSSL or Nettle. Password-encrypted comic archives are not a supported release feature. The unchanged public JavaScript client calls the rebuilt worker through Comlink.
+The npm libarchive.js 2.0.2 decoder links OpenSSL 1.0.2s. Audiobook Loft serves this independently rebuilt decoder without OpenSSL or Nettle. Password-encrypted comic archives are not a supported release feature. The unchanged public JavaScript client calls the rebuilt worker through Comlink.
 
 The build pins Emscripten 3.1.51 by image digest, libarchivejs commit `0989c1a6db20d030d793b1763e20d880068091bd`, libarchive 3.7.2, xz/liblzma 5.2.11 and source archive SHA256 values. Emscripten supplies zlib 1.2.13 and bzip2 1.0.6 port. Their full inputs and notices accompany the release. The worker targets the browser worker environment and replaces the retired Emscripten allocation helper with the exported UTF-8/malloc interface. Comlink 4.4.1 and esbuild 0.25.12 are pinned; the generated bundler lock and exact npm archives accompany the release.
 

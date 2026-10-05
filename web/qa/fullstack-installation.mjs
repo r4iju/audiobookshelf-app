@@ -58,7 +58,7 @@ if (process.env.LEAFWAKE_INSTALL_TEST_PHASE === "restart") {
     assert.equal(status.status, 200, "the image serves the replacement backend, not only a browser client");
     const before = await status.json();
     assert.equal(before.isInit, false);
-    assert.equal(before.app, "Leafwake");
+    assert.equal(before.app, "Audiobook Loft");
     const page = await call("/setup");
     assert.equal(page.status, 200);
     assert.match(await page.text(), /Create your owner account/);
