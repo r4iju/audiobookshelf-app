@@ -353,8 +353,9 @@ import UIKit
         do { try await seek(to: currentTime + amount, autoplay: wantsPlayback) }
         catch { failed(error) }
     }
-    func seek(to time: Double, autoplay: Bool) async throws {
+    func seek(to time: Double, autoplay: Bool, preservingPause: Bool = false) async throws {
         guard !closing, let session, session.position(at: time) != nil else { return }
+        if !preservingPause { pausedAt = nil }
         playbackIntent = UUID()
         wantsPlayback = autoplay && !needsSignIn
         let target = min(max(time.isFinite ? time : 0, 0), session.duration)
@@ -489,7 +490,7 @@ import UIKit
                 recoveryTarget = nil
                 guard api.credentials?.accessToken != token else { return playbackFailed() }
                 player.replaceCurrentItem(with: nil)
-                try await seek(to: position, autoplay: wantsPlayback)
+                try await seek(to: position, autoplay: wantsPlayback, preservingPause: true)
             } catch is CancellationError {
             } catch {
                 guard current() else { return }
