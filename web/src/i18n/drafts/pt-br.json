@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "O progresso continua retido. Reinicie agora o servidor Audiobookshelf em {0} e depois confirme aqui. Este navegador não consegue detectar o reinício: se ele não ocorreu, uma exclusão ainda em execução pode apagar o progresso enviado após a confirmação. Confirmar cobre apenas as solicitações enviadas por este navegador antes de pedir o reinício; as posteriores continuam retidas.",
   "WebHeldRestartUnreadable": "O progresso está retido e o registro do reinício solicitado não pode ser lido, então este navegador não sabe quais solicitações um reinício encerraria. Escolha «Reiniciar o servidor» novamente e reinicie o servidor Audiobookshelf em {0} quando solicitado.",
   "WebServerRestarted": "Reiniciei o servidor",
-  "WebAppName": "Leafwake",
+  "WebAppName": "Audiobook Loft",
   "WebSkipToContent": "Pular para o conteúdo",
   "WebServerAddressHelp": "O endereço do seu servidor Audiobookshelf, incluindo qualquer subcaminho, por exemplo https://home.example/audiobookshelf",
   "WebContinue": "Continuar",

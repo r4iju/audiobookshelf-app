@@ -84,7 +84,7 @@ def main():
         rows.append({'coordinate': coordinate, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'licenses': declared})
         for name, content in embedded_notices(path):
             notices.setdefault(content, []).append(f'{coordinate}: {name}')
-    parts = ['Leafwake, modified independent Audiobookshelf client, 2026.\n'
+    parts = ['Audiobook Loft, modified independent Audiobookshelf client, 2026.\n'
              'Fork modifications by Emanuel Franzen and contributors.\n'
              'Upstream copyright notices and GPLv3 are retained. No warranty.\n'
              'Corresponding source is available using the Source code button.\n\n'

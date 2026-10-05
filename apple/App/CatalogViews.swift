@@ -27,7 +27,7 @@ struct LibrarySidebar: View {
     let selected: Library
     var body: some View {
         ShelfList {
-            Label("Audiobookshelf", systemImage: "books.vertical.fill").font(.title2.bold()).padding(.vertical, 18)
+            Label("Audiobook Loft", systemImage: "books.vertical.fill").font(.title2.bold()).padding(.vertical, 18)
             Label(selected.name, systemImage: selected.mediaType == "podcast" ? "mic" : "books.vertical")
                 .foregroundColor(ShelfStyle.accent)
             Button(l10n("Change library")) { NativeHaptic.impact("library"); Task { await connection.openLibrariesForSelection() } }

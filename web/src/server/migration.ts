@@ -63,7 +63,7 @@ const completionSchema = z.object({
 });
 export function sourceCopy(path: string) {
   if (process.platform !== "linux")
-    throw new DomainError(400, "Run migration and snapshot restore inside the Leafwake product image");
+    throw new DomainError(400, "Run migration and snapshot restore inside the Audiobook Loft product image");
   const roots = (process.env.LEAFWAKE_IMPORT_ROOTS || "/imports")
     .split(":")
     .filter(Boolean)

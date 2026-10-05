@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Server, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useState } from "react";
+import { OriginNotice } from "@/components/app/origin-notice";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
 import { Alert } from "@/components/ui/status";
@@ -295,6 +296,7 @@ export function ConnectScreen({
         </section>
       ) : null}
       <p className="text-center text-xs text-muted">{t("WebLocalStorageWarning")}</p>
+      <OriginNotice />
     </main>
   );
 }

@@ -49,7 +49,7 @@ await mkdir(join(root, "public"), { recursive: true });
 await writeFile(join(root, "public", "web-dependencies.json"), JSON.stringify(inventory, null, 2) + "\n");
 await writeFile(
   join(root, "public", "THIRD-PARTY-NOTICES.txt"),
-  "Leafwake web/runtime dependency notices\n\n" +
+  "Audiobook Loft web/runtime dependency notices\n\n" +
     inventory.map((p) => `${p.name}@${p.version}: ${JSON.stringify(p.license)}`).join("\n") +
     "\n\n" +
     notices.join("\n\n"),

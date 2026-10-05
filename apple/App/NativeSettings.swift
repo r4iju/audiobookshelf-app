@@ -107,6 +107,11 @@ struct NativeSettings: View {
                 NavigationLink(l10n("Import previous app data"), destination: NativeMigrationImport())
                 NavigationLink(l10n("Diagnostics"), destination: NativeDiagnosticsView()).accessibilityIdentifier("diagnostics-settings")
             }
+            Section(header: Text("Audiobook Loft")) {
+                Text("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.")
+                Text("Open source under GPLv3, with applicable third-party licenses retained.")
+                Link("Source and license notices", destination: URL(string: "https://github.com/r4iju/audiobookshelf-app/releases")!)
+            }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Settings"))
     }
     private func option(_ title: String, selected: Bool, id: String, action: @escaping () -> Void) -> some View {

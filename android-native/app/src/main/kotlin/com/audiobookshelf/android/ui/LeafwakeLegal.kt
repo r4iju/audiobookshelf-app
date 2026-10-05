@@ -26,7 +26,7 @@ fun LeafwakeLegal() {
     val uri = LocalUriHandler.current
     var document by remember { mutableStateOf<String?>(null) }
     Column {
-        Text("Leafwake is an independent Audiobookshelf client. It is not affiliated with or endorsed by Audiobookshelf.")
+        Text("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.")
         OutlinedButton(onClick = { document = "privacy.txt" }, modifier = Modifier.fillMaxWidth().testTag("leafwake-privacy")) { Text("Privacy policy") }
         OutlinedButton(onClick = { document = "licenses.txt" }, modifier = Modifier.fillMaxWidth().testTag("leafwake-licenses")) { Text("Open source licenses") }
         TextButton(onClick = { uri.openUri("https://github.com/r4iju/audiobookshelf-app/issues") }) { Text("Support") }

@@ -1,4 +1,4 @@
-Leafwake uses the Debian-packaged FFmpeg and FFprobe tools as separate processes.
+Audiobook Loft uses the Debian-packaged FFmpeg and FFprobe tools as separate processes.
 FFmpeg is copyright its contributors. Its configured optional GPL components
 make the packaged build GPL; consult the exact package copyright and license
 texts included in this image at /usr/share/doc/ffmpeg/copyright and

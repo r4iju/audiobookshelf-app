@@ -34,7 +34,7 @@ export function database() {
     if (existing > maximumSchemaVersion) {
       db.close();
       throw new Error(
-        "This database needs a newer Leafwake image. Preserve the volume and use a compatible image.",
+        "This database needs a newer Audiobook Loft image. Preserve the volume and use a compatible image.",
       );
     }
   }
@@ -174,7 +174,7 @@ export function database() {
     } catch {}
     db.close();
     console.error(
-      "Leafwake schema upgrade failed; preserve the volume and inspect it with the maintenance CLI.",
+      "Audiobook Loft schema upgrade failed; preserve the volume and inspect it with the maintenance CLI.",
       error instanceof Error ? error.name : "UnknownError",
     );
     throw new Error(

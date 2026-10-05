@@ -4,6 +4,7 @@ import { Check, Copy, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import { OriginNotice } from "@/components/app/origin-notice";
 import { Button } from "@/components/ui/button";
 import { TextField, Toggle } from "@/components/ui/field";
 import { Section } from "@/components/ui/section";
@@ -105,6 +106,9 @@ export function SettingsScreen() {
       </Section>
 
       <DiagnosticsSection />
+      <Section title="About Audiobook Loft">
+        <OriginNotice />
+      </Section>
     </div>
   );
 }

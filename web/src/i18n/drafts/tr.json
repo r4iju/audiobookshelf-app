@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "İlerleme bekletilmeye devam ediyor. Şimdi Audiobookshelf sunucusunu{0} yeniden başlatın, sonra burada onaylayın. Tarayıcı yeniden başlatmayı algılayamaz; aksi hâlde süren silme işlemi onaydan sonra gönderilen ilerlemeyi silebilir. Onay yalnızca bu tarayıcının yeniden başlatmayı seçmeden önce gönderdiği isteklere uygulanır; sonraki istekler bekletilir.",
   "WebHeldRestartUnreadable": "İlerleme bekletiliyor. Yeniden başlatma isteğinin kaydı okunamıyor; yeniden başlatmanın hangi istekleri bitireceği bilinmiyor. Tekrar “Sunucuyu yeniden başlat” seçeneğini seçin ve istendiğinde Audiobookshelf sunucusunu{0} yeniden başlatın.",
   "WebServerRestarted": "Sunucuyu yeniden başlattım",
-  "WebAppName": "Leafwake",
+  "WebAppName": "Audiobook Loft",
   "WebSkipToContent": "İçeriğe geç",
   "WebServerAddressHelp": "Audiobookshelf sunucusunun varsa alt yolu da içeren adresi, örneğin https://home.example/audiobookshelf",
   "WebContinue": "Devam et",

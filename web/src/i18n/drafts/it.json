@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "I progressi restano trattenuti. Riavvia ora il server Audiobookshelf su {0}, poi conferma qui. Questo browser non può rilevare il riavvio: se non avviene, un'eliminazione ancora in corso può cancellare i progressi inviati dopo la conferma. La conferma copre solo le richieste inviate da questo browser prima di chiedere il riavvio; quelle successive restano trattenute.",
   "WebHeldRestartUnreadable": "I progressi sono trattenuti e il registro del riavvio richiesto non è leggibile, quindi il browser non sa quali richieste terminerebbe un riavvio. Scegli di nuovo «Riavvia il server», poi riavvia il server Audiobookshelf su {0} quando richiesto.",
   "WebServerRestarted": "Ho riavviato il server",
-  "WebAppName": "Leafwake",
+  "WebAppName": "Audiobook Loft",
   "WebSkipToContent": "Vai al contenuto",
   "WebServerAddressHelp": "L'indirizzo del tuo server Audiobookshelf, compresi eventuali sottopercorsi, ad esempio https://home.example/audiobookshelf",
   "WebContinue": "Continua",
