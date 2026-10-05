@@ -51,7 +51,7 @@ Public build preparation must reject a missing owner signing configuration inste
 
 Do not substitute a different license for inherited code, reuse upstream's Cast receiver without permission, claim that source availability alone settles store-term compatibility, or submit declarations that do not match the shipped runtime.
 
-## Reversible Android candidate
+## Android build procedure and earlier candidate evidence
 
 The default Gradle build retains the internal preview identity and Chromecast. `-Pleafwake=true` selects Leafwake's independent application ID, callback scheme, original icon, privacy/license screens, and Cast-free source/dependency graph. Legal screens are accessible before sign-in and in Settings. Cast instrumentation tests are compiled only for the preview.
 
