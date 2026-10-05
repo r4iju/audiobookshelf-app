@@ -36,10 +36,12 @@ import { useOnline } from "./online";
 import { useKeyboardScrolling, useScrollRestoration } from "./page-scroller";
 import { useHeadingTitle } from "./page-title";
 import { useRealtime } from "./realtime";
+import { SessionRecovery } from "./session-recovery";
 
 export function SignedInShell({ children }: { children: ReactNode }) {
   const session = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const { t } = useI18n();
 
   // External system: routing; a signed-out browser belongs on the connect screen.
@@ -48,6 +50,7 @@ export function SignedInShell({ children }: { children: ReactNode }) {
   }, [session.phase, router]);
 
   if (session.phase !== "signed-in") return <Spinner label={t("MessageLoading")} />;
+  if (session.reauthRequired) return <SessionRecovery connection={session.connection} next={pathname} />;
   return <Shell key={session.connection.id}>{children}</Shell>;
 }
 
@@ -177,7 +180,6 @@ function Shell({ children }: { children: ReactNode }) {
   const phoneMore = visible.filter((section) => section.phone === "more");
   const isActive = (section: Section, href: string) =>
     section.key === "home" ? pathname === href : pathname.startsWith(href);
-  const reauthHref = `/connect?${new URLSearchParams({ server: connection.serverUrl, username: connection.username, next: pathname })}`;
 
   const reading = pathname.startsWith("/read/");
 
@@ -385,17 +387,6 @@ function Shell({ children }: { children: ReactNode }) {
               ) : null}
             </header>
             <div className="flex flex-col gap-2 px-4 pt-4 empty:hidden lg:px-8">
-              {session.reauthRequired ? (
-                <Alert
-                  action={
-                    <ButtonLink href={reauthHref} size="sm" variant="primary">
-                      {t("WebSignIn")}
-                    </ButtonLink>
-                  }
-                >
-                  {t("WebReauthRequired")}
-                </Alert>
-              ) : null}
               <HeldDeliveries />
               {online ? null : (
                 <Alert tone="info">
