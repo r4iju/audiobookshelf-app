@@ -1,5 +1,13 @@
 # Audiobook Loft release status, October 5, 2026
 
+## Audiobook Loft rc.6, expired-session recovery, October 5, 2026
+
+Rc.6 supersedes rc.5 on the live server at `https://audiobookshelf.nginx.lan`. [The release](https://github.com/r4iju/audiobookshelf-app/releases/tag/audiobook-loft-v1.0.0-rc.6) provides the exact one-image archive, corresponding source `0eefd53f74cb4ed3457c48640670db5d50cdbaab`, materials and checksums. Archive SHA256: `f40fecd42c5011c5992cd383b9798aa6c9a1ee9cf0a1e6ebb89fcb44334442b9`. Image ID: `sha256:33842adcd49aa1de7e765f13a0552955607fcdf2bc6117969bbb04e41210a58c`; archive config digest: `sha256:e580687038536f4d8eece38840dc53b8732eee0429eb56169376e427fcb5184b`.
+
+Rejected saved sessions now show a centered recovery card with the server address and an actionable Sign in button on home and direct signed-in routes. The saved account, queued progress and return pathname are retained. Playback stops and saves its position while reauthentication is required. The root regression was observed red on rc.5 before implementation. Five production-image browser login/session journeys, 119 units, types and lint pass; final source was independently reviewed in [PR #219](https://github.com/r4iju/audiobookshelf-app/pull/219). Its merged tree is identical to the image source.
+
+A fresh live backup preceded the tag-only deployment. Archive checksum and imported source/product/config identity were verified. One ready production pod, zero crash restarts and zero retired-app pods. Original owner login and identity, 127 items and 34 history records retained; authenticated audio Range 206 (32 bytes), anonymous media 401 and HTTPS authenticated websocket passed. No automated progress writes touched owner data. Existing mounts, port and ingress remain unchanged. Android beta 2 and Apple/store gates below are unchanged by this browser fix.
+
 ## Audiobook Loft rc.5, completed October 5, 2026
 
 The selected public name is live at `https://audiobookshelf.nginx.lan`. [The rc.5 prerelease](https://github.com/r4iju/audiobookshelf-app/releases/tag/audiobook-loft-v1.0.0-rc.5) publishes the one-image Linux amd64 archive, exact corresponding source `995abf39ae721dee184f9397c86b497438dcc714`, build materials and checksums. Image ID: `sha256:1c88111930dcf85170a7a63e73b14a13a964832e34e02dafc763c5cab978bfa7`; archive SHA256: `3df518b6571f9860863a49205255259a4d8ba63034687ac73b7a3ecb932f0063`. Docker archive config digest is distinct: `sha256:f7f82a623fea53ccfbaef25907498d536c4c47adb6b1d1471a4415fab5a9b9fb`.
