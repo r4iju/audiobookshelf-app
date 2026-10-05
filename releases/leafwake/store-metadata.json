@@ -1,0 +1,15 @@
+{
+  "android": {
+    "language": "en-GB",
+    "title": "Leafwake",
+    "shortDescription": "Your audiobooks and podcasts, connected to your own server.",
+    "fullDescription": "Leafwake connects to your Leafwake or compatible Audiobookshelf server so you can listen to your own audiobooks and podcasts.\n\nBrowse your library, stream audio, keep your listening place across devices and download supported audio for offline listening. Read supported PDF companion documents while listening.\n\nLeafwake is free to download. This Android beta does not include Chromecast support. You need a self-hosted server and your own media. No books or subscriptions are included. Compatibility depends on the server version; tested versions and known limitations are recorded on the release page.\n\nLeafwake is independently maintained and is not affiliated with or endorsed by the Audiobookshelf project.\n\nLeafwake is open source under GPLv3, with applicable third-party licenses retained.\n\nSource code, license notices, corresponding build materials and compatibility information:\nhttps://github.com/r4iju/audiobookshelf-app/releases\n\nPrivacy and support:\nhttps://r4iju.github.io/audiobookshelf-app/\n\nSupport: leakwake@mozdom.mozmail.com"
+  },
+  "apple": {
+    "language": "en-GB",
+    "name": "Leafwake",
+    "subtitle": "Your self-hosted audio library",
+    "keywords": "audiobook,podcast,offline,player,listen,book,stream,download,progress,PDF",
+    "description": "Leafwake connects to your Leafwake or compatible Audiobookshelf server so you can listen to your own audiobooks and podcasts.\n\nBrowse your library, stream audio, keep your listening place across devices and download supported audio for offline listening. Read supported PDF companion documents while listening.\n\nYou need a self-hosted server and your own media. No books or subscriptions are included. Compatibility depends on the server version; tested versions and known limitations are recorded on the release page.\n\nLeafwake is independently maintained and is not affiliated with or endorsed by the Audiobookshelf project.\n\nLeafwake is open source under GPLv3, with applicable third-party licenses retained.\n\nSource code, license notices, corresponding build materials and compatibility information:\nhttps://github.com/r4iju/audiobookshelf-app/releases\n\nPrivacy and support:\nhttps://r4iju.github.io/audiobookshelf-app/\n\nSupport: leakwake@mozdom.mozmail.com"
+  }
+}
