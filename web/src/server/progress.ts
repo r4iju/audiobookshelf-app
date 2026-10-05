@@ -45,10 +45,24 @@ export const progressPatchSchema = z
     ebookLocation: z.string().max(8192).nullable().optional(),
     ebookProgress: z.number().finite().min(0).max(1).nullable().optional(),
     updatedAt: timestamp.optional(),
+    lastUpdate: timestamp.optional(),
+    startedAt: timestamp.optional(),
+    finishedAt: timestamp.nullable().optional(),
     progressGeneration: z.number().int().nonnegative().optional(),
   })
   .strict()
-  .transform(({ duration: _duration, progress: _progress, ...intent }) => intent);
+  .superRefine((value, context) => {
+    if (
+      value.updatedAt !== undefined &&
+      value.lastUpdate !== undefined &&
+      value.updatedAt !== value.lastUpdate
+    )
+      context.addIssue({ code: "custom", message: "Conflicting progress timestamps", path: ["lastUpdate"] });
+  })
+  .transform(({ duration: _duration, progress: _progress, lastUpdate, ...intent }) => ({
+    ...intent,
+    updatedAt: intent.updatedAt ?? lastUpdate,
+  }));
 function readContent(row: unknown) {
   return row
     ? mediaProgressSchema.parse(JSON.parse(z.object({ content: z.string() }).parse(row).content))
@@ -125,8 +139,16 @@ export function patchProgress(
           409,
           "This progress intent predates a reset. Choose a new reading place or finish state.",
         );
-      if (patch.updatedAt !== undefined && patch.updatedAt > now + 300000)
+      if (
+        [patch.updatedAt, patch.startedAt, patch.finishedAt].some(
+          (value) => value != null && value > now + 300000,
+        )
+      )
         throw new DomainError(400, "Progress time is in the future");
+      if (patch.startedAt !== undefined && patch.startedAt > (patch.updatedAt ?? now))
+        throw new DomainError(400, "Invalid progress times");
+      if (patch.finishedAt != null && patch.finishedAt < (previous?.startedAt ?? patch.startedAt ?? 0))
+        throw new DomainError(400, "Invalid progress times");
       if (
         previous &&
         patch.updatedAt !== undefined &&
@@ -136,8 +158,9 @@ export function patchProgress(
       const next = {
         ...(previous ?? freshProgress(itemId, episodeId, duration, now)),
         ...patch,
+        startedAt: previous?.startedAt ?? patch.startedAt ?? patch.updatedAt ?? now,
         duration,
-        lastUpdate: Math.max(now, (previous?.lastUpdate ?? 0) + 1),
+        lastUpdate: patch.updatedAt ?? Math.max(now, (previous?.lastUpdate ?? 0) + 1),
         intentAt: patch.updatedAt ?? now,
         intentSessionId: null,
       };
@@ -146,10 +169,18 @@ export function patchProgress(
         next.progress = duration ? next.currentTime / duration : 0;
       }
       if (patch.isFinished !== undefined) {
-        next.finishedAt = patch.isFinished ? (next.finishedAt ?? now) : null;
+        next.finishedAt = patch.isFinished
+          ? (previous?.finishedAt ?? patch.finishedAt ?? patch.updatedAt ?? now)
+          : null;
         next.progress = patch.isFinished ? 1 : duration ? next.currentTime / duration : 0;
         if (patch.isFinished) next.currentTime = duration;
       }
+      if (!next.isFinished) next.finishedAt = null;
+      if (
+        next.finishedAt != null &&
+        (next.finishedAt < next.startedAt || next.finishedAt > (patch.updatedAt ?? now))
+      )
+        throw new DomainError(400, "Invalid progress times");
       const parsed = mediaProgressSchema.parse(next);
       storeProgress(current.id, parsed);
       return parsed;
@@ -250,11 +281,11 @@ export function syncLocal(actor: Account, input: z.infer<typeof localReportsSche
             .prepare("SELECT content FROM listening_reports WHERE user_id=? AND id=?")
             .get(current.id, report.id);
           const old = oldRow ? reportSchema.parse(JSON.parse(z.string().parse(oldRow.content))) : null;
+          if (old && report.updatedAt < old.startedAt) throw new DomainError(400, "Invalid listening times");
           if (
             old &&
             (old.libraryItemId !== report.libraryItemId ||
               (old.episodeId ?? "") !== episode ||
-              old.startedAt !== report.startedAt ||
               (old.progressGeneration ?? 0) !== (report.progressGeneration ?? 0))
           )
             throw new DomainError(409, "Listening identity changed");
@@ -267,6 +298,7 @@ export function syncLocal(actor: Account, input: z.infer<typeof localReportsSche
           const stored = {
             ...(newer ? report : old),
             duration,
+            startedAt: old?.startedAt ?? report.startedAt,
             timeListening: Math.max(old?.timeListening ?? 0, report.timeListening),
             deviceInfo: input.deviceInfo ?? {},
             mediaMetadata: itemFor(current, report.libraryItemId).media.metadata,
