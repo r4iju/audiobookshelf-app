@@ -1,5 +1,7 @@
 # Leafwake candidate verification, October 4, 2026
 
+This historical candidate report is superseded for the replacement release by [RELEASE-STATUS.md](RELEASE-STATUS.md). The current QA runner uses the new unified image. The stock-server results below describe the earlier unmodified 2.30.0 run, not the replacement backend.
+
 This is preparation evidence, not public release clearance.
 
 ## Stock server

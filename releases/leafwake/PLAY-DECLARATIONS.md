@@ -24,8 +24,12 @@ Definitions: [Google Play Data safety guidance](https://support.google.com/googl
 
 ## Review and account gates
 
-Use only synthetic media in screenshots and a reachable review server. A loopback QA server is not review access. The owner's live deployment host has not been provided, so its cutover and external review access remain open. Do not supply private owner credentials to reviewers.
+Use only synthetic media in screenshots and a reachable review server. A loopback QA server is not review access. The owner cutover reached Leafwake at `audiobookshelf.nginx.lan`, but the NAS is currently unreachable. The existing public hostname has restrictive access rules; a separate globally reachable synthetic review server remains necessary. Do not supply private owner credentials to reviewers.
 
 The personal Play account requires12 opted-in closed testers for14 continuous days before applying for production access. Upload, internal testing, closed testing, production application, review approval and public availability are separate states. Record each actual Console/API result. No tester enrollment or elapsed testing period is inferred from an uploaded artifact.
 
 Requirement: [Google's personal-account testing policy](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en-GB).
+
+## October 5 Console results
+
+Version code 1 is available to the selected owner-only internal testers. Closed alpha has version code 1 saved as a validated draft, without rollout or enrolled closed testers. Music & audio, six listing graphics and foreground-service declarations are saved. User-requested download and media-playback demonstrations are published with release rc.4. Sign-in review access, target audience and final Data safety submission remain incomplete. No production approval is claimed.

@@ -1,6 +1,6 @@
 # Replacement implementation status
 
-The authoritative scope is SPEC.md and GitHub issue #150. The backend/browser replacement and active legacy removal have been implemented through #173. Final release acceptance and publishing are tracked in #174; live owner cutover and store work remain #175–177. The evidence below records each reviewed slice and its limits. A local fixture is not a live public deployment.
+The authoritative scope is SPEC.md and GitHub issue #150. The backend/browser replacement and active legacy removal have been implemented through #173. The unified image and matching sources are published as 1.0.0-rc.4; the owner cutover succeeded before the NAS became unreachable. Final native compatibility passed; physical assistive acceptance and live recovery remain in #174–175 and store work in #176–177. [RELEASE-STATUS.md](../../releases/leafwake/RELEASE-STATUS.md) records current identities, evidence and external gates. The notes below are historical evidence for each reviewed slice. A local fixture is not a live public deployment.
 
 ## #151: production bootstrap and persistent sign-in
 
@@ -17,7 +17,7 @@ Evidence files for this development run are outside the repository:
 
 Image config digest: `sha256:5b0c1f1af6c3a7a54e310a611c1cd347c1b1467f7f511e07eab7b6528e5f7ac6` (`leafwake:bootstrap-151`). Browser setup and sign-in passed through the shared preview. Preview screenshot capture failed; DOM and interaction evidence was available. Typecheck, lint, 115 existing unit tests and production Docker build passed. Independent source review cleared the bootstrap scope after the Origin fix.
 
-## Remaining work
+## Historical remaining-work note after #160
 
 Tickets #151–160 are complete. The sections below track subsequent slices and their remaining acceptance. Realtime, full migration, administration, legacy removal, final deployment and store acceptance still require the remaining tickets. Existing deployment examples still describe the superseded two-server configuration until the deployment and cleanup tickets replace them.
 
