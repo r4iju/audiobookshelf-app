@@ -1,4 +1,4 @@
-# Leafwake full stack
+# Audiobook Loft full stack
 
 Next.js browser UI and a new TypeScript backend, packaged together with Socket.IO and bounded media jobs on one Node listener. SQLite accounts, sessions, catalog and progress persist in `/data`. Original media mounts are read-only. No original Audiobookshelf process is required.
 

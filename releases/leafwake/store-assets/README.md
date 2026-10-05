@@ -8,6 +8,6 @@ On October 5, 2026 the icon, feature graphic and four phone screenshots were upl
 
 The foreground-service demos show the same Cast-free Android build. `data-sync-demo.mp4` shows a user-requested download and its completion (the synthetic file is short). `media-playback-demo.mp4` shows user-requested playback continuing while the system media controls cover the app. The clips are start-of-recording excerpts without retouching; they do not claim a long download, background import, transcoding or picture-in-picture. No private accounts, media or notifications appear.
 
-The feature graphic now uses the full Audiobook Loft public name. Earlier phone captures and service demos show the unchanged beta 1 binary; fresh beta 2 captures must accompany its upload. Published earlier release assets retain their historical names.
+The feature graphic now uses the full Audiobook Loft public name. Earlier phone captures and service demos show the unchanged beta 1 binary; fresh beta 2 captures are still needed before public store submission. Published earlier release assets retain their historical names.
 
 On October 5, 2026 the renamed feature graphic was validated and committed to the existing Play app. Tracks were unchanged.

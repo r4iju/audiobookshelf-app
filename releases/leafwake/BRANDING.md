@@ -8,4 +8,4 @@ The repository history, upstream copyrights, GPLv3 and dependency notices remain
 
 Stable technical identifiers remain: `com.forkzed.leafwake`, `leafwake` callback scheme, persisted database/encryption formats, configuration/environment names and `releases/leafwake` paths. Changing them would need an explicit migration and could break updates or decrypting owner backups. Published Leafwake prereleases and their matching source are historical immutable releases.
 
-Android's next source build is version code 2, `1.0.0-beta.2`; the already uploaded internal beta 1 keeps its original binary. Apple preview identifiers remain preview identifiers pending separately signed public builds. No public Apple build is implied by the display rename.
+Android beta 2 (version code 2, `1.0.0-beta.2`) is uploaded and completed on the existing internal test track; closed alpha beta 2 remains a draft. Earlier beta 1 keeps its historical binary. Apple preview identifiers remain preview identifiers pending separately signed public builds. No public Apple build is implied by the display rename.
