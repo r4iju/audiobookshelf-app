@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Förloppet hålls fortfarande tillbaka. Starta om Audiobookshelf-servern på {0} nu och bekräfta sedan här. Webbläsaren kan inte upptäcka omstarten: utan den kan en pågående radering ta bort förlopp som skickas efter bekräftelsen. Bekräftelsen omfattar bara begäranden som den här webbläsaren skickade innan du begärde omstart; senare begäranden hålls kvar.",
   "WebHeldRestartUnreadable": "Förloppet hålls tillbaka och posten för den begärda omstarten kan inte läsas. Webbläsaren vet därför inte vilka begäranden en omstart skulle avsluta. Välj «Starta om servern» igen och starta om Audiobookshelf-servern på {0} när du blir ombedd.",
   "WebServerRestarted": "Jag har startat om servern",
-  "WebAppName": "Leafwake",
+  "WebAppName": "Audiobook Loft",
   "WebSkipToContent": "Hoppa till innehållet",
   "WebServerAddressHelp": "Adressen till din Audiobookshelf-server, inklusive eventuell undersökväg, till exempel https://home.example/audiobookshelf",
   "WebContinue": "Fortsätt",

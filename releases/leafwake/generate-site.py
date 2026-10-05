@@ -16,6 +16,6 @@ for block in (ROOT / 'PRIVACY.md').read_text().strip().split('\n\n'):
         parts.append('<h1>' + text[2:] + '</h1>')
     else:
         parts.append('<p>' + text + '</p>')
-page = '''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Leafwake privacy policy</title><link rel="stylesheet" href="style.css"></head><body><main class="policy"><nav aria-label="Main navigation"><a href="index.html">Leafwake</a><a href="privacy.html" aria-current="page">Privacy</a><a href="https://github.com/r4iju/audiobookshelf-app/issues">Support</a></nav>''' + '\n'.join(parts) + '</main></body></html>\n'
+page = '''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Audiobook Loft privacy policy</title><link rel="stylesheet" href="style.css"></head><body><main class="policy"><nav aria-label="Main navigation"><a href="index.html">Audiobook Loft</a><a href="privacy.html" aria-current="page">Privacy</a><a href="https://github.com/r4iju/audiobookshelf-app/issues">Support</a></nav>''' + '\n'.join(parts) + '</main></body></html>\n'
 (ROOT / 'site/privacy.html').write_text(page)
 print('Rendered public privacy policy from PRIVACY.md.')

@@ -27,18 +27,18 @@ android {
         applicationId = if (leafwake) "com.forkzed.leafwake" else "com.audiobookshelf.app.nativepreview"
         minSdk = 24
         targetSdk = 36
-        versionCode = if (leafwake) 1 else 200
-        versionName = if (leafwake) "1.0.0-beta.1" else "0.15.0-native-preview"
+        versionCode = if (leafwake) 2 else 200
+        versionName = if (leafwake) "1.0.0-beta.2" else "0.15.0-native-preview"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val scheme = if (leafwake) "leafwake" else "audiobookshelf-native-preview"
         manifestPlaceholders["oauthScheme"] = scheme
-        manifestPlaceholders["displayName"] = if (leafwake) "Leafwake" else "@string/app_name"
+        manifestPlaceholders["displayName"] = if (leafwake) "Audiobook Loft" else "@string/app_name"
         manifestPlaceholders["launcherIcon"] = if (leafwake) "@drawable/leafwake_icon" else "@mipmap/ic_launcher"
         buildConfigField("String", "OAUTH_REDIRECT", "\"$scheme://oauth\"")
         buildConfigField("boolean", "PUBLIC_RELEASE", leafwake.toString())
         buildConfigField("boolean", "CAST_ENABLED", (!leafwake).toString())
         buildConfigField("String", "SOURCE_URL", "\"${leafwakeSourceUrl}\"")
-        resValue("string", "product_name", if (leafwake) "Leafwake" else "Audiobookshelf")
+        resValue("string", "product_name", if (leafwake) "Audiobook Loft" else "Audiobookshelf")
     }
 
     if (ownerKeystore != null) signingConfigs.create("owner") {

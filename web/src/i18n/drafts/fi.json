@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Edistymistiedot pidätetään yhä. Käynnistä Audiobookshelf-palvelin osoitteessa {0} nyt uudelleen ja vahvista sen jälkeen täällä. Selain ei voi havaita uudelleenkäynnistystä: ilman sitä käynnissä oleva poisto voi poistaa vahvistuksen jälkeen lähetetyt tiedot. Vahvistus koskee vain tämän selaimen ennen uudelleenkäynnistyspyyntöä lähettämiä pyyntöjä; myöhemmät pidätetään edelleen.",
   "WebHeldRestartUnreadable": "Edistymistiedot pidätetään, eikä pyydetyn uudelleenkäynnistyksen tallennetta voi lukea. Selain ei siksi tiedä, mitkä pyynnöt uudelleenkäynnistys lopettaisi. Valitse uudelleen «Käynnistä palvelin uudelleen» ja käynnistä Audiobookshelf-palvelin osoitteessa {0} uudelleen, kun sitä pyydetään.",
   "WebServerRestarted": "Käynnistin palvelimen uudelleen",
-  "WebAppName": "Leafwake",
+  "WebAppName": "Audiobook Loft",
   "WebSkipToContent": "Siirry sisältöön",
   "WebServerAddressHelp": "Audiobookshelf-palvelimesi osoite mahdollisine alipolkuineen, esimerkiksi https://home.example/audiobookshelf",
   "WebContinue": "Jatka",

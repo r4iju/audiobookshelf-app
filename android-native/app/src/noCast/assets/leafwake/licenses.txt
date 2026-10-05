@@ -1,6 +1,6 @@
 
 
-Leafwake, modified independent Audiobookshelf client, 2026.
+Audiobook Loft, modified independent Audiobookshelf client, 2026.
 Fork modifications by Emanuel Franzen and contributors.
 Upstream copyright notices and GPLv3 are retained. No warranty.
 Corresponding source is available using the Source code button.

@@ -26,7 +26,7 @@ export const serverSettingsSchema = z.object({
   maxMediaProbes: z.number().int().min(1).max(4),
 });
 const defaults = {
-  serverName: "Leafwake",
+  serverName: "Audiobook Loft",
   language: "en",
   loginMessage: "",
   allowedOrigins: [],

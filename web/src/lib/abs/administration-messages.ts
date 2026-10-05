@@ -448,7 +448,7 @@ const messages = new Map<string, StringKey>([
   ],
   ["Setup key", "WebAdminSetupKey"],
   ["Re-enter your setup key to confirm the account import.", "WebAdminReEnterYourSetupKeyToConfirm"],
-  ["Read setup-key from the Leafwake data folder.", "WebAdminReadSetupKeyFromTheLeafwakeData"],
+  ["Read setup-key from the Audiobook Loft data folder.", "WebAdminReadSetupKeyFromTheLeafwakeData"],
   ["Import these accounts", "WebAdminImportTheseAccounts"],
   ["Import inventory", "WebAdminImportInventory"],
   ["supported accounts", "WebAdminSupportedAccounts"],
@@ -461,7 +461,7 @@ const messages = new Map<string, StringKey>([
   ],
   ["Use at least 12 characters.", "WebAdminUseAtLeast12Characters618b57"],
   [
-    "Read setup-key from your mounted Leafwake data folder. This key is never sent to visitors.",
+    "Read setup-key from your mounted Audiobook Loft data folder. This key is never sent to visitors.",
     "WebAdminReadSetupKeyFromYourMountedLeafwake",
   ],
   ["Creating account…", "WebAdminCreatingAccount"],

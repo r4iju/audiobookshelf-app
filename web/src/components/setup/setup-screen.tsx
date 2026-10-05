@@ -8,7 +8,7 @@ export function SetupScreen({ ready }: { ready: boolean }) {
   const { t } = useI18n();
   return (
     <main className="mx-auto max-w-lg space-y-6 px-6 py-16">
-      <p className="text-sm font-semibold text-accent">Leafwake</p>
+      <p className="text-sm font-semibold text-accent">Audiobook Loft</p>
       <h1 className="text-3xl font-bold">{t(ready ? "WebSetupReady" : "WebSetupCreateOwner")}</h1>
       {ready ? (
         <>

@@ -15,8 +15,8 @@ RUN npm run build && \
 
 FROM ${NODE_IMAGE}
 ARG LEAFWAKE_REVISION=development
-LABEL org.opencontainers.image.title="Leafwake" \
-      org.opencontainers.image.version="1.0.0-rc.4" \
+LABEL org.opencontainers.image.title="Audiobook Loft" \
+      org.opencontainers.image.version="1.0.0-rc.5" \
       org.opencontainers.image.source="https://github.com/r4iju/audiobookshelf-app" \
       org.opencontainers.image.revision=${LEAFWAKE_REVISION} \
       org.opencontainers.image.licenses="GPL-3.0-only"

@@ -1,5 +1,10 @@
 # Leafwake release workspace
 
+## Public name: Audiobook Loft
+
+On October 5, 2026 the owner selected Audiobook Loft. Apple accepted the name on app record 6819142007; iOS/tvOS draft copy and Google Play en-GB copy were saved and read back with explicit Audiobookshelf fork-origin and independence disclosures. Release tracks and Apple submission state were not changed. Existing Leafwake release artifacts and technical identifiers remain historical/stable; see [BRANDING.md](BRANDING.md). The renamed server source is rc.5; rc.4 remains the live image until the verified rc.5 rollout is recorded.
+
+
 The unified backend/browser prerelease is published with its matching source and build materials. The independent Cast-free Android beta is available to the selected internal Play testers; Apple distribution remains blocked on actual rights/terms and its app record. See [RELEASE-STATUS.md](RELEASE-STATUS.md) for current artifact identities, evidence and external gates. The candidate notes below record earlier preparation and are superseded by that status.
 
 ## Historical preparation gates (superseded by RELEASE-STATUS.md)

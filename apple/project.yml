@@ -35,7 +35,7 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: Audiobookshelf Native
+        INFOPLIST_KEY_CFBundleDisplayName: Audiobook Loft
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
     info:
@@ -52,7 +52,7 @@ targets:
             UTTypeConformsTo: [com.apple.package, public.composite-content]
             UTTypeTagSpecification:
               public.filename-extension: [absmigration]
-        NSLocalNetworkUsageDescription: Connect directly to your Audiobookshelf server on your local network.
+        NSLocalNetworkUsageDescription: Connect directly to your Audiobook Loft or compatible Audiobookshelf server on your local network.
         UIBackgroundModes: [audio]
         CFBundleURLTypes:
           - CFBundleURLName: com.forkzed.audiobookshelf.native.preview.openid

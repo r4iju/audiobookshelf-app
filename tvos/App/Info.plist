@@ -24,6 +24,6 @@
 		<true/>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Connect to your Audiobookshelf server on your local network.</string>
+	<string>Connect to your Audiobook Loft or compatible Audiobookshelf server on your local network.</string>
 </dict>
 </plist>

@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "Pažanga tebėra sulaikyta. Dabar paleiskite Audiobookshelf serverį{0} iš naujo, tada patvirtinkite čia. Naršyklė negali aptikti paleidimo iš naujo; kitaip vykstantis trynimas gali ištrinti po patvirtinimo išsiųstą pažangą. Patvirtinimas taikomas tik šios naršyklės užklausoms, išsiųstoms prieš pasirenkant paleidimą iš naujo; vėlesnės lieka sulaikytos.",
   "WebHeldRestartUnreadable": "Pažanga sulaikyta. Paleidimo iš naujo užklausos įrašas neperskaitomas, todėl nežinoma, kurias užklausas paleidimas užbaigs. Dar kartą pasirinkite „Paleisti serverį iš naujo“ ir paraginti paleiskite Audiobookshelf serverį{0} iš naujo.",
   "WebServerRestarted": "Paleidau serverį iš naujo",
-  "WebAppName": "Leafwake",
+  "WebAppName": "Audiobook Loft",
   "WebSkipToContent": "Pereiti prie turinio",
   "WebServerAddressHelp": "Audiobookshelf serverio adresas su poaplankio keliu, jei toks yra, pvz., https://home.example/audiobookshelf",
   "WebContinue": "Tęsti",

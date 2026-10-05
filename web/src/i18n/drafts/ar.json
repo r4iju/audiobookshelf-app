@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "لا يزال التقدم موقوفًا. أعد تشغيل خادم Audiobookshelf{0} الآن، ثم أكد ذلك هنا. لا يستطيع المتصفح اكتشاف إعادة التشغيل؛ وإلا فقد تحذف عملية الحذف الجارية التقدم المرسل بعد التأكيد. يشمل التأكيد فقط طلبات هذا المتصفح المرسلة قبل اختيار إعادة التشغيل؛ وتظل الطلبات اللاحقة موقوفة.",
   "WebHeldRestartUnreadable": "التقدم موقوف. لا يمكن قراءة سجل طلب إعادة التشغيل، لذا لا يمكن معرفة الطلبات التي ستنهيها إعادة التشغيل. اختر «إعادة تشغيل الخادم» مجددًا، ثم أعد تشغيل خادم Audiobookshelf{0} عندما يُطلب منك ذلك.",
   "WebServerRestarted": "أعدت تشغيل الخادم",
-  "WebAppName": "Leafwake",
+  "WebAppName": "Audiobook Loft",
   "WebSkipToContent": "الانتقال إلى المحتوى",
   "WebServerAddressHelp": "عنوان خادم Audiobookshelf، بما في ذلك المسار الفرعي إن وجد، مثل https://home.example/audiobookshelf",
   "WebContinue": "متابعة",

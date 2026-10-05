@@ -899,8 +899,8 @@ async function inventory(input: CompleteImportInput, authorize: () => Account) {
       notices: [
         "Original IDs, account roles, passwords, progress, history, lists and published-feed relations are preserved by the prior stages. OpenID links use the validated original issuer and subject; names and emails never create links.",
         "Imported covers are copied into private SQLite storage. Original database and media remain read-only and unchanged. Keep original media and this snapshot for rollback.",
-        "Legacy token secrets and sign-in sessions are retired. Leafwake issues new sign-ins. Legacy file-writing/scanner-watcher options are replaced by bounded explicit scans and managed metadata; originals remain in the private archive.",
-        "Source device records, migration bookkeeping and scanner/name/title caches remain archived. New playback records device information supplied by the client. Exact recognized cache-maintenance triggers remain archived as schema text and never execute in Leafwake; catalog names and titles come from canonical media relationships.",
+        "Legacy token secrets and sign-in sessions are retired. Audiobook Loft issues new sign-ins. Legacy file-writing/scanner-watcher options are replaced by bounded explicit scans and managed metadata; originals remain in the private archive.",
+        "Source device records, migration bookkeeping and scanner/name/title caches remain archived. New playback records device information supplied by the client. Exact recognized cache-maintenance triggers remain archived as schema text and never execute in Audiobook Loft; catalog names and titles come from canonical media relationships.",
         "Legacy log levels and file retention are retired in favor of sanitized container logs and bounded product diagnostics. Configure container log rotation outside the image.",
         "Every unsupported table, field or active setting blocks full cutover. Archive retention alone does not claim feature migration.",
       ],

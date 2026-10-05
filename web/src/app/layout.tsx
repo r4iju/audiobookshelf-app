@@ -4,7 +4,7 @@ import { AppProviders } from "@/components/app/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Leafwake", template: "%s · Leafwake" },
+  title: { default: "Audiobook Loft", template: "%s · Audiobook Loft" },
   description: "Your self-hosted library, wherever you listen",
   robots: { index: false, follow: false },
 };

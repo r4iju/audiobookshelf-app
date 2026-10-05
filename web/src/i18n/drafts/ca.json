@@ -3,7 +3,7 @@
   "WebHeldRestartRequested": "El progrés continua retingut. Reinicia ara el servidor Audiobookshelf a {0} i després confirma-ho aquí. Aquest navegador no pot detectar el reinici: si no s'ha fet, una supressió encara en curs pot esborrar el progrés enviat després de confirmar. La confirmació només cobreix les peticions enviades per aquest navegador abans de demanar el reinici; les posteriors continuen retingudes.",
   "WebHeldRestartUnreadable": "El progrés es reté i no es pot llegir el registre del reinici demanat. Per això, el navegador no sap quines peticions acabaria un reinici. Torna a triar «Reinicia el servidor» i reinicia el servidor Audiobookshelf a {0} quan se't demani.",
   "WebServerRestarted": "He reiniciat el servidor",
-  "WebAppName": "Leafwake",
+  "WebAppName": "Audiobook Loft",
   "WebSkipToContent": "Salta al contingut",
   "WebServerAddressHelp": "L'adreça del teu servidor Audiobookshelf, inclosos els subcamins, per exemple https://home.example/audiobookshelf",
   "WebContinue": "Continua",

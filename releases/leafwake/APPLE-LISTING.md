@@ -1,24 +1,24 @@
-# Leafwake Apple listing preparation
+# Audiobook Loft Apple listing preparation
 
 Canonical store fields: [store-metadata.json](store-metadata.json), Apple `en-GB`.
 
-Name: Leafwake Audio
-Subtitle: Your self-hosted library
+Name: Audiobook Loft
+Subtitle: Your books. Your server.
 Keywords: audiobook,podcast,offline,player,listen,book,stream,download,progress,PDF
 Support: leakwake@mozdom.mozmail.com
 Independent bundle identifier: com.forkzed.leafwake
 Existing Android privacy policy (not configured for Apple): https://r4iju.github.io/audiobookshelf-app/privacy.html
 Support and source: https://r4iju.github.io/audiobookshelf-app/
 
-Leafwake connects to your Leafwake or compatible Audiobookshelf server so you can listen to your own audiobooks and podcasts.
+Audiobook Loft connects to your Audiobook Loft or compatible Audiobookshelf server so you can listen to your own audiobooks and podcasts.
 
 Browse your library, stream audio, keep your listening place across devices and download supported audio for offline listening. Read supported PDF companion documents while listening.
 
 You need a self-hosted server and your own media. No books or subscriptions are included. Compatibility depends on the server version; tested versions and known limitations are recorded on the release page.
 
-Leafwake is independently maintained and is not affiliated with or endorsed by the Audiobookshelf project.
+Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.
 
-Leafwake is open source under GPLv3, with applicable third-party licenses retained.
+Audiobook Loft is open source under GPLv3, with applicable third-party licenses retained.
 
 Source code, license notices, corresponding build materials and compatibility information:
 https://github.com/r4iju/audiobookshelf-app/releases
@@ -38,15 +38,15 @@ Native inherited GPL distribution rights and current Apple terms must be resolve
 
 ## tvOS description
 
-Leafwake connects to your Leafwake or compatible Audiobookshelf server so you can listen to your own audiobooks and podcasts.
+Audiobook Loft connects to your Audiobook Loft or compatible Audiobookshelf server so you can listen to your own audiobooks and podcasts.
 
 Browse your audiobook and podcast library, stream audio and keep your listening place across devices. Control playback with chapters, playback speed and a sleep timer.
 
 You need a self-hosted server and your own media. No books or subscriptions are included. On Apple TV, sign in with a local server account. OpenID browser sign-in, downloads, offline playback and document reading are not offered on TV. Compatibility depends on the server version; tested versions and known limitations are recorded on the release page.
 
-Leafwake is independently maintained and is not affiliated with or endorsed by the Audiobookshelf project.
+Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.
 
-Leafwake is open source under GPLv3, with applicable third-party licenses retained.
+Audiobook Loft is open source under GPLv3, with applicable third-party licenses retained.
 
 Source code, license notices, corresponding build materials and compatibility information:
 https://github.com/r4iju/audiobookshelf-app/releases
@@ -63,3 +63,7 @@ The canonical tvOS description excludes mobile-only downloads, offline playback 
 ## Saved metadata
 
 Name/subtitle, separate iOS and tvOS descriptions/keywords, marketing and support links were saved and read back through the Apple API on October 5. Both versions remain Prepare for Submission. Privacy URL/text, screenshots, age rating, privacy declarations, review access and a public signed build are not completed by this metadata save.
+
+## Public rename, October 5, 2026
+
+The owner selected Audiobook Loft, preserving `com.forkzed.leafwake`, app record 6819142007 and SKU `leafwake-2026`. The earlier Leafwake Audio name is historical. Name acceptance and saved draft copy do not establish trademark clearance or Apple review approval. Origins, retained upstream notices and independent status are disclosed in the descriptions and native Settings. Public Apple upload remains subject to the documented rights, privacy, signing and review-access gates.

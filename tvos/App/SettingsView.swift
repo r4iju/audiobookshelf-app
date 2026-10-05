@@ -25,6 +25,10 @@ struct SettingsView: View {
                         Text(SignInView.supportedSignIn(l10n)).font(.callout).foregroundStyle(.secondary)
                             .accessibilityIdentifier("auth-modes")
                     }
+                    section("Audiobook Loft") {
+                        Text("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.").font(.callout)
+                        Text("Open source under GPLv3, with applicable third-party licenses retained. Source and notices: https://github.com/r4iju/audiobookshelf-app/releases").font(.callout)
+                    }
                     if !waiting.isEmpty { savesWaiting }
                     section(l10n("Listening")) {
                         Text(syncStatus).accessibilityIdentifier("sync-status")

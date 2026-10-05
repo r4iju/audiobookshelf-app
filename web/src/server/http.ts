@@ -148,7 +148,7 @@ export async function boundary(work: () => Promise<Response> | Response) {
     if (error instanceof DomainError) return new Response(error.message, { status: error.status });
     if (error instanceof z.ZodError || error instanceof SyntaxError)
       return new Response("Invalid request", { status: 400 });
-    console.error("Leafwake request failed", error instanceof Error ? error.name : "UnknownError");
+    console.error("Audiobook Loft request failed", error instanceof Error ? error.name : "UnknownError");
     return new Response("The server could not complete this request", { status: 500 });
   }
 }
@@ -197,7 +197,7 @@ export function serverStatus() {
   const ready = initialized();
   if (!ready) setupKey();
   return json({
-    app: "Leafwake",
+    app: "Audiobook Loft",
     serverVersion: version,
     isInit: ready,
     language: serverSettings().language,
@@ -218,7 +218,7 @@ export async function health() {
   database().prepare("SELECT 1").get();
   const current = await readiness(dataDirectory());
   return json(
-    { status: current.ready ? "ready" : "unavailable", app: "Leafwake" },
+    { status: current.ready ? "ready" : "unavailable", app: "Audiobook Loft" },
     current.ready ? 200 : 503,
   );
 }
