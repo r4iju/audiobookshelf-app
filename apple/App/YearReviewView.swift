@@ -88,14 +88,15 @@ struct YearReviewView: View {
     var body: some View {
         ShelfList {
             HStack {
-                Button { Task { await store.load(year: store.year - 1, copy: exportCopy) } } label: { Image(systemName: "chevron.left") }
+                Button { Task { await store.load(year: store.year - 1, copy: exportCopy) } } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }
                     .accessibilityLabel(l10n("Previous year")).disabled(store.year <= 2000)
                 Spacer()
                 Text(String(store.year)).font(.title2.monospacedDigit().weight(.bold))
                 Spacer()
-                Button { Task { await store.load(year: store.year + 1, copy: exportCopy) } } label: { Image(systemName: "chevron.right") }
+                Button { Task { await store.load(year: store.year + 1, copy: exportCopy) } } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }
                     .accessibilityLabel(l10n("Next year")).disabled(store.year >= Calendar(identifier: .gregorian).component(.year, from: Date()))
             }
+            .buttonStyle(BorderlessButtonStyle())
             if store.loading { ProgressView(l10n("Opening your year…")) }
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load(year: store.year, copy: exportCopy) } } }
             if let stats = store.stats {
@@ -131,7 +132,7 @@ struct YearReviewView: View {
                     Section(header: Text(l10n("Longest audiobook finished")).foregroundColor(ShelfStyle.secondaryText)) { ranked(book.title, time: book.duration) }
                 }
             }
-        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Year in review"))
+        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Year in review")).navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .navigationBarTrailing) { shareButton } }
             .sheet(item: $exporting) { export in
                 switch export {

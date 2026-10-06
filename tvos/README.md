@@ -2,6 +2,10 @@
 
 Native SwiftUI streaming client for tvOS 17 or later. The TV target shares Apple API/playback code with the iPhone/iPad client and connects to the unified Audiobook Loft backend or a compatible Audiobookshelf server. Stable Xcode target names and preview signing identities retain their technical names. Current architecture and release gates are in [the full-stack docs](../docs/fullstack/STATE.md) and [RELEASE-STATUS.md](../releases/leafwake/RELEASE-STATUS.md).
 
+## Current Apple presentation
+
+OS 26 and newer apply native glass to focused controls when hardware supports it. Content cards keep native rectangular focus and clear artwork; native bordered controls preserve remote activation and older-system fallbacks. Settings actions precede long notices so focus can reach them. See [redesign state and verification](../docs/apple-liquid-glass/STATE.md) for the complete branch, private unsigned candidates and physical-device limitations.
+
 ## Local installation
 
 1. Keep the Mac and Apple TV on the same network.
@@ -63,7 +67,7 @@ The project has no external Swift dependencies. Xcode 27 and its tvOS SDK are in
 ```sh
 swift test --package-path tvos/Core
 
-# Remote-driven UI journeys on the dedicated tvOS QA simulator against owned synthetic fixtures
+# Remote-driven UI journeys on a pooled tvOS simulator against owned synthetic fixtures
 # (HTTP on 20765, HTTPS on 20767 signed by a throwaway CA trusted only in that simulator):
 ./tvos/scripts/verify-ui.sh                                                # TV unit tests, then every journey
 ./tvos/scripts/verify-ui.sh -only-testing:TVJourneyTests/PodcastJourney   # a single journey
@@ -78,7 +82,7 @@ xcodebuild -project tvos/AudiobookshelfTV.xcodeproj \
   -derivedDataPath tvos/build build
 ```
 
-`verify-ui.sh` uses the simulator `00DD108F-2435-4FEC-9C37-3E62861A0EF6` (override with `ABS_TV_QA_SIMULATOR`) and refuses to start if its fixture ports are busy. `ABS_TV_HTTP_PORT` and `ABS_TV_HTTPS_PORT` choose other fixture ports so a second simulator can run journeys in parallel. Debug builds accept a `--reset-tv-state` launch argument that clears the saved login, listening journal (the legacy file and the `NativeListeningJournal` defaults key), language choice and diagnostics log so each journey starts signed out; Release builds, including every signed device build, do not contain it.
+`verify-ui.sh` leases a fresh pooled TV with `sim acquire tv --fresh` and releases it on exit. To retain it for inspection, lease one yourself, set `ABS_TV_QA_SIMULATOR` to its UDID, then release it with `sim release <UDID>`. Never create or clone a task simulator. The verifier refuses busy fixture ports. `ABS_TV_HTTP_PORT` and `ABS_TV_HTTPS_PORT` choose other fixture ports so a second simulator can run journeys in parallel. Debug builds accept a `--reset-tv-state` launch argument that clears the saved login, listening journal (the legacy file and the `NativeListeningJournal` defaults key), language choice and diagnostics log so each journey starts signed out; Release builds, including every signed device build, do not contain it.
 
 Only if editing the project specification or artwork:
 

@@ -49,8 +49,12 @@ struct NowPlayingView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            transport.focusSection()
-            options.focusSection()
+            transport
+                .frame(maxWidth: .infinity)
+                .focusSection()
+            options
+                .frame(maxWidth: .infinity)
+                .focusSection()
             if savesWaiting {
                 Text(l10n("An earlier save of this title got no answer, so newer listening stays on this TV. Settings shows how to send it."))
                     .foregroundStyle(.secondary).accessibilityIdentifier("now-playing-saves-waiting")
@@ -116,7 +120,7 @@ struct NowPlayingView: View {
             Button { Task { await player.skip(-Double(player.backwardInterval)) } } label: { Image(systemName: Self.skipSymbol("gobackward", player.backwardInterval)) }
                 .accessibilityIdentifier("skip-back").accessibilityLabel(l10n("Back {0} seconds", player.backwardInterval))
             Button { player.toggle() } label: {
-                Image(systemName: player.wantsPlayback ? "pause.fill" : "play.fill").frame(width: 80)
+                Image(systemName: player.wantsPlayback ? "pause.fill" : "play.fill").frame(width: 100, height: 54)
             }
             .accessibilityIdentifier("toggle-playback").accessibilityLabel(player.wantsPlayback ? l10n("Pause") : l10n("Play"))
             Button { Task { await player.skip(Double(player.forwardInterval)) } } label: { Image(systemName: Self.skipSymbol("goforward", player.forwardInterval)) }

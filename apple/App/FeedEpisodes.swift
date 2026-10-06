@@ -15,7 +15,7 @@ struct FeedEpisodes: View {
     @Environment(\.nativeStrings) private var l10n
     private var existing: Set<String> { Set((item.media.episodes ?? []).compactMap { $0.enclosure?.url }) }
     var body: some View {
-        NavigationView {
+        NativeNavigation {
             ShelfList {
                 if loading { ProgressView(l10n("Opening podcast feed…")) }
                 if let error {
@@ -39,11 +39,16 @@ struct FeedEpisodes: View {
                     }.disabled(adding || episode.enclosureURL == nil || existing.contains(episode.enclosureURL ?? ""))
                         .accessibilityLabel(episode.title).accessibilityValue(l10n(selected.contains(episode.id) ? "Selected" : "Not selected"))
                 }
-                Button(l10n("Add selected episodes to server"), action: queue).disabled(selected.isEmpty || adding || loading)
                 if adding { ProgressView(l10n("Queueing on your server…")) }
-            }.navigationTitle(l10n("Feed episodes")).navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Done")) { request?.cancel(); presented = false } } }
-        }.navigationViewStyle(StackNavigationViewStyle()).onAppear(perform: load).onDisappear { request?.cancel() }
+            }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Feed episodes")).navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Done")) { request?.cancel(); presented = false } }
+                    ToolbarItem(placement: .bottomBar) {
+                        Button(l10n("Add selected episodes to server"), action: queue)
+                            .nativeGlassButton(prominent: true).disabled(selected.isEmpty || adding || loading)
+                    }
+                }
+        }.onAppear(perform: load).onDisappear { request?.cancel() }
     }
     private func load() {
         guard !adding, let url = item.media.metadata.feedUrl else { loading = false; return }

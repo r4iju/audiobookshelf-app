@@ -19,6 +19,7 @@ targets:
       - path: App/ReaderAssets
         type: folder
         buildPhase: resources
+      - Presentation
       - Playback
       - Export/Sources/YearExport
       - Localization/Sources/NativeLocalization

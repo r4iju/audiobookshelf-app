@@ -93,7 +93,7 @@ final class ReadinessJourney: TVJourney {
         XCTAssertTrue(app.tabBars.buttons["Startseite"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
         XCTAssertTrue(app.tabBars.buttons["Suchen"].exists)
         XCTAssertTrue(app.tabBars.buttons["Einstellungen"].exists)
-        XCTAssertEqual(german.value as? String, "Selected")
+        XCTAssertEqual(german.value as? String, "Ausgewählt")
         XCTAssertTrue(element("language-note").exists, "Partial translation is disclosed")
         audit("language")
         remote.press(.menu)

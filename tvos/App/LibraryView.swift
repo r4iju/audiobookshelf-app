@@ -13,6 +13,15 @@ struct LibraryView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 40) {
+                    HStack(alignment: .firstTextBaseline, spacing: 24) {
+                        Text(browser.library.name).font(.title2.bold())
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer()
+                        if browser.total > 0 {
+                            Text(browser.library.isPodcast ? l10n("{0} podcasts", browser.total) : l10n("{0} titles", browser.total))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                     controls.focusSection()
                     if let error = browser.error, browser.items.isEmpty {
                         StatusMessage(text: CatalogStore.recovery(for: error)) { Task { await browser.retry() } }
@@ -24,6 +33,7 @@ struct LibraryView: View {
                         ForEach(browser.items) { item in
                             NavigationLink(value: Route.item(item)) { ItemTile(item: item) }
                                 .buttonStyle(.card)
+                                .buttonBorderShape(.roundedRectangle(radius: 14))
                                 .accessibilityIdentifier("item-\(item.id)")
                                 .onAppear { Task { await browser.loadMore(after: item) } }
                         }
@@ -46,11 +56,6 @@ struct LibraryView: View {
 
     private var controls: some View {
         HStack(spacing: 30) {
-            Text(browser.library.name).font(.title2.bold())
-            if browser.total > 0 {
-                Text(browser.library.isPodcast ? l10n("{0} podcasts", browser.total) : l10n("{0} titles", browser.total)).foregroundStyle(.secondary)
-            }
-            Spacer()
             Menu {
                 ForEach(LibrarySort.options(for: browser.library)) { option in
                     Button(l10n(option.title)) { Task { await browser.apply(sort: option) } }

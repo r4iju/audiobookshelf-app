@@ -36,6 +36,7 @@ struct SearchView: View {
                         ForEach(found.titles) { result in
                             NavigationLink(value: result.route) { ItemTile(item: result.item, episodeID: result.episodeID) }
                                 .buttonStyle(.card)
+                                .buttonBorderShape(.roundedRectangle(radius: 14))
                                 .accessibilityIdentifier("search." + result.item.id + (result.episodeID.map { "." + $0 } ?? ""))
                         }
                     }

@@ -82,7 +82,7 @@ struct NativeSettings: View {
     @AppStorage("previewHaptic") private var haptic = "light"
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
-        ShelfList {
+        ShelfForm {
             Section {
                 NavigationLink(destination: NativeLanguageSettings()) {
                     HStack { Text(l10n("Language")); Spacer(); Text(l10n.language.name).foregroundColor(ShelfStyle.secondaryText) }
@@ -103,16 +103,16 @@ struct NativeSettings: View {
                 }
             }
             Section {
-                NavigationLink(l10n("Network preferences"), destination: NativeNetworkSettings())
-                NavigationLink(l10n("Import previous app data"), destination: NativeMigrationImport())
-                NavigationLink(l10n("Diagnostics"), destination: NativeDiagnosticsView()).accessibilityIdentifier("diagnostics-settings")
+                NavigationLink(destination: NativeNetworkSettings()) { Label(l10n("Network preferences"), systemImage: "network") }
+                NavigationLink(destination: NativeMigrationImport()) { Label(l10n("Import previous app data"), systemImage: "square.and.arrow.down") }
+                NavigationLink(destination: NativeDiagnosticsView()) { Label(l10n("Diagnostics"), systemImage: "stethoscope") }.accessibilityIdentifier("diagnostics-settings")
             }
             Section(header: Text("Audiobook Loft")) {
                 Text("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.")
                 Text("Open source under GPLv3, with applicable third-party licenses retained.")
                 Link("Source and license notices", destination: URL(string: "https://github.com/r4iju/audiobookshelf-app/releases")!)
             }
-        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Settings"))
+        }.navigationTitle(l10n("Settings")).navigationBarTitleDisplayMode(.inline)
     }
     private func option(_ title: String, selected: Bool, id: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
@@ -126,10 +126,10 @@ struct NativeNetworkSettings: View {
     @State private var streaming = AppleNetworkPolicy.read(AppleNetworkPolicy.streamingKey)
     @State private var downloads = AppleNetworkPolicy.read(AppleNetworkPolicy.downloadsKey)
     var body: some View {
-        ShelfList {
+        ShelfForm {
             choices(l10n("Streaming"), key: AppleNetworkPolicy.streamingKey, selected: $streaming, id: "streaming")
             choices(l10n("Downloads"), key: AppleNetworkPolicy.downloadsKey, selected: $downloads, id: "downloads")
-        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Network preferences"))
+        }.navigationTitle(l10n("Network preferences")).navigationBarTitleDisplayMode(.inline)
     }
     private func choices(_ title: String, key: String, selected: Binding<AppleNetworkPolicy>, id: String) -> some View {
         Section(header: Text(title).foregroundColor(ShelfStyle.secondaryText), footer: Text(l10n("Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions.")).foregroundColor(ShelfStyle.secondaryText)) {

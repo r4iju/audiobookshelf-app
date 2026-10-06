@@ -4,6 +4,10 @@ SwiftUI iPhone/iPad client, connecting directly to the unified Audiobook Loft ba
 
 Current backend architecture, migration and release gates are in [the full-stack docs](../docs/fullstack/STATE.md) and [RELEASE-STATUS.md](../releases/leafwake/RELEASE-STATUS.md). Apple verification commands are documented below. Dated stock-2.30.0 observations below are historical compatibility evidence, not an active backend dependency or current acceptance claim.
 
+## Current Apple presentation
+
+OS 26 and newer use native Liquid Glass navigation and availability-guarded custom controls. Content, artwork and reading pages remain solid surfaces. iPad navigation adapts to its actual window width. Reduce Transparency and Increase Contrast select opaque custom-control fallbacks; Reduce Motion suppresses interactive glass motion and explicit transactions. Light, dark and black appearance preferences remain available. See [redesign state and verification](../docs/apple-liquid-glass/STATE.md) for exact candidates and acceptance limits.
+
 ## Local builds
 
 ```sh
@@ -13,7 +17,9 @@ xcodegen generate --spec apple/project.yml
 ./apple/scripts/deploy.sh <paired-iPhone-or-iPad-UDID>
 ```
 
-`verify-ui.sh` leases a pooled iPhone with `sim acquire` and releases it on exit; set `ABS_QA_SIMULATOR` to a UDID or device name to use a specific simulator instead. The UI journey uses synthetic loopback servers and proves sign-in, library selection, Keychain restoration after relaunch, invalid-address recovery, qualified `.lan` HTTP, and rejection of an untrusted HTTPS certificate. `verify-ui.sh` owns HTTP fixtures on 19765 and 19766 and an untrusted HTTPS fixture on 19767, using synthetic accounts `qa` and `qa-other` with password `qa`. It creates a temporary two-day test certificate and requires the Studio's existing `dev.nginx.lan → 127.0.0.1` alias. It does not install a trust root. Simulator builds must be ad hoc signed with the app's entitlements: disabling signing makes genuine Keychain operations fail with `-34018`. The qualified-host regression was first observed failing with an ATS cleartext-denial message; removing the conflicting `NSAllowsLocalNetworking` key made it pass while normal HTTPS trust remained enforced.
+`verify-ui.sh` leases a pooled iPhone with `sim acquire` and releases it on exit; set `ABS_QA_SIMULATOR` to a UDID or device name to use a specific simulator instead. The UI journey uses synthetic loopback servers and proves sign-in, library selection, Keychain restoration after relaunch, invalid-address recovery, qualified `.lan` HTTP, and rejection of an untrusted HTTPS certificate. `verify-ui.sh` owns HTTP fixtures on 19765 and 19766 and an untrusted HTTPS fixture on 19767, using synthetic accounts `qa` and `qa-other` with password `qa`. It creates a temporary two-day test certificate and requires the Studio's existing `dev.nginx.lan → 127.0.0.1` alias only for the qualified-host case or an unfiltered run. It does not install a trust root. Simulator builds must be ad hoc signed with the app's entitlements: disabling signing makes genuine Keychain operations fail with `-34018`. The qualified-host regression was first observed failing with an ATS cleartext-denial message; removing the conflicting `NSAllowsLocalNetworking` key made it pass while normal HTTPS trust remained enforced.
+
+The main `AudiobookshelfNative` scheme runs UI journeys. Run existing unit tests separately with the `NativeTests` scheme. Fixture-dependent playback authorization and full-volume tests use their dedicated scripts. `verify-presentation.sh` and `verify-remaining-qa.sh` require the **name** of an already leased device in `ABS_PRESENTATION_SIMULATOR` and `ABS_REMAINING_QA_SIMULATOR`, respectively; resolve that name from `sim list`. Release the lease when finished.
 
 No replacement in-memory credential store is used by the app or UI journey.
 
@@ -37,7 +43,7 @@ The native catalog uses the server's paginated item API, expanded book details, 
 
 The UI journeys exercise the actual signed app against the synthetic server: book details and chapters, scrolling through 61 titles, and a resume card outside page one without an eager page-two request. The fixture's request observations verify pagination behavior. The original placeholder failed the browsing journey; the eager-fetch regression failed before personalized shelves and scrolling-driven pagination were implemented.
 
-Run the same journeys on a dedicated iPad simulator with `ABS_QA_SIMULATOR='Audiobookshelf Native iPad QA' ./apple/scripts/verify-ui.sh`. Create that simulator using an available iPad device type and the same iOS runtime.
+Lease an iPad with `sim acquire ipad --for "Apple catalog QA"`, set `ABS_QA_SIMULATOR` to the returned UDID, run the verifier, and call `sim release <UDID>` afterward. Never create or clone a task simulator.
 
 ## Display preferences and statistics
 

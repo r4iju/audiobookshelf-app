@@ -40,6 +40,7 @@ struct HomeView: View {
                                     ForEach(shelf.items) { item in
                                         NavigationLink(value: Route.to(item)) { ItemTile(item: item) }
                                             .buttonStyle(.card)
+                                            .buttonBorderShape(.roundedRectangle(radius: 14))
                                             .accessibilityIdentifier("\(shelf.shelfID).\(item.id)")
                                     }
                                 }

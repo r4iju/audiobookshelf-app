@@ -42,20 +42,22 @@ struct RootView: View {
     private var tabs: some View {
         TabView(selection: $navigator.tab) {
             HomeView()
-                .tabItem { Text(l10n("Home")) }.tag(TVTab.home)
+                .tabItem { Label(l10n("Home"), systemImage: "house") }.tag(TVTab.home)
             ForEach(catalog.libraries) { library in
                 LibraryView(library: library, api: catalog.api)
-                    .tabItem { Text(library.name) }.tag(TVTab.library(library.id))
+                    .tabItem { Label(library.name, systemImage: library.isPodcast ? "mic" : "books.vertical") }.tag(TVTab.library(library.id))
             }
             SearchView()
-                .tabItem { Text(l10n("Search")) }.tag(TVTab.search)
+                .tabItem { Label(l10n("Search"), systemImage: "magnifyingglass") }.tag(TVTab.search)
             if player.session != nil || player.preparing {
                 NowPlayingView()
-                    .tabItem { Text(l10n("Now Playing")) }.tag(TVTab.nowPlaying)
+                    .tabItem { Label(l10n("Now Playing"), systemImage: "waveform") }.tag(TVTab.nowPlaying)
             }
             SettingsView()
-                .tabItem { Text(l10n("Settings")) }.tag(TVTab.settings)
+                .tabItem { Label(l10n("Settings"), systemImage: "gearshape") }.tag(TVTab.settings)
         }
+        .nativeGlassButton()
+        .buttonBorderShape(.capsule)
         .onPlayPauseCommand { if player.session != nil { player.toggle() } }
         .onChange(of: player.session == nil && !player.preparing) { _, ended in
             if ended && navigator.tab == .nowPlaying { navigator.tab = .home }

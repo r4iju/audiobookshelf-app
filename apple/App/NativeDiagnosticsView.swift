@@ -90,6 +90,7 @@ struct NativeDiagnosticsView: View {
     @EnvironmentObject private var downloads: NativeDownloads
     @ObservedObject private var diagnostics = NativeDiagnostics.shared
     @Environment(\.nativeStrings) private var l10n
+    @Environment(\.sizeCategory) private var sizeCategory
     @State private var showAddress = false
     @State private var confirmingClear = false
     @State private var sharing = false
@@ -119,10 +120,19 @@ struct NativeDiagnosticsView: View {
             }
             Section(header: Text(l10n("Status")).foregroundColor(ShelfStyle.secondaryText)) {
                 ForEach(statusLines(), id: \.id) { line in
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(line.label).foregroundColor(ShelfStyle.secondaryText)
-                        Spacer()
-                        Text(line.value).multilineTextAlignment(.trailing)
+                    Group {
+                        if sizeCategory.isAccessibilityCategory {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(line.label).foregroundColor(ShelfStyle.secondaryText)
+                                Text(line.value)
+                            }
+                        } else {
+                            HStack(alignment: .firstTextBaseline) {
+                                Text(line.label).foregroundColor(ShelfStyle.secondaryText)
+                                Spacer()
+                                Text(line.value).multilineTextAlignment(.trailing)
+                            }
+                        }
                     }.accessibilityElement(children: .combine).accessibilityIdentifier(line.id)
                 }
             }
@@ -132,7 +142,7 @@ struct NativeDiagnosticsView: View {
                 Button(l10n("Copy report")) { NativeHaptic.impact("logs"); UIPasteboard.general.string = report() }.accessibilityIdentifier("diagnostic-copy")
                 Button(l10n("Clear events")) { confirmingClear = true }.foregroundColor(.red).disabled(diagnostics.events.isEmpty).accessibilityIdentifier("diagnostic-clear")
             }
-        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Diagnostics"))
+        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Diagnostics")).navigationBarTitleDisplayMode(.inline)
             .onAppear { pending = NativeDiagnostics.pendingListening() }
             .alert(isPresented: $confirmingClear) {
                 Alert(title: Text(l10n("Clear events?")), message: Text(l10n("The recorded problems are removed from this device.")),

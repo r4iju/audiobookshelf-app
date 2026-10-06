@@ -187,7 +187,7 @@ struct EPUBReader: View {
         _reading = StateObject(wrappedValue: EPUBReading(source: source, api: api, store: store))
     }
     var body: some View {
-        NavigationView {
+        NativeNavigation {
             VStack(spacing: 0) {
                 ZStack {
                     EPUBCanvas(reading: reading)
@@ -195,13 +195,14 @@ struct EPUBReader: View {
                     else if !reading.ready { ProgressView(l10n("Opening EPUB…")).padding().background(appearance.background) }
                 }
                 HStack {
-                    Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left") }.accessibilityLabel(l10n("Previous page"))
+                    Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Previous page"))
                     Spacer()
-                    Button { contents = true } label: { Image(systemName: "list.bullet") }.accessibilityLabel(l10n("Contents"))
-                    Button { settings = true } label: { Image(systemName: "textformat.size") }.accessibilityLabel(l10n("Reading settings"))
+                    Button { contents = true } label: { Image(systemName: "list.bullet").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Contents"))
+                    Button { settings = true } label: { Image(systemName: "textformat.size").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Reading settings"))
                     Spacer()
-                    Button { reading.call("turn", true) } label: { Image(systemName: "chevron.right") }.accessibilityLabel(l10n("Next page"))
-                }.padding().disabled(!reading.ready)
+                    Button { reading.call("turn", true) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Next page"))
+                }.buttonStyle(PlainButtonStyle()).padding(.horizontal, 8).padding(.vertical, 4)
+                    .nativeFloatingControl(background: appearance.card).padding(.horizontal).padding(.vertical, 8).disabled(!reading.ready)
                 if player.session != nil {
                     HStack {
                         Text(player.title).font(.caption).lineLimit(1)
@@ -216,27 +217,20 @@ struct EPUBReader: View {
                 } else if store.waitingForListening {
                     Text(l10n("Passage saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding(.horizontal)
                 }
-            }.navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
+            }.background(appearance.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } } }
                 .sheet(isPresented: $contents) {
-                    NavigationView { ShelfList { ForEach(reading.chapters) { chapter in Button(chapter.title) { reading.call("navigate", chapter.href); contents = false } } }.navigationTitle(l10n("Contents")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { contents = false } } } }.navigationViewStyle(StackNavigationViewStyle())
+                    NativeNavigation { ShelfList { ForEach(reading.chapters) { chapter in Button(chapter.title) { reading.call("navigate", chapter.href); contents = false } } }.navigationTitle(l10n("Contents")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { contents = false } } } }.listeningSheet()
                 }
                 .sheet(isPresented: $settings) {
-                    NavigationView {
+                    NativeNavigation {
                         ShelfForm {
                             Picker(l10n("Volume buttons"), selection: $reading.preferences.volume) {
                                 Text(l10n("Enabled")).tag("enabled"); Text(l10n("Mirrored")).tag("mirrored"); Text(l10n("Off")).tag("none")
                             }.accessibilityIdentifier("reader-volume-mode")
-                            HStack {
-                                Text(l10n("While listening"))
-                                Spacer()
-                                Toggle(l10n("Volume navigation while listening"), isOn: $reading.preferences.volumeWhileListening).labelsHidden().accessibilityLabel(l10n("Volume navigation while listening")).fixedSize()
-                            }
-                            HStack {
-                                Text(l10n("Keep screen awake"))
-                                Spacer()
-                                Toggle(l10n("Keep screen awake"), isOn: $reading.preferences.keepAwake).labelsHidden().accessibilityLabel(l10n("Keep screen awake")).fixedSize()
-                            }
+                            Toggle(l10n("While listening"), isOn: $reading.preferences.volumeWhileListening)
+                                .accessibilityLabel(l10n("Volume navigation while listening"))
+                            Toggle(l10n("Keep screen awake"), isOn: $reading.preferences.keepAwake)
                             Picker(l10n("Theme"), selection: $reading.preferences.theme) { Text(l10n("Light", context: .theme)).tag("light"); Text(l10n("Dark", context: .theme)).tag("dark"); Text(l10n("Black", context: .theme)).tag("black") }
                             Picker(l10n("Font"), selection: $reading.preferences.font) { Text(l10n("Serif")).tag("serif"); Text(l10n("Sans serif")).tag("sans-serif"); Text(l10n("Monospace")).tag("monospace") }
                             Text(l10n("Font size {0}%", Int(reading.preferences.scale)))
@@ -247,9 +241,9 @@ struct EPUBReader: View {
                             Slider(value: $reading.preferences.stroke, in: 0...300, step: 5).accessibilityLabel(l10n("Text weight"))
                             Picker(l10n("Spread"), selection: $reading.preferences.spread) { Text(l10n("Automatic")).tag("auto"); Text(l10n("Single page")).tag("none"); Text(l10n("Two pages")).tag("always") }
                         }.navigationTitle(l10n("Reading settings")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { settings = false } } }
-                    }.navigationViewStyle(StackNavigationViewStyle())
+                    }.listeningSheet()
                 }
-        }.navigationViewStyle(StackNavigationViewStyle()).accentColor(ShelfStyle.accent)
+        }.accentColor(ShelfStyle.accent)
             .onAppear { reading.context(listening: player.session != nil || player.preparing, active: scenePhase == .active && !contents && !settings) }
             .onChange(of: player.session?.id) { _ in reading.context(listening: player.session != nil || player.preparing, active: scenePhase == .active && !contents && !settings) }
             .onChange(of: player.preparing) { _ in reading.context(listening: player.session != nil || player.preparing, active: scenePhase == .active && !contents && !settings) }

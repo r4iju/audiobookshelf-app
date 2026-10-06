@@ -18,6 +18,16 @@ struct SettingsView: View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 44) {
+                    section(l10n("Apple TV")) {
+                        NavigationLink(value: ReturnFocus.language) {
+                            Label(l10n("Language") + ": " + l10n.language.name, systemImage: "globe")
+                        }
+                        .focused($focus, equals: .language)
+                        .accessibilityIdentifier("language-setting")
+                        NavigationLink(value: ReturnFocus.diagnostics) { Label(l10n("Diagnostics"), systemImage: "stethoscope") }
+                            .focused($focus, equals: .diagnostics)
+                            .accessibilityIdentifier("diagnostics-setting")
+                    }
                     section(l10n("Server")) {
                         Text(catalog.serverAddress).font(.headline).accessibilityIdentifier("server-address")
                             .accessibilityLabel(l10n("Server address")).accessibilityValue(catalog.serverAddress)
@@ -42,16 +52,6 @@ struct SettingsView: View {
                         }
                         .focusSection()
                         Toggle(l10n("Rewind a little after a long pause"), isOn: $player.rewindAfterPause)
-                    }
-                    section(l10n("Apple TV")) {
-                        NavigationLink(value: ReturnFocus.language) {
-                            Label(l10n("Language") + ": " + l10n.language.name, systemImage: "globe")
-                        }
-                        .focused($focus, equals: .language)
-                        .accessibilityIdentifier("language-setting")
-                        NavigationLink(value: ReturnFocus.diagnostics) { Label(l10n("Diagnostics"), systemImage: "stethoscope") }
-                            .focused($focus, equals: .diagnostics)
-                            .accessibilityIdentifier("diagnostics-setting")
                     }
                     section(l10n("Account")) {
                         Button(role: .destructive) {
@@ -149,6 +149,8 @@ struct SettingsView: View {
             Text(title).font(.title3.bold())
             content()
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .bottom) { Divider().offset(y: 22) }
         .focusSection()
     }
 

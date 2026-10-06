@@ -141,6 +141,7 @@ private struct AuthorScreen: View {
                         ForEach(books.items) { item in
                             NavigationLink(value: Route.to(item)) { ItemTile(item: item) }
                                 .buttonStyle(.card)
+                                .buttonBorderShape(.roundedRectangle(radius: 14))
                                 .accessibilityIdentifier("author-book." + item.id)
                                 .onAppear { Task { await books.loadMore(after: item) } }
                         }
@@ -211,6 +212,7 @@ private struct SeriesScreen: View {
                             }
                             NavigationLink(value: Route.to(item)) { ItemTile(item: item) }
                                 .buttonStyle(.card)
+                                .buttonBorderShape(.roundedRectangle(radius: 14))
                                 .accessibilityIdentifier("series-book." + item.id)
                                 .onAppear { Task { await books.loadMore(after: item) } }
                         }

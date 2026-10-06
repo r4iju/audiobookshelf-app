@@ -1,0 +1,18 @@
+Check	Passed tests	Final result	Result bundle or log
+NativeTests	88	PASS	/tmp/lg228/native-pass.xcresult
+PlaybackAuthorizationTests	4	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build-playback-authorization/Logs/Test/Test-NativeTests-2026.10.07_00-42-23-+0900.xcresult
+DownloadStorage + PublicationStorage	2	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build-remaining-qa/results/storage-Pool-iPhone-1-(iOS-26.0)-20261007-004316.xcresult
+TVAppTests + TV focus/player/audit	17+3	PASS	/tmp/lg228/tv.xcresult
+Mobile contrast light/dark/black	3	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build-remaining-qa/results/Pool-iPhone-1-(iOS-26.0)-20261007-003904.xcresult
+iPhone27 auth/chapter-speed/PDF	3	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-43-34-+0900.xcresult
+iPad27 large-player + Arabic	2 passed, German rerun below	PASS (selected 2; German failed then reran)	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation/derived/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-38-41-+0900.xcresult
+iPad27 saved German	1	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation/derived/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-42-50-+0900.xcresult
+iPhone27 largest search	1	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-50-36-+0900.xcresult
+iPhone26 Reduce Transparency retry	1	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-45-57-+0900.xcresult
+iPhone26 Reduce Transparency full offline	1	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-46-46-+0900.xcresult
+iPhone26 all accessibility fallbacks + largest player	1	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation/derived/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-55-28-+0900.xcresult
+YearExport iOS package	28	PASS	/tmp/lg228/export/Logs/Test/Test-YearExport-2026.10.07_00-42-01-+0900.xcresult
+Localization	18	PASS	/tmp/lg228/package-Localization-final.log
+Diagnostics	21	PASS	/tmp/lg228/package-Diagnostics.log
+Migration	39	PASS	/tmp/lg228/package-Migration.log
+Core	72	PASS	/tmp/lg228/package-Core.log

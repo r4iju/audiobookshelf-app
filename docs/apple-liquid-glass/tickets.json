@@ -1,0 +1,100 @@
+[
+  {
+    "index": 1,
+    "title": "Modernize Apple sign-in and introduce accessible glass controls",
+    "blockers": [],
+    "criteria": [
+      "Sign-in, loading and credential recovery use coherent native presentation on iPhone/iPad and TV.",
+      "Availability-guarded genuine glass controls preserve minimum OS support and accessibility fallbacks.",
+      "Existing authentication identifiers, account storage, localization and recovery behavior remain intact.",
+      "Both Apple apps compile with current SDK and changes are Apple-only."
+    ],
+    "number": 223,
+    "id": 5729763100,
+    "url": "https://github.com/r4iju/audiobookshelf-app/issues/223",
+    "path": "docs/apple-liquid-glass/01-ticket.md"
+  },
+  {
+    "index": 2,
+    "title": "Modernize iPhone and iPad library navigation",
+    "blockers": [
+      1
+    ],
+    "criteria": [
+      "Library chooser, browse/search/filter, details and related catalog journeys use adaptive native navigation and controls.",
+      "iPhone and compact/wide iPad layouts remain readable with large text and both appearances.",
+      "All existing catalog actions and accessibility identifiers remain reachable."
+    ],
+    "number": 224,
+    "id": 5729764464,
+    "url": "https://github.com/r4iju/audiobookshelf-app/issues/224",
+    "path": "docs/apple-liquid-glass/02-ticket.md"
+  },
+  {
+    "index": 3,
+    "title": "Modernize Apple listening controls and player presentation",
+    "blockers": [
+      2
+    ],
+    "criteria": [
+      "Compact playback floats in appropriate system glass above content without obscuring navigation.",
+      "Expanded playback, chapter/speed/sleep/bookmark controls use coherent native presentation.",
+      "Existing audio lifecycle, background/remote controls, progress recovery and offline playback remain unchanged."
+    ],
+    "number": 225,
+    "id": 5729765889,
+    "url": "https://github.com/r4iju/audiobookshelf-app/issues/225",
+    "path": "docs/apple-liquid-glass/03-ticket.md"
+  },
+  {
+    "index": 4,
+    "title": "Modernize Apple reading, downloads and account utilities",
+    "blockers": [
+      3
+    ],
+    "criteria": [
+      "Reader chrome, downloads, podcasts/queues, settings/accounts, diagnostics and statistics match the redesigned Apple presentation.",
+      "Reading text and artwork remain content surfaces; opaque accessibility fallbacks remain usable.",
+      "All existing utility actions, localization and stored preferences remain intact."
+    ],
+    "number": 226,
+    "id": 5729767216,
+    "url": "https://github.com/r4iju/audiobookshelf-app/issues/226",
+    "path": "docs/apple-liquid-glass/04-ticket.md"
+  },
+  {
+    "index": 5,
+    "title": "Modernize Apple TV browsing and listening",
+    "blockers": [
+      1
+    ],
+    "criteria": [
+      "TV navigation, search, library/detail/related screens, player and settings adopt native glass/control presentation.",
+      "Focused actions remain conspicuous and legible across the room, with Back and Play/Pause behavior intact.",
+      "TV minimum OS and device capability fallbacks preserve existing behavior."
+    ],
+    "number": 227,
+    "id": 5729769228,
+    "url": "https://github.com/r4iju/audiobookshelf-app/issues/227",
+    "path": "docs/apple-liquid-glass/05-ticket.md"
+  },
+  {
+    "index": 6,
+    "title": "Verify and ship the complete Apple redesign",
+    "blockers": [
+      4,
+      5
+    ],
+    "criteria": [
+      "Existing relevant native/UI journeys pass for iPhone/iPad and TV; meaningful failures are fixed.",
+      "Actual platform screenshots and accessibility/layout evidence cover all three device families.",
+      "Review the full integration diff, fix findings, merge the integration PR and provide verified Apple candidate build evidence.",
+      "Refresh only Apple-facing docs/release evidence and preserve public distribution rights gates.",
+      "No Android, browser or backend runtime changes are included."
+    ],
+    "number": 228,
+    "id": 5729770861,
+    "url": "https://github.com/r4iju/audiobookshelf-app/issues/228",
+    "path": "docs/apple-liquid-glass/06-ticket.md"
+  }
+]

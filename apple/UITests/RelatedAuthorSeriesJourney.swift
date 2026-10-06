@@ -16,8 +16,8 @@ import XCTest
         let app = XCUIApplication()
         XCTAssertTrue(app.buttons["Search library"].waitForExistence(timeout: 10))
         app.buttons["Search library"].tap()
-        app.textFields["library-search"].tap()
-        app.textFields["library-search"].typeText(text + "\n")
+        librarySearchField(app).tap()
+        librarySearchField(app).typeText(text + "\n")
         let result = app.buttons[identifier]
         for _ in 0..<6 where !result.waitForExistence(timeout: 2) { app.swipeUp() }
         XCTAssertTrue(result.exists, app.debugDescription)

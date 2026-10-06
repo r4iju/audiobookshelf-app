@@ -22,8 +22,23 @@ cleanup() {
     rm -rf "$fixture_dir"
 }
 trap cleanup EXIT
-python3 - <<'PY'
-import socket
+# A focused local-fixture run does not need the qualified-host trust regression's DNS entry.
+require_qualified_host=true
+only_tests=()
+for argument in "$@"; do
+    if [[ "$argument" == -only-testing:* ]]; then only_tests+=("${argument#-only-testing:}"); fi
+done
+if (( ${#only_tests[@]} > 0 )); then
+    require_qualified_host=false
+    for selected in "${only_tests[@]}"; do
+        case "$selected" in
+            NativeJourneyTests|NativeJourneyTests/ConnectionJourney|NativeJourneyTests/ConnectionJourney/testQualifiedLANHTTPConnectsWithoutWeakeningHTTPSTrust)
+                require_qualified_host=true ;;
+        esac
+    done
+fi
+ABS_QA_REQUIRE_QUALIFIED_HOST="$require_qualified_host" python3 - <<'PY'
+import os, socket
 for port in [19765, 19766, 19767, 19769]:
     with socket.socket() as listener:
         listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -31,7 +46,7 @@ for port in [19765, 19766, 19767, 19769]:
             listener.bind(('127.0.0.1', port))
         except OSError:
             raise SystemExit(f'Fixture port {port} is already in use. Finish the previous owned verification before starting another.')
-if socket.gethostbyname('dev.nginx.lan') != '127.0.0.1':
+if os.environ['ABS_QA_REQUIRE_QUALIFIED_HOST'] == 'true' and socket.gethostbyname('dev.nginx.lan') != '127.0.0.1':
     raise SystemExit('The signed qualified-host regression requires dev.nginx.lan resolving to 127.0.0.1 on this Studio.')
 PY
 openssl req -x509 -newkey rsa:2048 -nodes -days 2 \

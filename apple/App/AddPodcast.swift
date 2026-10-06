@@ -24,7 +24,7 @@ struct AddPodcast: View {
         return false
     }
     var body: some View {
-        NavigationView {
+        NativeNavigation {
             ShelfForm {
                 if feed == nil {
                     Section(header: Text(l10n("Discover a podcast")).foregroundColor(ShelfStyle.secondaryText)) {
@@ -60,7 +60,7 @@ struct AddPodcast: View {
                             ForEach(folders) { folder in Text(folder.fullPath).tag(folder.id) }
                         }
                         Toggle(l10n("Automatically download new episodes"), isOn: $autoDownload)
-                        Button(l10n("Create podcast"), action: create).disabled(!permitted || busy || folders.isEmpty || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        Button(l10n("Create podcast"), action: create).nativeGlassButton(prominent: true).disabled(!permitted || busy || folders.isEmpty || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }.disabled(busy)
                     if folders.isEmpty { Text(l10n("This library has no server folder. Add one in server settings before creating a podcast.")).foregroundColor(ShelfStyle.secondaryText) }
                 }
@@ -68,7 +68,7 @@ struct AddPodcast: View {
                 if let error { Text(error).foregroundColor(.red).accessibilityIdentifier("podcast-action-error") }
             }.navigationTitle(l10n("Add podcast")).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Cancel")) { request?.cancel(); presented = false } } }
-        }.navigationViewStyle(StackNavigationViewStyle())
+        }
             .onChange(of: feedURL) { _ in if !busy { feed = nil; discovery = nil } }
             .onDisappear { request?.cancel() }
     }

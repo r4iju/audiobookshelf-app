@@ -5,6 +5,7 @@ set -euo pipefail
 apple_root="$(cd "$(dirname "$0")/.." && pwd)"
 repo_root="$(cd "$apple_root/.." && pwd)"
 simulator="${ABS_PRESENTATION_SIMULATOR:-Audiobookshelf Presentation QA}"
+simulator_id="$(xcrun simctl list devices available --json | python3 -c 'import json,sys; name=sys.argv[1]; matches=[d["udid"] for devices in json.load(sys.stdin)["devices"].values() for d in devices if d["name"] == name]; assert len(matches) == 1, "Name an available leased simulator uniquely"; print(matches[0])' "$simulator")"
 qa_root="$apple_root/build-presentation"
 fixture_dir="$(mktemp -d)"
 fixture_pids=()
@@ -60,6 +61,6 @@ open(target, 'w').write(text.replace('name: AudiobookshelfNative\n', 'name: buil
 PY
 xcodegen generate --quiet --spec "$spec" --project-root "$apple_root" --project "$apple_root"
 xcodebuild -project "$apple_root/build-presentation-qa.xcodeproj" -scheme AudiobookshelfNative \
-    -destination "platform=iOS Simulator,name=$simulator" \
+    -destination "id=$simulator_id" \
     -derivedDataPath "$qa_root/derived" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
     IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never "${@:--only-testing:NativeJourneyTests/PresentationJourney}" test
