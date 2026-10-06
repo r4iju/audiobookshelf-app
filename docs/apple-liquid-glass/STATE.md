@@ -16,3 +16,11 @@ Existing selected automated checks passed without accepted skips after correctin
 Both private unsigned Release archives were built from the exact application source above, using Xcode 27. iOS source minimum remains 14; the installed SDK requires a build-only 15 override, so this candidate's actual minimum is 15. tvOS candidate minimum is 17. Archive hashes and commands are in [the candidate evidence](evidence/228/verification.md). No Apple binary was uploaded or published.
 
 Acceptance limits remain explicit: actual 375-point compact iPad window rendering was inspected, but its offset confused both available AX/input tooling and the attempted XCTest launch, so compact-window action/retained-detail/player acceptance remains unverified. Full-width iPad, large text, localization and iPhone fallback actions passed. Physical device background/remote/headset/haptics, physical Apple TV glass capability/rendering, actual VoiceOver speech and physical traversal, and older supported OS execution are not established by simulator evidence. Public Apple distribution is still gated by actual rights/terms approval; source integration and private candidate builds do not satisfy that gate.
+
+## Independent integration review
+
+Fresh standards and spec reviewers examined `f1ed5915...1064bd6c`. Neither found a confirmed implementation defect or scope violation. Their search-size and accessibility-fallback concerns were verified through the final passing interactions. The suspected download-row coactivation did not reproduce under Reduce Transparency, so no speculative runtime fix was applied.
+
+The verification-only delta through `b28fdded` was independently reviewed without assertion weakening or restored legacy runtime code. The final evidence delta through `e576f010` was reviewed against the spec; counts and private archive hashes reconcile. Actual compact/wide inspection satisfies the written layout inspection requirement. Compact-window actions remain a residual verification gap, not a demonstrated regression or a claim of complete compact behavioral acceptance.
+
+Integration PR: [#229](https://github.com/r4iju/audiobookshelf-app/pull/229). Its merge and post-merge smoke results will be recorded on the PR.
