@@ -2,12 +2,8 @@ import XCTest
 @testable import NativeLocalization
 
 final class NativeLanguageTests: XCTestCase {
-    private static let repository = URL(fileURLWithPath: #filePath)
-        .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-        .deletingLastPathComponent().deletingLastPathComponent()
-
     func testEveryLegacySelectableLanguageRemainsSelectableInLegacyOrder() throws {
-        let source = try String(contentsOf: Self.repository.appendingPathComponent("plugins/i18n.js"))
+        let source = try String(contentsOf: URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("legacy-language-map.js"))
         let map = try XCTUnwrap(source.range(of: "const languageCodeMap = {").map { source[$0.upperBound...] })
         let body = map[..<(try XCTUnwrap(map.range(of: "\n}")).lowerBound)]
         let entries = body.split(separator: "\n").compactMap { line -> (String, String)? in

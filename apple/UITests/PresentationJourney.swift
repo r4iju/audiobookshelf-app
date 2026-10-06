@@ -54,6 +54,7 @@ import XCTest
         language.tap()
         XCTAssertEqual(app.buttons["language-system"].value as? String, "Selected")
         XCTAssertTrue(app.staticTexts["language-coverage-note"].exists, "Partial translations must be disclosed")
+        for _ in 0..<4 where !app.buttons["language-de"].exists { app.swipeUp() }
         app.buttons["language-de"].tap()
         XCTAssertEqual(app.buttons["language-de"].value as? String, "Ausgewählt", "The selection state reads in the chosen language")
         XCTAssertTrue(app.navigationBars["Sprache"].waitForExistence(timeout: 3), "The open screen must switch without relaunch")

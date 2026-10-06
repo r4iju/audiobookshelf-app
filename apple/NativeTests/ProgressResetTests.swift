@@ -128,6 +128,9 @@ import XCTest
                 guard let row = server[item, episode] else { return .status(404) }
                 return .json(200, ["id": row.id, "libraryItemId": item, "episodeId": episode as Any? ?? NSNull(), "currentTime": row.time, "lastUpdate": row.updatedAt])
             }
+            harness.stub.route("GET", api + "/items/" + item) { _ in
+                .json(200, ["id": item, "mediaType": "book", "media": ["metadata": ["title": item], "duration": 20]])
+            }
             for id in [server.id(item, episode), server.recreatedID(item, episode)] {
                 harness.stub.route("DELETE", api + "/me/progress/" + id) { _ in server.remove(id: id); return .status(200) }
             }

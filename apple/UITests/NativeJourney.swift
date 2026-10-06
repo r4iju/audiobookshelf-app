@@ -28,13 +28,16 @@ import XCTest
         app.launchArguments = ["--reset-preview-account"] + arguments
         app.launch()
         let server = app.textFields["server"]
+        for _ in 0..<5 where !server.exists { app.swipeUp() }
         XCTAssertTrue(server.waitForExistence(timeout: 10))
         server.tap()
         server.typeText(serverURL)
         let username = app.textFields["username"]
+        for _ in 0..<3 where !username.exists { app.swipeUp() }
         username.tap()
         username.typeText("qa")
         let password = app.secureTextFields["password"]
+        for _ in 0..<3 where !password.exists { app.swipeUp() }
         password.tap()
         password.typeText("qa")
         app.buttons["connect"].tap()
