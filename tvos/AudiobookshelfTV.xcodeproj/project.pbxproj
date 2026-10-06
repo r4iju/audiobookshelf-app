@@ -22,6 +22,7 @@
 		36F158C1075AC3CE473DC5FB /* NativeLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0202BA2A93AB75BA20AF1D16 /* NativeLanguage.swift */; };
 		38950C817DAB40C293DB9DC5 /* CatalogStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135BB43ECEB37379B7AE3630 /* CatalogStoreTests.swift */; };
 		3B95AC7609006D67C4F509AC /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FE311F10522D8719513EB5 /* NowPlayingView.swift */; };
+		3DF60CBF1F580E63630E890D /* NativeNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C5E7F6ECF7EA6EDC66C298 /* NativeNavigation.swift */; };
 		409D41253AE8E8455CD512EE /* RelatedAuthorSeries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FFE7452AE233275CAC0A16 /* RelatedAuthorSeries.swift */; };
 		449DA4ED8C22A891485A8DC6 /* ApplePlayback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D1347C28F681CD8D2533F3 /* ApplePlayback.swift */; };
 		470B841E12FA752EAB3C4D81 /* ItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59C7FA52BC8C86AB78FD34E /* ItemDetailView.swift */; };
@@ -146,6 +147,7 @@
 		AC22CA0557C4ADE1E5B9AED9 /* DiagnosticRedactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticRedactor.swift; sourceTree = "<group>"; };
 		AF6886FC9D2F5AE7BE5EFE76 /* CoreTextInstallation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTextInstallation.swift; sourceTree = "<group>"; };
 		B6AB6A2975B73CF339FA4BF2 /* ListeningSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningSync.swift; sourceTree = "<group>"; };
+		B7C5E7F6ECF7EA6EDC66C298 /* NativeNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeNavigation.swift; sourceTree = "<group>"; };
 		B9DCF54C11B37504BA508579 /* ListeningStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningStats.swift; sourceTree = "<group>"; };
 		C0AD23FC843CB2C071D6A2C0 /* NativeGlassControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeGlassControls.swift; sourceTree = "<group>"; };
 		C0C1E64C7B03BD172853A157 /* bn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/NativeStrings.strings; sourceTree = "<group>"; };
@@ -350,6 +352,7 @@
 			isa = PBXGroup;
 			children = (
 				C0AD23FC843CB2C071D6A2C0 /* NativeGlassControls.swift */,
+				B7C5E7F6ECF7EA6EDC66C298 /* NativeNavigation.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -572,6 +575,7 @@
 				B5588A53439584F39D4D3E82 /* Models.swift in Sources */,
 				6D1D84D03C60DD6B034A41C9 /* NativeGlassControls.swift in Sources */,
 				36F158C1075AC3CE473DC5FB /* NativeLanguage.swift in Sources */,
+				3DF60CBF1F580E63630E890D /* NativeNavigation.swift in Sources */,
 				7EA618B6C4A97C000619531D /* NativeStrings.swift in Sources */,
 				3B95AC7609006D67C4F509AC /* NowPlayingView.swift in Sources */,
 				36078078332730C389B72106 /* OfflineAudio.swift in Sources */,

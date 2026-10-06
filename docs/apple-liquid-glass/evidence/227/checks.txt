@@ -1,0 +1,28 @@
+Xcode 27.0 (27A266a)
+Base: c71029352e6464f470f98f5de03d5d1b524c30a0
+Source minimum: tvOS 17.0
+Simulator: Pool TV 1 / tvOS 27.0 / 9ACC6F5B-180D-44C3-823B-F8796813D69D
+
+/tmp/liquid-glass-227-build-final.log
+** BUILD SUCCEEDED **
+
+/tmp/liquid-glass-227-final.log
+Test Case '-[TVJourneyTests.CatalogJourney testContinueListeningOpensDetailsAndBackRestoresFocus]' passed (18.722 seconds).
+Test Case '-[TVJourneyTests.CatalogJourney testFilterAndSortAreAppliedByTheServer]' passed (26.844 seconds).
+Test Case '-[TVJourneyTests.CatalogJourney testServerSearchFindsTitlesOutsideLoadedPage]' passed (21.836 seconds).
+Test Case '-[TVJourneyTests.PlaybackJourney testResumeShowsChapterAndTotalProgressAndRemoteToggles]' passed (23.027 seconds).
+Test Case '-[TVJourneyTests.ReadinessJourney testGermanLocalizesTheInterfaceAndPersists]' failed (29.382 seconds).
+Test Case '-[TVJourneyTests.RecoveryJourney testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying]' passed (59.417 seconds).
+Test Case '-[TVJourneyTests.RelatedJourney testSearchOpensAuthorWithBioSeriesAndEveryBook]' passed (28.854 seconds).
+Test Case '-[TVJourneyTests.RelatedJourney testSeriesFollowsServerSequenceAndOpensTheIntendedBook]' passed (26.070 seconds).
+** TEST FAILED **
+
+/tmp/liquid-glass-227-settings-final.log
+Test Case '-[TVJourneyTests.ReadinessJourney testCatalogFailureIsRecordedAndClearedFromSettings]' passed (30.885 seconds).
+Test Case '-[TVJourneyTests.ReadinessJourney testGermanLocalizesTheInterfaceAndPersists]' failed (22.452 seconds).
+** TEST FAILED **
+
+/tmp/liquid-glass-227-german-final.log
+Test Case '-[TVJourneyTests.ReadinessJourney testGermanLocalizesTheInterfaceAndPersists]' passed (41.543 seconds).
+** TEST SUCCEEDED **
+
