@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 @MainActor final class LibrarySearchStore: ObservableObject {
     enum State { case idle, loading, results(SearchResponse), failed(String) }
@@ -33,12 +34,8 @@ struct LibrarySearch: View {
     init(catalog: CatalogStore) { _search = StateObject(wrappedValue: LibrarySearchStore(catalog: catalog)) }
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "magnifyingglass").foregroundColor(ShelfStyle.secondaryText)
-                TextField(l10n("Books, podcasts, authors, series…"), text: $search.query, onCommit: { submit() })
-                    .accessibilityIdentifier("library-search")
-                if !search.query.isEmpty { Button { search.query = ""; submit() } label: { Image(systemName: "xmark.circle.fill") }.accessibilityLabel(l10n("Clear search")) }
-            }.padding(14).background(appearance.card).cornerRadius(16).padding(20)
+            CatalogSearchField(query: $search.query, prompt: l10n("Books, podcasts, authors, series…"), submit: submit)
+                .frame(height: 56).padding(.horizontal, 12)
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 18) {
                     switch search.state {
@@ -98,5 +95,38 @@ struct LibrarySearch: View {
         NavigationLink(destination: destination) {
             HStack { Text(name); Spacer(); Image(systemName: "chevron.right") }.padding(18).background(appearance.card).cornerRadius(16)
         }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier(identifier)
+    }
+}
+
+/// UISearchBar supplies native search semantics while retaining the existing field identity.
+private struct CatalogSearchField: UIViewRepresentable {
+    @Binding var query: String
+    let prompt: String
+    let submit: () -> Void
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+    func makeUIView(context: Context) -> UISearchBar {
+        let bar = UISearchBar()
+        bar.searchBarStyle = .minimal
+        bar.delegate = context.coordinator
+        bar.searchTextField.accessibilityIdentifier = "library-search"
+        bar.searchTextField.font = .preferredFont(forTextStyle: .body)
+        bar.searchTextField.adjustsFontForContentSizeCategory = true
+        bar.searchTextField.autocapitalizationType = .none
+        return bar
+    }
+    func updateUIView(_ bar: UISearchBar, context: Context) {
+        context.coordinator.field = self
+        if bar.text != query { bar.text = query }
+        bar.placeholder = prompt
+    }
+    final class Coordinator: NSObject, UISearchBarDelegate {
+        var field: CatalogSearchField
+        init(_ field: CatalogSearchField) { self.field = field }
+        func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) { field.query = searchText }
+        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+            searchBar.resignFirstResponder()
+            field.submit()
+        }
     }
 }

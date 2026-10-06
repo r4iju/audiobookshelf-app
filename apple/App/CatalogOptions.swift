@@ -7,7 +7,7 @@ struct CatalogFilterOptions: View {
     @State private var error: String?
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
-        NavigationView {
+        CatalogNavigation {
             ShelfList {
                 if let error { Text(error).foregroundColor(.red); Button(l10n("Retry filters")) { load() } }
                 else if let data {
@@ -36,7 +36,7 @@ struct CatalogFilterOptions: View {
                     if canAccessExplicitContent { Button(l10n("Explicit content")) { select("explicit") } }
                 } else { ProgressView(l10n("Opening filters…")) }
             }.navigationTitle(l10n("Filters")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { presented = false } } }
-        }.navigationViewStyle(StackNavigationViewStyle()).onAppear { load() }
+        }.onAppear { load() }
     }
     private func load() {
         error = nil

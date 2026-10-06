@@ -10,8 +10,8 @@ import XCTest
         app.buttons["library-podcasts"].tap()
         XCTAssertTrue(app.buttons["Search library"].waitForExistence(timeout: 5))
         app.buttons["Search library"].tap()
-        app.textFields["library-search"].tap()
-        app.textFields["library-search"].typeText("Quiet Evening\n")
+        librarySearchField(app).tap()
+        librarySearchField(app).typeText("Quiet Evening\n")
         let episode = app.buttons["search-episode-episode"]
         XCTAssertTrue(episode.waitForExistence(timeout: 5))
         guard episode.exists else { return }
@@ -48,7 +48,7 @@ import XCTest
         XCTAssertTrue(search.waitForExistence(timeout: 3))
         guard search.exists else { return }
         search.tap()
-        let query = app.textFields["library-search"]
+        let query = librarySearchField(app)
         query.tap()
         query.typeText("Tomorrow 61\n")
         XCTAssertTrue(app.buttons["search-book-60"].waitForExistence(timeout: 10))

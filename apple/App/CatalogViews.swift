@@ -7,16 +7,38 @@ struct ConnectedLibrary: View {
     let library: Library
     var body: some View {
         Group {
-            if sizeClass == .regular {
+            if #available(iOS 17, *), UIDevice.current.userInterfaceIdiom == .pad {
+                AdaptiveLibraryNavigation(library: library, api: connection.api)
+            } else if #available(iOS 16, *), sizeClass == .regular {
+                NavigationSplitView {
+                    LibrarySidebar(selected: library)
+                } detail: {
+                    NavigationStack { CatalogShelf(api: connection.api, library: library) }
+                }.navigationSplitViewStyle(.balanced)
+            } else if sizeClass == .regular {
                 NavigationView {
                     LibrarySidebar(selected: library)
                     CatalogShelf(api: connection.api, library: library)
                 }
             } else {
-                NavigationView { CatalogShelf(api: connection.api, library: library) }
-                    .navigationViewStyle(StackNavigationViewStyle())
+                CatalogNavigation { CatalogShelf(api: connection.api, library: library) }
             }
         }.id(library.id)
+    }
+}
+
+@available(iOS 17, *)
+private struct AdaptiveLibraryNavigation: View {
+    let library: Library
+    let api: APIClient
+    @State private var compactColumn: NavigationSplitViewColumn = .detail
+
+    var body: some View {
+        NavigationSplitView(preferredCompactColumn: $compactColumn) {
+            LibrarySidebar(selected: library)
+        } detail: {
+            NavigationStack { CatalogShelf(api: api, library: library) }
+        }.navigationSplitViewStyle(.balanced)
     }
 }
 
@@ -27,7 +49,6 @@ struct LibrarySidebar: View {
     let selected: Library
     var body: some View {
         ShelfList {
-            Label("Audiobook Loft", systemImage: "books.vertical.fill").font(.title2.bold()).padding(.vertical, 18)
             Label(selected.name, systemImage: selected.mediaType == "podcast" ? "mic" : "books.vertical")
                 .foregroundColor(ShelfStyle.accent)
             Button(l10n("Change library")) { NativeHaptic.impact("library"); Task { await connection.openLibrariesForSelection() } }
@@ -37,6 +58,7 @@ struct LibrarySidebar: View {
 }
 
 struct CatalogShelf: View {
+    @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
@@ -81,13 +103,14 @@ struct CatalogShelf: View {
                         Text(l10n(catalog.library.mediaType == "podcast" ? "All podcasts" : "All books")).font(.title3.weight(.semibold))
                         Text("\(content.total)").font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
                         Spacer()
-                        Button { NativeHaptic.impact("layout"); listLayout.toggle() } label: { Image(systemName: listLayout ? "square.grid.2x2" : "list.bullet").padding(10) }
+                        Button { NativeHaptic.impact("layout"); listLayout.toggle() } label: { Image(systemName: listLayout ? "square.grid.2x2" : "list.bullet").frame(minWidth: 44, minHeight: 44) }
+                            .nativeGlassButton()
                             .accessibilityLabel(l10n(listLayout ? "Show covers" : "Show list"))
                     }
                     if content.items.isEmpty {
                         Text(l10n(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.")).foregroundColor(ShelfStyle.secondaryText)
                     }
-                    LazyVGrid(columns: listLayout ? [GridItem(.flexible(), alignment: .top)] : [GridItem(.adaptive(minimum: 140, maximum: 210), spacing: 16, alignment: .top)], spacing: 22) {
+                    LazyVGrid(columns: listLayout ? [GridItem(.flexible(), alignment: .top)] : [GridItem(.adaptive(minimum: sizeCategory.isAccessibilityCategory ? 260 : 140, maximum: sizeCategory.isAccessibilityCategory ? 420 : 210), spacing: 16, alignment: .top)], spacing: 22) {
                         ForEach(content.items) { item in
                             NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: progress(item, content))) {
                                 BookCard(item: item, catalog: catalog, listLayout: listLayout)
@@ -147,11 +170,11 @@ struct CatalogShelf: View {
             .onReceive(realtime.events) { event in catalog.receive(event) }
             .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
             .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
-            .background(NavigationLink(destination: NativeSettings(), isActive: $settingsPresented) { EmptyView() }.hidden())
-            .background(NavigationLink(destination: StatisticsView(api: catalog.api), isActive: $statisticsPresented) { EmptyView() }.hidden())
-            .background(NavigationLink(destination: NativeDiagnosticsView(), isActive: $diagnosticsPresented) { EmptyView() }.hidden())
-            .background(NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .collection), isActive: $collectionsPresented) { EmptyView() })
-            .background(NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .playlist), isActive: $playlistsPresented) { EmptyView() })
+            .catalogDestination(isPresented: $settingsPresented) { NativeSettings() }
+            .catalogDestination(isPresented: $statisticsPresented) { StatisticsView(api: catalog.api) }
+            .catalogDestination(isPresented: $diagnosticsPresented) { NativeDiagnosticsView() }
+            .catalogDestination(isPresented: $collectionsPresented) { AudioGroupList(catalog: catalog, kind: .collection) }
+            .catalogDestination(isPresented: $playlistsPresented) { AudioGroupList(catalog: catalog, kind: .playlist) }
     }
 
     private func sort(_ choice: CatalogSort, descending: Bool) {
@@ -195,6 +218,7 @@ struct BookCard: View {
     let item: LibraryItem
     let catalog: CatalogStore
     let listLayout: Bool
+    @Environment(\.sizeCategory) private var sizeCategory
     /// `LibraryItem` equality compares ids only, so metadata edited elsewhere is held separately for SwiftUI to redraw it.
     private let title: String
     private let author: String
@@ -222,7 +246,7 @@ struct BookCard: View {
             if !listLayout {
                 Text("Ag\nAg").hidden().accessibilityHidden(true)
             }
-            Text(value).foregroundColor(color).lineLimit(2)
+            Text(value).foregroundColor(color).lineLimit(sizeCategory.isAccessibilityCategory ? nil : 2)
         }.font(font).frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -245,8 +269,8 @@ struct ContinueCard: View {
         HStack(spacing: 14) {
             BookArtwork(item: item, catalog: catalog).frame(width: 64)
             VStack(alignment: .leading, spacing: 6) {
-                Text(title).font(.subheadline.weight(.semibold)).foregroundColor(.primary).lineLimit(2)
-                Text(author).font(.caption).foregroundColor(ShelfStyle.secondaryText).lineLimit(1)
+                Text(title).font(.subheadline.weight(.semibold)).foregroundColor(.primary).lineLimit(sizeCategory.isAccessibilityCategory ? nil : 2)
+                Text(author).font(.caption).foregroundColor(ShelfStyle.secondaryText).lineLimit(sizeCategory.isAccessibilityCategory ? nil : 1)
                 ProgressView(value: progress?.fraction ?? 0).accentColor(ShelfStyle.accent)
                 Text(l10n("{0}% listened", Int((progress?.fraction ?? 0) * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
             }.frame(width: sizeCategory.isAccessibilityCategory ? 260 : 175, alignment: .leading)

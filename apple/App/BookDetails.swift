@@ -3,6 +3,7 @@ import UIKit
 
 struct BookDetails: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var serverQueue: NativePodcastQueue
     @EnvironmentObject private var readingStore: ReadingStore
@@ -65,7 +66,7 @@ struct BookDetails: View {
                         Image(systemName: "play.fill")
                         Text(l10n((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening")).fontWeight(.semibold)
                         Spacer()
-                    }.padding(18).foregroundColor(.white).background(ShelfStyle.accentFill).cornerRadius(16)
+                    }.padding(18).nativeGlassControl(tint: ShelfStyle.accent)
                 }.disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
                 }
                 if episode != nil || book.mediaType == "book" {
@@ -184,7 +185,7 @@ struct BookDetails: View {
     }
 
     @ViewBuilder private var header: some View {
-        if sizeClass == .regular {
+        if sizeClass == .regular && !sizeCategory.isAccessibilityCategory {
             HStack(alignment: .top, spacing: 28) {
                 BookArtwork(item: book, catalog: catalog).frame(width: 200)
                 metadata(alignment: .leading)

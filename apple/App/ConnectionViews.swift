@@ -163,11 +163,12 @@ struct LibraryChooser: View {
     @EnvironmentObject private var connection: ConnectionStore
     let libraries: [Library]
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    Text(l10n("Find your next chapter.")).font(.largeTitle.bold())
+        CatalogNavigation {
+            ShelfList {
+                Section {
                     Text(l10n("Choose a library to get started.")).foregroundColor(ShelfStyle.secondaryText)
+                }
+                Section {
                     ForEach(libraries) { library in
                         Button { NativeHaptic.impact("library"); connection.select(library) } label: {
                             HStack(spacing: 18) {
@@ -178,11 +179,11 @@ struct LibraryChooser: View {
                                     Text(l10n(library.mediaType == "podcast" ? "Podcasts" : "Audiobooks & reading")).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                                 }
                                 Spacer(); Image(systemName: "chevron.right").foregroundColor(ShelfStyle.secondaryText)
-                            }.padding(22).background(appearance.card).cornerRadius(20)
+                            }.padding(.vertical, 10)
                         }.accessibilityIdentifier("library-\(library.id)")
                     }
                     if libraries.isEmpty { Text(l10n("No libraries are available to this account. Ask your server administrator for access.")).foregroundColor(ShelfStyle.secondaryText) }
-                }.padding(24).frame(maxWidth: 640).frame(maxWidth: .infinity)
+                }
             }.navigationTitle(l10n("Your libraries"))
                 .toolbar { ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
@@ -191,7 +192,7 @@ struct LibraryChooser: View {
                         Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }
                     } label: { Image(systemName: "person.crop.circle") }.accessibilityLabel(l10n("Account")).accessibilityIdentifier("account")
                 } }
-        }.navigationViewStyle(StackNavigationViewStyle())
+        }
     }
 }
 

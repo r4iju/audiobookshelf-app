@@ -11,6 +11,11 @@ import XCTest
         app.collectionViews.matching(NSPredicate(format: "label != %@", "Sidebar"))
     }
 
+    func librarySearchField(_ app: XCUIApplication) -> XCUIElement {
+        let field = app.searchFields["library-search"]
+        return field.exists ? field : app.textFields["library-search"]
+    }
+
     func capture(_ name: String) {
         let evidence = XCTAttachment(screenshot: XCUIApplication().screenshot())
         evidence.name = name
