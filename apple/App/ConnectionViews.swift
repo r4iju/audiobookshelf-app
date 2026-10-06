@@ -22,7 +22,11 @@ struct ConnectionRoot: View {
             switch connection.screen {
             case .connection(let error): ConnectionForm(error: error)
             case .loading:
-                VStack(spacing: 18) { ProgressView(); Text(l10n("Opening your library…")).font(.headline); Button(l10n("Open downloads")) { downloads.presented = true } }
+                VStack(spacing: 24) {
+                    ProgressView().accessibilityLabel(l10n("Opening your library…"))
+                    Text(l10n("Opening your library…")).font(.headline)
+                    Button(l10n("Open downloads")) { downloads.presented = true }.nativeGlassButton()
+                }.padding(24)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .libraries(let libraries): LibraryChooser(libraries: libraries)
             case .shelf(let library): ConnectedLibrary(library: library)
@@ -55,17 +59,19 @@ struct ConnectionForm: View {
     @State private var panel: ConnectionFormPanel?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
-                Image(systemName: "books.vertical.fill").font(.system(size: 28, weight: .medium))
-                    .foregroundColor(.white).frame(width: 64, height: 64)
-                    .background(ShelfStyle.accentFill).cornerRadius(20)
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(l10n("Make room for\na good story.")).font(.system(size: 40, weight: .bold, design: .serif))
-                        .fixedSize(horizontal: false, vertical: true)
-                    Text(l10n("Your books. Your server.\nListen wherever the day takes you.")).font(.body).foregroundColor(ShelfStyle.secondaryText)
-                }
-                VStack(alignment: .leading, spacing: 20) {
+        NavigationView {
+            Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Image(systemName: "books.vertical.fill")
+                            .font(.largeTitle).foregroundColor(ShelfStyle.accent).accessibilityHidden(true)
+                        Text(l10n("Make room for\na good story."))
+                            .font(.largeTitle.bold()).fixedSize(horizontal: false, vertical: true)
+                        Text(l10n("Your books. Your server.\nListen wherever the day takes you."))
+                            .font(.body).foregroundColor(ShelfStyle.secondaryText)
+                    }.padding(.vertical, 12)
+                }.listRowBackground(appearance.card)
+                Section {
                     field(l10n("Server address")) {
                         TextField("https://audiobookshelf.nginx.lan", text: $connection.server)
                             .keyboardType(.URL).textContentType(.URL).autocapitalization(.none).disableAutocorrection(true)
@@ -79,37 +85,47 @@ struct ConnectionForm: View {
                         SecureField(l10n("Password"), text: $password).textContentType(.password).accessibilityIdentifier("password")
                     }
                     if let error {
-                        Text(error).font(.callout).foregroundColor(.red).fixedSize(horizontal: false, vertical: true)
-                            .accessibilityIdentifier("connection-error")
+                        Label { Text(error).fixedSize(horizontal: false, vertical: true) } icon: { Image(systemName: "exclamationmark.triangle") }
+                            .font(.callout).foregroundColor(.primary).accessibilityIdentifier("connection-error")
+                            .accessibilityElement(children: .combine)
                     }
+                }.listRowBackground(appearance.card)
+                Section {
                     Button {
                         NativeHaptic.impact("connect")
                         let secret = password
                         password = ""
                         Task { await connection.connect(server: connection.server, username: connection.username, password: secret) }
                     } label: {
-                        HStack { Text(l10n("Connect to your library")).fontWeight(.semibold); Spacer(); Image(systemName: "arrow.right") }
-                            .padding(18).foregroundColor(.white).background(ShelfStyle.accentFill).cornerRadius(16)
-                    }.disabled(connection.server.isEmpty || connection.username.isEmpty).accessibilityIdentifier("connect")
-                    if !downloads.visible.isEmpty { Button(l10n("Open downloads")) { downloads.presented = true } }
+                        Label(l10n("Connect to your library"), systemImage: "arrow.right")
+                            .font(.headline).frame(maxWidth: .infinity).padding(16)
+                            .nativeGlassControl(tint: ShelfStyle.accentFill)
+                    }.buttonStyle(PlainButtonStyle())
+                        .disabled(connection.server.isEmpty || connection.username.isEmpty).accessibilityIdentifier("connect")
                     Button(l10n("Sign in with OpenID")) {
                         password = ""
                         Task { await connection.connectWithOpenID() }
                     }.disabled(connection.server.isEmpty).accessibilityIdentifier("openid-sign-in")
-                }.padding(24).background(appearance.card).cornerRadius(26)
-                Button(l10n("Import previous app data")) { NativeHaptic.impact("migration"); panel = .migration }
-                Text(l10n("Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported."))
-                    .font(.footnote).foregroundColor(ShelfStyle.secondaryText).fixedSize(horizontal: false, vertical: true)
-                if connection.api.credentials != nil {
-                    Button(l10n("Cancel")) { Task { await connection.cancelConnection() } }
-                }
-                Button(l10n("Diagnostics")) { panel = .diagnostics }.accessibilityIdentifier("connection-diagnostics")
-                if !connection.savedConnections.isEmpty {
-                    Button(l10n("Downloads")) { downloads.presented = true }
+                    if !downloads.visible.isEmpty { Button(l10n("Open downloads")) { downloads.presented = true } }
+                    if connection.api.credentials != nil {
+                        Button(l10n("Cancel")) { Task { await connection.cancelConnection() } }
+                    }
+                }.listRowBackground(appearance.card)
+                Section(footer: Text(l10n("Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported."))) {
+                    Button(l10n("Import previous app data")) { NativeHaptic.impact("migration"); panel = .migration }
+                    Button(l10n("Diagnostics")) { panel = .diagnostics }.accessibilityIdentifier("connection-diagnostics")
+                    if !connection.savedConnections.isEmpty {
+                        Button(l10n("Downloads")) { downloads.presented = true }
                         Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+                    }
                 }
-            }.frame(maxWidth: 480).padding(24).frame(maxWidth: .infinity)
-        }.accessibilityIdentifier("connection-screen")
+            }.listRowBackground(appearance.card)
+                .frame(maxWidth: 720).frame(maxWidth: .infinity)
+                .nativeConnectionFormBackground(appearance.background)
+                .navigationTitle(l10n("Connect"))
+                .navigationBarTitleDisplayMode(.inline)
+                .accessibilityIdentifier("connection-screen")
+        }.navigationViewStyle(StackNavigationViewStyle())
             .sheet(item: $panel) { active in
                 NavigationView {
                     Group {
@@ -125,7 +141,17 @@ struct ConnectionForm: View {
     private func field<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 9) {
             Text(title).font(.caption).fontWeight(.semibold).foregroundColor(ShelfStyle.secondaryText)
-            content().padding(14).background(appearance.background).cornerRadius(12)
+            content().accessibilityLabel(title).padding(.vertical, 6)
+        }
+    }
+}
+
+private extension View {
+    @ViewBuilder func nativeConnectionFormBackground(_ color: Color) -> some View {
+        if #available(iOS 16, *) {
+            self.scrollContentBackground(.hidden).background(color)
+        } else {
+            self
         }
     }
 }

@@ -24,8 +24,8 @@ struct SignInView: View {
     private var form: some View {
         HStack(alignment: .top, spacing: 110) {
             VStack(alignment: .leading, spacing: 26) {
-                Image(systemName: "headphones").font(.system(size: 80)).foregroundStyle(.tint).accessibilityHidden(true)
-                Text(reauthenticating ? l10n("Sign in again") : l10n("Listen on the big screen")).font(.system(size: 56, weight: .bold))
+                Image(systemName: "headphones").font(.system(size: 72)).foregroundStyle(.tint).accessibilityHidden(true)
+                Text(reauthenticating ? l10n("Sign in again") : l10n("Listen on the big screen")).font(.largeTitle.bold())
                     .fixedSize(horizontal: false, vertical: true)
                 Text(l10n("Connect directly to your Audiobookshelf server to stream audiobooks and podcasts."))
                     .font(.title3).foregroundStyle(.secondary)
@@ -44,7 +44,7 @@ struct SignInView: View {
                     .accessibilityIdentifier("username").disabled(reauthenticating)
                 SecureField(l10n("Password"), text: $password).textContentType(.password).accessibilityIdentifier("password")
                 if let error = catalog.signInError {
-                    Text(error).font(.callout).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
+                    Text(error).font(.callout).foregroundStyle(.primary).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("sign-in-error")
                 }
                 Button {
@@ -69,11 +69,13 @@ struct SignInView: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
+                .nativeGlassButton(prominent: true)
                 .disabled(server.isEmpty || username.isEmpty)
                 .focused($connectFocused)
                 .accessibilityIdentifier("connect")
                 Text(l10n("The Apple TV Remote on an iPhone offers a keyboard for easier typing.")).font(.caption).foregroundStyle(.secondary)
                 NavigationLink(value: ReturnFocus.diagnostics) { Label(l10n("Diagnostics"), systemImage: "stethoscope") }
+                    .nativeGlassButton()
                     .focused($focus, equals: .diagnostics)
                     .accessibilityIdentifier("sign-in-diagnostics")
             }
