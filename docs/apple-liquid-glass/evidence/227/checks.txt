@@ -25,4 +25,3 @@ Test Case '-[TVJourneyTests.ReadinessJourney testGermanLocalizesTheInterfaceAndP
 /tmp/liquid-glass-227-german-final.log
 Test Case '-[TVJourneyTests.ReadinessJourney testGermanLocalizesTheInterfaceAndPersists]' passed (41.543 seconds).
 ** TEST SUCCEEDED **
-
