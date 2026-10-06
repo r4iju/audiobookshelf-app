@@ -106,7 +106,6 @@ struct ConnectionForm: View {
                         password = ""
                         Task { await connection.connectWithOpenID() }
                     }.disabled(connection.server.isEmpty).accessibilityIdentifier("openid-sign-in")
-                    if !downloads.visible.isEmpty { Button(l10n("Open downloads")) { downloads.presented = true } }
                     if connection.api.credentials != nil {
                         Button(l10n("Cancel")) { Task { await connection.cancelConnection() } }
                     }
@@ -125,6 +124,15 @@ struct ConnectionForm: View {
                 .navigationTitle(l10n("Connect"))
                 .navigationBarTitleDisplayMode(.inline)
                 .accessibilityIdentifier("connection-screen")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        if !downloads.visible.isEmpty {
+                            Button { downloads.presented = true } label: {
+                                Label(l10n("Open downloads"), systemImage: "arrow.down.circle")
+                            }.accessibilityLabel(l10n("Open downloads"))
+                        }
+                    }
+                }
         }.navigationViewStyle(StackNavigationViewStyle())
             .sheet(item: $panel) { active in
                 NavigationView {

@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Glass belongs to controls, while forms, artwork and reading content keep solid surfaces.
 extension View {
-    func nativeGlassControl(tint: Color) -> some View {
-        modifier(NativeGlassControl(tint: tint))
+    func nativeGlassControl(tint: Color, cornerRadius: CGFloat = 16) -> some View {
+        modifier(NativeGlassControl(tint: tint, cornerRadius: cornerRadius))
     }
 
     func nativeGlassButton(prominent: Bool = false) -> some View {
@@ -17,6 +17,7 @@ private struct NativeGlassControl: ViewModifier {
     @Environment(\.colorSchemeContrast) private var contrast
     @Environment(\.isEnabled) private var isEnabled
     let tint: Color
+    let cornerRadius: CGFloat
 
     func body(content: Content) -> some View {
         surface(content)
@@ -27,11 +28,11 @@ private struct NativeGlassControl: ViewModifier {
     @ViewBuilder private func surface(_ content: Content) -> some View {
         if #available(iOS 26, tvOS 26, *), !reduceTransparency, contrast != .increased {
             content.foregroundColor(.white)
-                .glassEffect(.regular.tint(tint).interactive(!reduceMotion && isEnabled), in: RoundedRectangle(cornerRadius: 16))
+                .glassEffect(.regular.tint(tint).interactive(!reduceMotion && isEnabled), in: RoundedRectangle(cornerRadius: cornerRadius))
         } else {
             content.foregroundColor(.white)
-                .background(RoundedRectangle(cornerRadius: 16).fill(tint))
-                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary, lineWidth: contrast == .increased ? 2 : 0))
+                .background(RoundedRectangle(cornerRadius: cornerRadius).fill(tint))
+                .overlay(RoundedRectangle(cornerRadius: cornerRadius).stroke(Color.primary, lineWidth: contrast == .increased ? 2 : 0))
         }
     }
 }
@@ -60,3 +61,35 @@ private struct NativeGlassButton: ViewModifier {
         #endif
     }
 }
+
+#if os(iOS)
+extension View {
+    func nativeFloatingControl(background: Color) -> some View {
+        modifier(NativeFloatingControl(background: background))
+    }
+
+    @ViewBuilder func listeningSheet() -> some View {
+        if #available(iOS 16, *) {
+            presentationDetents([.large]).presentationDragIndicator(.visible)
+        } else { self }
+    }
+}
+
+private struct NativeFloatingControl: ViewModifier {
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var contrast
+    let background: Color
+
+    @ViewBuilder func body(content: Content) -> some View {
+        Group {
+            if #available(iOS 26, *), !reduceTransparency, contrast != .increased {
+                content.glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
+            } else {
+                content.background(RoundedRectangle(cornerRadius: 24).fill(background))
+                    .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.primary, lineWidth: contrast == .increased ? 2 : 0))
+            }
+        }.transaction { if reduceMotion { $0.animation = nil } }
+    }
+}
+#endif

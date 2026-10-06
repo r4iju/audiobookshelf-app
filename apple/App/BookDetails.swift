@@ -66,7 +66,7 @@ struct BookDetails: View {
                         Image(systemName: "play.fill")
                         Text(l10n((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening")).fontWeight(.semibold)
                         Spacer()
-                    }.padding(18).nativeGlassControl(tint: ShelfStyle.accent)
+                    }.padding(18).nativeGlassControl(tint: ShelfStyle.accentFill)
                 }.disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
                 }
                 if episode != nil || book.mediaType == "book" {
