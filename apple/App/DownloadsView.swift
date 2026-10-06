@@ -5,7 +5,7 @@ struct DownloadsView: View {
     @EnvironmentObject private var player: ApplePlayback
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
-        NavigationView {
+        NativeNavigation {
             ShelfList {
                 NavigationLink(l10n("Network preferences"), destination: NativeNetworkSettings())
                 if let error = downloads.error { Text(error).foregroundColor(.red) }
@@ -26,15 +26,15 @@ struct DownloadsView: View {
                                 Text(l10n("{0} of {1} files saved", entry.finished.count, entry.parts.count)).font(.caption)
                                 ProgressView(value: downloads.fraction(for: entry))
                                 Button(l10n("Cancel download")) { NativeHaptic.impact("download"); downloads.cancel(entry) }
-                            } else { Button(l10n("Retry download")) { NativeHaptic.impact("download"); Task { await downloads.retry(entry) } } }
+                            } else { Button(l10n("Retry download")) { NativeHaptic.impact("download"); Task { await downloads.retry(entry) } }.nativeGlassButton() }
                             if entry.audioAvailable { NavigationLink(l10n("Play offline"), destination: OfflineDetails(entry: entry)).accessibilityIdentifier("offline-audio-" + entry.media.libraryItemID) }
                             Button(l10n("Remove download")) { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player) } }
                         }.padding(.vertical, 8)
                     }
                 }
-            }.buttonStyle(BorderlessButtonStyle()).navigationTitle(l10n("Downloads"))
+            }.listStyle(InsetGroupedListStyle()).buttonStyle(BorderlessButtonStyle()).navigationTitle(l10n("Downloads"))
                 .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { downloads.presented = false } } }
-        }.navigationViewStyle(StackNavigationViewStyle()).onAppear { downloads.refresh() }.nativeLocalization()
+        }.onAppear { downloads.refresh() }.nativeLocalization()
     }
 }
 
@@ -59,7 +59,7 @@ private struct OfflineDetails: View {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         do { reader = ReadingSource(account: entry.account, itemID: entry.media.libraryItemID, title: entry.media.title, ebook: ebook, file: try downloads.ebookURL(entry), progress: entry.readingProgress, fileID: entry.supplementaryID, progressGeneration: entry.media.progressGeneration) }
                         catch { self.error = error.localizedDescription }
-                    }.accessibilityIdentifier("read-downloaded-ebook")
+                    }.accessibilityIdentifier("read-downloaded-ebook").nativeGlassButton(prominent: true)
                 }
                 if !entry.tracks.isEmpty { Button(l10n("Play offline")) {
                     NativeHaptic.impact("play")
@@ -67,7 +67,7 @@ private struct OfflineDetails: View {
                         let audio = try downloads.audio(entry)
                         Task { await player.startOffline(audio); if player.offlineID == entry.id { downloads.presented = false } }
                     } catch { self.error = error.localizedDescription }
-                }.font(.headline) }
+                }.font(.headline).nativeGlassButton(prominent: true) }
                 ForEach(entry.chapters) { chapter in Text(chapter.title) }
                 if let error { Text(error).foregroundColor(.red) }
                 Button(l10n("Remove download")) { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player); presentation.wrappedValue.dismiss() } }.foregroundColor(.red)

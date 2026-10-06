@@ -1,0 +1,11 @@
+journey	result	bundle
+PreferencesJourney/testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-10-02-+0900.xcresult
+OfflineJourney/testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-08-56-+0900.xcresult
+ReaderJourney/testPDFReadingKeepsAudioPlayingAndRetainsDisplayPreference	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-07-26-+0900.xcresult
+PreferencesJourney/testYearReviewShowsServerTotalsAndChangesYear	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-13-30-+0900.xcresult
+ReaderJourney/testEPUBChapterLocationSurvivesDownloadedOfflineRelaunch	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-08-09-+0900.xcresult
+PodcastJourney/testAdminCanSelectFeedEpisodesAndQueueThemOnTheExistingServer	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-09-30-+0900.xcresult
+PreferencesJourney/testSeparateStreamingAndDownloadNetworkChoicesPersist	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-10-46-+0900.xcresult
+SavedConnectionsJourney/testSavedServersKeepLibraryChoicesAndRecoverUnsentListeningWhenSwitchedBack	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-11-33-+0900.xcresult
+PreferencesJourney/testStatisticsShowServerListeningTotalsAndRecentSessions	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-12-35-+0900.xcresult
+PresentationJourney/testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials	PASS	/Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation/derived/Logs/Test/Test-AudiobookshelfNative-2026.10.07_00-16-30-+0900.xcresult

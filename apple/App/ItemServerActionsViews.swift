@@ -86,8 +86,8 @@ struct RSSFeedSheet: View {
     @State private var adjusted = false
 
     var body: some View {
-        NavigationView {
-            Form {
+        NativeNavigation {
+            ShelfForm {
                 if let feed = actions.feed {
                     openFeed(feed)
                 } else if actions.canManageFeed {
@@ -100,7 +100,6 @@ struct RSSFeedSheet: View {
             .navigationTitle(l10n("RSS feed")).navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button(l10n("Done")) { presented = false }.accessibilityIdentifier("rss-done") } }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
         .onAppear { slug = actions.itemID; copied = false; adjusted = false }
     }
 

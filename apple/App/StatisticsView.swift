@@ -60,7 +60,7 @@ struct StatisticsView: View {
             if store.loading { ProgressView(l10n("Opening your statistics…")) }
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load() } } }
             if let stats = store.stats {
-                NavigationLink(destination: YearReviewView(api: store.api)) { Text(l10n("Year in review")) }
+                NavigationLink(destination: YearReviewView(api: store.api)) { Label(l10n("Year in review"), systemImage: "calendar") }
                 Section(header: Text(l10n("Your listening")).foregroundColor(ShelfStyle.secondaryText)) {
                     Text(l10n("{0} minutes listened", minutes(stats.totalTime))).font(.title2.bold())
                     Text(l10n("{0} days listened", stats.days.count))
@@ -83,7 +83,7 @@ struct StatisticsView: View {
                     }
                 }
             }
-        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Statistics"))
+        }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Statistics")).navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Refresh")) { Task { await store.load() } }.disabled(store.loading) } }
             .onAppear { Task { await store.load() } }
     }

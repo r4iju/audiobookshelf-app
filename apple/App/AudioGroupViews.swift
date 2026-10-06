@@ -240,7 +240,7 @@ struct AudioGroupEditor: View {
         _members = State(initialValue: group?.members ?? [])
     }
     var body: some View {
-        NavigationView {
+        NativeNavigation {
             ShelfForm {
                 Section(header: Text(l10n("Details")).foregroundColor(ShelfStyle.secondaryText)) {
                     TextField(l10n("Name"), text: $name).accessibilityIdentifier("group-name")
@@ -277,7 +277,7 @@ struct AudioGroupEditor: View {
                     }
                 }
                 .sheet(isPresented: $choosing) { AudioGroupMemberPicker(catalog: store.catalog, members: $members, presented: $choosing) }
-        }.navigationViewStyle(StackNavigationViewStyle())
+        }
     }
 }
 
@@ -290,7 +290,7 @@ struct AudioGroupMemberPicker: View {
         _catalog = StateObject(wrappedValue: CatalogStore(api: catalog.api, library: catalog.library)); _members = members; _presented = presented
     }
     var body: some View {
-        NavigationView {
+        NativeNavigation {
             ShelfList {
                 switch catalog.state {
                 case .loading: ProgressView(l10n("Opening titles…"))
@@ -314,7 +314,7 @@ struct AudioGroupMemberPicker: View {
             }.navigationTitle(l10n("Choose titles"))
                 .toolbar { Button(l10n("Done choosing")) { presented = false } }
                 .onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
-        }.navigationViewStyle(StackNavigationViewStyle())
+        }
     }
 }
 

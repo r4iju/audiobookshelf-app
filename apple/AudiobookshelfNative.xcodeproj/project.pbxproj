@@ -32,6 +32,7 @@
 		1D6FBD9926863FE0187E344A /* ItemServerActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BCA8DDCB7ADEF0A70E130B /* ItemServerActions.swift */; };
 		1FE9EA77C952A31EF63EA86A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C645D6AE0D674A57C0773628 /* Assets.xcassets */; };
 		226EA0775FF70BA12A07AFE4 /* YearExportArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720023A73DE8EED43613809E /* YearExportArtwork.swift */; };
+		243937688197DE7D68AAA00E /* NativeNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B76FE6649E465EA011F7EC /* NativeNavigation.swift */; };
 		2827F89F67488E2FA0269A5C /* YearReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CE0125ADF13E64A5D923DE /* YearReviewView.swift */; };
 		285CD6737141BF31B5382E4F /* OfflineJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476656CB1D03ABE26877362E /* OfflineJourney.swift */; };
 		2B132A6700DE521417D1F55F /* ConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB2BE9B3C4981C09FDF4568 /* ConnectionStore.swift */; };
@@ -108,7 +109,6 @@
 		AFB57CD7EF2A9720B7ACC3BE /* PublicationLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BB99A0D43D69E268F05AE7 /* PublicationLedger.swift */; };
 		B2BE3442612B81AABAC53598 /* YearExportSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AE85515F50329F5B559034 /* YearExportSnapshot.swift */; };
 		B45335BDFB6BB0F80FA92AD5 /* DownloadRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EF674FD637DA6AA5553E2C /* DownloadRecoveryTests.swift */; };
-		B652DAD87E0329D910BCC13B /* CatalogNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D91C7E588A7B31722F8A48D /* CatalogNavigation.swift */; };
 		B67838D92AF9F9E97900EBEB /* PausedRealtimeJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24931BFD9E7E37464F0BDD2F /* PausedRealtimeJourney.swift */; };
 		B7087685B20CC875DDF2759C /* NativePodcastQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66117F51540A95F01ED0EAA3 /* NativePodcastQueue.swift */; };
 		B86C69E5D15DA92377A9859B /* BookDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A19219CBB98F877315C1125 /* BookDetails.swift */; };
@@ -182,7 +182,6 @@
 		075B4B8D355897463125028F /* ApplePlayback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePlayback.swift; sourceTree = "<group>"; };
 		08E1F5CC85EE44BF6832E4A5 /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = lt; path = lt.lproj/NativeStrings.strings; sourceTree = "<group>"; };
 		09843D6B0B597927B04CA0F0 /* CatalogViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogViews.swift; sourceTree = "<group>"; };
-		0D91C7E588A7B31722F8A48D /* CatalogNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogNavigation.swift; sourceTree = "<group>"; };
 		1F5AD9145C4C2A8FFC022546 /* CatalogOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogOptions.swift; sourceTree = "<group>"; };
 		1FB851A1081C9C3BC37D5664 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/NativeStrings.strings; sourceTree = "<group>"; };
 		2030CD55C6143360B9A1C8A8 /* NativeTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NativeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -229,6 +228,7 @@
 		555E32B34297E5993C20AE0B /* NativeDownloads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeDownloads.swift; sourceTree = "<group>"; };
 		55A4EE6F7E23AB099BB93117 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/NativeStrings.strings; sourceTree = "<group>"; };
 		55AE85515F50329F5B559034 /* YearExportSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearExportSnapshot.swift; sourceTree = "<group>"; };
+		55B76FE6649E465EA011F7EC /* NativeNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeNavigation.swift; sourceTree = "<group>"; };
 		5ACB7A3BFB513A11CFB7E24E /* MigrationJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationJSON.swift; sourceTree = "<group>"; };
 		608BFD9B2170FCF63E2B7BD0 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/NativeStrings.strings; sourceTree = "<group>"; };
 		612D1953AEA2C0DB8083C470 /* ReaderVolume.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderVolume.swift; sourceTree = "<group>"; };
@@ -479,8 +479,8 @@
 		7BE97370094C0D3F203F5FAE /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
-				0D91C7E588A7B31722F8A48D /* CatalogNavigation.swift */,
 				DC89275DE0E80D983CFE2D07 /* NativeGlassControls.swift */,
+				55B76FE6649E465EA011F7EC /* NativeNavigation.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -859,7 +859,6 @@
 				EEE3896FC019F21D59C1EC7C /* AudiobookshelfNativeApp.swift in Sources */,
 				6F498C3DCC2E7D0A468376C4 /* AuthorSeries.swift in Sources */,
 				B86C69E5D15DA92377A9859B /* BookDetails.swift in Sources */,
-				B652DAD87E0329D910BCC13B /* CatalogNavigation.swift in Sources */,
 				9E87AA39139252A49A463254 /* CatalogOptions.swift in Sources */,
 				5323206E75CC2F3F28252BB9 /* CatalogStore.swift in Sources */,
 				6CC295CC9E2BB6C15A159209 /* CatalogViews.swift in Sources */,
@@ -898,6 +897,7 @@
 				16FDFA714AD7EAF58F1D9676 /* NativeLanguageSettings.swift in Sources */,
 				0C1453BA69F399B4F811F929 /* NativeMigrationAdoption.swift in Sources */,
 				DA17B586D1F33A53DF740B62 /* NativeMigrationImport.swift in Sources */,
+				243937688197DE7D68AAA00E /* NativeNavigation.swift in Sources */,
 				B7087685B20CC875DDF2759C /* NativePodcastQueue.swift in Sources */,
 				D79D8E4579A85CA1D2B47793 /* NativeRealtime.swift in Sources */,
 				8F46B458CBF492ECD0B26A3F /* NativeSettings.swift in Sources */,

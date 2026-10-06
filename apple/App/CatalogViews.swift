@@ -21,7 +21,7 @@ struct ConnectedLibrary: View {
                     CatalogShelf(api: connection.api, library: library)
                 }
             } else {
-                CatalogNavigation { CatalogShelf(api: connection.api, library: library) }
+                NativeNavigation { CatalogShelf(api: connection.api, library: library) }
             }
         }.id(library.id)
     }

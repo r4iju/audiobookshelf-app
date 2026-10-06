@@ -73,7 +73,7 @@ struct NowListening: View {
     @AppStorage(PlayerDisplay.scaleElapsedKey) private var scaleElapsed = true
     @AppStorage(PlayerDisplay.lockKey) private var locked = false
     var body: some View {
-        CatalogNavigation {
+        NativeNavigation {
             ScrollView {
                 VStack(spacing: 28) {
                     ZStack {
@@ -245,7 +245,7 @@ struct ListeningControls: View {
     @State private var editing: Bookmark?
     @State private var seconds = ""
     var body: some View {
-        CatalogNavigation {
+        NativeNavigation {
             ShelfForm {
                 switch panel {
                 case .chapters:

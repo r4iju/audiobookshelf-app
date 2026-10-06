@@ -135,14 +135,14 @@ struct ConnectionForm: View {
                 }
         }.navigationViewStyle(StackNavigationViewStyle())
             .sheet(item: $panel) { active in
-                NavigationView {
+                NativeNavigation {
                     Group {
                         switch active {
                         case .migration: NativeMigrationImport()
                         case .diagnostics: NativeDiagnosticsView()
                         }
                     }.toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { panel = nil } } }
-                }.navigationViewStyle(StackNavigationViewStyle()).nativeLocalization()
+                }.listeningSheet().nativeLocalization()
             }
     }
 
@@ -171,7 +171,7 @@ struct LibraryChooser: View {
     @EnvironmentObject private var connection: ConnectionStore
     let libraries: [Library]
     var body: some View {
-        CatalogNavigation {
+        NativeNavigation {
             ShelfList {
                 Section {
                     Text(l10n("Choose a library to get started.")).foregroundColor(ShelfStyle.secondaryText)
@@ -209,7 +209,7 @@ struct SavedConnectionsView: View {
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var connection: ConnectionStore
     var body: some View {
-        NavigationView {
+        NativeNavigation {
             ShelfList {
                 ForEach(connection.savedConnections) { saved in
                     Button { NativeHaptic.impact("connect"); Task { await connection.switchConnection(saved.id) } } label: {
@@ -220,11 +220,14 @@ struct SavedConnectionsView: View {
                     }.accessibilityIdentifier("connection-" + saved.server)
                         .accessibilityLabel(l10n("{0} on {1}", saved.username, saved.server))
                 }
-                Button(l10n("Add server")) { NativeHaptic.impact("add-server"); connection.addServer() }
-            }.navigationTitle(l10n("Saved connections"))
+            }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Saved connections")).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) {
                     Button(l10n("Done")) { connection.savedConnectionsPresented = false }
-                } }
-        }.navigationViewStyle(StackNavigationViewStyle())
+                }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(l10n("Add server")) { NativeHaptic.impact("add-server"); connection.addServer() }
+                    }
+                }
+        }
     }
 }

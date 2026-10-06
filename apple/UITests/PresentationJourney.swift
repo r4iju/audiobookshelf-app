@@ -123,14 +123,14 @@ import XCTest
             app.textFields["username"].tap(); app.textFields["username"].typeText("qa")
             app.secureTextFields["password"].tap(); app.secureTextFields["password"].typeText("pw-secret-77")
             app.buttons["connect"].tap()
-            XCTAssertTrue(app.staticTexts["connection-error"].waitForExistence(timeout: 20))
+            XCTAssertTrue(app.staticTexts["connection-error"].firstMatch.waitForExistence(timeout: 20))
         }
         attempt("http://qa:hunter2-secret@127.0.0.1:25799/abs?token=leak-123")
-        XCTAssertTrue(app.staticTexts["connection-error"].label.contains("without credentials"), "An address carrying credentials must be refused")
+        XCTAssertTrue(app.staticTexts["connection-error"].firstMatch.label.contains("without credentials"), "An address carrying credentials must be refused")
         app.buttons["Cancel"].tap()
         XCTAssertTrue(app.buttons["account"].waitForExistence(timeout: 10))
         attempt("http://127.0.0.1:25799/abs")
-        XCTAssertTrue(app.staticTexts["connection-error"].label.contains("could not be reached"), app.staticTexts["connection-error"].label)
+        XCTAssertTrue(app.staticTexts["connection-error"].firstMatch.label.contains("could not be reached"), app.staticTexts["connection-error"].firstMatch.label)
         app.buttons["Cancel"].tap()
         XCTAssertTrue(app.buttons["account"].waitForExistence(timeout: 10))
 

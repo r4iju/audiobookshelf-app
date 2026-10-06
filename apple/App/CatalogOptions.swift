@@ -7,7 +7,7 @@ struct CatalogFilterOptions: View {
     @State private var error: String?
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
-        CatalogNavigation {
+        NativeNavigation {
             ShelfList {
                 if let error { Text(error).foregroundColor(.red); Button(l10n("Retry filters")) { load() } }
                 else if let data {

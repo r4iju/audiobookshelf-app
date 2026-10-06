@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Keep the same destination tree on older systems, including programmatic account routes.
-struct CatalogNavigation<Content: View>: View {
+/// Native navigation for catalog, reading and utility presentations, with the same legacy destination tree.
+struct NativeNavigation<Content: View>: View {
     private let content: Content
     init(@ViewBuilder content: () -> Content) { self.content = content() }
     var body: some View {
