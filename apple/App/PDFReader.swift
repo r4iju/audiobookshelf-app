@@ -182,7 +182,7 @@ struct PDFReader: View {
                             .accessibilityLabel(l10n("Previous page")).disabled(reading.page <= 1)
                     }
                     ToolbarItem(placement: .bottomBar) {
-                        Text(l10n("Page {0} of {1}", reading.page, reading.count)).font(.callout.monospacedDigit())
+                        if reading.count > 0 { Text(l10n("Page {0} of {1}", reading.page, reading.count)).font(.callout.monospacedDigit()) }
                     }
                     ToolbarItem(placement: .bottomBar) {
                         Button { reading.move(1) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }

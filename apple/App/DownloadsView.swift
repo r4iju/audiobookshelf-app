@@ -15,6 +15,7 @@ struct DownloadsView: View {
                 if downloads.visible.isEmpty {
                     CatalogStatus(title: l10n("No downloads yet"), message: l10n("Save books or episodes from your library to listen offline."), symbol: "arrow.down.circle")
                 }
+                if !downloads.visible.isEmpty {
                 Section(header: Text(l10n("Saved on this device"))) {
                 ForEach(downloads.visible) { entry in
                     if entry.state == .ready {
@@ -41,6 +42,7 @@ struct DownloadsView: View {
                             }.buttonStyle(BorderlessButtonStyle())
                         }.padding(.vertical, 8)
                     }
+                }
                 }
                 }
             }.listStyle(InsetGroupedListStyle()).buttonStyle(BorderlessButtonStyle()).navigationTitle(l10n("Downloads"))
