@@ -193,7 +193,6 @@
 "Has ebook" = "E-Buch verfügbar";
 "Has supplementary ebook" = "Ergänzendes E-Buch verfügbar";
 "Highlights" = "Highlights";
-"Home" = "Startseite";
 "Idle" = "Inaktiv";
 "Import data" = "Daten importieren";
 "Import needs {0}; {1} is available. Free space and retry." = "Der Import benötigt {0}; verfügbar sind {1}. Gib Speicher frei und versuche es erneut.";

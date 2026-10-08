@@ -90,7 +90,7 @@ final class ReadinessJourney: TVJourney {
         select(language)
         let german = app.buttons["language-de"]
         select(german)
-        XCTAssertTrue(app.tabBars.buttons["Startseite"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
+        XCTAssertTrue(app.tabBars.buttons["Listen Now"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
         XCTAssertTrue(app.tabBars.buttons["Suchen"].exists)
         XCTAssertTrue(app.tabBars.buttons["Einstellungen"].exists)
         XCTAssertEqual(german.value as? String, "Ausgewählt")
@@ -103,9 +103,9 @@ final class ReadinessJourney: TVJourney {
 
         app.terminate()
         launch(reset: false)
-        XCTAssertTrue(app.tabBars.buttons["Startseite"].waitForExistence(timeout: 20), "The choice survives relaunch")
+        XCTAssertTrue(app.tabBars.buttons["Listen Now"].waitForExistence(timeout: 20), "The choice survives relaunch")
         let shelf = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Weiterhören")).firstMatch
-        XCTAssertTrue(shelf.waitForExistence(timeout: 10), "Home shelves use the legacy translation: \(app.staticTexts.debugDescription.prefix(2000))")
+        XCTAssertTrue(shelf.waitForExistence(timeout: 10), "Listen Now shelves use the legacy translation: \(app.staticTexts.debugDescription.prefix(2000))")
         select(app.buttons["continue-listening.book-0"])
         let finish = app.buttons["mark-finished"]
         XCTAssertTrue(finish.waitForExistence(timeout: 10))
@@ -115,7 +115,7 @@ final class ReadinessJourney: TVJourney {
         tab("Einstellungen")
         select(app.buttons["language-setting"])
         select(app.buttons["language-system"])
-        XCTAssertTrue(app.tabBars.buttons["Home"].waitForExistence(timeout: 5), "System default follows the English simulator")
+        XCTAssertTrue(app.tabBars.buttons["Listen Now"].waitForExistence(timeout: 5), "System default follows the English simulator")
     }
 
     func testArabicMirrorsTheInterface() {
@@ -124,7 +124,7 @@ final class ReadinessJourney: TVJourney {
         tab("Settings")
         select(app.buttons["language-setting"])
         select(app.buttons["language-ar"])
-        XCTAssertTrue(app.tabBars.buttons["الرئيسية"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
+        XCTAssertTrue(app.tabBars.buttons["Listen Now"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
         remote.press(.menu)
         let account = app.staticTexts["الحساب"]
         XCTAssertTrue(account.waitForExistence(timeout: 5))
@@ -138,7 +138,7 @@ final class ReadinessJourney: TVJourney {
         audit("sign-in")
         signIn(reset: false)
         waitForHome()
-        audit("home")
+        audit("listen-now")
         select(app.buttons["continue-listening.book-0"])
         XCTAssertTrue(app.buttons["play-item"].waitForExistence(timeout: 10))
         audit("details")

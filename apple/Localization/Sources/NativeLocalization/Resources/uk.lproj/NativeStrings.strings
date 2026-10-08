@@ -193,7 +193,6 @@
 "Has ebook" = "Має електронну книгу";
 "Has supplementary ebook" = "Має додаткову електронну книгу";
 "Highlights" = "Головне";
-"Home" = "Головна";
 "Idle" = "Неактивно";
 "Import data" = "Імпортувати дані";
 "Import needs {0}; {1} is available. Free space and retry." = "Для імпорту потрібно {0}, доступно {1}. Звільніть місце й повторіть спробу.";

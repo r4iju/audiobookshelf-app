@@ -193,7 +193,6 @@
 "Has ebook" = "E-kitabı var";
 "Has supplementary ebook" = "Ek e-kitabı var";
 "Highlights" = "Öne çıkanlar";
-"Home" = "Ana Sayfa";
 "Idle" = "Boşta";
 "Import data" = "Verileri içe aktar";
 "Import needs {0}; {1} is available. Free space and retry." = "İçe aktarma için {0} gerekiyor; kullanılabilir alan {1}. Yer açıp yeniden deneyin.";

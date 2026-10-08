@@ -193,7 +193,6 @@
 "Has ebook" = "Sillä on s-kirja";
 "Has supplementary ebook" = "Sillä on täydentävän s-kirjan";
 "Highlights" = "Kohokohdat";
-"Home" = "Koti";
 "Idle" = "Joutilas";
 "Import data" = "Tuo tiedot";
 "Import needs {0}; {1} is available. Free space and retry." = "Tuonti vaatii {0}; {1} on käytettävissä. Vapauta tilaa ja yritä uudelleen.";

@@ -193,7 +193,6 @@
 "Has ebook" = "يحتوي كتاب إلكتروني";
 "Has supplementary ebook" = "يحتوي كتاب إلكتروني تكميلي";
 "Highlights" = "أبرز اللحظات";
-"Home" = "الرئيسية";
 "Idle" = "خامل";
 "Import data" = "استيراد البيانات";
 "Import needs {0}; {1} is available. Free space and retry." = "يحتاج الاستيراد إلى {0}، والمتاح {1}. حرّر بعض المساحة وأعد المحاولة.";

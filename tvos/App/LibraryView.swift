@@ -4,8 +4,10 @@ struct LibraryView: View {
     @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     @StateObject private var browser: LibraryBrowser
+    let chooseLibrary: () -> Void
 
-    init(library: Library, api: APIClient) {
+    init(library: Library, api: APIClient, chooseLibrary: @escaping () -> Void) {
+        self.chooseLibrary = chooseLibrary
         _browser = StateObject(wrappedValue: LibraryBrowser(library: library, api: api))
     }
 
@@ -14,8 +16,12 @@ struct LibraryView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 40) {
                     HStack(alignment: .firstTextBaseline, spacing: 24) {
-                        Text(browser.library.name).font(.title2.bold())
-                            .fixedSize(horizontal: false, vertical: true)
+                        Button(action: chooseLibrary) {
+                            Label(browser.library.name, systemImage: "chevron.down")
+                        }
+                        .accessibilityIdentifier("library-chooser")
+                        .accessibilityLabel(browser.library.name)
+                        .accessibilityHint(l10n("Choose library"))
                         Spacer()
                         if browser.total > 0 {
                             Text(browser.library.isPodcast ? l10n("{0} podcasts", browser.total) : l10n("{0} titles", browser.total))
@@ -90,5 +96,54 @@ struct LibraryView: View {
         ForEach(filters) { filter in
             Button(filter.group == "progress" ? l10n(filter.title) : filter.title) { Task { await browser.apply(filter: filter) } }
         }
+    }
+}
+
+/// Selection belongs to Library, while the native tab bar stays independent of server configuration.
+struct LibraryDestination: View {
+    @EnvironmentObject private var catalog: CatalogStore
+    @Environment(\.nativeStrings) private var l10n
+    @State private var selectedID: String?
+    @State private var choosing = false
+
+    private var selected: Library? {
+        catalog.libraries.first { $0.id == selectedID } ?? catalog.libraries.first
+    }
+
+    var body: some View {
+        Group {
+            if let library = selected {
+                LibraryView(library: library, api: catalog.api) { choosing = true }
+                    .id(library.id)
+            } else if let error = catalog.catalogError {
+                StatusMessage(text: error) { Task { await catalog.loadCatalog() } }
+            } else if catalog.loadingCatalog {
+                ProgressView(l10n("Loading…"))
+            } else {
+                Text(l10n("This library is empty.")).foregroundStyle(.secondary)
+            }
+        }
+        .sheet(isPresented: $choosing) {
+            NavigationStack {
+                List(catalog.libraries) { library in
+                    Button {
+                        selectedID = library.id
+                        choosing = false
+                    } label: {
+                        HStack(spacing: 24) {
+                            Label(library.name, systemImage: library.isPodcast ? "mic" : "books.vertical")
+                            Spacer()
+                            if library.id == selected?.id { Image(systemName: "checkmark") }
+                        }
+                    }
+                    .accessibilityIdentifier("library-choice-\(library.id)")
+                    .accessibilityLabel(library.name)
+                    .accessibilityAddTraits(library.id == selected?.id ? [.isSelected] : [])
+                }
+                .navigationTitle(l10n("Choose library"))
+            }
+            .tvLocalization()
+        }
+        .onChange(of: catalog.accountID) { selectedID = nil; choosing = false }
     }
 }

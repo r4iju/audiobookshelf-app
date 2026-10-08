@@ -39,6 +39,7 @@
 		7EA618B6C4A97C000619531D /* NativeStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8205CF6D4EF82FEF2C34DC75 /* NativeStrings.swift */; };
 		8CC56959FBDA408B0DC136DF /* DiagnosticLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099239ACAF408CD70D642DBB /* DiagnosticLog.swift */; };
 		90BAA58FF739E83E825A2751 /* CatalogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659342124C81DC7C5E07BB3A /* CatalogStore.swift */; };
+		911B4238905D0E31A81033DB /* ShellJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF08FDC339B006C61F2D29A3 /* ShellJourney.swift */; };
 		917E944D857BC42FA92CAEE3 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE22E9CB2F259AC21DBE966D /* LibraryView.swift */; };
 		918C833A12209C49FEF99F95 /* FormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E658F1503F524B5E48D2954E /* FormatTests.swift */; };
 		A00ADDE49FE9507689823D66 /* MediaRestart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9022EA791A627A7442A89C24 /* MediaRestart.swift */; };
@@ -163,6 +164,7 @@
 		D2657CD6D6A491BCD02A0AF6 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/NativeStrings.strings; sourceTree = "<group>"; };
 		DCD793A3AD26FD3D4FAB2A63 /* be */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = be; path = be.lproj/NativeStrings.strings; sourceTree = "<group>"; };
 		DE3415E0FDD33594D8AAB1FD /* ItemServerActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemServerActions.swift; sourceTree = "<group>"; };
+		DF08FDC339B006C61F2D29A3 /* ShellJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellJourney.swift; sourceTree = "<group>"; };
 		DFED0402AB7D61A322B0535F /* TVAppTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TVAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E658F1503F524B5E48D2954E /* FormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatTests.swift; sourceTree = "<group>"; };
 		E7C9CC8D7EA65AD9D300C352 /* TVPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVPlayer.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 				4A04E81294E99047AF6D81FE /* ReadinessJourney.swift */,
 				A19DDF6F0EA4566595251D33 /* RecoveryJourney.swift */,
 				0F1A278300353A6B51E55684 /* RelatedJourney.swift */,
+				DF08FDC339B006C61F2D29A3 /* ShellJourney.swift */,
 				FEF2CDC828B2A12C335D7310 /* TVJourney.swift */,
 			);
 			path = UITests;
@@ -540,6 +543,7 @@
 				6ACF14FCF495F3298896CE62 /* ReadinessJourney.swift in Sources */,
 				611F21B8CA412F2735C761F4 /* RecoveryJourney.swift in Sources */,
 				D1C721FBF3B35F932E24EC29 /* RelatedJourney.swift in Sources */,
+				911B4238905D0E31A81033DB /* ShellJourney.swift in Sources */,
 				A84625D913609E565C7440F4 /* TVJourney.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

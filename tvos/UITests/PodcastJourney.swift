@@ -5,7 +5,7 @@ final class PodcastJourney: TVJourney {
     func openPodcast() {
         signIn()
         waitForHome()
-        tab("Podcasts")
+        library("Podcasts")
         select(app.buttons["item-podcast"])
         XCTAssertTrue(app.buttons["episode-episode-morning"].waitForExistence(timeout: 10))
     }

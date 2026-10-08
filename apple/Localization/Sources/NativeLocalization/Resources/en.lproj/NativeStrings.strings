@@ -76,6 +76,7 @@
 "Choose a library to get started." = "Choose a library to get started.";
 "Choose a title from your library to start listening." = "Choose a title from your library to start listening.";
 "Choose export" = "Choose export";
+"Choose library" = "Choose library";
 "Choose the complete export package or the folder containing archive.json. An unfinished export cannot be imported." = "Choose the complete export package or the folder containing archive.json. An unfinished export cannot be imported.";
 "Choose the feedback for playback controls and library actions." = "Choose the feedback for playback controls and library actions.";
 "Choose titles" = "Choose titles";
@@ -196,7 +197,6 @@
 "Has ebook" = "Has ebook";
 "Has supplementary ebook" = "Has supplementary ebook";
 "Highlights" = "Highlights";
-"Home" = "Home";
 "Idle" = "Idle";
 "Import data" = "Import data";
 "Import needs {0}; {1} is available. Free space and retry." = "Import needs {0}; {1} is available. Free space and retry.";
@@ -230,6 +230,7 @@
 "Loading details…" = "Loading details…";
 "Loading episode…" = "Loading episode…";
 "Loading your library…" = "Loading your library…";
+"Loading…" = "Loading…";
 "Lock player" = "Lock player";
 "Longest audiobook finished" = "Longest audiobook finished";
 "Longest book finished" = "Longest book finished";

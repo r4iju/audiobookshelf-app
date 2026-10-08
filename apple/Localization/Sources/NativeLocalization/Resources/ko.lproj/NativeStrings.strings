@@ -193,7 +193,6 @@
 "Has ebook" = "보유한 전자책";
 "Has supplementary ebook" = "보유한 보충 전자책";
 "Highlights" = "하이라이트";
-"Home" = "홈";
 "Idle" = "대기";
 "Import data" = "데이터 가져오기";
 "Import needs {0}; {1} is available. Free space and retry." = "가져오려면 {0}이(가) 필요하지만 {1}만 사용 가능합니다. 공간을 확보한 후 다시 시도하십시오.";

@@ -81,7 +81,7 @@ struct CoverView: View {
     var body: some View {
         ZStack {
             LinearGradient(colors: [Color(white: 0.2), Color(white: 0.12)], startPoint: .top, endPoint: .bottom)
-            if let cover { Image(uiImage: cover).resizable().scaledToFill() }
+            if let cover { Image(uiImage: cover).resizable().scaledToFit() }
             else if loaded {
                 Image(systemName: podcast ? "mic.fill" : "book.closed.fill")
                     .font(.system(size: 64)).foregroundStyle(.secondary)

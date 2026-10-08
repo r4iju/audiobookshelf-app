@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum TVTab: Hashable {
-    case home, library(String), search, nowPlaying, settings
+    case home, library, search, nowPlaying, settings
 }
 
 @MainActor final class TVNavigator: ObservableObject {
@@ -42,11 +42,9 @@ struct RootView: View {
     private var tabs: some View {
         TabView(selection: $navigator.tab) {
             HomeView()
-                .tabItem { Label(l10n("Home"), systemImage: "house") }.tag(TVTab.home)
-            ForEach(catalog.libraries) { library in
-                LibraryView(library: library, api: catalog.api)
-                    .tabItem { Label(library.name, systemImage: library.isPodcast ? "mic" : "books.vertical") }.tag(TVTab.library(library.id))
-            }
+                .tabItem { Label(l10n("Listen Now"), systemImage: "play.circle") }.tag(TVTab.home)
+            LibraryDestination()
+                .tabItem { Label(l10n("Library"), systemImage: "books.vertical") }.tag(TVTab.library)
             SearchView()
                 .tabItem { Label(l10n("Search"), systemImage: "magnifyingglass") }.tag(TVTab.search)
             if player.session != nil || player.preparing {
@@ -56,8 +54,6 @@ struct RootView: View {
             SettingsView()
                 .tabItem { Label(l10n("Settings"), systemImage: "gearshape") }.tag(TVTab.settings)
         }
-        .nativeGlassButton()
-        .buttonBorderShape(.capsule)
         .onPlayPauseCommand { if player.session != nil { player.toggle() } }
         .onChange(of: player.session == nil && !player.preparing) { _, ended in
             if ended && navigator.tab == .nowPlaying { navigator.tab = .home }

@@ -193,7 +193,6 @@
 "Has ebook" = "有电子书";
 "Has supplementary ebook" = "有补充电子书";
 "Highlights" = "精彩回顾";
-"Home" = "首页";
 "Idle" = "空闲";
 "Import data" = "导入数据";
 "Import needs {0}; {1} is available. Free space and retry." = "导入需要 {0}，当前可用 {1}。请释放空间后重试。";

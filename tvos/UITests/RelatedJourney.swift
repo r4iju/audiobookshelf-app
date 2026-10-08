@@ -61,7 +61,7 @@ final class RelatedJourney: TVJourney {
     func testBookDetailsLeadToItsSeriesAndAuthor() {
         signIn()
         waitForHome()
-        tab("Audiobooks")
+        library("Audiobooks")
         select(app.buttons["item-book-2"])
         let series = app.buttons["detail-series.series-saga"]
         XCTAssertTrue(series.waitForExistence(timeout: 10), app.debugDescription)

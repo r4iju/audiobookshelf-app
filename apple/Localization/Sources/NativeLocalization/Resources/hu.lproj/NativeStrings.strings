@@ -193,7 +193,6 @@
 "Has ebook" = "Van e-könyv";
 "Has supplementary ebook" = "Van kiegészítő e-könyve";
 "Highlights" = "Kiemelések";
-"Home" = "Kezdőlap";
 "Idle" = "Tétlen";
 "Import data" = "Adatok importálása";
 "Import needs {0}; {1} is available. Free space and retry." = "Az importáláshoz {0} szükséges; {1} érhető el. Szabadítson fel tárhelyet, és próbálja újra.";

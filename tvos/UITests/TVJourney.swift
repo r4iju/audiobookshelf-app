@@ -109,6 +109,16 @@ import XCTest
         select(app.tabBars.buttons[name], file: file, line: line)
     }
 
+    func library(_ name: String, file: StaticString = #filePath, line: UInt = #line) {
+        tab("Library", file: file, line: line)
+        let chooser = app.buttons["library-chooser"]
+        XCTAssertTrue(chooser.waitForExistence(timeout: 15), file: file, line: line)
+        if chooser.label != name {
+            select(chooser, file: file, line: line)
+            select(app.cells.containing(NSPredicate(format: "label == %@", name)).firstMatch, file: file, line: line)
+        }
+    }
+
     func waitForHome(file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertTrue(app.buttons["continue-listening.book-0"].waitForExistence(timeout: 20), app.debugDescription, file: file, line: line)
     }
