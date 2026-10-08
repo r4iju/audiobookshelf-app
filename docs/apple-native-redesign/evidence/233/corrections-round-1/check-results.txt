@@ -1,0 +1,54 @@
+
+/tmp/233-search-activation-red.log
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/SearchJourney.swift:10: error: -[NativeJourneyTests.SearchJourney testSelectingSearchAcceptsTypingWithoutAnotherActivation] : XCTAssertTrue failed - Selecting Search exposes its native input
+Test Case '-[NativeJourneyTests.SearchJourney testSelectingSearchAcceptsTypingWithoutAnotherActivation]' failed (22.498 seconds).
+** TEST FAILED **
+
+/tmp/233-search-activation-green-attempt.log
+Test Case '-[NativeJourneyTests.SearchJourney testSelectingSearchAcceptsTypingWithoutAnotherActivation]' passed (18.832 seconds).
+** TEST SUCCEEDED **
+
+/tmp/233-phone-green.log
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' passed (22.396 seconds).
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/SearchJourney.swift:27: error: -[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode] : XCTAssertTrue failed
+Test Case '-[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode]' failed (24.734 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSearchFindsBookBeyondFirstPageAndReturnsFromDetails]' passed (22.170 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSelectingSearchAcceptsTypingWithoutAnotherActivation]' passed (18.182 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSortingAndGenreFilteringUseTheServerAcrossPagination]' passed (23.194 seconds).
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/ShellJourney.swift:41: error: -[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing] : XCTAssertTrue failed
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/ShellJourney.swift:42: error: -[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing] : Failed to tap Cell (First Match): No matches found for first query match sequence: `Descendants matching type Cell` -> `Elements matching predicate 'label == "Listen Now"'`, given input App element pid: 54498
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' failed (50.380 seconds).
+** TEST FAILED **
+
+/tmp/233-scope-green.log
+Test Case '-[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode]' passed (25.104 seconds).
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' passed (47.204 seconds).
+** TEST SUCCEEDED **
+
+/tmp/233-ipad-final.log
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' passed (21.955 seconds).
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/ShellJourney.swift:46: error: -[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing] : XCTAssertTrue failed - The selected library remains shared across destinations
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' failed (35.887 seconds).
+** TEST FAILED **
+
+/tmp/233-ipad-dismiss-green.log
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' passed (35.149 seconds).
+** TEST SUCCEEDED **
+
+/tmp/233-phone-final-2.log
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' passed (22.312 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode]' passed (24.669 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSearchFindsBookBeyondFirstPageAndReturnsFromDetails]' passed (22.369 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSelectingSearchAcceptsTypingWithoutAnotherActivation]' passed (18.218 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSortingAndGenreFilteringUseTheServerAcrossPagination]' passed (22.358 seconds).
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' passed (46.409 seconds).
+** TEST SUCCEEDED **
+
+/tmp/233-generic-final-pinned.log
+** BUILD SUCCEEDED **
+
+/tmp/233-source14-final.log
+Full76-source Swift5 target14 diagnostic exited0; no binary or runtime14 acceptance.
+
+Final source pin: 8739a7b49b43a11950981eae7ffeb162c43d1ce0
+git diff --check: passed

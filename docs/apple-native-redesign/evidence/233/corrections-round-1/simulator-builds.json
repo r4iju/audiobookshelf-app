@@ -1,0 +1,46 @@
+{
+  "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+  "runtime": "iOS 27.0 (24A434)",
+  "sdk": "27.0",
+  "sourceMinimum": "iOS14.0",
+  "buildOverride": "IPHONEOS_DEPLOYMENT_TARGET=15.0",
+  "devices": [
+    {
+      "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+      "version": "1.0.0",
+      "build": "1",
+      "binaryMinimum": "15.0",
+      "executableSHA256": "776ba0e107b88c845d66af87a9f979f45f01c481714d2d0976955a64594ba2ea",
+      "debugDylibSHA256": "0554dc289b4c372ea0ed21b4a0729ab6cddd3a154ec905ec095dc93faa13a490",
+      "appPath": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/46CCB928-E135-4C1C-9FE0-C85A87F3FFB9/AudiobookshelfNative.app",
+      "signature": "Executable=/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/46CCB928-E135-4C1C-9FE0-C85A87F3FFB9/AudiobookshelfNative.app/AudiobookshelfNative\nIdentifier=com.forkzed.audiobookshelf.native.preview\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=450 flags=0x2(adhoc) hashes=3+7 location=embedded\nSignature=adhoc\nInfo.plist entries=36\nTeamIdentifier=not set\nSealed Resources version=2 rules=10 files=43\nInternal requirements count=0 size=12",
+      "installedBundleVerify": {
+        "exit": 1,
+        "output": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/46CCB928-E135-4C1C-9FE0-C85A87F3FFB9/AudiobookshelfNative.app: a sealed resource is missing or invalid",
+        "detail": "codesign --verify --verbose=4 identified Assets.car as modified; same outcome in current build product. Runtime executable and debug-library hashes match tablet."
+      },
+      "installedExecutableVerify": {
+        "exit": 1,
+        "output": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/46CCB928-E135-4C1C-9FE0-C85A87F3FFB9/AudiobookshelfNative.app/AudiobookshelfNative: a sealed resource is missing or invalid"
+      }
+    },
+    {
+      "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+      "version": "1.0.0",
+      "build": "1",
+      "binaryMinimum": "15.0",
+      "executableSHA256": "776ba0e107b88c845d66af87a9f979f45f01c481714d2d0976955a64594ba2ea",
+      "debugDylibSHA256": "0554dc289b4c372ea0ed21b4a0729ab6cddd3a154ec905ec095dc93faa13a490",
+      "appPath": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/442BE845-116D-4B49-88CB-63395477F284/AudiobookshelfNative.app",
+      "signature": "Executable=/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/442BE845-116D-4B49-88CB-63395477F284/AudiobookshelfNative.app/AudiobookshelfNative\nIdentifier=com.forkzed.audiobookshelf.native.preview\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=450 flags=0x2(adhoc) hashes=3+7 location=embedded\nSignature=adhoc\nInfo.plist entries=36\nTeamIdentifier=not set\nSealed Resources version=2 rules=10 files=43\nInternal requirements count=0 size=12",
+      "installedBundleVerify": {
+        "exit": 0,
+        "output": ""
+      },
+      "installedExecutableVerify": {
+        "exit": 0,
+        "output": ""
+      }
+    }
+  ]
+}
