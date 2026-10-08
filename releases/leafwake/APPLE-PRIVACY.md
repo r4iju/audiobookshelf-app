@@ -18,6 +18,10 @@ The clients contain no advertising, analytics, Google Cast or automatic crash-re
 
 Diagnostics remain locally with credential redaction. On mobile you may explicitly copy or share a diagnostic report. Review it before sharing because server or library information can remain. Contacting support voluntarily supplies the information you send; do not include passwords or tokens in public GitHub issues.
 
+## Optional public sharing
+
+On mobile, accounts with server permission can publish RSS feeds. The server receives the owner name/email and indexing settings you choose. A public feed can expose that owner information and selected media to anyone with access to its link. Publish only information and media you intend to share. Close the feed on your server to stop its availability; already downloaded copies remain with their recipients.
+
 ## Retention and deletion
 
 Signing out removes the saved connection but can retain recoverable listening and media; it is not a server-account deletion request. Remove downloads in the app, clear diagnostics and remove the app using Delete App rather than Offload App to remove its local app data. Saved Keychain connections should be removed in the app before uninstalling because Keychain data can outlast installation. Copies explicitly shared or saved to other apps must be removed there. Contact your server administrator for server-account or history deletion.

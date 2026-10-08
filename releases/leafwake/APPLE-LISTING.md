@@ -9,7 +9,7 @@ Subtitle: Your books. Your server.
 Keywords: audiobook,podcast,offline,player,listen,book,stream,download,progress,PDF
 Support: leakwake@mozdom.mozmail.com
 Independent bundle identifier: com.forkzed.leafwake
-Existing Android privacy policy (not configured for Apple): https://r4iju.github.io/audiobookshelf-app/privacy.html
+Apple privacy policy (publication pending): https://r4iju.github.io/audiobookshelf-app/apple-privacy.html
 Support and source: https://r4iju.github.io/audiobookshelf-app/
 
 Audiobook Loft connects to your Audiobook Loft or compatible Audiobookshelf server so you can listen to your own audiobooks and podcasts.
@@ -25,7 +25,10 @@ The independently implemented Apple clients are open source under a scoped MIT l
 Source code, license notices, corresponding build materials and compatibility information:
 https://github.com/r4iju/audiobookshelf-app/releases
 
-Privacy and support:
+Apple privacy:
+https://r4iju.github.io/audiobookshelf-app/apple-privacy.html
+
+Support:
 https://r4iju.github.io/audiobookshelf-app/
 
 Support: leakwake@mozdom.mozmail.com
@@ -53,7 +56,10 @@ The independently implemented Apple clients are open source under a scoped MIT l
 Source code, license notices, corresponding build materials and compatibility information:
 https://github.com/r4iju/audiobookshelf-app/releases
 
-Privacy and support:
+Apple privacy:
+https://r4iju.github.io/audiobookshelf-app/apple-privacy.html
+
+Support:
 https://r4iju.github.io/audiobookshelf-app/
 
 Support: leakwake@mozdom.mozmail.com
