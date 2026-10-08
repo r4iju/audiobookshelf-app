@@ -26,14 +26,20 @@ private struct NativeGlassControl: ViewModifier {
     }
 
     @ViewBuilder private func surface(_ content: Content) -> some View {
+        #if ABS_SDK_26
         if #available(iOS 26, tvOS 26, *), !reduceTransparency, contrast != .increased {
             content.foregroundColor(.white)
                 .glassEffect(.regular.tint(tint).interactive(!reduceMotion && isEnabled), in: RoundedRectangle(cornerRadius: cornerRadius))
-        } else {
+        } else { solidSurface(content) }
+        #else
+        solidSurface(content)
+        #endif
+    }
+
+    private func solidSurface(_ content: Content) -> some View {
             content.foregroundColor(.white)
                 .background(RoundedRectangle(cornerRadius: cornerRadius).fill(tint))
                 .overlay(RoundedRectangle(cornerRadius: cornerRadius).stroke(Color.primary, lineWidth: contrast == .increased ? 2 : 0))
-        }
     }
 }
 
@@ -52,14 +58,25 @@ private struct NativeGlassButton: ViewModifier {
         // Native TV buttons adopt glass when focused on supported hardware and keep remote activation intact.
         content.buttonStyle(.bordered)
         #else
+        #if ABS_SDK_26
         if #available(iOS 26, *), !reduceTransparency, contrast != .increased {
             if prominent { content.buttonStyle(.glassProminent) }
             else { content.buttonStyle(.glass) }
-        } else {
-            content.buttonStyle(DefaultButtonStyle())
-        }
+        } else { accessibleStyle(content) }
+        #else
+        accessibleStyle(content)
+        #endif
         #endif
     }
+
+    #if os(iOS)
+    @ViewBuilder private func accessibleStyle(_ content: Content) -> some View {
+        if prominent {
+            if #available(iOS 15, *) { content.foregroundColor(.white).buttonStyle(.borderedProminent) }
+            else { content.buttonStyle(DefaultButtonStyle()).nativeGlassControl(tint: .accentColor) }
+        } else { content.buttonStyle(DefaultButtonStyle()) }
+    }
+    #endif
 }
 
 #if os(iOS)
@@ -83,13 +100,19 @@ private struct NativeFloatingControl: ViewModifier {
 
     @ViewBuilder func body(content: Content) -> some View {
         Group {
+            #if ABS_SDK_26
             if #available(iOS 26, *), !reduceTransparency, contrast != .increased {
                 content.glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
-            } else {
+            } else { solidSurface(content) }
+            #else
+            solidSurface(content)
+            #endif
+        }.transaction { if reduceMotion { $0.animation = nil } }
+    }
+
+    private func solidSurface(_ content: Content) -> some View {
                 content.background(RoundedRectangle(cornerRadius: 24).fill(background))
                     .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.primary, lineWidth: contrast == .increased ? 2 : 0))
-            }
-        }.transaction { if reduceMotion { $0.animation = nil } }
     }
 }
 #endif

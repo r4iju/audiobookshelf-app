@@ -54,9 +54,17 @@ private struct NativeShellNavigation: View {
     }
 
     @ViewBuilder private var shell: some View {
+        #if ABS_SDK_18
         if #available(iOS 18, *) {
             PlaybackContainer(content: adaptiveModernTabs, nativeTabAccessory: true)
-        } else if #available(iOS 16, *), UIDevice.current.userInterfaceIdiom == .pad {
+        } else { legacyShell }
+        #else
+        legacyShell
+        #endif
+    }
+
+    @ViewBuilder private var legacyShell: some View {
+        if #available(iOS 16, *), UIDevice.current.userInterfaceIdiom == .pad {
             PlaybackContainer(content: NavigationSplitView {
                 List {
                     ForEach(ShellDestination.allCases) { item in
@@ -72,6 +80,7 @@ private struct NativeShellNavigation: View {
         }
     }
 
+    #if ABS_SDK_18
     @available(iOS 18, *) @ViewBuilder private var adaptiveModernTabs: some View {
         if UIDevice.current.userInterfaceIdiom == .pad {
             searchableModernTabs.tabViewStyle(.sidebarAdaptable)
@@ -81,16 +90,18 @@ private struct NativeShellNavigation: View {
     }
 
     @available(iOS 18, *) @ViewBuilder private var searchableModernTabs: some View {
+        #if ABS_SDK_26
         if #available(iOS 26, *) {
-            modernTabs.searchable(text: $search.query, isPresented: $search.presented, prompt: l10n("Books, podcasts, authors, series…"))
-                .onSubmit(of: .search, search.submit)
-                .tabViewSearchActivation(.searchTabSelection)
+            modernTabs.tabViewSearchActivation(.searchTabSelection)
                 .onChange(of: selected) { destination in
-                    if destination != .search { search.presented = false }
+                    search.presented = destination == .search
                 }
         } else {
             modernTabs
         }
+        #else
+        modernTabs
+        #endif
     }
 
     @available(iOS 18, *) private var modernTabs: some View {
@@ -103,6 +114,8 @@ private struct NativeShellNavigation: View {
         }
     }
 
+    #endif
+
     private var legacyTabs: some View {
         TabView(selection: $selected) {
             ForEach(ShellDestination.allCases) { item in
@@ -111,20 +124,35 @@ private struct NativeShellNavigation: View {
         }
     }
 
-    private var shellOwnsSearch: Bool {
-        if #available(iOS 26, *) { return true }
-        return false
+    @ViewBuilder private var searchDestination: some View {
+        #if ABS_SDK_26
+        if #available(iOS 26, *) {
+            NativeNavigation { LibrarySearch(search: search, shellOwnsSearch: true).id(library.id) }
+                .searchable(text: $search.query, isPresented: $search.presented, prompt: l10n("Books, podcasts, authors, series…"))
+                .onSubmit(of: .search, search.submit)
+        } else { legacySearchDestination }
+        #else
+        legacySearchDestination
+        #endif
     }
 
-    @ViewBuilder private func destination(_ item: ShellDestination) -> some View {
+    private var legacySearchDestination: some View {
+        NativeNavigation { LibrarySearch(search: search).id(library.id) }
+    }
+
+    private func destination(_ item: ShellDestination) -> some View {
+        destinationContent(item).modifier(NativePlaybackInset())
+    }
+
+    @ViewBuilder private func destinationContent(_ item: ShellDestination) -> some View {
         switch item {
         case .library:
-            NativeNavigation { CatalogShelf(api: api, library: library).id(library.id) }
+            NativeNavigation { CatalogShelf(api: api, library: library) }.id(library.id)
         case .listenNow:
-            NativeNavigation { CatalogShelf(api: api, library: library, listenNow: true).id(library.id) }
+            NativeNavigation { CatalogShelf(api: api, library: library, listenNow: true) }.id(library.id)
         case .downloads: DownloadsView(embedded: true)
         case .search:
-            NativeNavigation { LibrarySearch(search: search, shellOwnsSearch: shellOwnsSearch).id(library.id) }
+            searchDestination
         case .settings: NativeNavigation { NativeSettings() }
         }
     }

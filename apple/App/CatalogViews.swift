@@ -291,7 +291,13 @@ struct RecoveryCard: View {
 
 enum ShelfTime {
     static func describe(_ seconds: Double, language: NativeLanguage = NativeStrings.current.language) -> String {
-        let safe = seconds.isFinite ? Int(min(max(seconds, 0), Double(Int.max / 2))) : 0
+        // Unrepresentable metadata is unavailable, rather than a saturated invented duration.
+        // The authoritative duration is retained by the media/player stores.
+        guard seconds.isFinite, seconds < Double(Int.max / 2) else {
+            let strings = NativeStrings(language: language)
+            return strings("Duration unavailable")
+        }
+        let safe = Int(max(seconds, 0))
         if language != .english { return localized(safe, locale: language.locale) }
         if safe < 60 { return "\(safe) sec" }
         if safe < 3600 { return "\(safe / 60) min" }

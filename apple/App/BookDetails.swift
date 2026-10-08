@@ -51,6 +51,11 @@ struct BookDetails: View {
     private var requestedDownloads: Set<String> { serverQueue.pending(itemID: item.id) }
     @State private var detailRevision = UUID()
     private var book: LibraryItem { expanded ?? item }
+    private var canListen: Bool {
+        // Only authoritative, explicitly empty audio metadata excludes listening.
+        // An unloaded catalog summary must still allow the existing playback request.
+        !(episode == nil && book.media.ebookFile != nil && book.media.tracks?.isEmpty == true)
+    }
 
     init(item: LibraryItem, catalog: CatalogStore, progress: MediaProgress?, episode: Episode? = nil) {
         self.item = item; self.catalog = catalog; self.progress = progress; self.episode = episode
@@ -142,7 +147,7 @@ struct BookDetails: View {
                 case .discard:
                     return Alert(title: Text(l10n("Confirm")), message: Text(l10n("Are you sure you want to reset your progress?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 case .serverRestarted:
-                    return Alert(title: Text(l10n("Restart the server now")), message: Text(l10n("Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.")), primaryButton: .destructive(Text(l10n("Server restarted")), action: confirmRestart), secondaryButton: .cancel(Text(l10n("Cancel"))))
+                    return Alert(title: Text(l10n("Restart the server now")), message: Text(l10n("Restart your server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.")), primaryButton: .destructive(Text(l10n("Server restarted")), action: confirmRestart), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 }
             }
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
@@ -175,12 +180,12 @@ struct BookDetails: View {
 
     private var detailActions: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if book.mediaType != "podcast" || episode != nil {
+            if canListen, book.mediaType != "podcast" || episode != nil {
                 Button { NativeHaptic.impact("play"); playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
                     Label(l10n((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening"), systemImage: "play.fill")
                         .font(.body.weight(.semibold)).padding(.vertical, 10).padding(.horizontal, 12)
                         .frame(maxWidth: regularActions ? nil : .infinity, alignment: .leading)
-                }.nativeGlassButton(prominent: true).accentColor(ShelfStyle.accentFill).disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
+                }.nativeGlassButton(prominent: true).modifier(DetailPrimaryTint()).disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
             }
             readingAction
             if regularActions, #available(iOS 15, *) {
@@ -505,5 +510,12 @@ struct BookDetails: View {
             value = value.replacingOccurrences(of: entity, with: replacement)
         }
         return value.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+private struct DetailPrimaryTint: ViewModifier {
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(iOS 15, *) { content.tint(ShelfStyle.accentFill) }
+        else { content.accentColor(ShelfStyle.accentFill) }
     }
 }

@@ -4,7 +4,7 @@ Native SwiftUI streaming client for tvOS 17 or later. The TV target shares Apple
 
 ## Current Apple presentation
 
-OS 26 and newer apply native glass to focused controls when hardware supports it. Content cards keep native rectangular focus and clear artwork; native bordered controls preserve remote activation and older-system fallbacks. Settings actions precede long notices so focus can reach them. See [redesign state and verification](../docs/apple-liquid-glass/STATE.md) for the complete branch, private unsigned candidates and physical-device limitations.
+OS 26 and newer apply native glass to focused controls when hardware supports it. Content cards keep native rectangular focus and clear artwork; native bordered controls preserve remote activation and older-system fallbacks. Settings actions precede long notices so focus can reach them. Original source minima remain iOS14/tvOS17; SDK27 mobile diagnostic builds use an explicit15 override. Current older-runtime, spoken-accessibility and private-release acceptance is recorded separately. See [redesign state and verification](../docs/apple-native-redesign/STATE.md) for the complete branch, private unsigned candidates and physical-device limitations.
 
 ## Local installation
 

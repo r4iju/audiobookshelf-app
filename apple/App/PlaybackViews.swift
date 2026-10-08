@@ -30,9 +30,20 @@ struct PlaybackContainer<Content: View>: View {
             .nativeLocalization()
     }
     @ViewBuilder private var playbackContent: some View {
-        // 26.0 cannot disable the accessory without replacing the tab container, which loses navigation state.
+        #if ABS_SDK_26_1
         if #available(iOS 26.1, *), nativeTabAccessory {
             content.tabViewBottomAccessory(isEnabled: player.session != nil || player.preparing) { compactControls.padding(.horizontal, 12) }
+        } else { fallbackContent }
+        #else
+        fallbackContent
+        #endif
+    }
+
+    @ViewBuilder private var fallbackContent: some View {
+        if #available(iOS 26, *), nativeTabAccessory {
+            // 26.0 has no accessory visibility API. Each native destination reserves its own
+            // bottom safe area above tab chrome; this container still owns presentation and intent.
+            content.environment(\.nativePlaybackInset, AnyView(miniPlayer))
         } else if #available(iOS 15, *) {
             content.safeAreaInset(edge: .bottom, spacing: 0) { miniPlayer }
         } else {
@@ -480,5 +491,25 @@ struct NativeListeningSettings: View {
     var body: some View {
         ShelfForm { PlaybackPreferenceSections() }
             .navigationTitle(l10n("Playback preferences")).navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// A single playback owner supplies the fallback surface to the selected native destination.
+// Changing sessions updates the environment without replacing TabView or its navigation stacks.
+private struct NativePlaybackInsetKey: EnvironmentKey {
+    static let defaultValue: AnyView? = nil
+}
+extension EnvironmentValues {
+    var nativePlaybackInset: AnyView? {
+        get { self[NativePlaybackInsetKey.self] }
+        set { self[NativePlaybackInsetKey.self] = newValue }
+    }
+}
+struct NativePlaybackInset: ViewModifier {
+    @Environment(\.nativePlaybackInset) private var surface
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(iOS 15, *) {
+            content.safeAreaInset(edge: .bottom, spacing: 0) { surface }
+        } else { content }
     }
 }

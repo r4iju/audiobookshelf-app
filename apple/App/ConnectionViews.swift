@@ -8,7 +8,7 @@ enum ShelfStyle {
     /// Fill behind white text and symbols: the light accent in every appearance.
     static let accentFill = Color(UIColor(named: "AccentColor")!.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light)))
     static let secondaryText = Color(UIColor { traits in
-        traits.userInterfaceStyle == .dark ? UIColor.secondaryLabel.resolvedColor(with: traits) : UIColor(red: 0.42, green: 0.42, blue: 0.44, alpha: 1)
+        traits.userInterfaceStyle == .dark ? UIColor.secondaryLabel.resolvedColor(with: traits) : UIColor(red: 0.35, green: 0.35, blue: 0.37, alpha: 1)
     })
 }
 
@@ -107,7 +107,7 @@ struct ConnectionForm: View {
                         Button(l10n("Cancel")) { Task { await connection.cancelConnection() } }
                     }
                 }.listRowBackground(appearance.card)
-                Section(footer: Text(l10n("Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported."))) {
+                Section(footer: Text(l10n("Connect directly to your Audiobook Loft or compatible Audiobookshelf server. Local HTTP and trusted HTTPS servers are supported."))) {
                     Button(l10n("Import previous app data")) { NativeHaptic.impact("migration"); panel = .migration }
                     Button(l10n("Diagnostics")) { panel = .diagnostics }.accessibilityIdentifier("connection-diagnostics")
                     Button(l10n("Open downloads")) { downloads.presented = true }

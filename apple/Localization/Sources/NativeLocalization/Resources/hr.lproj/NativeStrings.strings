@@ -91,8 +91,6 @@
 "Complete" = "Potpuno";
 "Confirm" = "Potvrdi";
 "Connect" = "Povezivanje";
-"Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Povežite se izravno s Audiobookshelfom. Podržani su lokalni HTTP poslužitelji i pouzdani HTTPS poslužitelji.";
-"Connect directly to your Audiobookshelf server to stream audiobooks and podcasts." = "Povežite se izravno sa svojim poslužiteljem Audiobookshelf i strujite audioknjige i podcaste.";
 "Connect to your library" = "Povežite se sa svojom knjižnicom";
 "Connecting" = "Pokušavam se povezati s poslužiteljem...";
 "Connecting…" = "Pokušavam se povezati s poslužiteljem...";
@@ -284,7 +282,6 @@
 "Nothing to continue yet. Choose a library above to start listening." = "Još nema ničega za nastavak. Odaberite knjižnicu iznad i počnite slušati.";
 "Now Playing" = "Sada svira";
 "Now listening" = "Sada slušate";
-"Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "Sada ponovno pokrenite poslužitelj Audiobookshelf. Računa se samo ponovno pokretanje nakon odabira opcije Započni ponovno pokretanje poslužitelja. Kad poslužitelj ponovno radi, potvrdite to ovdje.";
 "Number of episodes" = "broj nastavaka";
 "Off" = "Isključeno";
 "Oldest first" = "Najprije najstarije";
@@ -375,10 +372,8 @@
 "Report" = "Izvješće";
 "Reset timer" = "Resetiraj timer";
 "Restart playback" = "Reproduciraj od početka";
-"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Sada ponovno pokrenite poslužitelj Audiobookshelf i potvrdite kad ponovno bude radio. Ponovno pokretanje prije ove poruke ne računa se jer je spremanje bez odgovora možda stiglo na poslužitelj nakon njega.";
 "Restart the server" = "Ponovno pokreni poslužitelj";
 "Restart the server now" = "Ponovno pokreni poslužitelj sada";
-"Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server." = "Ponovno pokretanje poslužitelja Audiobookshelf završava spremanje bez odgovora. Najprije odaberite Započni ponovno pokretanje poslužitelja, a zatim ponovno pokrenite poslužitelj.";
 "Restarting…" = "Ponovno pokretanje…";
 "Resume" = "Nastavi";
 "Resume listening" = "Nastavi slušati";

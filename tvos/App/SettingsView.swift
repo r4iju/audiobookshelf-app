@@ -105,10 +105,10 @@ struct SettingsView: View {
             Text(l10n("Server {0}, signed in as {1}", catalog.serverAddress, catalog.username)).foregroundStyle(.secondary)
                 .accessibilityIdentifier("publications-account")
             if waiting.restartRequested {
-                Text(l10n("Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here."))
+                Text(l10n("Now restart your server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here."))
                     .accessibilityIdentifier("restart-instructions")
             } else {
-                Text(l10n("Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server."))
+                Text(l10n("Restarting your server ends an unanswered save. Choose Start server restart first, then restart the server."))
             }
             // Keep one native List row as the requested restart becomes its confirmation step.
             Button {

@@ -1,6 +1,22 @@
 import XCTest
 
 @MainActor final class ReaderJourney: NativeJourney {
+    func testEbookOnlyDetailsReadWithoutOfferingAnUnavailableListeningAction() async throws {
+        try await FixtureControl.configure("pdf-ebook-only")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        XCTAssertTrue(app.buttons["Read PDF"].waitForExistence(timeout: 5))
+        let absent = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: app.buttons["play-book"])
+        XCTAssertEqual(XCTWaiter().wait(for: [absent], timeout: 5), .completed, "Authoritative ebook-only details must not offer unavailable listening")
+        app.buttons["Read PDF"].tap()
+        XCTAssertTrue(app.staticTexts["Page 1 of 4"].waitForExistence(timeout: 10))
+        app.buttons["Next page"].tap()
+        XCTAssertTrue(app.staticTexts["Page 2 of 4"].waitForExistence(timeout: 5))
+        app.buttons["Close reader"].tap()
+        XCTAssertTrue(app.buttons["Read PDF"].waitForExistence(timeout: 5))
+    }
+
     func testDownloadedEPUBRemainsReadableWithUnreadableProgressStorage() async throws {
         try await downloadedReaderWithUnreadableStorage(mode: "epub-reader", content: "First passage by the window.")
     }

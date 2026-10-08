@@ -41,6 +41,8 @@ PY
     tv_profile="$(python3 "$tv_root/scripts/provision.py" --udid "$tv_udid")"
 fi
 
+xcodegen generate --spec "$tv_root/project.yml" > /dev/null
+
 xcodebuild -project "$tv_root/AudiobookshelfTV.xcodeproj" \
     -scheme AudiobookshelfTV -configuration Release \
     -destination 'generic/platform=tvOS' -derivedDataPath "$tv_root/build" \

@@ -3,8 +3,7 @@ import UIKit
 
 @MainActor final class ShellJourney: NativeJourney {
     private func destination(_ name: String, in app: XCUIApplication) -> XCUIElement {
-        let tab = app.buttons[name].firstMatch
-        return tab.exists ? tab : app.cells.matching(NSPredicate(format: "label == %@", name)).firstMatch
+        mainDestination(name, in: app)
     }
 
     func testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing() async throws {
@@ -43,7 +42,7 @@ import UIKit
         destination("Listen Now", in: app).tap()
         XCTAssertTrue(app.navigationBars["Listen Now"].waitForExistence(timeout: 5))
         library.tap()
-        XCTAssertTrue(app.staticTexts["Podcasts"].firstMatch.exists, "The selected library remains shared across destinations")
+        XCTAssertTrue(app.staticTexts["Podcasts"].firstMatch.exists, "The selected library remains shared across destinations: " + app.debugDescription)
         capture("Native Library selected podcast")
     }
 }

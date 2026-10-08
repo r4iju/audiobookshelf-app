@@ -1,5 +1,6 @@
 name: AudiobookshelfTV
 options:
+  projectFormat: xcode15_0
   deploymentTarget:
     tvOS: "17.0"
   createIntermediateGroups: true
@@ -10,8 +11,20 @@ settings:
     CODE_SIGN_STYLE: Automatic
     MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: 1
+targetTemplates:
+  NativeSDKTarget:
+    configFiles:
+      Debug: ../apple/Configuration/NativeSDK.xcconfig
+      Release: ../apple/Configuration/NativeSDK.xcconfig
+    preBuildScripts:
+      - name: Validate selected SDK capabilities
+        script: /bin/bash "$SRCROOT/../apple/scripts/check-sdk-capabilities.sh"
+        shell: /bin/bash
+        showEnvVars: false
+        basedOnDependencyAnalysis: false
 targets:
   AudiobookshelfTV:
+    templates: [NativeSDKTarget]
     type: application
     platform: tvOS
     sources:
@@ -40,6 +53,7 @@ targets:
           NSAllowsArbitraryLoads: true
         NSLocalNetworkUsageDescription: Connect to your Audiobook Loft or compatible Audiobookshelf server on your local network.
   TVJourneyTests:
+    templates: [NativeSDKTarget]
     type: bundle.ui-testing
     platform: tvOS
     sources: [UITests]
@@ -50,6 +64,7 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.forkzed.audiobookshelf.tv.uitests
   TVAppTests:
+    templates: [NativeSDKTarget]
     type: bundle.unit-test
     platform: tvOS
     sources: [AppTests]

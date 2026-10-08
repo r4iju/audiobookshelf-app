@@ -91,8 +91,6 @@
 "Complete" = "Fullfør";
 "Confirm" = "Bekreft";
 "Connect" = "Koble til";
-"Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Koble direkte til Audiobookshelf. Lokale HTTP-tjenere og klarerte HTTPS-tjenere støttes.";
-"Connect directly to your Audiobookshelf server to stream audiobooks and podcasts." = "Koble direkte til Audiobookshelf-tjeneren din for å strømme lydbøker og podcaster.";
 "Connect to your library" = "Koble til biblioteket ditt";
 "Connecting" = "Kobler til tjener …";
 "Connecting…" = "Kobler til tjener …";
@@ -284,7 +282,6 @@
 "Nothing to continue yet. Choose a library above to start listening." = "Ingenting å fortsette med ennå. Velg et bibliotek ovenfor for å begynne å lytte.";
 "Now Playing" = "Spilles nå";
 "Now listening" = "Lytter nå";
-"Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "Start Audiobookshelf-tjeneren på nytt nå. Bare en omstart etter at du valgte Start omstart av tjener, teller. Bekreft det her når tjeneren kjører igjen.";
 "Number of episodes" = "# episoder";
 "Off" = "Av";
 "Oldest first" = "Eldste først";
@@ -375,10 +372,8 @@
 "Report" = "Rapport";
 "Reset timer" = "Tilbakestill tidsur";
 "Restart playback" = "Start avspilling på nytt";
-"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Start Audiobookshelf-tjeneren på nytt nå, og bekreft når den kjører igjen. En omstart før denne meldingen teller ikke, fordi lagringen som ikke fikk svar, kan ha nådd tjeneren etter den.";
 "Restart the server" = "Start tjeneren på nytt";
 "Restart the server now" = "Start tjeneren på nytt nå";
-"Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server." = "En omstart av Audiobookshelf-tjeneren avslutter en lagring uten svar. Velg Start omstart av tjener først, og start deretter tjeneren på nytt.";
 "Restarting…" = "Starter på nytt …";
 "Resume" = "Gjenoppta";
 "Resume listening" = "Fortsett å lytte";

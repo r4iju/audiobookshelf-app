@@ -14,6 +14,7 @@ struct RootView: View {
     @Environment(\.nativeStrings) private var l10n
     @StateObject private var navigator = TVNavigator()
     @State private var reauthenticating = false
+    @State private var signInPrompt = false
 
     var body: some View {
         ZStack {
@@ -31,9 +32,14 @@ struct RootView: View {
             guard let error else { return }
             TVDiagnostics.shared.record(player.isProgressFailure ? .sync : .media, error, detail: player.title.isEmpty ? nil : "Item: " + player.title)
         }
-        .alert(l10n("Sign in again"), isPresented: $catalog.needsSignIn) {
-            Button(l10n("Sign in")) { player.pause(); reauthenticating = true }
-            Button(l10n("Not now"), role: .cancel) {}
+        // SwiftUI owns alert dismissal locally; its binding must not publish a store
+        // change while the native presentation hierarchy is updating.
+        .onReceive(catalog.$needsSignIn) { needed in
+            if !reauthenticating { signInPrompt = needed }
+        }
+        .alert(l10n("Sign in again"), isPresented: $signInPrompt) {
+            Button(l10n("Sign in")) { catalog.needsSignIn = false; player.pause(); reauthenticating = true }
+            Button(l10n("Not now"), role: .cancel) { catalog.needsSignIn = false }
         } message: {
             Text(l10n("The server no longer accepts this login. Listening saved on this TV is kept and sent after you sign in."))
         }

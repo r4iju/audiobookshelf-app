@@ -95,8 +95,8 @@
 "Complete" = "مكتمل";
 "Confirm" = "تأكيد";
 "Connect" = "اتصل";
-"Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "اتصل مباشرةً بـ Audiobookshelf. الخوادم المحلية عبر HTTP وخوادم HTTPS الموثوقة مدعومة.";
-"Connect directly to your Audiobookshelf server to stream audiobooks and podcasts." = "اتصل مباشرةً بخادم Audiobookshelf لبث الكتب الصوتية والبودكاست.";
+"Connect directly to your Audiobook Loft or compatible Audiobookshelf server to stream audiobooks and podcasts." = "اتصل مباشرة بخادم Audiobook Loft أو خادم Audiobookshelf المتوافق لبث الكتب الصوتية والبودكاست.";
+"Connect directly to your Audiobook Loft or compatible Audiobookshelf server. Local HTTP and trusted HTTPS servers are supported." = "اتصل مباشرة بخادم Audiobook Loft أو خادم Audiobookshelf المتوافق. يُدعم HTTP المحلي وخوادم HTTPS الموثوقة.";
 "Connect to your library" = "الاتصال بمكتبتك";
 "Connecting" = "جاري محاولة الاتصال بالخادم...";
 "Connecting…" = "جاري محاولة الاتصال بالخادم...";
@@ -154,6 +154,7 @@
 "Downloads could not be restored: {0}" = "تعذّرت استعادة التنزيلات: {0}";
 "Downloads could not restore network permissions: {0}" = "تعذّرت استعادة أذونات الشبكة للتنزيلات: {0}";
 "Duration" = "المدة";
+"Duration unavailable" = "المدة غير متاحة";
 "Ebook sent to {0}" = "تم إرسال الكتاب الإلكتروني إلى {0}";
 "Ebooks" = "الكتب الإلكترونية";
 "Edit" = "تعديل";
@@ -302,7 +303,7 @@
 "Nothing to continue yet. Choose a library above to start listening." = "لا يوجد ما تتابعه بعد. اختر مكتبة أعلاه لبدء الاستماع.";
 "Now Playing" = "قيد التشغيل";
 "Now listening" = "يتم الاستماع الآن";
-"Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "أعد تشغيل خادم Audiobookshelf الآن. لا تُحتسب إلا إعادة التشغيل التي تتم بعد اختيار «بدء إعادة تشغيل الخادم». عندما يعمل الخادم مجددًا، أكّد ذلك هنا.";
+"Now restart your server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "أعد تشغيل خادمك الآن. لا تُحتسب إلا إعادة التشغيل بعد اختيار بدء إعادة تشغيل الخادم. عندما يعود الخادم للعمل، أكّد ذلك هنا.";
 "Number of episodes" = "# من الحلقات";
 "Off" = "ايقاف";
 "Offline listening" = "الاستماع دون اتصال";
@@ -400,10 +401,10 @@
 "Report" = "التقرير";
 "Reset timer" = "إعادة تعيين المؤقت";
 "Restart playback" = "إعادة بدء التشغيل";
-"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "أعد تشغيل خادم Audiobookshelf الآن، وأكّد ذلك بعد أن يعمل مجددًا. لا تُحتسب أي إعادة تشغيل قبل هذه الرسالة، لأن عملية الحفظ التي لم يصل ردها ربما وصلت إلى الخادم بعدها.";
 "Restart the server" = "إعادة تشغيل الخادم";
 "Restart the server now" = "إعادة تشغيل الخادم الآن";
-"Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server." = "تؤدي إعادة تشغيل خادم Audiobookshelf إلى إنهاء عملية الحفظ التي لم يصل ردها. اختر «بدء إعادة تشغيل الخادم» أولًا، ثم أعد تشغيل الخادم.";
+"Restart your server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "أعد تشغيل خادمك الآن، ثم أكّد عندما يعود للعمل. لا تُحتسب إعادة التشغيل السابقة لهذه الرسالة، لأن عملية الحفظ التي لم تتلقَّ ردًا ربما وصلت إلى الخادم بعدها.";
+"Restarting your server ends an unanswered save. Choose Start server restart first, then restart the server." = "تنهي إعادة تشغيل خادمك عملية حفظ لم تتلقَّ ردًا. اختر بدء إعادة تشغيل الخادم أولًا، ثم أعد تشغيل الخادم.";
 "Restarting…" = "جارٍ إعادة التشغيل…";
 "Resume" = "استئناف";
 "Resume listening" = "استئناف الاستماع";
