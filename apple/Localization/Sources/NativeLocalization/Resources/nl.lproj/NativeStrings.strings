@@ -81,7 +81,6 @@
 "Clear" = "Wis";
 "Clear events" = "Logbestanden verwijderen";
 "Clear events?" = "Gebeurtenissen wissen?";
-"Clear search" = "Zoekopdracht wissen";
 "Close feed" = "Feed sluiten";
 "Close playback" = "Sluit speler";
 "Close reader" = "Lezer sluiten";
@@ -177,7 +176,6 @@
 "Filter library" = "Filter bibliotheek";
 "Filter: {0}" = "Filter: {0}";
 "Filters" = "Filters";
-"Find your next chapter." = "Vind je volgende hoofdstuk.";
 "Find your next listen." = "Vind je volgende luisterboek.";
 "Finished" = "Voltooid";
 "Font" = "Letterfamilie";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Je voortgang opslaan…";
 "Scale elapsed time by speed" = "Schaal verstreken tijd per snelheid";
 "Search" = "Zoeken";
-"Search library" = "Doorzoek bibliotheek";
 "Search podcasts" = "Zoek podcasts";
 "Searching your library…" = "Je bibliotheek doorzoeken…";
 "Searching…" = "Zoeken…";

@@ -81,7 +81,6 @@
 "Clear" = "清除";
 "Clear events" = "清除日志";
 "Clear events?" = "要清除日志吗？";
-"Clear search" = "清除搜索";
 "Close feed" = "关闭源";
 "Close playback" = "关闭播放器";
 "Close reader" = "关闭阅读器";
@@ -177,7 +176,6 @@
 "Filter library" = "筛选媒体库";
 "Filter: {0}" = "筛选：{0}";
 "Filters" = "筛选条件";
-"Find your next chapter." = "寻找你的下一章。";
 "Find your next listen." = "寻找你下一部想听的作品。";
 "Finished" = "已听完";
 "Font" = "字体";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "正在存储你的进度…";
 "Scale elapsed time by speed" = "按速度缩放播放时间";
 "Search" = "查找";
-"Search library" = "搜索媒体库";
 "Search podcasts" = "搜索播客";
 "Searching your library…" = "正在搜索你的媒体库…";
 "Searching…" = "正在搜索…";

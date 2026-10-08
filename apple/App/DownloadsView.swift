@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct DownloadsView: View {
+    var embedded = false
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
     @Environment(\.nativeStrings) private var l10n
@@ -33,7 +34,7 @@ struct DownloadsView: View {
                     }
                 }
             }.listStyle(InsetGroupedListStyle()).buttonStyle(BorderlessButtonStyle()).navigationTitle(l10n("Downloads"))
-                .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { downloads.presented = false } } }
+                .toolbar { ToolbarItem(placement: .navigationBarTrailing) { if !embedded { Button(l10n("Done")) { downloads.presented = false } } } }
         }.onAppear { downloads.refresh() }.nativeLocalization()
     }
 }

@@ -81,7 +81,6 @@
 "Clear" = "Törlés";
 "Clear events" = "Naplók tisztítása";
 "Clear events?" = "Törli a naplókat?";
-"Clear search" = "Keresés törlése";
 "Close feed" = "Hírcsatorna bezárása";
 "Close playback" = "Lejátszó bezárása";
 "Close reader" = "Olvasó bezárása";
@@ -177,7 +176,6 @@
 "Filter library" = "Könyvtár szűrése";
 "Filter: {0}" = "Szűrő: {0}";
 "Filters" = "Szűrők";
-"Find your next chapter." = "Találja meg a következő fejezetét.";
 "Find your next listen." = "Találja meg a következő hallgatnivalóját.";
 "Finished" = "Befejezve";
 "Font" = "Betűcsalád";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Haladás mentése…";
 "Scale elapsed time by speed" = "Eltelt idő skálázása sebesség szerint";
 "Search" = "Keresés";
-"Search library" = "Keresés a könyvtárban";
 "Search podcasts" = "Podcastok keresése";
 "Searching your library…" = "Keresés a könyvtárban…";
 "Searching…" = "Keresés…";

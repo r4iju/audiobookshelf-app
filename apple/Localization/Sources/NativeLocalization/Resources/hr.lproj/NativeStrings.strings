@@ -81,7 +81,6 @@
 "Clear" = "Očisti";
 "Clear events" = "Izbriši zapisnike";
 "Clear events?" = "Očistiti događaje?";
-"Clear search" = "Očisti pretraživanje";
 "Close feed" = "Zatvori izvor";
 "Close playback" = "Zatvori reproduktor";
 "Close reader" = "Zatvori čitač";
@@ -177,7 +176,6 @@
 "Filter library" = "Filtriraj knjižnicu";
 "Filter: {0}" = "Filtar: {0}";
 "Filters" = "Filtri";
-"Find your next chapter." = "Pronađite svoje sljedeće poglavlje.";
 "Find your next listen." = "Pronađite nešto novo za slušanje.";
 "Finished" = "Završeno";
 "Font" = "Skup pisma";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Spremanje napretka…";
 "Scale elapsed time by speed" = "Prilagodi preostalo vrijeme brzini izvođenja";
 "Search" = "Traži";
-"Search library" = "Pretraži knjižnicu";
 "Search podcasts" = "Pretraži podcaste";
 "Searching your library…" = "Pretraživanje knjižnice…";
 "Searching…" = "Pretraživanje…";

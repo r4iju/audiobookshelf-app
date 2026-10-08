@@ -78,11 +78,20 @@ enum NativeHaptic: String, CaseIterable {
 #endif
 
 struct NativeSettings: View {
+    @EnvironmentObject private var connection: ConnectionStore
     @AppStorage("previewTheme") private var theme = "system"
     @AppStorage("previewHaptic") private var haptic = "light"
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
         ShelfForm {
+            Section(header: Text(l10n("Account"))) {
+                Text(connection.username).font(.headline)
+                Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+                Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }.accessibilityIdentifier("account-signout")
+            }
+            Section {
+                NavigationLink(destination: StatisticsView(api: connection.api)) { Label(l10n("Statistics"), systemImage: "chart.bar") }
+            }
             Section {
                 NavigationLink(destination: NativeLanguageSettings()) {
                     HStack { Text(l10n("Language")); Spacer(); Text(l10n.language.name).foregroundColor(ShelfStyle.secondaryText) }

@@ -81,7 +81,6 @@
 "Clear" = "Tyhjennä";
 "Clear events" = "Tyhjennä lokit";
 "Clear events?" = "Tyhjennetäänkö tapahtumat?";
-"Clear search" = "Tyhjennä haku";
 "Close feed" = "Sulje syöte";
 "Close playback" = "Sulje soitin";
 "Close reader" = "Sulje lukija";
@@ -177,7 +176,6 @@
 "Filter library" = "Suodata kirjastoa";
 "Filter: {0}" = "Suodatin: {0}";
 "Filters" = "Suodattimet";
-"Find your next chapter." = "Löydä seuraava lukusi.";
 "Find your next listen." = "Löydä seuraava kuunneltavasi.";
 "Finished" = "Valmis";
 "Font" = "Fonttiperhe";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Tallennetaan edistymistäsi…";
 "Scale elapsed time by speed" = "Skaalaa kulunut aika nopeuden mukaan";
 "Search" = "Etsi";
-"Search library" = "Hae kirjastosta";
 "Search podcasts" = "Hae podcasteja";
 "Searching your library…" = "Haetaan kirjastostasi…";
 "Searching…" = "Haetaan…";

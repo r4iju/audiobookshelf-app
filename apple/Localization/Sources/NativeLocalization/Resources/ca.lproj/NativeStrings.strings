@@ -81,7 +81,6 @@
 "Clear" = "Esborra";
 "Clear events" = "Neteja els registres";
 "Clear events?" = "Voleu esborrar els registres?";
-"Clear search" = "Esborra la cerca";
 "Close feed" = "Tanca el canal";
 "Close playback" = "Tanca el reproductor";
 "Close reader" = "Tanca el lector";
@@ -177,7 +176,6 @@
 "Filter library" = "Filtra la biblioteca";
 "Filter: {0}" = "Filtre: {0}";
 "Filters" = "Filtres";
-"Find your next chapter." = "Trobeu el vostre proper capítol.";
 "Find your next listen." = "Trobeu la vostra propera escolta.";
 "Finished" = "Acabat";
 "Font" = "Família tipogràfica";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Desant el vostre progrés…";
 "Scale elapsed time by speed" = "Ajusta el temps transcorregut a la velocitat";
 "Search" = "Cercar";
-"Search library" = "Cerca a la biblioteca";
 "Search podcasts" = "Cerca pòdcasts";
 "Searching your library…" = "Cercant a la biblioteca…";
 "Searching…" = "Cercant…";

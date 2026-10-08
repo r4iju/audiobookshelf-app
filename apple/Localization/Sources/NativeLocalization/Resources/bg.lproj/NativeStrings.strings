@@ -81,7 +81,6 @@
 "Clear" = "Изчисти";
 "Clear events" = "Изчисти логове";
 "Clear events?" = "Да се изчистят ли събитията?";
-"Clear search" = "Изчисти търсенето";
 "Close feed" = "Затвори стената";
 "Close playback" = "Затвори плейъра";
 "Close reader" = "Затвори четеца";
@@ -177,7 +176,6 @@
 "Filter library" = "Филтрирай библиотеката";
 "Filter: {0}" = "Филтър: {0}";
 "Filters" = "Филтри";
-"Find your next chapter." = "Открий следващата си глава.";
 "Find your next listen." = "Открий какво да слушаш след това.";
 "Finished" = "Дата на приключване";
 "Font" = "Шрифт";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Запазване на напредъка…";
 "Scale elapsed time by speed" = "Скалируй изминалото време спрямо скоростта";
 "Search" = "Търси в";
-"Search library" = "Търси в библиотеката";
 "Search podcasts" = "Търси подкасти";
 "Searching your library…" = "Търсене в библиотеката…";
 "Searching…" = "Търсене…";

@@ -81,7 +81,6 @@
 "Clear" = "Vymazať";
 "Clear events" = "Zmazať záznamy logovania";
 "Clear events?" = "Vymazať udalosti?";
-"Clear search" = "Vymazať vyhľadávanie";
 "Close feed" = "Zatvoriť zdroj";
 "Close playback" = "Zavrieť prehrávač";
 "Close reader" = "Zavrieť čítačku";
@@ -177,7 +176,6 @@
 "Filter library" = "Filtrovať knižnicu";
 "Filter: {0}" = "Filter: {0}";
 "Filters" = "Filtre";
-"Find your next chapter." = "Nájdite svoju ďalšiu kapitolu.";
 "Find your next listen." = "Nájdite si ďalšie počúvanie.";
 "Finished" = "Ukončené";
 "Font" = "písmo";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Ukladanie stavu…";
 "Scale elapsed time by speed" = "Zmeniť ubehnutý čas podľa rýchlosti";
 "Search" = "Vyhľadať";
-"Search library" = "Hľadať v knižnici";
 "Search podcasts" = "Hľadať podcasty";
 "Searching your library…" = "Prehľadávanie knižnice…";
 "Searching…" = "Vyhľadávanie…";

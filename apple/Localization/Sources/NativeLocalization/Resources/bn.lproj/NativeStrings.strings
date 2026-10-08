@@ -81,7 +81,6 @@
 "Clear" = "মুছুন";
 "Clear events" = "লগ মুছে ফেলুন";
 "Clear events?" = "লগ মুছে ফেলবেন?";
-"Clear search" = "অনুসন্ধান মুছুন";
 "Close feed" = "ফিড বন্ধ করুন";
 "Close playback" = "প্লেয়ার বন্ধ করুন";
 "Close reader" = "রিডার বন্ধ করুন";
@@ -177,7 +176,6 @@
 "Filter library" = "লাইব্রেরি ফিল্টার করুন";
 "Filter: {0}" = "ফিল্টার: {0}";
 "Filters" = "ফিল্টার";
-"Find your next chapter." = "আপনার পরের অধ্যায় খুঁজে নিন।";
 "Find your next listen." = "পরবর্তী শোনার জন্য কিছু খুঁজে নিন।";
 "Finished" = "সমাপ্ত";
 "Font" = "ফন্টের ধরন";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "আপনার অগ্রগতি সংরক্ষণ করা হচ্ছে…";
 "Scale elapsed time by speed" = "অতিবাহিত সময় গতি দ্বারা স্কেল করুন";
 "Search" = "অনুসন্ধান";
-"Search library" = "লাইব্রেরিতে অনুসন্ধান করুন";
 "Search podcasts" = "পডকাস্ট অনুসন্ধান করুন";
 "Searching your library…" = "আপনার লাইব্রেরিতে অনুসন্ধান করা হচ্ছে…";
 "Searching…" = "অনুসন্ধান করা হচ্ছে…";

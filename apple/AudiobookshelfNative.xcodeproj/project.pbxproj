@@ -31,6 +31,7 @@
 		1D04F1C76DAF3872336653B7 /* NativeDownloads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555E32B34297E5993C20AE0B /* NativeDownloads.swift */; };
 		1D6FBD9926863FE0187E344A /* ItemServerActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BCA8DDCB7ADEF0A70E130B /* ItemServerActions.swift */; };
 		1FE9EA77C952A31EF63EA86A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C645D6AE0D674A57C0773628 /* Assets.xcassets */; };
+		20F70B9CA037A49733FC8168 /* NativeShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC034B4DC1430EFA479841C0 /* NativeShell.swift */; };
 		226EA0775FF70BA12A07AFE4 /* YearExportArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720023A73DE8EED43613809E /* YearExportArtwork.swift */; };
 		243937688197DE7D68AAA00E /* NativeNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B76FE6649E465EA011F7EC /* NativeNavigation.swift */; };
 		2827F89F67488E2FA0269A5C /* YearReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CE0125ADF13E64A5D923DE /* YearReviewView.swift */; };
@@ -81,6 +82,7 @@
 		71768637F6E2751D1BD2647A /* LibrarySearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F86C6F6039D0FDDE1C1243 /* LibrarySearch.swift */; };
 		73EE790E8C13186D9FBE9831 /* ReadingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FE9972E1A212CD4A7EB8F13 /* ReadingStore.swift */; };
 		75FB9F4C1498E7D6A0B3E891 /* ReaderAssets in Resources */ = {isa = PBXBuildFile; fileRef = DFD50815ACE665566CE9977C /* ReaderAssets */; };
+		7748A625F7E6572392B336A9 /* ShellJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247EF5B8181B359D3EAF0DF0 /* ShellJourney.swift */; };
 		777F5E431544BF4102D2F997 /* RealtimeChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE571CDE5FEFF23A3F5BC09 /* RealtimeChange.swift */; };
 		7862EB2D7FB793926899623D /* ListeningStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EEE96E03F0804CA4A07919 /* ListeningStorage.swift */; };
 		7AA8A946DEFE5E40C63888EB /* KeychainCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB2B0D3551E87A9FB4A17E2 /* KeychainCredentials.swift */; };
@@ -189,6 +191,7 @@
 		21435F87EED7BB1D017FEE3A /* RelatedAuthorSeriesJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedAuthorSeriesJourney.swift; sourceTree = "<group>"; };
 		2252A3BCFB930B28E7180A39 /* AdoptionStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdoptionStoreTests.swift; sourceTree = "<group>"; };
 		23C701FCF48F04F2E684681C /* MigrationFileSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationFileSystem.swift; sourceTree = "<group>"; };
+		247EF5B8181B359D3EAF0DF0 /* ShellJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellJourney.swift; sourceTree = "<group>"; };
 		24931BFD9E7E37464F0BDD2F /* PausedRealtimeJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PausedRealtimeJourney.swift; sourceTree = "<group>"; };
 		27172291A78804715DCC8B07 /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
 		27CD32345AB102E314FA1A91 /* ListeningControlsJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningControlsJourney.swift; sourceTree = "<group>"; };
@@ -285,6 +288,7 @@
 		B1DF48EC545EDEC32858D8A9 /* ItemServerActionsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemServerActionsViews.swift; sourceTree = "<group>"; };
 		B82DCA1A340D0C67301C8D69 /* AdoptionSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdoptionSyncTests.swift; sourceTree = "<group>"; };
 		BAC5E1F504D08AE2592356B1 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/NativeStrings.strings; sourceTree = "<group>"; };
+		BC034B4DC1430EFA479841C0 /* NativeShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeShell.swift; sourceTree = "<group>"; };
 		BD27B1008D8A87AD6F323D13 /* YearExportCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearExportCopy.swift; sourceTree = "<group>"; };
 		C0EF6368A1E46741394F4D15 /* PublicationRecoveryJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicationRecoveryJourney.swift; sourceTree = "<group>"; };
 		C5A6E3D8EC2CD713F6DBFA5C /* LegacySnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacySnapshot.swift; sourceTree = "<group>"; };
@@ -387,6 +391,7 @@
 				66117F51540A95F01ED0EAA3 /* NativePodcastQueue.swift */,
 				D9E570FC8A544AEED91515BF /* NativeRealtime.swift */,
 				3BBFE41052DB269091F57B43 /* NativeSettings.swift */,
+				BC034B4DC1430EFA479841C0 /* NativeShell.swift */,
 				297B85D6B7A67F973912B0E8 /* OpenIDSignIn.swift */,
 				89D370E0E2EBBE61D284F30A /* PDFReader.swift */,
 				67AC840B99BF9E4C5E8634AC /* PlaybackViews.swift */,
@@ -601,6 +606,7 @@
 				AE2250461D6F320BCC12E73A /* RemainingQAJourney.swift */,
 				A0BE0DA74DB532E459645134 /* SavedConnectionsJourney.swift */,
 				AA392F8FC9F549194AB0F29A /* SearchJourney.swift */,
+				247EF5B8181B359D3EAF0DF0 /* ShellJourney.swift */,
 			);
 			path = UITests;
 			sourceTree = "<group>";
@@ -839,6 +845,7 @@
 				BC24AD994CD148714B465179 /* RemainingQAJourney.swift in Sources */,
 				7ADB9D718A297152BA9A03A9 /* SavedConnectionsJourney.swift in Sources */,
 				3A3B859FF517BB94D5C0C0FB /* SearchJourney.swift in Sources */,
+				7748A625F7E6572392B336A9 /* ShellJourney.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -901,6 +908,7 @@
 				B7087685B20CC875DDF2759C /* NativePodcastQueue.swift in Sources */,
 				D79D8E4579A85CA1D2B47793 /* NativeRealtime.swift in Sources */,
 				8F46B458CBF492ECD0B26A3F /* NativeSettings.swift in Sources */,
+				20F70B9CA037A49733FC8168 /* NativeShell.swift in Sources */,
 				6CEB4496F52A514C9EBDFC54 /* NativeStrings.swift in Sources */,
 				1095C603C525A2AE8C7B2647 /* OfflineAudio.swift in Sources */,
 				4F8A3AF97ADB6DB816C3DDA2 /* OpenIDSignIn.swift in Sources */,

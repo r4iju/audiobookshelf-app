@@ -81,7 +81,6 @@
 "Clear" = "Очистить";
 "Clear events" = "Очистить журнал";
 "Clear events?" = "Очистить журнал?";
-"Clear search" = "Очистить поиск";
 "Close feed" = "Закрыть ленту";
 "Close playback" = "Закрыть проигрыватель";
 "Close reader" = "Закрыть читалку";
@@ -177,7 +176,6 @@
 "Filter library" = "Фильтровать библиотеку";
 "Filter: {0}" = "Фильтр: {0}";
 "Filters" = "Фильтры";
-"Find your next chapter." = "Найдите свою следующую главу.";
 "Find your next listen." = "Найдите, что послушать дальше.";
 "Finished" = "Закончен";
 "Font" = "Семейство шрифта";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Сохранение прогресса…";
 "Scale elapsed time by speed" = "Масштабирование затраченного времени по скорости";
 "Search" = "Поиск";
-"Search library" = "Поиск в библиотеке";
 "Search podcasts" = "Поиск подкастов";
 "Searching your library…" = "Поиск в библиотеке…";
 "Searching…" = "Поиск…";

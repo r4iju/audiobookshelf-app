@@ -81,7 +81,6 @@
 "Clear" = "ניקוי";
 "Clear events" = "נקה לוגים";
 "Clear events?" = "לנקות את הלוגים?";
-"Clear search" = "ניקוי החיפוש";
 "Close feed" = "סגור ערוץ";
 "Close playback" = "סגור נגן";
 "Close reader" = "סגירת הקורא";
@@ -177,7 +176,6 @@
 "Filter library" = "סינון הספרייה";
 "Filter: {0}" = "סינון: {0}";
 "Filters" = "מסננים";
-"Find your next chapter." = "למצוא את הפרק הבא שלך.";
 "Find your next listen." = "למצוא את ההאזנה הבאה שלך.";
 "Finished" = "הושלם";
 "Font" = "גופן";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "שומר את ההתקדמות שלך…";
 "Scale elapsed time by speed" = "שנה קנה מידה של זמן שחלף לפי מהירות ההשמעה";
 "Search" = "חיפוש";
-"Search library" = "חיפוש בספרייה";
 "Search podcasts" = "חיפוש פודקאסטים";
 "Searching your library…" = "מחפש בספרייה שלך…";
 "Searching…" = "מחפש…";

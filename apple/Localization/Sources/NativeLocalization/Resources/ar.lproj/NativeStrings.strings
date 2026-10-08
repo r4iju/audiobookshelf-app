@@ -81,7 +81,6 @@
 "Clear" = "مسح";
 "Clear events" = "مسح السجل";
 "Clear events?" = "هل تريد مسح السجل؟";
-"Clear search" = "مسح البحث";
 "Close feed" = "إغلاق الموجز";
 "Close playback" = "إغلاق المشغل";
 "Close reader" = "إغلاق القارئ";
@@ -177,7 +176,6 @@
 "Filter library" = "فلترة المكتبة";
 "Filter: {0}" = "الفلتر: {0}";
 "Filters" = "الفلاتر";
-"Find your next chapter." = "اعثر على فصلك التالي.";
 "Find your next listen." = "اعثر على ما ستستمع إليه تاليًا.";
 "Finished" = "المنجزة";
 "Font" = "عائلة الخطوط";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "جارٍ حفظ تقدّمك…";
 "Scale elapsed time by speed" = "تعديل الوقت المنصرم حسب السرعة";
 "Search" = "بحث";
-"Search library" = "البحث في المكتبة";
 "Search podcasts" = "البحث عن بودكاست";
 "Searching your library…" = "جارٍ البحث في مكتبتك…";
 "Searching…" = "جارٍ البحث…";

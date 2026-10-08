@@ -81,7 +81,6 @@
 "Clear" = "Rensa";
 "Clear events" = "Rensa loggar";
 "Clear events?" = "Vill du rensa händelserna?";
-"Clear search" = "Rensa sökning";
 "Close feed" = "Stäng flödet";
 "Close playback" = "Stäng spelaren";
 "Close reader" = "Stäng läsaren";
@@ -177,7 +176,6 @@
 "Filter library" = "Filtrera bibliotek";
 "Filter: {0}" = "Filter: {0}";
 "Filters" = "Filter";
-"Find your next chapter." = "Hitta ditt nästa kapitel.";
 "Find your next listen." = "Hitta din nästa lyssning.";
 "Finished" = "Avslutad";
 "Font" = "Teckensnittsfamilj";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Sparar ditt förlopp…";
 "Scale elapsed time by speed" = "Justera den visade uppspelningstiden efter uppspelningshastigheten.";
 "Search" = "Sök";
-"Search library" = "Sök i biblioteket";
 "Search podcasts" = "Sök poddar";
 "Searching your library…" = "Söker i ditt bibliotek…";
 "Searching…" = "Söker…";

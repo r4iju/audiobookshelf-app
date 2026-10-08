@@ -81,7 +81,6 @@
 "Clear" = "Temizle";
 "Clear events" = "Kayıtları Temizle";
 "Clear events?" = "Kayıtlar temizlensin mi?";
-"Clear search" = "Aramayı temizle";
 "Close feed" = "Akışı Kapat";
 "Close playback" = "Oynatıcıyı kapat";
 "Close reader" = "Okuyucuyu kapat";
@@ -177,7 +176,6 @@
 "Filter library" = "Kütüphaneyi filtrele";
 "Filter: {0}" = "Filtre: {0}";
 "Filters" = "Filtreler";
-"Find your next chapter." = "Sıradaki bölümünüzü bulun.";
 "Find your next listen." = "Sıradaki dinleyeceğinizi bulun.";
 "Finished" = "Bitirildi";
 "Font" = "Yazı tipi ailesi";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "İlerlemeniz kaydediliyor…";
 "Scale elapsed time by speed" = "Geçen Süreyi Hıza Göre Ölçekle";
 "Search" = "Ara";
-"Search library" = "Kütüphanede ara";
 "Search podcasts" = "Podcast ara";
 "Searching your library…" = "Kütüphaneniz aranıyor…";
 "Searching…" = "Aranıyor…";

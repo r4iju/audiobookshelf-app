@@ -5,11 +5,10 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap()
-        accountMenu(app).buttons["Change library"].tap()
+        app.buttons["Change library"].tap()
         app.buttons["library-podcasts"].tap()
-        XCTAssertTrue(app.buttons["Search library"].waitForExistence(timeout: 5))
-        app.buttons["Search library"].tap()
+        XCTAssertTrue(app.buttons["Search"].firstMatch.waitForExistence(timeout: 5))
+        app.buttons["Search"].firstMatch.tap()
         librarySearchField(app).tap()
         librarySearchField(app).typeText("Quiet Evening\n")
         let episode = app.buttons["search-episode-episode"]
@@ -44,7 +43,7 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        let search = app.buttons["Search library"]
+        let search = app.buttons["Search"].firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 3))
         guard search.exists else { return }
         search.tap()

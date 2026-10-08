@@ -81,7 +81,6 @@
 "Clear" = "Wyczyść";
 "Clear events" = "Wyczyść Logi";
 "Clear events?" = "Wyczyścić zdarzenia?";
-"Clear search" = "Wyczyść wyszukiwanie";
 "Close feed" = "Zamknij kanał";
 "Close playback" = "Zamknij odtwarzacz";
 "Close reader" = "Zamknij czytnik";
@@ -177,7 +176,6 @@
 "Filter library" = "Filtruj bibliotekę";
 "Filter: {0}" = "Filtr: {0}";
 "Filters" = "Filtry";
-"Find your next chapter." = "Znajdź swój kolejny rozdział.";
 "Find your next listen." = "Znajdź coś nowego do słuchania.";
 "Finished" = "Zakończone";
 "Font" = "Krój pisma";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Zapisywanie postępu…";
 "Scale elapsed time by speed" = "Skaluj czas, który upłynął według prędkości";
 "Search" = "Szukaj";
-"Search library" = "Szukaj w bibliotece";
 "Search podcasts" = "Szukaj podcastów";
 "Searching your library…" = "Przeszukiwanie biblioteki…";
 "Searching…" = "Wyszukiwanie…";

@@ -33,17 +33,36 @@ struct LibrarySearch: View {
     @Environment(\.nativeStrings) private var l10n
     init(catalog: CatalogStore) { _search = StateObject(wrappedValue: LibrarySearchStore(catalog: catalog)) }
     var body: some View {
-        VStack(spacing: 0) {
-            CatalogSearchField(query: $search.query, prompt: l10n("Books, podcasts, authors, series…"), submit: submit)
-                .frame(height: 56).padding(.horizontal, 12)
+        systemSearch
+            .onChange(of: search.query) { _ in
+                pending?.cancel()
+                pending = Task {
+                    do { try await Task.sleep(nanoseconds: 350_000_000) }
+                    catch { return }
+                    await search.search()
+                }
+            }
+            .onDisappear { pending?.cancel() }
+    }
+    @ViewBuilder private var systemSearch: some View {
+        if #available(iOS 15, *) {
+            results.searchable(text: $search.query, placement: .navigationBarDrawer(displayMode: .always), prompt: l10n("Books, podcasts, authors, series…"))
+                .onSubmit(of: .search, submit)
+        } else {
+            results.background(LegacyNavigationSearch(query: $search.query, prompt: l10n("Books, podcasts, authors, series…"), submit: submit).frame(width: 0, height: 0))
+        }
+    }
+    private var results: some View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 18) {
+                    Text(search.catalog.library.name).font(.subheadline.weight(.semibold)).foregroundColor(ShelfStyle.secondaryText)
                     switch search.state {
                     case .idle: Text(l10n("Find your next listen.")).foregroundColor(ShelfStyle.secondaryText)
                     case .loading: ProgressView(l10n("Searching your library…")).frame(maxWidth: .infinity)
                     case .failed(let error): RecoveryCard(message: error) { submit() }
                     case .results(let results):
                         if results.isEmpty { Text(l10n("No results. Try another title, author, or series.")).foregroundColor(ShelfStyle.secondaryText) }
+                        if !results.items.isEmpty { Text(l10n(search.catalog.library.mediaType == "podcast" ? "Podcasts" : "Books")).font(.headline) }
                         ForEach(results.items) { item in
                             NavigationLink(destination: BookDetails(item: item, catalog: search.catalog, progress: nil)) {
                                 BookCard(item: item, catalog: search.catalog, listLayout: true)
@@ -76,16 +95,7 @@ struct LibrarySearch: View {
                     }
                 }.padding(20).frame(maxWidth: 1000).frame(maxWidth: .infinity, alignment: .leading)
             }
-        }.background(appearance.background).navigationTitle(l10n("Search"))
-            .onChange(of: search.query) { _ in
-                pending?.cancel()
-                pending = Task {
-                    do { try await Task.sleep(nanoseconds: 350_000_000) }
-                    catch { return }
-                    await search.search()
-                }
-            }
-            .onDisappear { pending?.cancel() }
+            .background(appearance.background).navigationTitle(l10n("Search"))
     }
     private func submit() { pending?.cancel(); pending = Task { await search.search() } }
     private func related(_ name: String, group: String, value: String) -> some View {
@@ -98,35 +108,39 @@ struct LibrarySearch: View {
     }
 }
 
-/// UISearchBar supplies native search semantics while retaining the existing field identity.
-private struct CatalogSearchField: UIViewRepresentable {
+/// On iOS 14 the navigation controller, rather than an embedded fixed-height bar, owns search.
+private struct LegacyNavigationSearch: UIViewControllerRepresentable {
     @Binding var query: String
     let prompt: String
     let submit: () -> Void
-
-    func makeCoordinator() -> Coordinator { Coordinator(self) }
-    func makeUIView(context: Context) -> UISearchBar {
-        let bar = UISearchBar()
-        bar.searchBarStyle = .minimal
-        bar.delegate = context.coordinator
-        bar.searchTextField.accessibilityIdentifier = "library-search"
-        bar.searchTextField.font = .preferredFont(forTextStyle: .body)
-        bar.searchTextField.adjustsFontForContentSizeCategory = true
-        bar.searchTextField.autocapitalizationType = .none
-        return bar
+    func makeUIViewController(context: Context) -> SearchBridge { SearchBridge() }
+    func updateUIViewController(_ controller: SearchBridge, context: Context) {
+        controller.queryChanged = { query = $0 }
+        controller.submitted = submit
+        controller.search.searchBar.placeholder = prompt
+        if controller.search.searchBar.text != query { controller.search.searchBar.text = query }
+        controller.attach()
     }
-    func updateUIView(_ bar: UISearchBar, context: Context) {
-        context.coordinator.field = self
-        if bar.text != query { bar.text = query }
-        bar.placeholder = prompt
-    }
-    final class Coordinator: NSObject, UISearchBarDelegate {
-        var field: CatalogSearchField
-        init(_ field: CatalogSearchField) { self.field = field }
-        func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) { field.query = searchText }
-        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-            searchBar.resignFirstResponder()
-            field.submit()
+    final class SearchBridge: UIViewController, UISearchResultsUpdating, UISearchBarDelegate {
+        let search = UISearchController(searchResultsController: nil)
+        var queryChanged: ((String) -> Void)?
+        var submitted: (() -> Void)?
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            search.obscuresBackgroundDuringPresentation = false
+            search.searchResultsUpdater = self
+            search.searchBar.delegate = self
+            search.searchBar.searchTextField.accessibilityIdentifier = "library-search"
         }
+        override func viewDidAppear(_ animated: Bool) { super.viewDidAppear(animated); attach() }
+        func attach() {
+            DispatchQueue.main.async { [weak self] in
+                guard let self, let navigation = self.navigationController else { return }
+                navigation.topViewController?.navigationItem.searchController = self.search
+                navigation.topViewController?.navigationItem.hidesSearchBarWhenScrolling = false
+            }
+        }
+        func updateSearchResults(for searchController: UISearchController) { queryChanged?(searchController.searchBar.text ?? "") }
+        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) { searchBar.resignFirstResponder(); submitted?() }
     }
 }

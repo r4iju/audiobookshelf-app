@@ -20,16 +20,16 @@ struct ConnectionRoot: View {
     var body: some View {
         Group {
             switch connection.screen {
-            case .connection(let error): ConnectionForm(error: error)
+            case .connection(let error): PlaybackContainer(content: ConnectionForm(error: error))
             case .loading:
-                VStack(spacing: 24) {
+                PlaybackContainer(content: VStack(spacing: 24) {
                     ProgressView().accessibilityLabel(l10n("Opening your library…"))
                     Text(l10n("Opening your library…")).font(.headline)
                     Button(l10n("Open downloads")) { downloads.presented = true }.nativeGlassButton()
                 }.padding(24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .libraries(let libraries): LibraryChooser(libraries: libraries)
-            case .shelf(let library): ConnectedLibrary(library: library)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity))
+            case .libraries(let libraries): PlaybackContainer(content: LibraryChooser(libraries: libraries))
+            case .shelf(let library): NativeShell(library: library)
             }
         }.background(appearance.background.edgesIgnoringSafeArea(.all))
             .sheet(isPresented: $connection.savedConnectionsPresented) { SavedConnectionsView().environmentObject(connection) }

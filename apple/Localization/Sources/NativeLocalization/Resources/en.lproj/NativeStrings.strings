@@ -59,6 +59,7 @@
 "Book progress" = "Book progress";
 "Book {0}" = "Book {0}";
 "Bookmarks" = "Bookmarks";
+"Books" = "Books";
 "Books, podcasts, authors, series…" = "Books, podcasts, authors, series…";
 "Browser sign-in was canceled. Your saved account is retained." = "Browser sign-in was canceled. Your saved account is retained.";
 "Buffering" = "Buffering";
@@ -73,6 +74,7 @@
 "Chapter track" = "Chapter track";
 "Chapters" = "Chapters";
 "Choose a library to get started." = "Choose a library to get started.";
+"Choose a title from your library to start listening." = "Choose a title from your library to start listening.";
 "Choose export" = "Choose export";
 "Choose the complete export package or the folder containing archive.json. An unfinished export cannot be imported." = "Choose the complete export package or the folder containing archive.json. An unfinished export cannot be imported.";
 "Choose the feedback for playback controls and library actions." = "Choose the feedback for playback controls and library actions.";
@@ -81,7 +83,6 @@
 "Clear" = "Clear";
 "Clear events" = "Clear events";
 "Clear events?" = "Clear events?";
-"Clear search" = "Clear search";
 "Close feed" = "Close feed";
 "Close playback" = "Close playback";
 "Close reader" = "Close reader";
@@ -177,7 +178,6 @@
 "Filter library" = "Filter library";
 "Filter: {0}" = "Filter: {0}";
 "Filters" = "Filters";
-"Find your next chapter." = "Find your next chapter.";
 "Find your next listen." = "Find your next listen.";
 "Finished" = "Finished";
 "Font" = "Font";
@@ -187,6 +187,7 @@
 "Format" = "Format";
 "Forward interval" = "Forward interval";
 "Forward {0} seconds" = "Forward {0} seconds";
+"From your library" = "From your library";
 "Genre" = "Genre";
 "Genres" = "Genres";
 "Go to page" = "Go to page";
@@ -213,9 +214,11 @@
 "Language" = "Language";
 "Languages" = "Languages";
 "Library" = "Library";
+"Library actions" = "Library actions";
 "Line spacing" = "Line spacing";
 "Line spacing {0}%" = "Line spacing {0}%";
 "Listen Again" = "Listen Again";
+"Listen Now" = "Listen Now";
 "Listen on the big screen" = "Listen on the big screen";
 "Listening" = "Listening";
 "Listening could not be saved on this device: {0}" = "Listening could not be saved on this device: {0}";
@@ -413,7 +416,6 @@
 "Saving your progress…" = "Saving your progress…";
 "Scale elapsed time by speed" = "Scale elapsed time by speed";
 "Search" = "Search";
-"Search library" = "Search library";
 "Search podcasts" = "Search podcasts";
 "Searching your library…" = "Searching your library…";
 "Searching…" = "Searching…";
@@ -611,6 +613,7 @@
 "Your books. Your server.\nListen wherever the day takes you." = "Your books. Your server.\nListen wherever the day takes you.";
 "Your libraries" = "Your libraries";
 "Your listening" = "Your listening";
+"Your next listen" = "Your next listen";
 "Your previous app and its original files stay available." = "Your previous app and its original files stay available.";
 "Your saved progress will change when this book is marked finished." = "Your saved progress will change when this book is marked finished.";
 "Your session expired. Please sign in again." = "Your session expired. Please sign in again.";

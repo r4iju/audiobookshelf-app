@@ -82,7 +82,7 @@ import SwiftUI
 
     var body: some Scene {
         WindowGroup {
-            PlaybackContainer(content: ConnectionRoot()).environmentObject(connection).environmentObject(player).environmentObject(downloads).environmentObject(reading).environmentObject(serverQueue).environmentObject(realtime)
+            ConnectionRoot().environmentObject(connection).environmentObject(player).environmentObject(downloads).environmentObject(reading).environmentObject(serverQueue).environmentObject(realtime)
                 .accentColor(ShelfStyle.accent)
                 .onAppear { Task { await connection.restore(); realtime.connect(); downloads.refresh(); reading.sync(api: connection.api); await restoreImportedData() } }
                 .onChange(of: scenePhase) { phase in if phase == .active { realtime.connect(); serverQueue.retrySavingResults(); Task { await migration.sync() } } }

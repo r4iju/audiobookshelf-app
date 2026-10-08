@@ -81,7 +81,6 @@
 "Clear" = "Limpar";
 "Clear events" = "Limpar Logs";
 "Clear events?" = "Limpar logs?";
-"Clear search" = "Limpar busca";
 "Close feed" = "Fechar Feed";
 "Close playback" = "Fechar Reprodutor";
 "Close reader" = "Fechar leitor";
@@ -177,7 +176,6 @@
 "Filter library" = "Filtrar biblioteca";
 "Filter: {0}" = "Filtro: {0}";
 "Filters" = "Filtros";
-"Find your next chapter." = "Encontre seu próximo capítulo.";
 "Find your next listen." = "Encontre sua próxima escuta.";
 "Finished" = "Concluído";
 "Font" = "Família de fontes";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Salvando seu progresso…";
 "Scale elapsed time by speed" = "Proporcionalizar Tempo Decorrido com a Velocidade";
 "Search" = "Pesquisar";
-"Search library" = "Buscar na biblioteca";
 "Search podcasts" = "Buscar podcasts";
 "Searching your library…" = "Buscando na sua biblioteca…";
 "Searching…" = "Buscando…";

@@ -81,7 +81,6 @@
 "Clear" = "지우기";
 "Clear events" = "로그 지우기";
 "Clear events?" = "로그를 지우겠습니까?";
-"Clear search" = "검색 지우기";
 "Close feed" = "피드 닫기";
 "Close playback" = "플레이어 닫기";
 "Close reader" = "리더 닫기";
@@ -177,7 +176,6 @@
 "Filter library" = "라이브러리 필터";
 "Filter: {0}" = "필터: {0}";
 "Filters" = "필터";
-"Find your next chapter." = "다음 챕터를 찾아보세요.";
 "Find your next listen." = "다음에 들을 작품을 찾아보세요.";
 "Finished" = "완료됨";
 "Font" = "글꼴 모양";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "진행 상황 저장 중…";
 "Scale elapsed time by speed" = "속도에 따른 경과 시간 스케일링";
 "Search" = "검색";
-"Search library" = "라이브러리 검색";
 "Search podcasts" = "팟캐스트 검색";
 "Searching your library…" = "라이브러리 검색 중…";
 "Searching…" = "검색 중…";

@@ -9,7 +9,9 @@ struct PlaybackContainer<Content: View>: View {
     @State private var expanded = false
     @State private var signInPrompt = false
     @State private var compactHeight: CGFloat = 96
+    @State private var artwork: UIImage?
     let content: Content
+    var nativeTabAccessory = false
     var body: some View {
         playbackContent
             .fullScreenCover(isPresented: $expanded) { NowListening().environmentObject(player).nativeLocalization() }
@@ -21,35 +23,56 @@ struct PlaybackContainer<Content: View>: View {
                       primaryButton: .default(Text(l10n("Sign in"))) { connection.reauthenticate() },
                       secondaryButton: .cancel(Text(l10n("Not now"))))
             }
+            .onAppear { loadArtwork() }
+            .onChange(of: player.itemID) { _ in loadArtwork() }
             .onPreferenceChange(CompactPlayerHeight.self) { compactHeight = $0 }
             .recordsDiagnostics()
             .nativeLocalization()
     }
     @ViewBuilder private var playbackContent: some View {
-        if #available(iOS 15, *) {
+        // 26.0 cannot disable the accessory without replacing the tab container, which loses navigation state.
+        if #available(iOS 26.1, *), nativeTabAccessory {
+            content.tabViewBottomAccessory(isEnabled: player.session != nil || player.preparing) { compactControls.padding(.horizontal, 12) }
+        } else if #available(iOS 15, *) {
             content.safeAreaInset(edge: .bottom, spacing: 0) { miniPlayer }
         } else {
             content.padding(.bottom, player.session == nil && !player.preparing ? 0 : compactHeight)
                 .overlay(miniPlayer, alignment: .bottom)
         }
     }
+    private var compactControls: some View {
+        HStack(spacing: 14) {
+            Button { expanded = true } label: {
+                HStack(spacing: 14) {
+                    Group {
+                        if let artwork { Image(uiImage: artwork).resizable().scaledToFit() }
+                        else { Image(systemName: "headphones").font(.title2).foregroundColor(ShelfStyle.accent) }
+                    }.frame(width: 44, height: 44).cornerRadius(6).accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(player.title).font(.headline).lineLimit(2)
+                        Text(player.preparing || player.seeking ? l10n("Preparing audio…") : l10n("{0} of {1}", ShelfTime.describe(player.currentTime), ShelfTime.describe(player.session?.duration ?? 0)))
+                            .font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                    }
+                    Spacer()
+                }
+            }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("mini-player")
+            playbackToggle(player, strings: l10n)
+        }
+    }
+
+    private func loadArtwork() {
+        artwork = nil
+        guard let id = player.itemID else { return }
+        Task {
+            guard let data = try? await connection.api.coverData(itemID: id), player.itemID == id else { return }
+            artwork = UIImage(data: data)
+        }
+    }
+
     private var miniPlayer: some View {
         Group {
                 if player.session != nil || player.preparing {
-                    HStack(spacing: 14) {
-                        Button { expanded = true } label: {
-                            HStack(spacing: 14) {
-                                Image(systemName: "headphones").font(.title2).foregroundColor(ShelfStyle.accent)
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(player.title).font(.headline).lineLimit(2)
-                                    Text(player.preparing || player.seeking ? l10n("Preparing audio…") : l10n("{0} of {1}", ShelfTime.describe(player.currentTime), ShelfTime.describe(player.session?.duration ?? 0)))
-                                        .font(.caption).foregroundColor(ShelfStyle.secondaryText)
-                                }
-                                Spacer()
-                            }
-                        }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("mini-player")
-                        playbackToggle(player, strings: l10n)
-                    }.padding(16).nativeFloatingControl(background: appearance.card)
+                    compactControls.padding(16).nativeFloatingControl(background: appearance.card)
                         .padding(.horizontal, 16).padding(.bottom, 8).frame(maxWidth: 900)
                         .fixedSize(horizontal: false, vertical: true)
                         .background(GeometryReader { geometry in Color.clear.preference(key: CompactPlayerHeight.self, value: geometry.size.height) })
@@ -74,90 +97,116 @@ struct NowListening: View {
     @AppStorage(PlayerDisplay.lockKey) private var locked = false
     var body: some View {
         NativeNavigation {
-            ScrollView {
-                VStack(spacing: 28) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 32).fill(ShelfStyle.accent.opacity(0.12))
-                        if let artwork { Image(uiImage: artwork).resizable().scaledToFill() }
-                        else { Image(systemName: "books.vertical.fill").font(.system(size: 90)).foregroundColor(ShelfStyle.accent) }
-                    }.frame(width: 220, height: 260).clipped().cornerRadius(24).padding(.top, 20).accessibilityHidden(true)
-                    VStack(spacing: 10) {
-                        if let chapter = player.currentChapter {
-                            Text(chapter.title).font(.headline)
-                            Text(l10n("{0} of {1}", ShelfTime.describe(player.currentTime - chapter.start), ShelfTime.describe(chapter.end - chapter.start)))
-                                .font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("chapter-elapsed")
+            GeometryReader { geometry in
+                    ScrollView {
+                        if geometry.size.width >= 780 && !sizeCategory.isAccessibilityCategory {
+                            HStack(alignment: .center, spacing: 48) {
+                                artworkContext(width: min(360, geometry.size.width * 0.35))
+                                    .frame(width: min(360, geometry.size.width * 0.35))
+                                listeningSurface.frame(maxWidth: 500)
+                            }.padding(40).frame(maxWidth: 1100).frame(maxWidth: .infinity, minHeight: geometry.size.height)
+                        } else {
+                            VStack(spacing: 28) {
+                                artworkContext(width: 220)
+                                listeningSurface
+                            }.padding(24).frame(maxWidth: 620).frame(maxWidth: .infinity)
                         }
-                        Text(player.title).font(.system(.title, design: .serif).bold()).multilineTextAlignment(.center)
-                        Text(player.author).foregroundColor(ShelfStyle.secondaryText)
-                        if let session = player.session {
-                            Text(l10n("File {0} of {1}", player.trackIndex + 1, session.audioTracks.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
-                        }
-                        Text(l10n(player.preparing ? "Preparing audio…" : player.seeking ? "Seeking…" : player.playing ? "Playing" : "Paused"))
-                            .font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("playback-status")
                     }
-                    let display = PlayerDisplay(player: player, at: scrubbing ? position : player.currentTime, totalTrack: totalTrack, scaleElapsed: scaleElapsed)
-                    VStack(spacing: 10) {
-                        if let total = display.total {
-                            ProgressView(value: total.fraction).accentColor(ShelfStyle.accent.opacity(0.6)).accessibilityHidden(true)
-                            HStack {
-                                Text(ShelfTime.describe(total.elapsed)).accessibilityIdentifier("total-elapsed")
-                                Spacer()
-                                Text("−" + ShelfTime.describe(total.remaining)).accessibilityIdentifier("total-remaining")
-                            }.font(.caption2.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
-                        }
-                        Slider(value: Binding(get: { min(max(scrubbing ? position : player.currentTime, display.range.lowerBound), display.range.upperBound) }, set: { position = $0 }), in: display.range, onEditingChanged: { editing in
-                            if editing && !scrubbing { NativeHaptic.impact("scrub") }
-                            scrubbing = editing
-                            if !editing { Task { do { try await player.seek(to: position, autoplay: player.wantsPlayback) } catch { player.error = ConnectionStore.recovery(for: error) } } }
-                        }).accentColor(ShelfStyle.accent).disabled(locked).accessibilityIdentifier("playback-position")
-                        HStack {
-                            Text(ShelfTime.describe(display.elapsed)).accessibilityIdentifier("playback-elapsed")
-                            Spacer()
-                            Text("−" + ShelfTime.describe(display.remaining)).accessibilityIdentifier("playback-remaining")
-                        }.font(.caption.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
-                    }
-                    if locked {
-                        Button { NativeHaptic.impact("lock"); locked = false } label: { Label(l10n("Unlock player"), systemImage: "lock.fill") }
-                            .font(.callout.bold()).foregroundColor(ShelfStyle.accent).nativeGlassButton().accessibilityIdentifier("unlock-player")
-                    }
-                    HStack(spacing: sizeCategory.isAccessibilityCategory ? 12 : 38) {
-                        Button { NativeHaptic.impact("skip"); Task { await player.skip(-Double(player.backwardInterval)) } } label: { VStack { Image(systemName: "gobackward").font(.system(size: 32)); Text("\(player.backwardInterval)").font(.caption) } }.frame(minWidth: 44, minHeight: 44).nativeGlassButton().disabled(locked).accessibilityLabel(l10n("Back {0} seconds", player.backwardInterval))
-                        playbackToggle(player, large: true, strings: l10n)
-                        Button { NativeHaptic.impact("skip"); Task { await player.skip(Double(player.forwardInterval)) } } label: { VStack { Image(systemName: "goforward").font(.system(size: 32)); Text("\(player.forwardInterval)").font(.caption) } }.frame(minWidth: 44, minHeight: 44).nativeGlassButton().disabled(locked).accessibilityLabel(l10n("Forward {0} seconds", player.forwardInterval))
-                    }.foregroundColor(ShelfStyle.accent)
-                    // At accessibility text sizes even two columns break words such as "Bookmarks", so each control gets its own row.
-                    Group {
-                        if sizeCategory.isAccessibilityCategory { VStack(alignment: .leading, spacing: 20) { listeningButtons } }
-                        else {
-                            VStack(spacing: 16) {
-                                HStack(spacing: 16) { chapterButton; speedButton }
-                                HStack(spacing: 16) { bookmarkButton; sleepButton }
-                            }
-                        }
-                    }.labelStyle(ListeningControlLabelStyle(stacked: !sizeCategory.isAccessibilityCategory)).font(.caption).foregroundColor(ShelfStyle.accent).multilineTextAlignment(.center)
-                    if let remaining = player.sleepRemaining { Text(l10n("Sleep in {0}", ShelfTime.describe(remaining))).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
-                    if player.sleepChapterEnd != nil { Text(l10n("Sleep at chapter end")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
-                    Button { panel = .settings } label: { Label(l10n("Playback settings"), systemImage: "slider.horizontal.3") }.font(.footnote).nativeGlassButton()
-                    if let error = player.error { Text(error).font(.callout).foregroundColor(.red).accessibilityIdentifier("playback-error") }
-                    if player.needsSignIn {
-                        Button(l10n("Sign in again")) {
-                            presentation.wrappedValue.dismiss()
-                            connection.reauthenticate()
-                        }.font(.callout.bold()).accessibilityIdentifier("sign-in-again")
-                    }
-                    Button(l10n("Close playback")) {
-                        Task {
-                            do { try await player.stop(); presentation.wrappedValue.dismiss() }
-                            catch { player.error = ConnectionStore.recovery(for: error) }
-                        }
-                    }.font(.footnote).foregroundColor(ShelfStyle.secondaryText).disabled(locked)
-                }.padding(28).frame(maxWidth: 560).frame(maxWidth: .infinity)
-            }.background(appearance.background).navigationTitle(l10n("Now listening")).navigationBarTitleDisplayMode(.inline)
+                }
+
+                .background(appearance.background).navigationTitle(l10n("Now listening")).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Done")) { presentation.wrappedValue.dismiss() } } }
         }
             .sheet(item: $panel) { _ in ListeningControls(panel: $panel).environmentObject(player).nativeLocalization().listeningSheet() }
             .onAppear { loadArtwork() }
             .onChange(of: player.itemID) { _ in loadArtwork() }
+    }
+    private func artworkContext(width: CGFloat) -> some View {
+        VStack(spacing: 20) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 32).fill(ShelfStyle.accent.opacity(0.12))
+                if let artwork { Image(uiImage: artwork).resizable().scaledToFill() }
+                else { Image(systemName: "books.vertical.fill").font(.system(size: 90)).foregroundColor(ShelfStyle.accent) }
+            }.frame(width: width, height: width).clipped().cornerRadius(24).accessibilityHidden(true)
+            VStack(spacing: 10) {
+                Text(player.title).font(.title2.bold()).multilineTextAlignment(.center)
+                Text(player.author).foregroundColor(ShelfStyle.secondaryText)
+                if let chapter = player.currentChapter {
+                    Text(chapter.title).font(.headline)
+                    Text(l10n("{0} of {1}", ShelfTime.describe(player.currentTime - chapter.start), ShelfTime.describe(chapter.end - chapter.start)))
+                        .font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("chapter-elapsed")
+                }
+                if let session = player.session {
+                    Text(l10n("File {0} of {1}", player.trackIndex + 1, session.audioTracks.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                }
+                Text(l10n(player.preparing ? "Preparing audio…" : player.seeking ? "Seeking…" : player.playing ? "Playing" : "Paused"))
+                    .font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("playback-status")
+            }
+        }
+    }
+    private var listeningSurface: some View {
+        VStack(spacing: 24) {
+            let display = PlayerDisplay(player: player, at: scrubbing ? position : player.currentTime, totalTrack: totalTrack, scaleElapsed: scaleElapsed)
+            VStack(spacing: 10) {
+                if let total = display.total {
+                    ProgressView(value: total.fraction).accentColor(ShelfStyle.accent.opacity(0.6)).accessibilityHidden(true)
+                    HStack {
+                        Text(ShelfTime.describe(total.elapsed)).accessibilityIdentifier("total-elapsed")
+                        Spacer()
+                        Text("−" + ShelfTime.describe(total.remaining)).accessibilityIdentifier("total-remaining")
+                    }.font(.caption2.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
+                }
+                Slider(value: Binding(get: { min(max(scrubbing ? position : player.currentTime, display.range.lowerBound), display.range.upperBound) }, set: { position = $0 }), in: display.range, onEditingChanged: { editing in
+                    if editing && !scrubbing { NativeHaptic.impact("scrub") }
+                    scrubbing = editing
+                    if !editing { Task { do { try await player.seek(to: position, autoplay: player.wantsPlayback) } catch { player.error = ConnectionStore.recovery(for: error) } } }
+                }).accentColor(ShelfStyle.accent).disabled(locked).accessibilityIdentifier("playback-position")
+                HStack {
+                    Text(ShelfTime.describe(display.elapsed)).accessibilityIdentifier("playback-elapsed")
+                    Spacer()
+                    Text("−" + ShelfTime.describe(display.remaining)).accessibilityIdentifier("playback-remaining")
+                }.font(.caption.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
+            }
+            if locked {
+                Button { NativeHaptic.impact("lock"); locked = false } label: { Label(l10n("Unlock player"), systemImage: "lock.fill") }
+                    .font(.callout.bold()).foregroundColor(ShelfStyle.accent).nativeGlassButton().accessibilityIdentifier("unlock-player")
+            }
+            HStack(spacing: sizeCategory.isAccessibilityCategory ? 12 : 38) {
+                Button { NativeHaptic.impact("skip"); Task { await player.skip(-Double(player.backwardInterval)) } } label: { VStack { Image(systemName: "gobackward").font(.system(size: 32)); Text("\(player.backwardInterval)").font(.caption) } }.frame(minWidth: 44, minHeight: 44).buttonStyle(PlainButtonStyle()).disabled(locked).accessibilityLabel(l10n("Back {0} seconds", player.backwardInterval))
+                playbackToggle(player, large: true, strings: l10n)
+                Button { NativeHaptic.impact("skip"); Task { await player.skip(Double(player.forwardInterval)) } } label: { VStack { Image(systemName: "goforward").font(.system(size: 32)); Text("\(player.forwardInterval)").font(.caption) } }.frame(minWidth: 44, minHeight: 44).buttonStyle(PlainButtonStyle()).disabled(locked).accessibilityLabel(l10n("Forward {0} seconds", player.forwardInterval))
+            }.foregroundColor(ShelfStyle.accent)
+            secondaryActions
+            if let remaining = player.sleepRemaining { Text(l10n("Sleep in {0}", ShelfTime.describe(remaining))).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
+            if player.sleepChapterEnd != nil { Text(l10n("Sleep at chapter end")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
+            Button { panel = .settings } label: { Label(l10n("Playback settings"), systemImage: "slider.horizontal.3") }.font(.footnote).buttonStyle(PlainButtonStyle())
+            if let error = player.error { Text(error).font(.callout).foregroundColor(.red).accessibilityIdentifier("playback-error") }
+            if player.needsSignIn {
+                Button(l10n("Sign in again")) {
+                    presentation.wrappedValue.dismiss()
+                    connection.reauthenticate()
+                }.font(.callout.bold()).accessibilityIdentifier("sign-in-again")
+            }
+            Button(l10n("Close playback")) {
+                Task {
+                    do { try await player.stop(); presentation.wrappedValue.dismiss() }
+                    catch { player.error = ConnectionStore.recovery(for: error) }
+                }
+            }.font(.footnote).foregroundColor(ShelfStyle.secondaryText).disabled(locked)
+        }
+    }
+    @ViewBuilder private var secondaryActions: some View {
+        if sizeCategory.isAccessibilityCategory {
+            VStack(alignment: .leading, spacing: 16) { listeningButtons }
+                .labelStyle(DefaultLabelStyle())
+        } else if #available(iOS 15, *) {
+            ControlGroup { listeningButtons }
+                .controlGroupStyle(.navigation)
+                .labelStyle(ListeningControlLabelStyle(stacked: true))
+        } else {
+            HStack(spacing: 16) { listeningButtons }
+                .labelStyle(ListeningControlLabelStyle(stacked: true))
+        }
     }
     @ViewBuilder private var listeningButtons: some View {
         chapterButton
@@ -166,16 +215,16 @@ struct NowListening: View {
         sleepButton
     }
     private var chapterButton: some View {
-        Button { panel = .chapters } label: { Label(l10n("Chapters"), systemImage: "list.bullet").frame(maxWidth: .infinity, minHeight: 44) }.nativeGlassButton().disabled(locked || player.session?.chapters?.isEmpty != false).frame(maxWidth: .infinity).accessibilityLabel(l10n("Chapters"))
+        Button { panel = .chapters } label: { Label(l10n("Chapters"), systemImage: "list.bullet").frame(maxWidth: .infinity, minHeight: 44) }.buttonStyle(PlainButtonStyle()).disabled(locked || player.session?.chapters?.isEmpty != false).frame(maxWidth: .infinity).accessibilityLabel(l10n("Chapters"))
     }
     private var speedButton: some View {
-        Button { panel = .speed } label: { Label(String(format: "%g×", player.speed), systemImage: "speedometer").frame(maxWidth: .infinity, minHeight: 44) }.nativeGlassButton().frame(maxWidth: .infinity).accessibilityLabel(l10n("Playback speed"))
+        Button { panel = .speed } label: { Label(String(format: "%g×", player.speed), systemImage: "speedometer").frame(maxWidth: .infinity, minHeight: 44) }.buttonStyle(PlainButtonStyle()).frame(maxWidth: .infinity).accessibilityLabel(l10n("Playback speed"))
     }
     private var bookmarkButton: some View {
-        Button { panel = .bookmarks } label: { Label(l10n("Bookmarks"), systemImage: "bookmark").frame(maxWidth: .infinity, minHeight: 44) }.nativeGlassButton().disabled(locked || !player.bookmarkSupported).frame(maxWidth: .infinity).accessibilityLabel(l10n("Bookmarks"))
+        Button { panel = .bookmarks } label: { Label(l10n("Bookmarks"), systemImage: "bookmark").frame(maxWidth: .infinity, minHeight: 44) }.buttonStyle(PlainButtonStyle()).disabled(locked || !player.bookmarkSupported).frame(maxWidth: .infinity).accessibilityLabel(l10n("Bookmarks"))
     }
     private var sleepButton: some View {
-        Button { panel = .sleep } label: { Label(l10n("Sleep timer"), systemImage: "moon").frame(maxWidth: .infinity, minHeight: 44) }.nativeGlassButton().disabled(player.session == nil).frame(maxWidth: .infinity).accessibilityLabel(l10n("Sleep timer"))
+        Button { panel = .sleep } label: { Label(l10n("Sleep timer"), systemImage: "moon").frame(maxWidth: .infinity, minHeight: 44) }.buttonStyle(PlainButtonStyle()).disabled(player.session == nil).frame(maxWidth: .infinity).accessibilityLabel(l10n("Sleep timer"))
     }
     private func loadArtwork() {
         artwork = nil
@@ -355,7 +404,10 @@ struct ListeningControls: View {
 private struct PlaybackToggleStyle: ViewModifier {
     let large: Bool
     @ViewBuilder func body(content: Content) -> some View {
-        if large { content.buttonStyle(PlainButtonStyle()).nativeGlassControl(tint: ShelfStyle.accentFill, cornerRadius: 40) }
+        if large {
+            if #available(iOS 26, *) { content.nativeGlassButton(prominent: true).tint(ShelfStyle.accentFill).buttonBorderShape(.circle) }
+            else { content.buttonStyle(PlainButtonStyle()).nativeGlassControl(tint: ShelfStyle.accentFill, cornerRadius: 40) }
+        }
         else { content.buttonStyle(PlainButtonStyle()) }
     }
 }

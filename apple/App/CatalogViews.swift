@@ -1,62 +1,5 @@
 import SwiftUI
 
-struct ConnectedLibrary: View {
-    @EnvironmentObject private var downloads: NativeDownloads
-    @EnvironmentObject private var connection: ConnectionStore
-    @Environment(\.horizontalSizeClass) private var sizeClass
-    let library: Library
-    var body: some View {
-        Group {
-            if #available(iOS 17, *), UIDevice.current.userInterfaceIdiom == .pad {
-                AdaptiveLibraryNavigation(library: library, api: connection.api)
-            } else if #available(iOS 16, *), sizeClass == .regular {
-                NavigationSplitView {
-                    LibrarySidebar(selected: library)
-                } detail: {
-                    NavigationStack { CatalogShelf(api: connection.api, library: library) }
-                }.navigationSplitViewStyle(.balanced)
-            } else if sizeClass == .regular {
-                NavigationView {
-                    LibrarySidebar(selected: library)
-                    CatalogShelf(api: connection.api, library: library)
-                }
-            } else {
-                NativeNavigation { CatalogShelf(api: connection.api, library: library) }
-            }
-        }.id(library.id)
-    }
-}
-
-@available(iOS 17, *)
-private struct AdaptiveLibraryNavigation: View {
-    let library: Library
-    let api: APIClient
-    @State private var compactColumn: NavigationSplitViewColumn = .detail
-
-    var body: some View {
-        NavigationSplitView(preferredCompactColumn: $compactColumn) {
-            LibrarySidebar(selected: library)
-        } detail: {
-            NavigationStack { CatalogShelf(api: api, library: library) }
-        }.navigationSplitViewStyle(.balanced)
-    }
-}
-
-struct LibrarySidebar: View {
-    @EnvironmentObject private var downloads: NativeDownloads
-    @EnvironmentObject private var connection: ConnectionStore
-    @Environment(\.nativeStrings) private var l10n
-    let selected: Library
-    var body: some View {
-        ShelfList {
-            Label(selected.name, systemImage: selected.mediaType == "podcast" ? "mic" : "books.vertical")
-                .foregroundColor(ShelfStyle.accent)
-            Button(l10n("Change library")) { NativeHaptic.impact("library"); Task { await connection.openLibrariesForSelection() } }
-            Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }
-        }.listStyle(SidebarListStyle()).navigationTitle(l10n("Library"))
-    }
-}
-
 struct CatalogShelf: View {
     @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.shelfAppearance) private var appearance
@@ -67,13 +10,11 @@ struct CatalogShelf: View {
     @AppStorage("previewListLayout") private var listLayout = false
     @State private var filterOptions = false
     @State private var addingPodcast = false
-    @State private var collectionsPresented = false
-    @State private var playlistsPresented = false
-    @State private var settingsPresented = false
-    @State private var statisticsPresented = false
-    @State private var diagnosticsPresented = false
+    @State private var libraryChooser = false
     @Environment(\.nativeStrings) private var l10n
-    init(api: APIClient, library: Library, filter: String? = nil) {
+    let listenNow: Bool
+    init(api: APIClient, library: Library, filter: String? = nil, listenNow: Bool = false) {
+        self.listenNow = listenNow
         _catalog = StateObject(wrappedValue: CatalogStore(api: api, library: library, filter: filter))
     }
     var body: some View {
@@ -99,43 +40,59 @@ struct CatalogShelf: View {
                             }
                         }
                     }
+                    if listenNow && content.continuing.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label(l10n("Your next listen"), systemImage: "headphones").font(.title2.bold())
+                            Text(l10n("Choose a title from your library to start listening.")).foregroundColor(ShelfStyle.secondaryText)
+                        }
+                    }
+                    if !listenNow {
+                        HStack(spacing: 20) {
+                            if catalog.library.mediaType == "book" {
+                                NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .collection)) { Label(l10n("Collections"), systemImage: "square.stack") }
+                            }
+                            NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .playlist)) { Label(l10n("Playlists"), systemImage: "music.note.list") }
+                        }.font(.subheadline.weight(.semibold)).padding(.vertical, 4)
+                    }
                     HStack {
-                        Text(l10n(catalog.library.mediaType == "podcast" ? "All podcasts" : "All books")).font(.title3.weight(.semibold))
-                        Text("\(content.total)").font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
+                        Text(l10n(listenNow ? "From your library" : catalog.library.mediaType == "podcast" ? "All podcasts" : "All books")).font(.title3.weight(.semibold))
+                        if !listenNow { Text("\(content.total)").font(.subheadline).foregroundColor(ShelfStyle.secondaryText) }
                         Spacer()
-                        Button { NativeHaptic.impact("layout"); listLayout.toggle() } label: { Image(systemName: listLayout ? "square.grid.2x2" : "list.bullet").frame(minWidth: 44, minHeight: 44) }
-                            .nativeGlassButton()
-                            .accessibilityLabel(l10n(listLayout ? "Show covers" : "Show list"))
+                        if !listenNow { Button { NativeHaptic.impact("layout"); listLayout.toggle() } label: { Image(systemName: listLayout ? "square.grid.2x2" : "list.bullet").frame(minWidth: 44, minHeight: 44) }
+                            .buttonStyle(PlainButtonStyle())
+                            .accessibilityLabel(l10n(listLayout ? "Show covers" : "Show list")) }
                     }
                     if content.items.isEmpty {
                         Text(l10n(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.")).foregroundColor(ShelfStyle.secondaryText)
                     }
                     LazyVGrid(columns: listLayout ? [GridItem(.flexible(), alignment: .top)] : [GridItem(.adaptive(minimum: sizeCategory.isAccessibilityCategory ? 260 : 140, maximum: sizeCategory.isAccessibilityCategory ? 420 : 210), spacing: 16, alignment: .top)], spacing: 22) {
-                        ForEach(content.items) { item in
+                        ForEach(listenNow ? Array(content.items.prefix(6)) : content.items) { item in
                             NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: progress(item, content))) {
                                 BookCard(item: item, catalog: catalog, listLayout: listLayout)
                             }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("book-\(item.id)")
                                 .onAppear {
-                                    if item.id == content.items.last?.id { Task { await catalog.loadMore() } }
+                                    if !listenNow && item.id == content.items.last?.id { Task { await catalog.loadMore() } }
                                 }
                         }
                     }
-                    if let error = content.pageError {
+                    if !listenNow, let error = content.pageError {
                         RecoveryCard(message: error) { Task { await catalog.loadMore() } }
-                    } else if content.hasMore {
+                    } else if !listenNow && content.hasMore {
                         ProgressView().frame(maxWidth: .infinity).padding(20)
 
                     }
                 }.padding(20).frame(maxWidth: 1400).frame(maxWidth: .infinity)
             }
         }.accessibilityIdentifier("catalog").background(appearance.background)
-            .navigationTitle(catalog.library.name)
+            .navigationTitle(listenNow ? l10n("Listen Now") : catalog.library.name)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    NavigationLink(destination: LibrarySearch(catalog: catalog)) { Image(systemName: "magnifyingglass") }.accessibilityLabel(l10n("Search library"))
+                    if !listenNow {
+                        Button { libraryChooser = true } label: { Label(l10n("Change library"), systemImage: "books.vertical") }.accessibilityLabel(l10n("Change library"))
+                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
+                    if !listenNow { HStack {
                         Menu {
                             Button(l10n("Title A–Z")) { sort(.title, descending: false) }
                             Button(l10n("Title Z–A")) { sort(.title, descending: true) }
@@ -145,36 +102,22 @@ struct CatalogShelf: View {
                             Button(l10n(catalog.descending ? "Ascending order" : "Descending order")) { sort(catalog.sort, descending: !catalog.descending) }
                         } label: { Image(systemName: "arrow.up.arrow.down").font(.body) }.accessibilityLabel(l10n("Sort library"))
                         Button { filterOptions = true } label: { Image(systemName: catalog.filter == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill") }.accessibilityLabel(l10n("Filter library"))
-                    }
+                    } }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         if catalog.library.mediaType == "podcast", case .content(let content) = catalog.state, content.user.canManagePodcasts {
                             Button(l10n("Add podcast")) { addingPodcast = true }
                         }
-                        Button(l10n("Settings")) { settingsPresented = true }
-                        Button(l10n("Statistics")) { statisticsPresented = true }
-                        Button(l10n("Downloads")) { downloads.presented = true }
-                        if catalog.library.mediaType == "book" {
-                            Button(l10n("Collections")) { collectionsPresented = true }
-                        }
-                        Button(l10n("Playlists")) { playlistsPresented = true }
-                        Button(l10n("Diagnostics")) { diagnosticsPresented = true }
                         Button(l10n("Refresh")) { Task { await catalog.reload() } }
-                        Button(l10n("Change library")) { NativeHaptic.impact("library"); Task { await connection.openLibrariesForSelection() } }
-                        Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
-                        Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }.accessibilityIdentifier("account-signout")
-                    } label: { Image(systemName: "person.crop.circle") }.accessibilityLabel(l10n("Account")).accessibilityIdentifier("account")
+                    } label: { Image(systemName: "ellipsis") }.accessibilityLabel(l10n("Library actions"))
                 }
             }.onAppear { Task { if case .loading = catalog.state { await catalog.reload() } else { await catalog.refreshProgressIfNeeded() } } }
             .onReceive(realtime.events) { event in catalog.receive(event) }
             .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
             .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
-            .catalogDestination(isPresented: $settingsPresented) { NativeSettings() }
-            .catalogDestination(isPresented: $statisticsPresented) { StatisticsView(api: catalog.api) }
-            .catalogDestination(isPresented: $diagnosticsPresented) { NativeDiagnosticsView() }
-            .catalogDestination(isPresented: $collectionsPresented) { AudioGroupList(catalog: catalog, kind: .collection) }
-            .catalogDestination(isPresented: $playlistsPresented) { AudioGroupList(catalog: catalog, kind: .playlist) }
+            .sheet(isPresented: $libraryChooser) { ShellLibraryChooser(presented: $libraryChooser) }
+
     }
 
     private func sort(_ choice: CatalogSort, descending: Bool) {
@@ -201,7 +144,6 @@ struct BookArtwork: View {
                 else {
                     VStack(spacing: 8) {
                         Image(systemName: "book.closed.fill").font(.title2)
-                        Text(item.title).font(.caption.bold()).multilineTextAlignment(.center).lineLimit(3)
                     }.foregroundColor(ShelfStyle.accent).padding(12)
                 }
             })

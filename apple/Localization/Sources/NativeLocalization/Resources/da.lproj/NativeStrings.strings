@@ -81,7 +81,6 @@
 "Clear" = "Ryd";
 "Clear events" = "Ryd Logfiler";
 "Clear events?" = "Vil du rydde hændelserne?";
-"Clear search" = "Ryd søgning";
 "Close feed" = "Luk feed";
 "Close playback" = "Luk afspiller";
 "Close reader" = "Luk læseren";
@@ -177,7 +176,6 @@
 "Filter library" = "Filtrer bibliotek";
 "Filter: {0}" = "Filter: {0}";
 "Filters" = "Filtre";
-"Find your next chapter." = "Find dit næste kapitel.";
 "Find your next listen." = "Find din næste lytteoplevelse.";
 "Finished" = "Færdig";
 "Font" = "Skrifttypefamilie";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Gemmer dit fremskridt…";
 "Scale elapsed time by speed" = "Skalér Forløbet Tid med Hastighed";
 "Search" = "Søg";
-"Search library" = "Søg i bibliotek";
 "Search podcasts" = "Søg efter podcasts";
 "Searching your library…" = "Søger i dit bibliotek…";
 "Searching…" = "Søger…";

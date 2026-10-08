@@ -13,7 +13,7 @@ import XCTest
 
     func librarySearchField(_ app: XCUIApplication) -> XCUIElement {
         let field = app.searchFields["library-search"]
-        return field.exists ? field : app.textFields["library-search"]
+        return field.exists ? field : app.searchFields.firstMatch
     }
 
     func capture(_ name: String) {

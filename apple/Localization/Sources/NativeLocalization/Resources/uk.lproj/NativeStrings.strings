@@ -81,7 +81,6 @@
 "Clear" = "Очистити";
 "Clear events" = "Очистити журнали";
 "Clear events?" = "Очистити журнал?";
-"Clear search" = "Очистити пошук";
 "Close feed" = "Закрити стрічку";
 "Close playback" = "Закрити програвач";
 "Close reader" = "Закрити читалку";
@@ -177,7 +176,6 @@
 "Filter library" = "Фільтрувати бібліотеку";
 "Filter: {0}" = "Фільтр: {0}";
 "Filters" = "Фільтри";
-"Find your next chapter." = "Знайдіть свою наступну главу.";
 "Find your next listen." = "Знайдіть, що послухати далі.";
 "Finished" = "Завершено";
 "Font" = "Сімейство шрифтів";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Збереження прогресу…";
 "Scale elapsed time by speed" = "Час відповідно швидкості";
 "Search" = "Пошук";
-"Search library" = "Пошук у бібліотеці";
 "Search podcasts" = "Пошук подкастів";
 "Searching your library…" = "Пошук у бібліотеці…";
 "Searching…" = "Пошук…";

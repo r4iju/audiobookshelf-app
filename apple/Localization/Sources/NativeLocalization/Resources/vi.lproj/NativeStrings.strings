@@ -81,7 +81,6 @@
 "Clear" = "Xóa";
 "Clear events" = "Xoá logs";
 "Clear events?" = "Xóa nhật ký?";
-"Clear search" = "Xóa tìm kiếm";
 "Close feed" = "Đóng Feed";
 "Close playback" = "Đóng Trình Phát";
 "Close reader" = "Đóng trình đọc";
@@ -177,7 +176,6 @@
 "Filter library" = "Lọc thư viện";
 "Filter: {0}" = "Bộ lọc: {0}";
 "Filters" = "Bộ lọc";
-"Find your next chapter." = "Tìm chương tiếp theo của bạn.";
 "Find your next listen." = "Tìm nội dung tiếp theo để nghe.";
 "Finished" = "Hoàn Thành";
 "Font" = "Phông chữ";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Đang lưu tiến độ của bạn…";
 "Scale elapsed time by speed" = "Tỷ Lệ Thời Gian Đã Trôi Theo Tốc Độ";
 "Search" = "Tìm Kiếm";
-"Search library" = "Tìm trong thư viện";
 "Search podcasts" = "Tìm podcast";
 "Searching your library…" = "Đang tìm trong thư viện của bạn…";
 "Searching…" = "Đang tìm…";

@@ -81,7 +81,6 @@
 "Clear" = "Išvalyti";
 "Clear events" = "Išvalyti žurnalus";
 "Clear events?" = "Išvalyti įvykius?";
-"Clear search" = "Išvalyti paiešką";
 "Close feed" = "Uždaryti srautą";
 "Close playback" = "Uždaryti grotuvą";
 "Close reader" = "Uždaryti skaityklę";
@@ -177,7 +176,6 @@
 "Filter library" = "Filtruoti biblioteką";
 "Filter: {0}" = "Filtras: {0}";
 "Filters" = "Filtrai";
-"Find your next chapter." = "Raskite savo kitą skyrių.";
 "Find your next listen." = "Raskite, ko klausytis toliau.";
 "Finished" = "Baigta";
 "Font" = "Šriftas";
@@ -413,7 +411,6 @@
 "Saving your progress…" = "Išsaugomas progresas…";
 "Scale elapsed time by speed" = "Praėjusį laiką skaičiuoti pagal greitį";
 "Search" = "Ieškoti";
-"Search library" = "Ieškoti bibliotekoje";
 "Search podcasts" = "Ieškoti tinklalaidžių";
 "Searching your library…" = "Ieškoma bibliotekoje…";
 "Searching…" = "Ieškoma…";
