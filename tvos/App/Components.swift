@@ -163,6 +163,19 @@ extension LibraryItem { var isPodcast: Bool { mediaType == "podcast" } }
 extension Library { var isPodcast: Bool { mediaType == "podcast" } }
 extension Episode { var playableDuration: Double? { duration ?? audioFile?.duration } }
 
+extension View {
+    /// Keep the native navigation bar while giving its title an explicit readable type role.
+    func tvNavigationTitle(_ title: String) -> some View {
+        navigationTitle(title)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(title).font(.title.bold()).foregroundStyle(.primary)
+                        .accessibilityAddTraits(.isHeader)
+                }
+            }
+    }
+}
+
 enum TileGrid {
     static let columns = [GridItem(.adaptive(minimum: 260, maximum: 260), spacing: 48, alignment: .top)]
 }
@@ -177,5 +190,47 @@ enum Route: Hashable {
     static func to(_ item: LibraryItem) -> Route {
         if let episode = item.recentEpisode, item.isPodcast { return .episode(item, episodeID: episode.id) }
         return .item(item)
+    }
+}
+
+/// Complete read-only content remains in the remote's focus path so it can scroll into view.
+struct TVReadableText: View {
+    let text: String
+    let identifier: String
+    @FocusState private var focusedPassage: Int?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(Array(passages.enumerated()), id: \.offset) { index, passage in
+                Text(passage)
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(focusedPassage == index ? 0.16 : 0)))
+                    .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(Color.white.opacity(focusedPassage == index ? 0.6 : 0), lineWidth: 2) }
+                    .focusable()
+                    .focused($focusedPassage, equals: index)
+                    .accessibilityIdentifier(index == 0 ? identifier : identifier + ".passage.\(index)")
+            }
+        }
+    }
+
+    /// A terminal oversized focus item cannot scroll past its initial viewport on TV.
+    /// Keep every character, preferring complete paragraphs and sentences in reachable reading regions.
+    private var passages: [String] {
+        var result: [String] = []
+        var start = text.startIndex
+        while let end = text.index(start, offsetBy: 600, limitedBy: text.endIndex), end < text.endIndex {
+            let region = text[start..<end]
+            let paragraph = region.lastIndex(of: "\n")
+            let sentence = region.lastIndex(where: { ".!?。！？".contains($0) })
+            let whitespace = region.lastIndex(where: \.isWhitespace)
+            let boundary = (paragraph ?? sentence ?? whitespace).map { text.index(after: $0) } ?? end
+            result.append(String(text[start..<boundary]))
+            start = boundary
+        }
+        result.append(String(text[start...]))
+        return result
     }
 }

@@ -42,6 +42,7 @@
 		911B4238905D0E31A81033DB /* ShellJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF08FDC339B006C61F2D29A3 /* ShellJourney.swift */; };
 		917E944D857BC42FA92CAEE3 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE22E9CB2F259AC21DBE966D /* LibraryView.swift */; };
 		918C833A12209C49FEF99F95 /* FormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E658F1503F524B5E48D2954E /* FormatTests.swift */; };
+		9D8CE1035314A3D30600C5A2 /* NoticesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB3F379B38AE881E436047FE /* NoticesView.swift */; };
 		A00ADDE49FE9507689823D66 /* MediaRestart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9022EA791A627A7442A89C24 /* MediaRestart.swift */; };
 		A1BD679FCDAD002CB258C6F9 /* LibraryBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02865B4E245C3AA23D5FD475 /* LibraryBrowser.swift */; };
 		A4DD27B94E49EECC148A38A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABA1E0404BA6403B2756A289 /* Assets.xcassets */; };
@@ -150,6 +151,7 @@
 		B6AB6A2975B73CF339FA4BF2 /* ListeningSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningSync.swift; sourceTree = "<group>"; };
 		B7C5E7F6ECF7EA6EDC66C298 /* NativeNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeNavigation.swift; sourceTree = "<group>"; };
 		B9DCF54C11B37504BA508579 /* ListeningStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningStats.swift; sourceTree = "<group>"; };
+		BB3F379B38AE881E436047FE /* NoticesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticesView.swift; sourceTree = "<group>"; };
 		C0AD23FC843CB2C071D6A2C0 /* NativeGlassControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeGlassControls.swift; sourceTree = "<group>"; };
 		C0C1E64C7B03BD172853A157 /* bn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/NativeStrings.strings; sourceTree = "<group>"; };
 		C1A714830F6BAB41AEED2B8E /* PlaybackJourney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackJourney.swift; sourceTree = "<group>"; };
@@ -273,6 +275,7 @@
 				02865B4E245C3AA23D5FD475 /* LibraryBrowser.swift */,
 				CE22E9CB2F259AC21DBE966D /* LibraryView.swift */,
 				9022EA791A627A7442A89C24 /* MediaRestart.swift */,
+				BB3F379B38AE881E436047FE /* NoticesView.swift */,
 				05FE311F10522D8719513EB5 /* NowPlayingView.swift */,
 				89FFE7452AE233275CAC0A16 /* RelatedAuthorSeries.swift */,
 				D11495E1C66F7E695A1F3872 /* RootView.swift */,
@@ -581,6 +584,7 @@
 				36F158C1075AC3CE473DC5FB /* NativeLanguage.swift in Sources */,
 				3DF60CBF1F580E63630E890D /* NativeNavigation.swift in Sources */,
 				7EA618B6C4A97C000619531D /* NativeStrings.swift in Sources */,
+				9D8CE1035314A3D30600C5A2 /* NoticesView.swift in Sources */,
 				3B95AC7609006D67C4F509AC /* NowPlayingView.swift in Sources */,
 				36078078332730C389B72106 /* OfflineAudio.swift in Sources */,
 				E23322425B5AEF0FFEE7C971 /* PodcastFeedEpisode.swift in Sources */,

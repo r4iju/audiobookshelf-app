@@ -319,6 +319,7 @@
 "Open downloads" = "Open downloads";
 "Open feed" = "Open feed";
 "Open source under GPLv3, with applicable third-party licenses retained." = "Open source under GPLv3, with applicable third-party licenses retained.";
+"Open source under GPLv3, with applicable third-party licenses retained. Source and notices: https://github.com/r4iju/audiobookshelf-app/releases" = "Open source under GPLv3, with applicable third-party licenses retained. Source and notices: https://github.com/r4iju/audiobookshelf-app/releases";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "OpenID sign-in is not enabled on this server. Use your username and password.";
 "Opening EPUB…" = "Opening EPUB…";
 "Opening PDF…" = "Opening PDF…";
@@ -444,6 +445,7 @@
 "Saving your progress…" = "Saving your progress…";
 "Scale elapsed time by speed" = "Scale elapsed time by speed";
 "Search" = "Search";
+"Search all your libraries." = "Search all your libraries.";
 "Search podcasts" = "Search podcasts";
 "Searching your library…" = "Searching your library…";
 "Searching…" = "Searching…";

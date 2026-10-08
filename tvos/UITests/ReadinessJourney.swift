@@ -5,6 +5,30 @@ final class ReadinessJourney: TVJourney {
     /// Nothing listens here, so connecting fails the way an unreachable server does.
     static let unreachable = "http://127.0.0.1:\(port("ABS_TV_HTTP_PORT", 20765) + 34)/abs"
 
+    func testCompleteNoticesAreRemoteReadableAndBackRestoresSettings() {
+        signIn()
+        waitForHome()
+        tab("Settings")
+        let entry = app.cells.containing(.button, identifier: "source-notices").firstMatch
+        select(entry)
+        let origin = element("notices-origin")
+        XCTAssertTrue(origin.waitForExistence(timeout: 5))
+        XCTAssertTrue(origin.label.contains("not affiliated with or endorsed by the Audiobookshelf project"))
+        focus(app.cells.containing(.staticText, identifier: "notices-origin").firstMatch)
+        capture("notices-origin-focused")
+        let license = element("notices-license")
+        focus(app.cells.containing(.staticText, identifier: "notices-license").firstMatch)
+        XCTAssertTrue(license.label.contains("GPLv3"))
+        XCTAssertTrue(license.label.contains("applicable third-party licenses retained"))
+        XCTAssertTrue(license.label.contains("https://github.com/r4iju/audiobookshelf-app/releases"))
+        capture("notices-license-focused")
+        remote.press(.menu)
+        waitForFocus(entry, "Back returns to Source and license notices")
+        let signOut = app.cells.containing(.button, identifier: "sign-out").firstMatch
+        select(signOut)
+        XCTAssertTrue(app.textFields["serverURL"].waitForExistence(timeout: 10), "Account actions remain reachable after reading complete notices")
+    }
+
     func testFailedSignInIsDiagnosedWithoutCredentials() {
         launch(reset: true)
         let server = app.textFields["serverURL"]
@@ -90,7 +114,7 @@ final class ReadinessJourney: TVJourney {
         select(language)
         let german = app.buttons["language-de"]
         select(german)
-        XCTAssertTrue(app.tabBars.buttons["Listen Now"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
+        XCTAssertTrue(app.tabBars.buttons["Jetzt hören"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
         XCTAssertTrue(app.tabBars.buttons["Suchen"].exists)
         XCTAssertTrue(app.tabBars.buttons["Einstellungen"].exists)
         XCTAssertEqual(german.value as? String, "Ausgewählt")
@@ -98,12 +122,14 @@ final class ReadinessJourney: TVJourney {
         audit("language")
         remote.press(.menu)
         waitForFocus(language, "Back returns to Language")
+        // Native List creates the lower Account section as the remote scrolls to it.
+        for _ in 0..<20 where !app.staticTexts["Konto"].exists || app.staticTexts["Konto"].frame.isEmpty || !app.windows.firstMatch.frame.intersects(app.staticTexts["Konto"].frame) { remote.press(.down) }
         XCTAssertTrue(app.staticTexts["Konto"].exists, "Settings sections follow the language")
         capture("settings-german")
 
         app.terminate()
         launch(reset: false)
-        XCTAssertTrue(app.tabBars.buttons["Listen Now"].waitForExistence(timeout: 20), "The choice survives relaunch")
+        XCTAssertTrue(app.tabBars.buttons["Jetzt hören"].waitForExistence(timeout: 20), "The choice survives relaunch")
         let shelf = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Weiterhören")).firstMatch
         XCTAssertTrue(shelf.waitForExistence(timeout: 10), "Listen Now shelves use the legacy translation: \(app.staticTexts.debugDescription.prefix(2000))")
         select(app.buttons["continue-listening.book-0"])
@@ -124,9 +150,10 @@ final class ReadinessJourney: TVJourney {
         tab("Settings")
         select(app.buttons["language-setting"])
         select(app.buttons["language-ar"])
-        XCTAssertTrue(app.tabBars.buttons["Listen Now"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
+        XCTAssertTrue(app.tabBars.buttons["استمع الآن"].waitForExistence(timeout: 5), app.tabBars.firstMatch.debugDescription)
         remote.press(.menu)
         let account = app.staticTexts["الحساب"]
+        for _ in 0..<20 where !account.exists || account.frame.isEmpty || !app.windows.firstMatch.frame.intersects(account.frame) { remote.press(.down) }
         XCTAssertTrue(account.waitForExistence(timeout: 5))
         XCTAssertGreaterThan(account.frame.midX, app.windows.firstMatch.frame.midX, "Section titles start on the right in Arabic")
         capture("settings-arabic")

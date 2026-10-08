@@ -62,6 +62,6 @@ xcrun simctl bootstatus "$simulator" > /dev/null
 xcrun simctl keychain "$simulator" add-root-cert "$fixture_dir/ca.pem"
 xcodegen generate --spec "$tvos_root/project.yml" > /dev/null
 xcodebuild -project "$tvos_root/AudiobookshelfTV.xcodeproj" -scheme AudiobookshelfTV -configuration Debug \
-    -destination "id=$simulator" -derivedDataPath "$tvos_root/build" \
+    -destination "id=$simulator" -derivedDataPath "${ABS_TV_DERIVED_DATA:-$tvos_root/build}" \
     -resultBundlePath "${ABS_TV_RESULT_BUNDLE:-$tvos_root/build/TVJourneys-$(date +%Y%m%d-%H%M%S).xcresult}" \
     -collect-test-diagnostics never "$@" test

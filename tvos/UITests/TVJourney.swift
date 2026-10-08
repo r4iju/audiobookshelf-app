@@ -15,6 +15,8 @@ import XCTest
     override func setUp() async throws {
         continueAfterFailure = false
         try await Fixture.configure("baseline")
+        try await Fixture.resetCatalogProgress(base: Self.fixture)
+        try await Fixture.resetCatalogProgress(base: Self.secureFixture)
     }
 
     override func tearDown() {
@@ -54,7 +56,11 @@ import XCTest
 
     /// SwiftUI menus report focus on an inner element rather than the identified button.
     func hasFocus(_ element: XCUIElement) -> Bool {
-        element.hasFocus || element.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true")).count > 0
+        if element.hasFocus || element.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true")).count > 0 { return true }
+        // Native List owns row focus on the cell containing the identified control.
+        guard !element.identifier.isEmpty else { return false }
+        return app.cells.containing(.any, identifier: element.identifier)
+            .matching(NSPredicate(format: "hasFocus == true")).count > 0
     }
 
     func select(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
@@ -66,6 +72,7 @@ import XCTest
         select(field, file: file, line: line)
         app.typeText(text)
         remote.press(.menu)
+        if app.keyboards.firstMatch.exists && app.keyboards.firstMatch.hasFocus { remote.press(.menu) }
     }
 
     /// An option in an open menu, found by the text the person reads (sections drop identifiers).
@@ -147,6 +154,14 @@ enum Fixture {
         request.httpBody = try JSONEncoder().encode(["mode": mode])
         let (_, response) = try await URLSession.shared.data(for: request)
         XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200, "Fixture on \(base) rejected mode \(mode)")
+    }
+
+    /// A fresh TV journey starts with unstarted secondary titles on each owned fixture.
+    static func resetCatalogProgress(base: String) async throws {
+        var request = URLRequest(url: URL(string: base + "/__related__/reset-progress")!)
+        request.httpMethod = "POST"
+        let (_, response) = try await URLSession.shared.data(for: request)
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
     }
 
     struct Request: Decodable { let method: String?; let path: String; let page: String? }
