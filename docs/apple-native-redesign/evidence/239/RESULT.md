@@ -1,5 +1,19 @@
 # Ticket239 acceptance and compatibility
 
+## Latest clean-source result and remaining blockers
+
+Frozen b64cc462060ba9a5a54790bfc6303144fd527a87 removes all temporary app observations/log-stream sidecars. Exact modern TV full suite passes49/49 and original clean TV17 full replay passes7/7, both zero failures/skips. Root independently verifies authoritative summaries, original assertion/helper provenance, all40 modern built/installed files and strict signatures, emitted capture guards and restored Actions controls. [Modern result](modern-b64/RESULT.md), [older result](older-b64/RESULT.md). Historical failures remain preserved; the cause of the earlier Series Back failure is not established by these passes.
+
+[Fresh mobile harness](mobile-harness-b64/RESULT.md) passes original Connection/login/selection/account-restoration1/1 with build-for-testing → generated/effective keepNever verification → unchanged execution. Root independently verifies all47 built/installed files and strict signatures. [Round7 independent reviews](review-round-7.md) find no new confirmed production or inspected presentation defect and retain incomplete acceptance. Reports preserve inspection-time status; later root final TV results are a factual response, not review shipping approval.
+
+[Additional B64 actual speech](spoken-process-route/b64/ROOT-ASR.md) gives machine-derived numeric120 adjustable/swipe instructions and separate2minutes. The transport target failed and was silent; playback may have ended, so playing-state/group-order acceptance is not established. The internal480s slice ended556.984s, disclosed as an overrun. Owned app/fixtures/lease cleanup completed; VoiceOver disable returned false before shutdown, subsequent query failed after shutdown. No human-listening/full reader/TV spoken pass is inferred.
+
+Required239 gates remain incomplete: original strict combined contrast RED2 without exclusions, full actual spoken accessibility, and original-minimum mobile execution. Public automatic capture OFF is supported, but audit-owned image prevention is unresolved; no uncertain failed-audit rerun, issue filtering or waiver was performed. Stock14.5 installer rejection remains an unavailable tested route, not an accepted skip. [Public audit contract](limitations/strict-contrast-public-capture-contract.md).
+
+[Final exact signed candidates](../240/b64/RESULT.md) are prepared and independently verified, NOT ACCEPTED/NOT INSTALLED/NOT RELEASED. Source14 versus localSDK27 phone15 override remains explicit; TV minimum17. Ticket240 still depends on239 before merge, matching owner installation and merged-source QA. Public Apple distribution separately has no written permission. Parent230/historical222 remain unchanged; PR241 remains draft. No new user confirmation or screenshot gate applies.
+
+## Historical original scopes
+
 Initial acceptance runtime is frozen at `f635a42ae8c9617409838008dfeec5645b4312b1`, with exact original scopes retained below. The bounded V239-01 follow-up runtime is `f9224289337a399d3d5c072b8eaf4b27bb0a533b`; see [correction evidence](corrections/V239-01/RESULT.md). Other intervening commits are test/CI-only. No owner release installation, public upload, merge or independent-review self-approval occurred.
 
 The October8 instruction stops screenshots/video/render-only runs and gallery production. Attachment-only helpers were suppressed in disposable QA; canonical helpers and all behavioral assertions remain. Existing originals remain attributed to their original sources. Pixel-sampling `RemainingQAAccessibilityJourney.testContrastAuditLightAppearance`, `...DarkAppearance`, `...BlackAppearance` were not run under that instruction. Native audits were not excluded or weakened.

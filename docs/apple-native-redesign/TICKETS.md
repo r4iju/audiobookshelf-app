@@ -14,3 +14,5 @@ Spec: [#230](https://github.com/r4iju/audiobookshelf-app/issues/230). Shared int
 | [#238](https://github.com/r4iju/audiobookshelf-app/issues/238) | Apple native 08: Complete TV presentation and remote journeys | #233 |
 | [#239](https://github.com/r4iju/audiobookshelf-app/issues/239) | Apple native 09: Resolve adaptive and accessibility acceptance | #237, #238 |
 | [#240](https://github.com/r4iju/audiobookshelf-app/issues/240) | Apple native 10: Verify, review, merge and install private Apple candidates | #239 |
+
+Current integration:231–238 are implemented on the draft integration PR241. Ticket239 remains incomplete after final clean modernTV49/49, TV17 seven/seven and fresh mobileConnection1/1 pass; strict combined contrast, full spoken accessibility and original-minimum mobile execution are genuine remaining acceptance blockers. Ticket240 has fresh verified B64 private candidates but remains blocked by239 before acceptance/merge/owner installation/merged QA. Public Apple distribution additionally requires written rights clearance. No parent/spec ticket is closed or changed.

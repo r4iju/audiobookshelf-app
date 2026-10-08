@@ -1,0 +1,6 @@
+{
+  "only_changed_source_file": "apple/UITests/NativeJourney.swift",
+  "original_sha256": "00854f2c462bf507c79cdf897eae29a1c4b886e57294ce8c59384dd58285e000",
+  "private_sha256": "fe596ac97a9375d427e0d5d63f3a4a270721ef3dcce7fb77d6d2d0afb51c1508",
+  "change": "Only original capture helper body suppressed; no assertions/test case changes."
+}

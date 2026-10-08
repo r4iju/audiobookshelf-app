@@ -1,5 +1,12 @@
 # Private Apple release preparation, not accepted or installed
 
+Current exact-source candidates are [B64 phone/Pad and TV](b64/RESULT.md), source b64cc462060ba9a5a54790bfc6303144fd527a87. Root independently verifies2275 archived source files, all46phone/36TV product files and strict signatures, valid certificate/profile/team, stable identities/callback/keychain. No owner installation or upload occurred. Phone SDK27 binary15 is an explicit local override of source14; TV17 retained. Older artifacts below remain historical and were not relabelled.
+
+Final clean-source modern TV49/49 and original TV17 seven/seven pass; fresh mobile originalConnection1/1 passes. Full requirements still depend on239 strict combined contrast, complete spoken accessibility and original-minimum mobile runtime execution. Fresh independent round7 finds no new confirmed production/inspected presentation defect but keeps acceptance pending. Matching owner installation and merged-source QA follow actual acceptance/merge, not signing success. Public App Store/TestFlight remains separately blocked on written rights clearance. Ticket240 remains open/blocked by239 and PR241 draft.
+
+## Historical f922 and bc preparation
+
+
 Runtime source `f9224289337a399d3d5c072b8eaf4b27bb0a533b`, tree `bdabc605c324680ce0ceec446cc53a2cedfd6f9d`. Test/CI/evidence descendant38 retains byte-identical Apple runtime. Ticket240 remains dependent on unresolved239 acceptance; no merge, owner replacement, public upload or invitation occurred.
 
 Both projects were generated from an exact committed Git archive into `/tmp/native240-frozen.pxYeiD`, then clean Release device builds used existing valid development signing profiles and bounded jobs2. The combined phone profile covers the known phone and Pad; the TV profile covers the known TV. Stable bundle identities, explicit keychain contract and phone OAuth callback are retained. Audiobookshelf origins and inherited notices remain intact.

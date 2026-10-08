@@ -1,0 +1,24 @@
+{
+  "device": {
+    "dataPath": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data",
+    "dataPathSize": 1018212352,
+    "logPath": "/Users/emanuel/Library/Logs/CoreSimulator/9ACC6F5B-180D-44C3-823B-F8796813D69D",
+    "udid": "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+    "lastUsedAt": "2026-10-08T19:48:32Z",
+    "isAvailable": true,
+    "logPathSize": 73728,
+    "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.Apple-TV-4K-3rd-generation-4K",
+    "state": "Shutdown",
+    "name": "Pool TV 1 (tvOS 27.0)"
+  },
+  "lease_released": true,
+  "ports": [
+    34765,
+    34767
+  ],
+  "lsof_exit": 1,
+  "lsof_output": "",
+  "harness_exit": 0,
+  "installation_retained": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/DA83115D-F872-446D-8DBC-9534FC99C801/AudiobookshelfTV.app",
+  "no_t3_tv_surface": true
+}

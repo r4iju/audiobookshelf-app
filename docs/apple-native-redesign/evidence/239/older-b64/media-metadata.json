@@ -1,0 +1,44 @@
+[
+  {
+    "test": "CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus()",
+    "result": "Passed",
+    "seconds": 29.9462730884552,
+    "hasMediaAttachments": false
+  },
+  {
+    "test": "CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage()",
+    "result": "Passed",
+    "seconds": 40.60578799247742,
+    "hasMediaAttachments": false
+  },
+  {
+    "test": "PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles()",
+    "result": "Passed",
+    "seconds": 29.422914028167725,
+    "hasMediaAttachments": false
+  },
+  {
+    "test": "ReadinessJourney/testMainScreensPassTheAccessibilityAudit()",
+    "result": "Passed",
+    "seconds": 50.29263401031494,
+    "hasMediaAttachments": false
+  },
+  {
+    "test": "RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying()",
+    "result": "Passed",
+    "seconds": 62.98838400840759,
+    "hasMediaAttachments": false
+  },
+  {
+    "test": "RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor()",
+    "result": "Passed",
+    "seconds": 31.187661051750183,
+    "hasMediaAttachments": false
+  },
+  {
+    "test": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "result": "Passed",
+    "seconds": 69.81141006946564,
+    "hasMediaAttachments": false
+  }
+]

@@ -1,0 +1,71 @@
+{
+  "ledger_sha256": "f66572a45621c9b6fb27778fcd91d42889b839beb7096deb5be0326714f20f7d",
+  "controls": {
+    "actions/permissions": {
+      "enabled": false,
+      "sha_pinning_required": false
+    },
+    "actions/permissions/workflow": {
+      "default_workflow_permissions": "read",
+      "can_approve_pull_request_reviews": false
+    },
+    "": {
+      "default_branch": "master",
+      "id": 1398783865
+    },
+    "actions/workflows/373413394": {
+      "id": 373413394,
+      "state": "active"
+    },
+    "actions/workflows/373413395": {
+      "id": 373413395,
+      "state": "active"
+    },
+    "actions/workflows/373413401": {
+      "id": 373413401,
+      "state": "active"
+    },
+    "actions/workflows/378488585": {
+      "id": 378488585,
+      "state": "active"
+    },
+    "actions/workflows/378488586": {
+      "id": 378488586,
+      "state": "active"
+    }
+  },
+  "finished": true,
+  "errors": [],
+  "budget": {
+    "cap_seconds": 18000,
+    "cap_revision": {
+      "previous_cap_seconds": 14400,
+      "current_cap_seconds": 18000,
+      "basis": "Parent prospective operational ceiling revised for demonstrated remaining TV17 Related navigation defect and complete final-source replay; no user budget or historical ledger changes",
+      "effective_window": "thirteenth"
+    },
+    "prior_attempt_seconds": 14861.0,
+    "current_attempt_seconds": 742.0,
+    "remaining_seconds": 2397.0,
+    "new_window_cap_seconds": 3000,
+    "cancellation_reserve_seconds": 420,
+    "settle_wait_seconds": 420,
+    "accounting": "Actual allocated job elapsed seconds, including both first-window Web failures; not billing units."
+  },
+  "hidden_pin_provenance": {
+    "target": false,
+    "first_ledger_sha256": "ac78e2b0b495d29af040620c478cb6b26a3869429c12df3c88bd350a36666d99",
+    "zero_push_ledger_sha256": "a321e939032990087e6a345f21b7229e9e75f47494283b57fee94a0deebb1872",
+    "scope": "Actual first enabled baselinefalse, our documented pintrue PUT, later enabled GETtrue; disabled GETfalse is not latent proof"
+  },
+  "scope_variable_absence_independently_verified": true,
+  "enabled_hidden_pin_false_proof": {
+    "enabled": true,
+    "allowed_actions": "all",
+    "sha_pinning_required": false
+  },
+  "pending": [],
+  "restore_errors": [],
+  "actual_seconds": 742,
+  "cumulative_seconds": 15603
+}

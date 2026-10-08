@@ -1,0 +1,14 @@
+{
+  "source": "b64cc462060ba9a5a54790bfc6303144fd527a87",
+  "run": 37835068246,
+  "artifact": 11576100995,
+  "artifact_sha256": "72f8d9485604cb0f2b64ad5db9585c253936ab504c0cb5c7cacfeb51d211d8fb",
+  "original_results_sha256": "9c550e7e3f852b83281cdbabfb26e0cdc8513f39792a11f91c73fb6afc1aaec3",
+  "summary_sha256": "e6ff111883e67268a08f92427c6528be93cce6105691d5727dbaee188395ca38",
+  "root_cases_and_media_metadata": "7PASS0fail0skip/all7hasMediaAttachmentsfalse",
+  "capture_policy": "Generated keepNever guard before build; emitted SDK18.2 xctestrun keepNever before UI; separate from absence of media",
+  "scope": "Actual stock TV17.0/21J353, Xcode16.2/Swift6.0.3/SDK18.2; no temporary app observers/sidecar, original assertions/native Back preserved",
+  "binary_limitation": "Hosted strict signature/source/identity/minimum evidence inspected; hosted binaries unavailable locally, no root whole-resource rehash of hosted app claimed",
+  "historical_qualification": "Clean pass establishes observed final-source acceptance of selected original7; earlier failed navigation cause not proven, historical failures preserved",
+  "controls": "Root genuine GETs +terminal original ledger restoration confirmed"
+}

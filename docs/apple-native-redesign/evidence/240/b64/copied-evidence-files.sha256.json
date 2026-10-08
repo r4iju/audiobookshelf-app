@@ -1,0 +1,8 @@
+{
+  "RESULT.md": "98ad1e5b8fe5b6ef892c3bee10cd159e22599596871d0882bc68d858cca1597e",
+  "phone-product-files.sha256.json": "8124d5a07a61d7c5adf471651afb5baa1544d3ad2159c9ba3df3678dfcf0a0d7",
+  "candidate-metadata.json": "d2bfdaa30b371cae98bb68b4eb4eed8a55641be3c1d5992716e6dbfb42a29990",
+  "tv-product-files.sha256.json": "68e9eaa11fe4181b38ae62dd2f663e4a0aa3026b0d930fa29a87b972b671414e",
+  "parent-candidate-verification.json": "a543b56f53b013f30fe006edec605d8a413ff3726b30831e1d63dca83ce3f67a",
+  "root-independent-signing-verification.json": "6aeec01621ae5f7d78e3d4a7ad398ade215be6773784db360957c48eae362ed9"
+}

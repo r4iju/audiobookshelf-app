@@ -1,0 +1,10 @@
+{
+  "clock": "BuiltInSpeakerDevice",
+  "current_hardware_input_channels": 0,
+  "output_channels": 2,
+  "process_tap_only": true,
+  "capture_binary_sha256": "9cb0524cfb40a413298eaa5703bb6ad89bde558dbee22ed2617b1a087d8185f7",
+  "capture_source_sha256": "a8b3b6fddb42ac0e7c42c20a695c776f074af982f635b861c727bf7e50f29e5b",
+  "each_child_bound_seconds": 20,
+  "clip_duration_seconds": 16
+}

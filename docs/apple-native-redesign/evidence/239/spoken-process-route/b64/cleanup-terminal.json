@@ -1,0 +1,27 @@
+{
+  "19765": {
+    "connection_result": 61
+  },
+  "19766": {
+    "connection_result": 61
+  },
+  "19767": {
+    "connection_result": 61
+  },
+  "19769": {
+    "connection_result": 61
+  },
+  "owned_device": {
+    "dataPath": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/DAF19749-8EE4-4512-A056-D11986922EC7/data",
+    "dataPathSize": 3921932288,
+    "logPath": "/Users/emanuel/Library/Logs/CoreSimulator/DAF19749-8EE4-4512-A056-D11986922EC7",
+    "udid": "DAF19749-8EE4-4512-A056-D11986922EC7",
+    "lastUsedAt": "2026-10-08T20:07:11Z",
+    "isAvailable": true,
+    "logPathSize": 540672,
+    "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-17",
+    "state": "Shutdown",
+    "name": "Pool iPhone 2 (iOS 27.0)"
+  },
+  "elapsed_terminal": 556.9840309619904
+}

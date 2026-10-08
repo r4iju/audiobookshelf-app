@@ -1,0 +1,345 @@
+[
+  {
+    "test": "CatalogStoreTests/testOnlyAnAbsentCoverIsRemembered()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogStoreTests_testOnlyAnAbsentCoverIsRemembered__.json",
+    "durationInSeconds": 0.0024900436401367188
+  },
+  {
+    "test": "CatalogStoreTests/testSearchDropsTheSameMatchFromAnotherLibraryOnly()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogStoreTests_testSearchDropsTheSameMatchFromAnotherLibraryOnly__.json",
+    "durationInSeconds": 0.0023620128631591797
+  },
+  {
+    "test": "CatalogStoreTests/testSearchKeepsAuthorsAndSeriesWithTheLibraryThatFoundThem()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogStoreTests_testSearchKeepsAuthorsAndSeriesWithTheLibraryThatFoundThem__.json",
+    "durationInSeconds": 0.0012489557266235352
+  },
+  {
+    "test": "CatalogStoreTests/testSearchKeepsEveryEpisodeMatchAlongsideItsPodcast()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogStoreTests_testSearchKeepsEveryEpisodeMatchAlongsideItsPodcast__.json",
+    "durationInSeconds": 0.00074005126953125
+  },
+  {
+    "test": "FormatTests/testClockSaturatesHugeAndInvalidValues()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/FormatTests_testClockSaturatesHugeAndInvalidValues__.json",
+    "durationInSeconds": 0.0004069805145263672
+  },
+  {
+    "test": "FormatTests/testDurationsAndDatesFollowTheChosenLanguage()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/FormatTests_testDurationsAndDatesFollowTheChosenLanguage__.json",
+    "durationInSeconds": 0.02165806293487549
+  },
+  {
+    "test": "FormatTests/testDurationSaturatesHugeValues()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/FormatTests_testDurationSaturatesHugeValues__.json",
+    "durationInSeconds": 0.0007549524307250977
+  },
+  {
+    "test": "FormatTests/testProgressWithHugeServerValuesStillFormats()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/FormatTests_testProgressWithHugeServerValuesStillFormats__.json",
+    "durationInSeconds": 0.0006569623947143555
+  },
+  {
+    "test": "ListeningStorageTests/testAWriteTheBoundedRecordCannotHoldIsNotSentAndKeepsTheEarlierRecord()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ListeningStorageTests_testAWriteTheBoundedRecordCannotHoldIsNotSentAndKeepsTheEarlierRecord__.json",
+    "durationInSeconds": 0.007187008857727051
+  },
+  {
+    "test": "ListeningStorageTests/testRecordsLeftInFilesByAnEarlierBuildAreReadAndKept()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ListeningStorageTests_testRecordsLeftInFilesByAnEarlierBuildAreReadAndKept__.json",
+    "durationInSeconds": 0.005304932594299316
+  },
+  {
+    "test": "ListeningStorageTests/testRepeatedlyUnreadableRecordsKeepOneBoundedCopyAndStopSending()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ListeningStorageTests_testRepeatedlyUnreadableRecordsKeepOneBoundedCopyAndStopSending__.json",
+    "durationInSeconds": 0.005244016647338867
+  },
+  {
+    "test": "ListeningStorageTests/testSentProgressAndResetsAreKeptAcrossRelaunchWhereFilesCannotBeWritten()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ListeningStorageTests_testSentProgressAndResetsAreKeptAcrossRelaunchWhereFilesCannotBeWritten__.json",
+    "durationInSeconds": 0.004495978355407715
+  },
+  {
+    "test": "MediaRestartTests/testAnAccountSwitchCancelsTheRestart()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/MediaRestartTests_testAnAccountSwitchCancelsTheRestart__.json",
+    "durationInSeconds": 0.0012040138244628906
+  },
+  {
+    "test": "MediaRestartTests/testANewerSessionForTheSameMediaIsNotRestartedOrBlamed()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/MediaRestartTests_testANewerSessionForTheSameMediaIsNotRestartedOrBlamed__.json",
+    "durationInSeconds": 0.0006999969482421875
+  },
+  {
+    "test": "MediaRestartTests/testAPauseOrRecoveryWhileWaitingIsRespected()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/MediaRestartTests_testAPauseOrRecoveryWhileWaitingIsRespected__.json",
+    "durationInSeconds": 0.0007070302963256836
+  },
+  {
+    "test": "MediaRestartTests/testAPlayOrSeekThatFailsAgainWhileWaitingIsRespected()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/MediaRestartTests_testAPlayOrSeekThatFailsAgainWhileWaitingIsRespected__.json",
+    "durationInSeconds": 0.0005620718002319336
+  },
+  {
+    "test": "MediaRestartTests/testRestartsTheFailedMediaWhenNothingChanged()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/MediaRestartTests_testRestartsTheFailedMediaWhenNothingChanged__.json",
+    "durationInSeconds": 0.0007500648498535156
+  },
+  {
+    "test": "CatalogJourney/testCatalogFailureRecoversWithRetry()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogJourney_testCatalogFailureRecoversWithRetry__.json",
+    "durationInSeconds": 16.966095089912415
+  },
+  {
+    "test": "CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogJourney_testContinueListeningOpensDetailsAndBackRestoresFocus__.json",
+    "durationInSeconds": 20.693050026893616
+  },
+  {
+    "test": "CatalogJourney/testFilterAndSortAreAppliedByTheServer()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogJourney_testFilterAndSortAreAppliedByTheServer__.json",
+    "durationInSeconds": 32.307412981987
+  },
+  {
+    "test": "CatalogJourney/testLibraryLoadsNextPageAsFocusMovesDown()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogJourney_testLibraryLoadsNextPageAsFocusMovesDown__.json",
+    "durationInSeconds": 22.598644971847534
+  },
+  {
+    "test": "CatalogJourney/testProgressFilterDropsATitleMarkedFinishedOnReturn()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogJourney_testProgressFilterDropsATitleMarkedFinishedOnReturn__.json",
+    "durationInSeconds": 29.881588101387024
+  },
+  {
+    "test": "CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogJourney_testServerSearchFindsTitlesOutsideLoadedPage__.json",
+    "durationInSeconds": 36.311668038368225
+  },
+  {
+    "test": "CatalogJourney/testTrustedHTTPSServerAndLongMetadata()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/CatalogJourney_testTrustedHTTPSServerAndLongMetadata__.json",
+    "durationInSeconds": 19.801114916801453
+  },
+  {
+    "test": "PlaybackJourney/testAStartThatCannotReplaceThePlayingTitleStaysOnTheChosenTitle()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PlaybackJourney_testAStartThatCannotReplaceThePlayingTitleStaysOnTheChosenTitle__.json",
+    "durationInSeconds": 29.264536023139954
+  },
+  {
+    "test": "PlaybackJourney/testNaturalEndShowsFinished()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PlaybackJourney_testNaturalEndShowsFinished__.json",
+    "durationInSeconds": 38.337876081466675
+  },
+  {
+    "test": "PlaybackJourney/testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PlaybackJourney_testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying__.json",
+    "durationInSeconds": 34.19837403297424
+  },
+  {
+    "test": "PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PlaybackJourney_testResumeShowsChapterAndTotalProgressAndRemoteToggles__.json",
+    "durationInSeconds": 25.56164300441742
+  },
+  {
+    "test": "PlaybackJourney/testSpeedSelectionAndExplicitStopClosesTheSession()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PlaybackJourney_testSpeedSelectionAndExplicitStopClosesTheSession__.json",
+    "durationInSeconds": 31.272610902786255
+  },
+  {
+    "test": "PlaybackJourney/testStartingAnotherTitleWhileOnePlaysReplacesIt()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PlaybackJourney_testStartingAnotherTitleWhileOnePlaysReplacesIt__.json",
+    "durationInSeconds": 31.93604600429535
+  },
+  {
+    "test": "PodcastJourney/testEpisodesSortAndPlaySeparatelyFromBooks()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PodcastJourney_testEpisodesSortAndPlaySeparatelyFromBooks__.json",
+    "durationInSeconds": 34.28614699840546
+  },
+  {
+    "test": "PodcastJourney/testMarkEpisodeFinishedUpdatesOnlyThatEpisode()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PodcastJourney_testMarkEpisodeFinishedUpdatesOnlyThatEpisode__.json",
+    "durationInSeconds": 29.10349702835083
+  },
+  {
+    "test": "PodcastJourney/testPodcastResultTileShowsItsEpisodeProgress()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/PodcastJourney_testPodcastResultTileShowsItsEpisodeProgress__.json",
+    "durationInSeconds": 38.533020973205566
+  },
+  {
+    "test": "ReadinessJourney/testArabicMirrorsTheInterface()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ReadinessJourney_testArabicMirrorsTheInterface__.json",
+    "durationInSeconds": 27.49926996231079
+  },
+  {
+    "test": "ReadinessJourney/testCatalogFailureIsRecordedAndClearedFromSettings()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ReadinessJourney_testCatalogFailureIsRecordedAndClearedFromSettings__.json",
+    "durationInSeconds": 31.600055932998657
+  },
+  {
+    "test": "ReadinessJourney/testCompleteNoticesAreRemoteReadableAndBackRestoresSettings()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ReadinessJourney_testCompleteNoticesAreRemoteReadableAndBackRestoresSettings__.json",
+    "durationInSeconds": 30.396647930145264
+  },
+  {
+    "test": "ReadinessJourney/testFailedSignInIsDiagnosedWithoutCredentials()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ReadinessJourney_testFailedSignInIsDiagnosedWithoutCredentials__.json",
+    "durationInSeconds": 38.28282308578491
+  },
+  {
+    "test": "ReadinessJourney/testGermanLocalizesTheInterfaceAndPersists()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ReadinessJourney_testGermanLocalizesTheInterfaceAndPersists__.json",
+    "durationInSeconds": 52.72123205661774
+  },
+  {
+    "test": "ReadinessJourney/testMainScreensPassTheAccessibilityAudit()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ReadinessJourney_testMainScreensPassTheAccessibilityAudit__.json",
+    "durationInSeconds": 43.96005690097809
+  },
+  {
+    "test": "ReadinessJourney/testSettingsAboveNoticesRemainReachableWithUpAfterBack()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ReadinessJourney_testSettingsAboveNoticesRemainReachableWithUpAfterBack__.json",
+    "durationInSeconds": 29.514186024665833
+  },
+  {
+    "test": "RecoveryJourney/testLaterListeningWaitsForARequestedAndConfirmedServerRestart()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/RecoveryJourney_testLaterListeningWaitsForARequestedAndConfirmedServerRestart__.json",
+    "durationInSeconds": 71.31625390052795
+  },
+  {
+    "test": "RecoveryJourney/testMediaFailureOffersRestartRatherThanSavingProgress()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/RecoveryJourney_testMediaFailureOffersRestartRatherThanSavingProgress__.json",
+    "durationInSeconds": 21.319864988327026
+  },
+  {
+    "test": "RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/RecoveryJourney_testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying__.json",
+    "durationInSeconds": 59.48189604282379
+  },
+  {
+    "test": "RecoveryJourney/testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/RecoveryJourney_testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch__.json",
+    "durationInSeconds": 39.0086430311203
+  },
+  {
+    "test": "RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/RelatedJourney_testBookDetailsLeadToItsSeriesAndAuthor__.json",
+    "durationInSeconds": 29.85383701324463
+  },
+  {
+    "test": "RelatedJourney/testSearchOpensAuthorWithBioSeriesAndEveryBook()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/RelatedJourney_testSearchOpensAuthorWithBioSeriesAndEveryBook__.json",
+    "durationInSeconds": 31.53158700466156
+  },
+  {
+    "test": "RelatedJourney/testSeriesFailureRecoversWithRetry()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/RelatedJourney_testSeriesFailureRecoversWithRetry__.json",
+    "durationInSeconds": 36.06904602050781
+  },
+  {
+    "test": "RelatedJourney/testSeriesFollowsServerSequenceAndOpensTheIntendedBook()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/RelatedJourney_testSeriesFollowsServerSequenceAndOpensTheIntendedBook__.json",
+    "durationInSeconds": 31.732148051261902
+  },
+  {
+    "test": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "result": "Passed",
+    "hasMediaAttachments": false,
+    "details": "details/ShellJourney_testManyLibrariesKeepTheShellBoundedAndRemainSelectable__.json",
+    "durationInSeconds": 65.26267004013062
+  }
+]

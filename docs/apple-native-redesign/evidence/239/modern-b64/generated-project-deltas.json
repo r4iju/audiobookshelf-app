@@ -1,0 +1,14 @@
+[
+  {
+    "file": "tvos/AudiobookshelfTV.xcodeproj/project.pbxproj",
+    "archived_sha256": "0c1497506a042d73fc4e76094e87b3373992d9d7269e6491c46893ad62671ce9",
+    "generated_sha256": "79b31edfc1a05eb6def904d980d78cc4d5fe725397f5c775392e5536071e8b0f",
+    "changed": true
+  },
+  {
+    "file": "tvos/AudiobookshelfTV.xcodeproj/xcshareddata/xcschemes/AudiobookshelfTV.xcscheme",
+    "archived_sha256": "fb94c0bb83a2fff393bc1d198696b9d68fb1e03b0204651efcd5ead8a0d2c996",
+    "generated_sha256": "0fbfd6f8f4370246e2d2229c36a15b30c455c34d3c2ba9c04bc21d40f20589a9",
+    "changed": true
+  }
+]

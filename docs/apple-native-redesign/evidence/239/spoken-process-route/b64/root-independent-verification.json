@@ -1,0 +1,13 @@
+{
+  "source": "b64cc462060ba9a5a54790bfc6303144fd527a87",
+  "actual_installed47_fullhash_strict": "PASS",
+  "original_audio_hashes_recomputed": true,
+  "nonzero_asr": {
+    "playing-progress": "Voice over on, audiobook logbook progress, 120, adjustable.\nSwipe up or down with one finger to adjust the value.",
+    "next-native-focus": "2 minutes."
+  },
+  "silent_transport": "Not transcribed, failed target/no speech claim",
+  "scope": "Actual numeric120 adjustable/swipe instruction and separate2minutes; playingstate/grouporder not proven; machine-only no human-listening claim",
+  "timing": "556.984sec exceeds internal480sec; preserved",
+  "cleanup": "Reported app/ownfixtures stopped, VOdisable returnedenabledfalse beforeshutdown, postshutdownqueryfailed, lease released"
+}

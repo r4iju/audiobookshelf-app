@@ -1,0 +1,76 @@
+[
+  {
+    "product": "phone",
+    "source": "b64cc462060ba9a5a54790bfc6303144fd527a87",
+    "tree": "e2f04fea05c1baeb8d87263320df925b5454496f",
+    "bundle": "com.forkzed.audiobookshelf.native.preview",
+    "version": "1.0.0",
+    "build": "1",
+    "minimumOS": "15.0",
+    "sourceMinimumOS": "14.0",
+    "localMinimumOverride": true,
+    "executableSHA256": "ec7e44abe158c8ac6ef38972f477c8159e476a76f6e60fca0d2700e93758dd74",
+    "resourceManifestSHA256": "8124d5a07a61d7c5adf471651afb5baa1544d3ad2159c9ba3df3678dfcf0a0d7",
+    "signature": "deep strict verified",
+    "distribution": "private Apple Development",
+    "installed": false,
+    "acceptanceStatus": "NOT ACCEPTED / NOT INSTALLED / NOT RELEASED",
+    "purpose": "explicitly authorized private preacceptance preparation",
+    "pendingGatePolicy": "Signing/build success does not satisfy remaining runtime, accessibility, older-system, independent review or merged-source acceptance gates; parent owns actual gate status.",
+    "sourceArchiveSHA256": "428fb8db8416ef613725bf0d5be151cbce348e85b23917b1b852f5ce9a48ec00",
+    "sourceInventorySHA256": "3026e3a48e8b3233fd1ec8034c8c6d5b2cf81e37fde20ba0555417a48ba76a96",
+    "allSourceFileManifestSHA256": "c7b1fcb614711fb5cea1a0f5c97172c6b1434fd42eb86f5024fe51fd2f2bcec7",
+    "signedCertificateSHA1": "2a3ed55085b53f9d350a706d9c638b138ffb62bc",
+    "profileCoverage": {
+      "ownerPhone": true,
+      "ownerPad": true,
+      "ownerTV": false
+    },
+    "productFileCount": 46,
+    "profileExpiry": "2027-10-02T19:27:25",
+    "externalGates": [
+      "strict contrast combined audit still unresolved",
+      "full actual spoken coverage still pending",
+      "original iOS14 runtime acceptance distinct from local SDK27 minimum15 build",
+      "written upstream public App Store/TestFlight permission pending"
+    ],
+    "licenseContract": "Exact frozen source includes existing licenses/origins, no attribution or public upload."
+  },
+  {
+    "product": "tv",
+    "source": "b64cc462060ba9a5a54790bfc6303144fd527a87",
+    "tree": "e2f04fea05c1baeb8d87263320df925b5454496f",
+    "bundle": "com.forkzed.audiobookshelf.tv",
+    "version": "1.0.0",
+    "build": "1",
+    "minimumOS": "17.0",
+    "sourceMinimumOS": "17.0",
+    "localMinimumOverride": false,
+    "executableSHA256": "662870856571bf58b2886945b0c1c7b84a6da27abeb6df9d8725cb2092b11f04",
+    "resourceManifestSHA256": "68e9eaa11fe4181b38ae62dd2f663e4a0aa3026b0d930fa29a87b972b671414e",
+    "signature": "deep strict verified",
+    "distribution": "private Apple Development",
+    "installed": false,
+    "acceptanceStatus": "NOT ACCEPTED / NOT INSTALLED / NOT RELEASED",
+    "purpose": "explicitly authorized private preacceptance preparation",
+    "pendingGatePolicy": "Signing/build success does not satisfy remaining runtime, accessibility, older-system, independent review or merged-source acceptance gates; parent owns actual gate status.",
+    "sourceArchiveSHA256": "428fb8db8416ef613725bf0d5be151cbce348e85b23917b1b852f5ce9a48ec00",
+    "sourceInventorySHA256": "3026e3a48e8b3233fd1ec8034c8c6d5b2cf81e37fde20ba0555417a48ba76a96",
+    "allSourceFileManifestSHA256": "c7b1fcb614711fb5cea1a0f5c97172c6b1434fd42eb86f5024fe51fd2f2bcec7",
+    "signedCertificateSHA1": "2a3ed55085b53f9d350a706d9c638b138ffb62bc",
+    "profileCoverage": {
+      "ownerPhone": false,
+      "ownerPad": false,
+      "ownerTV": true
+    },
+    "productFileCount": 36,
+    "profileExpiry": "2027-10-01T18:30:12",
+    "externalGates": [
+      "strict contrast combined audit still unresolved",
+      "full actual spoken coverage still pending",
+      "original iOS14 runtime acceptance distinct from local SDK27 minimum15 build",
+      "written upstream public App Store/TestFlight permission pending"
+    ],
+    "licenseContract": "Exact frozen source includes existing licenses/origins, no attribution or public upload."
+  }
+]
