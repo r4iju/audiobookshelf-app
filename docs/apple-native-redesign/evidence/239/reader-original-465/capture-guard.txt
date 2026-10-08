@@ -1,0 +1,2 @@
+AudiobookshelfNative: automatic screen capture disabled
+AudiobookshelfNative_iphonesimulator27.0-arm64-x86_64.xctestrun: effective automatic capture disabled
