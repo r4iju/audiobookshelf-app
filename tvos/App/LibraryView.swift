@@ -24,7 +24,7 @@ struct LibraryView: View {
                         .accessibilityHint(l10n("Choose library"))
                         Spacer()
                         if browser.total > 0 {
-                            Text(browser.library.isPodcast ? l10n("{0} podcasts", browser.total) : l10n("{0} titles", browser.total))
+                            Text(browser.library.isPodcast ? (browser.total == 1 ? l10n("1 podcast") : l10n("{0} podcasts", browser.total)) : (browser.total == 1 ? l10n("1 title") : l10n("{0} titles", browser.total)))
                                 .foregroundStyle(.secondary)
                         }
                     }

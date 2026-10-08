@@ -99,6 +99,7 @@ struct CoverView: View {
 
 /// A focusable cover with title, author and listening state that stays legible across the room.
 struct ItemTile: View {
+    @Environment(\.isFocused) private var isFocused
     @EnvironmentObject private var catalog: CatalogStore
     @Environment(\.nativeStrings) private var l10n
     let item: LibraryItem
@@ -131,7 +132,7 @@ struct ItemTile: View {
             .clipShape(RoundedRectangle(cornerRadius: 14))
             Text(episode?.title ?? item.title).font(.system(size: 26, weight: .semibold)).lineLimit(2)
                 .frame(width: width, height: 68, alignment: .topLeading)
-            Text(episode != nil ? item.title : item.author.isEmpty ? " " : item.author).font(.system(size: 21)).foregroundStyle(.secondary).lineLimit(1)
+            Text(episode != nil ? item.title : item.author.isEmpty ? " " : item.author).font(.system(size: 21)).foregroundStyle(isFocused ? .primary : .secondary).lineLimit(1)
                 .frame(width: width, alignment: .leading)
         }
         .accessibilityElement(children: .combine)
