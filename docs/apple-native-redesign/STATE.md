@@ -6,9 +6,10 @@ Integration branch: `feature/apple-native-redesign`, based on `77c154b1` on `for
 | --- | --- | --- |
 | #231 | Source `0894eb04`, evidence `f1116e66`, verified integrated | [Actual phone/tablet slice and checks](evidence/231/RESULT.md). Functional final-source phone 3/3, iPad shell 1/1 and bookmark 1/1. Full design acceptance remains #233. |
 | #232 | Source `cb8ebda8` + `5acca8c1`, evidence `5f48fdd0`, verified integrated | [Bounded TV shell, remote checks and focused/unfocused captures](evidence/232/RESULT.md). Final source 4/4; earlier 10/10. |
-| #233 | Corrections integrated `da05a80a` + `8739a7b4`, evidence `a8e2e6d0`; fresh round2 review pending | [Round1 findings](evidence/233/review-round-1.md) and [actual corrected renders/checks](evidence/233/corrections-round-1/RESULT.md). Final phone6/6 and wide-iPad Shell1/1 pass. [Missing TV portrait focus pair](evidence/233/corrections-round-1/tv-portrait/RESULT.md) is now captured. Phone `Assets.car` signature-resource caveat remains recorded for investigation. |
-| #234–237 | Pending dependency graph | Complete mobile screens and localization. |
-| #238 | Blocked by #233 | Complete TV screens and remote journeys. |
+| #233 | Corrections integrated `da05a80a` + `8739a7b4`, evidence `a8e2e6d0`; independent round2 PASS | [Fresh rendered review](evidence/233/review-round-2.md) resolved D1–D3 and permits broad migration. [Actual corrected renders/checks](evidence/233/corrections-round-1/RESULT.md): final phone6/6 and wide-iPad Shell1/1. [TV portrait focus pair](evidence/233/corrections-round-1/tv-portrait/RESULT.md) captured. [Asset provenance](evidence/233/assets-provenance.md) identifies stale incremental resource sealing; clean separately verified candidates remain required. |
+| #234 | Ready frontier | Complete mobile catalog/search/related hierarchy and acceptance. |
+| #235–237 | Pending dependency graph | Complete listening, readers/downloads/groups and utilities/localization. |
+| #238 | Ready frontier, queued behind sole mobile writer | Complete TV screens and remote journeys. |
 | #239 | Blocked by #237/#238 | Required adaptive, accessibility, fallback and full-screen acceptance. |
 | #240 | Blocked by #239 | Final review, merge, merged-source QA and private device candidates. |
 
