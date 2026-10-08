@@ -22,7 +22,7 @@ final class ShellJourney: TVJourney {
         focus(lastLibrary)
         capture("library-chooser-end")
         select(lastLibrary)
-        wait(app.buttons["library-chooser"], label: "Archive 10")
+        guard wait(app.buttons["library-chooser"], label: "Archive 10") else { return }
         let title = app.buttons["item-book-60"]
         XCTAssertTrue(title.waitForExistence(timeout: 15))
         capture("library-unfocused")

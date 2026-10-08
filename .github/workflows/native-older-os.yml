@@ -6,6 +6,11 @@ on:
       - .github/workflows/native-older-os.yml
       - verification/older-os/**
   workflow_dispatch:
+    inputs:
+      tv_only:
+        description: Replay TV only after unchanged mobile source has separate evidence
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -45,6 +50,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
   ios145-runtime:
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.tv_only }}
     runs-on: macos-14
     timeout-minutes: 75
     steps:
@@ -80,6 +86,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
   ios14-binary:
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.tv_only }}
     runs-on: macos-14
     timeout-minutes: 30
     env:

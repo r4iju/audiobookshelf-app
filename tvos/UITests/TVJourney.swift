@@ -65,6 +65,11 @@ import XCTest
 
     func select(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         focus(element, file: file, line: line)
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: element)
+        let result = XCTWaiter.wait(for: [ready], timeout: 5)
+        XCTAssertEqual(result, .completed, "Focused control must be hittable before Select: \(element)", file: file, line: line)
+        guard result == .completed else { return }
+        print("[DEBUG-239-select] id=\(element.identifier) focus=\(hasFocus(element)) hittable=\(element.isHittable) frame=\(element.frame)")
         remote.press(.select)
     }
 
@@ -144,10 +149,13 @@ import XCTest
 
     func label(_ identifier: String) -> String { app.staticTexts[identifier].label }
 
-    func wait(_ element: XCUIElement, label expected: String, timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) {
+    @discardableResult
+    func wait(_ element: XCUIElement, label expected: String, timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) -> Bool {
         let predicate = NSPredicate(format: "label == %@", expected)
         let matched = XCTNSPredicateExpectation(predicate: predicate, object: element)
-        XCTAssertEqual(XCTWaiter.wait(for: [matched], timeout: timeout), .completed, "Expected \(expected), saw \(element.exists ? element.label : "nothing")", file: file, line: line)
+        let result = XCTWaiter.wait(for: [matched], timeout: timeout)
+        XCTAssertEqual(result, .completed, "Expected \(expected), saw \(element.exists ? element.label : "nothing")", file: file, line: line)
+        return result == .completed
     }
 
     /// Seconds parsed from an m:ss or h:mm:ss clock label.
