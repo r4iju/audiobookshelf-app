@@ -72,6 +72,35 @@ import XCTest
         XCTAssertTrue(app.buttons["Choose export"].waitForExistence(timeout: 3))
     }
 
+    func testIncompleteExportShowsAnErrorAndCanBeChosenAgain() async throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--reset-preview-account"]
+        app.launch()
+        XCTAssertTrue(app.textFields["server"].waitForExistence(timeout: 8))
+        app.swipeUp()
+        app.buttons["Import previous app data"].tap()
+        let choose = app.buttons["Choose export"]
+        XCTAssertTrue(choose.waitForExistence(timeout: 5))
+        choose.tap()
+        let browse = app.buttons["Browse"]
+        XCTAssertTrue(browse.waitForExistence(timeout: 5), "Choosing an export must present the native file picker")
+        guard browse.exists else { return }
+        browse.tap()
+        let local = app.cells.containing(.staticText, identifier: "On My iPhone").firstMatch
+        if local.waitForExistence(timeout: 5) { local.tap() }
+        let folder = app.cells.matching(NSPredicate(format: "label BEGINSWITH %@", "Audiobook Loft")).firstMatch
+        if folder.exists { folder.tap() }
+        let open = app.buttons["Open"]
+        XCTAssertTrue(open.waitForExistence(timeout: 5), "The native picker must allow selecting the app's owned Documents folder")
+        guard open.exists else { return }
+        open.tap()
+        let error = app.staticTexts["Choose the complete export package or the folder containing archive.json. An unfinished export cannot be imported."]
+        XCTAssertTrue(error.waitForExistence(timeout: 8), "An incomplete export must show actionable feedback after the picker closes")
+        capture("Incomplete export feedback")
+        app.buttons["Choose export"].tap()
+        XCTAssertTrue(app.buttons["Open"].waitForExistence(timeout: 5), "Choosing another export must remain available after failure")
+    }
+
     func testLegacyImportExplainsExportAndReauthentication() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)

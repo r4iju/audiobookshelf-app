@@ -175,8 +175,8 @@ struct NativeMigrationImport: View {
     @Environment(\.presentationMode) private var presentation
     @EnvironmentObject private var connection: ConnectionStore
     @EnvironmentObject private var store: NativeMigrationStore
-    @State private var choosing = false
-    @State private var selectionToken: UUID?
+    private struct Selection: Identifiable { let id: UUID }
+    @State private var selection: Selection?
 
     var body: some View {
         ShelfList {
@@ -185,8 +185,7 @@ struct NativeMigrationImport: View {
                 Text(l10n("Your previous app and its original files stay available.")).foregroundColor(ShelfStyle.secondaryText)
                 Text(l10n("Sign in again after importing to access each account.")).foregroundColor(ShelfStyle.secondaryText)
                 Button(l10n("Choose export")) {
-                    selectionToken = store.beginSelection()
-                    choosing = selectionToken != nil
+                    if let token = store.beginSelection() { selection = Selection(id: token) }
                 }.disabled(store.busy)
             }
             if store.busy { ProgressView(l10n("Working on your import…")) }
@@ -240,18 +239,15 @@ struct NativeMigrationImport: View {
                 }
             }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Import your data")).navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $choosing, onDismiss: {
-                if let token = selectionToken {
-                    selectionToken = nil
+            .sheet(item: $selection, onDismiss: {
+                if let token = selection?.id {
+                    selection = nil
                     Task { await store.finishSelection(nil, token: token) }
                 }
-            }) {
+            }) { selected in
                 MigrationFilePicker { url in
-                    choosing = false
-                    if let token = selectionToken {
-                        Task { await store.finishSelection(url, token: token) }
-                        selectionToken = nil
-                    }
+                    selection = nil
+                    Task { await store.finishSelection(url, token: selected.id) }
                 }
             }
             .onAppear { Task { await store.loadCommitted() } }
