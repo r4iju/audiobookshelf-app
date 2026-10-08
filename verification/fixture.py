@@ -444,6 +444,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if path == '/api/items/book-0/file/epub' or downloaded_file and downloaded_file[1] == 'epub':
                 return self.respond(200, document, 'application/epub+zip')
             if path == '/api/items/book-0/file/pdf' or downloaded_file and downloaded_file[1] == 'pdf':
+                if configuration['mode'] == 'download-partial-ebook' and downloaded_file:
+                    return self.respond(503, {'error': 'Synthetic ebook unavailable'})
                 return self.respond(200, document, 'application/pdf')
             if downloaded_file:
                 if configuration['mode'] == 'download-error-page':
@@ -543,7 +545,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'released': len(released)})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-ebook-only', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art', 'many-libraries', 'long-audio', 'held-sync'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'download-partial-ebook', 'pdf-ebook-only', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art', 'many-libraries', 'long-audio', 'held-sync'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
                 tokens.update(renewals=0, revoked=set(), refresh_delay=0)
@@ -560,10 +562,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     playlists[:] = [entry for entry in playlists if entry['id'] != original['id']]
                     playlists.insert(index, original)
                 remote_originals['progress'].clear(); remote_originals['playlists'].clear()
-                if mode in ('pdf-ebook-only', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
+                if mode in ('pdf-ebook-only', 'download-partial-ebook', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
                     document = b'not a PDF' if mode == 'pdf-invalid' else pdf(pages=120 if mode == 'pdf-long' else 4, rotation=90 if mode == 'pdf-rotated' else 0)
                     items[0]['media']['ebookFile'] = {'ino': 'pdf', 'ebookFormat': 'pdf', 'metadata': {'filename': 'stories.pdf', 'ext': '.pdf', 'size': len(document)}}
-                    if mode in ('pdf-reader', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-rotated', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure'):
+                    if mode in ('pdf-reader', 'download-partial-ebook', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-rotated', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure'):
                         for account in users.values():
                             for entry in progress_by_user[account['id']].values():
                                 entry.pop('ebookLocation', None); entry.pop('ebookProgress', None)

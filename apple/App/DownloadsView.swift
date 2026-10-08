@@ -35,10 +35,10 @@ struct DownloadsView: View {
                             }
                             VStack(alignment: .leading, spacing: 12) {
                             if entry.state == .queued {
-                                Button(l10n("Cancel download")) { NativeHaptic.impact("download"); downloads.cancel(entry) }
-                            } else { Button(l10n("Retry download")) { NativeHaptic.impact("download"); Task { await downloads.retry(entry) } } }
-                            if entry.audioAvailable { NavigationLink(l10n("Play offline"), destination: OfflineDetails(entry: entry)).accessibilityIdentifier("offline-audio-" + entry.media.libraryItemID) }
-                            Button(l10n("Remove download")) { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player) } }.foregroundColor(.red)
+                                Button { NativeHaptic.impact("download"); downloads.cancel(entry) } label: { DownloadActionText(l10n("Cancel download")) }
+                            } else { Button { NativeHaptic.impact("download"); Task { await downloads.retry(entry) } } label: { DownloadActionText(l10n("Retry download")) } }
+                            if entry.audioAvailable { NavigationLink(destination: OfflineDetails(entry: entry)) { DownloadActionText(l10n("Play offline")) }.accessibilityIdentifier("offline-audio-" + entry.media.libraryItemID) }
+                            Button { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player) } } label: { DownloadActionText(l10n("Remove download")) }.foregroundColor(.red)
                             }.buttonStyle(BorderlessButtonStyle())
                         }.padding(.vertical, 8)
                     }
@@ -80,13 +80,13 @@ private struct OfflineDetails: View {
                     }.accessibilityIdentifier("read-downloaded-ebook").buttonStyle(BorderlessButtonStyle())
                 }
                 if !entry.tracks.isEmpty {
-                    Button(l10n("Play offline")) {
+                    Button {
                         NativeHaptic.impact("play")
                         do {
                             let audio = try downloads.audio(entry)
                             Task { await player.startOffline(audio); if player.offlineID == entry.id { downloads.presented = false } }
                         } catch { self.error = error.localizedDescription }
-                    }.buttonStyle(BorderlessButtonStyle())
+                    } label: { DownloadActionText(l10n("Play offline")) }.buttonStyle(BorderlessButtonStyle())
                 }
                 if let error { Label(error, systemImage: "exclamationmark.triangle").foregroundColor(.red) }
             }
@@ -96,10 +96,25 @@ private struct OfflineDetails: View {
                 }
             }
             Section {
-                Button(l10n("Remove download")) { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player); presentation.wrappedValue.dismiss() } }
+                Button { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player); presentation.wrappedValue.dismiss() } } label: { DownloadActionText(l10n("Remove download")) }
                     .foregroundColor(.red).buttonStyle(BorderlessButtonStyle())
             }
         }.navigationTitle(entry.media.title).navigationBarTitleDisplayMode(.inline)
             .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: downloads.api, store: readingStore) }
+    }
+}
+
+/// Native List navigation rows can impose a single-line label on sibling actions.
+/// Keep each essential action independently tappable and let its text grow.
+private struct DownloadActionText: View {
+    let title: String
+    init(_ title: String) { self.title = title }
+    var body: some View {
+        Text(title)
+            .lineLimit(nil)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
     }
 }
