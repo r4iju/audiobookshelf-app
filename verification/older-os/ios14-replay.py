@@ -63,7 +63,7 @@ try:
     _, actual = e.run('actual-device', ['xcrun', 'simctl', 'list', 'devices', '-j'])
     if not any(d['udid'] == udid and d['state'] == 'Booted' for d in json.loads(actual)['devices'].get(runtime['identifier'], [])):
         raise RuntimeError('Lease did not boot under exact selected runtime')
-    e.run('representative-journeys', ['bash', str(copy), 'CODE_SIGNING_ALLOWED=NO', '-resultBundlePath', str(result),
+    e.run('representative-journeys', ['bash', str(copy), 'CODE_SIGNING_ALLOWED=YES', 'CODE_SIGN_IDENTITY=-', '-resultBundlePath', str(result),
         '-only-testing:NativeJourneyTests/ConnectionJourney/testConnectSelectLibraryAndRestoreAccountAfterRelaunch',
         '-only-testing:NativeJourneyTests/ShellJourney/testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing',
         '-only-testing:NativeJourneyTests/SearchJourney/testSearchFindsBookBeyondFirstPageAndReturnsFromDetails',
@@ -76,7 +76,7 @@ finally:
     code, _ = e.run('pool-release', ['sim', 'release', udid], required=False)
     if code:
         errors.append('Lease release failed')
-for action in [lambda: e.app(e.root / 'build/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app', 'com.forkzed.audiobookshelf.native.preview', '14.0'), lambda: e.results(result)]:
+for action in [lambda: e.app(e.root / 'build/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app', 'com.forkzed.audiobookshelf.native.preview', '14.0'), lambda: e.simulator_signing(e.root / 'build/Build/Products/Debug-iphonesimulator'), lambda: e.results(result)]:
     try:
         action()
     except Exception as error:

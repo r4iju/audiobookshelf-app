@@ -7,3 +7,7 @@ Source856 actual Swift6/SDK18.2 original-minimum build still timed out inferring
 Next scoped TV17 retry records the original synthetic chain and restarts its owned lease after root installation, testing the observed setup trust failure without weakening TLS. f635 actual iOS14 binary succeeded; stock14.5 execution remains unavailable.
 
 Actual a363 hosted diagnostics exposed duplicate critical CA Basic Constraints from inherited OpenSSL req defaults; explicit owned CA config and independent chain validation correct only synthetic harness setup. No product trust exception. Runtime remainsf635.
+
+Final V239-01 runtimef922 native Downloads label wrapping/geometry correction preserves all callbacks/IDs and older fallbacks; final-source original-minimum binary and TV17 acceptance must remain source-pinned to this descendant.
+
+Actual f31 hosted17 validCA reached app sign-in but unsigned simulator build caused Keychain -34018; execution replays now enable normal ad-hoc simulator signing and record strict seals/Xcode-generated app+runner entitlements, preserving original keychain/domain/identity contracts. Independent build-only minimum proof remains distinct.

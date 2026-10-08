@@ -1,0 +1,5 @@
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' started.
+ACTUAL-DOWNLOAD-LABEL Retry download text=(32.0, 485.6666666666665, 221.0, 125.33333333333337) button=(32.0, 485.6666666666665, 221.0, 125.33333333333337) bodyFont=53.0 requiredHeight=126.0
+ACTUAL-DOWNLOAD-LABEL Remove download text=(32.0, 622.9999999999999, 221.0, 125.33333333333348) button=(32.0, 622.9999999999999, 221.0, 125.33333333333348) bodyFont=53.0 requiredHeight=126.0
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' passed (37.100 seconds).
+** TEST SUCCEEDED **

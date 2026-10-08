@@ -1,6 +1,6 @@
 # Ticket239 acceptance and compatibility
 
-Runtime is frozen at `f635a42ae8c9617409838008dfeec5645b4312b1`. Later commits are test/CI-only. No owner release installation, public upload, merge or independent-review self-approval occurred.
+Initial acceptance runtime is frozen at `f635a42ae8c9617409838008dfeec5645b4312b1`, with exact original scopes retained below. The bounded V239-01 follow-up runtime is `f9224289337a399d3d5c072b8eaf4b27bb0a533b`; see [correction evidence](corrections/V239-01/RESULT.md). Other intervening commits are test/CI-only. No owner release installation, public upload, merge or independent-review self-approval occurred.
 
 The October8 instruction stops screenshots/video/render-only runs and gallery production. Attachment-only helpers were suppressed in disposable QA; canonical helpers and all behavioral assertions remain. Existing originals remain attributed to their original sources. Pixel-sampling `RemainingQAAccessibilityJourney.testContrastAuditLightAppearance`, `...DarkAppearance`, `...BlackAppearance` were not run under that instruction. Native audits were not excluded or weakened.
 

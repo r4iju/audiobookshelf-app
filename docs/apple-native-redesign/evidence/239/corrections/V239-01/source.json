@@ -1,0 +1,12 @@
+{
+  "runtimeSource": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+  "file": "apple/App/DownloadsView.swift",
+  "sha256": "1de156953e151610309e05338921ecd26d7bc108cbf57da821484e6640d75bee",
+  "beforeRuntime": "f635a42ae8c9617409838008dfeec5645b4312b1",
+  "source14Diagnostic": {
+    "log": "/tmp/native239-download-label-f922-source14.log",
+    "exit": 0,
+    "files": 77,
+    "scope": "SDK27 source14 typecheck, not older runtime"
+  }
+}

@@ -1,0 +1,7 @@
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' started.
+/tmp/native239-sim-qa/apple/UITests/LargestDownloads239Journey.swift:16: error: -[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent] : XCTAssertTrue failed
+/tmp/native239-sim-qa/apple/UITests/LargestDownloads239Journey.swift:21: error: -[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent] : XCTAssertTrue failed
+/tmp/native239-sim-qa/apple/UITests/LargestDownloads239Journey.swift:21: error: -[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent] : XCTAssertTrue failed
+/tmp/native239-sim-qa/apple/UITests/LargestDownloads239Journey.swift:23: error: -[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent] : Failed to get matching snapshot: No matches found for Elements matching predicate '"Retry download" IN identifiers' from input {(
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' failed (81.246 seconds).
+** TEST FAILED **

@@ -4,7 +4,7 @@ import UIKit
 @MainActor final class LargestDownloads239Journey: NativeJourney {
     func testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent() async throws {
         try await FixtureControl.configure("download-partial-ebook")
-        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false, arguments: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])
         let app = XCUIApplication()
         app.buttons["book-book-0"].tap()
         let download = app.buttons["Download for offline"]

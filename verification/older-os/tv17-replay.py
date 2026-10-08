@@ -68,7 +68,7 @@ try:
     if not any(d['udid'] == udid and d['state'] == 'Booted' for d in json.loads(actual)['devices'].get(runtime['identifier'], [])):
         raise RuntimeError('Lease did not boot under exact selected runtime')
     e.run('representative-journeys', ['bash', str(copy),
-        'CODE_SIGNING_ALLOWED=NO', 'TVOS_DEPLOYMENT_TARGET=17.0',
+        'CODE_SIGNING_ALLOWED=YES', 'CODE_SIGN_IDENTITY=-', 'TVOS_DEPLOYMENT_TARGET=17.0',
         '-only-testing:TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable',
         '-only-testing:TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus',
         '-only-testing:TVJourneyTests/CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage',
@@ -83,7 +83,7 @@ finally:
     if code:
         errors.append('Lease release failed')
 # Diagnostic exceptions cannot prevent lease cleanup or erase the original test failure.
-for action in [lambda: e.app(Path('tvos/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app'), 'com.forkzed.audiobookshelf.tv', '17.0'), lambda: e.results(result)]:
+for action in [lambda: e.app(Path('tvos/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app'), 'com.forkzed.audiobookshelf.tv', '17.0'), lambda: e.simulator_signing(Path('tvos/build/Build/Products/Debug-appletvsimulator')), lambda: e.results(result)]:
     try:
         action()
     except Exception as error:

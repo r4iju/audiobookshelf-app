@@ -76,3 +76,5 @@ Current Settings Search drawer remains a truthful ticket239 ownership/clearance 
 ## Final acceptance239
 
 [239 evidence](evidence/239/RESULT.md) records single native Search ownership, actual375×536 iPad transport/navigation/search actions, largest-text locator red/green, SDK contracts and original-minimum older build attempts. Runtimef635 stays frozen; test/CI follow-ups do not redesign the approved screens. The user stopped new screenshots. Strict combined native contrast, spoken traversal, stock14.5 execution and acceptedTV17 HTTPS journeys remain explicitly unresolved; no final whole-app/independent-review pass is inferred.
+
+Confirmed V239-01 largest partial-download action truncation is corrected at runtimef922 with actual native-font text-fit red→green and independent Retry/Play/Remove actions; [bounded correction evidence](evidence/239/corrections/V239-01/RESULT.md). Strict combined contrast remains unresolved after visible-target audits; no new screenshots.

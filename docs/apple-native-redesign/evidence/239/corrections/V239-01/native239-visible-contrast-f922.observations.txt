@@ -1,0 +1,11 @@
+Test Case '-[NativeJourneyTests.VisibleContrast239Journey testNarratorAndProgressAuditAtVisiblePositions]' started.
+VISIBLE-AUDIT-TARGET Narrated by QA Narrator frame=(43.83333333333334, 711.3333333333334, 314.33333333333337, 52.66666666666663) hittable=true
+VISIBLE-AUDIT-ISSUE target=Narrated by QA Narrator Contrast failed Contrast failed for SwiftUI.AccessibilityNode
+VISIBLE-AUDIT-ELEMENT Resume listening frame=(32.0, 861.0, 338.0, 221.33333333333326) enabled=true hittable=false
+/tmp/native239-sim-qa/apple/UITests/Acceptance239Harness.swift:112: error: -[NativeJourneyTests.VisibleContrast239Journey testNarratorAndProgressAuditAtVisiblePositions] : Contrast failed
+VISIBLE-AUDIT-TARGET 6 sec listened · 5% complete frame=(32.0, 71.0, 281.3333333333333, 102.33333333333337) hittable=true
+VISIBLE-AUDIT-ISSUE target=6 sec listened · 5% complete Contrast failed Contrast failed for SwiftUI.AccessibilityNode
+VISIBLE-AUDIT-ELEMENT Synthetic two-file audio. No live library data. frame=(16.0, 669.3333333333335, 370.0, 294.33333333333314) enabled=true hittable=true
+/tmp/native239-sim-qa/apple/UITests/Acceptance239Harness.swift:112: error: -[NativeJourneyTests.VisibleContrast239Journey testNarratorAndProgressAuditAtVisiblePositions] : Contrast failed
+Test Case '-[NativeJourneyTests.VisibleContrast239Journey testNarratorAndProgressAuditAtVisiblePositions]' failed (54.142 seconds).
+** TEST FAILED **

@@ -1,0 +1,9 @@
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' started.
+ACTUAL-DOWNLOAD-LABEL Retry download text=(32.0, 471.99999999999994, 326.3333333333333, 63.333333333333314) button=(32.0, 471.99999999999994, 326.3333333333333, 63.333333333333314) bodyFont=53.0 requiredHeight=126.0
+ACTUAL-DOWNLOAD-WORD Retry download requiredWidth=220.6953125 available=326.3333333333333
+/tmp/native239-sim-qa/apple/UITests/LargestDownloads239Journey.swift:30: error: -[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent] : XCTAssertGreaterThanOrEqual failed: ("65.33333333333331") is less than ("126.0") - Full native action text must fit at the actual largest text size
+ACTUAL-DOWNLOAD-LABEL Remove download text=(32.0, 622.6666666666666, 321.3333333333333, 63.33333333333337) button=(32.0, 622.6666666666666, 321.3333333333333, 63.33333333333337) bodyFont=53.0 requiredHeight=126.0
+ACTUAL-DOWNLOAD-WORD Remove download requiredWidth=220.6953125 available=321.3333333333333
+/tmp/native239-sim-qa/apple/UITests/LargestDownloads239Journey.swift:30: error: -[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent] : XCTAssertGreaterThanOrEqual failed: ("65.33333333333337") is less than ("126.0") - Full native action text must fit at the actual largest text size
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' failed (36.945 seconds).
+** TEST FAILED **

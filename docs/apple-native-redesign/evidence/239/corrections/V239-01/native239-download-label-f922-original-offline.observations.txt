@@ -1,0 +1,5 @@
+Test Case '-[NativeJourneyTests.OfflineJourney testDownloadedBookPlaysAcrossFilesOfflineAfterRelaunchAndSynchronizesOnReconnect]' started.
+Test Case '-[NativeJourneyTests.OfflineJourney testDownloadedBookPlaysAcrossFilesOfflineAfterRelaunchAndSynchronizesOnReconnect]' passed (46.396 seconds).
+Test Case '-[NativeJourneyTests.OfflineJourney testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload]' started.
+Test Case '-[NativeJourneyTests.OfflineJourney testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload]' passed (26.701 seconds).
+** TEST SUCCEEDED **

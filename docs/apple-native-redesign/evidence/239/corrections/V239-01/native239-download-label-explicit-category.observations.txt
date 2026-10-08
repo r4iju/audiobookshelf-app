@@ -1,0 +1,15 @@
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' started.
+ACTUAL-DOWNLOAD-LABEL Retry download text=(32.0, 409.99999999999994, 338.0, 125.33333333333331) button=(32.0, 409.99999999999994, 338.0, 125.33333333333331) bodyFont=53.0 requiredHeight=126.0
+ACTUAL-DOWNLOAD-WORD Retry download requiredWidth=220.6953125 available=338.0
+ACTUAL-DOWNLOAD-LABEL Remove download text=(32.0, 622.6666666666666, 338.0, 125.33333333333337) button=(32.0, 622.6666666666666, 338.0, 125.33333333333337) bodyFont=53.0 requiredHeight=126.0
+ACTUAL-DOWNLOAD-WORD Remove download requiredWidth=220.6953125 available=338.0
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' passed (36.692 seconds).
+Test Case '-[NativeJourneyTests.OSAccessibility239Journey testEnableCombinedModes]' started.
+ACTUAL-OS-INITIAL REDUCE_TRANSPARENCY=Optional(0)
+ACTUAL-OS-VERIFIED REDUCE_TRANSPARENCY=Optional(1)
+ACTUAL-OS-INITIAL TEXT_COLORS_DARKEN=Optional(0)
+ACTUAL-OS-VERIFIED TEXT_COLORS_DARKEN=Optional(1)
+ACTUAL-OS-INITIAL REDUCE_MOTION=Optional(0)
+ACTUAL-OS-VERIFIED REDUCE_MOTION=Optional(1)
+Test Case '-[NativeJourneyTests.OSAccessibility239Journey testEnableCombinedModes]' passed (18.842 seconds).
+** TEST SUCCEEDED **

@@ -68,6 +68,18 @@ class Evidence:
         if info.get('CFBundleIdentifier') != identity or info.get('MinimumOSVersion') != minimum or not re.search(r'\bminos\s+' + re.escape(minimum) + r'(?:\s|$)', build):
             raise RuntimeError('Stable identity or actual deployment minimum mismatch')
 
+    def simulator_signing(self, products):
+        # Simulator execution needs its ordinary code-sign identity for Keychain.
+        # Inspect original Xcode-generated app/runner seals and entitlements;
+        # never repair a bundle by re-signing it after the build.
+        bundles = sorted(products.glob('*.app'))
+        if len(bundles) < 2:
+            raise RuntimeError('Expected signed app and XCTest runner products')
+        for bundle in bundles:
+            name = 'signing-' + bundle.stem
+            self.run(name + '-strict', ['codesign', '--verify', '--deep', '--strict', str(bundle)])
+            self.run(name + '-entitlements', ['codesign', '--display', '--entitlements', ':-', str(bundle)])
+
     def results(self, result):
         if not result.is_dir():
             raise RuntimeError('Original xcresult missing; acceptance remains pending')

@@ -1,0 +1,29 @@
+# V239-01 bounded correction
+
+Runtime source `f9224289337a399d3d5c072b8eaf4b27bb0a533b`; later34f34de1 native empty-row reveal and final explicit-X3/RUN-ID changes are test-only. Original f635 manifests/results remain unchanged and are not relabelled current. No screenshots/video/render-only production.
+
+The fresh independent review confirmed the existing source9093 original `evidence/236/screens/phone-downloads-partial-tools-largest.png`: Retry downlo… / Remove dow… at402×874/X3. Exact reproduction needs failed ebook with completed audio plus native Play-offline NavigationLink; failed-audio-only diagnostics wrap already and passed, so were not called red. One initial partial fixture registration omission failed setup and is not product acceptance.
+
+New meaningful XCTest tracer was written before UI changes. Valid pre-fix partial-red-2 observes native Retry326.33×63.33 and Remove321.33×63.33. Native UIFont.body at X3 is53pt and requires126pt for the complete two-line strings; both geometry assertions actually fail. No modifier/source-constant assertions, backfilled green test or AX full-label-only claim.
+
+Correction uses existing independent native Button/NavigationLink labels with unlimited text lines, vertical intrinsic growth, leading native alignment, available width and44pt minimum action target. Cancel/Retry/Play/Remove callbacks, IDs, destructive color, localization inputs and domain/media/download data are unchanged. Needed older fallbacks remain. Verification-only download-partial-ebook mode preserves finished audio and returns synthetic503 for the PDF, matching the confirmed row; actual backend unchanged.
+
+After correction, actualX3 Retry and Remove338×125.33pt match126pt font line measurement within2pt rounding, complete words fit220.70pt widths, and native action frames exceed44pt. Independent Retry→ready→Play-offline→Remove→empty/no saved row/noRetry passes38.001s. First post-fix run has correct geometry but native empty title outside the retained lazy List position; bounded downward native reveal then identical assertions pass. Explicit app X3 launch argument additionally replays36.692s while underlyingOS is original large, ensuring the permanent test requests its measured category. Both actualOSX3 and explicit-category runs are recorded.
+
+Unchanged original OfflineJourney two cases pass on same f922 runtime: multi-file offline/relaunch/reconnect/sync46.396s, and HTTP200 error rejection/Retry26.701s. Fresh isolated modern simulator build passes; all77 production sources typecheck against original14 target with SDK27 diagnostic, exit0. This is not actual14 execution. Parent owns final hosted original-minimum builds/TV17 and independent acceptance.
+
+## Bounded strict combined native contrast diagnosis
+
+Actual owned native Settings enables ReduceTransparency/IncreaseContrast/ReduceMotion1, each assertion recorded. Whole-app native contrast audit preserves every issue and returnsfalse for all exclusions. No style change or pixel capture.
+
+First generic-scroll probe positions narrator hittable but overshoots progress; retained as diagnostic, not correction proof. Corrected native drag derives movement from actual target/navigation/tab frames. Narrator is fully visible/hittable at43.83,711.33,314.33×52.67 (navigation bottom116/window874). Whole-app audit flags different Resume listening at32,861,338×221.33,hittablefalse; narrator is not reported. Progress is fully visible/hittable at32,525.67,281.33×102.33; whole-app audit flags different Audiobookshelf QA at47.67,758.67,222×187.33,hittabletrue but extends below874; progress is not reported. Positioned case remains RED2,26.479s. These observations narrow the clipping/audit hypothesis but do not establish global contrast acceptance or harmlessness. Original two strict reds remain; no issues were suppressed, no globalgreen claim.
+
+Fresh product/resource verification, final cleanup and parent-controlled older results are recorded separately. Spoken traversal/stock14.5 execution/full strict audit acceptance remain pending as documented in the parent239 RESULT.
+
+## Older execution harness and cleanup
+
+Parent actual sourcef31 TV17 now verifies the corrected CA and reaches app sign-in, but original unsigned replay reports Keychain -34018; two Catalog assertions fail then1200s harness timeout, not acceptedTV17 execution. Both older execution replays now enable normal ad-hoc simulator signing (`CODE_SIGNING_ALLOWED=YES`, `CODE_SIGN_IDENTITY=-`) while keeping original project/team/entitlement contracts. Build-only minimum proof remains distinct. Diagnostics strictly verify original Xcode-produced app/runner seals and display actual entitlements; no post-build re-sign, guessed entitlement/group requirement or production Keychain fallback/security change. Local diagnostic method verifies the existing fresh modern app and XCTest runner, all four commands exit0; actual older sign-in/relaunch remains parent-controlled proof. Normal modern simulator entitlement output may be an empty dictionary and is not invented as physical provisioning.
+
+Fresh isolated f922 product and immutable installed-before/after-checks snapshots each pass strict/deep signatures and all47 resource hashes, zero difference. Native OS restoration passes: RT/contrast/motion0; original contentlarge/OSlight verified. Owned reacquired Phone lease released and fixture ports closed; no other leases/owner preview/hardware touched. Parent's separate stable signed f922 private candidates remain preparation, not accepted installation.
+
+No more audit/capture exploration: original strict combined red remains pending. Global audits above are retained RED, no exclusion or globalgreen. Explicit X3 test control and native lazy empty-row reveal are test-only descendants of the measured f922 runtime. RUN-ID marks the final-source older CI trigger; parent alone controls pushes/CI and fresh reviews.
