@@ -1,0 +1,14 @@
+[
+  {
+    "query": "audio",
+    "exit": 1,
+    "result_keys": [],
+    "error_code": 1001
+  },
+  {
+    "query": "voiceover",
+    "exit": 1,
+    "result_keys": [],
+    "error_code": 21062
+  }
+]

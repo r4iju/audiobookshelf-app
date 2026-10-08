@@ -12,6 +12,8 @@ Required239 gates remain incomplete: original strict combined contrast RED2 with
 
 [Final exact signed candidates](../240/b64/RESULT.md) are prepared and independently verified, NOT ACCEPTED/NOT INSTALLED/NOT RELEASED. Source14 versus localSDK27 phone15 override remains explicit; TV minimum17. Ticket240 still depends on239 before merge, matching owner installation and merged-source QA. Public Apple distribution separately has no written permission. Parent230/historical222 remain unchanged; PR241 remains draft. No new user confirmation or screenshot gate applies.
 
+[Final bounded speech followthrough](spoken-process-route/b64-followthrough/RESULT.md) establishes actual continued1200-second-fixture playback, but the nonsilent clip speaks only the system VoiceOver gestures alert. The supported text-only alert route times out; playing-control speech remains unverified. Retained bundles independently verify, and read-only physical TV query failures retain their exact limited scope. The phone lease-release shutdown side effect is explicitly corrected. No new capture or approval gate applies.
+
 ## Historical original scopes
 
 Initial acceptance runtime is frozen at `f635a42ae8c9617409838008dfeec5645b4312b1`, with exact original scopes retained below. The bounded V239-01 follow-up runtime is `f9224289337a399d3d5c072b8eaf4b27bb0a533b`; see [correction evidence](corrections/V239-01/RESULT.md). Other intervening commits are test/CI-only. No owner release installation, public upload, merge or independent-review self-approval occurred.
