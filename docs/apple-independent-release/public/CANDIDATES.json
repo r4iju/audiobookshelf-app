@@ -1,0 +1,26 @@
+[
+  {
+    "platform": "ios",
+    "source": "1b5c10b26ab86470d25be3e0fe5b50647bc1dd31",
+    "build": "3",
+    "bundle": "com.forkzed.leafwake",
+    "minimumOS": "15.0",
+    "ipa_sha256": "74379756b9f4e97bf8a0532d2ddf74624c0c8188f83ca74f9e63c11e61a227cf",
+    "ipa_bytes": 5373116,
+    "strict_archive_payload_verification": true,
+    "privacy_manifest_bundled": true,
+    "app_store_eligible_export": true
+  },
+  {
+    "platform": "tv",
+    "source": "1b5c10b26ab86470d25be3e0fe5b50647bc1dd31",
+    "build": "3",
+    "bundle": "com.forkzed.leafwake",
+    "minimumOS": "17.0",
+    "ipa_sha256": "21ad02ce5d01f69b2fb446121ab00ede88938fba1a97bb4462eb91f1feb3466a",
+    "ipa_bytes": 8913802,
+    "strict_archive_payload_verification": true,
+    "privacy_manifest_bundled": true,
+    "app_store_eligible_export": true
+  }
+]
