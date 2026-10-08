@@ -5,15 +5,17 @@ from pathlib import Path
 import re
 from ci_support import Evidence
 
-os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_15.0.1.app/Contents/Developer'
+os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_15.4.app/Contents/Developer'
 os.environ['PATH'] = str(Path(__file__).resolve().parent) + ':' + os.environ['PATH']
 e = Evidence('tv17-replay')
-e.source()
+e.source(expected_xcode="15.4", expected_swift="5.10")
 import importlib.util
 spec = importlib.util.spec_from_file_location("capture_suppression", Path(__file__).with_name("suppress-captures.py"))
 module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
 module.suppress(Path.cwd(), e.root)
-e.run('sdk', ['xcrun', '--sdk', 'appletvsimulator', '--show-sdk-version'])
+_, sdk = e.run('sdk', ['xcrun', '--sdk', 'appletvsimulator', '--show-sdk-version'])
+if sdk.strip() != '17.5':
+    raise RuntimeError('Expected actual selected SDK17.5, no substituted SDK')
 e.run('xcodegen', ['xcodegen', '--version'])
 e.run('openssl', ['openssl', 'version'])
 _, raw = e.run('runtimes-before', ['xcrun', 'simctl', 'list', 'runtimes', '-j'])

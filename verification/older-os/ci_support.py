@@ -15,10 +15,11 @@ class Evidence:
         self.root.mkdir(parents=True, exist_ok=True)
         self.commands = []
 
-    def run(self, label, command, seconds=120, required=True):
+    def run(self, label, command, seconds=120, required=True, separate_stderr=False):
         path = self.root / (label + '.log')
-        with path.open('w') as stream:
-            process = subprocess.Popen(command, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+        stderr_path = self.root / (label + '.stderr.log')
+        with path.open('w') as stream, stderr_path.open('w') as errors:
+            process = subprocess.Popen(command, stdout=stream, stderr=errors if separate_stderr else subprocess.STDOUT, start_new_session=True)
             try:
                 code = process.wait(timeout=seconds)
             except subprocess.TimeoutExpired:
@@ -29,14 +30,14 @@ class Evidence:
                     os.killpg(process.pid, signal.SIGKILL)
                     process.wait()
                 code = 124
-        self.commands.append({'label': label, 'command': command, 'exit': code})
+        self.commands.append({'label': label, 'command': command, 'exit': code, 'stderrSeparate': separate_stderr})
         (self.root / 'commands.json').write_text(json.dumps(self.commands, indent=2))
         print(label, code, flush=True)
         if required and code:
             raise RuntimeError(f'{label} failed ({code}); original log preserved')
         return code, path.read_text()
 
-    def source(self):
+    def source(self, expected_xcode=None, expected_swift=None):
         _, sha = self.run('source', ['git', 'rev-parse', 'HEAD'])
         if sha.strip() != os.environ.get('GITHUB_SHA'):
             raise RuntimeError('Checkout must match exact triggering GITHUB_SHA')
@@ -47,7 +48,13 @@ class Evidence:
         _, arch = self.run('architecture', ['uname', '-m'])
         if arch.strip() != 'arm64':
             raise RuntimeError('Expected arm64 runner; no Rosetta substitution')
-        self.run('xcode', ['xcodebuild', '-version'])
+        self.run('xcode-inventory', ['find', '/Applications', '-maxdepth', '1', '-name', 'Xcode*.app', '-print'])
+        _, xcode = self.run('xcode', ['xcodebuild', '-version'])
+        _, swift = self.run('swift', ['xcrun', 'swiftc', '--version'])
+        if expected_xcode and not re.search(r'^Xcode ' + re.escape(expected_xcode) + r'\s', xcode):
+            raise RuntimeError('Actual selected Xcode does not match the fixed pin')
+        if expected_swift and not re.search(r'Apple Swift version ' + re.escape(expected_swift) + r'(?:[.\s])', swift):
+            raise RuntimeError('Actual selected Swift compiler does not match the fixed pin')
 
     def app(self, bundle, identity, minimum):
         if not bundle.is_dir():

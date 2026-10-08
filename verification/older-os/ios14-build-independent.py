@@ -5,12 +5,12 @@ import os
 from pathlib import Path
 from ci_support import Evidence
 
-os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_15.0.1.app/Contents/Developer'
+os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_15.4.app/Contents/Developer'
 e = Evidence('ios14-build')
-e.source()
+e.source(expected_xcode="15.4", expected_swift="5.10")
 _, sdk = e.run('sdk', ['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'])
-if sdk.strip() != '17.0':
-    raise RuntimeError('Expected actual selected Xcode15.0.1 SDK17.0, no substituted toolchain')
+if sdk.strip() != '17.5':
+    raise RuntimeError('Expected actual selected Xcode15.4 SDK17.5, no substituted toolchain')
 e.run('xcodegen-version', ['xcodegen', '--version'])
 free = os.statvfs(e.root).f_bavail * os.statvfs(e.root).f_frsize
 (e.root / 'free-bytes.txt').write_text(str(free))
@@ -25,7 +25,7 @@ project = ['xcodebuild', '-project', 'apple/AudiobookshelfNative.xcodeproj',
     '-derivedDataPath', str(e.root / 'build'),
     'CODE_SIGNING_ALLOWED=NO', 'IPHONEOS_DEPLOYMENT_TARGET=14.0']
 # Store only relevant resolved target settings, not an unrelated environment dump.
-_, raw = e.run('settings-raw', project + ['-showBuildSettings', '-json'], seconds=120)
+_, raw = e.run('settings-raw', project + ['-showBuildSettings', '-json'], seconds=120, separate_stderr=True)
 settings = json.loads(raw)
 allowed = ['SDKROOT', 'SDK_VERSION', 'SDK_VERSION_ACTUAL', 'SDK_VERSION_MAJOR',
     'SDK_VERSION_MINOR', 'IPHONEOS_DEPLOYMENT_TARGET', 'PRODUCT_BUNDLE_IDENTIFIER',
