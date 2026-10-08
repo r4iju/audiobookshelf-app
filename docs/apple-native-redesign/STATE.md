@@ -1,11 +1,11 @@
 # Native Apple redesign integration state
 
-Integration branch: `feature/apple-native-redesign`, based on `77c154b1` on `fork/native-tv`. Spec #230 and historical spec #222 remain unchanged. Source, Android, web and backend scope boundaries follow SPEC.md. One shared source writer runs at a time.
+Integration branch: `feature/apple-native-redesign`, based on `77c154b1` on `fork/native-tv`. [Draft integration PR #241](https://github.com/r4iju/audiobookshelf-app/pull/241). Spec #230 and historical spec #222 remain unchanged. Source, Android, web and backend scope boundaries follow SPEC.md. One shared source writer runs at a time.
 
 | Ticket | Integration | Evidence / remaining work |
 | --- | --- | --- |
 | #231 | Source `0894eb04`, evidence `f1116e66`, verified integrated | [Actual phone/tablet slice and checks](evidence/231/RESULT.md). Functional final-source phone 3/3, iPad shell 1/1 and bookmark 1/1. Full design acceptance remains #233. |
-| #232 | Ready after #231 | Bounded TV shell and remote design slice. |
+| #232 | Claimed, in progress after #231 | Bounded TV shell and remote design slice. |
 | #233 | Blocked by #232 | Fresh independent rendered phone/tablet/TV review. Check actual Search placement against Apple's current conventions. |
 | #234–237 | Pending dependency graph | Complete mobile screens and localization. |
 | #238 | Blocked by #233 | Complete TV screens and remote journeys. |
