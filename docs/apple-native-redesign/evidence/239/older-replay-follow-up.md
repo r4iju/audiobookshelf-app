@@ -1,0 +1,13 @@
+# Actual older replay follow-up
+
+Runtime `f9224289` remains unchanged. Source-pinned QA/CI descendant38 uses normal ad-hoc simulator signing; the private stable release artifacts remain separately source-labelled and unaccepted.
+
+Sourcef31, run37795294544: the corrected synthetic CA verifies and stockTV17 boots. Both original-minimum iOS14 architectures build. The unsigned TV app reaches sign-in but Keychain returns34018; two Catalog cases fail and the1200-second harness times out. No TV journey pass is inferred. All owned jobs terminate and repository control restoration verifies; cumulative allocated time5120 seconds.
+
+Source38, run37799475694: both original-minimum iOS14 architectures build with actual minimum14.0/SDK18.2, stable preview identity and no build failures. Stock14.5 signed package installation remains unavailable on the hosted system volume. Normal ad-hoc TV simulator signing now passes strict app and XCTest-runner checks. Sign-in, home, continuing title details and Back/focus restoration pass in `CatalogJourney.testContinueListeningOpensDetailsAndBackRestoresFocus`,47.799 seconds. This is one scoped actualTV17 pass, not acceptance of all seven selected journeys.
+
+The next original Search case fails: the batched native keyboard event requested “Tomorrow 61”, but the actual SearchField value and no-match label both show “Tmorrow 61”. No expected result exists for that incorrectly entered query. XCTest's result builder then traps with133; the remaining five selected journeys are not reported passed. Original logs, result bundle, certificate diagnostics and signatures are preserved under `/tmp/native239-ci-38f647e3/tv17`. The run is fully terminal, Actions globalOFF and all original workflow states/hidden pinfalse are restored, with no control/restoration errors. Cumulative actual allocated runner time6207 seconds, below8700.
+
+The QA-only Search helper now sends each native character and waits for the field to expose the expected prefix, then asserts the entire query. It does not rewrite app state, retry a missing character silently, change server matching or relax original result/request/detail/focus assertions. A missing prefix still fails. The original production Search binding, network behavior, Keychain, identities and callbacks are unchanged. The next source-pinned older replay remains required; this harness correction alone supplies no new functional pass.
+
+Final native combined contrast and actual spoken VoiceOver remain pending separately. No additional screenshot, recording or user-inspection gate is added, and no owner app is installed or data reset.
