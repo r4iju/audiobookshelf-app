@@ -141,6 +141,16 @@ struct ItemDetailView: View {
             .padding(80)
         }
         .task { if detail.item == nil { await detail.load(item.id, catalog: catalog) } }
+        .onAppear {
+            #if DEBUG
+            NSLog("[DEBUG-239-back] detail appear %@", item.id)
+            #endif
+        }
+        .onDisappear {
+            #if DEBUG
+            NSLog("[DEBUG-239-back] detail disappear %@", item.id)
+            #endif
+        }
     }
 
     private func facts(_ item: LibraryItem) -> String {

@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "type": "Button",
+  "rect": {
+    "width": 94,
+    "height": 94,
+    "x": 154,
+    "y": 733.3333333333333
+  },
+  "hittable": true,
+  "depth": 2,
+  "label": "Play",
+  "identifier": "resume-playback",
+  "index": 21,
+  "parentIndex": 4,
+  "ref": "e22"
+}

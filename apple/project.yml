@@ -114,9 +114,11 @@ schemes:
         NativeJourneyTests: [test]
     test:
       targets: [NativeJourneyTests]
+      captureScreenshotsAutomatically: false
   NativeTests:
     build:
       targets:
         NativeTests: [test]
     test:
       targets: [NativeTests]
+      captureScreenshotsAutomatically: false

@@ -1,0 +1,11 @@
+# Full original TV17 replay, six pass and one failure
+
+Exact source5c4c6aafa91589a9ca1fd27accef60cc63a056af, runtime465 (5c4 changed documentation/evidence only). Hosted run37822005861, original seven distinct cases, stocktvOS17.0/21J353, arm64, SDK18.2/Xcode16.2. Six PASS, one FAIL, zero skips/expected failures. Catalog details/Back35.545s and Search52.262s; Playback45.193s; Readiness76.989s; Recovery83.981s; many-library Shell105.634s PASS. Related48.843s FAIL at RelatedJourney74: FIRST Menu from Series, before author selection. Postfailure native hierarchy still Series. Earlier d49 authorBack failure is separate; current cause remains unproved. The persistent outer Library stack now has measured successful selection, not full navigation acceptance.
+
+Actual built minimum17/stableidentifier and original strict app/runner signing checks pass. Root independently verifies source clean/fullSHA, original helper hashes against Git, summary/test list and retained original archive hashes. No claim of independently rehashing unavailable hosted app binaries. Phone jobs were SKIPPED, not accepted; current phone speech/journeys retain separate source scopes.
+
+Controller terminal, finishedtrue/pending[]/restoreerrors[], actual1037/cumulative13498 below14400, within1800window. Root independently reads genuine enabled hiddenpinfalse, globalOFF, scope-variable absence restoration, allfive originalactive, tokenread/noapproval and master default. Original earlier failed budgets/ledgers unchanged.
+
+Explicit capturehelpers suppressed, assertions unchanged. However ORIGINAL failed xcresult contains framework kXCTAttachmentScreenRecording/public.mpeg-4: automatic recording WAS CREATED despite screenshot/video stop. Root did not view or export it; preservation/unexported status does not undo the process violation. No screenshot/video exports. collect-test-diagnostics never remained supported/present; it governs verbose diagnostics, not automatic UI capture. No future UI replay until supported capture-off configuration is reviewed. Parent now applies documented publicscheme capturefalse, validates generated options, and builds effective configuration before any diagnostic retry. No Backoverride or extra Menu.
+
+Private originalartifact/resultzip/logs preserved at /tmp/native239-5c4-tv17. Final acceptance/merge/ownerinstall/publicuploads remain pending.

@@ -1,0 +1,45 @@
+[
+  {
+    "file": "drained-progress.wav",
+    "sha256": "62d670e1c5ee130514a9d95a2fd9240b3317fc9ee3b63cafb7a6fc2d1bfdcc37",
+    "samples": 1532928,
+    "nonzero": 921642,
+    "peak": 0.2854313850402832,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "id=playback-position"
+          ],
+          "exit": 0,
+          "out": "Tapped id=playback-position (201, 670)\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 18.555362939834595
+    }
+  },
+  {
+    "file": "selected-speed-coordinate.wav",
+    "sha256": "fb08107d8b508ba83f53297542c6291bc7f705dc940ec8ab33931a508dfce540",
+    "samples": 1533952,
+    "nonzero": 462020,
+    "peak": 0.2854313850402832,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "201",
+            "302"
+          ],
+          "exit": 0,
+          "out": "Tapped (201, 302)\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.470379114151
+    }
+  }
+]

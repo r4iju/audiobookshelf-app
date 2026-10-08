@@ -75,7 +75,12 @@ xcrun simctl boot "$simulator" 2>/dev/null || true
 xcrun simctl bootstatus "$simulator" > /dev/null
 xcrun simctl keychain "$simulator" add-root-cert "$fixture_dir/ca.pem"
 xcodegen generate --spec "$tvos_root/project.yml" > /dev/null
+python3 "$repo_root/verification/verify-native-capture-policy.py" "$tvos_root/AudiobookshelfTV.xcodeproj" AudiobookshelfTV
+derived_data="${ABS_TV_DERIVED_DATA:-$tvos_root/build}"
 xcodebuild -project "$tvos_root/AudiobookshelfTV.xcodeproj" -scheme AudiobookshelfTV -configuration Debug \
-    -destination "id=$simulator" -derivedDataPath "${ABS_TV_DERIVED_DATA:-$tvos_root/build}" \
+    -destination "id=$simulator" -derivedDataPath "$derived_data" "$@" build-for-testing
+python3 "$repo_root/verification/verify-native-capture-policy.py" "$tvos_root/AudiobookshelfTV.xcodeproj" AudiobookshelfTV "$derived_data"
+xcodebuild -project "$tvos_root/AudiobookshelfTV.xcodeproj" -scheme AudiobookshelfTV -configuration Debug \
+    -destination "id=$simulator" -derivedDataPath "$derived_data" \
     -resultBundlePath "${ABS_TV_RESULT_BUNDLE:-$tvos_root/build/TVJourneys-$(date +%Y%m%d-%H%M%S).xcresult}" \
-    -collect-test-diagnostics never "$@" test
+    -collect-test-diagnostics never "$@" test-without-building

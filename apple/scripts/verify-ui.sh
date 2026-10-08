@@ -85,6 +85,7 @@ for fixture_pid in "${fixture_pids[@]}"; do
 done
 derived_data="${ABS_QA_DERIVED_DATA:-$apple_root/build/ui-$(printf '%s' "$simulator" | tr -c 'A-Za-z0-9-' '_')}"
 xcodegen generate --spec "$apple_root/project.yml"
+python3 "$repo_root/verification/verify-native-capture-policy.py" "$apple_root/AudiobookshelfNative.xcodeproj" AudiobookshelfNative
 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative \
     -destination "$destination" \
     -derivedDataPath "$derived_data" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \

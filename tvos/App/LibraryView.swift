@@ -125,6 +125,11 @@ struct LibraryDestination: View {
             }
             .catalogRoutes()
         }
+        .onChange(of: path) { routes in
+            #if DEBUG
+            NSLog("[DEBUG-239-back] library path %@", routes.map(\.navigationTraceID).joined(separator: "/"))
+            #endif
+        }
         .sheet(isPresented: $choosing, onDismiss: {
             if let pendingSelectionID {
                 path.removeAll()

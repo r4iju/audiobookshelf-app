@@ -186,6 +186,17 @@ enum Route: Hashable {
     case author(RelatedLink)
     case series(RelatedLink)
 
+    #if DEBUG
+    var navigationTraceID: String {
+        switch self {
+        case .item(let item): "item:" + item.id
+        case .episode(let item, let episodeID): "episode:" + item.id + ":" + episodeID
+        case .author(let author): "author:" + author.id
+        case .series(let series): "series:" + series.id
+        }
+    }
+    #endif
+
     /// Search and shelf results for podcasts carry the matched episode; open it directly.
     static func to(_ item: LibraryItem) -> Route {
         if let episode = item.recentEpisode, item.isPodcast { return .episode(item, episodeID: episode.id) }
@@ -213,6 +224,11 @@ struct TVReadableText: View {
                     .focused($focusedPassage, equals: index)
                     .accessibilityIdentifier(index == 0 ? identifier : identifier + ".passage.\(index)")
             }
+        }
+        .onChange(of: focusedPassage) { passage in
+            #if DEBUG
+            NSLog("[DEBUG-239-back] readable %@ focus %@", identifier, passage.map(String.init) ?? "none")
+            #endif
         }
     }
 

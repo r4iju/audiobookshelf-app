@@ -1,0 +1,18 @@
+{
+  "parentIndex": 4,
+  "rect": {
+    "y": 654,
+    "height": 31,
+    "width": 354,
+    "x": 24
+  },
+  "identifier": "playback-position",
+  "type": "Slider",
+  "value": "7.232",
+  "hittable": false,
+  "label": "Chapter progress",
+  "enabled": false,
+  "depth": 2,
+  "index": 15,
+  "ref": "e16"
+}

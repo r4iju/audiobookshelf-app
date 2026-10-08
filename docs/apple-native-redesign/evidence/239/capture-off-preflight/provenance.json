@@ -1,0 +1,17 @@
+{
+  "source_commit": "5c4c6aafa91589a9ca1fd27accef60cc63a056af",
+  "archive_sha256": "ab8abe36ec901bd176e8d0f0818cd1bc30384d0f506f25024f486fb959504313",
+  "only_source_deltas": {
+    "apple/project.yml": {
+      "before_sha256": "9a226152ef8122d02054c02c9f757e2c96d835ddf5ea7aacfd693852edbb2e7a",
+      "after_sha256": "a45fc7249b465db68796a221c24ca41e74a73b3bba5819958bd37f358e339131",
+      "added_flags": 2
+    },
+    "tvos/project.yml": {
+      "before_sha256": "bdd01bb7557851b4dabbb64691c5bfec1a902d4b2ac402732cb907d4269be875",
+      "after_sha256": "8dd876391e3b534adea73bbdcccbfba5bcbb93879946daafecb5ecfdbf429430",
+      "added_flags": 1
+    }
+  },
+  "intent": "Build-for-testing only, no test execution/UI/audio/capture"
+}

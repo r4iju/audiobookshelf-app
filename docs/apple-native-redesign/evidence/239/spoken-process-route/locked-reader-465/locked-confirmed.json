@@ -1,0 +1,18 @@
+{
+  "parentIndex": 32,
+  "rect": {
+    "width": 370,
+    "x": 16,
+    "y": 370.33333333333337,
+    "height": 52
+  },
+  "identifier": "lock-player",
+  "type": "Switch",
+  "value": "1",
+  "hittable": true,
+  "label": "Lock player",
+  "enabled": true,
+  "depth": 8,
+  "index": 33,
+  "ref": "e34"
+}
