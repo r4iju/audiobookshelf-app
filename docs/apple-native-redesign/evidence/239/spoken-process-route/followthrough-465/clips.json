@@ -1,0 +1,89 @@
+[
+  {
+    "file": "settings-playback.wav",
+    "sha256": "4ee7ffad07ca0dc0a3ed98259c847847d55e2eb61594b775fb83af1b311977c6",
+    "samples": 1533952,
+    "nonzero": 337090,
+    "peak": 0.2854313850402832,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "label=\"Playback preferences\""
+          ],
+          "exit": 0,
+          "out": "Tapped label=\"Playback preferences\" (201, 84)\n"
+        },
+        {
+          "action": [
+            "swipe",
+            "up"
+          ],
+          "exit": 1,
+          "out": "Error (INVALID_ARGS): Expected x to be a finite number.\nHint: Check command arguments and run --help for usage examples.\nDiagnostic ID: muztpak6-ae5fb3aa\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 18.57366704940796
+    }
+  },
+  {
+    "file": "player-progress.wav",
+    "sha256": "101838f3e3238e342934a07536b858aaab4bdfe64df44273425b047d9ebdefff",
+    "samples": 1533952,
+    "nonzero": 300670,
+    "peak": 0.2972567677497864,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "id=playback-position"
+          ],
+          "exit": 1,
+          "out": "Error (COMMAND_FAILED): The iOS runner is still finishing a previous command that exceeded its execution watchdog (usually an accessibility capture on a heavy or animating screen).\nHint: Wait a few seconds and retry. If snapshots keep failing on this screen, use screenshot as visual truth and interact by coordinates, or navigate to another screen.\nDiagnostic ID: muztqo43-ca6321ec\nDiagnostics Log: /Users/emanuel/.agent-device/remote-diagnostics/t3-359297c541bf76ade4d8f3b5/requests/2d2ed48bf751cd0a.ndjson\n"
+        },
+        {
+          "action": [
+            "click",
+            "id=playback-elapsed"
+          ],
+          "exit": 1,
+          "out": "Error (COMMAND_FAILED): The iOS runner is still finishing a previous command that exceeded its execution watchdog (usually an accessibility capture on a heavy or animating screen).\nHint: Wait a few seconds and retry. If snapshots keep failing on this screen, use screenshot as visual truth and interact by coordinates, or navigate to another screen.\nDiagnostic ID: muztqvms-87109c57\nDiagnostics Log: /Users/emanuel/.agent-device/remote-diagnostics/t3-359297c541bf76ade4d8f3b5/requests/bc4cd5b115e2e48e.ndjson\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 19.192492961883545
+    }
+  },
+  {
+    "file": "preferences-values.wav",
+    "sha256": "206482691513e59b29ef163ce0c381b93a12eede73a0450e4e1b7db55b86d1ff",
+    "samples": 1532928,
+    "nonzero": 435022,
+    "peak": 0.2842347025871277,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "id=chapter-track-setting"
+          ],
+          "exit": 0,
+          "out": "Tapped id=chapter-track-setting (201, 182)\n"
+        },
+        {
+          "action": [
+            "click",
+            "id=lock-player"
+          ],
+          "exit": 1,
+          "out": "Error (COMMAND_FAILED): Selector did not match: id=lock-player\nHint: Selector text/label values match exactly (quote multi-word values: text=\"Sign in\"). Run snapshot -i to see current elements and refs, or use find <text> for contains matching.\nDiagnostic ID: muztpwpx-3f25efd6\nDiagnostics Log: /Users/emanuel/.agent-device/remote-diagnostics/t3-359297c541bf76ade4d8f3b5/requests/d1140655e47cd8bb.ndjson\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.476664066314697
+    }
+  }
+]

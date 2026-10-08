@@ -63,7 +63,7 @@ Installing the build is not acceptance. These checks need a person using the Sir
 
 1. Sign in with the remote; confirm the HTTPS connection, and confirm that a wrong password or an unreachable address shows the recovery text.
 2. Across-room readability: titles, focus highlight, progress bars and the Now Playing timeline from the sofa; long real titles and missing covers.
-3. Browse Home, each library (sort, filter, scroll a large library to its end), Search and details; Back from every screen returns to the expected focus.
+3. Browse Listen Now, each library through the Library chooser (sort, filter, scroll a large library to its end), Search and details; Back from every screen returns to the expected focus.
 4. Audiobook playback of real codecs (for example m4b/mp3) including a multi-file book: file transitions, rapid skips, chapter list and previous/next chapter, speed changes, natural end.
 5. System controls: the Siri Remote Play/Pause on other tabs, the TV Control Center Now Playing card, and any AirPlay/HomePod route change act on the same session.
 6. Podcast episode chosen with the remote plays real audio; the server shows that episode's progress only.

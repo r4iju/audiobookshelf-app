@@ -4,7 +4,7 @@ Native SwiftUI streaming client for tvOS 17 or later. The TV target shares Apple
 
 ## Current Apple presentation
 
-OS 26 and newer apply native glass to focused controls when hardware supports it. Content cards keep native rectangular focus and clear artwork; native bordered controls preserve remote activation and older-system fallbacks. Settings actions precede long notices so focus can reach them. Original source minima remain iOS14/tvOS17; SDK27 mobile diagnostic builds use an explicit15 override. Current older-runtime, spoken-accessibility and private-release acceptance is recorded separately. See [redesign state and verification](../docs/apple-native-redesign/STATE.md) for the complete branch, private unsigned candidates and physical-device limitations.
+OS 26 and newer apply native glass to focused controls when hardware supports it. Content cards keep native rectangular focus and clear artwork; native bordered controls preserve remote activation and older-system fallbacks. Settings actions precede long notices so focus can reach them. Original source minima remain iOS14/tvOS17; SDK27 mobile diagnostic builds use an explicit15 override. Current older-runtime, spoken-accessibility and private-release acceptance is recorded separately. See [redesign state and verification](../docs/apple-native-redesign/STATE.md) for the complete branch, private signed candidates with acceptance still pending and physical-device limitations.
 
 ## Local installation
 
@@ -25,8 +25,8 @@ Apple's [pairing instructions](https://help.apple.com/xcode/mac/current/en.lproj
 
 ## Included
 
-- **Remote-first navigation.** A top tab bar holds Home, one tab per server library, Search, Now Playing (while a session exists) and Settings. Every screen is operated with the Siri Remote. Rows and controls are focus sections so directional movement is predictable, and Back returns to the tile that opened a screen. The simulator journeys verify this focus behaviour; legibility from across a room still needs the physical check in [QA.md](QA.md).
-- **Home.** The server's personalized shelves, such as Continue Listening and Recently Added, with listening progress on each cover.
+- **Remote-first navigation.** A top tab bar holds Listen Now, Library, Search, Now Playing (while a session exists) and Settings. Library offers a contextual chooser for every server library. Every screen is operated with the Siri Remote. Rows and controls are focus sections so directional movement is predictable, and Back returns to the tile that opened a screen. Source-scoped simulator journeys verify this focus behaviour; current older-system acceptance remains in [redesign state](../docs/apple-native-redesign/STATE.md), and legibility from across a room still needs the physical check in [QA.md](QA.md).
+- **Listen Now.** The server's personalized shelves, such as Continue Listening and Recently Added, with listening progress on each cover.
 - **Libraries.** Server-side sorting (title, author, recently added) and filtering (progress, genre, narrator, author) with automatic pagination as focus approaches the end of the loaded titles. Loading, empty and failure states each offer a recovery action.
 - **Search.** Server search across every library for titles, authors, series, narrators and podcast episodes, including titles that have not been loaded yet. Matching authors and series appear in a row above the titles.
 - **Authors and series.** An author page shows the server's image, bio, title count, series and every title (paged as focus moves down). A series page shows its description, how many books are finished, and its books in the server's sequence order with each book's place (Book 1, Book 2.5, …). Book details link to their series and authors.
@@ -46,7 +46,7 @@ Connections go directly to the server. HTTPS uses system trust only, so a server
 
 ### TV playback policy
 
-- Switching tabs, opening details or returning to Home keeps the current session.
+- Switching tabs, opening details or returning to Listen Now keeps the current session.
 - Pressing the TV/Home button sends the app to the background, which pauses and saves. Control Center or the screen saver (the inactive phase) keeps listening.
 - Failures say what helps: a progress failure offers "Save progress again"; a media failure offers "Restart playback", which reopens the same book or episode from its saved position and stays on Now Playing while it prepares.
 - Stop closes the server session after sending outstanding listening. Signing out stops playback first and is cancelled if listening cannot be saved.

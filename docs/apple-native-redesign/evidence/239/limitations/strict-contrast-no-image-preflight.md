@@ -1,0 +1,9 @@
+# Strict audit no-image preflight, execution stopped
+
+No device/lease/fixture/build/test/audit was started. No shared writes or images.
+
+The exact retained original contrast audit detail at /tmp/native239-contrast-detail.json reports hasMediaAttachments=true, and each Contrast failed issue has an App Screenshot_0_*.png and Element Screenshot_1_*.png attachment. These are framework-generated failure evidence, separate from the explicit NativeJourney.capture helper. The original command used -collect-test-diagnostics never; it does not suppress them.
+
+Installed public XCUIAutomation XCUIApplication.h143–149 offers audit types and an issueHandler. HandlerYES prevents issue recording, which would violate the required no-dismissal/all-issues contract. Handlerfalse preserves native failure, including original framework issue behavior. XCUIAccessibilityAuditIssue public fields offer no disable-image flag. xcodebuild help only exposes collect-test-diagnostics (verbose diagnostics such as sysdiagnose), resultBundle options and performance diagnostics, no audit screenshot-disable control. Explicit helper suppression therefore cannot guarantee no new image creation. Removing attachment after framework generation would not stop capture and is not a compliant substitute. Private interception or returningYES/recreating assertions would alter the authoritative seam and was not attempted.
+
+Given root instruction to stop if unavoidable image-artifact route cannot comply, proposed positioned strict audit was NOT executed. Its outcomes remain unknown; original strict/positioned red remains pending. Existing text-only diagnosis and finite next seam remain /tmp/native239-contrast-readonly-diagnosis.md. A strict native audit can be reconsidered only under a policy that explicitly allows unavoidable framework-owned failure attachments; no user question/permission request or waiver is made here.
