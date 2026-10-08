@@ -1,0 +1,26 @@
+{
+  "source": "0894eb047a5319294dcc5e1d41f976f7eb1f4bf5",
+  "runtime": "iOS 27.0 (24A434)",
+  "sdk": "27.0",
+  "signature": "ad hoc",
+  "sourceMinimum": "iOS14.0",
+  "buildOverride": "IPHONEOS_DEPLOYMENT_TARGET=15.0",
+  "devices": [
+    {
+      "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+      "version": "1.0.0",
+      "build": "1",
+      "binaryMinimum": "15.0",
+      "executableSHA256": "bcf68f5f0126d4f78770907e1dbd5ea0a90d772bf31e32b6b4256b184c5ddaef",
+      "debugDylibSHA256": "fcb2289785553d9cf6fe4c17fd2e8a3f6909176eb5245172361c31ef22729589"
+    },
+    {
+      "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+      "version": "1.0.0",
+      "build": "1",
+      "binaryMinimum": "15.0",
+      "executableSHA256": "410d546fa7fa55e16a168cfdb4710b7020e4986a342a04bb09ab8f04953d9515",
+      "debugDylibSHA256": "fcb2289785553d9cf6fe4c17fd2e8a3f6909176eb5245172361c31ef22729589"
+    }
+  ]
+}
