@@ -94,7 +94,7 @@ jobs:
         run: |
           brew install xcodegen
           xcodegen --version
-      - name: Independently build original iOS14 minimum with SDK17
+      - name: Independently build original iOS14 minimum with SDK18.2
         run: python3 verification/older-os/ios14-build-independent.py
       - name: Preserve binary minimum and source evidence without runtime claim
         if: always()
