@@ -5,12 +5,12 @@ import os
 from pathlib import Path
 from ci_support import Evidence
 
-os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_15.4.app/Contents/Developer'
+os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_16.2.app/Contents/Developer'
 e = Evidence('ios14-build')
-e.source(expected_xcode="15.4", expected_swift="5.10")
+e.source(expected_xcode="16.2", expected_swift="6.0")
 _, sdk = e.run('sdk', ['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'])
-if sdk.strip() != '17.5':
-    raise RuntimeError('Expected actual selected Xcode15.4 SDK17.5, no substituted toolchain')
+if sdk.strip() != '18.2':
+    raise RuntimeError('Expected actual selected Xcode16.2 SDK18.2, no substituted toolchain')
 e.run('xcodegen-version', ['xcodegen', '--version'])
 free = os.statvfs(e.root).f_bavail * os.statvfs(e.root).f_frsize
 (e.root / 'free-bytes.txt').write_text(str(free))

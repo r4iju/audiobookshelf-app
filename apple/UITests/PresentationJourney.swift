@@ -53,6 +53,20 @@ import XCTest
         await fulfillment(of: [listened], timeout: Double(seconds) + 10)
     }
 
+    private func revealSettingsRow(_ identifier: String, in app: XCUIApplication) {
+        let row = app.buttons[identifier]
+        for _ in 0..<16 {
+            if !row.exists { app.swipeUp(); continue }
+            let frame = row.frame
+            let bottom = app.tabBars.firstMatch.exists ? app.tabBars.firstMatch.frame.minY : app.frame.maxY
+            let top = app.navigationBars.firstMatch.frame.maxY
+            print("SETTINGS-ROW \(identifier) frame=\(frame) visible=\(top)...\(bottom)")
+            if frame.minY < top { app.swipeDown() }
+            else if frame.maxY > bottom { app.swipeUp() }
+            else { return }
+        }
+    }
+
     // MARK: Language
 
     func testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch() async throws {
@@ -61,6 +75,7 @@ import XCTest
         let app = XCUIApplication()
         open("Settings", in: app)
         let language = app.buttons["language-settings"]
+        revealSettingsRow("language-settings", in: app)
         XCTAssertTrue(language.waitForExistence(timeout: 3))
         guard language.exists else { return }
         language.tap()
@@ -71,7 +86,7 @@ import XCTest
         XCTAssertEqual(app.buttons["language-de"].value as? String, "Ausgewählt", "The selection state reads in the chosen language")
         XCTAssertTrue(app.navigationBars["Sprache"].waitForExistence(timeout: 3), "The open screen must switch without relaunch")
         let lastLegacyLanguage = app.buttons["language-zh-cn"]
-        for _ in 0..<4 where !lastLegacyLanguage.exists { app.swipeUp() }
+        for _ in 0..<40 where !lastLegacyLanguage.exists { app.swipeUp() }
         XCTAssertTrue(lastLegacyLanguage.exists, "Every legacy language must remain selectable")
         app.navigationBars.buttons.firstMatch.tap()
 
@@ -80,12 +95,14 @@ import XCTest
         XCTAssertEqual(destination("Einstellungen", in: app).label, "Einstellungen", "Native destinations must follow the chosen language, not the device")
         open("Einstellungen", in: app)
         XCTAssertTrue(app.navigationBars["Einstellungen"].waitForExistence(timeout: 3), "The choice must survive relaunch")
+        revealSettingsRow("appearance-settings", in: app)
         app.buttons["appearance-settings"].tap()
         XCTAssertTrue(app.staticTexts["Haptische Rückmeldung"].exists)
         XCTAssertEqual(app.buttons["theme-light"].label, "Hell", "The theme keeps its legacy meaning")
         XCTAssertEqual(app.buttons["haptic-light"].label, "Leicht", "The haptic strength keeps its legacy meaning")
         capture("Native settings in German")
         app.navigationBars.buttons.firstMatch.tap()
+        revealSettingsRow("language-settings", in: app)
         app.buttons["language-settings"].tap()
         app.buttons["language-system"].tap()
         XCTAssertTrue(app.navigationBars["Language"].waitForExistence(timeout: 3), "System must return to the English device language")
@@ -97,6 +114,7 @@ import XCTest
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: french)
         let app = XCUIApplication()
         open("Paramètres", in: app)
+        revealSettingsRow("language-settings", in: app)
         guard app.buttons["language-settings"].waitForExistence(timeout: 3) else { return XCTFail("Language settings are missing") }
         app.buttons["language-settings"].tap()
         XCTAssertEqual(app.buttons["language-system"].value as? String, "Sélectionné", "The selection state reads in the device language")
@@ -113,6 +131,7 @@ import XCTest
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: Self.english)
         let app = XCUIApplication()
         open("Settings", in: app)
+        revealSettingsRow("language-settings", in: app)
         guard app.buttons["language-settings"].waitForExistence(timeout: 3) else { return XCTFail("Language settings are missing") }
         app.buttons["language-settings"].tap()
         let mark = app.images["language-selected-mark"]
@@ -246,6 +265,7 @@ import XCTest
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: Self.english + ["--observe-haptics"])
         let app = XCUIApplication()
         open("Settings", in: app)
+        revealSettingsRow("appearance-settings", in: app)
         app.buttons["appearance-settings"].tap()
         app.buttons["haptic-medium"].tap()
         expectHaptic("settings", "medium", in: app)
@@ -278,6 +298,7 @@ import XCTest
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: Self.english + ["--observe-haptics"])
         let app = XCUIApplication()
         open("Settings", in: app)
+        revealSettingsRow("appearance-settings", in: app)
         app.buttons["appearance-settings"].tap()
         app.buttons["haptic-heavy"].tap()
         expectHaptic("settings", "heavy", in: app)

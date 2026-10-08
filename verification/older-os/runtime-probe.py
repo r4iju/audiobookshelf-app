@@ -10,10 +10,10 @@ from ci_support import Evidence
 
 root = Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'ios145-capability'
 root.mkdir(parents=True, exist_ok=True)
-os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_15.4.app/Contents/Developer'
+os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_16.2.app/Contents/Developer'
 os.environ['PATH'] = str(Path(__file__).resolve().parent) + ':' + os.environ['PATH']
 e = Evidence('ios145-capability')
-e.source(expected_xcode="15.4", expected_swift="5.10")
+e.source(expected_xcode="16.2", expected_swift="6.0")
 run = e.run
 run('host', ['sw_vers'])
 run('arch', ['uname', '-m'])

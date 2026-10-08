@@ -4,7 +4,7 @@ import UIKit
 
 // The session uses the serial main queue so UIKit completion follows durable file publication.
 // Temporary download files must move before the download callback returns.
-@MainActor private final class DownloadDelegate: NSObject, @preconcurrency URLSessionDownloadDelegate {
+@MainActor private final class DownloadDelegate: NSObject {
     weak var owner: NativeDownloads?
     var stagingDirectory = NativeDownloads.directory
     private var staged: [Int: URL] = [:]
@@ -30,6 +30,12 @@ import UIKit
         completion?()
     }
 }
+
+#if compiler(>=6.0)
+extension DownloadDelegate: @preconcurrency URLSessionDownloadDelegate {}
+#else
+extension DownloadDelegate: URLSessionDownloadDelegate {}
+#endif
 
 final class NativeDownloadAppDelegate: NSObject, UIApplicationDelegate {
     @MainActor static var backgroundCompletion: (() -> Void)?

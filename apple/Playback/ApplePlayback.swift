@@ -944,10 +944,15 @@ import UIKit
         audioObservers.append(center.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] notification in
             let type = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
             let options = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
-            var reason: UInt?
-            if #available(iOS 14.5, tvOS 14.5, *) {
+            let reason: UInt?
+            #if os(iOS)
+            if #available(iOS 14.5, *) {
                 reason = notification.userInfo?[AVAudioSessionInterruptionReasonKey] as? UInt
-            }
+            } else { reason = nil }
+            #else
+            // This notification key is unavailable on tvOS; retain the unknown-reason fallback.
+            reason = nil
+            #endif
             Task { @MainActor in
                 guard let self, let type, let interruption = AVAudioSession.InterruptionType(rawValue: type) else { return }
                 if interruption == .began {

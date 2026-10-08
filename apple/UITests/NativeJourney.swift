@@ -82,6 +82,7 @@ import XCTest
         openPlayerSettings(app)
         for (identifier, on) in switches {
             let toggle = app.switches[identifier]
+            for _ in 0..<8 where !(toggle.exists && toggle.isHittable) { app.swipeUp() }
             XCTAssertTrue(toggle.waitForExistence(timeout: 3), "\(identifier) is missing from Playback settings")
             if (toggle.value as? String == "1") != on { toggle.switches.firstMatch.tap() }
             XCTAssertEqual(toggle.value as? String, on ? "1" : "0", identifier)
