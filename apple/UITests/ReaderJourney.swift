@@ -128,7 +128,7 @@ import XCTest
         let awake = app.switches["Keep screen awake"]
         XCTAssertTrue(awake.waitForExistence(timeout: 3))
         guard awake.exists else { return }
-        awake.tap(); XCTAssertEqual(awake.value as? String, "1")
+        awake.switches.firstMatch.tap(); XCTAssertEqual(awake.value as? String, "1")
         app.navigationBars.buttons["Done"].tap()
         app.buttons["Contents"].tap(); app.buttons["Second chapter"].tap()
         XCTAssertTrue(app.staticTexts["Second passage beneath the stars."].waitForExistence(timeout: 10))
