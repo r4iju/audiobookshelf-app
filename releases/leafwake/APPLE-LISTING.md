@@ -20,7 +20,7 @@ You need a self-hosted server and your own media. No books or subscriptions are 
 
 Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.
 
-Audiobook Loft is open source under GPLv3, with applicable third-party licenses retained.
+The independently implemented Apple clients are open source under a scoped MIT license. Bundled reader libraries retain their own licenses; inherited repository history and Android code retain their existing licenses.
 
 Source code, license notices, corresponding build materials and compatibility information:
 https://github.com/r4iju/audiobookshelf-app/releases
@@ -48,7 +48,7 @@ You need a self-hosted server and your own media. No books or subscriptions are 
 
 Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.
 
-Audiobook Loft is open source under GPLv3, with applicable third-party licenses retained.
+The independently implemented Apple clients are open source under a scoped MIT license. Bundled reader libraries retain their own licenses; inherited repository history and Android code retain their existing licenses.
 
 Source code, license notices, corresponding build materials and compatibility information:
 https://github.com/r4iju/audiobookshelf-app/releases
