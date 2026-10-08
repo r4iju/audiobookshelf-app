@@ -1,0 +1,92 @@
+[
+  {
+    "file": "compact-player.wav",
+    "sha256": "68f03802f5153f471eb49c5ade50708365d8a92f9dd969c8afe3fab7ff6c450a",
+    "raw_bytes": 6131712,
+    "nonzero_samples": 592246,
+    "peak": 0.2843833863735199,
+    "actions": "compact-player-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  },
+  {
+    "file": "destinations.wav",
+    "sha256": "4a0631191d41466fcb3dcb8c535d35f553b6518af1febfc4daf7a986078c2dc8",
+    "raw_bytes": 6131712,
+    "nonzero_samples": 653216,
+    "peak": 0.2850310206413269,
+    "actions": "destinations-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  },
+  {
+    "file": "detail-metadata.wav",
+    "sha256": "848c59921c3ffbeb8011e50b1f1a8a01939c197456a3e72708c921aed8f768d8",
+    "raw_bytes": 6135808,
+    "nonzero_samples": 170480,
+    "peak": 0.28184330463409424,
+    "actions": "detail-metadata-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  },
+  {
+    "file": "detail.wav",
+    "sha256": "f3b0d23d2b9e465644044e5e74e9ef29b27d3800b43a1bc5c72288bce5e73d55",
+    "raw_bytes": 6135808,
+    "nonzero_samples": 729706,
+    "peak": 0.27659890055656433,
+    "actions": "detail-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  },
+  {
+    "file": "form.wav",
+    "sha256": "3a8de4d9aaed7f1cea51531aab8abd4e18177d40d0f3eaaa178da57e8db6c5b6",
+    "raw_bytes": 6135808,
+    "nonzero_samples": 802834,
+    "peak": 0.28092747926712036,
+    "actions": "form-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  },
+  {
+    "file": "player-values.wav",
+    "sha256": "d1f1872e90d7263818efa46ef0cb0877f51c27aa571799b9d8a8346477cccb20",
+    "raw_bytes": 6131712,
+    "nonzero_samples": 0,
+    "peak": 0.0,
+    "actions": "player-values-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  },
+  {
+    "file": "signin.wav",
+    "sha256": "28fffd656fc50d07aa63c1729c940bd8f9b87769de62543c30ab92c63c81f87d",
+    "raw_bytes": 6135808,
+    "nonzero_samples": 523436,
+    "peak": 0.2915349006652832,
+    "actions": "signin-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  },
+  {
+    "file": "speed-panel.wav",
+    "sha256": "63e060f192f463c48105a6c3a348e498332a6464d90b73402138bc0296fc04d9",
+    "raw_bytes": 6139904,
+    "nonzero_samples": 0,
+    "peak": 0.0,
+    "actions": "speed-panel-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  },
+  {
+    "file": "start-player.wav",
+    "sha256": "74874951d8ce2a0749b59cc15b82151f9127da7dfe3b131e2d505a7da653ed02",
+    "raw_bytes": 6144000,
+    "nonzero_samples": 175412,
+    "peak": 0.267087459564209,
+    "actions": "start-player-actions.json",
+    "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+    "current_mobile_runtime_equivalent": "bc1211135df900d4658d5d0b69de483b6044222f"
+  }
+]
