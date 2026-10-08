@@ -63,6 +63,15 @@ struct BookDetails: View {
                 if !regularActions, book.mediaType != "podcast" || episode != nil { detailActions }
             }.listRowBackground(Color.clear)
             Group {
+                if let error {
+                    RecoveryCard(message: error.message) {
+                        switch error {
+                        case .load: load(monitorDownloads: true)
+                        case .discard: discardProgress()
+                        case .unresolvedWrites: askForRestart(thenDiscard: true)
+                        }
+                    }
+                }
                 if episode == nil, book.mediaType == "book" { RelatedBookLinks(item: book, catalog: catalog) }
                 if episode != nil || book.mediaType == "book" {
                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
@@ -117,15 +126,6 @@ struct BookDetails: View {
                                 Spacer()
                                 Text(ShelfTime.describe(chapter.end - chapter.start)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                             }.padding(.vertical, 8)
-                        }
-                    }
-                }
-                if let error {
-                    RecoveryCard(message: error.message) {
-                        switch error {
-                        case .load: load(monitorDownloads: true)
-                        case .discard: discardProgress()
-                        case .unresolvedWrites: askForRestart(thenDiscard: true)
                         }
                     }
                 }

@@ -95,7 +95,7 @@ import XCTest
         try await ResetFixture.configure(fail: nil)
         connectSelectAndRestore(serverURL: Self.fixture, verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap(); accountMenu(app).buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
+        app.buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
         XCTAssertTrue(app.buttons["book-podcast"].waitForExistence(timeout: 10))
         app.buttons["book-podcast"].tap()
         let evening = app.buttons["episode-episode"]
@@ -124,6 +124,7 @@ import XCTest
         try discardAction(in: app).tap()
         confirmation(in: app).buttons["Discard progress"].tap()
         let failure = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Discarding progress has not finished")).firstMatch
+        for _ in 0..<3 where !failure.waitForExistence(timeout: 2) { app.swipeUp() }
         XCTAssertTrue(failure.waitForExistence(timeout: 10), "The failed reset is reported. " + app.debugDescription)
         XCTAssertTrue(listened(in: app).exists, "Progress is kept when the server did not delete it")
         XCTAssertTrue(app.buttons["play-book"].label.contains("Resume listening"))
