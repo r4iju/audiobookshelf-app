@@ -227,7 +227,7 @@ struct TVReadableText: View {
         }
         .onChange(of: focusedPassage) { passage in
             #if DEBUG
-            NSLog("[DEBUG-239-back] readable %@ focus %@", identifier, passage.map(String.init) ?? "none")
+            NSLog("[DEBUG-239-back] readable %@ focus %@", identifier, String(describing: passage))
             #endif
         }
     }
