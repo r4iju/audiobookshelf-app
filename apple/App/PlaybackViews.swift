@@ -125,7 +125,7 @@ struct NowListening: View {
         VStack(spacing: 20) {
             ZStack {
                 RoundedRectangle(cornerRadius: 32).fill(ShelfStyle.accent.opacity(0.12))
-                if let artwork { Image(uiImage: artwork).resizable().scaledToFill() }
+                if let artwork { Image(uiImage: artwork).resizable().scaledToFit() }
                 else { Image(systemName: "books.vertical.fill").font(.system(size: 90)).foregroundColor(ShelfStyle.accent) }
             }.frame(width: width, height: width).clipped().cornerRadius(24).accessibilityHidden(true)
             VStack(spacing: 10) {
@@ -149,6 +149,7 @@ struct NowListening: View {
             let display = PlayerDisplay(player: player, at: scrubbing ? position : player.currentTime, totalTrack: totalTrack, scaleElapsed: scaleElapsed)
             VStack(spacing: 10) {
                 if let total = display.total {
+                    Text(l10n(player.episodeID == nil ? "Book progress" : "Episode progress")).font(.caption).foregroundColor(ShelfStyle.secondaryText).frame(maxWidth: .infinity, alignment: .leading)
                     ProgressView(value: total.fraction).accentColor(ShelfStyle.accent.opacity(0.6)).accessibilityHidden(true)
                     HStack {
                         Text(ShelfTime.describe(total.elapsed)).accessibilityIdentifier("total-elapsed")
@@ -156,11 +157,12 @@ struct NowListening: View {
                         Text("−" + ShelfTime.describe(total.remaining)).accessibilityIdentifier("total-remaining")
                     }.font(.caption2.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
                 }
+                Text(l10n(player.mediaChapterWindow == nil ? (player.episodeID == nil ? "Book progress" : "Episode progress") : "Chapter progress")).font(.caption).foregroundColor(ShelfStyle.secondaryText).frame(maxWidth: .infinity, alignment: .leading)
                 Slider(value: Binding(get: { min(max(scrubbing ? position : player.currentTime, display.range.lowerBound), display.range.upperBound) }, set: { position = $0 }), in: display.range, onEditingChanged: { editing in
                     if editing && !scrubbing { NativeHaptic.impact("scrub") }
                     scrubbing = editing
                     if !editing { Task { do { try await player.seek(to: position, autoplay: player.wantsPlayback) } catch { player.error = ConnectionStore.recovery(for: error) } } }
-                }).accentColor(ShelfStyle.accent).disabled(locked).accessibilityIdentifier("playback-position")
+                }).accentColor(ShelfStyle.accent).disabled(locked).accessibilityIdentifier("playback-position").accessibilityLabel(l10n(player.mediaChapterWindow == nil ? (player.episodeID == nil ? "Book progress" : "Episode progress") : "Chapter progress"))
                 HStack {
                     Text(ShelfTime.describe(display.elapsed)).accessibilityIdentifier("playback-elapsed")
                     Spacer()
@@ -180,12 +182,16 @@ struct NowListening: View {
             if let remaining = player.sleepRemaining { Text(l10n("Sleep in {0}", ShelfTime.describe(remaining))).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
             if player.sleepChapterEnd != nil { Text(l10n("Sleep at chapter end")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
             Button { panel = .settings } label: { Label(l10n("Playback settings"), systemImage: "slider.horizontal.3") }.font(.footnote).buttonStyle(PlainButtonStyle())
-            if let error = player.error { Text(error).font(.callout).foregroundColor(.red).accessibilityIdentifier("playback-error") }
-            if player.needsSignIn {
-                Button(l10n("Sign in again")) {
-                    presentation.wrappedValue.dismiss()
-                    connection.reauthenticate()
-                }.font(.callout.bold()).accessibilityIdentifier("sign-in-again")
+            if player.error != nil || player.needsSignIn {
+                VStack(alignment: .leading, spacing: 12) {
+                    if let error = player.error { Label { Text(error).accessibilityIdentifier("playback-error") } icon: { Image(systemName: "exclamationmark.triangle") }.font(.callout).foregroundColor(.red) }
+                    if player.needsSignIn {
+                        Button(l10n("Sign in again")) {
+                            presentation.wrappedValue.dismiss()
+                            connection.reauthenticate()
+                        }.font(.callout.bold()).accessibilityIdentifier("sign-in-again")
+                    }
+                }.frame(maxWidth: .infinity, alignment: .leading)
             }
             Button(l10n("Close playback")) {
                 Task {
@@ -248,7 +254,7 @@ struct NowListening: View {
     }
 }
 
-/// Player track and time presentation from the earlier app's player menu. Display only: system media controls are unaffected.
+/// Book and chapter time presentation. Display preferences do not change system media seeking.
 struct PlayerDisplay {
     static let totalTrackKey = "previewTotalTrack"
     static let scaleElapsedKey = "previewScaleElapsedBySpeed"
@@ -310,22 +316,35 @@ struct ListeningControls: View {
             ShelfForm {
                 switch panel {
                 case .chapters:
-                    ForEach(player.session?.chapters ?? []) { chapter in
-                        Button {
-                            NativeHaptic.impact("chapter")
-                            Task { await player.skip(chapter.start - player.currentTime) }
-                            panel = nil
-                        } label: {
-                            HStack { Text(chapter.title); Spacer(); Text(ShelfTime.describe(chapter.start)).foregroundColor(ShelfStyle.secondaryText) }
-                        }.accessibilityIdentifier("chapter-\(chapter.id)")
+                    Section(header: Text(l10n("Chapters")), footer: Text(player.title)) {
+                        ForEach(player.session?.chapters ?? []) { chapter in
+                            Button {
+                                NativeHaptic.impact("chapter")
+                                Task { await player.skip(chapter.start - player.currentTime) }
+                                panel = nil
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Text(chapter.title).foregroundColor(.primary)
+                                    Spacer()
+                                    Text(ShelfTime.describe(chapter.start)).font(.caption.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
+                                    if player.currentChapter?.id == chapter.id { Image(systemName: "speaker.wave.2.fill").foregroundColor(ShelfStyle.accent).accessibilityLabel(l10n("Current chapter")) }
+                                }
+                            }.accessibilityIdentifier("chapter-\(chapter.id)")
+                        }
                     }
                 case .speed:
-                    ForEach([0.5, 1, 1.2, 1.5, 1.7, 2, 3], id: \.self) { rate in
-                        Button(String(format: "%g×", rate)) { player.speed = Float(rate); player.changeSpeed(); panel = nil }
+                    Section(header: Text(l10n("Playback speed"))) {
+                        ForEach([0.5, 1, 1.2, 1.5, 1.7, 2, 3], id: \.self) { rate in
+                            Button { player.speed = Float(rate); player.changeSpeed(); panel = nil } label: {
+                                HStack { Text(String(format: "%g×", rate)); Spacer(); if player.speed == Float(rate) { Image(systemName: "checkmark").accessibilityLabel(l10n("Selected")) } }
+                            }
                             .accessibilityIdentifier(String(format: "speed-%g", rate))
+                        }
                     }
-                    Stepper(value: Binding(get: { Double(player.speed) }, set: { player.speed = Float($0); player.changeSpeed() }), in: 0.5...10, step: 0.1) {
-                        Text(l10n("Custom speed: {0}×", String(format: "%.1f", player.speed)))
+                    Section(header: Text(l10n("Custom speed"))) {
+                        Stepper(value: Binding(get: { Double(player.speed) }, set: { player.speed = Float($0); player.changeSpeed() }), in: 0.5...10, step: 0.1) {
+                            Text(l10n("Custom speed: {0}×", String(format: "%.1f", player.speed)))
+                        }
                     }
                 case .bookmarks:
                     Section(header: Text(l10n(editing == nil ? "Add a bookmark here" : "Edit bookmark")).foregroundColor(ShelfStyle.secondaryText)) {
@@ -339,20 +358,25 @@ struct ListeningControls: View {
                         }.disabled(bookmarkTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || player.bookmarkBusy)
                     }
                     if let error = player.bookmarkError {
-                        Text(error).foregroundColor(.red)
-                        Button(l10n("Retry bookmarks")) { Task { await player.loadBookmarks() } }
+                        Section {
+                            Label { Text(error) } icon: { Image(systemName: "exclamationmark.triangle") }.foregroundColor(.red)
+                            Button(l10n("Retry bookmarks")) { Task { await player.loadBookmarks() } }
+                        }
                     }
-                    if player.bookmarks.isEmpty { Text(l10n("No bookmarks yet")).foregroundColor(ShelfStyle.secondaryText) }
-                    ForEach(player.bookmarks) { bookmark in
-                        VStack(alignment: .leading, spacing: 12) {
-                            Button(bookmark.title) { NativeHaptic.impact("bookmark"); Task { await player.skip(bookmark.time - player.currentTime) }; panel = nil }
-                            Text(ShelfTime.describe(bookmark.time)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
-                            HStack {
-                                Button(l10n("Edit")) { editing = bookmark; bookmarkTitle = bookmark.title }.accessibilityLabel(l10n("Edit {0}", bookmark.title))
-                                Spacer()
-                                Button(l10n("Delete")) { NativeHaptic.impact("bookmark"); Task { await player.deleteBookmark(bookmark) } }.foregroundColor(.red).accessibilityLabel(l10n("Delete {0}", bookmark.title))
-                            }.font(.caption)
-                        }.buttonStyle(BorderlessButtonStyle()).disabled(player.bookmarkBusy)
+                    Section(header: Text(l10n("Bookmarks"))) {
+                        if player.bookmarkBusy { ProgressView().frame(maxWidth: .infinity).accessibilityLabel(l10n("Bookmarks")) }
+                        if player.bookmarks.isEmpty { Text(l10n("No bookmarks yet")).foregroundColor(ShelfStyle.secondaryText) }
+                        ForEach(player.bookmarks) { bookmark in
+                            VStack(alignment: .leading, spacing: 12) {
+                                Button(bookmark.title) { NativeHaptic.impact("bookmark"); Task { await player.skip(bookmark.time - player.currentTime) }; panel = nil }
+                                Text(ShelfTime.describe(bookmark.time)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                                HStack {
+                                    Button(l10n("Edit")) { editing = bookmark; bookmarkTitle = bookmark.title }.accessibilityLabel(l10n("Edit {0}", bookmark.title))
+                                    Spacer()
+                                    Button(l10n("Delete")) { NativeHaptic.impact("bookmark"); Task { await player.deleteBookmark(bookmark) } }.foregroundColor(.red).accessibilityLabel(l10n("Delete {0}", bookmark.title))
+                                }.font(.caption)
+                            }.buttonStyle(BorderlessButtonStyle()).disabled(player.bookmarkBusy)
+                        }
                     }
                 case .sleep:
                     if player.sleepRemaining != nil || player.sleepChapterEnd != nil {
@@ -366,34 +390,46 @@ struct ListeningControls: View {
                             Button(l10n("Cancel timer")) { NativeHaptic.impact("sleep-timer"); player.cancelSleepTimer(); panel = nil }
                         }
                     }
-                    Toggle(l10n("Fade audio in the last minute"), isOn: $player.fadeSleepTimer)
-                    if player.sleepRemaining != nil { Text(l10n("Audio volume: {0}%", Int(player.audioVolume * 100))).accessibilityIdentifier("fade-volume") }
+                    Section(header: Text(l10n("Audio"))) {
+                        Toggle(l10n("Fade audio in the last minute"), isOn: $player.fadeSleepTimer)
+                        if player.sleepRemaining != nil { Text(l10n("Audio volume: {0}%", Int(player.audioVolume * 100))).accessibilityIdentifier("fade-volume") }
+                    }
                     Section(header: Text(l10n("Sleep after listening")).foregroundColor(ShelfStyle.secondaryText)) {
                         ForEach([5, 10, 15, 30, 45, 60], id: \.self) { minutes in
                             Button(l10n("{0} minutes", minutes)) { NativeHaptic.impact("sleep-timer"); player.setSleepTimer(seconds: Double(minutes * 60)); panel = nil }
                         }
+                    }
+                    Section(header: Text(l10n("Custom duration in seconds"))) {
                         TextField(l10n("Custom duration in seconds"), text: $seconds).keyboardType(.numberPad).accessibilityIdentifier("timer-seconds")
                         Button(l10n("Start timer")) { if let duration = Double(seconds) { NativeHaptic.impact("sleep-timer"); player.setSleepTimer(seconds: duration); panel = nil } }
-                            .disabled((Double(seconds) ?? 0) <= 0)
+                        .disabled((Double(seconds) ?? 0) <= 0)
+                    }
+                    Section {
                         Button(l10n("End of chapter")) { NativeHaptic.impact("sleep-timer"); player.setChapterSleepTimer(); panel = nil }.disabled(player.currentChapter == nil)
                     }
                 case .settings:
-                    // As in the earlier app, turning one track off turns the other on, so a track always stays visible.
-                    Toggle(l10n("Chapter track"), isOn: Binding(get: { player.chapterTrack }, set: { player.chapterTrack = $0; if !$0 { totalTrack = true } }))
+                    // Turning one track off turns the other on, so progress always stays visible.
+                    Section(header: Text(l10n("Progress display"))) {
+                        Toggle(l10n("Chapter track"), isOn: Binding(get: { player.chapterTrack }, set: { player.chapterTrack = $0; if !$0 { totalTrack = true } }))
                         .accessibilityIdentifier("chapter-track-setting")
-                    Toggle(l10n("Total track"), isOn: Binding(get: { totalTrack }, set: { totalTrack = $0; if !$0 { player.chapterTrack = true } }))
+                        Toggle(l10n("Total track"), isOn: Binding(get: { totalTrack }, set: { totalTrack = $0; if !$0 { player.chapterTrack = true } }))
                         .accessibilityIdentifier("total-track-setting")
-                    Toggle(l10n("Scale elapsed time by speed"), isOn: $scaleElapsed).accessibilityIdentifier("scale-elapsed-setting")
-                    Toggle(l10n("Lock player"), isOn: $locked).accessibilityIdentifier("lock-player")
-                    Toggle(l10n("Rewind after a pause"), isOn: $player.rewindAfterPause)
-                    Toggle(l10n("Allow seeking from system media controls"), isOn: $player.allowMediaSeeking)
-                    Picker(l10n("Forward interval"), selection: $player.forwardInterval) {
-                        ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
-                    }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Forward interval")
-                    Picker(l10n("Backward interval"), selection: $player.backwardInterval) {
-                        ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
-                    }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Backward interval")
-                    Toggle(l10n("Fade audio in the last minute"), isOn: $player.fadeSleepTimer)
+                        Toggle(l10n("Scale elapsed time by speed"), isOn: $scaleElapsed).accessibilityIdentifier("scale-elapsed-setting")
+                    }
+                    Section(header: Text(l10n("Playback controls"))) {
+                        Toggle(l10n("Lock player"), isOn: $locked).accessibilityIdentifier("lock-player")
+                        Toggle(l10n("Rewind after a pause"), isOn: $player.rewindAfterPause)
+                        Toggle(l10n("Allow seeking from system media controls"), isOn: $player.allowMediaSeeking)
+                        Picker(l10n("Forward interval"), selection: $player.forwardInterval) {
+                            ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
+                        }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Forward interval")
+                        Picker(l10n("Backward interval"), selection: $player.backwardInterval) {
+                            ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
+                        }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Backward interval")
+                    }
+                    Section(header: Text(l10n("Sleep timer"))) {
+                        Toggle(l10n("Fade audio in the last minute"), isOn: $player.fadeSleepTimer)
+                    }
                 case nil: EmptyView()
                 }
             }.navigationTitle(l10n(panel?.title ?? "Listening"))

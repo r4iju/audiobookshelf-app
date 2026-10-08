@@ -11,7 +11,6 @@ import XCTest
         guard download.exists else { return }
         download.tap()
         app.navigationBars.buttons["BackButton"].tap()
-        app.buttons["account"].tap()
         app.buttons["Downloads"].tap()
         XCTAssertTrue(app.buttons["offline-book-0"].waitForExistence(timeout: 45))
         try await FixtureControl.configure("offline-library")
@@ -52,7 +51,7 @@ import XCTest
         app.buttons["book-book-0"].tap()
         app.buttons["Download for offline"].tap()
         app.navigationBars.buttons["BackButton"].tap()
-        app.buttons["account"].tap(); app.buttons["Downloads"].tap()
+        app.buttons["Downloads"].tap()
         XCTAssertTrue(app.buttons["offline-book-0"].waitForExistence(timeout: 45))
         let originalDownloads = try await fixtureRequests().filter { $0.path.hasSuffix("/download") }.count
         try await FixtureControl.configure("offline-library")
@@ -82,7 +81,7 @@ import XCTest
         let app = XCUIApplication()
         app.buttons["book-book-0"].tap(); app.buttons["Download for offline"].tap()
         app.navigationBars.buttons["BackButton"].tap()
-        app.buttons["account"].tap(); app.buttons["Downloads"].tap()
+        app.buttons["Downloads"].tap()
         XCTAssertTrue(app.buttons["Retry download"].waitForExistence(timeout: 45), "An HTTP 200 error page must not become playable offline content")
         guard app.buttons["Retry download"].exists else { return }
         XCTAssertFalse(app.buttons["offline-book-0"].exists)
@@ -90,7 +89,7 @@ import XCTest
         app.buttons["Retry download"].tap()
         XCTAssertTrue(app.buttons["offline-book-0"].waitForExistence(timeout: 45))
         app.terminate(); app.launchArguments = []; app.launch()
-        app.buttons["account"].tap(); app.buttons["Downloads"].tap()
+        app.buttons["Downloads"].tap()
         XCTAssertTrue(app.buttons["offline-book-0"].waitForExistence(timeout: 5))
     }
 
