@@ -148,8 +148,8 @@ struct PDFReader: View {
     @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var player: ApplePlayback
     @StateObject private var reading: PDFReading
-    @Environment(\.sizeCategory) private var sizeCategory
     @State private var requestedPage = ""
+    @State private var settings = false
     @ObservedObject private var store: ReadingStore
     @Environment(\.presentationMode) private var presentation
     @Environment(\.nativeStrings) private var l10n
@@ -162,54 +162,89 @@ struct PDFReader: View {
             VStack(spacing: 0) {
                 if reading.document != nil {
                     NativePDFCanvas(reading: reading)
-                    ScrollView {
-                        VStack(spacing: 8) {
-                            HStack {
-                                Button { reading.move(-1) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Previous page")).disabled(reading.page <= 1)
-                                Spacer()
-                                Text(l10n("Page {0} of {1}", reading.page, reading.count)).font(.callout.monospacedDigit())
-                                Spacer()
-                                Button { reading.move(1) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Next page")).disabled(reading.page >= reading.count)
-                            }.buttonStyle(PlainButtonStyle()).padding(.horizontal, 8).padding(.vertical, 4)
-                                .nativeFloatingControl(background: appearance.card).padding(.horizontal)
-                            HStack {
-                                TextField(l10n("Page"), text: $requestedPage).keyboardType(.numberPad)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle()).frame(width: 72)
-                                    .accessibilityIdentifier("reader-page")
+                    if player.session != nil { ReaderAudioControls() }
+                    if let error = reading.error ?? store.error ?? player.error {
+                        Label(error, systemImage: "exclamationmark.triangle").font(.caption).foregroundColor(.red).padding()
+                    } else if store.waitingForListening {
+                        Text(l10n("Page saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding()
+                    }
+                } else if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding() }
+                else { ProgressView(l10n("Opening PDF…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
+            }.background(appearance.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button { settings = true } label: { Image(systemName: "slider.horizontal.3") }
+                            .accessibilityLabel(l10n("Page actions")).disabled(reading.document == nil)
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        Button { reading.move(-1) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }
+                            .accessibilityLabel(l10n("Previous page")).disabled(reading.page <= 1)
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        Text(l10n("Page {0} of {1}", reading.page, reading.count)).font(.callout.monospacedDigit())
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        Button { reading.move(1) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }
+                            .accessibilityLabel(l10n("Next page")).disabled(reading.page >= reading.count)
+                    }
+                }
+                .sheet(isPresented: $settings) {
+                    NativeNavigation {
+                        ShelfForm {
+                            Section(header: Text(l10n("Go to page"))) {
+                                TextField(l10n("Page"), text: $requestedPage).keyboardType(.numberPad).accessibilityIdentifier("reader-page")
                                 Button(l10n("Go to page")) {
                                     if let page = Int(requestedPage) { reading.go(to: page) }
                                     requestedPage = ""
                                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                                }.nativeGlassButton().disabled(Int(requestedPage).map { $0 < 1 || $0 > reading.count } ?? true)
-                                Spacer()
-                            }.padding(.horizontal).padding(.bottom, 8)
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Button(l10n("Rotate page")) { reading.rotate() }.nativeGlassButton()
-                                    Text(l10n("Rotation {0}°", reading.displayedRotation)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
-                                }
-                                Toggle(l10n("Continuous"), isOn: $reading.continuous).accessibilityLabel(l10n("Continuous"))
-                            }.padding(.horizontal).padding(.bottom, 8)
-                            if player.session != nil {
-                                HStack {
-                                    Text(player.title).font(.caption).lineLimit(1)
-                                    Text(String(Int(player.currentTime))).font(.caption.monospacedDigit()).accessibilityIdentifier("reader-audio-elapsed")
-                                    Spacer()
-                                    playbackToggle(player, prefix: "reader-")
-                                    Button { Task { do { try await player.stop() } catch { player.error = ConnectionStore.recovery(for: error) } } } label: { Image(systemName: "stop.circle") }
-                                        .accessibilityLabel(l10n("Stop listening"))
-                                }.padding(.horizontal).padding(.bottom, 8)
+                                    settings = false
+                                }.disabled(Int(requestedPage).map { $0 < 1 || $0 > reading.count } ?? true)
                             }
-                            if let error = reading.error ?? store.error ?? player.error { Text(error).font(.caption).foregroundColor(.red).padding(.horizontal) }
-                            else if store.waitingForListening { Text(l10n("Page saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding(.horizontal) }
-                        }.padding(.vertical, 8)
-                    }.frame(maxHeight: sizeCategory.isAccessibilityCategory ? 320 : 260)
-                } else if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding() }
-                else { ProgressView(l10n("Opening PDF…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
-            }.background(appearance.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } } }
+                            Section(header: Text(l10n("Display"))) {
+                                Button(l10n("Rotate page")) { reading.rotate() }
+                                Text(l10n("Rotation {0}°", reading.displayedRotation)).font(.callout.monospacedDigit()).foregroundColor(ShelfStyle.secondaryText)
+                                Toggle(l10n("Continuous"), isOn: $reading.continuous).accessibilityLabel(l10n("Continuous"))
+                            }
+                        }.navigationTitle(l10n("Page actions")).navigationBarTitleDisplayMode(.inline)
+                            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { settings = false } } }
+                    }.listeningSheet()
+                }
         }
             .onAppear { reading.open() }
             .onDisappear { reading.cancelOpen(); reading.detach() }
+    }
+}
+
+struct ReaderAudioControls: View {
+    @EnvironmentObject private var player: ApplePlayback
+    @Environment(\.nativeStrings) private var l10n
+    @Environment(\.sizeCategory) private var sizeCategory
+    var body: some View {
+        Group {
+            if sizeCategory.isAccessibilityCategory {
+                VStack(alignment: .leading, spacing: 8) { context; transport }
+            } else {
+                HStack(spacing: 16) { context; Spacer(minLength: 8); transport }
+            }
+        }.padding(.horizontal).padding(.vertical, 8).background(Color(UIColor.secondarySystemBackground))
+    }
+    private var context: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(player.title).font(.caption).lineLimit(sizeCategory.isAccessibilityCategory ? nil : 2)
+            HStack(spacing: 4) {
+                Text(String(Int(player.currentTime))).font(.caption.monospacedDigit()).accessibilityIdentifier("reader-audio-elapsed")
+                Text(l10n("sec")).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+            }
+        }
+    }
+    private var transport: some View {
+        HStack(spacing: 16) {
+            playbackToggle(player, prefix: "reader-").frame(minWidth: 44, minHeight: 44)
+            Button {
+                Task { do { try await player.stop() } catch { player.error = ConnectionStore.recovery(for: error) } }
+            } label: { Image(systemName: "stop.fill").frame(minWidth: 44, minHeight: 44) }
+                .accessibilityLabel(l10n("Stop listening"))
+        }.buttonStyle(BorderlessButtonStyle())
     }
 }

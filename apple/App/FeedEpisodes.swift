@@ -23,6 +23,7 @@ struct FeedEpisodes: View {
                     Button(l10n("Retry feed"), action: load).disabled(adding)
                 }
                 if !loading, episodes.isEmpty { Text(l10n("No feed episodes found")).foregroundColor(ShelfStyle.secondaryText) }
+                Section(header: Text(l10n("Feed episodes")), footer: Text(l10n("Selected episodes are downloaded to your server. Save them from your library to listen offline on this device."))) {
                 ForEach(episodes) { episode in
                     Button {
                         if selected.contains(episode.id) { selected.remove(episode.id) }
@@ -37,7 +38,8 @@ struct FeedEpisodes: View {
                             }
                         }
                     }.disabled(adding || episode.enclosureURL == nil || existing.contains(episode.enclosureURL ?? ""))
-                        .accessibilityLabel(episode.title).accessibilityValue(l10n(selected.contains(episode.id) ? "Selected" : "Not selected"))
+                        .accessibilityLabel(episode.title).accessibilityValue(l10n(existing.contains(episode.enclosureURL ?? "") ? "Already on server" : episode.enclosureURL == nil ? "No audio enclosure" : selected.contains(episode.id) ? "Selected" : "Not selected"))
+                }
                 }
                 if adding { ProgressView(l10n("Queueing on your server…")) }
             }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Feed episodes")).navigationBarTitleDisplayMode(.inline)
@@ -45,7 +47,7 @@ struct FeedEpisodes: View {
                     ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Done")) { request?.cancel(); presented = false } }
                     ToolbarItem(placement: .bottomBar) {
                         Button(l10n("Add selected episodes to server"), action: queue)
-                            .nativeGlassButton(prominent: true).disabled(selected.isEmpty || adding || loading)
+                            .font(.body).fixedSize(horizontal: false, vertical: true).disabled(selected.isEmpty || adding || loading)
                     }
                 }
         }.onAppear(perform: load).onDisappear { request?.cancel() }

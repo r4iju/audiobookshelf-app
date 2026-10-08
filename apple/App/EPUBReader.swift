@@ -194,52 +194,57 @@ struct EPUBReader: View {
                     if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding().background(appearance.background) }
                     else if !reading.ready { ProgressView(l10n("Opening EPUB…")).padding().background(appearance.background) }
                 }
-                HStack {
-                    Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Previous page"))
-                    Spacer()
-                    Button { contents = true } label: { Image(systemName: "list.bullet").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Contents"))
-                    Button { settings = true } label: { Image(systemName: "textformat.size").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Reading settings"))
-                    Spacer()
-                    Button { reading.call("turn", true) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Next page"))
-                }.buttonStyle(PlainButtonStyle()).padding(.horizontal, 8).padding(.vertical, 4)
-                    .nativeFloatingControl(background: appearance.card).padding(.horizontal).padding(.vertical, 8).disabled(!reading.ready)
-                if player.session != nil {
-                    HStack {
-                        Text(player.title).font(.caption).lineLimit(1)
-                        Text(String(Int(player.currentTime))).font(.caption.monospacedDigit()).accessibilityIdentifier("reader-audio-elapsed")
-                        Spacer()
-                        playbackToggle(player, prefix: "reader-")
-                        Button(l10n("Stop listening")) { Task { do { try await player.stop() } catch { player.error = ConnectionStore.recovery(for: error) } } }
-                    }.padding()
-                }
+                if player.session != nil { ReaderAudioControls() }
                 if let error = store.error ?? reading.savingError {
                     Text(error).font(.caption).foregroundColor(.red).padding(.horizontal).accessibilityIdentifier("reading-save-error")
                 } else if store.waitingForListening {
                     Text(l10n("Passage saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding(.horizontal)
                 }
             }.background(appearance.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } } }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button { contents = true } label: { Image(systemName: "list.bullet") }.accessibilityLabel(l10n("Contents")).disabled(!reading.ready)
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button { settings = true } label: { Image(systemName: "textformat.size") }.accessibilityLabel(l10n("Reading settings")).disabled(!reading.ready)
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }
+                            .accessibilityLabel(l10n("Previous page")).disabled(!reading.ready)
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        Button { reading.call("turn", true) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }
+                            .accessibilityLabel(l10n("Next page")).disabled(!reading.ready)
+                    }
+                }
                 .sheet(isPresented: $contents) {
                     NativeNavigation { ShelfList { ForEach(reading.chapters) { chapter in Button(chapter.title) { reading.call("navigate", chapter.href); contents = false } } }.navigationTitle(l10n("Contents")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { contents = false } } } }.listeningSheet()
                 }
                 .sheet(isPresented: $settings) {
                     NativeNavigation {
                         ShelfForm {
-                            Picker(l10n("Volume buttons"), selection: $reading.preferences.volume) {
-                                Text(l10n("Enabled")).tag("enabled"); Text(l10n("Mirrored")).tag("mirrored"); Text(l10n("Off")).tag("none")
-                            }.accessibilityIdentifier("reader-volume-mode")
-                            Toggle(l10n("While listening"), isOn: $reading.preferences.volumeWhileListening)
-                                .accessibilityLabel(l10n("Volume navigation while listening"))
-                            Toggle(l10n("Keep screen awake"), isOn: $reading.preferences.keepAwake)
-                            Picker(l10n("Theme"), selection: $reading.preferences.theme) { Text(l10n("Light", context: .theme)).tag("light"); Text(l10n("Dark", context: .theme)).tag("dark"); Text(l10n("Black", context: .theme)).tag("black") }
-                            Picker(l10n("Font"), selection: $reading.preferences.font) { Text(l10n("Serif")).tag("serif"); Text(l10n("Sans serif")).tag("sans-serif"); Text(l10n("Monospace")).tag("monospace") }
-                            Text(l10n("Font size {0}%", Int(reading.preferences.scale)))
-                            Slider(value: $reading.preferences.scale, in: 5...300, step: 5).accessibilityLabel(l10n("Font size"))
-                            Text(l10n("Line spacing {0}%", Int(reading.preferences.spacing)))
-                            Slider(value: $reading.preferences.spacing, in: 100...300, step: 5).accessibilityLabel(l10n("Line spacing"))
-                            Text(l10n("Text weight {0}", Int(reading.preferences.stroke)))
-                            Slider(value: $reading.preferences.stroke, in: 0...300, step: 5).accessibilityLabel(l10n("Text weight"))
-                            Picker(l10n("Spread"), selection: $reading.preferences.spread) { Text(l10n("Automatic")).tag("auto"); Text(l10n("Single page")).tag("none"); Text(l10n("Two pages")).tag("always") }
+                            Section(header: Text(l10n("Navigation"))) {
+                                Picker(l10n("Volume buttons"), selection: $reading.preferences.volume) {
+                                    Text(l10n("Enabled")).tag("enabled"); Text(l10n("Mirrored")).tag("mirrored"); Text(l10n("Off")).tag("none")
+                                }.accessibilityIdentifier("reader-volume-mode")
+                                Toggle(l10n("While listening"), isOn: $reading.preferences.volumeWhileListening)
+                                    .accessibilityLabel(l10n("Volume navigation while listening"))
+                            }
+                            Section(header: Text(l10n("Display"))) {
+                                Toggle(l10n("Keep screen awake"), isOn: $reading.preferences.keepAwake)
+                                Picker(l10n("Theme"), selection: $reading.preferences.theme) { Text(l10n("Light", context: .theme)).tag("light"); Text(l10n("Dark", context: .theme)).tag("dark"); Text(l10n("Black", context: .theme)).tag("black") }
+                                Picker(l10n("Font"), selection: $reading.preferences.font) { Text(l10n("Serif")).tag("serif"); Text(l10n("Sans serif")).tag("sans-serif"); Text(l10n("Monospace")).tag("monospace") }
+                                Picker(l10n("Spread"), selection: $reading.preferences.spread) { Text(l10n("Automatic")).tag("auto"); Text(l10n("Single page")).tag("none"); Text(l10n("Two pages")).tag("always") }
+                            }
+                            Section(header: Text(l10n("Typography"))) {
+                                Text(l10n("Font size {0}%", Int(reading.preferences.scale)))
+                                Slider(value: $reading.preferences.scale, in: 5...300, step: 5).accessibilityLabel(l10n("Font size"))
+                                Text(l10n("Line spacing {0}%", Int(reading.preferences.spacing)))
+                                Slider(value: $reading.preferences.spacing, in: 100...300, step: 5).accessibilityLabel(l10n("Line spacing"))
+                                Text(l10n("Text weight {0}", Int(reading.preferences.stroke)))
+                                Slider(value: $reading.preferences.stroke, in: 0...300, step: 5).accessibilityLabel(l10n("Text weight"))
+                            }
                         }.navigationTitle(l10n("Reading settings")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { settings = false } } }
                     }.listeningSheet()
                 }
