@@ -1,6 +1,18 @@
 import XCTest
 
 @MainActor final class SearchJourney: NativeJourney {
+    func testSelectingSearchAcceptsTypingWithoutAnotherActivation() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["Search"].firstMatch.tap()
+        let query = librarySearchField(app)
+        XCTAssertTrue(query.waitForExistence(timeout: 5), "Selecting Search exposes its native input")
+        guard query.exists else { return }
+        query.typeText("Tomorrow 61\n")
+        XCTAssertTrue(app.buttons["search-book-60"].waitForExistence(timeout: 10), "The selected Search input accepts typing and keyboard submission")
+    }
+
     func testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)

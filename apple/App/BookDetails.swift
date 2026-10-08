@@ -60,22 +60,8 @@ struct BookDetails: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 header
-                if book.mediaType != "podcast" || episode != nil {
-                Button { NativeHaptic.impact("play"); playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
-                    HStack {
-                        Image(systemName: "play.fill")
-                        Text(l10n((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening")).fontWeight(.semibold)
-                        Spacer()
-                    }.padding(.vertical, 10).padding(.horizontal, 12)
-                }.nativeGlassButton(prominent: true).accentColor(ShelfStyle.accentFill).disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
-                }
+                if !regularActions { detailActions }
                 if episode != nil || book.mediaType == "book" {
-                    Button(l10n(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished"), action: toggleFinished).disabled(progressBusy)
-                    if let progress = selectedProgress, (progress.progress ?? 0) > 0 || (progress.ebookProgress ?? 0) > 0 {
-                        Button(l10n("Discard progress")) { NativeHaptic.impact("discard-progress"); progressConfirmation = .discard }
-                            .disabled(progressBusy).accessibilityIdentifier("discard-progress")
-
-                    }
                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
                     if writesWaiting.waiting {
                         VStack(alignment: .leading, spacing: 12) {
@@ -109,16 +95,9 @@ struct BookDetails: View {
                     }
                 }
                 if book.mediaType == "book" || episode != nil {
-                    Button(l10n("Download for offline")) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: episode) } }
                     if let error = localDownloads.error { Text(error).foregroundColor(.red) }
                 }
                 if episode == nil { ItemServerActionsSection(itemID: book.id, catalog: catalog) }
-                if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
-                    VStack(alignment: .leading, spacing: 10) {
-                        ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
-                        Text(l10n("{0} listened · {1}% complete", ShelfTime.describe(progress.currentTime ?? 0), Int(progress.fraction * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
-                    }
-                }
                 if let description = episode?.description ?? book.media.metadata.description, !description.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(l10n(episode != nil ? "About this episode" : book.mediaType == "podcast" ? "About this podcast" : "About this book")).font(.title3.bold())
@@ -188,7 +167,10 @@ struct BookDetails: View {
         if sizeClass == .regular && !sizeCategory.isAccessibilityCategory {
             HStack(alignment: .top, spacing: 28) {
                 BookArtwork(item: book, catalog: catalog).frame(width: 200)
-                metadata(alignment: .leading)
+                VStack(alignment: .leading, spacing: 24) {
+                    metadata(alignment: .leading)
+                    detailActions
+                }
             }
         } else {
             VStack(spacing: 20) {
@@ -197,6 +179,47 @@ struct BookDetails: View {
             }.frame(maxWidth: .infinity)
         }
     }
+    private var regularActions: Bool { sizeClass == .regular && !sizeCategory.isAccessibilityCategory }
+
+    private var detailActions: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if book.mediaType != "podcast" || episode != nil {
+                Button { NativeHaptic.impact("play"); playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
+                    Label(l10n((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening"), systemImage: "play.fill")
+                        .font(.body.weight(.semibold)).padding(.vertical, 10).padding(.horizontal, 12)
+                        .frame(maxWidth: regularActions ? nil : .infinity, alignment: .leading)
+                }.nativeGlassButton(prominent: true).accentColor(ShelfStyle.accentFill).disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
+            }
+            if regularActions, #available(iOS 15, *) {
+                ControlGroup { secondaryDetailActions }.controlGroupStyle(.navigation)
+            } else {
+                VStack(alignment: .leading, spacing: 16) { secondaryDetailActions }
+            }
+            if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
+                VStack(alignment: .leading, spacing: 10) {
+                    ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
+                    Text(l10n("{0} listened · {1}% complete", ShelfTime.describe(progress.currentTime ?? 0), Int(progress.fraction * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                }
+            }
+        }.frame(maxWidth: 560, alignment: .leading)
+    }
+
+    @ViewBuilder private var secondaryDetailActions: some View {
+        if episode != nil || book.mediaType == "book" {
+            Button(l10n(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished"), action: toggleFinished).disabled(progressBusy)
+            Button(l10n("Download for offline")) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: episode) } }
+            if let progress = selectedProgress, (progress.progress ?? 0) > 0 || (progress.ebookProgress ?? 0) > 0 {
+                if #available(iOS 15, *) {
+                    Button(l10n("Discard progress"), role: .destructive) { NativeHaptic.impact("discard-progress"); progressConfirmation = .discard }
+                        .disabled(progressBusy).accessibilityIdentifier("discard-progress")
+                } else {
+                    Button(l10n("Discard progress")) { NativeHaptic.impact("discard-progress"); progressConfirmation = .discard }
+                        .foregroundColor(.red).disabled(progressBusy).accessibilityIdentifier("discard-progress")
+                }
+            }
+        }
+    }
+
     private func metadata(alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 8) {
             Text(episode?.title ?? book.title).font(.title2.weight(.semibold)).fixedSize(horizontal: false, vertical: true)

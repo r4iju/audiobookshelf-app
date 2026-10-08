@@ -103,12 +103,12 @@ struct NowListening: View {
                             HStack(alignment: .center, spacing: 48) {
                                 artworkContext(width: min(360, geometry.size.width * 0.35))
                                     .frame(width: min(360, geometry.size.width * 0.35))
-                                listeningSurface.frame(maxWidth: 500)
+                                listeningSurface(width: min(500, geometry.size.width - min(360, geometry.size.width * 0.35) - 128)).frame(maxWidth: 500)
                             }.padding(40).frame(maxWidth: 1100).frame(maxWidth: .infinity, minHeight: geometry.size.height)
                         } else {
                             VStack(spacing: 28) {
                                 artworkContext(width: 220)
-                                listeningSurface
+                                listeningSurface(width: min(620, geometry.size.width) - 48)
                             }.padding(24).frame(maxWidth: 620).frame(maxWidth: .infinity)
                         }
                     }
@@ -144,7 +144,7 @@ struct NowListening: View {
             }
         }
     }
-    private var listeningSurface: some View {
+    private func listeningSurface(width: CGFloat) -> some View {
         VStack(spacing: 24) {
             let display = PlayerDisplay(player: player, at: scrubbing ? position : player.currentTime, totalTrack: totalTrack, scaleElapsed: scaleElapsed)
             VStack(spacing: 10) {
@@ -176,7 +176,7 @@ struct NowListening: View {
                 playbackToggle(player, large: true, strings: l10n)
                 Button { NativeHaptic.impact("skip"); Task { await player.skip(Double(player.forwardInterval)) } } label: { VStack { Image(systemName: "goforward").font(.system(size: 32)); Text("\(player.forwardInterval)").font(.caption) } }.frame(minWidth: 44, minHeight: 44).buttonStyle(PlainButtonStyle()).disabled(locked).accessibilityLabel(l10n("Forward {0} seconds", player.forwardInterval))
             }.foregroundColor(ShelfStyle.accent)
-            secondaryActions
+            secondaryActions(width: width)
             if let remaining = player.sleepRemaining { Text(l10n("Sleep in {0}", ShelfTime.describe(remaining))).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
             if player.sleepChapterEnd != nil { Text(l10n("Sleep at chapter end")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
             Button { panel = .settings } label: { Label(l10n("Playback settings"), systemImage: "slider.horizontal.3") }.font(.footnote).buttonStyle(PlainButtonStyle())
@@ -195,10 +195,15 @@ struct NowListening: View {
             }.font(.footnote).foregroundColor(ShelfStyle.secondaryText).disabled(locked)
         }
     }
-    @ViewBuilder private var secondaryActions: some View {
+    @ViewBuilder private func secondaryActions(width: CGFloat) -> some View {
         if sizeCategory.isAccessibilityCategory {
             VStack(alignment: .leading, spacing: 16) { listeningButtons }
                 .labelStyle(DefaultLabelStyle())
+        } else if width < 440 {
+            VStack(spacing: 16) {
+                toolGroup { chapterButton; speedButton }
+                toolGroup { bookmarkButton; sleepButton }
+            }.labelStyle(ListeningControlLabelStyle(stacked: false))
         } else if #available(iOS 15, *) {
             ControlGroup { listeningButtons }
                 .controlGroupStyle(.navigation)
@@ -206,6 +211,13 @@ struct NowListening: View {
         } else {
             HStack(spacing: 16) { listeningButtons }
                 .labelStyle(ListeningControlLabelStyle(stacked: true))
+        }
+    }
+    @ViewBuilder private func toolGroup<Buttons: View>(@ViewBuilder content: () -> Buttons) -> some View {
+        if #available(iOS 15, *) {
+            ControlGroup(content: content).controlGroupStyle(.navigation)
+        } else {
+            HStack(spacing: 16, content: content)
         }
     }
     @ViewBuilder private var listeningButtons: some View {

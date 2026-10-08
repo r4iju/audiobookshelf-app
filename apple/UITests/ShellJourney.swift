@@ -39,6 +39,7 @@ import UIKit
         capture("Native search keyboard")
         query.typeText("\n")
         XCTAssertTrue(app.buttons["search-episode-episode"].waitForExistence(timeout: 10))
+        if app.buttons["Close"].exists { app.buttons["Close"].tap() }
         destination("Listen Now", in: app).tap()
         XCTAssertTrue(app.navigationBars["Listen Now"].waitForExistence(timeout: 5))
         library.tap()

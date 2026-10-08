@@ -26,14 +26,36 @@ private enum ShellDestination: String, CaseIterable, Identifiable {
 
 struct NativeShell: View {
     @EnvironmentObject private var connection: ConnectionStore
+    let library: Library
+    var body: some View { NativeShellNavigation(api: connection.api, library: library) }
+}
+
+private struct NativeShellNavigation: View {
+    @EnvironmentObject private var connection: ConnectionStore
     @Environment(\.nativeStrings) private var l10n
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var selected = ShellDestination.library
+    let api: APIClient
     let library: Library
+    @StateObject private var search: LibrarySearchStore
+
+    init(api: APIClient, library: Library) {
+        self.api = api
+        self.library = library
+        _search = StateObject(wrappedValue: LibrarySearchStore(catalog: CatalogStore(api: api, library: library)))
+    }
 
     var body: some View {
+        shell.onReceive(connection.$screen) { screen in
+            if case .shelf(let selectedLibrary) = screen {
+                search.select(catalog: CatalogStore(api: api, library: selectedLibrary))
+            }
+        }
+    }
+
+    @ViewBuilder private var shell: some View {
         if #available(iOS 18, *) {
-            PlaybackContainer(content: modernTabs, nativeTabAccessory: true)
+            PlaybackContainer(content: adaptiveModernTabs, nativeTabAccessory: true)
         } else if #available(iOS 16, *), UIDevice.current.userInterfaceIdiom == .pad {
             PlaybackContainer(content: NavigationSplitView {
                 List {
@@ -50,14 +72,32 @@ struct NativeShell: View {
         }
     }
 
+    @available(iOS 18, *) @ViewBuilder private var adaptiveModernTabs: some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            searchableModernTabs.tabViewStyle(.sidebarAdaptable)
+        } else {
+            searchableModernTabs
+        }
+    }
+
+    @available(iOS 18, *) @ViewBuilder private var searchableModernTabs: some View {
+        if #available(iOS 26, *) {
+            modernTabs.searchable(text: $search.query, prompt: l10n("Books, podcasts, authors, series…"))
+                .onSubmit(of: .search, search.submit)
+                .tabViewSearchActivation(.searchTabSelection)
+        } else {
+            modernTabs
+        }
+    }
+
     @available(iOS 18, *) private var modernTabs: some View {
         TabView(selection: $selected) {
             Tab(l10n("Listen Now"), systemImage: "headphones", value: .listenNow) { destination(.listenNow) }
             Tab(l10n("Library"), systemImage: "books.vertical", value: .library) { destination(.library) }
             Tab(l10n("Downloads"), systemImage: "arrow.down.circle", value: .downloads) { destination(.downloads) }
-            Tab(l10n("Search"), systemImage: "magnifyingglass", value: .search, role: .search) { destination(.search) }
             Tab(l10n("Settings"), systemImage: "gearshape", value: .settings) { destination(.settings) }
-        }.tabViewStyle(.sidebarAdaptable)
+            Tab(value: .search, role: .search) { destination(.search) }
+        }
     }
 
     private var legacyTabs: some View {
@@ -68,15 +108,20 @@ struct NativeShell: View {
         }
     }
 
+    private var shellOwnsSearch: Bool {
+        if #available(iOS 26, *) { return true }
+        return false
+    }
+
     @ViewBuilder private func destination(_ item: ShellDestination) -> some View {
         switch item {
         case .library:
-            NativeNavigation { CatalogShelf(api: connection.api, library: library).id(library.id) }
+            NativeNavigation { CatalogShelf(api: api, library: library).id(library.id) }
         case .listenNow:
-            NativeNavigation { CatalogShelf(api: connection.api, library: library, listenNow: true).id(library.id) }
+            NativeNavigation { CatalogShelf(api: api, library: library, listenNow: true).id(library.id) }
         case .downloads: DownloadsView(embedded: true)
         case .search:
-            NativeNavigation { LibrarySearch(catalog: CatalogStore(api: connection.api, library: library)).id(library.id) }
+            NativeNavigation { LibrarySearch(search: search, shellOwnsSearch: shellOwnsSearch).id(library.id) }
         case .settings: NativeNavigation { NativeSettings() }
         }
     }

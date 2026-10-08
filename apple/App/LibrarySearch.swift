@@ -4,11 +4,36 @@ import UIKit
 @MainActor final class LibrarySearchStore: ObservableObject {
     enum State { case idle, loading, results(SearchResponse), failed(String) }
     @Published private(set) var state: State = .idle
-    @Published var query = ""
+    @Published var query = "" { didSet { schedule() } }
+    private var pending: Task<Void, Never>?
     private var generation = UUID()
     private var limit = 12
-    let catalog: CatalogStore
+    @Published private(set) var catalog: CatalogStore
     init(catalog: CatalogStore) { self.catalog = catalog }
+
+    func select(catalog: CatalogStore) {
+        guard self.catalog.library.id != catalog.library.id else { return }
+        cancelPending()
+        generation = UUID()
+        self.catalog = catalog
+        query = ""
+        state = .idle
+    }
+    func cancelPending() { pending?.cancel() }
+    func submit() { pending?.cancel(); pending = Task { await search() } }
+    private func schedule() {
+        pending?.cancel()
+        if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            generation = UUID()
+            state = .idle
+            return
+        }
+        pending = Task {
+            do { try await Task.sleep(nanoseconds: 350_000_000) }
+            catch { return }
+            await search()
+        }
+    }
 
     func search(more: Bool = false) async {
         let text = query.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -28,24 +53,16 @@ import UIKit
 
 struct LibrarySearch: View {
     @Environment(\.shelfAppearance) private var appearance
-    @StateObject private var search: LibrarySearchStore
-    @State private var pending: Task<Void, Never>?
+    @ObservedObject var search: LibrarySearchStore
+    var shellOwnsSearch = false
     @Environment(\.nativeStrings) private var l10n
-    init(catalog: CatalogStore) { _search = StateObject(wrappedValue: LibrarySearchStore(catalog: catalog)) }
     var body: some View {
-        systemSearch
-            .onChange(of: search.query) { _ in
-                pending?.cancel()
-                pending = Task {
-                    do { try await Task.sleep(nanoseconds: 350_000_000) }
-                    catch { return }
-                    await search.search()
-                }
-            }
-            .onDisappear { pending?.cancel() }
+        systemSearch.onDisappear(perform: search.cancelPending)
     }
     @ViewBuilder private var systemSearch: some View {
-        if #available(iOS 15, *) {
+        if shellOwnsSearch {
+            results
+        } else if #available(iOS 15, *) {
             results.searchable(text: $search.query, placement: .navigationBarDrawer(displayMode: .always), prompt: l10n("Books, podcasts, authors, series…"))
                 .onSubmit(of: .search, submit)
         } else {
@@ -97,7 +114,7 @@ struct LibrarySearch: View {
             }
             .background(appearance.background).navigationTitle(l10n("Search"))
     }
-    private func submit() { pending?.cancel(); pending = Task { await search.search() } }
+    private func submit() { search.submit() }
     private func related(_ name: String, group: String, value: String) -> some View {
         relatedRow(name, identifier: "search-\(group)-\(value)", destination: CatalogShelf(api: search.catalog.api, library: search.catalog.library, filter: group + "." + Data(value.utf8).base64EncodedString()))
     }
