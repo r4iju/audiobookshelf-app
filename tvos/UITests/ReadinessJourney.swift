@@ -29,6 +29,32 @@ final class ReadinessJourney: TVJourney {
         XCTAssertTrue(app.textFields["serverURL"].waitForExistence(timeout: 10), "Account actions remain reachable after reading complete notices")
     }
 
+    func testSettingsAboveNoticesRemainReachableWithUpAfterBack() {
+        signIn()
+        waitForHome()
+        tab("Settings")
+        let notices = app.cells.containing(.button, identifier: "source-notices").firstMatch
+        select(notices)
+        focus(app.cells.containing(.staticText, identifier: "notices-license").firstMatch)
+        remote.press(.menu)
+        waitForFocus(notices, "Back restores the Notices row before upward traversal")
+        let language = app.cells.containing(.button, identifier: "language-setting").firstMatch
+        for _ in 0..<12 {
+            if hasFocus(language) { break }
+            remote.press(.up)
+        }
+        XCTAssertTrue(hasFocus(language), "Up reaches the earlier native Settings rows after Notices Back")
+        remote.press(.select)
+        XCTAssertTrue(app.buttons["language-en-us"].waitForExistence(timeout: 5))
+        remote.press(.menu)
+        waitForFocus(language, "Back restores Language after traversing above Notices")
+        let diagnostics = app.cells.containing(.button, identifier: "diagnostics-setting").firstMatch
+        select(diagnostics)
+        XCTAssertTrue(element("diagnostic-empty").waitForExistence(timeout: 5))
+        remote.press(.menu)
+        waitForFocus(diagnostics, "Back restores Diagnostics above Notices")
+    }
+
     func testFailedSignInIsDiagnosedWithoutCredentials() {
         launch(reset: true)
         let server = app.textFields["serverURL"]

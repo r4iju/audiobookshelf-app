@@ -31,7 +31,11 @@ struct SettingsView: View {
                     Text(catalog.serverAddress).font(.headline).accessibilityIdentifier("server-address")
                         .accessibilityLabel(l10n("Server address")).accessibilityValue(catalog.serverAddress)
                     if !catalog.username.isEmpty { Text(l10n("Signed in as {0}", catalog.username)).foregroundStyle(.secondary) }
-                    TVReadableText(text: SignInView.supportedSignIn(l10n), identifier: "auth-modes")
+                    // This short context stays in the native List row's focus system.
+                    // A separate child focus item skips earlier offscreen rows when moving Up.
+                    Text(SignInView.supportedSignIn(l10n)).font(.body)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("auth-modes")
                 }
                 section("Audiobook Loft") {
                     NavigationLink(value: ReturnFocus.notices) {
