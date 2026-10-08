@@ -1,0 +1,58 @@
+Application, 0x105885bc0, pid: 43018, label: 'Audiobook Loft' <App element pid: 43018>
+  Window (Main), 0x105884ac0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4330794400.5>
+    Other, 0x105885720, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4329792720.6>
+      Other, 0x105884280, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4329808640.7>
+        Other, 0x105882eb0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4330789120.8>
+          Other, 0x105885300, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 105553171853168.9>
+            Other, 0x1058832d0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4331265840.156>
+              Other, 0x105883e60, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4331275248.157>
+                Other, 0x1058846a0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4331340432.159>
+                  Other, 0x105882a90, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4331288128.226>
+                    Other, 0x105882560, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 105553171845248.228>
+                      Other, 0x105881d00, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 105553171856160.229>
+                        Other, 0x1058809c0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4329968448.230>
+                          Other, 0x1058867a0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4330209424.231>
+                            Other, 0x105884ee0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4330221664.232>
+                              Other, 0x105889ca0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4331546064.335>
+                                Other, 0x105889dc0, {{0.0, 0.0}, {1920.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 105553172198816.336>
+                                  ScrollView, 0x105889ee0, {{80.0, 0.0}, {1760.0, 1080.0}} <AX element pid: 43018, elementOrHash.elementID: 4357232128.337>
+                                    Other, 0x10588a000, {{80.0, 157.0}, {1760.0, 864.0}} <AX element pid: 43018, elementOrHash.elementID: 4331556096.338>
+                                      StaticText, 0x10588a120, {{160.0, 237.0}, {475.0, 62.5}}, identifier: 'series-name', label: 'The Tomorrow Saga' <AX element pid: 43018, elementOrHash.elementID: 105553172150016.340>
+                                      StaticText, 0x10588a240, {{160.0, 317.5}, {325.0, 45.5}}, identifier: 'series-progress', label: '4 books · 0 finished' <AX element pid: 43018, elementOrHash.elementID: 105553172150544.341>
+                                      StaticText, 0x10588a360, {{176.0, 397.0}, {747.5, 35.0}}, identifier: 'series-description', label: 'Read in order: each story picks up where the last one ends.' <AX element pid: 43018, elementOrHash.elementID: 105553172151248.342>
+                                      Other, 0x10588a480, {{160.0, 492.0}, {1184.0, 449.0}} <AX element pid: 43018, elementOrHash.elementID: 105553172198288.343>
+                                        StaticText, 0x10588a5a0, {{160.0, 492.0}, {111.5, 45.5}}, identifier: 'series-sequence.book-5', label: 'Book 1' <AX element pid: 43018, elementOrHash.elementID: 105553172151952.344>
+                                        Button, 0x10588a6c0, {{160.0, 567.5}, {260.0, 373.5}}, identifier: 'series-book.book-5', label: 'Stories for Tomorrow 06, Audiobookshelf QA' <AX element pid: 43018, elementOrHash.elementID: 105553171949184.345>
+                                          Image, 0x10588a7e0, {{160.0, 567.5}, {260.0, 260.0}}, identifier: 'cover-placeholder', label: 'book.closed.fill' <AX element pid: 43018, elementOrHash.elementID: 105553172184368.364>
+                                          StaticText, 0x10588a900, {{160.0, 837.5}, {157.0, 62.5}}, label: 'Stories for Tomorrow 06' <AX element pid: 43018, elementOrHash.elementID: 105553172004496.353>
+                                          StaticText, 0x10588aa20, {{160.0, 915.5}, {176.0, 25.5}}, label: 'Audiobookshelf QA' <AX element pid: 43018, elementOrHash.elementID: 105553171971024.354>
+                                        StaticText, 0x10588ab40, {{468.0, 492.0}, {116.5, 45.5}}, identifier: 'series-sequence.book-2', label: 'Book 2' <AX element pid: 43018, elementOrHash.elementID: 105553172186320.346>
+                                        Button, 0x10588ac60, {{468.0, 567.5}, {260.0, 373.5}}, identifier: 'series-book.book-2', label: 'Stories for Tomorrow 03, Audiobookshelf QA' <AX element pid: 43018, elementOrHash.elementID: 105553172188256.347>
+                                          Image, 0x10588ad80, {{468.0, 567.5}, {260.0, 260.0}}, identifier: 'cover-placeholder', label: 'book.closed.fill' <AX element pid: 43018, elementOrHash.elementID: 105553172168336.365>
+                                          StaticText, 0x10588aea0, {{468.0, 837.5}, {156.5, 62.5}}, label: 'Stories for Tomorrow 03' <AX element pid: 43018, elementOrHash.elementID: 105553172187552.356>
+                                          StaticText, 0x10588afc0, {{468.0, 915.5}, {176.0, 25.5}}, label: 'Audiobookshelf QA' <AX element pid: 43018, elementOrHash.elementID: 105553172187904.357>
+                                        StaticText, 0x10588b0e0, {{776.0, 492.0}, {148.5, 45.5}}, identifier: 'series-sequence.book-9', label: 'Book 2.5' <AX element pid: 43018, elementOrHash.elementID: 105553172189840.348>
+                                        Button, 0x10588b200, {{776.0, 567.5}, {260.0, 373.5}}, identifier: 'series-book.book-9', label: 'Stories for Tomorrow 10, Audiobookshelf QA' <AX element pid: 43018, elementOrHash.elementID: 105553172191776.349>
+                                          Image, 0x10588b320, {{776.0, 567.5}, {260.0, 260.0}}, identifier: 'cover-placeholder', label: 'book.closed.fill' <AX element pid: 43018, elementOrHash.elementID: 105553172202528.366>
+                                          StaticText, 0x10588b440, {{776.0, 837.5}, {153.0, 62.5}}, label: 'Stories for Tomorrow 10' <AX element pid: 43018, elementOrHash.elementID: 105553172191072.359>
+                                          StaticText, 0x10588b560, {{776.0, 915.5}, {176.0, 25.5}}, label: 'Audiobookshelf QA' <AX element pid: 43018, elementOrHash.elementID: 105553172191424.360>
+                                        StaticText, 0x10588b680, {{1084.0, 492.0}, {136.0, 45.5}}, identifier: 'series-sequence.book-1', label: 'Book 10' <AX element pid: 43018, elementOrHash.elementID: 105553172193360.350>
+                                        Button, 0x10588b7a0, {{1084.0, 567.5}, {260.0, 373.5}}, identifier: 'series-book.book-1', label: 'Stories for Tomorrow 02, Audiobookshelf QA' <AX element pid: 43018, elementOrHash.elementID: 105553172195296.351>
+                                          Image, 0x10588b8c0, {{1084.0, 567.5}, {260.0, 260.0}}, identifier: 'cover-placeholder', label: 'book.closed.fill' <AX element pid: 43018, elementOrHash.elementID: 105553172200400.367>
+                                          StaticText, 0x10588b9e0, {{1084.0, 837.5}, {156.0, 62.5}}, label: 'Stories for Tomorrow 02' <AX element pid: 43018, elementOrHash.elementID: 105553172194592.362>
+                                          StaticText, 0x10588bb00, {{1084.0, 915.5}, {176.0, 25.5}}, label: 'Audiobookshelf QA' <AX element pid: 43018, elementOrHash.elementID: 105553172194944.363>
+                                    Other, 0x10588bc20, {{0.0, 0.0}, {0.0, 0.0}}, label: '0 pages', value: 0% <AX element pid: 43018, elementOrHash.elementID: 4331577344.339>
+              Other, 0x10588bd40, {{0.0, 46.0}, {1920.0, 68.0}} <AX element pid: 43018, elementOrHash.elementID: 4331274816.158>
+                TabBar, 0x10588be60, {{0.0, 46.0}, {1920.0, 68.0}}, label: 'Menu' <AX element pid: 43018, elementOrHash.elementID: 4331266288.160>
+                  Other, 0x10588bf80, {{80.0, 46.0}, {200.0, 68.0}} <AX element pid: 43018, elementOrHash.elementID: 4330888912.162>
+                    Other, 0x10588c0a0, {{80.0, 46.0}, {200.0, 68.0}} <AX element pid: 43018, elementOrHash.elementID: 4331271664.167>
+                  Other, 0x10588c1c0, {{280.0, 46.0}, {1360.0, 68.0}} <AX element pid: 43018, elementOrHash.elementID: 4331274384.163>
+                    Other, 0x10588c2e0, {{763.5, 52.0}, {221.0, 56.0}} <AX element pid: 43018, elementOrHash.elementID: 4331273952.168>
+                  Other, 0x10588c400, {{495.5, 46.0}, {929.5, 68.0}} <AX element pid: 43018, elementOrHash.elementID: 4331273520.164>
+                    ScrollView, 0x10588c520, {{495.5, 46.0}, {929.5, 68.0}} <AX element pid: 43018, elementOrHash.elementID: 4345863168.169>
+                      Button, 0x105890d90, {{536.5, 62.5}, {197.0, 35.0}}, label: 'Listen Now' <AX element pid: 43018, elementOrHash.elementID: 4328862720.155>
+                      Button, 0x105890eb0, {{798.5, 61.5}, {151.0, 37.0}}, label: 'Library' <AX element pid: 43018, elementOrHash.elementID: 4328851888.172>
+                      Button, 0x105890fd0, {{1014.5, 62.5}, {142.5, 35.0}}, label: 'Search' <AX element pid: 43018, elementOrHash.elementID: 4328854704.173>
+                      Button, 0x1058910f0, {{1222.0, 62.0}, {162.0, 36.0}}, label: 'Settings' <AX element pid: 43018, elementOrHash.elementID: 4328876848.174>
+                  Other, 0x105891210, {{1640.0, 46.0}, {200.0, 68.0}} <AX element pid: 43018, elementOrHash.elementID: 4331272096.165>
+                    Other, 0x105891330, {{1640.0, 46.0}, {200.0, 68.0}} <AX element pid: 43018, elementOrHash.elementID: 4331272544.170>

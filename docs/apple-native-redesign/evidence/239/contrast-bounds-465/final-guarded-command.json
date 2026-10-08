@@ -1,0 +1,15 @@
+[
+  "xcodebuild",
+  "test-without-building",
+  "-xctestrun",
+  "/tmp/native239-contrast-bounds8c82/final-effective/Build/Products/AudiobookshelfNative_iphonesimulator27.0-arm64-x86_64.xctestrun",
+  "-destination",
+  "id=97F3D534-A564-47C9-AFD4-AA20D28891DE",
+  "-parallel-testing-enabled",
+  "NO",
+  "-collect-test-diagnostics",
+  "never",
+  "-resultBundlePath",
+  "/tmp/native239-contrast-bounds8c82/login-guarded.xcresult",
+  "-only-testing:NativeJourneyTests/ConnectionJourney/testConnectSelectLibraryAndRestoreAccountAfterRelaunch"
+]

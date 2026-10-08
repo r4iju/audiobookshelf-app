@@ -1,0 +1,14 @@
+[
+  {
+    "kind": "phone",
+    "strict_profile_team_identity_certificate_callback_keychain": "PASS",
+    "minimum": "15.0",
+    "profile_valid": true
+  },
+  {
+    "kind": "tv",
+    "strict_profile_team_identity_certificate_callback_keychain": "PASS",
+    "minimum": "17.0",
+    "profile_valid": true
+  }
+]

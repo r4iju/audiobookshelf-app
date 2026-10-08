@@ -1,0 +1,49 @@
+Error from getpwuid_r: 25 (Inappropriate ioctl for device)
+Filtering the log data using "composedMessage CONTAINS "[DEBUG-239-back]""
+Timestamp               Ty Process[PID:TID]
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+2026-10-08 19:22:10.762 Df AudiobookshelfTV[21973:e6f3] (Foundation) [DEBUG-239-back] detail appear book-0
+2026-10-08 19:22:15.875 Df AudiobookshelfTV[21973:e6f3] (Foundation) [DEBUG-239-back] detail disappear book-0
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+2026-10-08 19:22:55.180 Df AudiobookshelfTV[22612:ed80] (Foundation) [DEBUG-239-back] detail appear book-60
+=== Messages dropped during live streaming (use `log show` to see what they were)
+2026-10-08 19:23:13.257 Df AudiobookshelfTV[24884:10249] (Foundation) [DEBUG-239-back] detail appear book-0
+2026-10-08 19:23:15.941 Df AudiobookshelfTV[24884:10249] (Foundation) [DEBUG-239-back] detail disappear book-0
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+2026-10-08 19:23:47.891 Df AudiobookshelfTV[25704:10b21] (Foundation) [DEBUG-239-back] detail appear book-0
+2026-10-08 19:23:53.365 Df AudiobookshelfTV[25704:10b21] (Foundation) [DEBUG-239-back] detail disappear book-0
+=== Messages dropped during live streaming (use `log show` to see what they were)
+=== Messages dropped during live streaming (use `log show` to see what they were)
+2026-10-08 19:24:31.026 Df AudiobookshelfTV[27767:11ea7] (Foundation) [DEBUG-239-back] detail appear book-0
+2026-10-08 19:24:33.503 Df AudiobookshelfTV[27767:11ea7] (Foundation) [DEBUG-239-back] detail disappear book-0
+2026-10-08 19:25:28.717 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] library path item:book-2
+2026-10-08 19:25:28.718 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] detail appear book-2
+2026-10-08 19:25:31.506 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] library path item:book-2/series:series-saga
+2026-10-08 19:25:31.506 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] series appear series-saga
+2026-10-08 19:25:32.015 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] detail disappear book-2
+2026-10-08 19:25:32.022 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] readable series-description focus Optional(0)
+2026-10-08 19:25:33.857 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] detail appear book-2
+2026-10-08 19:25:34.370 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] library path item:book-2
+2026-10-08 19:25:34.371 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] series disappear series-saga
+2026-10-08 19:25:36.630 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] library path item:book-2/author:author
+2026-10-08 19:25:37.141 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] detail disappear book-2
+2026-10-08 19:25:37.150 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] readable author-bio focus Optional(0)
+2026-10-08 19:25:37.858 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] detail appear book-2
+2026-10-08 19:25:38.370 Df AudiobookshelfTV[29945:13419] (Foundation) [DEBUG-239-back] library path item:book-2
+2026-10-08 19:26:17.995 Df AudiobookshelfTV[32136:148f3] (Foundation) [DEBUG-239-back] library path item:book-60
+2026-10-08 19:26:17.996 Df AudiobookshelfTV[32136:148f3] (Foundation) [DEBUG-239-back] detail appear book-60
+2026-10-08 19:26:19.801 Df AudiobookshelfTV[32136:148f3] (Foundation) [DEBUG-239-back] library path
+2026-10-08 19:26:19.802 Df AudiobookshelfTV[32136:148f3] (Foundation) [DEBUG-239-back] detail disappear book-60
+Child process terminated with signal 15: Terminated

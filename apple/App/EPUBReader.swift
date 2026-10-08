@@ -2,8 +2,9 @@ import SwiftUI
 import WebKit
 import UIKit
 import CryptoKit
+import Combine
 
-private struct EPUBPreferences: Codable {
+private struct EPUBPreferences: Codable, Equatable {
     var theme = "dark"
     var font = "serif"
     var scale = 100.0
@@ -21,14 +22,8 @@ private struct EPUBPreferences: Codable {
     @Published var ready = false
     @Published var error: String?
     @Published var savingError: String?
-    @Published var preferences: EPUBPreferences {
-        didSet {
-            if let data = try? JSONEncoder().encode(preferences) { UserDefaults.standard.set(data, forKey: "previewEPUBPreferences") }
-            call("preferences", preferences)
-            applyAwakePreference()
-            configureVolume()
-        }
-    }
+    private var preferenceChanges: AnyCancellable?
+    private var preferences: EPUBPreferences { EPUBPreferenceStore.shared.value }
     let source: ReadingSource
     let api: APIClient
     let store: ReadingStore
@@ -45,7 +40,14 @@ private struct EPUBPreferences: Codable {
     private struct Payload: Encodable { let data: String; let location: String?; let preferences: EPUBPreferences; let cache: String? }
     init(source: ReadingSource, api: APIClient, store: ReadingStore) {
         self.source = source; self.api = api; self.store = store
-        preferences = UserDefaults.standard.data(forKey: "previewEPUBPreferences").flatMap { try? JSONDecoder().decode(EPUBPreferences.self, from: $0) } ?? EPUBPreferences()
+        super.init()
+        preferenceChanges = EPUBPreferenceStore.shared.$value.dropFirst().sink { [weak self] value in
+            guard let self else { return }
+            if let payload = self.payload { self.payload = Payload(data: payload.data, location: payload.location, preferences: value, cache: payload.cache) }
+            self.call("preferences", value)
+            self.applyAwakePreference(value)
+            self.configureVolume(value)
+        }
     }
     func attach(_ web: WKWebView) {
         self.web = web
@@ -93,10 +95,12 @@ private struct EPUBPreferences: Codable {
     func context(listening: Bool, active: Bool) {
         self.listening = listening; self.active = active; configureVolume()
     }
-    private func configureVolume() {
+    private func configureVolume(_ updated: EPUBPreferences? = nil) {
+        let preferences = updated ?? self.preferences
         volume.enabled(web != nil && active && preferences.volume != "none" && (preferences.volumeWhileListening || !listening))
     }
-    private func applyAwakePreference() {
+    private func applyAwakePreference(_ updated: EPUBPreferences? = nil) {
+        let preferences = updated ?? self.preferences
         if let previousIdleTimer { UIApplication.shared.isIdleTimerDisabled = previousIdleTimer || preferences.keepAwake }
     }
     func detach() {
@@ -194,52 +198,37 @@ struct EPUBReader: View {
                     if let error = reading.error { RecoveryCard(message: error) { reading.open() }.padding().background(appearance.background) }
                     else if !reading.ready { ProgressView(l10n("Opening EPUB…")).padding().background(appearance.background) }
                 }
-                HStack {
-                    Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Previous page"))
-                    Spacer()
-                    Button { contents = true } label: { Image(systemName: "list.bullet").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Contents"))
-                    Button { settings = true } label: { Image(systemName: "textformat.size").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Reading settings"))
-                    Spacer()
-                    Button { reading.call("turn", true) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }.accessibilityLabel(l10n("Next page"))
-                }.buttonStyle(PlainButtonStyle()).padding(.horizontal, 8).padding(.vertical, 4)
-                    .nativeFloatingControl(background: appearance.card).padding(.horizontal).padding(.vertical, 8).disabled(!reading.ready)
-                if player.session != nil {
-                    HStack {
-                        Text(player.title).font(.caption).lineLimit(1)
-                        Text(String(Int(player.currentTime))).font(.caption.monospacedDigit()).accessibilityIdentifier("reader-audio-elapsed")
-                        Spacer()
-                        playbackToggle(player, prefix: "reader-")
-                        Button(l10n("Stop listening")) { Task { do { try await player.stop() } catch { player.error = ConnectionStore.recovery(for: error) } } }
-                    }.padding()
-                }
+                if player.session != nil { ReaderAudioControls() }
                 if let error = store.error ?? reading.savingError {
                     Text(error).font(.caption).foregroundColor(.red).padding(.horizontal).accessibilityIdentifier("reading-save-error")
                 } else if store.waitingForListening {
                     Text(l10n("Passage saved on this device. Sync follows when listening closes.")).font(.caption).foregroundColor(ShelfStyle.secondaryText).padding(.horizontal)
                 }
             }.background(appearance.background).navigationTitle(reading.source.title).navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } } }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) { Button(l10n("Close reader")) { presentation.wrappedValue.dismiss() } }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button { contents = true } label: { Image(systemName: "list.bullet") }.accessibilityLabel(l10n("Contents")).disabled(!reading.ready)
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button { settings = true } label: { Image(systemName: "textformat.size") }.accessibilityLabel(l10n("Reading settings")).disabled(!reading.ready)
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        Button { reading.call("turn", false) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }
+                            .accessibilityLabel(l10n("Previous page")).disabled(!reading.ready)
+                    }
+                    ToolbarItem(placement: .bottomBar) {
+                        Button { reading.call("turn", true) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }
+                            .accessibilityLabel(l10n("Next page")).disabled(!reading.ready)
+                    }
+                }
                 .sheet(isPresented: $contents) {
                     NativeNavigation { ShelfList { ForEach(reading.chapters) { chapter in Button(chapter.title) { reading.call("navigate", chapter.href); contents = false } } }.navigationTitle(l10n("Contents")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { contents = false } } } }.listeningSheet()
                 }
                 .sheet(isPresented: $settings) {
                     NativeNavigation {
                         ShelfForm {
-                            Picker(l10n("Volume buttons"), selection: $reading.preferences.volume) {
-                                Text(l10n("Enabled")).tag("enabled"); Text(l10n("Mirrored")).tag("mirrored"); Text(l10n("Off")).tag("none")
-                            }.accessibilityIdentifier("reader-volume-mode")
-                            Toggle(l10n("While listening"), isOn: $reading.preferences.volumeWhileListening)
-                                .accessibilityLabel(l10n("Volume navigation while listening"))
-                            Toggle(l10n("Keep screen awake"), isOn: $reading.preferences.keepAwake)
-                            Picker(l10n("Theme"), selection: $reading.preferences.theme) { Text(l10n("Light", context: .theme)).tag("light"); Text(l10n("Dark", context: .theme)).tag("dark"); Text(l10n("Black", context: .theme)).tag("black") }
-                            Picker(l10n("Font"), selection: $reading.preferences.font) { Text(l10n("Serif")).tag("serif"); Text(l10n("Sans serif")).tag("sans-serif"); Text(l10n("Monospace")).tag("monospace") }
-                            Text(l10n("Font size {0}%", Int(reading.preferences.scale)))
-                            Slider(value: $reading.preferences.scale, in: 5...300, step: 5).accessibilityLabel(l10n("Font size"))
-                            Text(l10n("Line spacing {0}%", Int(reading.preferences.spacing)))
-                            Slider(value: $reading.preferences.spacing, in: 100...300, step: 5).accessibilityLabel(l10n("Line spacing"))
-                            Text(l10n("Text weight {0}", Int(reading.preferences.stroke)))
-                            Slider(value: $reading.preferences.stroke, in: 0...300, step: 5).accessibilityLabel(l10n("Text weight"))
-                            Picker(l10n("Spread"), selection: $reading.preferences.spread) { Text(l10n("Automatic")).tag("auto"); Text(l10n("Single page")).tag("none"); Text(l10n("Two pages")).tag("always") }
+                            EPUBPreferenceSections()
                         }.navigationTitle(l10n("Reading settings")).toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { settings = false } } }
                     }.listeningSheet()
                 }
@@ -263,5 +252,70 @@ struct EbookReader: View {
             if source.ebook.format == "pdf" { PDFReader(source: source, api: api, store: store) }
             else { EPUBReader(source: source, api: api, store: store) }
         }.nativeLocalization()
+    }
+}
+
+// One persisted value is shared by Settings and every reader; the bridge never writes a stale reader copy.
+@MainActor private final class EPUBPreferenceStore: ObservableObject {
+    static let shared = EPUBPreferenceStore()
+    private static let key = "previewEPUBPreferences"
+    @Published var value: EPUBPreferences {
+        didSet { if let data = try? JSONEncoder().encode(value) { defaults.set(data, forKey: Self.key) } }
+    }
+    private let defaults: UserDefaults
+    private var defaultsChanges: AnyCancellable?
+    private static func read(_ defaults: UserDefaults) -> EPUBPreferences {
+        defaults.data(forKey: key).flatMap { try? JSONDecoder().decode(EPUBPreferences.self, from: $0) } ?? EPUBPreferences()
+    }
+    private init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        value = Self.read(defaults)
+        defaultsChanges = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification, object: defaults)
+            .receive(on: RunLoop.main).sink { [weak self] _ in
+                guard let self else { return }
+                let latest = Self.read(self.defaults)
+                if latest != self.value { self.value = latest }
+            }
+    }
+}
+
+private struct EPUBPreferenceSections: View {
+    @ObservedObject private var preferences = EPUBPreferenceStore.shared
+    @Environment(\.nativeStrings) private var l10n
+    var body: some View {
+        Group {
+            Section(header: Text(l10n("Navigation"))) {
+                Picker(l10n("Volume buttons"), selection: $preferences.value.volume) {
+                    Text(l10n("Enabled")).tag("enabled"); Text(l10n("Mirrored")).tag("mirrored"); Text(l10n("Off")).tag("none")
+                }.accessibilityIdentifier("reader-volume-mode")
+                Toggle(l10n("While listening"), isOn: $preferences.value.volumeWhileListening)
+                    .accessibilityLabel(l10n("Volume navigation while listening"))
+            }
+            Section(header: Text(l10n("Display"))) {
+                Toggle(l10n("Keep screen awake"), isOn: $preferences.value.keepAwake)
+                Picker(l10n("Theme"), selection: $preferences.value.theme) { Text(l10n("Light", context: .theme)).tag("light"); Text(l10n("Dark", context: .theme)).tag("dark"); Text(l10n("Black", context: .theme)).tag("black") }
+                Picker(l10n("Font"), selection: $preferences.value.font) { Text(l10n("Serif")).tag("serif"); Text(l10n("Sans serif")).tag("sans-serif"); Text(l10n("Monospace")).tag("monospace") }
+                Picker(l10n("Spread"), selection: $preferences.value.spread) { Text(l10n("Automatic")).tag("auto"); Text(l10n("Single page")).tag("none"); Text(l10n("Two pages")).tag("always") }
+            }
+            Section(header: Text(l10n("Typography"))) {
+                Text(l10n("Font size {0}%", Int(preferences.value.scale)))
+                Slider(value: $preferences.value.scale, in: 5...300, step: 5).accessibilityLabel(l10n("Font size"))
+                Text(l10n("Line spacing {0}%", Int(preferences.value.spacing)))
+                Slider(value: $preferences.value.spacing, in: 100...300, step: 5).accessibilityLabel(l10n("Line spacing"))
+                Text(l10n("Text weight {0}", Int(preferences.value.stroke)))
+                Slider(value: $preferences.value.stroke, in: 0...300, step: 5).accessibilityLabel(l10n("Text weight"))
+            }
+        }
+    }
+}
+
+struct NativeReadingSettings: View {
+    @AppStorage("previewPDFContinuous") private var continuous = false
+    @Environment(\.nativeStrings) private var l10n
+    var body: some View {
+        ShelfForm {
+            EPUBPreferenceSections()
+            Section(header: Text("PDF")) { Toggle(l10n("Continuous scrolling"), isOn: $continuous) }
+        }.navigationTitle(l10n("Reading preferences")).navigationBarTitleDisplayMode(.inline)
     }
 }

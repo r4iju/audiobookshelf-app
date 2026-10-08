@@ -1,0 +1,14 @@
+[
+  {
+    "file": "tvos/AudiobookshelfTV.xcodeproj/project.pbxproj",
+    "originalSHA256": "0c1497506a042d73fc4e76094e87b3373992d9d7269e6491c46893ad62671ce9",
+    "generatedSHA256": "79b31edfc1a05eb6def904d980d78cc4d5fe725397f5c775392e5536071e8b0f",
+    "reason": "xcodegen derived output from immutable project.yml, including capture-off scheme"
+  },
+  {
+    "file": "tvos/AudiobookshelfTV.xcodeproj/xcshareddata/xcschemes/AudiobookshelfTV.xcscheme",
+    "originalSHA256": "93bf1e2c0bff6bc4a31c9aee532c97905797f263eb9119c674187a687c7258da",
+    "generatedSHA256": "0fbfd6f8f4370246e2d2229c36a15b30c455c34d3c2ba9c04bc21d40f20589a9",
+    "reason": "xcodegen derived output from immutable project.yml, including capture-off scheme"
+  }
+]

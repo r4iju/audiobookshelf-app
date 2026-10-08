@@ -33,6 +33,10 @@ final class PlaybackJourney: TVJourney {
         let paused = seconds("now-playing-elapsed")
         sleep(2)
         XCTAssertEqual(seconds("now-playing-elapsed"), paused)
+        focus(app.tabBars.buttons["Now Playing"])
+        capture("now-playing-unfocused")
+        focus(app.buttons["toggle-playback"])
+        capture("now-playing-focused")
         remote.press(.playPause)
         wait(app.staticTexts["playback-status"], label: "Playing")
     }
@@ -41,8 +45,8 @@ final class PlaybackJourney: TVJourney {
         startContinueListening()
         chooseNextChapterWhilePaused()
         let left = seconds("now-playing-elapsed")
-        tab("Home")
-        XCTAssertTrue(app.buttons["play-item"].waitForExistence(timeout: 5), "Home keeps the details that started playback")
+        tab("Listen Now")
+        XCTAssertTrue(app.buttons["play-item"].waitForExistence(timeout: 5), "Listen Now keeps the details that started playback")
         tab("Now Playing")
         // The fixture has 12 seconds left, so the book may have finished while away; it must not pause.
         XCTAssertNotEqual(label("playback-status"), "Paused")
@@ -72,7 +76,7 @@ final class PlaybackJourney: TVJourney {
     func testStartingAnotherTitleWhileOnePlaysReplacesIt() async throws {
         let earlier = try await observations().requests.count
         startContinueListening()
-        tab("Audiobooks")
+        library("Audiobooks")
         select(app.buttons["item-book-1"])
         wait(app.buttons["play-item"], label: "Play")
         select(app.buttons["play-item"])
@@ -96,7 +100,7 @@ final class PlaybackJourney: TVJourney {
     func testAStartThatCannotReplaceThePlayingTitleStaysOnTheChosenTitle() async throws {
         startContinueListening()
         try await Fixture.configure("offline-progress")
-        tab("Audiobooks")
+        library("Audiobooks")
         select(app.buttons["item-book-1"])
         wait(app.buttons["play-item"], label: "Play")
         select(app.buttons["play-item"])

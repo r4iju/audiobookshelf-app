@@ -1,0 +1,50 @@
+[
+  {
+    "label": "signing-AudiobookshelfNative-strict",
+    "command": [
+      "codesign",
+      "--verify",
+      "--deep",
+      "--strict",
+      "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "signing-AudiobookshelfNative-entitlements",
+    "command": [
+      "codesign",
+      "--display",
+      "--entitlements",
+      ":-",
+      "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "signing-NativeJourneyTests-Runner-strict",
+    "command": [
+      "codesign",
+      "--verify",
+      "--deep",
+      "--strict",
+      "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/NativeJourneyTests-Runner.app"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "signing-NativeJourneyTests-Runner-entitlements",
+    "command": [
+      "codesign",
+      "--display",
+      "--entitlements",
+      ":-",
+      "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/NativeJourneyTests-Runner.app"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  }
+]

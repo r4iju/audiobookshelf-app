@@ -1,0 +1,68 @@
+[
+  {
+    "name": "playing-progress",
+    "wav_sha256": "a229d4a39cda8048f9741f52fb71158eb79cb50f61ac155a97b57e2aeaddbd0b",
+    "samples": 1532928,
+    "nonzero_samples": 865902,
+    "peak": 0.2854313850402832,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "id=playback-position"
+          ],
+          "exit": 0,
+          "out": "Tapped id=playback-position (201, 553)\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 18.607323169708252
+    }
+  },
+  {
+    "name": "playing-transport",
+    "wav_sha256": "c84e193d4ea99cd1cd6a906b5b3a1c8bb5c66c8bb4ededa26b632999c10a7556",
+    "samples": 1533952,
+    "nonzero_samples": 0,
+    "peak": 0.0,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "id=pause-playback"
+          ],
+          "exit": 1,
+          "out": "Error (COMMAND_FAILED): Selector did not match: id=pause-playback\nHint: Selector text/label values match exactly (quote multi-word values: text=\"Sign in\"). Run snapshot -i to see current elements and refs, or use find <text> for contains matching.\nDiagnostic ID: muzys3xz-3b50eca5\nDiagnostics Log: /Users/emanuel/.agent-device/remote-diagnostics/t3-359297c541bf76ade4d8f3b5/requests/7d2fcaacec9d3a9e.ndjson\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.494646072387695
+    }
+  },
+  {
+    "name": "next-native-focus",
+    "wav_sha256": "049a5f3bc05168a67a6e0e459cf0cfad7e92fc4ebfdb111cf456fc837f268a57",
+    "samples": 1532928,
+    "nonzero_samples": 85466,
+    "peak": 0.21347782015800476,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "swipe",
+            "180",
+            "780",
+            "280",
+            "780"
+          ],
+          "exit": 0,
+          "out": "Flung\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.455672025680542
+    }
+  }
+]

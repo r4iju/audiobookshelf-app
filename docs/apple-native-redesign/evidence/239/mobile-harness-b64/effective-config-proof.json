@@ -1,0 +1,15 @@
+{
+  "files": {
+    "/tmp/native240-harness-b64cc462/derived/Build/Products/AudiobookshelfNative_iphonesimulator27.0-arm64.xctestrun": "c3eedbfc9faead8c72b806fd9bed51f7f890a1a6c15cd620cc4c95efbaf72e1f"
+  },
+  "targets": [
+    {
+      "TestBundlePath": "__TESTHOST__/PlugIns/NativeJourneyTests.xctest",
+      "TestHostPath": "__TESTROOT__/Debug-iphonesimulator/NativeJourneyTests-Runner.app",
+      "UITargetAppPath": "__TESTROOT__/Debug-iphonesimulator/AudiobookshelfNative.app",
+      "SystemAttachmentLifetime": "keepNever",
+      "IsUITestBundle": true,
+      "PreferredScreenCaptureFormat": "screenRecording"
+    }
+  ]
+}

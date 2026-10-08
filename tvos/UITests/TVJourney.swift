@@ -15,6 +15,8 @@ import XCTest
     override func setUp() async throws {
         continueAfterFailure = false
         try await Fixture.configure("baseline")
+        try await Fixture.resetCatalogProgress(base: Self.fixture)
+        try await Fixture.resetCatalogProgress(base: Self.secureFixture)
     }
 
     override func tearDown() {
@@ -54,7 +56,11 @@ import XCTest
 
     /// SwiftUI menus report focus on an inner element rather than the identified button.
     func hasFocus(_ element: XCUIElement) -> Bool {
-        element.hasFocus || element.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true")).count > 0
+        if element.hasFocus || element.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true")).count > 0 { return true }
+        // Native List owns row focus on the cell containing the identified control.
+        guard !element.identifier.isEmpty else { return false }
+        return app.cells.containing(.any, identifier: element.identifier)
+            .matching(NSPredicate(format: "hasFocus == true")).count > 0
     }
 
     func select(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
@@ -66,6 +72,7 @@ import XCTest
         select(field, file: file, line: line)
         app.typeText(text)
         remote.press(.menu)
+        if app.keyboards.firstMatch.exists && app.keyboards.firstMatch.hasFocus { remote.press(.menu) }
     }
 
     /// An option in an open menu, found by the text the person reads (sections drop identifiers).
@@ -79,7 +86,19 @@ import XCTest
         let keyboard = app.keyboards.firstMatch
         for _ in 0..<4 where !(keyboard.exists && keyboard.hasFocus) { remote.press(.down) }
         XCTAssertTrue(keyboard.hasFocus, "The search keyboard should take focus", file: file, line: line)
-        app.typeText(text)
+        let field = app.searchFields.firstMatch
+        var entered = ""
+        // Stock17's native keyboard dropped a character from one batched event.
+        // Observe each actual character before sending the next native event.
+        for character in text {
+            app.typeText(String(character))
+            entered.append(character)
+            let matches = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", entered), object: field)
+            let result = XCTWaiter.wait(for: [matches], timeout: 3)
+            XCTAssertEqual(result, .completed, "Native search input expected \(entered), got \(String(describing: field.value))", file: file, line: line)
+            guard result == .completed else { return }
+        }
+        XCTAssertEqual(field.value as? String, text, "Verify complete native query before result assertions", file: file, line: line)
     }
 
     func signIn(server: String = TVJourney.fixture, reset: Bool = true) {
@@ -109,16 +128,29 @@ import XCTest
         select(app.tabBars.buttons[name], file: file, line: line)
     }
 
+    func library(_ name: String, file: StaticString = #filePath, line: UInt = #line) {
+        tab("Library", file: file, line: line)
+        let chooser = app.buttons["library-chooser"]
+        XCTAssertTrue(chooser.waitForExistence(timeout: 15), file: file, line: line)
+        if chooser.label != name {
+            select(chooser, file: file, line: line)
+            select(app.cells.containing(NSPredicate(format: "label == %@", name)).firstMatch, file: file, line: line)
+        }
+    }
+
     func waitForHome(file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertTrue(app.buttons["continue-listening.book-0"].waitForExistence(timeout: 20), app.debugDescription, file: file, line: line)
     }
 
     func label(_ identifier: String) -> String { app.staticTexts[identifier].label }
 
-    func wait(_ element: XCUIElement, label expected: String, timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) {
+    @discardableResult
+    func wait(_ element: XCUIElement, label expected: String, timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) -> Bool {
         let predicate = NSPredicate(format: "label == %@", expected)
         let matched = XCTNSPredicateExpectation(predicate: predicate, object: element)
-        XCTAssertEqual(XCTWaiter.wait(for: [matched], timeout: timeout), .completed, "Expected \(expected), saw \(element.exists ? element.label : "nothing")", file: file, line: line)
+        let result = XCTWaiter.wait(for: [matched], timeout: timeout)
+        XCTAssertEqual(result, .completed, "Expected \(expected), saw \(element.exists ? element.label : "nothing")", file: file, line: line)
+        return result == .completed
     }
 
     /// Seconds parsed from an m:ss or h:mm:ss clock label.
@@ -137,6 +169,14 @@ enum Fixture {
         request.httpBody = try JSONEncoder().encode(["mode": mode])
         let (_, response) = try await URLSession.shared.data(for: request)
         XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200, "Fixture on \(base) rejected mode \(mode)")
+    }
+
+    /// A fresh TV journey starts with unstarted secondary titles on each owned fixture.
+    static func resetCatalogProgress(base: String) async throws {
+        var request = URLRequest(url: URL(string: base + "/__related__/reset-progress")!)
+        request.httpMethod = "POST"
+        let (_, response) = try await URLSession.shared.data(for: request)
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
     }
 
     struct Request: Decodable { let method: String?; let path: String; let page: String? }

@@ -1,0 +1,9 @@
+{
+  "installed_resources": 47,
+  "all_match": true,
+  "strict_signature": "PASS",
+  "original_wav_sha256": "6adc45d0d73378a4ca3c6236293854b64c5486a82f65fe74d9eb8881269df974",
+  "transcript": "voiceover on, audiobook loft, done, button.",
+  "scope": "Automatic Done button speech only; requested values focus failed. Genuine paused intent does not resolve AX watchdog. No human listening claim, no full acceptance.",
+  "final_voiceover": false
+}

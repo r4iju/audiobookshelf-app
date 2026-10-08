@@ -83,8 +83,21 @@ for fixture_pid in "${fixture_pids[@]}"; do
         exit 2
     fi
 done
+derived_data="${ABS_QA_DERIVED_DATA:-$apple_root/build/ui-$(printf '%s' "$simulator" | tr -c 'A-Za-z0-9-' '_')}"
 xcodegen generate --spec "$apple_root/project.yml"
-xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative \
-    -destination "$destination" \
-    -derivedDataPath "$apple_root/build" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
-    IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never "$@" test
+python3 "$repo_root/verification/verify-native-capture-policy.py" "$apple_root/AudiobookshelfNative.xcodeproj" AudiobookshelfNative
+# A result bundle belongs to execution, not the preceding configuration build.
+build_arguments=()
+skip_result_path=false
+for argument in "$@"; do
+    if $skip_result_path; then skip_result_path=false; continue; fi
+    if [[ "$argument" == -resultBundlePath ]]; then skip_result_path=true; continue; fi
+    build_arguments+=("$argument")
+done
+if $skip_result_path; then echo "Missing -resultBundlePath value." >&2; exit 2; fi
+native_build=(xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative
+    -destination "$destination" -derivedDataPath "$derived_data"
+    CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0)
+"${native_build[@]}" "${build_arguments[@]}" build-for-testing
+python3 "$repo_root/verification/verify-native-capture-policy.py" "$apple_root/AudiobookshelfNative.xcodeproj" AudiobookshelfNative "$derived_data"
+"${native_build[@]}" -collect-test-diagnostics never "$@" test-without-building

@@ -41,8 +41,11 @@ import XCTest
         capture("native-catalog")
         firstBook.tap()
         XCTAssertTrue(app.staticTexts["Narrated by QA Narrator"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["Opening"].exists)
-        XCTAssertTrue(app.staticTexts["Next chapter"].exists)
+        let opening = app.staticTexts["Opening"]
+        let next = app.staticTexts["Next chapter"]
+        for _ in 0..<5 where !next.exists { app.swipeUp() }
+        XCTAssertTrue(opening.exists)
+        XCTAssertTrue(next.exists)
         capture("native-book-details")
         app.navigationBars.buttons["Audiobooks"].tap()
         let lastBook = app.buttons["book-book-60"]

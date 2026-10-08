@@ -11,9 +11,15 @@ import XCTest
         app.collectionViews.matching(NSPredicate(format: "label != %@", "Sidebar"))
     }
 
+    /// iPad's native sidebar exposes destinations as cells; its toolbar may also contain a Search button.
+    func mainDestination(_ name: String, in app: XCUIApplication) -> XCUIElement {
+        let cell = app.cells.matching(NSPredicate(format: "label == %@", name)).firstMatch
+        return cell.exists ? cell : app.buttons[name].firstMatch
+    }
+
     func librarySearchField(_ app: XCUIApplication) -> XCUIElement {
         let field = app.searchFields["library-search"]
-        return field.exists ? field : app.textFields["library-search"]
+        return field.exists ? field : app.searchFields.firstMatch
     }
 
     func capture(_ name: String) {
@@ -23,25 +29,38 @@ import XCTest
         add(evidence)
     }
 
+    private func dismissConnectionKeyboard(_ app: XCUIApplication) {
+        let hide = app.keyboards.buttons["Hide keyboard"].firstMatch
+        if hide.exists { hide.tap() }
+    }
+
+    private func scrollConnectionForm(_ app: XCUIApplication) {
+        let form = app.collectionViews.firstMatch.exists ? app.collectionViews.firstMatch : app.tables.firstMatch
+        if form.exists { form.swipeUp() } else { app.swipeUp() }
+    }
+
     func connectSelectAndRestore(serverURL: String, verifyRestoration: Bool = true, arguments: [String] = []) {
         let app = XCUIApplication()
         app.launchArguments = ["--reset-preview-account"] + arguments
         app.launch()
         let server = app.textFields["server"]
-        for _ in 0..<5 where !server.exists { app.swipeUp() }
+        for _ in 0..<5 where !(server.exists && server.isHittable) { scrollConnectionForm(app) }
         XCTAssertTrue(server.waitForExistence(timeout: 10))
         server.tap()
         server.typeText(serverURL)
+        dismissConnectionKeyboard(app)
         let username = app.textFields["username"]
-        for _ in 0..<3 where !username.exists { app.swipeUp() }
+        for _ in 0..<3 where !(username.exists && username.isHittable) { scrollConnectionForm(app) }
         username.tap()
         username.typeText("qa")
+        dismissConnectionKeyboard(app)
         let password = app.secureTextFields["password"]
-        for _ in 0..<3 where !password.exists { app.swipeUp() }
+        for _ in 0..<3 where !(password.exists && password.isHittable) { scrollConnectionForm(app) }
         password.tap()
         password.typeText("qa")
+        dismissConnectionKeyboard(app)
         app.buttons["connect"].tap()
-        XCTAssertTrue(app.buttons["library-books"].waitForExistence(timeout: 10), app.staticTexts["connection-error"].exists ? app.staticTexts["connection-error"].label : app.debugDescription)
+        XCTAssertTrue(app.buttons["library-books"].waitForExistence(timeout: 10), app.staticTexts["connection-error"].exists ? app.staticTexts["connection-error"].firstMatch.label : app.debugDescription)
         app.buttons["library-books"].tap()
         XCTAssertTrue(app.staticTexts["Audiobooks"].firstMatch.waitForExistence(timeout: 10))
         guard verifyRestoration else { return }
@@ -63,6 +82,7 @@ import XCTest
         openPlayerSettings(app)
         for (identifier, on) in switches {
             let toggle = app.switches[identifier]
+            for _ in 0..<8 where !(toggle.exists && toggle.isHittable) { app.swipeUp() }
             XCTAssertTrue(toggle.waitForExistence(timeout: 3), "\(identifier) is missing from Playback settings")
             if (toggle.value as? String == "1") != on { toggle.switches.firstMatch.tap() }
             XCTAssertEqual(toggle.value as? String, on ? "1" : "0", identifier)

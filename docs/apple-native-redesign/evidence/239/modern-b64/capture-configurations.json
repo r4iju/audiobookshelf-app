@@ -1,0 +1,10 @@
+[
+  {
+    "path": "/tmp/native-b64-modern-tv/build/Build/Products/AudiobookshelfTV_appletvsimulator27.0-arm64.xctestrun",
+    "sha256": "001afafdbfea8662e39509ef948f44447b266b6a9f69d1567889c0dd92fd27d7",
+    "targets": {
+      "TVAppTests": "keepNever",
+      "TVJourneyTests": "keepNever"
+    }
+  }
+]

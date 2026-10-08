@@ -343,7 +343,18 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if configuration['mode'] == 'offline-library' and path and path.startswith('/api/'):
                 return self.respond(503, {})
             if path == '/api/libraries':
-                return self.respond(200, {'libraries': [{'id': 'books', 'name': 'Audiobooks', 'mediaType': 'book'}, {'id': 'podcasts', 'name': 'Podcasts', 'mediaType': 'podcast', 'folders': [{'id': 'podcast-folder', 'fullPath': '/fixtures/podcasts'}]}]})
+                libraries = [{'id': 'books', 'name': 'Audiobooks', 'mediaType': 'book'}, {'id': 'podcasts', 'name': 'Podcasts', 'mediaType': 'podcast', 'folders': [{'id': 'podcast-folder', 'fullPath': '/fixtures/podcasts'}]}]
+                if configuration['mode'] == 'many-libraries':
+                    libraries += [{'id': f'archive-{i}', 'name': f'Archive {i:02}', 'mediaType': 'book'} for i in range(1, 11)]
+                return self.respond(200, {'libraries': libraries})
+            archive = re.fullmatch(r'/api/libraries/archive-(\d+)/(items|personalized|filterdata|search)', path or '')
+            if archive and configuration['mode'] == 'many-libraries':
+                number, endpoint = archive.groups()
+                if endpoint == 'personalized': return self.respond(200, [])
+                if endpoint == 'filterdata': return self.respond(200, {'genres': [], 'narrators': [], 'authors': []})
+                if endpoint == 'search': return self.respond(200, {'book': [], 'authors': [], 'series': [], 'tags': []})
+                result = [items[60]] if number == '10' else []
+                return self.respond(200, {'results': result, 'total': len(result)})
             if path == '/api/libraries/books/collections':
                 return self.respond(200, {'results': collections, 'total': len(collections)})
             playlist_library = re.fullmatch(r'/api/libraries/(books|podcasts)/playlists', path or '')
@@ -433,6 +444,8 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
             if path == '/api/items/book-0/file/epub' or downloaded_file and downloaded_file[1] == 'epub':
                 return self.respond(200, document, 'application/epub+zip')
             if path == '/api/items/book-0/file/pdf' or downloaded_file and downloaded_file[1] == 'pdf':
+                if configuration['mode'] == 'download-partial-ebook' and downloaded_file:
+                    return self.respond(503, {'error': 'Synthetic ebook unavailable'})
                 return self.respond(200, document, 'application/pdf')
             if downloaded_file:
                 if configuration['mode'] == 'download-error-page':
@@ -440,14 +453,17 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, tracks[int(downloaded_file[1])], 'audio/wav')
             if path and path.startswith('/api/items/book-') and not path.endswith('/cover'):
                 try:
-                    return self.respond(200, items[int(path.rsplit('-', 1)[1])])
+                    item = items[int(path.rsplit('-', 1)[1])]
+                    if configuration['mode'] == 'pdf-ebook-only' and item['id'] == 'book-0':
+                        item = {**item, 'media': {**item['media'], 'duration': None, 'numTracks': 0, 'tracks': [], 'chapters': []}}
+                    return self.respond(200, item)
                 except (ValueError, IndexError):
                     return self.respond(404, {})
             if path and path.endswith('/cover'):
+                if configuration['mode'] in ('baseline', 'many-libraries', 'long-audio', 'large-cover-art') and (directory := os.environ.get('ABS_QA_COVER_DIRECTORY')):
+                    index = 0 if path.endswith('book-0/cover') else 1
+                    return self.respond(200, (Path(directory) / f'{index}.jpg').read_bytes(), 'image/jpeg')
                 if configuration['mode'] == 'large-cover-art':
-                    if directory := os.environ.get('ABS_QA_COVER_DIRECTORY'):
-                        index = 0 if path.endswith('book-0/cover') else 1
-                        return self.respond(200, (Path(directory) / f'{index}.jpg').read_bytes(), 'image/jpeg')
                     width, height = (1800, 1800) if path.endswith('book-0/cover') else (1200, 1800)
                     def chunk(kind, data):
                         return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data) & 0xffffffff)
@@ -529,7 +545,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                 return self.respond(200, {'released': len(released)})
             if path == '/__fixture__/configure':
                 mode = data.get('mode')
-                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art', 'long-audio', 'held-sync'):
+                if mode not in ('baseline', 'empty', 'catalog-error', 'page-error', 'edge-metadata', 'slow-audio', 'slow-session', 'slow-close', 'broken-audio', 'no-audio', 'offline-progress', 'lost-ack', 'newer-remote', 'openid', 'openid-invalid-state', 'openid-invalid-provider-state', 'podcast-admin', 'podcast-slow-detail', 'offline-library', 'remote-rewind', 'download-error-page', 'download-partial-ebook', 'pdf-ebook-only', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary', 'epub-reader', 'epub-invalid', 'epub-long', 'epub-styled', 'epub-zero-percentage', 'group-forbidden', 'group-partial-failure', 'group-remote-finish', 'podcast-download-failure', 'podcast-held-download-failure', 'podcast-retry-delayed-failure', 'large-cover-art', 'many-libraries', 'long-audio', 'held-sync'):
                     return self.respond(400, {})
                 configuration.update(mode=mode, failed=False, reading_attempts=0, reading_rejected=False)
                 tokens.update(renewals=0, revoked=set(), refresh_delay=0)
@@ -546,10 +562,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     playlists[:] = [entry for entry in playlists if entry['id'] != original['id']]
                     playlists.insert(index, original)
                 remote_originals['progress'].clear(); remote_originals['playlists'].clear()
-                if mode in ('pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
+                if mode in ('pdf-ebook-only', 'download-partial-ebook', 'pdf-reader', 'pdf-remote', 'pdf-rotated', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure', 'pdf-supplementary'):
                     document = b'not a PDF' if mode == 'pdf-invalid' else pdf(pages=120 if mode == 'pdf-long' else 4, rotation=90 if mode == 'pdf-rotated' else 0)
                     items[0]['media']['ebookFile'] = {'ino': 'pdf', 'ebookFormat': 'pdf', 'metadata': {'filename': 'stories.pdf', 'ext': '.pdf', 'size': len(document)}}
-                    if mode in ('pdf-reader', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-rotated', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure'):
+                    if mode in ('pdf-reader', 'download-partial-ebook', 'pdf-invalid', 'pdf-long', 'pdf-audio', 'pdf-rotated', 'pdf-delayed', 'pdf-lost-ack', 'pdf-double-failure'):
                         for account in users.values():
                             for entry in progress_by_user[account['id']].values():
                                 entry.pop('ebookLocation', None); entry.pop('ebookProgress', None)
@@ -760,7 +776,7 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     result['audioTracks'][1]['duration'] = duration - 8
                     result['chapters'] = [chapters[0], {**chapters[1], 'end': duration}]
                 sessions[session_id] = result
-                if configuration['mode'] == 'no-audio':
+                if configuration['mode'] in ('no-audio', 'pdf-ebook-only'):
                     result['audioTracks'] = []
                 if delay_response:
                     time.sleep(8)

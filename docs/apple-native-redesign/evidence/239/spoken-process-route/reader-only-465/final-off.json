@@ -1,0 +1,28 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "info",
+      "voiceover",
+      "--device",
+      "DAF19749-8EE4-4512-A056-D11986922EC7",
+      "--timeout",
+      "10",
+      "--json-output",
+      "/tmp/native239-spoken-reader-only465/final-off.json"
+    ],
+    "commandType" : "devicectl.device.info.voiceover",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 5,
+    "outcome" : "success",
+    "version" : "642.16"
+  },
+  "result" : {
+    "deviceIdentifier" : "DAF19749-8EE4-4512-A056-D11986922EC7",
+    "enabled" : false,
+    "operation" : "query"
+  }
+}

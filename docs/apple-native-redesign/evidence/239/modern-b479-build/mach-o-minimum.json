@@ -1,0 +1,22 @@
+[
+  {
+    "file": "AudiobookshelfTV.debug.dylib",
+    "exit": 0,
+    "output": "/tmp/native-b479-modern-tv/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV.debug.dylib (architecture x86_64):\nLoad command 10\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n/tmp/native-b479-modern-tv/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV.debug.dylib (architecture arm64):\nLoad command 10\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "file": "AudiobookshelfTV",
+    "exit": 0,
+    "output": "/tmp/native-b479-modern-tv/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV (architecture x86_64):\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n/tmp/native-b479-modern-tv/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV (architecture arm64):\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "file": "__preview.dylib",
+    "exit": 0,
+    "output": "/tmp/native-b479-modern-tv/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/__preview.dylib (architecture x86_64):\nLoad command 8\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n/tmp/native-b479-modern-tv/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/__preview.dylib (architecture arm64):\nLoad command 8\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "file": "PlugIns/TVAppTests.xctest/TVAppTests",
+    "exit": 0,
+    "output": "/tmp/native-b479-modern-tv/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/PlugIns/TVAppTests.xctest/TVAppTests (architecture x86_64):\nLoad command 9\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n/tmp/native-b479-modern-tv/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/PlugIns/TVAppTests.xctest/TVAppTests (architecture arm64):\nLoad command 9\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  }
+]

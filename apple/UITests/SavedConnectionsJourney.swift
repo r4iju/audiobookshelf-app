@@ -11,7 +11,7 @@ import XCTest
         app.launchArguments = []
         app.launch()
         XCTAssertTrue(app.buttons["book-book-0"].waitForExistence(timeout: 10))
-        app.buttons["account"].tap()
+        app.buttons["Settings"].tap()
         app.buttons["Saved connections"].tap()
         XCTAssertEqual(app.buttons.matching(identifier: "connection-http://127.0.0.1:19765/abs").count, 1)
     }
@@ -31,7 +31,7 @@ import XCTest
         app.buttons["pause-playback"].tap()
         app.buttons["Done"].tap()
         app.navigationBars.buttons["Audiobooks"].tap()
-        app.buttons["account"].tap()
+        app.buttons["Settings"].tap()
         app.buttons["Saved connections"].tap()
         app.buttons["Add server"].tap()
         let server = app.textFields["server"]
@@ -58,7 +58,7 @@ import XCTest
         await fulfillment(of: [otherPosition], timeout: 10)
         app.buttons["Done"].tap()
         app.navigationBars.buttons["Audiobooks"].tap()
-        app.buttons["account"].tap()
+        app.buttons["Settings"].tap()
         app.buttons["Saved connections"].tap()
         app.buttons["qa on http://127.0.0.1:19765/abs"].tap()
         XCTAssertTrue(app.buttons["book-book-0"].waitForExistence(timeout: 10))
@@ -93,7 +93,7 @@ import XCTest
         app.buttons["pause-playback"].tap()
         app.buttons["Done"].tap()
         app.navigationBars.buttons["Audiobooks"].tap()
-        app.buttons["account"].tap()
+        app.buttons["Settings"].tap()
         let connections = app.buttons["Saved connections"]
         XCTAssertTrue(connections.waitForExistence(timeout: 3))
         guard connections.exists else { return }
@@ -114,13 +114,13 @@ import XCTest
         XCTAssertTrue(app.buttons["book-podcast"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["mini-player"].exists)
         try await FixtureControl.configure("baseline")
-        app.buttons["account"].tap()
+        app.buttons["Settings"].tap()
         app.buttons["Saved connections"].tap()
         app.buttons["connection-http://127.0.0.1:19765/abs"].tap()
         XCTAssertTrue(app.buttons["book-book-0"].waitForExistence(timeout: 10))
         let reports = try await fixtureObservations().reports
         XCTAssertTrue(reports.contains { $0.path == "/api/session/local-all" && $0.currentTime >= 10 && $0.timeListened > 0 })
-        app.buttons["account"].tap()
+        app.buttons["Settings"].tap()
         app.buttons["Saved connections"].tap()
         app.buttons["connection-http://127.0.0.1:19766/abs"].tap()
         XCTAssertTrue(app.staticTexts["Podcasts"].firstMatch.waitForExistence(timeout: 10))

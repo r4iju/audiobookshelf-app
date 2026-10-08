@@ -1,0 +1,5 @@
+{
+  "CFBundleIdentifier": "com.forkzed.audiobookshelf.tv",
+  "MinimumOSVersion": "17.0",
+  "CFBundleExecutable": "AudiobookshelfTV"
+}

@@ -1,0 +1,38 @@
+{
+  "source": "b64cc462060ba9a5a54790bfc6303144fd527a87",
+  "root_independent": true,
+  "archive_sha256": "428fb8db8416ef613725bf0d5be151cbce348e85b23917b1b852f5ce9a48ec00",
+  "full_archived_files": 2275,
+  "phone_full_product_files": 46,
+  "tv_full_product_files": 36,
+  "fresh_mobile_built_installed_files": 47,
+  "strict_seals": "PASS",
+  "signing_contracts": [
+    {
+      "kind": "phone",
+      "strict_profile_team_identity_certificate_callback_keychain": "PASS",
+      "minimum": "15.0",
+      "profile_valid": true
+    },
+    {
+      "kind": "tv",
+      "strict_profile_team_identity_certificate_callback_keychain": "PASS",
+      "minimum": "17.0",
+      "profile_valid": true
+    }
+  ],
+  "capture_guard_generated_and_effective": "PASS independently repeated before accepting harness evidence",
+  "status": "NOT ACCEPTED / NOT INSTALLED / NOT RELEASED",
+  "pending": [
+    "strict combined contrast RED2",
+    "complete spoken accessibility",
+    "original-minimum mobile execution",
+    "final clean TV verification and independent review",
+    "merge/merged-source QA/owner installation",
+    "public written rights clearance"
+  ],
+  "static_inspection_notes": [
+    "First schema inspection wrongly assumed object where product-proof is a list; corrected and whole manifests verified",
+    "Capture guard has positional-only CLI, --help unsupported; actual project/scheme/derived-data invocation passed"
+  ]
+}

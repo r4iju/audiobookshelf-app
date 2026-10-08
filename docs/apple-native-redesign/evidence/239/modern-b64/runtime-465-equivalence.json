@@ -1,0 +1,327 @@
+{
+  "base": "465c490152f9184418e5f7b8bb9b3662b38c5e88",
+  "source": "b64cc462060ba9a5a54790bfc6303144fd527a87",
+  "files": [
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Back.imagestacklayer/Content.imageset/Back-1x.png",
+      "same": true,
+      "sha256": "1216fb23da70c89ad1ee6b41d8277e90536fb8668e9affbf093d9c78b4ddee49"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Back.imagestacklayer/Content.imageset/Back-2x.png",
+      "same": true,
+      "sha256": "fa3c9d3124a87908fa9fd241c77fbe2751f7de3e248330df1915de4dda0140d9"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Back.imagestacklayer/Content.imageset/Contents.json",
+      "same": true,
+      "sha256": "cc3366e14a0b63c32a7b735f6bad8a3d1a9d0eab2d6ff7d4770cc4eabe6417b2"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Back.imagestacklayer/Contents.json",
+      "same": true,
+      "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Contents.json",
+      "same": true,
+      "sha256": "93877d7a2f7e4b19e031b18a1d1975cb5160e148f063dbaf704f4381cbeb7189"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Front.imagestacklayer/Content.imageset/Contents.json",
+      "same": true,
+      "sha256": "7b4d7d8746ce20193d8fb9d890182ab32fafdf519bae4586f9aeccc5599816a5"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Front.imagestacklayer/Content.imageset/Front-1x.png",
+      "same": true,
+      "sha256": "785fde4a4343b9522551f5cdc95ce72697317c1916a7f7d00de5569270d46e6e"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Front.imagestacklayer/Content.imageset/Front-2x.png",
+      "same": true,
+      "sha256": "982941339e8a4595a92c79e22ca195c300e2c83b92586eb7fa9b409ed264d3e2"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Front.imagestacklayer/Contents.json",
+      "same": true,
+      "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Back.imagestacklayer/Content.imageset/Back-1x.png",
+      "same": true,
+      "sha256": "3c51d25d1b90dd60debdd7c5e17f11125fa10090028a4445c619bfbba7bf63b2"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Back.imagestacklayer/Content.imageset/Contents.json",
+      "same": true,
+      "sha256": "462b71e9db4b1dc72eef11d342e4e5af42f08ced47a60713f065f79bbbc165f2"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Back.imagestacklayer/Contents.json",
+      "same": true,
+      "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Contents.json",
+      "same": true,
+      "sha256": "93877d7a2f7e4b19e031b18a1d1975cb5160e148f063dbaf704f4381cbeb7189"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Front.imagestacklayer/Content.imageset/Contents.json",
+      "same": true,
+      "sha256": "4b6f1cdadd75c8d8327e77edacd203e8828c07cb4d7c20ce98e9ec9a16502b4e"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Front.imagestacklayer/Content.imageset/Front-1x.png",
+      "same": true,
+      "sha256": "01b46486ab69bbaca194043e3eecb8176d16b692d84a7027147814e85739d68e"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Front.imagestacklayer/Contents.json",
+      "same": true,
+      "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Contents.json",
+      "same": true,
+      "sha256": "9608617e4d5c16658194d093a7c2f5a65480bfc05253704eda911d6aa870a3fe"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf Wide.imageset/Contents.json",
+      "same": true,
+      "sha256": "89474fe82b8b16f06d52ceee35c7a0d12b661720d7d4623d0c706cd33581f7a1"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf Wide.imageset/shelf-1x.png",
+      "same": true,
+      "sha256": "a247ccfea48c61d4d91c58814663b41e623e0466598f13d0a1e6fe496e18c151"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf Wide.imageset/shelf-2x.png",
+      "same": true,
+      "sha256": "d95bfa90a8b405705619a07a337629ac62818dc92eec9500cab817e547720708"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf.imageset/Contents.json",
+      "same": true,
+      "sha256": "89474fe82b8b16f06d52ceee35c7a0d12b661720d7d4623d0c706cd33581f7a1"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf.imageset/shelf-1x.png",
+      "same": true,
+      "sha256": "86e6f8b11392063a72b8b0d0cbc9d8c8b7aba5bb1f6933fd2c42d8be60eab71f"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf.imageset/shelf-2x.png",
+      "same": true,
+      "sha256": "9a7a89489b0fad6636103ca62ea4c40a950187e01dde5733fb8b46be74b47210"
+    },
+    {
+      "file": "tvos/App/Assets.xcassets/Contents.json",
+      "same": true,
+      "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+    },
+    {
+      "file": "tvos/App/AudiobookshelfTVApp.swift",
+      "same": true,
+      "sha256": "90ed4356de35f5740394a97af45354c3c125b3d8082f216497074d97303cc3a4"
+    },
+    {
+      "file": "tvos/App/CatalogStore.swift",
+      "same": true,
+      "sha256": "70be7fac850bbebc3f91b84e86fefc8170efcc9489a7fc0a3690e2cca60174d9"
+    },
+    {
+      "file": "tvos/App/Components.swift",
+      "same": true,
+      "sha256": "c9a86d784ae2796e3fb0638e3e1c00f57c5927620c9bf06c062416ff270e8740"
+    },
+    {
+      "file": "tvos/App/HomeView.swift",
+      "same": true,
+      "sha256": "26349a57b4f71981914676a8e0e09bd4ccb5d91913722b69a33a16ed529972c5"
+    },
+    {
+      "file": "tvos/App/Info.plist",
+      "same": true,
+      "sha256": "dc46559d980c6a7da479ab5b5b4509a11ab413f6a755ea09b0cba1daae8086e6"
+    },
+    {
+      "file": "tvos/App/ItemDetailView.swift",
+      "same": true,
+      "sha256": "6642377703a35c6fe1d590d85e9527a6d1d1974a3e2e9fc79a9d71ba10dd680d"
+    },
+    {
+      "file": "tvos/App/KeychainCredentials.swift",
+      "same": true,
+      "sha256": "55081fb9cb4eaf8649b1b76cedf2ddc7207b7e938268a1a9fddbe3d921ba30ad"
+    },
+    {
+      "file": "tvos/App/LibraryBrowser.swift",
+      "same": true,
+      "sha256": "6c73a20905f8d347332b400532192b7fd0c24de2317a3a288c9ca4bbd35029d9"
+    },
+    {
+      "file": "tvos/App/LibraryView.swift",
+      "same": true,
+      "sha256": "9eb172aa0884749d48790524f4c572a0eca3470815987020597d897b0f29dd9e"
+    },
+    {
+      "file": "tvos/App/MediaRestart.swift",
+      "same": true,
+      "sha256": "cc4fca4e6e46cbcaa27cc1535b30dcfeb990a589ef19a5cc57d8355e1e1012af"
+    },
+    {
+      "file": "tvos/App/NoticesView.swift",
+      "same": true,
+      "sha256": "ce517571561f58986f650a3390cc94d298b9ceaba0658b9de0119305b5342919"
+    },
+    {
+      "file": "tvos/App/NowPlayingView.swift",
+      "same": true,
+      "sha256": "51c2a6a175e2620621f9c53fd3b45054d9a51d8e124c5eb6260b1ba2b677d18a"
+    },
+    {
+      "file": "tvos/App/RelatedAuthorSeries.swift",
+      "same": true,
+      "sha256": "5ead920b599bc5513bf9c139c2120061c0f919ec6a5c49aa846c36512ff6e662"
+    },
+    {
+      "file": "tvos/App/RootView.swift",
+      "same": true,
+      "sha256": "bad20b657c8fce6bbf9c2adab013eaf903ecd3de378cd4827fa52f32068e05b7"
+    },
+    {
+      "file": "tvos/App/SearchView.swift",
+      "same": true,
+      "sha256": "0d0f20fa071bb4498f363222c177dad6fdedede1ed9b75c547e2fe8959595ee4"
+    },
+    {
+      "file": "tvos/App/SettingsView.swift",
+      "same": true,
+      "sha256": "d31280ea3222329edad7499e500708a4908f7c57dcd78ac836507b3eab8ee19a"
+    },
+    {
+      "file": "tvos/App/SignInView.swift",
+      "same": true,
+      "sha256": "8cfaf7be4245d853dd690333276900180c41420dfb585ebe491526f3525605a6"
+    },
+    {
+      "file": "tvos/App/TVDiagnostics.swift",
+      "same": true,
+      "sha256": "f4023ec609c3c8e06d02738b3b7fecf474c401a8a32625d16ed1a8852e0fb5cb"
+    },
+    {
+      "file": "tvos/App/TVLanguage.swift",
+      "same": true,
+      "sha256": "2fc8828059f94f3b77fc27383abdfe331070bdda276219184296497793788928"
+    },
+    {
+      "file": "tvos/App/TVPlayer.swift",
+      "same": true,
+      "sha256": "28ec4f73847ef27274eccdc17f533a786de5c45d26b36d26942bd08c357d427d"
+    },
+    {
+      "file": "tvos/Core/Package.swift",
+      "same": true,
+      "sha256": "e550464cfe3e86ef640bbdcd6445430d6f3ba8a2d538e38b4f63ed83d0704112"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/APIClient.swift",
+      "same": true,
+      "sha256": "4e591e14bb41a974668670df84ef747d7a6233c9ad8781bc08f0378e3a2f5d65"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/AudioGroups.swift",
+      "same": true,
+      "sha256": "fa2c0c874a88618260f76e33b630e04933da8311ed9075e825da0b0a877d7a77"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/AuthorSeries.swift",
+      "same": true,
+      "sha256": "1796bf240c720d31e371471a51c11f4eda5a25cf9e822ff5d7f824d8114abcf1"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/CoreText.swift",
+      "same": true,
+      "sha256": "abea41f738255b395f110680721e460d44efa8b843fcaea2835f5bc987df3a96"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/ItemServerActions.swift",
+      "same": true,
+      "sha256": "2630667a3661203763f5079876c7439062d34bf64bdf88528c00609a7d6f54ee"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/ListeningJournal.swift",
+      "same": true,
+      "sha256": "6bbe1a4347cdf2d67e428103d1ad4348365eb0630c7f2993c600c105a71fe998"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/ListeningStats.swift",
+      "same": true,
+      "sha256": "178bdea9cdae31489d6aa387c67d48cb4d7df2bd64ee982d67327f7a3b32bcc5"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/Models.swift",
+      "same": true,
+      "sha256": "0486b5c828c10bc251bcd8c0b3e6c8323216d98006d7282ec334e3f1039882b7"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/OfflineAudio.swift",
+      "same": true,
+      "sha256": "be258a6938ebc2a97621e5b51f38e373ba3eb8f7c032f25b04da88722df83db6"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/PodcastFeedEpisode.swift",
+      "same": true,
+      "sha256": "8fa4b82d5f67bcf4f2f76412cd9aea2cab3e9cbb06a5a802a3e84f5861d1f06c"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/RealtimeChange.swift",
+      "same": true,
+      "sha256": "018d4871db2313377ed0715af6afa858f8ade38fb5642878303b938c438a9508"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/ServerEvents.swift",
+      "same": true,
+      "sha256": "6a342bbd83f1cb8a35011183f2c0c04aa919004cfda8e83c54812672bacc206f"
+    },
+    {
+      "file": "tvos/Core/Tests/TVCoreTests/AnnualStatsTests.swift",
+      "same": true,
+      "sha256": "531b71776a9c2da4a4f76aa411924482da25df728a0cd3ba52aab710c4caebd4"
+    },
+    {
+      "file": "tvos/Core/Tests/TVCoreTests/ItemServerActionsTests.swift",
+      "same": true,
+      "sha256": "4698dfe73d94278623700fd67c2de99b48207981861d33ad9368f4b75cc1229e"
+    },
+    {
+      "file": "tvos/Core/Tests/TVCoreTests/ListeningJournalTests.swift",
+      "same": true,
+      "sha256": "eaca6e8c79655ff8f62ff95e4241a328a2c94df6ba4b70eef814d8dad50a490e"
+    },
+    {
+      "file": "tvos/Core/Tests/TVCoreTests/RealtimeChangeTests.swift",
+      "same": true,
+      "sha256": "509e91c6ede552df8d20373f9d416e61605a5aa6e84f99d79d93648a28a5bbd4"
+    },
+    {
+      "file": "tvos/Core/Tests/TVCoreTests/RelatedAuthorSeriesTests.swift",
+      "same": true,
+      "sha256": "431e9b1e2dcc542aef0765787861fc2c1d7cdc503ccf5aa0797c19d5e5ea8542"
+    },
+    {
+      "file": "tvos/Core/Tests/TVCoreTests/RelatedLoadersTests.swift",
+      "same": true,
+      "sha256": "d47f792e25d64f33072b07029c0e4884d6e2b8cbd6aafd5033dafd41bcbf736c"
+    },
+    {
+      "file": "tvos/Core/Tests/TVCoreTests/TVCoreTests.swift",
+      "same": true,
+      "sha256": "eaec5a0fa16f0d7359b3c770cc4ce0f312b9312023db67fb1037c792a7a85aaf"
+    }
+  ],
+  "all_equal": true
+}

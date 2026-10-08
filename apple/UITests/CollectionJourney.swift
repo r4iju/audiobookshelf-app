@@ -71,8 +71,8 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap(); accountMenu(app).buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
-        app.buttons["account"].tap(); app.buttons["Playlists"].tap()
+        app.buttons["Change library"].tap(); app.buttons["library-podcasts"].tap()
+        app.buttons["Playlists"].tap()
         XCTAssertTrue(app.buttons["group-playlist-podcasts"].waitForExistence(timeout: 5))
         app.buttons["group-playlist-podcasts"].tap()
         XCTAssertTrue(app.buttons["group-member-podcast:episode-morning"].waitForExistence(timeout: 5))
@@ -100,7 +100,7 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap(); app.buttons["Playlists"].tap()
+        app.buttons["Playlists"].tap()
         let create = app.buttons["New playlist"]
         XCTAssertTrue(create.waitForExistence(timeout: 5))
         guard create.exists else { return }
@@ -116,7 +116,7 @@ import XCTest
         app.buttons["group-\(created.id)"].tap(); app.buttons["Edit playlist"].tap()
         app.buttons["move-up-book-2:"].tap(); app.buttons["Save group"].tap()
         app.terminate(); app.launchArguments = []; app.launch()
-        app.buttons["account"].tap(); app.buttons["Playlists"].tap()
+        app.buttons["Playlists"].tap()
         XCTAssertTrue(app.buttons["group-\(created.id)"].waitForExistence(timeout: 5))
         app.buttons["group-\(created.id)"].tap(); app.buttons["Play playlist"].tap()
         for _ in 0..<30 {
@@ -159,7 +159,6 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap()
         let collections = app.buttons["Collections"]
         XCTAssertTrue(collections.waitForExistence(timeout: 3))
         guard collections.exists else { return }
@@ -175,7 +174,7 @@ import XCTest
         app.buttons["Pause collection"].tap()
         XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 3), "The group action must pause its currently playing member instead of restarting it")
         app.navigationBars.buttons["BackButton"].tap(); app.navigationBars.buttons["BackButton"].tap()
-        app.buttons["account"].tap(); app.buttons["Playlists"].tap()
+        app.buttons["Playlists"].tap()
         XCTAssertTrue(app.buttons["group-playlist-evening"].waitForExistence(timeout: 10))
         app.buttons["group-playlist-evening"].tap()
         XCTAssertTrue(app.buttons["Play playlist"].waitForExistence(timeout: 5))

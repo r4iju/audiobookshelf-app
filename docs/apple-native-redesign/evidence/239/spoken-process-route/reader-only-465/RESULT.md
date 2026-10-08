@@ -1,0 +1,15 @@
+# Bounded reader speech attempt — f922/465-equivalent phone
+
+Original cached ConnectionJourney/testConnectSelectLibraryAndRestoreAccountAfterRelaunch: 1 passed, 0 failed/skipped, no rebuild. Fixture login accepted=true. Installed application strict/deep signature passes and all 47 resources exactly match the cached f922 product, before and after the attempt. Mobile runtime is unchanged relative to 465; current 8c82 changes are TV diagnostics only.
+
+Owned synthetic pdf-reader configuration, native book/Read PDF activation. Initial immediate Page 1 of 4 lookup failed (retained); later native pdf-document was enabled/hittable, frame 0,116,402,672 and actual value Stories for Tomorrow - Passage 1. This is metadata, not speech proof. Earlier malformed selector arguments were corrected without source changes. Native runner completed its tree before VoiceOver/focus; the next audio action began about 21 seconds after that completed tree, rather than the planned 40-second sleep (sleep still pending, no overlapping AX work). No watchdog/busy error occurred in these focus actions.
+
+Two bounded 16-second recordings used only the owned simulator vot PID matched to launchctl and a private process tap, with existing output-only BuiltInSpeaker clock (zero hardware input). Aggregate input was two tap channels. No microphone/global tap/default-route change/images/video. First clip: document focus then public gesture swipe right. Second: two more public gesture swipe right. All CLI actions exited zero and reported Flung; this establishes dispatch only, not a VoiceOver next-element guarantee. First local parent ASR: Voice over on audiobook log; no reader passage. Second local parent ASR: you; rejected as meaningful PDF traversal proof. Do not claim reader speech acceptance from PDF value or action success.
+
+Stopped after two finite clips, per parent instruction. No EPUB alternate attempted. Player lock was not changed in this slice (prior owned lock-reader slice restored it to zero; not newly verified here). VoiceOver restored/query confirmed Off. Owned fixture groups stopped; ports 19765/19769 had no listeners. App terminated, owned DAF19749 phone panel closed/shutdown and lease released; installed bundle retained for independent verification. No shared source/index changes, no new tests, no public/owner operations.
+
+Artifacts: login-summary.json, installed.json, installed-after.json, login-observations.json, reader entry/readiness originals, clips.json with hashes/nonzero/actions, per-clip scope/log/raw/WAV, final-off.json. A meaningful next supported route needs demonstrated public VoiceOver next-element behavior or native accessible passage focus; another blind container/swipe loop is not proof.
+
+## Cached XCTest capture-policy qualification
+Audio/input had no explicit image commands. Cached test scheme/effective configuration keepNever was not guarded before execution, so automatic framework image creation is unproven. No definite image creation inferred; original result retained.
+Scheme and xctestrun candidate hashes: cached-capture-policy-qualification.json.

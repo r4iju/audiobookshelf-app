@@ -48,7 +48,8 @@ if [[ -z "$simulator" ]]; then
     leased_simulator="$simulator"
 fi
 xcodegen generate --spec "$apple_root/project.yml" > /dev/null
+derived_data="${ABS_QA_DERIVED_DATA:-$apple_root/build-related/$simulator}"
 TEST_RUNNER_ABS_ITEM_ACTIONS_QA=1 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative \
-    -destination "id=$simulator" -derivedDataPath "$apple_root/build-related" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
+    -destination "id=$simulator" -derivedDataPath "$derived_data" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
     IPHONEOS_DEPLOYMENT_TARGET=15.0 -resultBundlePath "${ABS_ITEM_ACTIONS_RESULT_BUNDLE:-$apple_root/build-related/ItemActions-$(date +%Y%m%d-%H%M%S).xcresult}" \
     -collect-test-diagnostics never -only-testing:NativeJourneyTests/ItemServerActionsJourney "$@" test

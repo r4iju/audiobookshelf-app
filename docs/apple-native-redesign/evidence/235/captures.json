@@ -1,0 +1,395 @@
+[
+  {
+    "file": "ipad-compact-player.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:37:29.844057+00:00",
+    "sha256": "5ad20ca38b2548bd0ab9a9257a4091828d8a7d1c66da18d61ffe991cd9356ecb",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-expanded-portrait.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:37:38.519719+00:00",
+    "sha256": "b75dac4b491bfa0ea121b0b73d49e228bd4156eb4ae8b55f4cf1ac31db9eadee",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-chapters-current.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:40:09.715387+00:00",
+    "sha256": "b8efcaaf39f9a38116331c1d05c0d252cc72ce53c3c9722ff75f47d7e1e1367b",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-speed-presets.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:40:28.550990+00:00",
+    "sha256": "ea6992d2bc63a0a4cf7f19b265166bf4bce762fe3ed794d84ec91a83603ced8d",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-speed-custom.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:41:00.282610+00:00",
+    "sha256": "39cf32a06eae6093cfa5995534802062be58d6b6e748b2a9f951f7c3f7e3f71f",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-bookmarks-empty.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:41:04.147569+00:00",
+    "sha256": "736358ef9a9fcefabe83e5921ebb8626deb9e1ccf59f2cd8397f5db2a2f0a67d",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-bookmarks-populated.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:44:51.455514+00:00",
+    "sha256": "f24ba1b0ca0c71574fd84e36e0e6f63e99a8a016b56445ed1f6114c80bf4adcf",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-bookmarks-edit-keyboard.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:45:22.469288+00:00",
+    "sha256": "316604f129c080bd8e17ca5b106094c6927125c67f9686c28b0124c4ea2c37c9",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-sleep-options.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:45:38.148992+00:00",
+    "sha256": "6e5b46fa60e2f19ffb1be6ba1f429c1ed2c1a845df41fb8b137954a081ef873d",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-sleep-active.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:45:52.297126+00:00",
+    "sha256": "effc954775a591f10db2c77ef2028b5e12450f4046690c78ea65a46f6f6ff698",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-settings-progress.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:46:05.715025+00:00",
+    "sha256": "d028ddcc09bd7486fd95c5f736010b3a72a858d27438a0ddee014e42530d70cb",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-settings-controls.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:46:16.188841+00:00",
+    "sha256": "01c224da47356495e9d1fb2e550f75e107013222c4ae2f6cb93c00eb8a4c03eb",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-compact-player.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:46:32.604682+00:00",
+    "sha256": "336d5184e4f0390921471b1374b3a93daef975f49970db1dc9a308f3a5477f0e",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-player-locked.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:46:37.298236+00:00",
+    "sha256": "9cbc201a2388d65f0fc102ea5baf26207a46c2e35792edf1becebcea7fd4e8ac",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-expanded-portrait.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:46:50.269172+00:00",
+    "sha256": "2e42908d4935b45856b6b8c63d9d48abbb2ad2ed693160818f8bd1718862ee9d",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-player-unlocked.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:46:53.184079+00:00",
+    "sha256": "dddee2537b21c3c1ae60a34a2a9d96fb26bc7d7fa9c6e90e9763da4766a73c34",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-bookmarks-error-retry.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:46:55.182622+00:00",
+    "sha256": "cf78cd75f4e9dbf61cdc65360d60514b6c0eeaf5c3bd0a5e3da6c62f5ec13e30",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data; owned api/me503 override"
+  },
+  {
+    "file": "ipad-bookmarks-retry-recovered.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:47:11.690779+00:00",
+    "sha256": "14146cc1765bc124a4b649ae6b2be60a057325a04ce67c360992f6039adeaf5d",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data; override cleared, actual Retry response success"
+  },
+  {
+    "file": "phone-player-tools.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:47:13.524882+00:00",
+    "sha256": "8ea02ec686e87af9d1414fa753ec00769f6315b2718715ca141c83fbf0a97166",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-chapters-current.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:47:44.465716+00:00",
+    "sha256": "46a907d2042234c287d47a9f6593c7b4c9670049bc2261abadb59629a92ed881",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-speed.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:48:34.586409+00:00",
+    "sha256": "b4afc5d07aab368d7fb2759d8358b8c2f9c076a5285e6ccf05e9ae51fbb2b99f",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-search-compact-keyboard.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:48:56.758026+00:00",
+    "sha256": "9f01d63fc22eaf1f3a03861152426a6b164811e59ee664742f82ca2197475a7f",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-bookmarks-populated.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:49:00.206711+00:00",
+    "sha256": "f57ef7cc01fa03ddb1f1e6c981c8ab8b713c0d2de73dddde3f39fa72e9d7aed7",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-bookmarks-edit-keyboard.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:49:21.271007+00:00",
+    "sha256": "303230be51f7e87abe8cb14435e522a381035649bd2b44e4f93231361bc48f94",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "ipad-search-compact-restored.png",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:49:26.210518+00:00",
+    "sha256": "ca10b847b13faf6ae60e3969178a1a09db951247cd13082a2cf061c7f7c7a076",
+    "product": "ipad",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-sleep-options.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:49:49.151932+00:00",
+    "sha256": "dbbe93a35098e9ee5672f42f3c935d30a5af53effb21dfac874bb947eb965947",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-sleep-custom-chapter.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:49:51.396434+00:00",
+    "sha256": "6ce2809f8627a8614582e356fbd72f856f50337190f284e1f66f123aeb8e96da",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-sleep-chapter-active.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:50:08.365040+00:00",
+    "sha256": "94456ae4acd4e0363c47556c587fb027bf76c6df8d9c2072de121bafd393636e",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-settings-controls.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:50:40.657657+00:00",
+    "sha256": "f11a6ad097fe027318becc2c5974c8e0d739408e3bc272ca103b9d434a428648",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-expanded-no-art.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:51:20.474787+00:00",
+    "sha256": "843955e2871282fc43b161dd2c3b35e80bf4df0c8adb66b8b38fceba66908ce0",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data; cover404 override"
+  },
+  {
+    "file": "phone-search-compact-keyboard.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:51:43.459041+00:00",
+    "sha256": "d97ea20ed280355c0e956159f2af6a5c61ceea8613b13d96fc432258671f6ca8",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-search-compact-restored.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:52:00.644567+00:00",
+    "sha256": "d8cd6ff3e628efd63b7985b33b85aa2095e40605e2b055f9f7c04d5423bb3fcb",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data"
+  },
+  {
+    "file": "phone-media-error.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:54:24.426677+00:00",
+    "sha256": "315562b6bf9db908b312c5a869531fb1a8c448ce98fb9d8f6d6a232bbc5426b2",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data; broken-audio mode"
+  },
+  {
+    "file": "phone-sign-in-prompt.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:55:25.704941+00:00",
+    "sha256": "0e036fb45b8723ff447dcac2b56945100d6c6db8d645f2e945e0f604f5696cfa",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data; actual synthetic qa revocation then same-server reauthentication"
+  },
+  {
+    "file": "phone-player-auth-error.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:55:29.267557+00:00",
+    "sha256": "bbdec24be8ea44577a580164e7a82be2f13c723323e62b876bdf4e795e4b39bc",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data; actual synthetic qa revocation then same-server reauthentication"
+  },
+  {
+    "file": "phone-reauthentication-actions.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:57:19.726582+00:00",
+    "sha256": "c2d8fe3d2f3ffa184813e9cbaf4321958a105f07ec943f601b608d7347995d5a",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data; actual synthetic qa revocation then same-server reauthentication"
+  },
+  {
+    "file": "phone-authentication-restored.png",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "source": "0b4733e63a69a46312d5976ba306ab699fcb83ac",
+    "captured_at": "2026-10-08T04:58:32.964925+00:00",
+    "sha256": "9ddcbefc6504627f6ac3d7c064957b5c79f3e2f0d159695d2eda5b3f66948665",
+    "product": "phone",
+    "fixture": "owned loopback25765/25769; long-audio + portrait synthetic book0 cover unless state names error/no-art/auth; no owner data; actual synthetic qa revocation then same-server reauthentication"
+  },
+  {
+    "file": "before-ipad-portrait-player.png",
+    "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "sha256": "99fc415ee9e9a3e7102355db1576aac09fcd0619595d1116df9117afb2482e8b",
+    "fixture": "owned loopback25765/25769 long-audio; synthetic cover0 mapped to portrait cover1 from234",
+    "product": "historical installed234 tablet product; see evidence234/builds.json",
+    "note": "Actual before capture, not final0b acceptance.",
+    "captured_at": "2026-10-08T04:29:37.988864+00:00"
+  },
+  {
+    "file": "before-ipad-speed.png",
+    "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "sha256": "9b75da0d91897f63c3dbd96c99c41b0db732a6baa6cd3d166cea256a4be054ae",
+    "fixture": "owned loopback25765/25769 long-audio; synthetic cover0 mapped to portrait cover1 from234",
+    "product": "historical installed234 tablet product; see evidence234/builds.json",
+    "note": "Actual before capture, not final0b acceptance.",
+    "captured_at": "2026-10-08T04:30:29.869506+00:00"
+  },
+  {
+    "file": "before-ipad-bookmarks.png",
+    "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "sha256": "a604fa24aba938dc9b76619277447a15e14f7c0ec19b8669a86b40f44cc76bdb",
+    "fixture": "owned loopback25765/25769 long-audio; synthetic cover0 mapped to portrait cover1 from234",
+    "product": "historical installed234 tablet product; see evidence234/builds.json",
+    "note": "Actual before capture, not final0b acceptance.",
+    "captured_at": "2026-10-08T04:30:47.650556+00:00"
+  },
+  {
+    "file": "before-ipad-sleep.png",
+    "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "sha256": "b7e9308c843b305be804511e57982179b87136fcdc899e951f0d9909ecea555e",
+    "fixture": "owned loopback25765/25769 long-audio; synthetic cover0 mapped to portrait cover1 from234",
+    "product": "historical installed234 tablet product; see evidence234/builds.json",
+    "note": "Actual before capture, not final0b acceptance.",
+    "captured_at": "2026-10-08T04:31:00.233400+00:00"
+  },
+  {
+    "file": "before-ipad-settings.png",
+    "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "sha256": "441531705eb139d7bb4136de47f7aad8f00f9a21fa33c7b3abe0d955db30ba75",
+    "fixture": "owned loopback25765/25769 long-audio; synthetic cover0 mapped to portrait cover1 from234",
+    "product": "historical installed234 tablet product; see evidence234/builds.json",
+    "note": "Actual before capture, not final0b acceptance.",
+    "captured_at": "2026-10-08T04:31:19.451563+00:00"
+  },
+  {
+    "file": "before-ipad-chapters.png",
+    "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+    "sha256": "4b3c8a57d2ff3da554e17e9e551547d2b638353c467422d2cc70a9f731f127b8",
+    "fixture": "owned loopback25765/25769 long-audio; portrait synthetic book0 cover",
+    "product": "historical installed234 tablet product; see evidence234/builds.json",
+    "note": "Actual before capture, not final0b acceptance.",
+    "captured_at": "2026-10-08T04:30:07.244779+00:00"
+  }
+]

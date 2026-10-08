@@ -1,0 +1,28 @@
+{
+  "retained_bundles": [
+    {
+      "probe": "native239-playing-long-b64",
+      "retained_path_exists": true,
+      "actual_files": 47,
+      "recorded_files": 47,
+      "current_hash_match": true,
+      "strict_signature_exit": 0
+    },
+    {
+      "probe": "native239-playing-pad-b64",
+      "retained_path_exists": false,
+      "actual_files": 0,
+      "recorded_files": 47,
+      "current_hash_match": false
+    },
+    {
+      "probe": "native239-playing-pad-alert-b64",
+      "retained_path_exists": true,
+      "actual_files": 47,
+      "recorded_files": 47,
+      "current_hash_match": true,
+      "strict_signature_exit": 0
+    }
+  ],
+  "missing_historical_pad_path": "Later owned Pad reinstall replaced the historical app container. Original verification remains historical; latest retained app independently verifies."
+}

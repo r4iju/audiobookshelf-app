@@ -1,0 +1,6 @@
+Test Case '-[TVJourneyTests.CatalogJourney testContinueListeningOpensDetailsAndBackRestoresFocus]' passed (47.799 seconds).
+    t =    30.92s Type 'Tomorrow 61' into Target Application 'com.forkzed.audiobookshelf.tv'
+/Users/runner/work/audiobookshelf-app/audiobookshelf-app/tvos/UITests/CatalogJourney.swift:45: error: -[TVJourneyTests.CatalogJourney testServerSearchFindsTitlesOutsideLoadedPage] : XCTAssertTrue failed - Attributes: Application, 0x1045565d0, pid: 19319, label: 'Audiobook Loft'
+                                                      StaticText, 0x1046747f0, {{365.0, 416.5}, {1190.5, 57.5}}, label: 'No titles, episodes, authors or series match “Tmorrow 61”.'
+                                                SearchField, 0x1045573a0, {{65.0, 156.4}, {1790.0, 71.2}}, label: 'Titles, authors, narrators or episodes', placeholderValue: 'Titles, authors, narrators or episodes', value: Tmorrow 61, Keyboard Focused
+/Users/runner/work/_temp/tv17-replay/fixture-harness.sh: line 84:  2602 Trace/BPT trap: 5       xcodebuild -project "$tvos_root/AudiobookshelfTV.xcodeproj" -scheme AudiobookshelfTV -configuration Debug -destination "id=$simulator" -derivedDataPath "${ABS_TV_DERIVED_DATA:-$tvos_root/build}" -resultBundlePath "${ABS_TV_RESULT_BUNDLE:-$tvos_root/build/TVJourneys-$(date +%Y%m%d-%H%M%S).xcresult}" -collect-test-diagnostics never "$@" test

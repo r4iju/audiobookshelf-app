@@ -1,0 +1,1041 @@
+{
+  "manifest": "docs/apple-native-redesign/evidence/238/captures.json",
+  "screens": 114,
+  "sources": {
+    "903ea6c008e5583a5c78be9d28dd09d368a02387": 2,
+    "7c69ac4caddf77237b1a777aef60ba7428f196b6": 31,
+    "17869645d869445fcc101f8ad625522f25b2b90e": 81
+  },
+  "devices": {
+    "9ACC6F5B-180D-44C3-823B-F8796813D69D": 114
+  },
+  "hashMismatches": 0,
+  "images": [
+    {
+      "file": "images/tv-settings-signout-focused-corrected.png",
+      "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+      "sha256": "db0df86410a0511937baba64961b702954eccca1c4208b730ad7f9e25149ff4f",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-signout-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-signout-unsent-error.png",
+      "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+      "sha256": "95557eafec5f7187aa34a0b1388b0f71f9bc052dd0cbc94d1e6445d515c0c4ae",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-signout-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-top.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "c8c4d715e342739c1808bf4d3f8e1a48423a7c3b3677e2d69776777f80dc5a77",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-supported-signin-context.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "df81bdfb83084d8dd23fea1084e076579ad12405df9df5ddbfbe832ded4088f8",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-notices-overview.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "be3909311ba4d548b3a0f69230e8676ee6547e82183a6cc360e859d0df9e962d",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-notices-license-focus.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "7eb522b2161b4e6fcf6566cda54800a50436bf5fb9a7302b43dd7fe3ba9f6e84",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-notices-back-restored.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "2062bf7af5d04574a856a763284d5bb8ca50a4545af0fe3dbd6eabb44940da2a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-language-top-selected.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "8a66ac63c1d7a0dd8874793846a15b5c92a2d7b76b8a84e38ce9402be02adcbc",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-language-list-end.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "83d40069d0a6cbc469dc5fcd743ee7a4af311824b746429edaa5be0d37e7966e",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-diagnostics-empty-masked.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "6d4bcfc00dd4baecc2523aed3bc7af99d6545d0048d60c20cddac2df30cbd7f8",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-diagnostics-address-revealed.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "46e528e4d51f1cc1c06be6f734aac8f0d24144017acbc7bed18ae7a9bd12edcb",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-language-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-listen-now-overview.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "4ecea53434ca6276c01531425055f56759775b4c500480309ae2170529ae3f24",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-book-primary-focused.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "cc420ff6e636f7440548cfb1c98f1cf1cd1f826379e1347d441e28b31c8b215c",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-player-paused-overview.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "ff3ef7a5dfcfc06e29495575a4ce9796a13bb848e966df9097bffcbdb7a4eccc",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-chapters-current.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "3f8af84a70082831b37a9f17d3738b45cb66cc45f4a17da78bc426f01914b048",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-chapters-last-focused.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "368841ec85ae1718fd8845767bde98fd2fd2ba5cb6b44ba3db868190e6f13315",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-speed-options.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "495800eef604e7ecf4f73c0d32821f1960bd7bc7d71cb3120459c43ce012de7a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-speed-last-focused.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "0e0f13461ab2f58806c67eb143270cdd22b8d041afab20162cbe0042172f918b",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-sleep-duration-options.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "b7bfd8d48590a4da51902ec0b1fe43206dedcb98d2a5eca1239133a124952b3c",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-sleep-chapter-active.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "42ca7a5ead202cf582cd2da60e40b7f77075dc123a0298eb9dad20475471247a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-sleep-active-cancel-option.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "6c08d1ef16ad024b06f9c0ae4cc9ea16dee1aa428a292f095e4a597b8407b55c",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-sleep-duration-active.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "477d3286c3f624d6abb682db5ddd167a242e714bdb5e4117a84798cd453808d0",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-with-session-top.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "d18a77ac50ee27b019ed775e76ccc626eb8ed9c511ff99f93fec1f42d3714fc1",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-skip-back-options.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "7db3d63d6fd8703e62b75c2a4a57ce6d4cc664aeae08e2a923e4f0c84e67afd5",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-skip-back-last.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "74a9153b344042664278767949866b642620b72e6e8625c995cbe7fb77d6e281",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-skip-forward-options.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "ccc570247362da063ff318b722f7e5ff7fb969bf2fab7245ab4829263fac3cf5",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-shell-after-explicit-stop.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "677b40bee9cc1f4ea05de357c5900308fe89c5277d3bb083bcbb009b25c4e7f8",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-render",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-arabic.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "51a23c689648ce1e612a7ef5b7c3e0a32eab0b2fc918e37b605732da4a68b781",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-german.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "c0cf5c93f9b2ded7b4611ba7d137734523c390eeddfb075d0cc718d69caec24f",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-prompt.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "0a40ac9457c583f2c05a0e933d0ad856d70e7a1053a45ba480a036c8a2f6a5ee",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-publications-waiting.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "6f055d50cab73e745ddb8afafca0c1ae3cb1f4e601851a72fd21f2a8e17b162b",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-publications-restart-requested.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "11f918581ea644d0442bdc86549c58ecb4f325c0be0384905e8c4cbbb2de2034",
+      "width": 3840,
+      "height": 2160,
+      "phase": "final-settings-functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-filtered.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "0aeb6a180f8890d2ebf21163c1d01317e4ece474372b7fe8ad72c705130bfb69",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-end.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "822c08b0c663dd31ace9af46466c7428c3e37315127fc4654045aee6bea9bd00",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "f3eab2811a3062d8826ce5375a85ed9966004cf40a8541a0a78ee730c3d1c969",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-now-playing.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "432ecd6a9d0c50fe3b21b90c3fabfa173a40e9dec2859985805c033cf0fb751a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-now-playing-unfocused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "6d9e97d3cd3d0b0ece73fa8c5aebd87eb140af51509d99479f87d38db5352299",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-now-playing-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "763544cc47349c1d44eb704a2fd1f5ff0913f454725a6b79c713a61c657f7e1e",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-episodes.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "19474598ce12e3c61ded57dcc29c40c8b4d19aeb255cffe11c6e1133643b7baf",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-diagnostics-sign-in.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "610cba59738823521c6f7c548a8cb73271a7b8b0e29b3d89f87df06b6dd72784",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-signing-in-again.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "2484dffaddba88ff6c0546bbc675d4cefc2b5476c8143c7cfb2af4805901012f",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-signed-in-again.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "1b17372cd582370098ab91f547676ec9c44231203de71a8f25438c06467898cb",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-author.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "1ffc7d315bf96b166cdb8e36d8e769a860dd20d536a96e32fbef651d16e0ff5e",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-series.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "263668e2af8b1b5b7bbc188d1c2e5894130183d81fb4112c975ab81e5953bc92",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-many-libraries-shell.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "c2241511190149322cb2f7022e54559ee1792fe9f09fd8c43f1ccaa75f264e7f",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-chooser.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "dec752f0afde50df219e8bf0fc5ad86e6c8b43fd09969f3299e250bdbfd85799",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-chooser-end.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "ebe716ec5d8aa8df06057ba86a12fb3e01c125ac9cb7dc5eb061f6148ce67867",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-unfocused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "61d89445f3cab0930f0947734d48fcfea700a54b7891809355a7a0c9fa02a8ef",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "3697a6f7def8a4c65761fc2cab6c67b791781e9f4ff32a717cdb75f6544ac3bb",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-archive-detail.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "54d6371cb9a0828ba8836ff70635a00be2d22b61f31096ef6be6624667fc3b30",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-back-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "afc16817b67841c44fe168264bbe797ad45428392efaf8d3f778c3c353692491",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-multi-library-search.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "3facc5fc92b02fc3a8c9f81d4698834ff6448ca7fc29d6a2e13452a0a51e9434",
+      "width": 3840,
+      "height": 2160,
+      "phase": "functional",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-no-results-keyboard.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "3eb47f54d92e620002da43d455fd9755f10571c814d7019ad48d54202b57a4bd",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-episode-group-keyboard.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "97cf4384b5264ce9105691be15e41ee7f54ddadba1441bede52908739fd1e166",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-episode-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "ea7fb431bb48d7930886d795f675d34a230780ed28410e623a32f2d504904650",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-failure-keyboard.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "611a1204e62529c394898da880eb3fb34274e676604ca58907a2b96a5bd4465a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-native-keyboard-prompt.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "1b743c6e9260c07ff2127b25e805e12b9cc6a5984bf428eb9e90000661b00c54",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-authors-group-keyboard.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "26a140b657f59bcc2a9df0b25c43dfc64cf85f8211f02d39ebaa44348b526a6e",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-author-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "9205309f80fb2dbe89e662879c08413f30028a7d39fac2c01692aaf51938eade",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-series-book-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "34cf0c1ba8571e1945e84671cf5b0a9bb6828192ec72224b4bd22b0eb4e424fd",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-loading-keyboard.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "4bed3b3a6bab50b7c915d165099f4548903d8367237e9588de90e2511c79b0b6",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-search-after-loading.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "250eedddaf614252776f867f60293b9d767ffb69cb99817e89a637364fdbb743",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-signin-initial.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "404e7d50d0dfeb255c73ceb84a84b762cca6644108caea14686eeae65871c232",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-signin-server-keyboard.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "92b4a656ae17348f3536e1203f178b00039087ff3c8694ec97183c9f47221c7a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-signin-unreachable-error.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "c4a7f15a3b1c00dd671ee18ca5139fc629a49747a49fbeb1c95489898d77768d",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-unbroken-description-first.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "0124ef5a0ca16836be2fec910642a211e976aeecc4d3964cbf3675c887abf0dc",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-unbroken-description-down-2.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "ecbf85f4a455aaced23f356ba67ed73340b5d4da4da849f17252946a500a74c3",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-unbroken-description-down-8.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "6f15c82539371c50dbf7f9ec9f6efda3f9f7a9f5d81632d14b9875c94d9dad60",
+      "width": 3840,
+      "height": 2160,
+      "phase": "first-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-media-error-restart-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "73f678e0885b25eca0675502c5e1778560f39dbcf954458750a5c0280d864632",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-media-restart-recovered.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "1b9cba77d780fd29f7d76cfbfbe785ee86fb094ca86eea8b9c03b1f3b9374961",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-progress-sync-error-paused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "ab4f92ce16229ed5a219b573c2e0998d6edf2d6e9e8e270b7d75ec7ad766e425",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-progress-retry-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "5e3317cfb0990a5cae5ede9dad65c4e80dca416f439e8ff95bb52c78d7729abe",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-saved-listening-recovered-detail.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "2a0ea9ed3d5158b61a32975bf07ceb162643f885329a6c79b66b41f9f9c427a3",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-book-top.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "a07b07d5a17612936168423ede0c233082e86537931bd74ab916749cf5111a11",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-book-description-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "a2fea8c3e91c38b901df8a3962918fc3498376159548a7f9c147efca46d51bb0",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-book-description-down-8.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "00351227dd4513b053cb29d1f8f83a94069ea8b312b3b790629921bb2fb1f455",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-book-description-down-16.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "2903face2ddd693f46b56ac4a0d7ec19169496a5f991cfa1549b07de56bfef9e",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-author-bio-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "d3e020b51c0e7eb07790d65728f0920d2c568611baf16e8d65599509635b4bec",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-author-bio-down-4.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "99d3718235ff22066b3753b719416ed74b1727a37a5f1bf4e396af01e197094a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-author-bio-down-16.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "f5d0c81d78f18c1a4a2620791507f429972bce8a270e92d03a5a57689aa4b63e",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-series-description-first.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "a32061293e2d101d71c8c2efb5387af2fad472c25646ee921fdedd1c524754a1",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-series-description-down-4.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "558ca13d762b217f899bce7bf0d6ea093f04631534cca587ed68885d72c721d5",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-series-description-down-16.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "91f88012f9f70dbee978f393b81700b0730d29deaf06d4e4153d619aa57696af",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-episode-first.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "e5489ad0252830ba4e97aa977c974ddd190118c60c985a00478c075130e2cbe6",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-episode-down-4.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "5ce6a580314b8537d79d9a0af4a405d8774363758fa43b10357815f218e3d997",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-long-episode-down-16.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "bdd02ae43bff71e7bb623bb99ee3d181f46f943d12a9ae5a11759e0914dda46a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-settings-native-title.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "1f6e615064d853a73a832afffe5f53c8c03abeddc7175655866105b690a19bad",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-auth-expired-native-alert.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "8df1865ed48399e4f7e090fc45200f1438856f84826c5cd0b431beed63961d14",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-auth-fullscreen-form.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "10704f57821434f5e7a65b8c06ae219e7433dcb4c18d00b6ac53ed8b6d24ee0f",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-auth-password-native-keyboard.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "7342bc59254a82cc8bfbf719cc8eb6c396925f423882bcf598cf9d915d27b9a1",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-auth-dismissal-preserved-player.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "44d53862ea5b3a38b9310e76e1358c46ce677d194bb5365a7dd7c9e1db70c368",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-catalog-service-failure.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "fd70d2614c095f3bb164674c293f46c4cec60e22c0c03d8e9ba9e272809aab73",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-catalog-service-recovered.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "1ab1051043746cf70d013b7d54639341c27a101a305e5e03ba7517d06e24dcbb",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-book-loading-context.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "30508c1eb285cdb69339ceb7a5659d8aec632180ced41bda61767bc43a95029d",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-book-loaded.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "158e032619eb435e38f63d691e2a5af6dfa19e4fa9b7e33a1d065b8756be5ab0",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-book-detail-failure.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "d7aa525cd714be79288a3ff1e1e795514e827e99f4a8e9ba9349bb1d73aabeb8",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-listen-now-empty.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "33b49d7a4b4478bcd80d5933dfb97be10f39314ed677563fac2c445760cdf27d",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-empty.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "0b326447039884a8a4bc9126a09f83e931504d67c1f1bc6566dc22d212ea0a19",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-overview.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "a35b30bc1d77420175f8b41c86f305032815daddea2f2bfa6a0940890c7153b2",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-sort-options.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "80df406a73c8b726a1677d6bffb27c3d38009a670ef4eca6f9278a2dc70d8220",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-filter-options.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "a4a90b05589ec349eac73d4dbe0eb74b4a539b70270f7a60fb31afaee1d40be2",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-library-filter-empty.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "61693b35a4e73c07635464a63780f7801b4c94d0d674ee09f0aa93e5856e9006",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-portrait-cover-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "823df594bd6f1582f75e31eb99699c229d57efc0c79eea6ef4ba021e7617b3c3",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-portrait-cover-detail.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "762696cbd24969dd0f87a91901b0af9d3407c44f431023f7d4f4b03a133ccdb5",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-listen-now-missing-art.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "a77de83cb4e45425f924653ecf94a21a9ce8b7172ec2899863335380a46fa244",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-book-missing-art.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "84e3ae2d05d5c17f6fe86c6a5d5b7a2470ac77feb1be00c00eaa56c76653cdb0",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-author-missing-image.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "edd6b86e819f907b2913ab72936fa81b710f70b01dae2253ba2ea928dba27059",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-podcast-empty-episodes.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "4a677451fdb805d1f47e09e6a2a8e813b5eae39f8a8d2440290a49a76f345eab",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-podcast-library.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "6da500c13a63c6f5f20c7bff9ace6ab8c3ccba4b66e225ff68c159645778a68e",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-podcast-newest-episode-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "a62317659919444cfac27cc12df7c883144c87919c8a158f288e02455be355a3",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-podcast-oldest-first.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "63675591dc46cd6fad897cdb089b19d54bc888bedb688eafcaa0fd5339c72c0f",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-episode-play-focused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "ce72ad3c37d893517e7fa058aa804af079306ea4f79b6836116986d7eec7ae05",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/tv-episode-player-paused.png",
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+      "sha256": "891b0cb10af1b94c5aac98b0cee504462d149cf01d41919abdb7f6581e0dc33a",
+      "width": 3840,
+      "height": 2160,
+      "phase": "corrected-render-checkpointed",
+      "historical": false
+    },
+    {
+      "file": "images/before-tv-signout-focus-7c69.png",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "sha256": "0846b353df42f2e487434160833c8ef449b2a73b0b1b8fc127a949017d8502f5",
+      "width": 3840,
+      "height": 2160,
+      "phase": "before-correction",
+      "historical": false
+    }
+  ]
+}

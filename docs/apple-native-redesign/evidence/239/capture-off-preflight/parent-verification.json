@@ -1,0 +1,7 @@
+{
+  "all_four_effective_targets_verified": true,
+  "scheme_targets_unchanged": true,
+  "testplan_override": false,
+  "public_contract": "Automatic capture off, independently of preferred format and success retention",
+  "scope": "Build-only SDK27 with explicit existing min15 mobile CLI override, tvsource17. Not older execution or test acceptance."
+}

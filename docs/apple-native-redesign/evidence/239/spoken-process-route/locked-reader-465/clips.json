@@ -1,0 +1,88 @@
+[
+  {
+    "file": "unlock-control.wav",
+    "sha256": "b5f487de68a33598a4622112bf227689fde989628b616650d464c7a265bab8e6",
+    "samples": 1533952,
+    "nonzero": 158672,
+    "peak": 0.2761533558368683,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "id=unlock-player"
+          ],
+          "exit": 0,
+          "out": "Tapped id=unlock-player (201, 750)\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.582947254180908
+    }
+  },
+  {
+    "file": "reader-page.wav",
+    "sha256": "64e96500a4f19a368f3e8855915987aa79b74ec6249d052724186887648c8561",
+    "samples": 1533952,
+    "nonzero": 132846,
+    "peak": 0.28543320298194885,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "201",
+            "822"
+          ],
+          "exit": 0,
+          "out": "Tapped (201, 822)\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.62257409095764
+    }
+  },
+  {
+    "file": "locked-slider.wav",
+    "sha256": "fd2e8617e5fd6ffcc86673ea6ca17ecc39a2824407f142ea2a9f4d5b2fa09471",
+    "samples": 1533952,
+    "nonzero": 537716,
+    "peak": 0.28543370962142944,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "201",
+            "670"
+          ],
+          "exit": 0,
+          "out": "Tapped (201, 670)\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.49171018600464
+    }
+  },
+  {
+    "file": "reader-document.wav",
+    "sha256": "f27321e54ef6e3fdb5c2307e671f8c1ee5ab3518b8f2b1181213753bcfe515c8",
+    "samples": 1532928,
+    "nonzero": 8290,
+    "peak": 0.03266952186822891,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "id=pdf-document"
+          ],
+          "exit": 0,
+          "out": "Tapped id=pdf-document (201, 452)\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.47280788421631
+    }
+  }
+]

@@ -1,0 +1,63 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "arm64",
+        "deviceId" : "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+        "deviceName" : "Pool TV 1 (tvOS 27.0)",
+        "modelName" : "Apple TV 4K (3rd generation)",
+        "osBuildNumber" : "24J360",
+        "osVersion" : "27.0",
+        "platform" : "tvOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 1,
+      "passedTests" : 2,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "AudiobookshelfTV · Built with macOS 27.0.1",
+  "expectedFailures" : 0,
+  "failedTests" : 1,
+  "finishTime" : 1791460403.975,
+  "passedTests" : 2,
+  "result" : "Failed",
+  "runtimeWarnings" : [
+    {
+      "issueType" : "Runtime Warning",
+      "message" : "Adding '_UIReplicantView' as a subview of UIHostingController.view is not supported and may result in a broken view hierarchy. Add your view above UIHostingController.view in a common superview or insert it into your SwiftUI content in a UIViewRepresentable instead."
+    },
+    {
+      "issueType" : "Runtime Warning",
+      "message" : "Adding '_UIReplicantView' as a subview of UIHostingController.view is not supported and may result in a broken view hierarchy. Add your view above UIHostingController.view in a common superview or insert it into your SwiftUI content in a UIViewRepresentable instead."
+    },
+    {
+      "issueType" : "Runtime Warning",
+      "message" : "Adding '_UIReplicantView' as a subview of UIHostingController.view is not supported and may result in a broken view hierarchy. Add your view above UIHostingController.view in a common superview or insert it into your SwiftUI content in a UIViewRepresentable instead."
+    }
+  ],
+  "skippedTests" : 0,
+  "startTime" : 1791460237.571,
+  "statistics" : [
+
+  ],
+  "testFailures" : [
+    {
+      "failureText" : "XCTAssertTrue failed - Missing \"language-zh-Hans\" Button",
+      "targetName" : "TVJourneyTests",
+      "testIdentifier" : 1,
+      "testIdentifierString" : "RenderJourney/testRenderNativeSettingsLanguageAndNotices()",
+      "testIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/RenderJourney/testRenderNativeSettingsLanguageAndNotices",
+      "testName" : "testRenderNativeSettingsLanguageAndNotices()"
+    }
+  ],
+  "title" : "Test - AudiobookshelfTV",
+  "topInsights" : [
+
+  ],
+  "totalTestCount" : 3
+}

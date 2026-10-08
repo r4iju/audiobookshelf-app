@@ -1,0 +1,212 @@
+[
+  {
+    "name": "offline-entry-red",
+    "path": "/tmp/235-offline-entry-red.log",
+    "sha256": "c0b40b70c0332eb56738167b10bccd9d7d9c0137797c56934a33da4d33c8eb71",
+    "scope": "obsolete first account-entry red",
+    "passed": 0,
+    "failed": 1,
+    "cases": [
+      {
+        "name": "OfflineJourney testDownloadedBookPlaysAcrossFilesOfflineAfterRelaunchAndSynchronizesOnReconnect",
+        "status": "failed",
+        "seconds": "21.999"
+      }
+    ],
+    "outcome": "TEST FAILED"
+  },
+  {
+    "name": "offline-routes",
+    "path": "/tmp/235-offline-routes.log",
+    "sha256": "af7d2b3777a42c4870e4bfd15bb7ced10553810431a0c782264ccc9b5ec42090",
+    "scope": "first adapted Downloads path green; remaining two obsolete routes observed red",
+    "passed": 1,
+    "failed": 2,
+    "cases": [
+      {
+        "name": "OfflineJourney testDownloadedBookPlaysAcrossFilesOfflineAfterRelaunchAndSynchronizesOnReconnect",
+        "status": "passed",
+        "seconds": "45.847"
+      },
+      {
+        "name": "OfflineJourney testNewerRemoteRewindBecomesTheNextOfflineResumeWithoutRedownloading",
+        "status": "failed",
+        "seconds": "17.878"
+      },
+      {
+        "name": "OfflineJourney testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload",
+        "status": "failed",
+        "seconds": "18.047"
+      }
+    ],
+    "outcome": "TEST FAILED"
+  },
+  {
+    "name": "listening-green",
+    "path": "/tmp/235-listening-green.log",
+    "sha256": "276841d250634b911b3c966d954ef1d0e3179cea02aafcc1194f02e5a7dbb64d",
+    "scope": "14 selected phone journeys; grouped panels/ranges/IDs/callbacks unchanged after display-only Episode label and indentation tidy",
+    "passed": 14,
+    "failed": 0,
+    "cases": [
+      {
+        "name": "DurableProgressJourney testUnsentListeningSurvivesTerminationAndRestoresServerProgress",
+        "status": "passed",
+        "seconds": "41.859"
+      },
+      {
+        "name": "ListeningControlsJourney testBookmarkCreateEditJumpAndDeletePersistOnServer",
+        "status": "passed",
+        "seconds": "42.880"
+      },
+      {
+        "name": "ListeningControlsJourney testChapterSeekAndSpeedSurviveSessionRestoration",
+        "status": "passed",
+        "seconds": "64.159"
+      },
+      {
+        "name": "ListeningControlsJourney testConfiguredSkipIntervalsSeekAcrossFilesAndPersist",
+        "status": "passed",
+        "seconds": "37.450"
+      },
+      {
+        "name": "ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor",
+        "status": "passed",
+        "seconds": "21.932"
+      },
+      {
+        "name": "ListeningControlsJourney testDisablingAnActiveSleepFadeRestoresActualAudioVolume",
+        "status": "passed",
+        "seconds": "31.287"
+      },
+      {
+        "name": "ListeningControlsJourney testResumeRewindsAfterAPauseAndCanBeDisabledPersistently",
+        "status": "passed",
+        "seconds": "47.293"
+      },
+      {
+        "name": "ListeningControlsJourney testSeekingPastChapterSleepBoundaryStopsAudioInsteadOfLeavingTimerStranded",
+        "status": "passed",
+        "seconds": "27.783"
+      },
+      {
+        "name": "ListeningControlsJourney testShortSleepTimerActuallyStopsAndPersistsPositionAfterLeavingPlayer",
+        "status": "passed",
+        "seconds": "31.189"
+      },
+      {
+        "name": "ListeningControlsJourney testTimerAdjustmentChangesActualStopAndResetKeepsOriginalDuration",
+        "status": "passed",
+        "seconds": "39.450"
+      },
+      {
+        "name": "OfflineJourney testDownloadedBookPlaysAcrossFilesOfflineAfterRelaunchAndSynchronizesOnReconnect",
+        "status": "passed",
+        "seconds": "45.074"
+      },
+      {
+        "name": "OfflineJourney testNewerRemoteRewindBecomesTheNextOfflineResumeWithoutRedownloading",
+        "status": "passed",
+        "seconds": "44.161"
+      },
+      {
+        "name": "OfflineJourney testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload",
+        "status": "passed",
+        "seconds": "27.280"
+      },
+      {
+        "name": "PlaybackJourney testMediaHTTPFailureShowsErrorAndCanBeReopened",
+        "status": "passed",
+        "seconds": "27.525"
+      }
+    ],
+    "outcome": "TEST SUCCEEDED"
+  },
+  {
+    "name": "presentation-ipad",
+    "path": "/tmp/235-presentation-ipad.log",
+    "sha256": "fe8424e6108ec92f70af2936a0dbc3538e33b7f4608d5b3fc754fbcaabcb82a5",
+    "scope": "4 selected tablet journeys; before final display-only Episode label and indentation tidy",
+    "passed": 4,
+    "failed": 0,
+    "cases": [
+      {
+        "name": "PresentationJourney testAccessibilityTextSizeKeepsPlayerControlsOnScreen",
+        "status": "passed",
+        "seconds": "27.982"
+      },
+      {
+        "name": "PresentationJourney testChapterTrackFollowsTheChapterWithTheTotalTrackAlongside",
+        "status": "passed",
+        "seconds": "57.387"
+      },
+      {
+        "name": "PresentationJourney testElapsedTimeScalesWithPlaybackSpeedUntilTurnedOff",
+        "status": "passed",
+        "seconds": "49.092"
+      },
+      {
+        "name": "PresentationJourney testLockedPlayerPreventsAccidentalSeekingUntilUnlocked",
+        "status": "passed",
+        "seconds": "49.651"
+      }
+    ],
+    "outcome": "TEST SUCCEEDED"
+  },
+  {
+    "name": "auth-final",
+    "path": "/tmp/235-auth-final.log",
+    "sha256": "5a11b5d0a50c574512198087ed4b548dbfeccf9688dd4b1b1289657c390d12f9",
+    "scope": "committed0b source reauthentication journey",
+    "passed": 1,
+    "failed": 0,
+    "cases": [
+      {
+        "name": "PlaybackAuthorizationJourney testRevokedLoginStopsPlaybackAndSigningInAgainDeliversItsListening",
+        "status": "passed",
+        "seconds": "47.729"
+      }
+    ],
+    "outcome": "TEST SUCCEEDED"
+  },
+  {
+    "name": "phone-capture-build",
+    "path": "/tmp/235-phone-capture-build.log",
+    "sha256": "2aa434870d7ec89180e0f86b4a2d5fb76424ed3a4cc3a78e21f849bfedf1f9a2",
+    "scope": "committed0b clean isolated phone build",
+    "passed": 0,
+    "failed": 0,
+    "cases": [],
+    "outcome": "BUILD SUCCEEDED"
+  },
+  {
+    "name": "ipad-capture-build",
+    "path": "/tmp/235-ipad-capture-build.log",
+    "sha256": "f3bd29d093c5217e1e341a488305d27306a854263fdddf29a30ff17948123f00",
+    "scope": "committed0b clean isolated tablet build",
+    "passed": 0,
+    "failed": 0,
+    "cases": [],
+    "outcome": "BUILD SUCCEEDED"
+  },
+  {
+    "name": "generic-build",
+    "path": "/tmp/235-generic-build.log",
+    "sha256": "21e43187e4fa11454dc71b874c58509284c89025d929e5785685b7f782a62971",
+    "scope": "committed0b generic15 override device build",
+    "passed": 0,
+    "failed": 0,
+    "cases": [],
+    "outcome": "BUILD SUCCEEDED"
+  },
+  {
+    "name": "source14-diagnostic",
+    "path": "/tmp/235-source14-diagnostic.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scope": "committed0b contents full76-source Swift5 target14 diagnostic only",
+    "passed": 0,
+    "failed": 0,
+    "cases": [],
+    "outcome": "diagnostic exit0"
+  }
+]

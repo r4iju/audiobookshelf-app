@@ -146,9 +146,11 @@ struct AudioGroupList: View {
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n(store.kind.title))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
-                        Button(l10n("Refresh")) { Task { await store.load() } }
-                        if store.canEdit { Button(l10n(store.kind.text("New collection", "New playlist"))) { creating = true } }
+                    Button { Task { await store.load() } } label: { Image(systemName: "arrow.clockwise") }.accessibilityLabel(l10n("Refresh"))
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if store.canEdit {
+                        Button { creating = true } label: { Image(systemName: "plus") }.accessibilityLabel(l10n(store.kind.text("New collection", "New playlist")))
                     }
                 }
             }
@@ -182,9 +184,12 @@ struct AudioGroupDetails: View {
         let active = player.wantsPlayback && group.members.contains { $0.libraryItemId == player.itemID && $0.episodeId == player.episodeID }
         ShelfList {
             if let error = store.error { RecoveryCard(message: error) { Task { await store.load(id: initial.id) } } }
+            Section {
             if let description = group.description, !description.isEmpty { Text(description).foregroundColor(ShelfStyle.secondaryText) }
             Button(l10n(active ? store.kind.text("Pause collection", "Pause playlist") : store.kind.text("Play collection", "Play playlist"))) { NativeHaptic.impact("play"); Task { await store.play(group, player: player, downloads: downloads) } }
-                .disabled(store.loading || store.saving || store.starting || store.error != nil || player.preparing || !group.members.contains(where: \.playable))
+                .disabled(store.loading || store.saving || store.starting || store.error != nil || player.preparing || !group.members.contains(where: \.playable)).buttonStyle(BorderlessButtonStyle())
+            }
+            Section(header: Text(l10n("Listening order"))) {
             ForEach(group.members) { member in
                 if let item = member.libraryItem {
                     NavigationLink(destination: BookDetails(item: item, catalog: store.catalog, progress: store.user?.mediaProgress.first { $0.libraryItemId == item.id && $0.episodeId == member.episodeId }, episode: member.episode)) {
@@ -192,17 +197,18 @@ struct AudioGroupDetails: View {
                     }.accessibilityIdentifier("group-member-\(member.id)")
                 } else { Text(member.title).foregroundColor(ShelfStyle.secondaryText) }
             }
+            }
             if let error = player.error { Text(error).foregroundColor(.red) }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(group.name)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
-                    if store.canEdit { Button(l10n(store.kind.text("Edit collection", "Edit playlist"))) { editing = true } }
+                    if store.canEdit { Button { editing = true } label: { Image(systemName: "pencil") }.accessibilityLabel(l10n(store.kind.text("Edit collection", "Edit playlist"))) }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button(l10n("Refresh")) { Task { await store.load(id: initial.id) } }
                         if store.canDelete { Button(l10n(store.kind.text("Delete collection", "Delete playlist"))) { deleting = true } }
                     } label: { Image(systemName: "ellipsis.circle") }.accessibilityLabel(l10n("Group actions"))
-                    }
                 }
             }
             .sheet(isPresented: $editing) { AudioGroupEditor(store: store, group: store.selected ?? initial, presented: $editing) }
@@ -233,6 +239,7 @@ struct AudioGroupEditor: View {
     @State private var description: String
     @State private var members: [AudioGroupMember]
     @State private var choosing = false
+    @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.nativeStrings) private var l10n
     init(store: AudioGroupStore, group: AudioGroup?, presented: Binding<Bool>) {
         self.store = store; self.group = group; _presented = presented
@@ -248,17 +255,13 @@ struct AudioGroupEditor: View {
                 }
                 Section(header: Text(l10n("Listening order")).foregroundColor(ShelfStyle.secondaryText)) {
                     ForEach(members) { member in
-                        HStack {
-                            Text(member.title)
-                            Spacer()
-                            Button {
-                                if let index = members.firstIndex(where: { $0.id == member.id }), index > 0 { members.swapAt(index, index - 1) }
-                            } label: { Image(systemName: "arrow.up") }.buttonStyle(BorderlessButtonStyle())
-                                .accessibilityLabel(l10n("Move {0} up", member.title)).accessibilityIdentifier("move-up-\(member.id)")
-                                .disabled(members.first?.id == member.id)
-                            Button { members.removeAll { $0.id == member.id } } label: { Image(systemName: "minus.circle") }.buttonStyle(BorderlessButtonStyle())
-                                .accessibilityLabel(l10n("Remove {0}", member.title)).accessibilityIdentifier("remove-\(member.id)")
-                                .disabled(store.kind == .playlist && group != nil && members.count == 1)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(member.title).font(.headline)
+                            if sizeCategory.isAccessibilityCategory {
+                                VStack(alignment: .leading, spacing: 8) { memberActions(member) }
+                            } else {
+                                HStack(spacing: 24) { memberActions(member) }
+                            }
                         }
                     }
                     Button(l10n("Choose titles")) { choosing = true }
@@ -277,8 +280,19 @@ struct AudioGroupEditor: View {
                     }
                 }
                 .sheet(isPresented: $choosing) { AudioGroupMemberPicker(catalog: store.catalog, members: $members, presented: $choosing) }
-        }
+        }.listeningSheet()
     }
+    @ViewBuilder private func memberActions(_ member: AudioGroupMember) -> some View {
+        Button {
+            if let index = members.firstIndex(where: { $0.id == member.id }), index > 0 { members.swapAt(index, index - 1) }
+        } label: { Label(l10n("Move up"), systemImage: "arrow.up").frame(minHeight: 44) }.buttonStyle(BorderlessButtonStyle())
+            .accessibilityLabel(l10n("Move {0} up", member.title)).accessibilityIdentifier("move-up-\(member.id)")
+            .disabled(members.first?.id == member.id)
+        Button { members.removeAll { $0.id == member.id } } label: { Label(l10n("Remove"), systemImage: "minus.circle").frame(minHeight: 44) }.buttonStyle(BorderlessButtonStyle())
+            .accessibilityLabel(l10n("Remove {0}", member.title)).accessibilityIdentifier("remove-\(member.id)")
+            .disabled(store.kind == .playlist && group != nil && members.count == 1)
+    }
+
 }
 
 struct AudioGroupMemberPicker: View {
@@ -306,6 +320,7 @@ struct AudioGroupMemberPicker: View {
                             } label: {
                                 HStack { Text(item.title); Spacer(); if members.contains(where: { $0.libraryItemId == item.id }) { Image(systemName: "checkmark") } }
                             }.accessibilityIdentifier("choose-\(item.id)")
+                                .accessibilityValue(l10n(members.contains(where: { $0.libraryItemId == item.id }) ? "Selected" : "Not selected"))
                         }
                     }
                     if let error = content.pageError { RecoveryCard(message: error) { Task { await catalog.loadMore() } } }
@@ -314,7 +329,7 @@ struct AudioGroupMemberPicker: View {
             }.navigationTitle(l10n("Choose titles"))
                 .toolbar { Button(l10n("Done choosing")) { presented = false } }
                 .onAppear { if case .loading = catalog.state { Task { await catalog.reload() } } }
-        }
+        }.listeningSheet()
     }
 }
 
@@ -336,6 +351,7 @@ struct AudioGroupEpisodePicker: View {
                     } label: {
                         HStack { Text(episode.title); Spacer(); if members.contains(where: { $0.libraryItemId == item.id && $0.episodeId == episode.id }) { Image(systemName: "checkmark") } }
                     }.accessibilityIdentifier("choose-episode-\(episode.id)")
+                        .accessibilityValue(l10n(members.contains(where: { $0.libraryItemId == item.id && $0.episodeId == episode.id }) ? "Selected" : "Not selected"))
                 }
             } else if error == nil { ProgressView(l10n("Opening episodes…")) }
         }.navigationTitle(item.title).onAppear { Task { await load() } }

@@ -1,0 +1,11 @@
+# Modern TV diagnostic8c82 private replay
+
+Immutable source8c82bf91815c4bf0175824783b44ad863a93be54 archived;2203 originalfilehashes and archivehash recorded in provenance.json. Only disposable TVJourney attachmenthelper suppressed, original/executedhashes preserved, every assertion unchanged. Xcodegen derived pbxproj/scheme from immutable project.yml; those two generatedoutputdeltas independentlyrecorded in generated-project-deltas.json and exactdiffs. All other sourcefiles match frozen archive afterbuild; executed-source-final.json records wholeexecutedset. No shared source/index changes.
+
+Exact supported new harness build-for-testing→test-without-building compiled under Xcode27/SDK27 with normalad-hoc signing. Generated scheme keepNever and effective xctestrun SystemAttachmentLifetime keepNever both passed BEFORE UI. Originalselected3 PASS0FAIL0SKIP: Readiness45.606s, Related30.200s, Shell67.334s. Authoritativesummary/tests/details/log/xcresult retained. ThreeUIKitReplicant runtimewarnings, no assertionfailures or publishingwarning. Eachtest hasMediaAttachments=false in media-metadata.json, and runlog no screenshot/recording lines. No screenshots/video/export/render runs.
+
+Public DEBUG diagnostic stream navigation-trace.log includes Related item→series→item→author→item boundpath, readonlyseriesdescription/authorbio focus0, matching appear/disappear. OriginalsingleMenu assertions passed on modern27; no Menuhandler/movedfocus/newtest. This is not actualold17acceptance or complete239acceptance; prior5c4 old17 firstSeriesBackred remains separate.
+
+Product+installed strict/deep exit0, each40resourcefiles exact match products.json. Fresh isolatedbuild; actualmodernTV27/24J360 device recorded. Installed retained path D880F9D9-7AE4-4FF7-849B-C4377F31281D under pooled9ACC bundlecontainer was sent parent before shutdown/release. Noerase/reinstall afterverification. Product-before.json is separate preUIseal scope.
+
+Cleanup: owned33765/33767 fixtureharness trap completed, no listeners. Owned DEBUGstream stopped; TV9ACC shutdown/released, appretained. T3device_list has no TVsurface, no inventedopen target/panel; nativeXCUIRemote seam used. Noownerinstall/publicuploads/GH/Actions/profiles or sharedsource writes.

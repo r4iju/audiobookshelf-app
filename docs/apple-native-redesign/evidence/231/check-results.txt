@@ -1,0 +1,153 @@
+
+red
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' started.
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/ShellJourney.swift:10: error: -[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing] : XCTAssertTrue failed - Library must be a visible main destination
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' failed (20.586 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 20.586 (20.588) seconds
+	 Executed 1 test, with 1 failure (0 unexpected) in 20.586 (20.589) seconds
+	 Executed 1 test, with 1 failure (0 unexpected) in 20.586 (20.589) seconds
+** TEST FAILED **
+
+before-pad
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' started.
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/ShellJourney.swift:10: error: -[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing] : XCTAssertTrue failed - Library must be a visible main destination
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' failed (20.753 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 20.753 (20.755) seconds
+	 Executed 1 test, with 1 failure (0 unexpected) in 20.753 (20.755) seconds
+	 Executed 1 test, with 1 failure (0 unexpected) in 20.753 (20.756) seconds
+** TEST EXECUTE FAILED **
+
+regression-red
+Test Case '-[NativeJourneyTests.ArtworkJourney testLoadedSquareAndPortraitCoversStayInsidePhoneGridColumns]' started.
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/ArtworkJourney.swift:8: error: -[NativeJourneyTests.ArtworkJourney testLoadedSquareAndPortraitCoversStayInsidePhoneGridColumns] : Failed to tap "account" Button: No matches found for Elements matching predicate '"account" IN identifiers' from input {(
+Test Case '-[NativeJourneyTests.ArtworkJourney testLoadedSquareAndPortraitCoversStayInsidePhoneGridColumns]' failed (16.325 seconds).
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Case '-[NativeJourneyTests.ConnectionJourney testBrowsePaginatedBooksAndExpandedMetadata]' started.
+Test Case '-[NativeJourneyTests.ConnectionJourney testBrowsePaginatedBooksAndExpandedMetadata]' passed (60.828 seconds).
+Test Case '-[NativeJourneyTests.ConnectionJourney testConnectSelectLibraryAndRestoreAccountAfterRelaunch]' started.
+Test Case '-[NativeJourneyTests.ConnectionJourney testConnectSelectLibraryAndRestoreAccountAfterRelaunch]' passed (19.007 seconds).
+	 Executed 2 tests, with 0 failures (0 unexpected) in 79.835 (79.838) seconds
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' started.
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' passed (21.413 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 21.413 (21.413) seconds
+Test Case '-[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode]' started.
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/SearchJourney.swift:8: error: -[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode] : Failed to tap "account" Button: No matches found for Elements matching predicate '"account" IN identifiers' from input {(
+Test Case '-[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode]' failed (15.653 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSearchFindsBookBeyondFirstPageAndReturnsFromDetails]' started.
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/SearchJourney.swift:48: error: -[NativeJourneyTests.SearchJourney testSearchFindsBookBeyondFirstPageAndReturnsFromDetails] : XCTAssertTrue failed
+Test Case '-[NativeJourneyTests.SearchJourney testSearchFindsBookBeyondFirstPageAndReturnsFromDetails]' failed (16.918 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSortingAndGenreFilteringUseTheServerAcrossPagination]' started.
+Test Case '-[NativeJourneyTests.SearchJourney testSortingAndGenreFilteringUseTheServerAcrossPagination]' passed (22.372 seconds).
+	 Executed 2 tests, with 1 failure (0 unexpected) in 39.290 (39.292) seconds
+	 Executed 2 tests, with 1 failure (0 unexpected) in 39.290 (39.293) seconds
+	 Executed 2 tests, with 1 failure (0 unexpected) in 39.290 (39.296) seconds
+** TEST FAILED **
+
+regression-green
+Test Case '-[NativeJourneyTests.ArtworkJourney testLoadedSquareAndPortraitCoversStayInsidePhoneGridColumns]' started.
+Test Case '-[NativeJourneyTests.ArtworkJourney testLoadedSquareAndPortraitCoversStayInsidePhoneGridColumns]' passed (24.039 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 24.039 (24.042) seconds
+Test Case '-[NativeJourneyTests.ConnectionJourney testBrowsePaginatedBooksAndExpandedMetadata]' started.
+Test Case '-[NativeJourneyTests.ConnectionJourney testBrowsePaginatedBooksAndExpandedMetadata]' passed (60.981 seconds).
+Test Case '-[NativeJourneyTests.ConnectionJourney testConnectSelectLibraryAndRestoreAccountAfterRelaunch]' started.
+Test Case '-[NativeJourneyTests.ConnectionJourney testConnectSelectLibraryAndRestoreAccountAfterRelaunch]' passed (19.459 seconds).
+	 Executed 2 tests, with 0 failures (0 unexpected) in 80.439 (80.441) seconds
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' started.
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' passed (21.466 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 21.466 (21.467) seconds
+Test Case '-[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode]' started.
+Test Case '-[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode]' passed (24.205 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSearchFindsBookBeyondFirstPageAndReturnsFromDetails]' started.
+Test Case '-[NativeJourneyTests.SearchJourney testSearchFindsBookBeyondFirstPageAndReturnsFromDetails]' passed (21.766 seconds).
+Test Case '-[NativeJourneyTests.SearchJourney testSortingAndGenreFilteringUseTheServerAcrossPagination]' started.
+Test Case '-[NativeJourneyTests.SearchJourney testSortingAndGenreFilteringUseTheServerAcrossPagination]' passed (22.311 seconds).
+	 Executed 3 tests, with 0 failures (0 unexpected) in 68.282 (68.285) seconds
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' started.
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' passed (43.796 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 43.796 (43.797) seconds
+	 Executed 8 tests, with 0 failures (0 unexpected) in 238.022 (238.034) seconds
+	 Executed 8 tests, with 0 failures (0 unexpected) in 238.022 (238.035) seconds
+** TEST SUCCEEDED **
+
+pad-final
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' started.
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' passed (22.751 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 22.751 (22.753) seconds
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' started.
+/Volumes/ai-ssd/code/leafwake-fullstack/apple/UITests/ShellJourney.swift:12: error: -[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing] : XCTAssertTrue failed - Library must be a visible main destination
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' failed (19.550 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 19.550 (19.551) seconds
+	 Executed 2 tests, with 1 failure (0 unexpected) in 42.301 (42.305) seconds
+	 Executed 2 tests, with 1 failure (0 unexpected) in 42.301 (42.306) seconds
+** TEST FAILED **
+
+pad-shell-green
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' started.
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' passed (36.132 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 36.132 (36.135) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 36.132 (36.141) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 36.132 (36.143) seconds
+** TEST SUCCEEDED **
+
+phone-final
+Test Case '-[NativeJourneyTests.ArtworkJourney testLoadedSquareAndPortraitCoversStayInsidePhoneGridColumns]' started.
+Test Case '-[NativeJourneyTests.ArtworkJourney testLoadedSquareAndPortraitCoversStayInsidePhoneGridColumns]' passed (24.869 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 24.869 (24.874) seconds
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' started.
+Test Case '-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]' passed (21.634 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 21.634 (21.636) seconds
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' started.
+Test Case '-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]' passed (43.755 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 43.755 (43.756) seconds
+	 Executed 3 tests, with 0 failures (0 unexpected) in 90.259 (90.267) seconds
+	 Executed 3 tests, with 0 failures (0 unexpected) in 90.259 (90.268) seconds
+** TEST SUCCEEDED **
+
+generic-build
+** BUILD SUCCEEDED **
+
+localization
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testArabicAndHebrewUseRightToLeftLayout]' started.
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testArabicAndHebrewUseRightToLeftLayout]' passed (0.001 seconds).
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testDeviceLanguagesMatchLegacyRegionalAndScriptVariants]' started.
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testDeviceLanguagesMatchLegacyRegionalAndScriptVariants]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testEveryLegacySelectableLanguageRemainsSelectableInLegacyOrder]' started.
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testEveryLegacySelectableLanguageRemainsSelectableInLegacyOrder]' passed (0.001 seconds).
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testMigratedLegacyLanguageIsAdoptedOnlyWhenTheNativeAppHasNone]' started.
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testMigratedLegacyLanguageIsAdoptedOnlyWhenTheNativeAppHasNone]' passed (0.002 seconds).
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testSavedLegacyChoiceWinsOverDeviceLanguage]' started.
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testSavedLegacyChoiceWinsOverDeviceLanguage]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testUnknownSavedChoiceFollowsTheDevice]' started.
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testUnknownSavedChoiceFollowsTheDevice]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testUnsupportedDeviceLanguagesAreSkippedBeforeTheEnglishDefault]' started.
+Test Case '-[NativeLocalizationTests.NativeLanguageTests testUnsupportedDeviceLanguagesAreSkippedBeforeTheEnglishDefault]' passed (0.000 seconds).
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
+Test Case '-[NativeLocalizationTests.NativeStringsTests testCopyForAnotherRendererCarriesOnlyTranslatedText]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testCopyForAnotherRendererCarriesOnlyTranslatedText]' passed (0.002 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testEnglishKeepsTheNativeWording]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testEnglishKeepsTheNativeWording]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testEquivalentNativeTextShowsTheLegacyTranslation]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testEquivalentNativeTextShowsTheLegacyTranslation]' passed (0.002 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testNativeWordingOfALegacyLabelShowsTheLegacyTranslation]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testNativeWordingOfALegacyLabelShowsTheLegacyTranslation]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testPlaceholdersAreSubstitutedInOrder]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testPlaceholdersAreSubstitutedInOrder]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testPodcastEpisodeSortChoicesShowTheLegacyTranslations]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testPodcastEpisodeSortChoicesShowTheLegacyTranslations]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testSameActionUnderTheLegacyNameShowsTheLegacyTranslation]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testSameActionUnderTheLegacyNameShowsTheLegacyTranslation]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testSharedEnglishWordingIsTranslatedByItsMeaning]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testSharedEnglishWordingIsTranslatedByItsMeaning]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testShippedTranslationsAreTheUsableLegacyOrMaintainedTranslations]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testShippedTranslationsAreTheUsableLegacyOrMaintainedTranslations]' passed (0.124 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testTextWithoutATranslationFallsBackToEnglish]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testTextWithoutATranslationFallsBackToEnglish]' passed (0.000 seconds).
+Test Case '-[NativeLocalizationTests.NativeStringsTests testTranslatedPercentNeverRoundsAPartialLanguageUpToComplete]' started.
+Test Case '-[NativeLocalizationTests.NativeStringsTests testTranslatedPercentNeverRoundsAPartialLanguageUpToComplete]' passed (0.000 seconds).
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.129 (0.130) seconds
+	 Executed 18 tests, with 0 failures (0 unexpected) in 0.134 (0.135) seconds
+	 Executed 18 tests, with 0 failures (0 unexpected) in 0.134 (0.135) seconds
+
+localization-check
+
+source14-typecheck

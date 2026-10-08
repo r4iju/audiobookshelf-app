@@ -1,0 +1,80 @@
+[
+  {
+    "file": "iphone-library-search-inactive.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "8331894360d29ccf7632228c3368966bfed37d571cdc29759137ffc113ab2c90",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "iphone-search-active-keyboard.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "3b9e078d07909ba3b1a763c9ecd4b0f663c6ae90be32f5cdc314989b58d02734",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "iphone-search-results-keyboard.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "dceaef36181bb1880560a6eec2a701062c05eb64475163ac439ddc7dda5d584d",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "iphone-search-submitted.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "6420a2619294516ab6d55fa1680cc29d32b573670e643cab667676556c450d91",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "iphone-search-cleared.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "a2ebcc30aab12346bf6d3fe361ffd13ad561ec2e0d2cbc0687f4b602acaf9268",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "iphone-search-cancelled.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "b62c4bbaa6ea0b8cfd5f52cf8ae000442ce3ef3eeedbb50c12ccee7ce276a712",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "iphone-detail-compact-player.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "5e9b6832b391a8cbe35119ec14c134eae167167c82fccdf9cd8db0655b362c21",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "iphone-player-overview.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "3e427623dbf2f43056696ab0f6bcad385b3ea438d76dbb4b373a68dc4c6bca81",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "iphone-player-tools.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "af33f26b277a24af54bc97dd878228c4f66ee78505b1e82c1d62555bb777edf8",
+    "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C"
+  },
+  {
+    "file": "ipad-library.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "a145cfdd561bd43c603d6ddc35ab00f74304b784fd9f1a2ffde203773ab8af83",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B"
+  },
+  {
+    "file": "ipad-search-software-keyboard.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "43050274e756257f26dc93817bb89deae9f4bae9afc3420331635d3a125282be",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B"
+  },
+  {
+    "file": "ipad-search-results-keyboard.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "c4c691870aa3da5a5cb86eddcf1ca70d8564d30b65a6d63d515fdcfee59988f3",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B"
+  },
+  {
+    "file": "ipad-detail-actions.png",
+    "source": "8739a7b49b43a11950981eae7ffeb162c43d1ce0",
+    "sha256": "8499121afc59702b0d8349add79f830677fc3bd5c2e6ffe6cedc2766943544e4",
+    "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B"
+  }
+]

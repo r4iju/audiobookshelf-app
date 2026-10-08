@@ -67,6 +67,7 @@ import XCTest
         XCTAssertEqual(held, 1, "Precondition: the fixture held the save sent on pause")
 
         let restart = app.buttons["restart-server"]
+        for _ in 0..<8 where !restart.exists { app.swipeUp() }
         XCTAssertTrue(restart.waitForExistence(timeout: 10), "Open details should offer a server restart once a save got no answer")
         capture("Details after a save got no answer")
 

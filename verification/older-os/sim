@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+"""sim — lease simulators from a fixed pool instead of creating one per task.
+
+  sim acquire <iphone|ipad|tv> [--os 26] [--fresh] [--no-boot] [--for LABEL] [--hours N]
+      Print the UDID of a free pool device, leased to you until released or expired.
+  sim release <udid>        Shut the device down and end the lease.
+  sim list                  Show pool devices and active leases.
+  sim gc [--yes]            Delete every simulator outside the pool (dry run without --yes).
+
+Agents create a new simulator per task and never delete them, so the device set
+grows by gigabytes a day. The pool caps it; leases let parallel agents share it
+without stepping on each other, and expire so a crashed agent cannot hold one.
+"""
+import argparse
+import fcntl
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+from contextlib import contextmanager
+from pathlib import Path
+
+KINDS = {
+    "iphone": ("iOS", "com.apple.CoreSimulator.SimDeviceType.iPhone-12", "iPhone", 5),
+    "ipad": ("iOS", "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-11-inch-M5-12GB", "iPad", 3),
+    "tv": ("tvOS", "com.apple.CoreSimulator.SimDeviceType.Apple-TV-4K-3rd-generation-4K", "TV", 2),
+}
+POOL_NAME = re.compile(r"^Pool (iPhone|iPad|TV) \d+ \((iOS|tvOS) [\d.]+\)$")
+STATE = Path.home() / ".local/state/sim-pool"
+LEASES = STATE / "leases.json"
+
+
+def simctl(*args, check=True):
+    return subprocess.run(["xcrun", "simctl", *args], check=check, capture_output=True, text=True).stdout
+
+
+def runtimes():
+    return [r for r in json.loads(simctl("list", "runtimes", "-j"))["runtimes"] if r["isAvailable"]]
+
+
+def devices():
+    out = json.loads(simctl("list", "devices", "-j"))["devices"]
+    return [dict(d, runtime=rt) for rt, devs in out.items() for d in devs]
+
+
+def pick_runtime(platform, os_version):
+    candidates = [r for r in runtimes() if r.get("platform", "tvOS" if ".tvOS-" in r["identifier"] else "iOS" if ".iOS-" in r["identifier"] else "unknown") == platform]
+    if os_version:
+        candidates = [r for r in candidates if r["version"].startswith(os_version)]
+    if not candidates:
+        sys.exit(f"sim: no available {platform} runtime matching {os_version or 'any'}")
+    return max(candidates, key=lambda r: [int(p) for p in r["version"].split(".")])
+
+
+@contextmanager
+def leases():
+    STATE.mkdir(parents=True, exist_ok=True)
+    with open(STATE / "lock", "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        data = json.loads(LEASES.read_text()) if LEASES.exists() else {}
+        data = {u: l for u, l in data.items() if l["expires"] > time.time()}
+        yield data
+        LEASES.write_text(json.dumps(data, indent=2))
+
+
+def acquire(args):
+    platform, device_type, label, size = KINDS[args.kind]
+    runtime = pick_runtime(platform, args.os)
+    names = [f"Pool {label} {i} ({platform} {runtime['version']})" for i in range(1, size + 1)]
+    existing = {d["name"]: d["udid"] for d in devices() if d["runtime"] == runtime["identifier"]}
+    with leases() as held:
+        free = next((n for n in names if existing.get(n) not in held), None)
+        if free is None:
+            busy = "\n".join(f"  {held[existing[n]]['for']} until {time.ctime(held[existing[n]]['expires'])}" for n in names)
+            sys.exit(f"sim: all {size} pool {label} devices for {platform} {runtime['version']} are leased:\n{busy}\n"
+                     "Wait, or release one you no longer need.")
+        udid = existing.get(free) or simctl("create", free, device_type, runtime["identifier"]).strip()
+        held[udid] = {"for": args.label or f"pid {os.getppid()} in {os.getcwd()}", "expires": time.time() + args.hours * 3600}
+    if args.fresh:
+        simctl("shutdown", udid, check=False)
+        simctl("erase", udid)
+    if not args.no_boot:
+        simctl("bootstatus", udid, "-b")
+    print(f"sim: leased {free} for {args.hours}h; run `sim release {udid}` when done", file=sys.stderr)
+    print(udid)
+
+
+def release(args):
+    simctl("shutdown", args.udid, check=False)
+    with leases() as held:
+        held.pop(args.udid, None)
+
+
+def list_pool(_args):
+    with leases() as held:
+        for d in sorted(devices(), key=lambda d: d["name"]):
+            if POOL_NAME.match(d["name"]):
+                lease = held.get(d["udid"])
+                owner = f"leased to {lease['for']} until {time.ctime(lease['expires'])}" if lease else "free"
+                print(f"{d['udid']}  {d['state']:<9} {d['name']:<32} {owner}")
+
+
+def gc(args):
+    strays = [d for d in devices() if not POOL_NAME.match(d["name"])]
+    for d in strays:
+        print(f"{'delete' if args.yes else 'would delete'} {d['udid']}  {d['name']}")
+        if args.yes:
+            simctl("shutdown", d["udid"], check=False)
+            simctl("delete", d["udid"])
+    if not args.yes and strays:
+        print(f"{len(strays)} simulators outside the pool; rerun with --yes to delete them")
+
+
+def main():
+    parser = argparse.ArgumentParser(prog="sim", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = parser.add_subparsers(dest="cmd", required=True)
+    a = sub.add_parser("acquire")
+    a.add_argument("kind", choices=KINDS)
+    a.add_argument("--os", help="OS version prefix, e.g. 26 or 27.0 (default: newest installed)")
+    a.add_argument("--fresh", action="store_true", help="erase the device before use")
+    a.add_argument("--no-boot", action="store_true")
+    a.add_argument("--for", dest="label", help="who holds the lease, shown to other agents")
+    a.add_argument("--hours", type=float, default=4)
+    a.set_defaults(func=acquire)
+    r = sub.add_parser("release")
+    r.add_argument("udid")
+    r.set_defaults(func=release)
+    sub.add_parser("list").set_defaults(func=list_pool)
+    g = sub.add_parser("gc")
+    g.add_argument("--yes", action="store_true")
+    g.set_defaults(func=gc)
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()

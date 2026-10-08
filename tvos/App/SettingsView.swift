@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var waiting = PublicationLedger.Waiting()
     @State private var recoveryFailure: String?
     @State private var confirming = false
+    @FocusState private var signOutFocused: Bool
     @FocusState private var confirmFocused: Bool
     @State private var path: [ReturnFocus] = []
     @FocusState private var focus: ReturnFocus?
@@ -16,64 +17,74 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 44) {
-                    section(l10n("Apple TV")) {
-                        NavigationLink(value: ReturnFocus.language) {
-                            Label(l10n("Language") + ": " + l10n.language.name, systemImage: "globe")
-                        }
-                        .focused($focus, equals: .language)
-                        .accessibilityIdentifier("language-setting")
-                        NavigationLink(value: ReturnFocus.diagnostics) { Label(l10n("Diagnostics"), systemImage: "stethoscope") }
-                            .focused($focus, equals: .diagnostics)
-                            .accessibilityIdentifier("diagnostics-setting")
+            List {
+                section(l10n("Apple TV")) {
+                    NavigationLink(value: ReturnFocus.language) {
+                        Label(l10n("Language") + ": " + l10n.language.name, systemImage: "globe")
                     }
-                    section(l10n("Server")) {
-                        Text(catalog.serverAddress).font(.headline).accessibilityIdentifier("server-address")
-                            .accessibilityLabel(l10n("Server address")).accessibilityValue(catalog.serverAddress)
-                        if !catalog.username.isEmpty { Text(l10n("Signed in as {0}", catalog.username)).foregroundStyle(.secondary) }
-                        Text(SignInView.supportedSignIn(l10n)).font(.callout).foregroundStyle(.secondary)
-                            .accessibilityIdentifier("auth-modes")
-                    }
-                    section("Audiobook Loft") {
-                        Text("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.").font(.callout)
-                        Text("Open source under GPLv3, with applicable third-party licenses retained. Source and notices: https://github.com/r4iju/audiobookshelf-app/releases").font(.callout)
-                    }
-                    if !waiting.isEmpty { savesWaiting }
-                    section(l10n("Listening")) {
-                        Text(syncStatus).accessibilityIdentifier("sync-status")
-                        Button {
-                            Task { syncing = true; await player.restoreListening(); syncing = false; await refreshWaiting() }
-                        } label: { Label(syncing ? l10n("Sending…") : l10n("Send saved listening now"), systemImage: "arrow.triangle.2.circlepath") }
-                            .accessibilityIdentifier("send-listening").disabled(syncing)
-                        HStack(spacing: 30) {
-                            interval(l10n("Skip back"), value: $player.backwardInterval, identifier: "skip-back-interval")
-                            interval(l10n("Skip forward"), value: $player.forwardInterval, identifier: "skip-forward-interval")
-                        }
-                        .focusSection()
-                        Toggle(l10n("Rewind a little after a long pause"), isOn: $player.rewindAfterPause)
-                    }
-                    section(l10n("Account")) {
-                        Button(role: .destructive) {
-                            Task {
-                                do { try await player.stop(); try catalog.signOut() }
-                                catch {
-                                    catalog.noteAuthentication(error)
-                                    TVDiagnostics.shared.record(error, detail: "Sign-out")
-                                    failure = l10n("Sign-out was cancelled so that listening is not lost: {0}", CatalogStore.recovery(for: error, in: l10n))
-                                }
-                            }
-                        } label: { Label(l10n("Sign out"), systemImage: "rectangle.portrait.and.arrow.right") }
-                            .accessibilityIdentifier("sign-out").disabled(player.preparing || player.seeking)
-                        if let failure { Text(failure).foregroundStyle(.orange) }
-                    }
+                    .focused($focus, equals: .language)
+                    .accessibilityIdentifier("language-setting")
+                    NavigationLink(value: ReturnFocus.diagnostics) { Label(l10n("Diagnostics"), systemImage: "stethoscope") }
+                        .focused($focus, equals: .diagnostics)
+                        .accessibilityIdentifier("diagnostics-setting")
                 }
-                .padding(.horizontal, 90)
-                .padding(.vertical, 50)
-                .frame(maxWidth: 1400, alignment: .leading)
+                section(l10n("Server")) {
+                    Text(catalog.serverAddress).font(.headline).accessibilityIdentifier("server-address")
+                        .accessibilityLabel(l10n("Server address")).accessibilityValue(catalog.serverAddress)
+                    if !catalog.username.isEmpty { Text(l10n("Signed in as {0}", catalog.username)).foregroundStyle(.secondary) }
+                    // This short context stays in the native List row's focus system.
+                    // A separate child focus item skips earlier offscreen rows when moving Up.
+                    Text(SignInView.supportedSignIn(l10n)).font(.body)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("auth-modes")
+                }
+                section("Audiobook Loft") {
+                    NavigationLink(value: ReturnFocus.notices) {
+                        Label(l10n("Source and license notices"), systemImage: "doc.text")
+                    }
+                    .focused($focus, equals: .notices)
+                    .accessibilityIdentifier("source-notices")
+                }
+                if !waiting.isEmpty { savesWaiting }
+                section(l10n("Listening")) {
+                    Text(syncStatus).accessibilityIdentifier("sync-status")
+                    Button {
+                        Task { syncing = true; await player.restoreListening(); syncing = false; await refreshWaiting() }
+                    } label: { Label(syncing ? l10n("Sending…") : l10n("Send saved listening now"), systemImage: "arrow.triangle.2.circlepath") }
+                        .accessibilityIdentifier("send-listening").disabled(syncing)
+                    interval(l10n("Skip back"), value: $player.backwardInterval, identifier: "skip-back-interval")
+                    interval(l10n("Skip forward"), value: $player.forwardInterval, identifier: "skip-forward-interval")
+                    Toggle(l10n("Rewind a little after a long pause"), isOn: $player.rewindAfterPause)
+                }
+                section(l10n("Account")) {
+                    Button(role: .destructive) {
+                        Task {
+                            do { try await player.stop(); try catalog.signOut() }
+                            catch {
+                                catalog.noteAuthentication(error)
+                                TVDiagnostics.shared.record(error, detail: "Sign-out")
+                                failure = l10n("Sign-out was cancelled so that listening is not lost: {0}", CatalogStore.recovery(for: error, in: l10n))
+                            }
+                        }
+                    } label: {
+                        Label(l10n("Sign out"), systemImage: "rectangle.portrait.and.arrow.right")
+                            .foregroundStyle(signOutFocused ? Color.black : Color.red)
+                    }
+                        .focused($signOutFocused)
+                        .accessibilityIdentifier("sign-out").disabled(player.preparing || player.seeking)
+                    if let failure { Text(failure).foregroundStyle(.orange) }
+                }
             }
+            .frame(maxWidth: 1400)
+            .padding(.horizontal, 90)
+            .padding(.vertical, 35)
+            .tvNavigationTitle(l10n("Settings"))
             .navigationDestination(for: ReturnFocus.self) { route in
-                if route == .language { LanguageView() } else { DiagnosticsView() }
+                switch route {
+                case .language: LanguageView()
+                case .diagnostics: DiagnosticsView()
+                case .notices: NoticesView()
+                }
             }
         }
         .restoresFocus(path: path, to: $focus)
@@ -94,17 +105,24 @@ struct SettingsView: View {
             Text(l10n("Server {0}, signed in as {1}", catalog.serverAddress, catalog.username)).foregroundStyle(.secondary)
                 .accessibilityIdentifier("publications-account")
             if waiting.restartRequested {
-                Text(l10n("Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here."))
+                Text(l10n("Now restart your server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here."))
                     .accessibilityIdentifier("restart-instructions")
-                HStack(spacing: 30) {
-                    Button { confirmRestart() } label: { Label(confirming ? l10n("Sending…") : l10n("The server has restarted"), systemImage: "checkmark.circle") }
-                        .focused($confirmFocused).accessibilityIdentifier("confirm-server-restarted").disabled(confirming)
-                    Button(l10n("Start again")) { requestRestart() }.accessibilityIdentifier("request-server-restart-again").disabled(confirming)
-                }
             } else {
-                Text(l10n("Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server."))
-                Button { requestRestart() } label: { Label(l10n("Start server restart"), systemImage: "arrow.clockwise.circle") }
-                    .accessibilityIdentifier("request-server-restart")
+                Text(l10n("Restarting your server ends an unanswered save. Choose Start server restart first, then restart the server."))
+            }
+            // Keep one native List row as the requested restart becomes its confirmation step.
+            Button {
+                if waiting.restartRequested { confirmRestart() } else { requestRestart() }
+            } label: {
+                Label(confirming ? l10n("Sending…") : waiting.restartRequested ? l10n("The server has restarted") : l10n("Start server restart"),
+                      systemImage: waiting.restartRequested ? "checkmark.circle" : "arrow.clockwise.circle")
+            }
+            .id("server-restart-step")
+            .focused($confirmFocused)
+            .accessibilityIdentifier(waiting.restartRequested ? "confirm-server-restarted" : "request-server-restart")
+            .disabled(confirming)
+            if waiting.restartRequested {
+                Button(l10n("Start again")) { requestRestart() }.accessibilityIdentifier("request-server-restart-again").disabled(confirming)
             }
             if let recoveryFailure { Text(recoveryFailure).foregroundStyle(.orange) }
         }
@@ -145,13 +163,13 @@ struct SettingsView: View {
     }
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Text(title).font(.title3.bold())
+        Section {
+            // TV List supplementary headers do not enter its accessibility tree.
+            Text(title).font(.headline).foregroundStyle(.primary)
+                .accessibilityAddTraits(.isHeader)
+                .listRowBackground(Color.clear)
             content()
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(alignment: .bottom) { Divider().offset(y: 22) }
-        .focusSection()
     }
 
     private func interval(_ title: String, value: Binding<Int>, identifier: String) -> some View {

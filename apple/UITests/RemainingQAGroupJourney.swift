@@ -17,7 +17,7 @@ import XCTest
     func testServerRejectedCollectionEditSaysTheAccountIsNotAllowedAndSavesNothing() async throws {
         signIn()
         let app = XCUIApplication()
-        openAccountMenu("Collections")
+        app.buttons["Collections"].tap()
         XCTAssertTrue(app.buttons["group-collection-evening"].waitForExistence(timeout: 10))
         app.buttons["group-collection-evening"].tap()
         app.buttons["Edit collection"].tap()
@@ -39,7 +39,7 @@ import XCTest
         try await configure("podcast-admin")
         signIn()
         let app = XCUIApplication()
-        openAccountMenu("Collections")
+        app.buttons["Collections"].tap()
         XCTAssertTrue(app.buttons["group-collection-evening"].waitForExistence(timeout: 10))
         app.buttons["group-collection-evening"].tap()
         XCTAssertTrue(app.buttons["Edit collection"].waitForExistence(timeout: 10))

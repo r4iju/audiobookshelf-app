@@ -1,0 +1,39 @@
+{
+  "source": "d49f2a42545ba19b40fa1f2a453711e02032abcc",
+  "run": 37812757060,
+  "cases": [
+    {
+      "suite": "ReadinessJourney",
+      "test": "testMainScreensPassTheAccessibilityAudit",
+      "status": "passed",
+      "seconds": 81.518
+    },
+    {
+      "suite": "RelatedJourney",
+      "test": "testBookDetailsLeadToItsSeriesAndAuthor",
+      "status": "failed",
+      "seconds": 55.574
+    },
+    {
+      "suite": "ShellJourney",
+      "test": "testManyLibrariesKeepTheShellBoundedAndRemainSelectable",
+      "status": "failed",
+      "seconds": 96.973
+    }
+  ],
+  "original_hashes": {
+    "representative-journeys.log": "0e1d0c10da723ee8f50d4997405698e0eb2fa25971547deaa629cdbd3ffe2b7c",
+    "original-results.zip": "a4beb04503d479b3b8d9801086e4dc17a0dfa5ff0b2b566378304f61ab609e23",
+    "harness-provenance.json": "116e943e5dcb5acbe8f1a4be23d4e16187719dfbf1679c7cf3b5b447dfe449c8",
+    "selected-journeys.json": "c1670c7220ae5d537c44b02bb148cbb504f0844b8da0dba3637835ced7ac2543"
+  },
+  "scope": "focused navigation3; mobile jobs skipped; no all7 acceptance",
+  "first_failures": [
+    "Related author Back line78",
+    "Shell chooser label after Archive10 Select line25"
+  ],
+  "limitations": [
+    "Shell app pid0 at teardown suggests termination; cause not yet established",
+    "modern3 passing does not establish old17 passing"
+  ]
+}

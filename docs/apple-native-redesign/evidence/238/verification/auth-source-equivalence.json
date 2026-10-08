@@ -1,0 +1,31 @@
+{
+  "baseline": "58ba71da6404fb2471f7ad0b445e462ff36b8c04",
+  "frozen": "17869645d869445fcc101f8ad625522f25b2b90e",
+  "files": [
+    {
+      "file": "tvos/App/RootView.swift",
+      "baselineBlob": "4661ed7f093c15a4d7492646a05d62101a7c19f5",
+      "frozenBlob": "4661ed7f093c15a4d7492646a05d62101a7c19f5",
+      "byteIdentical": true
+    },
+    {
+      "file": "tvos/App/SignInView.swift",
+      "baselineBlob": "04f190837dbeed2cef9886649ec8a2fc222b1bdd",
+      "frozenBlob": "04f190837dbeed2cef9886649ec8a2fc222b1bdd",
+      "byteIdentical": true
+    },
+    {
+      "file": "tvos/App/CatalogStore.swift",
+      "baselineBlob": "c2af5e138c3fa1d76667b2837dab786a837b6f5f",
+      "frozenBlob": "c2af5e138c3fa1d76667b2837dab786a837b6f5f",
+      "byteIdentical": true
+    },
+    {
+      "file": "tvos/App/TVPlayer.swift",
+      "baselineBlob": "a46336044401bb90eadacca40fb3949c10d29679",
+      "frozenBlob": "a46336044401bb90eadacca40fb3949c10d29679",
+      "byteIdentical": true
+    }
+  ],
+  "limitation": "Source identity does not establish absence or harmlessness of the runtime warning."
+}

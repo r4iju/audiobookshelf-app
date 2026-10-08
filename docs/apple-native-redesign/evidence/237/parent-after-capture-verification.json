@@ -1,0 +1,33 @@
+{
+  "source": "4524ee1635057f581174b4e770339fe995a093cb",
+  "checks": [
+    {
+      "device": "phone",
+      "scope": "product",
+      "strict_exit": 0,
+      "resources": 47,
+      "mismatches": []
+    },
+    {
+      "device": "phone",
+      "scope": "installed-after-capture",
+      "strict_exit": 0,
+      "resources": 47,
+      "mismatches": []
+    },
+    {
+      "device": "ipad",
+      "scope": "product",
+      "strict_exit": 0,
+      "resources": 47,
+      "mismatches": []
+    },
+    {
+      "device": "ipad",
+      "scope": "installed-after-capture",
+      "strict_exit": 0,
+      "resources": 47,
+      "mismatches": []
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "configurations": [
+    {
+      "target": "NativeJourneyTests",
+      "xctestrun": "/tmp/native-capture-off-effective-5c4-20261009/derived-ios-ui-modern/Build/Products/AudiobookshelfNative_iphonesimulator27.0-arm64-x86_64.xctestrun",
+      "sha256": "1dea7811e49b078f79ffc18b49486521686521c368f1652325c80d1a09f2ef15",
+      "SystemAttachmentLifetime": "keepNever",
+      "PreferredScreenCaptureFormat": "screenRecording",
+      "IsUITestBundle": true,
+      "TestBundlePath": "__TESTHOST__/PlugIns/NativeJourneyTests.xctest",
+      "qualification": "Effective build-only configuration, no test or UI execution"
+    },
+    {
+      "target": "NativeTests",
+      "xctestrun": "/tmp/native-capture-off-effective-5c4-20261009/derived-ios-unit-modern/Build/Products/NativeTests_iphonesimulator27.0-arm64-x86_64.xctestrun",
+      "sha256": "7129e31e4d866324ba1ddc97e906a02d5e44aedfd1c8f7a32640a471d9d4ff3c",
+      "SystemAttachmentLifetime": "keepNever",
+      "PreferredScreenCaptureFormat": "screenRecording",
+      "IsUITestBundle": false,
+      "TestBundlePath": "__TESTROOT__/Debug-iphonesimulator/NativeTests.xctest",
+      "qualification": "Effective build-only configuration, no test or UI execution"
+    },
+    {
+      "target": "TVAppTests",
+      "xctestrun": "/tmp/native-capture-off-effective-5c4-20261009/derived-tv/Build/Products/AudiobookshelfTV_appletvsimulator27.0-arm64-x86_64.xctestrun",
+      "sha256": "0d7188574f32c4c8c6301c91aecd950903cffdf5e38ff4a89f5c6326fb9c6274",
+      "SystemAttachmentLifetime": "keepNever",
+      "PreferredScreenCaptureFormat": "screenRecording",
+      "IsUITestBundle": false,
+      "TestBundlePath": "__TESTHOST__/PlugIns/TVAppTests.xctest",
+      "qualification": "Effective build-only configuration, no test or UI execution"
+    },
+    {
+      "target": "TVJourneyTests",
+      "xctestrun": "/tmp/native-capture-off-effective-5c4-20261009/derived-tv/Build/Products/AudiobookshelfTV_appletvsimulator27.0-arm64-x86_64.xctestrun",
+      "sha256": "0d7188574f32c4c8c6301c91aecd950903cffdf5e38ff4a89f5c6326fb9c6274",
+      "SystemAttachmentLifetime": "keepNever",
+      "PreferredScreenCaptureFormat": "screenRecording",
+      "IsUITestBundle": true,
+      "TestBundlePath": "__TESTHOST__/PlugIns/TVJourneyTests.xctest",
+      "qualification": "Effective build-only configuration, no test or UI execution"
+    }
+  ],
+  "scheme_no_testplan_overrides": [
+    {
+      "scheme": "AudiobookshelfNative",
+      "file": "/tmp/native-capture-off-effective-5c4-20261009/source/apple/AudiobookshelfNative.xcodeproj/xcshareddata/xcschemes/AudiobookshelfNative.xcscheme",
+      "systemAttachmentLifetime": "keepNever",
+      "testPlanReferences": 0,
+      "targets": [
+        "NativeJourneyTests"
+      ]
+    },
+    {
+      "scheme": "NativeTests",
+      "file": "/tmp/native-capture-off-effective-5c4-20261009/source/apple/AudiobookshelfNative.xcodeproj/xcshareddata/xcschemes/NativeTests.xcscheme",
+      "systemAttachmentLifetime": "keepNever",
+      "testPlanReferences": 0,
+      "targets": [
+        "NativeTests"
+      ]
+    },
+    {
+      "scheme": "AudiobookshelfTV",
+      "file": "/tmp/native-capture-off-effective-5c4-20261009/source/tvos/AudiobookshelfTV.xcodeproj/xcshareddata/xcschemes/AudiobookshelfTV.xcscheme",
+      "systemAttachmentLifetime": "keepNever",
+      "testPlanReferences": 0,
+      "targets": [
+        "TVAppTests",
+        "TVJourneyTests"
+      ]
+    }
+  ],
+  "toolchain": "Xcode 27.0\nBuild version 27A266a",
+  "xcodegen": "Version: 2.46.0",
+  "build_results": {
+    "original_ios14_on_sdk27": 65,
+    "ios_ui_modern_cli_min15": 0,
+    "ios_unit_modern_cli_min15": 0,
+    "tv_source_min17": 0
+  },
+  "actions": "Only project generation and generic build-for-testing; no device lease/simulator boot/test/audio/capture"
+}

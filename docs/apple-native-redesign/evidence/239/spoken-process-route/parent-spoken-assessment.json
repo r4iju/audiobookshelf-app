@@ -1,0 +1,80 @@
+{
+  "source": "f9224289337a399d3d5c072b8eaf4b27bb0a533b",
+  "runtimeEquivalent": "d49f2a42545ba19b40fa1f2a453711e02032abcc",
+  "tool": "installed local whisper-cli/ggml-large-v3, English, no forced prompt, no upload",
+  "clips": [
+    {
+      "file": "compact-player.wav",
+      "sha256": "68f03802f5153f471eb49c5ade50708365d8a92f9dd969c8afe3fab7ff6c450a",
+      "nonzeroSamples": 592246,
+      "machineTranscript": "Stories for Tomorrow 01, 20 seconds of 20 seconds, button, done, button.",
+      "assessment": "machine transcript of actual process-scoped speech; partial scope",
+      "fullAcceptance": false
+    },
+    {
+      "file": "destinations.wav",
+      "sha256": "4a0631191d41466fcb3dcb8c535d35f553b6518af1febfc4daf7a986078c2dc8",
+      "nonzeroSamples": 653216,
+      "machineTranscript": "Tab bar, selected, library, tab, two of five.\nDownloads, tab, three of five.",
+      "assessment": "machine transcript of actual process-scoped speech; partial scope",
+      "fullAcceptance": false
+    },
+    {
+      "file": "detail-metadata.wav",
+      "sha256": "848c59921c3ffbeb8011e50b1f1a8a01939c197456a3e72708c921aed8f768d8",
+      "nonzeroSamples": 170480,
+      "machineTranscript": "Narrated by QA Narrator",
+      "assessment": "machine transcript of actual process-scoped speech; partial scope",
+      "fullAcceptance": false
+    },
+    {
+      "file": "detail.wav",
+      "sha256": "f3b0d23d2b9e465644044e5e74e9ef29b27d3800b43a1bc5c72288bce5e73d55",
+      "nonzeroSamples": 729706,
+      "machineTranscript": "Stories for Tomorrow 01\nAudiobook Shelf QA\n20 seconds\nButton\nStories for Tomorrow 01",
+      "assessment": "machine transcript of actual process-scoped speech; partial scope",
+      "fullAcceptance": false
+    },
+    {
+      "file": "form.wav",
+      "sha256": "3a8de4d9aaed7f1cea51531aab8abd4e18177d40d0f3eaaa178da57e8db6c5b6",
+      "nonzeroSamples": 802834,
+      "machineTranscript": "Server Address: https://audiobookshealth.nginx Username:",
+      "assessment": "machine transcript of actual process-scoped speech; partial scope",
+      "fullAcceptance": false
+    },
+    {
+      "file": "player-values.wav",
+      "sha256": "d1f1872e90d7263818efa46ef0cb0877f51c27aa571799b9d8a8346477cccb20",
+      "nonzeroSamples": 0,
+      "machineTranscript": "Thank you.",
+      "assessment": "rejected silent clip, ASR hallucination",
+      "fullAcceptance": false
+    },
+    {
+      "file": "signin.wav",
+      "sha256": "28fffd656fc50d07aa63c1729c940bd8f9b87769de62543c30ab92c63c81f87d",
+      "nonzeroSamples": 523436,
+      "machineTranscript": null,
+      "assessment": "not transcribed",
+      "fullAcceptance": false
+    },
+    {
+      "file": "speed-panel.wav",
+      "sha256": "63e060f192f463c48105a6c3a348e498332a6464d90b73402138bc0296fc04d9",
+      "nonzeroSamples": 0,
+      "machineTranscript": "Thank you.",
+      "assessment": "rejected silent clip, ASR hallucination",
+      "fullAcceptance": false
+    },
+    {
+      "file": "start-player.wav",
+      "sha256": "74874951d8ce2a0749b59cc15b82151f9127da7dfe3b131e2d505a7da653ed02",
+      "nonzeroSamples": 175412,
+      "machineTranscript": "Resume listening.",
+      "assessment": "machine transcript of actual process-scoped speech; partial scope",
+      "fullAcceptance": false
+    }
+  ],
+  "limitations": "Machine transcripts may misrecognize; no human listening claim. Onboarding is separate. Recovery/Downloads/disabled/selected tools/full traversal remain unassessed."
+}

@@ -15,11 +15,23 @@ import XCTest
         XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
     }
 
-    private func open(_ menuItem: String, in app: XCUIApplication) {
-        app.buttons["account"].tap()
-        let item = app.buttons[menuItem]
-        XCTAssertTrue(item.waitForExistence(timeout: 3), "\(menuItem) is missing from the account menu")
-        item.tap()
+    private func destination(_ name: String, in app: XCUIApplication) -> XCUIElement {
+        let tab = app.buttons[name].firstMatch
+        return tab.exists ? tab : app.cells.matching(NSPredicate(format: "label == %@", name)).firstMatch
+    }
+
+    private func open(_ destination: String, in app: XCUIApplication) {
+        if ["Settings", "Einstellungen", "Paramètres"].contains(destination) {
+            let settings = self.destination(destination, in: app)
+            XCTAssertTrue(settings.waitForExistence(timeout: 3), "The Settings destination must be available")
+            settings.tap()
+        } else {
+            self.destination("Settings", in: app).tap()
+            let item = app.buttons[destination]
+            for _ in 0..<4 where !(item.exists && item.isHittable) { app.swipeUp() }
+            XCTAssertTrue(item.waitForExistence(timeout: 3), "\(destination) is missing from Settings")
+            item.tap()
+        }
     }
 
     private func element(_ identifier: String, in app: XCUIApplication) -> XCUIElement {
@@ -41,6 +53,20 @@ import XCTest
         await fulfillment(of: [listened], timeout: Double(seconds) + 10)
     }
 
+    private func revealSettingsRow(_ identifier: String, in app: XCUIApplication) {
+        let row = app.buttons[identifier]
+        for _ in 0..<16 {
+            if !row.exists { app.swipeUp(); continue }
+            let frame = row.frame
+            let bottom = app.tabBars.firstMatch.exists ? app.tabBars.firstMatch.frame.minY : app.frame.maxY
+            let top = app.navigationBars.firstMatch.frame.maxY
+            print("SETTINGS-ROW \(identifier) frame=\(frame) visible=\(top)...\(bottom)")
+            if frame.minY < top { app.swipeDown() }
+            else if frame.maxY > bottom { app.swipeUp() }
+            else { return }
+        }
+    }
+
     // MARK: Language
 
     func testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch() async throws {
@@ -49,6 +75,7 @@ import XCTest
         let app = XCUIApplication()
         open("Settings", in: app)
         let language = app.buttons["language-settings"]
+        revealSettingsRow("language-settings", in: app)
         XCTAssertTrue(language.waitForExistence(timeout: 3))
         guard language.exists else { return }
         language.tap()
@@ -59,19 +86,23 @@ import XCTest
         XCTAssertEqual(app.buttons["language-de"].value as? String, "Ausgewählt", "The selection state reads in the chosen language")
         XCTAssertTrue(app.navigationBars["Sprache"].waitForExistence(timeout: 3), "The open screen must switch without relaunch")
         let lastLegacyLanguage = app.buttons["language-zh-cn"]
-        for _ in 0..<4 where !lastLegacyLanguage.exists { app.swipeUp() }
+        for _ in 0..<40 where !lastLegacyLanguage.exists { app.swipeUp() }
         XCTAssertTrue(lastLegacyLanguage.exists, "Every legacy language must remain selectable")
         app.navigationBars.buttons.firstMatch.tap()
 
         app.terminate(); app.launchArguments = Self.english; app.launch()
-        XCTAssertTrue(app.buttons["account"].waitForExistence(timeout: 10))
-        XCTAssertEqual(app.buttons["account"].label, "Konto", "Icon-only controls must follow the chosen language, not the device")
+        XCTAssertTrue(destination("Einstellungen", in: app).waitForExistence(timeout: 10))
+        XCTAssertEqual(destination("Einstellungen", in: app).label, "Einstellungen", "Native destinations must follow the chosen language, not the device")
         open("Einstellungen", in: app)
         XCTAssertTrue(app.navigationBars["Einstellungen"].waitForExistence(timeout: 3), "The choice must survive relaunch")
+        revealSettingsRow("appearance-settings", in: app)
+        app.buttons["appearance-settings"].tap()
         XCTAssertTrue(app.staticTexts["Haptische Rückmeldung"].exists)
         XCTAssertEqual(app.buttons["theme-light"].label, "Hell", "The theme keeps its legacy meaning")
         XCTAssertEqual(app.buttons["haptic-light"].label, "Leicht", "The haptic strength keeps its legacy meaning")
         capture("Native settings in German")
+        app.navigationBars.buttons.firstMatch.tap()
+        revealSettingsRow("language-settings", in: app)
         app.buttons["language-settings"].tap()
         app.buttons["language-system"].tap()
         XCTAssertTrue(app.navigationBars["Language"].waitForExistence(timeout: 3), "System must return to the English device language")
@@ -83,13 +114,14 @@ import XCTest
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: french)
         let app = XCUIApplication()
         open("Paramètres", in: app)
+        revealSettingsRow("language-settings", in: app)
         guard app.buttons["language-settings"].waitForExistence(timeout: 3) else { return XCTFail("Language settings are missing") }
         app.buttons["language-settings"].tap()
         XCTAssertEqual(app.buttons["language-system"].value as? String, "Sélectionné", "The selection state reads in the device language")
         app.buttons["language-en-us"].tap()
         XCTAssertTrue(app.navigationBars["Language"].waitForExistence(timeout: 3))
         app.terminate(); app.launchArguments = french; app.launch()
-        XCTAssertTrue(app.buttons["account"].waitForExistence(timeout: 10))
+        XCTAssertTrue(destination("Settings", in: app).waitForExistence(timeout: 10))
         open("Settings", in: app)
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 3), "A saved choice must override the device language")
     }
@@ -99,6 +131,7 @@ import XCTest
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: Self.english)
         let app = XCUIApplication()
         open("Settings", in: app)
+        revealSettingsRow("language-settings", in: app)
         guard app.buttons["language-settings"].waitForExistence(timeout: 3) else { return XCTFail("Language settings are missing") }
         app.buttons["language-settings"].tap()
         let mark = app.images["language-selected-mark"]
@@ -128,12 +161,12 @@ import XCTest
         }
         attempt("http://qa:hunter2-secret@127.0.0.1:25799/abs?token=leak-123")
         XCTAssertTrue(app.staticTexts["connection-error"].firstMatch.label.contains("without credentials"), "An address carrying credentials must be refused")
-        app.buttons["Cancel"].tap()
-        XCTAssertTrue(app.buttons["account"].waitForExistence(timeout: 10))
+        revealed("Cancel", in: app).tap()
+        XCTAssertTrue(destination("Settings", in: app).waitForExistence(timeout: 10))
         attempt("http://127.0.0.1:25799/abs")
         XCTAssertTrue(app.staticTexts["connection-error"].firstMatch.label.contains("could not be reached"), app.staticTexts["connection-error"].firstMatch.label)
-        app.buttons["Cancel"].tap()
-        XCTAssertTrue(app.buttons["account"].waitForExistence(timeout: 10))
+        revealed("Cancel", in: app).tap()
+        XCTAssertTrue(destination("Settings", in: app).waitForExistence(timeout: 10))
 
         open("Diagnostics", in: app)
         let event = element("diagnostic-event", in: app)
@@ -167,11 +200,11 @@ import XCTest
 
         revealed("diagnostic-clear", in: app).tap()
         app.alerts.buttons["Clear"].tap()
-        app.swipeDown(); app.swipeDown()
+        for _ in 0..<6 where !app.staticTexts["No problems recorded"].exists { app.collectionViews.firstMatch.swipeDown() }
         XCTAssertTrue(app.staticTexts["No problems recorded"].waitForExistence(timeout: 3))
         XCTAssertFalse(element("diagnostic-event", in: app).exists)
         app.terminate(); app.launchArguments = Self.english; app.launch()
-        XCTAssertTrue(app.buttons["account"].waitForExistence(timeout: 10))
+        XCTAssertTrue(destination("Settings", in: app).waitForExistence(timeout: 10))
         open("Diagnostics", in: app)
         XCTAssertTrue(app.navigationBars["Diagnostics"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["No problems recorded"].waitForExistence(timeout: 3), "Clearing must persist")
@@ -232,9 +265,12 @@ import XCTest
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: Self.english + ["--observe-haptics"])
         let app = XCUIApplication()
         open("Settings", in: app)
+        revealSettingsRow("appearance-settings", in: app)
+        app.buttons["appearance-settings"].tap()
         app.buttons["haptic-medium"].tap()
         expectHaptic("settings", "medium", in: app)
         app.navigationBars.buttons.firstMatch.tap()
+        destination("Library", in: app).tap()
         app.buttons["Show list"].tap()
         expectHaptic("layout", "medium", in: app)
         app.buttons["Sort library"].tap(); app.buttons["Title Z–A"].tap()
@@ -262,11 +298,14 @@ import XCTest
         connectSelectAndRestore(serverURL: Self.server, verifyRestoration: false, arguments: Self.english + ["--observe-haptics"])
         let app = XCUIApplication()
         open("Settings", in: app)
+        revealSettingsRow("appearance-settings", in: app)
+        app.buttons["appearance-settings"].tap()
         app.buttons["haptic-heavy"].tap()
         expectHaptic("settings", "heavy", in: app)
         app.buttons["haptic-off"].tap()
         let before = observedHaptic(app)
         app.navigationBars.buttons.firstMatch.tap()
+        destination("Library", in: app).tap()
         app.buttons["Show list"].tap()
         app.buttons["book-book-0"].tap(); app.buttons["play-book"].tap()
         XCTAssertTrue(app.buttons["mini-player"].waitForExistence(timeout: 5))
@@ -371,7 +410,9 @@ import XCTest
         let app = XCUIApplication()
         app.buttons["book-book-0"].tap()
         app.swipeUp()
-        app.buttons["play-book"].tap(); app.buttons["mini-player"].tap()
+        app.buttons["play-book"].tap()
+        XCTAssertTrue(app.buttons["mini-player"].waitForExistence(timeout: 10))
+        app.buttons["mini-player"].tap()
         XCTAssertTrue(app.buttons["Back 10 seconds"].waitForExistence(timeout: 5))
         let window = app.windows.firstMatch.frame
         for control in ["Back 10 seconds", "Forward 10 seconds", "Chapters", "Playback speed", "Bookmarks", "Sleep timer"] {

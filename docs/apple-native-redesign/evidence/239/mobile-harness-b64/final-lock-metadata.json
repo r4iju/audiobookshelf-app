@@ -1,0 +1,8 @@
+{
+  "key": "previewLockPlayerControls",
+  "stored": null,
+  "resolved_default": false,
+  "baseline_observed": false,
+  "no_Lock_UI_activation": true,
+  "original_test_reset_clears_Lock": true
+}

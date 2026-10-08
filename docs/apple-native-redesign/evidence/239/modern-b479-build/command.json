@@ -1,0 +1,17 @@
+[
+  "xcodebuild",
+  "-project",
+  "/tmp/native-b479-modern-tv/source/tvos/AudiobookshelfTV.xcodeproj",
+  "-scheme",
+  "AudiobookshelfTV",
+  "-configuration",
+  "Debug",
+  "-destination",
+  "generic/platform=tvOS Simulator",
+  "-derivedDataPath",
+  "/tmp/native-b479-modern-tv/build",
+  "CODE_SIGNING_ALLOWED=YES",
+  "CODE_SIGN_IDENTITY=-",
+  "TVOS_DEPLOYMENT_TARGET=17.0",
+  "build-for-testing"
+]

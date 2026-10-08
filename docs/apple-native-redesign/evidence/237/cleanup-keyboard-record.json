@@ -1,0 +1,20 @@
+{
+  "phone": {
+    "KeyboardLastUsed": "ja_JP-Romaji@sw=QWERTY-Japanese;hw=Automatic",
+    "KeyboardsCurrentAndNext": [
+      "ja_JP-Romaji@sw=QWERTY-Japanese;hw=Automatic",
+      "ja_JP-Romaji@sw=QWERTY-Japanese;hw=Automatic",
+      "en_US@sw=QWERTY;hw=Automatic"
+    ],
+    "HardwareKeyboardLastSeen": true
+  },
+  "ipad": {
+    "KeyboardLastUsed": "ja_JP-Romaji@sw=QWERTY-Japanese;hw=Automatic",
+    "KeyboardsCurrentAndNext": [
+      "en_JP@sw=QWERTY-JIS;hw=Automatic",
+      "en_JP@sw=QWERTY-JIS;hw=Automatic",
+      "ja_JP-Romaji@sw=QWERTY-Japanese;hw=Automatic"
+    ],
+    "HardwareKeyboardLastSeen": true
+  }
+}

@@ -1,0 +1,188 @@
+import XCTest
+
+// Disposable239 acceptance instrumentation, removed before runtime freeze.
+@MainActor final class OSAccessibility239Journey: XCTestCase {
+    func testEnableCombinedModes() throws { try modes(enabled: true) }
+    func testRestoreCombinedModes() throws { try modes(enabled: false) }
+    private func route(_ name: String, in settings: XCUIApplication) -> XCUIElement {
+        let button = settings.buttons[name].firstMatch
+        return button.exists ? button : settings.cells[name].firstMatch
+    }
+    private func modes(enabled: Bool) throws {
+        let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+        settings.launch()
+        let accessibility = route("Accessibility", in: settings)
+        for _ in 0..<12 where !accessibility.exists {
+            if settings.collectionViews["Sidebar"].exists { settings.collectionViews["Sidebar"].swipeUp() } else { settings.swipeUp() }
+        }
+        XCTAssertTrue(accessibility.waitForExistence(timeout: 10)); accessibility.tap()
+        route("Display & Text Size", in: settings).tap()
+        for identifier in ["REDUCE_TRANSPARENCY", "TEXT_COLORS_DARKEN"] {
+            let toggle = settings.switches[identifier].firstMatch
+            XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+            print("ACTUAL-OS-INITIAL " + identifier + "=" + String(describing: toggle.value))
+            if (toggle.value as? String == "1") != enabled {
+                if toggle.switches.firstMatch.exists { toggle.switches.firstMatch.tap() } else { toggle.tap() }
+            }
+            XCTAssertEqual(toggle.value as? String, enabled ? "1" : "0", identifier)
+            print("ACTUAL-OS-VERIFIED " + identifier + "=" + String(describing: toggle.value))
+        }
+        settings.navigationBars.buttons.firstMatch.tap()
+        route("Motion", in: settings).tap()
+        let motion = settings.switches["Reduce Motion"].firstMatch
+        XCTAssertTrue(motion.waitForExistence(timeout: 5))
+        print("ACTUAL-OS-INITIAL REDUCE_MOTION=" + String(describing: motion.value))
+        if (motion.value as? String == "1") != enabled {
+            if motion.switches.firstMatch.exists { motion.switches.firstMatch.tap() } else { motion.tap() }
+        }
+        XCTAssertEqual(motion.value as? String, enabled ? "1" : "0")
+        print("ACTUAL-OS-VERIFIED REDUCE_MOTION=" + String(describing: motion.value))
+        settings.terminate()
+    }
+}
+
+@MainActor final class CombinedAccessibility239Journey: NativeJourney {
+    private func reveal(_ element: XCUIElement, in app: XCUIApplication) {
+        for _ in 0..<8 where element.frame.maxY > app.frame.maxY - 100 || element.frame.minY < 100 {
+            app.swipeUp()
+        }
+        print("AUDITED-CONTROL-FRAME " + String(describing: element.frame) + " WINDOW " + String(describing: app.frame))
+        XCTAssertTrue(element.isHittable)
+    }
+    func testCombinedModesKeepPrimaryTransportAndToolsOperable() async throws {
+        try await FixtureControl.configure("long-audio")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["book-book-0"].tap()
+        XCTAssertTrue(app.buttons["play-book"].waitForExistence(timeout: 5))
+        reveal(app.buttons["play-book"], in: app)
+        if #available(iOS 17, *) {
+            try app.performAccessibilityAudit(for: .contrast) { issue in
+                print("STRICT-AUDIT-ISSUE " + issue.compactDescription + " " + issue.detailedDescription)
+                if let element = issue.element { print("STRICT-AUDIT-ELEMENT " + element.label + " frame=" + String(describing: element.frame) + " enabled=" + String(element.isEnabled) + " hittable=" + String(element.isHittable)) }
+                return false
+            }
+        }
+        app.buttons["play-book"].tap()
+        XCTAssertTrue(app.buttons["mini-pause-playback"].waitForExistence(timeout: 10))
+        app.buttons["mini-pause-playback"].tap()
+        XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 5))
+        app.buttons["mini-player"].tap()
+        XCTAssertTrue(app.buttons["resume-playback"].waitForExistence(timeout: 5))
+        reveal(app.buttons["resume-playback"], in: app)
+        if #available(iOS 17, *) {
+            try app.performAccessibilityAudit(for: .contrast) { issue in
+                print("STRICT-AUDIT-ISSUE " + issue.compactDescription + " " + issue.detailedDescription)
+                if let element = issue.element { print("STRICT-AUDIT-ELEMENT " + element.label + " frame=" + String(describing: element.frame) + " enabled=" + String(element.isEnabled) + " hittable=" + String(element.isHittable)) }
+                return false
+            }
+        }
+        app.buttons["resume-playback"].tap()
+        XCTAssertTrue(app.buttons["pause-playback"].waitForExistence(timeout: 5))
+        app.buttons["pause-playback"].tap()
+        XCTAssertTrue(app.buttons["resume-playback"].waitForExistence(timeout: 5))
+        for tool in ["Chapters", "Playback speed", "Bookmarks", "Sleep timer"] {
+            let button = app.buttons[tool]
+            for _ in 0..<6 where !(button.exists && button.isHittable) { app.swipeUp() }
+            XCTAssertTrue(button.exists, tool); button.tap()
+            XCTAssertTrue(app.buttons["panel-done"].waitForExistence(timeout: 5), tool)
+            app.buttons["panel-done"].tap()
+        }
+    }
+}
+
+@MainActor final class Compact239Journey: NativeJourney {
+    func testActualNarrowWindowPreservesNavigationAndTransport() async throws {
+        try await FixtureControl.configure("long-audio")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let card = springboard.otherElements.matching(identifier: "card:com.forkzed.audiobookshelf.native.preview:sceneID:com.forkzed.audiobookshelf.native.preview-default").firstMatch
+        print("ACTUAL-NATIVE-WINDOW " + String(describing: card.frame) + " APP " + String(describing: app.frame))
+        XCTAssertLessThan(card.frame.width, 500, "This must be an actual narrow native window")
+        print("COMPACT-CATALOG-AX " + app.debugDescription)
+        func global(_ x: CGFloat, _ y: CGFloat) -> XCUICoordinate {
+            let frame = springboard.frame
+            print("ACTUAL-SPRINGBOARD-ORIGIN " + String(describing: frame))
+            return springboard.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: x - frame.minX, dy: y - frame.minY))
+        }
+        func targetFrame(_ element: XCUIElement) -> CGRect {
+            let reported = element.frame
+            if reported.midX < card.frame.minX {
+                let global = reported.offsetBy(dx: card.frame.minX, dy: card.frame.minY)
+                print("ACTUAL-LOCAL-ELEMENT " + element.identifier + " " + String(describing: reported) + " WINDOW " + String(describing: card.frame))
+                return global
+            }
+            return reported
+        }
+        func tap(_ element: XCUIElement, scroll: Bool = false) {
+            if scroll {
+                for _ in 0..<6 where targetFrame(element).midY > card.frame.maxY - 80 {
+                    global(card.frame.midX, card.frame.maxY - 130).press(forDuration: 0.1, thenDragTo: global(card.frame.midX, card.frame.minY + 100))
+                }
+            }
+            let target = targetFrame(element)
+            print("ACTUAL-GLOBAL-ELEMENT " + element.identifier + " " + String(describing: target))
+            global(target.midX, target.midY).tap()
+        }
+        tap(app.buttons["book-book-0"], scroll: true)
+        XCTAssertTrue(app.buttons["play-book"].waitForExistence(timeout: 5), app.debugDescription)
+        tap(app.buttons["play-book"], scroll: true)
+        XCTAssertTrue(app.buttons["mini-pause-playback"].waitForExistence(timeout: 10))
+        let mini = app.buttons["mini-player"]
+        let tab = app.tabBars.firstMatch
+        print("ACTUAL-NATIVE-PLAYER " + String(describing: mini.frame) + " TAB " + String(describing: tab.frame))
+        XCTAssertLessThanOrEqual(mini.frame.maxY, tab.frame.minY, "The mini player must stay above native tabs")
+        tap(app.buttons["mini-pause-playback"])
+        XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 5))
+        tap(mini)
+        XCTAssertTrue(app.buttons["resume-playback"].waitForExistence(timeout: 5))
+        tap(app.buttons["resume-playback"], scroll: true)
+        XCTAssertTrue(app.buttons["pause-playback"].waitForExistence(timeout: 5))
+        tap(app.buttons["pause-playback"], scroll: true)
+        tap(app.navigationBars["Now listening"].buttons["Done"])
+        XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 5), "After close " + app.debugDescription)
+        tap(mainDestination("Settings", in: app))
+        XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 5), "Settings " + app.debugDescription)
+        for _ in 0..<8 where !app.buttons["language-settings"].exists {
+            let bottom = targetFrame(app.buttons["mini-player"]).minY
+            global(card.frame.midX, bottom - 20).press(forDuration: 0.1, thenDragTo: global(card.frame.midX, card.frame.minY + 100))
+        }
+        XCTAssertTrue(app.buttons["language-settings"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.searchFields.firstMatch.exists)
+        tap(mainDestination("Library", in: app))
+        XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 5), "Library " + app.debugDescription)
+        XCTAssertTrue(app.buttons["play-book"].waitForExistence(timeout: 5), "Narrow destination switches preserve detail")
+        tap(mainDestination("Search", in: app))
+        XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 5), "Search " + app.debugDescription)
+        let field = app.searchFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5)); tap(field);field.typeText("Tomorrow 61\n")
+        XCTAssertTrue(app.buttons["search-book-60"].waitForExistence(timeout: 10))
+        tap(app.buttons["search-book-60"])
+        XCTAssertTrue(app.buttons["play-book"].waitForExistence(timeout: 5), app.debugDescription)
+        tap(app.navigationBars.buttons.firstMatch)
+        XCTAssertTrue(app.buttons["search-book-60"].waitForExistence(timeout: 5))
+        if app.buttons["Close"].exists { tap(app.buttons["Close"]) }
+        tap(mainDestination("Downloads", in: app))
+        XCTAssertTrue(app.navigationBars["Downloads"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 5), "Browsing does not restart playback " + app.debugDescription)
+    }
+}
+
+@MainActor final class NativeWindow239Journey: XCTestCase {
+    func testRestoreWideNativeWindow() {
+        let app = XCUIApplication()
+        app.launch()
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let menu = springboard.buttons["window-controls:com.forkzed.audiobookshelf.native.preview"]
+        if menu.exists { menu.tap() }
+        print("NATIVE-WINDOW-MENU " + springboard.debugDescription)
+        let full = springboard.descendants(matching: .any).matching(NSPredicate(format: "identifier == %@", "Zoom-button")).firstMatch
+        XCTAssertTrue(full.waitForExistence(timeout: 5))
+        full.tap()
+        let card = springboard.otherElements.matching(identifier: "card:com.forkzed.audiobookshelf.native.preview:sceneID:com.forkzed.audiobookshelf.native.preview-default").firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        print("ACTUAL-RESTORED-WIDE " + String(describing: card.frame))
+        XCTAssertGreaterThan(card.frame.width, 780)
+    }
+}

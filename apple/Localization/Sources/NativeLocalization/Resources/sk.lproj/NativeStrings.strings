@@ -81,7 +81,6 @@
 "Clear" = "Vymazať";
 "Clear events" = "Zmazať záznamy logovania";
 "Clear events?" = "Vymazať udalosti?";
-"Clear search" = "Vymazať vyhľadávanie";
 "Close feed" = "Zatvoriť zdroj";
 "Close playback" = "Zavrieť prehrávač";
 "Close reader" = "Zavrieť čítačku";
@@ -92,8 +91,6 @@
 "Complete" = "Hotovo";
 "Confirm" = "Potvrď";
 "Connect" = "Pripojiť";
-"Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Pripojte sa priamo k Audiobookshelf. Podporované sú lokálne servery HTTP a dôveryhodné servery HTTPS.";
-"Connect directly to your Audiobookshelf server to stream audiobooks and podcasts." = "Pripojte sa priamo k svojmu serveru Audiobookshelf a streamujte audioknihy a podcasty.";
 "Connect to your library" = "Pripojte sa k svojej knižnici";
 "Connecting" = "Pokus o pripojenie servera...";
 "Connecting…" = "Pokus o pripojenie servera...";
@@ -177,7 +174,6 @@
 "Filter library" = "Filtrovať knižnicu";
 "Filter: {0}" = "Filter: {0}";
 "Filters" = "Filtre";
-"Find your next chapter." = "Nájdite svoju ďalšiu kapitolu.";
 "Find your next listen." = "Nájdite si ďalšie počúvanie.";
 "Finished" = "Ukončené";
 "Font" = "písmo";
@@ -195,7 +191,6 @@
 "Has ebook" = "Má e-knihu";
 "Has supplementary ebook" = "Má doplnkovú e-knihu";
 "Highlights" = "To najlepšie";
-"Home" = "Domov";
 "Idle" = "Nečinné";
 "Import data" = "Importovať údaje";
 "Import needs {0}; {1} is available. Free space and retry." = "Import potrebuje {0}, k dispozícii je {1}. Uvoľnite miesto a skúste to znova.";
@@ -287,7 +282,6 @@
 "Nothing to continue yet. Choose a library above to start listening." = "Zatiaľ nie je v čom pokračovať. Vyberte vyššie knižnicu a začnite počúvať.";
 "Now Playing" = "Práve hrá";
 "Now listening" = "Práve počúvate";
-"Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "Teraz reštartujte server Audiobookshelf. Počíta sa len reštart vykonaný po voľbe Spustiť reštart servera. Keď server znova pobeží, potvrďte to tu.";
 "Number of episodes" = "# z epizód";
 "Off" = "Vypnuté";
 "Oldest first" = "Od najstarších";
@@ -370,6 +364,7 @@
 "Recently added" = "Posledné pridané";
 "Refresh" = "Obnoviť";
 "Refresh downloads" = "Obnoviť stiahnuté";
+"Remove" = "Odstrániť";
 "Remove download" = "Odstrániť lokálnu položku";
 "Remove {0}" = "Odstrániť: {0}";
 "Repair and retry import" = "Opraviť a zopakovať import";
@@ -377,10 +372,8 @@
 "Report" = "Hlásenie";
 "Reset timer" = "Resetovať časovač";
 "Restart playback" = "Prehrať od začiatku";
-"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Teraz reštartujte server Audiobookshelf a po jeho opätovnom spustení to potvrďte. Reštart pred touto správou sa nepočíta, pretože uloženie bez odpovede mohlo doraziť na server až po ňom.";
 "Restart the server" = "Reštartovať server";
 "Restart the server now" = "Reštartovať server teraz";
-"Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server." = "Reštart servera Audiobookshelf ukončí uloženie bez odpovede. Najprv zvoľte Spustiť reštart servera a potom server reštartujte.";
 "Restarting…" = "Reštartovanie…";
 "Resume" = "Pokračovať";
 "Resume listening" = "Pokračovať v počúvaní";
@@ -413,7 +406,6 @@
 "Saving your progress…" = "Ukladanie stavu…";
 "Scale elapsed time by speed" = "Zmeniť ubehnutý čas podľa rýchlosti";
 "Search" = "Vyhľadať";
-"Search library" = "Hľadať v knižnici";
 "Search podcasts" = "Hľadať podcasty";
 "Searching your library…" = "Prehľadávanie knižnice…";
 "Searching…" = "Vyhľadávanie…";

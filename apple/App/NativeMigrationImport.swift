@@ -175,8 +175,31 @@ struct NativeMigrationImport: View {
     @Environment(\.presentationMode) private var presentation
     @EnvironmentObject private var connection: ConnectionStore
     @EnvironmentObject private var store: NativeMigrationStore
-    @State private var choosing = false
-    @State private var selectionToken: UUID?
+    private final class Selection: Identifiable {
+        let id: UUID
+        var url: URL?
+        init(id: UUID) { self.id = id }
+    }
+    private final class ExportPicker: ObservableObject {
+        @Published var presented: Selection?
+        // SwiftUI clears the presented item before onDismiss. Retain the same
+        // selection until dismissal completes, including native swipe cancellation.
+        private var pending: Selection?
+        func begin(_ token: UUID) {
+            let selected = Selection(id: token)
+            pending = selected
+            presented = selected
+        }
+        func choose(_ url: URL?, for selected: Selection) {
+            selected.url = url
+            presented = nil
+        }
+        func complete() -> Selection? {
+            defer { pending = nil }
+            return pending
+        }
+    }
+    @StateObject private var picker = ExportPicker()
 
     var body: some View {
         ShelfList {
@@ -185,8 +208,7 @@ struct NativeMigrationImport: View {
                 Text(l10n("Your previous app and its original files stay available.")).foregroundColor(ShelfStyle.secondaryText)
                 Text(l10n("Sign in again after importing to access each account.")).foregroundColor(ShelfStyle.secondaryText)
                 Button(l10n("Choose export")) {
-                    selectionToken = store.beginSelection()
-                    choosing = selectionToken != nil
+                    if let token = store.beginSelection() { picker.begin(token) }
                 }.disabled(store.busy)
             }
             if store.busy { ProgressView(l10n("Working on your import…")) }
@@ -240,18 +262,13 @@ struct NativeMigrationImport: View {
                 }
             }
         }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Import your data")).navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $choosing, onDismiss: {
-                if let token = selectionToken {
-                    selectionToken = nil
-                    Task { await store.finishSelection(nil, token: token) }
+            .sheet(item: $picker.presented, onDismiss: {
+                if let selected = picker.complete() {
+                    Task { await store.finishSelection(selected.url, token: selected.id) }
                 }
-            }) {
+            }) { selected in
                 MigrationFilePicker { url in
-                    choosing = false
-                    if let token = selectionToken {
-                        Task { await store.finishSelection(url, token: token) }
-                        selectionToken = nil
-                    }
+                    picker.choose(url, for: selected)
                 }
             }
             .onAppear { Task { await store.loadCommitted() } }

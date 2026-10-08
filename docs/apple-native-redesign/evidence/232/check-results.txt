@@ -1,0 +1,52 @@
+Observed bounded-shell red
+/Volumes/ai-ssd/code/leafwake-fullstack/tvos/UITests/ShellJourney.swift:10: error: -[TVJourneyTests.ShellJourney testManyLibrariesKeepTheShellBoundedAndRemainSelectable] : XCTAssertEqual failed: ("10") is not equal to ("4") - Twelve libraries must not create twelve root tabs
+
+Observed native chooser row locator red
+/Volumes/ai-ssd/code/leafwake-fullstack/tvos/UITests/ShellJourney.swift:20: error: -[TVJourneyTests.ShellJourney testManyLibrariesKeepTheShellBoundedAndRemainSelectable] : failed - Could not move focus to "library-choice-archive-10" Button; focused Attributes: Cell, 0x102267a60, {{650.0, 810.0}, {620.0, 66.0}}, label: 'Archive 10', Focused
+
+Observed older root locator red
+/Volumes/ai-ssd/code/leafwake-fullstack/tvos/UITests/CatalogJourney.swift:24: error: -[TVJourneyTests.CatalogJourney testLibraryLoadsNextPageAsFocusMovesDown] : XCTAssertTrue failed - Missing "Audiobooks" Button
+/Volumes/ai-ssd/code/leafwake-fullstack/tvos/UITests/PlaybackJourney.swift:44: error: -[TVJourneyTests.PlaybackJourney testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying] : XCTAssertTrue failed - Missing "Home" Button
+/Volumes/ai-ssd/code/leafwake-fullstack/tvos/UITests/PodcastJourney.swift:8: error: -[TVJourneyTests.PodcastJourney testEpisodesSortAndPlaySeparatelyFromBooks] : XCTAssertTrue failed - Missing "Podcasts" Button
+
+Observed language root locator red
+/Volumes/ai-ssd/code/leafwake-fullstack/tvos/UITests/ReadinessJourney.swift:127: error: -[TVJourneyTests.ReadinessJourney testArabicMirrorsTheInterface] : XCTAssertTrue failed - Attributes: TabBar, 0x10261eb60, {{0.0, 46.0}, {1920.0, 68.0}}, label: 'Menu'
+/Volumes/ai-ssd/code/leafwake-fullstack/tvos/UITests/ReadinessJourney.swift:93: error: -[TVJourneyTests.ReadinessJourney testGermanLocalizesTheInterfaceAndPersists] : XCTAssertTrue failed - Attributes: TabBar, 0x105c3eb80, {{0.0, -178.5}, {1920.0, 68.0}}, label: 'Menu'
+
+Earlier ten-check replay, cb8ebda8
+Test Case '-[TVJourneyTests.CatalogJourney testContinueListeningOpensDetailsAndBackRestoresFocus]' passed (21.831 seconds).
+Test Case '-[TVJourneyTests.CatalogJourney testFilterAndSortAreAppliedByTheServer]' passed (28.612 seconds).
+Test Case '-[TVJourneyTests.PlaybackJourney testNextChapterCrossesFilesAndLeavingThePlayerKeepsPlaying]' passed (32.733 seconds).
+Test Case '-[TVJourneyTests.PlaybackJourney testResumeShowsChapterAndTotalProgressAndRemoteToggles]' passed (26.134 seconds).
+Test Case '-[TVJourneyTests.PodcastJourney testEpisodesSortAndPlaySeparatelyFromBooks]' passed (34.130 seconds).
+Test Case '-[TVJourneyTests.ReadinessJourney testArabicMirrorsTheInterface]' passed (21.665 seconds).
+Test Case '-[TVJourneyTests.ReadinessJourney testGermanLocalizesTheInterfaceAndPersists]' passed (40.750 seconds).
+Test Case '-[TVJourneyTests.ReadinessJourney testMainScreensPassTheAccessibilityAudit]' passed (43.550 seconds).
+Test Case '-[TVJourneyTests.RecoveryJourney testUnsentListeningSurvivesTerminationAndSyncsOnRelaunch]' passed (39.807 seconds).
+Test Case '-[TVJourneyTests.ShellJourney testManyLibrariesKeepTheShellBoundedAndRemainSelectable]' passed (50.547 seconds).
+	 Executed 10 tests, with 0 failures (0 unexpected) in 339.758 (339.775) seconds
+	 Executed 10 tests, with 0 failures (0 unexpected) in 339.758 (339.776) seconds
+
+Final four-check replay, 5acca8c1
+Test Case '-[TVJourneyTests.CatalogJourney testContinueListeningOpensDetailsAndBackRestoresFocus]' passed (21.870 seconds).
+Test Case '-[TVJourneyTests.PlaybackJourney testResumeShowsChapterAndTotalProgressAndRemoteToggles]' passed (26.350 seconds).
+Test Case '-[TVJourneyTests.ReadinessJourney testMainScreensPassTheAccessibilityAudit]' passed (43.731 seconds).
+Test Case '-[TVJourneyTests.ShellJourney testManyLibrariesKeepTheShellBoundedAndRemainSelectable]' passed (50.402 seconds).
+	 Executed 4 tests, with 0 failures (0 unexpected) in 142.354 (142.365) seconds
+	 Executed 4 tests, with 0 failures (0 unexpected) in 142.354 (142.370) seconds
+
+TVCore package
+	 Executed 72 tests, with 0 failures (0 unexpected) in 0.225 (0.229) seconds
+	 Executed 72 tests, with 0 failures (0 unexpected) in 0.225 (0.230) seconds
+
+Final localization package
+	 Executed 18 tests, with 0 failures (0 unexpected) in 0.133 (0.134) seconds
+	 Executed 18 tests, with 0 failures (0 unexpected) in 0.133 (0.135) seconds
+
+Final unsigned generic build
+** BUILD SUCCEEDED **
+
+Generated localization check: passed.
+Owned TV lease: released, shutdown/free.
+Owned fixture ports 20765/20767: no listener.
+React frontend routing grep: no matches on changed production Swift files; no React bars apply.

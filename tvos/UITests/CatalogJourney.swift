@@ -1,6 +1,6 @@
 import XCTest
 
-/// Story #26: remote-operated connection, home, library, search, filters and details.
+/// Story #26: remote-operated connection, Listen Now, library, search, filters and details.
 final class CatalogJourney: TVJourney {
     func testContinueListeningOpensDetailsAndBackRestoresFocus() {
         signIn()
@@ -12,6 +12,10 @@ final class CatalogJourney: TVJourney {
         XCTAssertEqual(label("detail-progress"), "0:06 of 0:20 listened")
         XCTAssertEqual(app.buttons["play-item"].label, "Resume")
         capture("detail")
+        focus(app.tabBars.buttons["Listen Now"])
+        capture("detail-unfocused")
+        focus(app.buttons["play-item"])
+        capture("detail-focused")
         remote.press(.menu)
         let tile = app.buttons["continue-listening.book-0"]
         XCTAssertTrue(tile.waitForExistence(timeout: 5))
@@ -21,7 +25,7 @@ final class CatalogJourney: TVJourney {
     func testLibraryLoadsNextPageAsFocusMovesDown() async throws {
         signIn()
         waitForHome()
-        tab("Audiobooks")
+        library("Audiobooks")
         XCTAssertTrue(app.buttons["item-book-0"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["loadMore"].exists)
         let last = app.buttons["item-book-60"]
@@ -50,7 +54,7 @@ final class CatalogJourney: TVJourney {
     func testFilterAndSortAreAppliedByTheServer() {
         signIn()
         waitForHome()
-        tab("Audiobooks")
+        library("Audiobooks")
         XCTAssertTrue(app.buttons["item-book-0"].waitForExistence(timeout: 10))
         select(app.buttons["library-filter"])
         select(menuItem("Mystery"))
@@ -68,7 +72,7 @@ final class CatalogJourney: TVJourney {
     func testProgressFilterDropsATitleMarkedFinishedOnReturn() {
         signIn()
         waitForHome()
-        tab("Audiobooks")
+        library("Audiobooks")
         XCTAssertTrue(app.buttons["item-book-0"].waitForExistence(timeout: 10))
         select(app.buttons["library-filter"])
         select(menuItem("Not started"))

@@ -1,0 +1,45 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "arm64",
+        "deviceId" : "7CBB617F-721C-4B2A-AF9E-F9456269191B",
+        "deviceName" : "Pool iPad 1 (iOS 26.0)",
+        "modelName" : "iPad Pro 11-inch (M5)",
+        "osBuildNumber" : "23A343",
+        "osVersion" : "26.0",
+        "platform" : "iOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 0,
+      "passedTests" : 1,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "AudiobookshelfNative · Built with macOS 27.0.1",
+  "expectedFailures" : 0,
+  "failedTests" : 0,
+  "finishTime" : 1791470000.243,
+  "passedTests" : 1,
+  "result" : "Passed",
+  "runtimeWarnings" : [
+
+  ],
+  "skippedTests" : 0,
+  "startTime" : 1791469966.904,
+  "statistics" : [
+
+  ],
+  "testFailures" : [
+
+  ],
+  "title" : "Test - AudiobookshelfNative",
+  "topInsights" : [
+
+  ],
+  "totalTestCount" : 1
+}

@@ -1,0 +1,20 @@
+{
+  "cover_files": {
+    "/tmp/235-covers/display.json": "016c6e7d5b3633a31544c95870e88d4c03f819a23505c1abecf082ec3982a5d7",
+    "/tmp/235-covers/1.jpg": "44fe81f8efeb2d26cb2fd98458cc6ccd538e5ed70ac355a44d0ac12649357a1a",
+    "/tmp/235-covers/0.jpg": "752fcef83d10bb6bd2556faf41205f8e02b36492f6a19be93f6bc12ed110076c"
+  },
+  "cover_mapping": "0.jpg is the portrait2341.jpg; 1.jpg is the square2340.jpg, same generated synthetic artwork",
+  "source_fixture": "verification/fixture.py at0b, unchanged",
+  "ports": [
+    25765,
+    25769
+  ],
+  "capture_wrapper": "capture-fixture.py",
+  "overrides": [
+    "bookmark-error: api/me returns503 while active; clear override then real Retry",
+    "no-art: cover404 only; existing audio/state retained"
+  ],
+  "observations_path": "/tmp/235-capture-observations.json",
+  "observations_sha256": "95ac6deb7eb0d63747ce5193ef6cc45e3d4b83f3a909de4106cd56599467689c"
+}

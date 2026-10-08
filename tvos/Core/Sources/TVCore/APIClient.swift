@@ -155,14 +155,19 @@ import Foundation
         let filename = title.components(separatedBy: CharacterSet(charactersIn: "/\\:?*\"<>|").union(.controlCharacters)).joined(separator: "_").trimmingCharacters(in: .whitespacesAndNewlines)
         guard !filename.isEmpty, filename != ".", filename != ".." else { throw APIError.invalidPodcastTitle }
         let path = (folder.fullPath as NSString).appendingPathComponent(filename)
-        let data = try await request("api/podcasts", method: "POST", body: [
-            "libraryId": libraryID, "folderId": folder.id, "path": path,
-            "media": ["metadata": ["title": title, "author": author, "description": description,
-                "feedUrl": discovery?.feedUrl ?? feed.metadata.feedUrl ?? feedURL, "imageUrl": discovery?.cover ?? feed.metadata.image ?? "",
-                "genres": discovery?.genres ?? feed.metadata.categories ?? [], "releaseDate": discovery?.releaseDate ?? "",
-                "itunesId": discovery.map { String($0.id) } ?? "", "itunesArtistId": discovery?.artistId.map(String.init) ?? "",
-                "itunesPageUrl": discovery?.pageUrl ?? ""] as [String: Any], "autoDownloadEpisodes": autoDownload]
-        ])
+        let itunesID = discovery.map { String($0.id) } ?? ""
+        let artistID = discovery?.artistId.map(String.init) ?? ""
+        let metadata: [String: Any] = [
+            "title": title, "author": author, "description": description,
+            "feedUrl": discovery?.feedUrl ?? feed.metadata.feedUrl ?? feedURL,
+            "imageUrl": discovery?.cover ?? feed.metadata.image ?? "",
+            "genres": discovery?.genres ?? feed.metadata.categories ?? [],
+            "releaseDate": discovery?.releaseDate ?? "",
+            "itunesId": itunesID, "itunesArtistId": artistID, "itunesPageUrl": discovery?.pageUrl ?? ""
+        ]
+        let media: [String: Any] = ["metadata": metadata, "autoDownloadEpisodes": autoDownload]
+        let body: [String: Any] = ["libraryId": libraryID, "folderId": folder.id, "path": path, "media": media]
+        let data = try await request("api/podcasts", method: "POST", body: body)
         return try JSONDecoder().decode(LibraryItem.self, from: data)
     }
 

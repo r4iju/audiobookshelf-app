@@ -1,0 +1,142 @@
+[
+  {
+    "file": "apple/UITests/NativeJourney.swift",
+    "sha256": "fe596ac97a9375d427e0d5d63f3a4a270721ef3dcce7fb77d6d2d0afb51c1508",
+    "canonical_sha256": "00854f2c462bf507c79cdf897eae29a1c4b886e57294ce8c59384dd58285e000"
+  },
+  {
+    "file": "apple/UITests/RealtimeJourney.swift",
+    "sha256": "20f18e3a7df6b5c67251f2af1bf7ff06df826da9c426d79dcb2b0c7d6025af47",
+    "canonical_sha256": "20f18e3a7df6b5c67251f2af1bf7ff06df826da9c426d79dcb2b0c7d6025af47"
+  },
+  {
+    "file": "apple/UITests/ConnectionJourney.swift",
+    "sha256": "2423a118c1893987d292e72eed4913133d73beab73b02ded4552a46e08f41eb7",
+    "canonical_sha256": "2423a118c1893987d292e72eed4913133d73beab73b02ded4552a46e08f41eb7"
+  },
+  {
+    "file": "apple/UITests/PublicationRecoveryJourney.swift",
+    "sha256": "0149ff1a2c055b30ce640ac35fe5c8ccd582fdf33fb34dd463321d6f2509583a",
+    "canonical_sha256": "0149ff1a2c055b30ce640ac35fe5c8ccd582fdf33fb34dd463321d6f2509583a"
+  },
+  {
+    "file": "apple/UITests/DurableProgressJourney.swift",
+    "sha256": "cc0fd1b2c791e2afacdf87fe71d773729b5e3a36889162ea665d8756f4c0c563",
+    "canonical_sha256": "cc0fd1b2c791e2afacdf87fe71d773729b5e3a36889162ea665d8756f4c0c563"
+  },
+  {
+    "file": "apple/UITests/ReaderJourney.swift",
+    "sha256": "8deb1df7580f7534fca86ab2bd63f0de01392950ad0be6de10d2c2373f67d8bf",
+    "canonical_sha256": "c2d59a3dd4ab5d89de064ae35eda4736247b8b40fd87f2bed389548f705e6355"
+  },
+  {
+    "file": "apple/UITests/ArtworkJourney.swift",
+    "sha256": "acdebc7a47be3d2686dc5013e1346153f4ec5ae35297f78bba6e3c2181e5139c",
+    "canonical_sha256": "acdebc7a47be3d2686dc5013e1346153f4ec5ae35297f78bba6e3c2181e5139c"
+  },
+  {
+    "file": "apple/UITests/SavedConnectionsJourney.swift",
+    "sha256": "6368b36ee98420db391a4d64d389b83d18f3c7341fca6dec0164c8029d55d0ac",
+    "canonical_sha256": "6368b36ee98420db391a4d64d389b83d18f3c7341fca6dec0164c8029d55d0ac"
+  },
+  {
+    "file": "apple/UITests/CollectionJourney.swift",
+    "sha256": "16e76090fb509bbf6057be03bc33caa048434dc0cb6b451497e557da12304653",
+    "canonical_sha256": "16e76090fb509bbf6057be03bc33caa048434dc0cb6b451497e557da12304653"
+  },
+  {
+    "file": "apple/UITests/RelatedAuthorSeriesJourney.swift",
+    "sha256": "45d32a4dfd342918f7c936c70476bf95648ec99e0392580633ab943d9e826d31",
+    "canonical_sha256": "45d32a4dfd342918f7c936c70476bf95648ec99e0392580633ab943d9e826d31"
+  },
+  {
+    "file": "apple/UITests/Acceptance239Harness.swift",
+    "sha256": "6402fefd1ce4451126bde629b234155ab68129701f09f5cb35d2d90a3d402910",
+    "canonical_sha256": null
+  },
+  {
+    "file": "apple/UITests/CatalogRecoveryJourney.swift",
+    "sha256": "cc60c562eaa1221dd391467b0ded8443f1b8b48cc65a079e07bed0d88b9c061e",
+    "canonical_sha256": "cc60c562eaa1221dd391467b0ded8443f1b8b48cc65a079e07bed0d88b9c061e"
+  },
+  {
+    "file": "apple/UITests/OpenIDJourney.swift",
+    "sha256": "2df6e0d2973a385882c2ef36a67892cb52a35f5a4e99b539df32414c118985aa",
+    "canonical_sha256": "2df6e0d2973a385882c2ef36a67892cb52a35f5a4e99b539df32414c118985aa"
+  },
+  {
+    "file": "apple/UITests/PlaybackJourney.swift",
+    "sha256": "1d5ebe96991403fd74dbd21e6c58990a1983b38d7c6bb14a304e4ad5c772de62",
+    "canonical_sha256": "1d5ebe96991403fd74dbd21e6c58990a1983b38d7c6bb14a304e4ad5c772de62"
+  },
+  {
+    "file": "apple/UITests/OfflineJourney.swift",
+    "sha256": "891cf565116729056e102649561ca06bba10457c4ec7ee47fd234e6fe7127e47",
+    "canonical_sha256": "891cf565116729056e102649561ca06bba10457c4ec7ee47fd234e6fe7127e47"
+  },
+  {
+    "file": "apple/UITests/ShellJourney.swift",
+    "sha256": "a8b3b698bb8b51791d167c16638e49fb0d4e24f4666e8b5d2cd470aa7da1e53a",
+    "canonical_sha256": "a8b3b698bb8b51791d167c16638e49fb0d4e24f4666e8b5d2cd470aa7da1e53a"
+  },
+  {
+    "file": "apple/UITests/PausedRealtimeJourney.swift",
+    "sha256": "e71bd86bdceadaa6bda3253c646bda82440668c4780671c4c25faf057575cff8",
+    "canonical_sha256": "e71bd86bdceadaa6bda3253c646bda82440668c4780671c4c25faf057575cff8"
+  },
+  {
+    "file": "apple/UITests/PresentationJourney.swift",
+    "sha256": "d85807d021970ecf862e0936666a7045ea929b396078ec252d84452566ce83fe",
+    "canonical_sha256": "d85807d021970ecf862e0936666a7045ea929b396078ec252d84452566ce83fe"
+  },
+  {
+    "file": "apple/UITests/ProgressResetJourney.swift",
+    "sha256": "45f51416318997604cc788370bdb8af0988fa6a47943dacb804fd7b8d2a48c94",
+    "canonical_sha256": "45f51416318997604cc788370bdb8af0988fa6a47943dacb804fd7b8d2a48c94"
+  },
+  {
+    "file": "apple/UITests/PreferencesJourney.swift",
+    "sha256": "189d7feee5f47e7d269ff942d6db46852dd4e82a44b6ec4243ce4a7ce92a8f7f",
+    "canonical_sha256": "189d7feee5f47e7d269ff942d6db46852dd4e82a44b6ec4243ce4a7ce92a8f7f"
+  },
+  {
+    "file": "apple/UITests/ListeningControlsJourney.swift",
+    "sha256": "23acda24b1766a89f7caa38e7d2e0520c3b75626334ecca59e82e0c3fcd13391",
+    "canonical_sha256": "23acda24b1766a89f7caa38e7d2e0520c3b75626334ecca59e82e0c3fcd13391"
+  },
+  {
+    "file": "apple/UITests/ItemServerActionsJourney.swift",
+    "sha256": "3bdc59e713aaabbf2a86870ddc8f96174da68df7d3375e7744c3bf3afcc2a7d6",
+    "canonical_sha256": "3bdc59e713aaabbf2a86870ddc8f96174da68df7d3375e7744c3bf3afcc2a7d6"
+  },
+  {
+    "file": "apple/UITests/RemainingQAGroupJourney.swift",
+    "sha256": "3b2672d11d0cc4b1fef3d89b37768e2d47890728bcc4b07719c26ab1f1923606",
+    "canonical_sha256": "3b2672d11d0cc4b1fef3d89b37768e2d47890728bcc4b07719c26ab1f1923606"
+  },
+  {
+    "file": "apple/UITests/PodcastJourney.swift",
+    "sha256": "a12cf2d8ef8244db48c2dfc721c3c98ccaa464245bc6c9276ffb9f44d05f4abc",
+    "canonical_sha256": "a12cf2d8ef8244db48c2dfc721c3c98ccaa464245bc6c9276ffb9f44d05f4abc"
+  },
+  {
+    "file": "apple/UITests/PlaybackAuthorizationJourney.swift",
+    "sha256": "5cf09e00ae5aa797c50f6bc0b7f100e83bc4b59fc6b39bdac1fad28a2bdb0325",
+    "canonical_sha256": "5cf09e00ae5aa797c50f6bc0b7f100e83bc4b59fc6b39bdac1fad28a2bdb0325"
+  },
+  {
+    "file": "apple/UITests/LargestDownloads239Journey.swift",
+    "sha256": "e2b3c0d3411cb503cf56723822941d4db8a556764cc29db87d9671bf634085bb",
+    "canonical_sha256": "e2b3c0d3411cb503cf56723822941d4db8a556764cc29db87d9671bf634085bb"
+  },
+  {
+    "file": "apple/UITests/SearchJourney.swift",
+    "sha256": "0fb96101099b932da9a93d5fb024d9872f1ffd994797f1103c426be3c399cf5e",
+    "canonical_sha256": "0fb96101099b932da9a93d5fb024d9872f1ffd994797f1103c426be3c399cf5e"
+  },
+  {
+    "file": "apple/UITests/RemainingQAJourney.swift",
+    "sha256": "c058d43aea707759c316f2e398f91cbfa3923a89e9a59b1d042241d03a0379d8",
+    "canonical_sha256": "c058d43aea707759c316f2e398f91cbfa3923a89e9a59b1d042241d03a0379d8"
+  }
+]

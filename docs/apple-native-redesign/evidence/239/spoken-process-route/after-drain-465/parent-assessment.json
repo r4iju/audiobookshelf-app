@@ -1,0 +1,19 @@
+{
+  "installed_resources": 47,
+  "all_match": true,
+  "strict_signature": "PASS",
+  "original_clips": [
+    {
+      "file": "drained-progress.wav",
+      "sha256": "62d670e1c5ee130514a9d95a2fd9240b3317fc9ee3b63cafb7a6fc2d1bfdcc37",
+      "transcript": "VoiceOver on, audio chapter progress, 6.479, adjustable.\nSwipe up or down with one finger to adjust the value."
+    },
+    {
+      "file": "selected-speed-coordinate.wav",
+      "sha256": "fb08107d8b508ba83f53297542c6291bc7f705dc940ec8ab33931a508dfce540",
+      "transcript": "VoiceOver on, audio selected, one times, selected, button."
+    }
+  ],
+  "scope": "Paused numeric adjustable-role and measured selected-speed-row utterances only. No human listening or full spoken acceptance.",
+  "final_voiceover": false
+}

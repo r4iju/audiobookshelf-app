@@ -1,0 +1,21 @@
+{
+  "log_sha256": "1a0be9b52a6a196622e615d3cab73e67c64425181c79c11fbc3648ec354e9529",
+  "lines": [
+    {
+      "line": 117,
+      "text": "AudiobookshelfTV: automatic screen capture disabled"
+    },
+    {
+      "line": 1406,
+      "text": "AudiobookshelfTV: automatic screen capture disabled"
+    },
+    {
+      "line": 1407,
+      "text": "AudiobookshelfTV_appletvsimulator18.2-arm64.xctestrun: effective automatic capture disabled"
+    },
+    {
+      "line": 3066,
+      "text": "** TEST EXECUTE SUCCEEDED **"
+    }
+  ]
+}

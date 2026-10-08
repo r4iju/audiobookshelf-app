@@ -1,0 +1,338 @@
+[
+  {
+    "target": "AudiobookshelfNative",
+    "platform": "iphoneos",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "NativeJourneyTests",
+    "platform": "iphoneos",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "NativeTests",
+    "platform": "iphoneos",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "AudiobookshelfNative",
+    "platform": "iphoneos",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "NativeJourneyTests",
+    "platform": "iphoneos",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "NativeTests",
+    "platform": "iphoneos",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "AudiobookshelfNative",
+    "platform": "iphonesimulator",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "NativeJourneyTests",
+    "platform": "iphonesimulator",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "NativeTests",
+    "platform": "iphonesimulator",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "AudiobookshelfNative",
+    "platform": "iphonesimulator",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "NativeJourneyTests",
+    "platform": "iphonesimulator",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "NativeTests",
+    "platform": "iphonesimulator",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "AudiobookshelfTV",
+    "platform": "appletvos",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "TVJourneyTests",
+    "platform": "appletvos",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "TVAppTests",
+    "platform": "appletvos",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "AudiobookshelfTV",
+    "platform": "appletvos",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "TVJourneyTests",
+    "platform": "appletvos",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "TVAppTests",
+    "platform": "appletvos",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "AudiobookshelfTV",
+    "platform": "appletvsimulator",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "TVJourneyTests",
+    "platform": "appletvsimulator",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "TVAppTests",
+    "platform": "appletvsimulator",
+    "configuration": "Debug",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "AudiobookshelfTV",
+    "platform": "appletvsimulator",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "TVJourneyTests",
+    "platform": "appletvsimulator",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  },
+  {
+    "target": "TVAppTests",
+    "platform": "appletvsimulator",
+    "configuration": "Release",
+    "settings": {
+      "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator27.0.sdk",
+      "SDK_VERSION": "27.0",
+      "SDK_VERSION_MAJOR": "270000",
+      "SDK_VERSION_MINOR": "270000",
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": " ABS_SDK_CONTRACT ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 ",
+      "ABS_SELECTED_SDK_KNOWN": "YES",
+      "ABS_SELECTED_SDK_CAPABILITIES": "ABS_SDK_18 ABS_SDK_26 ABS_SDK_26_1 "
+    }
+  }
+]

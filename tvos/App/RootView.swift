@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum TVTab: Hashable {
-    case home, library(String), search, nowPlaying, settings
+    case home, library, search, nowPlaying, settings
 }
 
 @MainActor final class TVNavigator: ObservableObject {
@@ -14,6 +14,7 @@ struct RootView: View {
     @Environment(\.nativeStrings) private var l10n
     @StateObject private var navigator = TVNavigator()
     @State private var reauthenticating = false
+    @State private var signInPrompt = false
 
     var body: some View {
         ZStack {
@@ -31,9 +32,14 @@ struct RootView: View {
             guard let error else { return }
             TVDiagnostics.shared.record(player.isProgressFailure ? .sync : .media, error, detail: player.title.isEmpty ? nil : "Item: " + player.title)
         }
-        .alert(l10n("Sign in again"), isPresented: $catalog.needsSignIn) {
-            Button(l10n("Sign in")) { player.pause(); reauthenticating = true }
-            Button(l10n("Not now"), role: .cancel) {}
+        // SwiftUI owns alert dismissal locally; its binding must not publish a store
+        // change while the native presentation hierarchy is updating.
+        .onReceive(catalog.$needsSignIn) { needed in
+            if !reauthenticating { signInPrompt = needed }
+        }
+        .alert(l10n("Sign in again"), isPresented: $signInPrompt) {
+            Button(l10n("Sign in")) { catalog.needsSignIn = false; player.pause(); reauthenticating = true }
+            Button(l10n("Not now"), role: .cancel) { catalog.needsSignIn = false }
         } message: {
             Text(l10n("The server no longer accepts this login. Listening saved on this TV is kept and sent after you sign in."))
         }
@@ -42,11 +48,9 @@ struct RootView: View {
     private var tabs: some View {
         TabView(selection: $navigator.tab) {
             HomeView()
-                .tabItem { Label(l10n("Home"), systemImage: "house") }.tag(TVTab.home)
-            ForEach(catalog.libraries) { library in
-                LibraryView(library: library, api: catalog.api)
-                    .tabItem { Label(library.name, systemImage: library.isPodcast ? "mic" : "books.vertical") }.tag(TVTab.library(library.id))
-            }
+                .tabItem { Label(l10n("Listen Now"), systemImage: "play.circle") }.tag(TVTab.home)
+            LibraryDestination()
+                .tabItem { Label(l10n("Library"), systemImage: "books.vertical") }.tag(TVTab.library)
             SearchView()
                 .tabItem { Label(l10n("Search"), systemImage: "magnifyingglass") }.tag(TVTab.search)
             if player.session != nil || player.preparing {
@@ -56,8 +60,6 @@ struct RootView: View {
             SettingsView()
                 .tabItem { Label(l10n("Settings"), systemImage: "gearshape") }.tag(TVTab.settings)
         }
-        .nativeGlassButton()
-        .buttonBorderShape(.capsule)
         .onPlayPauseCommand { if player.session != nil { player.toggle() } }
         .onChange(of: player.session == nil && !player.preparing) { _, ended in
             if ended && navigator.tab == .nowPlaying { navigator.tab = .home }

@@ -1,0 +1,20 @@
+[
+  {
+    "file": "apple/UITests/NativeJourney.swift",
+    "originalSHA256": "00854f2c462bf507c79cdf897eae29a1c4b886e57294ce8c59384dd58285e000",
+    "executedSHA256": "fe596ac97a9375d427e0d5d63f3a4a270721ef3dcce7fb77d6d2d0afb51c1508",
+    "delta": "attachment-only helper suppressed; assertions unchanged"
+  },
+  {
+    "file": "tvos/UITests/TVJourney.swift",
+    "originalSHA256": "4f4f55259c2e38a61b67557a686ef1a96b9af2088dd9269a39f87fb244014802",
+    "executedSHA256": "55790dd0e5f9b24edb78926ececa8f0f3b71ba03a986de11be90119422070d73",
+    "delta": "attachment-only helper suppressed; assertions unchanged"
+  },
+  {
+    "file": "apple/UITests/ReaderJourney.swift",
+    "originalSHA256": "c2d59a3dd4ab5d89de064ae35eda4736247b8b40fd87f2bed389548f705e6355",
+    "executedSHA256": "8deb1df7580f7534fca86ab2bd63f0de01392950ad0be6de10d2c2373f67d8bf",
+    "delta": "attachment-only helper suppressed; assertions unchanged"
+  }
+]

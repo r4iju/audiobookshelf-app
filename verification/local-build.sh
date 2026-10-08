@@ -12,6 +12,7 @@ leafwake_android() {
   (cd android-native && JAVA_HOME="$leafwake_java21" ./gradlew -Pleafwake=true :app:assembleDebug) > "$leafwake_output/android.log" 2>&1
 }
 leafwake_apple() {
+  xcodegen generate --spec apple/project.yml > /dev/null
   xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -configuration Debug \
     -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
     -derivedDataPath "$leafwake_output/apple-derived" CODE_SIGNING_ALLOWED=NO \

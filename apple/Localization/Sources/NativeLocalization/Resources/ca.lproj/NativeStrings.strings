@@ -81,7 +81,6 @@
 "Clear" = "Esborra";
 "Clear events" = "Neteja els registres";
 "Clear events?" = "Voleu esborrar els registres?";
-"Clear search" = "Esborra la cerca";
 "Close feed" = "Tanca el canal";
 "Close playback" = "Tanca el reproductor";
 "Close reader" = "Tanca el lector";
@@ -92,8 +91,6 @@
 "Complete" = "Complet";
 "Confirm" = "Confirma";
 "Connect" = "Connecta";
-"Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Connecteu-vos directament a Audiobookshelf. S'admeten servidors HTTP locals i servidors HTTPS de confiança.";
-"Connect directly to your Audiobookshelf server to stream audiobooks and podcasts." = "Connecteu-vos directament al vostre servidor d'Audiobookshelf per escoltar audiollibres i pòdcasts en temps real.";
 "Connect to your library" = "Connecteu-vos a la vostra biblioteca";
 "Connecting" = "Connectant";
 "Connecting…" = "Connectant…";
@@ -177,7 +174,6 @@
 "Filter library" = "Filtra la biblioteca";
 "Filter: {0}" = "Filtre: {0}";
 "Filters" = "Filtres";
-"Find your next chapter." = "Trobeu el vostre proper capítol.";
 "Find your next listen." = "Trobeu la vostra propera escolta.";
 "Finished" = "Acabat";
 "Font" = "Família tipogràfica";
@@ -195,7 +191,6 @@
 "Has ebook" = "Té llibre electrònic";
 "Has supplementary ebook" = "Té llibre electrònic suplementari";
 "Highlights" = "Destacats";
-"Home" = "Inici";
 "Idle" = "Inactiu";
 "Import data" = "Importa les dades";
 "Import needs {0}; {1} is available. Free space and retry." = "La importació necessita {0}; n'hi ha {1} disponibles. Allibereu espai i torneu-ho a provar.";
@@ -287,7 +282,6 @@
 "Nothing to continue yet. Choose a library above to start listening." = "Encara no hi ha res per continuar. Trieu una biblioteca a dalt per començar a escoltar.";
 "Now Playing" = "Ara s'està reproduint";
 "Now listening" = "Ara s'està escoltant";
-"Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "Ara reinicieu el servidor d'Audiobookshelf. Només compta un reinici fet després de triar «Inicia el reinici del servidor». Quan el servidor torni a funcionar, confirmeu-ho aquí.";
 "Number of episodes" = "Nre. d'episodis";
 "Off" = "Apagat";
 "Oldest first" = "Primer els més antics";
@@ -370,6 +364,7 @@
 "Recently added" = "Addicions recents";
 "Refresh" = "Actualitza";
 "Refresh downloads" = "Actualitza les baixades";
+"Remove" = "Eliminar";
 "Remove download" = "Esborrar element local";
 "Remove {0}" = "Elimina {0}";
 "Repair and retry import" = "Repara i torna a provar la importació";
@@ -377,10 +372,8 @@
 "Report" = "Informe";
 "Reset timer" = "Restableix el temporitzador";
 "Restart playback" = "Reinicia la reproducció";
-"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Reinicieu ara el servidor d'Audiobookshelf i confirmeu-ho quan torni a funcionar. Un reinici anterior a aquest missatge no compta, perquè el desament sense resposta podria haver arribat al servidor després.";
 "Restart the server" = "Reinicia el servidor";
 "Restart the server now" = "Reinicia el servidor ara";
-"Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server." = "Reiniciar el servidor d'Audiobookshelf posa fi a un desament sense resposta. Primer trieu «Inicia el reinici del servidor» i després reinicieu el servidor.";
 "Restarting…" = "Reiniciant…";
 "Resume" = "Reprèn";
 "Resume listening" = "Reprèn l'escolta";
@@ -413,7 +406,6 @@
 "Saving your progress…" = "Desant el vostre progrés…";
 "Scale elapsed time by speed" = "Ajusta el temps transcorregut a la velocitat";
 "Search" = "Cercar";
-"Search library" = "Cerca a la biblioteca";
 "Search podcasts" = "Cerca pòdcasts";
 "Searching your library…" = "Cercant a la biblioteca…";
 "Searching…" = "Cercant…";

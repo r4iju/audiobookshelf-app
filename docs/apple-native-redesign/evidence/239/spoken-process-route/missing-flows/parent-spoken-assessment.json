@@ -1,0 +1,51 @@
+[
+  {
+    "file": "download-actions.wav",
+    "sha256": "f57530f2edc16ac431e4f7904ea5953ba408943eff9603b26f7c047245cfc0f3",
+    "actual_audio_nonzero": true,
+    "local_machine_transcript": "voiceover on, audio, retry download, button, remove download, button.",
+    "limitation": "machine-derived utterance, not human listening or complete traversal"
+  },
+  {
+    "file": "download-retry.wav",
+    "sha256": "ddc5ac3a3734a2f809c55a37b2e250701734a07af0b3e443c1f66652362a29ff",
+    "actual_audio_nonzero": true,
+    "local_machine_transcript": "\"Retry Download\" button\n\"Network Preferences\" button",
+    "limitation": "machine-derived utterance, not human listening or complete traversal"
+  },
+  {
+    "file": "listen-now.wav",
+    "sha256": "ccb53a2ad99b7ef7a5272ee19c69c71cf407eb44b7e24173c76d8dda0202868f",
+    "actual_audio_nonzero": true,
+    "local_machine_transcript": "Listen now. Tab, 1 of 5.",
+    "limitation": "machine-derived utterance, not human listening or complete traversal"
+  },
+  {
+    "file": "offline-ready.wav",
+    "sha256": "122d70373ccb433e697b630f330ec071c001e89e75194e6de4519dff83fc7e24",
+    "actual_audio_nonzero": true,
+    "local_machine_transcript": "Stories for Tomorrow 01, available offline, button, bookshelf, image.",
+    "limitation": "machine-derived utterance, not human listening or complete traversal"
+  },
+  {
+    "file": "offline-remove.wav",
+    "sha256": "9c1ccb3ecfbf182c81c20bd9cecca7aa614b259f39f7c9b549d469d8ceb974d5",
+    "actual_audio_nonzero": true,
+    "local_machine_transcript": "\"Remove Download\" button\n\"Network Preferences\" button",
+    "limitation": "machine-derived utterance, not human listening or complete traversal"
+  },
+  {
+    "file": "rejected-login.wav",
+    "sha256": "1cf8ac65ea0f609fdcfe89de17776d02807a4f63336b884ffcc2fb9dad07bc69",
+    "actual_audio_nonzero": true,
+    "local_machine_transcript": "over on audio the username or password was not accepted\nconnect to your library button",
+    "limitation": "machine-derived utterance, not human listening or complete traversal"
+  },
+  {
+    "file": "remaining-tabs.wav",
+    "sha256": "8993f56775ecb835ff564bfc1e7bbb4e0723333717066b416f92c6b653ce4fec",
+    "actual_audio_nonzero": true,
+    "local_machine_transcript": "Tab bar. Settings. Tab. 4 of 5.\nSearch. Tab. 5 of 5.",
+    "limitation": "machine-derived utterance, not human listening or complete traversal"
+  }
+]

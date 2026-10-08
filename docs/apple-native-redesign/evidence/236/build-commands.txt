@@ -1,0 +1,21 @@
+phone-corrected
+/tmp/236-phone-corrected-build.log
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native236-phone-capture-final CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 build
+    CODE_SIGN_IDENTITY = -
+    IPHONEOS_DEPLOYMENT_TARGET = 15.0
+** BUILD SUCCEEDED **
+
+ipad-corrected
+/tmp/236-ipad-corrected-build.log
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=CDFFEB30-07F5-4A50-AB64-57A46709335B -derivedDataPath /tmp/native236-ipad-capture-final CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 build
+    CODE_SIGN_IDENTITY = -
+    IPHONEOS_DEPLOYMENT_TARGET = 15.0
+** BUILD SUCCEEDED **
+
+generic-ddad
+/tmp/236-generic-ddad.log
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination generic/platform=iOS -derivedDataPath /tmp/native236-generic-final CODE_SIGNING_ALLOWED=NO IPHONEOS_DEPLOYMENT_TARGET=15.0 build
+    IPHONEOS_DEPLOYMENT_TARGET = 15.0
+** BUILD SUCCEEDED **
+
+Full source14 diagnostic: execute source14-arguments.txt argv against final committed ddad checkout; /tmp/236-source14-ddad.log empty, exit 0.

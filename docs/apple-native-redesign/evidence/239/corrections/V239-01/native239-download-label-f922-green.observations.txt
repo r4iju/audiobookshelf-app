@@ -1,0 +1,8 @@
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' started.
+ACTUAL-DOWNLOAD-LABEL Retry download text=(32.0, 409.99999999999994, 338.0, 125.33333333333331) button=(32.0, 409.99999999999994, 338.0, 125.33333333333331) bodyFont=53.0 requiredHeight=126.0
+ACTUAL-DOWNLOAD-WORD Retry download requiredWidth=220.6953125 available=338.0
+ACTUAL-DOWNLOAD-LABEL Remove download text=(32.0, 622.6666666666666, 338.0, 125.33333333333337) button=(32.0, 622.6666666666666, 338.0, 125.33333333333337) bodyFont=53.0 requiredHeight=126.0
+ACTUAL-DOWNLOAD-WORD Remove download requiredWidth=220.6953125 available=338.0
+/tmp/native239-sim-qa/apple/UITests/LargestDownloads239Journey.swift:45: error: -[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent] : XCTAssertTrue failed
+Test Case '-[NativeJourneyTests.LargestDownloads239Journey testLargestDownloadLabelsFitAndRetryPlayRemoveStayIndependent]' failed (46.109 seconds).
+** TEST FAILED **

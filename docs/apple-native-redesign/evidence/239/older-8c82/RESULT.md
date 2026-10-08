@@ -1,0 +1,3 @@
+# Diagnostic compiler failure before UI
+
+Exact8c82/run37828287355 failed Swift6.0.3 typechecking TVReadableText body at Components.swift213 after temporary focus logging. Generated captureOFF guard passed; app binary/effective test config/xcresult/UI were not produced. No new Back verdict. Root preserves raw original artifact/log and selected error lines. Missing-binary/signature errors are downstream build consequences, not independent product defects. Actual627seconds/cumulative14125; all repository controls restored and independently checked. Subsequent b479 simplifies the diagnostic log argument; only actual753 older build/pass establishes that followthrough.

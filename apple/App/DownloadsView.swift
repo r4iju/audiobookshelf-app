@@ -1,15 +1,22 @@
 import SwiftUI
 
 struct DownloadsView: View {
+    var embedded = false
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
         NativeNavigation {
             ShelfList {
-                NavigationLink(l10n("Network preferences"), destination: NativeNetworkSettings())
-                if let error = downloads.error { Text(error).foregroundColor(.red) }
-                if downloads.visible.isEmpty { Text(l10n("Save books or episodes from your library to listen offline.")).foregroundColor(ShelfStyle.secondaryText) }
+                Section {
+                    NavigationLink(l10n("Network preferences"), destination: NativeNetworkSettings())
+                    if let error = downloads.error { Label(error, systemImage: "exclamationmark.triangle").foregroundColor(.red) }
+                }
+                if downloads.visible.isEmpty {
+                    CatalogStatus(title: l10n("No downloads yet"), message: l10n("Save books or episodes from your library to listen offline."), symbol: "arrow.down.circle")
+                }
+                if !downloads.visible.isEmpty {
+                Section(header: Text(l10n("Saved on this device"))) {
                 ForEach(downloads.visible) { entry in
                     if entry.state == .ready {
                         NavigationLink(destination: OfflineDetails(entry: entry)) {
@@ -21,25 +28,30 @@ struct DownloadsView: View {
                     } else {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(entry.media.title).font(.headline)
-                            Text(entry.error ?? l10n(entry.state.rawValue.capitalized)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                            Label(entry.error ?? l10n(entry.state.rawValue.capitalized), systemImage: entry.state == .queued ? "arrow.down.circle" : "exclamationmark.triangle").font(.callout).foregroundColor(ShelfStyle.secondaryText)
                             if entry.state == .queued {
                                 Text(l10n("{0} of {1} files saved", entry.finished.count, entry.parts.count)).font(.caption)
                                 ProgressView(value: downloads.fraction(for: entry))
-                                Button(l10n("Cancel download")) { NativeHaptic.impact("download"); downloads.cancel(entry) }
-                            } else { Button(l10n("Retry download")) { NativeHaptic.impact("download"); Task { await downloads.retry(entry) } }.nativeGlassButton() }
-                            if entry.audioAvailable { NavigationLink(l10n("Play offline"), destination: OfflineDetails(entry: entry)).accessibilityIdentifier("offline-audio-" + entry.media.libraryItemID) }
-                            Button(l10n("Remove download")) { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player) } }
+                            }
+                            VStack(alignment: .leading, spacing: 12) {
+                            if entry.state == .queued {
+                                Button { NativeHaptic.impact("download"); downloads.cancel(entry) } label: { DownloadActionText(l10n("Cancel download")) }
+                            } else { Button { NativeHaptic.impact("download"); Task { await downloads.retry(entry) } } label: { DownloadActionText(l10n("Retry download")) } }
+                            if entry.audioAvailable { NavigationLink(destination: OfflineDetails(entry: entry)) { DownloadActionText(l10n("Play offline")) }.accessibilityIdentifier("offline-audio-" + entry.media.libraryItemID) }
+                            Button { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player) } } label: { DownloadActionText(l10n("Remove download")) }.foregroundColor(.red)
+                            }.buttonStyle(BorderlessButtonStyle())
                         }.padding(.vertical, 8)
                     }
                 }
+                }
+                }
             }.listStyle(InsetGroupedListStyle()).buttonStyle(BorderlessButtonStyle()).navigationTitle(l10n("Downloads"))
-                .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button(l10n("Done")) { downloads.presented = false } } }
+                .toolbar { ToolbarItem(placement: .navigationBarTrailing) { if !embedded { Button(l10n("Done")) { downloads.presented = false } } } }
         }.onAppear { downloads.refresh() }.nativeLocalization()
     }
 }
 
 private struct OfflineDetails: View {
-    @Environment(\.shelfAppearance) private var appearance
     @EnvironmentObject private var downloads: NativeDownloads
     @EnvironmentObject private var player: ApplePlayback
     @EnvironmentObject private var readingStore: ReadingStore
@@ -49,30 +61,60 @@ private struct OfflineDetails: View {
     @State private var error: String?
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                Image(systemName: "books.vertical.fill").font(.system(size: 64)).foregroundColor(ShelfStyle.accent)
-                Text(entry.media.title).font(.system(.largeTitle, design: .serif).bold())
-                Text(entry.media.author).foregroundColor(ShelfStyle.secondaryText)
-                Label(l10n("Available offline"), systemImage: "checkmark.circle.fill")
+        ShelfList {
+            Section {
+                HStack(alignment: .top, spacing: 16) {
+                    Image(systemName: "books.vertical.fill").font(.largeTitle).foregroundColor(ShelfStyle.accent)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(entry.media.title).font(.title2.bold())
+                        Text(entry.media.author).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
+                        Label(l10n("Available offline"), systemImage: "checkmark.circle.fill").font(.callout)
+                    }
+                }.padding(.vertical, 8)
+            }
+            Section(header: Text(l10n("Available media"))) {
                 if let ebook = entry.ebook, entry.ebookAvailable, ["pdf", "epub"].contains(ebook.format) {
                     Button(l10n("Read {0}", ebook.format.uppercased())) {
                         do { reader = ReadingSource(account: entry.account, itemID: entry.media.libraryItemID, title: entry.media.title, ebook: ebook, file: try downloads.ebookURL(entry), progress: entry.readingProgress, fileID: entry.supplementaryID, progressGeneration: entry.media.progressGeneration) }
                         catch { self.error = error.localizedDescription }
-                    }.accessibilityIdentifier("read-downloaded-ebook").nativeGlassButton(prominent: true)
+                    }.accessibilityIdentifier("read-downloaded-ebook").buttonStyle(BorderlessButtonStyle())
                 }
-                if !entry.tracks.isEmpty { Button(l10n("Play offline")) {
-                    NativeHaptic.impact("play")
-                    do {
-                        let audio = try downloads.audio(entry)
-                        Task { await player.startOffline(audio); if player.offlineID == entry.id { downloads.presented = false } }
-                    } catch { self.error = error.localizedDescription }
-                }.font(.headline).nativeGlassButton(prominent: true) }
-                ForEach(entry.chapters) { chapter in Text(chapter.title) }
-                if let error { Text(error).foregroundColor(.red) }
-                Button(l10n("Remove download")) { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player); presentation.wrappedValue.dismiss() } }.foregroundColor(.red)
-            }.padding(24).frame(maxWidth: 800, alignment: .leading).frame(maxWidth: .infinity)
-        }.background(appearance.background).navigationTitle(entry.media.title).navigationBarTitleDisplayMode(.inline)
+                if !entry.tracks.isEmpty {
+                    Button {
+                        NativeHaptic.impact("play")
+                        do {
+                            let audio = try downloads.audio(entry)
+                            Task { await player.startOffline(audio); if player.offlineID == entry.id { downloads.presented = false } }
+                        } catch { self.error = error.localizedDescription }
+                    } label: { DownloadActionText(l10n("Play offline")) }.buttonStyle(BorderlessButtonStyle())
+                }
+                if let error { Label(error, systemImage: "exclamationmark.triangle").foregroundColor(.red) }
+            }
+            if !entry.chapters.isEmpty {
+                Section(header: Text(l10n("Chapters"))) {
+                    ForEach(entry.chapters) { chapter in Text(chapter.title).padding(.vertical, 4) }
+                }
+            }
+            Section {
+                Button { NativeHaptic.impact("delete-local"); Task { await downloads.remove(entry, player: player); presentation.wrappedValue.dismiss() } } label: { DownloadActionText(l10n("Remove download")) }
+                    .foregroundColor(.red).buttonStyle(BorderlessButtonStyle())
+            }
+        }.navigationTitle(entry.media.title).navigationBarTitleDisplayMode(.inline)
             .fullScreenCover(item: $reader) { source in EbookReader(source: source, api: downloads.api, store: readingStore) }
+    }
+}
+
+/// Native List navigation rows can impose a single-line label on sibling actions.
+/// Keep each essential action independently tappable and let its text grow.
+private struct DownloadActionText: View {
+    let title: String
+    init(_ title: String) { self.title = title }
+    var body: some View {
+        Text(title)
+            .lineLimit(nil)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
     }
 }

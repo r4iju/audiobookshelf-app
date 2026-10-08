@@ -1,0 +1,9 @@
+{
+  "source": "465c490152f9184418e5f7b8bb9b3662b38c5e88",
+  "source_files": 2147,
+  "product_files": 40,
+  "installed_files": 40,
+  "strict_signatures": "PASS",
+  "all_hashes_equal": true,
+  "scope": "three original modern navigation tests only"
+}

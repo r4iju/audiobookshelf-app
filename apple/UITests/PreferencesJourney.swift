@@ -1,6 +1,64 @@
 import XCTest
 
 @MainActor final class PreferencesJourney: NativeJourney {
+    private func openUtility(_ title: String, in app: XCUIApplication) {
+        app.buttons["Settings"].tap()
+        let destination = app.buttons[title]
+        for _ in 0..<4 where !(destination.exists && destination.isHittable) { app.swipeUp() }
+        destination.tap()
+    }
+
+    func testReadingPreferencesStayConsistentBetweenSettingsAndTheReader() async throws {
+        try await FixtureControl.configure("epub-reader")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["Settings"].tap()
+        let preferences = app.buttons["reading-settings"]
+        XCTAssertTrue(preferences.waitForExistence(timeout: 5), "Reading preferences must be available before opening a book")
+        guard preferences.exists else { return }
+        preferences.tap()
+        app.buttons["reader-volume-mode"].tap(); app.buttons["Mirrored"].tap()
+        let awake = app.switches["Keep screen awake"]
+        awake.switches.firstMatch.tap()
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Library"].tap(); app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
+        XCTAssertTrue(app.staticTexts["First passage by the window."].waitForExistence(timeout: 10))
+        app.buttons["Reading settings"].tap()
+        XCTAssertTrue(app.buttons["reader-volume-mode"].label.contains("Mirrored"))
+        XCTAssertEqual(app.switches["Keep screen awake"].value as? String, "1")
+        app.buttons["reader-volume-mode"].tap(); app.buttons["Off"].tap()
+        app.buttons["Done"].tap(); app.buttons["Close reader"].tap()
+        app.buttons["Settings"].tap(); app.buttons["reading-settings"].tap()
+        XCTAssertTrue(app.buttons["reader-volume-mode"].label.contains("Off"), "Settings must not overwrite the reader's latest preference")
+        XCTAssertEqual(app.switches["Keep screen awake"].value as? String, "1")
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["Settings"].tap(); app.buttons["reading-settings"].tap()
+        XCTAssertTrue(app.buttons["reader-volume-mode"].label.contains("Off"))
+        XCTAssertEqual(app.switches["Keep screen awake"].value as? String, "1")
+        capture("Reading preferences shared with reader")
+    }
+    func testPlaybackPreferencesCanBeChangedBeforeListeningAndSurviveRelaunch() async throws {
+        try await FixtureControl.configure("baseline")
+        connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
+        let app = XCUIApplication()
+        app.buttons["Settings"].tap()
+        let preferences = app.buttons["listening-settings"]
+        XCTAssertTrue(preferences.waitForExistence(timeout: 5), "Playback preferences must be available without starting a listening session")
+        guard preferences.exists else { return }
+        preferences.tap()
+        let total = app.switches["total-track-setting"]
+        XCTAssertTrue(total.waitForExistence(timeout: 3))
+        total.switches.firstMatch.tap()
+        XCTAssertEqual(total.value as? String, "0")
+        XCTAssertEqual(app.switches["chapter-track-setting"].value as? String, "1", "At least one progress track remains enabled")
+        XCTAssertFalse(app.buttons["mini-player"].exists, "Editing preferences must not start listening")
+        app.terminate(); app.launchArguments = []; app.launch()
+        app.buttons["Settings"].tap(); app.buttons["listening-settings"].tap()
+        XCTAssertEqual(app.switches["total-track-setting"].value as? String, "0")
+        XCTAssertEqual(app.switches["chapter-track-setting"].value as? String, "1")
+        XCTAssertFalse(app.buttons["mini-player"].exists)
+        capture("Playback preferences before listening")
+    }
     func testLegacyImportOpensBeforeSigningIntoAServer() async throws {
         let app = XCUIApplication()
         app.launchArguments = ["--reset-preview-account"]
@@ -14,11 +72,59 @@ import XCTest
         XCTAssertTrue(app.buttons["Choose export"].waitForExistence(timeout: 3))
     }
 
+    func testIncompleteExportShowsAnErrorAndCanBeChosenAgain() async throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--reset-preview-account"]
+        app.launch()
+        XCTAssertTrue(app.textFields["server"].waitForExistence(timeout: 8))
+        app.swipeUp()
+        app.buttons["Import previous app data"].tap()
+        let choose = app.buttons["Choose export"]
+        XCTAssertTrue(choose.waitForExistence(timeout: 5))
+        choose.tap()
+        let browse = app.buttons["Browse"]
+        XCTAssertTrue(browse.waitForExistence(timeout: 5), "Choosing an export must present the native file picker")
+        guard browse.exists else { return }
+        browse.tap()
+        let local = app.cells.containing(.staticText, identifier: "On My iPhone").firstMatch
+        if local.waitForExistence(timeout: 5) { local.tap() }
+        let folder = app.cells.matching(NSPredicate(format: "label BEGINSWITH %@", "Audiobook Loft")).firstMatch
+        if folder.exists { folder.tap() }
+        let open = app.buttons["Open"]
+        XCTAssertTrue(open.waitForExistence(timeout: 5), "The native picker must allow selecting the app's owned Documents folder")
+        guard open.exists else { return }
+        open.tap()
+        let error = app.staticTexts["Choose the complete export package or the folder containing archive.json. An unfinished export cannot be imported."]
+        XCTAssertTrue(error.waitForExistence(timeout: 8), "An incomplete export must show actionable feedback after the picker closes")
+        capture("Incomplete export feedback")
+        app.buttons["Choose export"].tap()
+        XCTAssertTrue(app.buttons["Open"].waitForExistence(timeout: 5), "Choosing another export must remain available after failure")
+    }
+
+    func testDismissingExportPickerAllowsChoosingAgain() async throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--reset-preview-account"]
+        app.launch()
+        XCTAssertTrue(app.textFields["server"].waitForExistence(timeout: 8))
+        app.swipeUp()
+        app.buttons["Import previous app data"].tap()
+        let choose = app.buttons["Choose export"]
+        XCTAssertTrue(choose.waitForExistence(timeout: 5))
+        choose.tap()
+        XCTAssertTrue(app.buttons["Browse"].waitForExistence(timeout: 5))
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.09))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.8)))
+        XCTAssertTrue(choose.waitForExistence(timeout: 5))
+        choose.tap()
+        XCTAssertTrue(app.buttons["Browse"].waitForExistence(timeout: 5), "Dismissing the native picker must release the selection so another export can be chosen")
+        capture("Export picker reopened after dismissal")
+    }
+
     func testLegacyImportExplainsExportAndReauthentication() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap(); app.buttons["Settings"].tap(); app.swipeUp()
+        app.buttons["Settings"].tap(); app.swipeUp()
         let migration = app.buttons["Import previous app data"]
         XCTAssertTrue(migration.waitForExistence(timeout: 3))
         guard migration.exists else { return }
@@ -33,7 +139,7 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap(); app.buttons["Settings"].tap()
+        app.buttons["Settings"].tap()
         app.swipeUp()
         let network = app.buttons["Network preferences"]
         XCTAssertTrue(network.waitForExistence(timeout: 3))
@@ -41,13 +147,13 @@ import XCTest
         network.tap()
         app.buttons["streaming-ask"].tap(); app.buttons["downloads-never"].tap()
         app.terminate(); app.launchArguments = []; app.launch()
-        app.buttons["account"].tap(); app.buttons["Settings"].tap(); app.swipeUp()
+        app.buttons["Settings"].tap(); app.swipeUp()
         app.buttons["Network preferences"].tap()
         XCTAssertEqual(app.buttons["streaming-ask"].value as? String, "Selected")
         XCTAssertEqual(app.buttons["downloads-never"].value as? String, "Selected")
         app.buttons["streaming-never"].tap(); app.buttons["downloads-always"].tap()
         app.terminate(); app.launch()
-        app.buttons["account"].tap(); app.buttons["Settings"].tap(); app.swipeUp()
+        app.buttons["Settings"].tap(); app.swipeUp()
         app.buttons["Network preferences"].tap()
         XCTAssertEqual(app.buttons["streaming-never"].value as? String, "Selected")
         XCTAssertEqual(app.buttons["downloads-always"].value as? String, "Selected")
@@ -57,7 +163,7 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false, arguments: ["-AppleLocale", "en_US@calendar=buddhist"])
         let app = XCUIApplication()
-        app.buttons["account"].tap(); app.buttons["Statistics"].tap(); app.buttons["Year in review"].tap()
+        openUtility("Statistics", in: app); app.buttons["Year in review"].tap()
         XCTAssertTrue(app.staticTexts["120 minutes listened"].waitForExistence(timeout: 8))
         let year = Calendar(identifier: .gregorian).component(.year, from: Date())
         let requests = try await fixtureRequests()
@@ -67,7 +173,7 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap(); app.buttons["Statistics"].tap()
+        openUtility("Statistics", in: app)
         let review = app.buttons["Year in review"]
         XCTAssertTrue(review.waitForExistence(timeout: 5))
         guard review.exists else { return }
@@ -149,11 +255,11 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap()
         let settings = app.buttons["Settings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 3))
         guard settings.exists else { return }
         settings.tap()
+        app.buttons["appearance-settings"].tap()
         XCTAssertTrue(app.buttons["theme-black"].waitForExistence(timeout: 5))
         app.buttons["theme-black"].tap()
         app.buttons["haptic-off"].tap()
@@ -161,14 +267,14 @@ import XCTest
         XCTAssertEqual(app.buttons["haptic-off"].value as? String, "Selected")
         capture("Native black appearance settings")
         app.terminate(); app.launchArguments = []; app.launch()
-        app.buttons["account"].tap(); app.buttons["Settings"].tap()
+        app.buttons["Settings"].tap(); app.buttons["appearance-settings"].tap()
         XCTAssertTrue(app.buttons["theme-black"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.buttons["theme-black"].value as? String, "Selected")
         XCTAssertEqual(app.buttons["haptic-off"].value as? String, "Selected")
         app.buttons["theme-light"].tap(); app.buttons["haptic-heavy"].tap()
         capture("Native light appearance settings")
         app.terminate(); app.launch()
-        app.buttons["account"].tap(); app.buttons["Settings"].tap()
+        app.buttons["Settings"].tap(); app.buttons["appearance-settings"].tap()
         XCTAssertTrue(app.buttons["theme-light"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.buttons["theme-light"].value as? String, "Selected")
         XCTAssertEqual(app.buttons["haptic-heavy"].value as? String, "Selected")
@@ -177,8 +283,9 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap()
+        app.buttons["Settings"].tap()
         let stats = app.buttons["Statistics"]
+        for _ in 0..<4 where !(stats.exists && stats.isHittable) { app.swipeUp() }
         XCTAssertTrue(stats.waitForExistence(timeout: 3))
         guard stats.exists else { return }
         stats.tap()

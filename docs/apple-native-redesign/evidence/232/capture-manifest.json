@@ -1,0 +1,134 @@
+[
+  {
+    "screen": "after-detail-focused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "f2378ab964931c1b6a45be04966c82da23355fd789fe0b0dd6f00a97b2b0c6a3",
+    "testIdentifier": "CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus()",
+    "timestamp": 1791424740.056
+  },
+  {
+    "screen": "after-detail-unfocused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "e72ba07490fc4b44c53a73aba206c47e1e2746063e5bf9a0096cc0bfe46aeec9",
+    "testIdentifier": "CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus()",
+    "timestamp": 1791424738.566
+  },
+  {
+    "screen": "after-now-playing-focused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "e18d691161053e46d6f2707cafe6dbca97e36469cd173a73a25fec331f3a6cdc",
+    "testIdentifier": "PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles()",
+    "timestamp": 1791424766.456
+  },
+  {
+    "screen": "after-now-playing-unfocused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "a8bf4237622bcb7c812ce9f8b2cf24dbd6e9b78cec66628a4d8497c853d0443c",
+    "testIdentifier": "PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles()",
+    "timestamp": 1791424764.587
+  },
+  {
+    "screen": "after-multi-library-search.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "607eb2a8fbc4b6d26353595ef271350bfd3ca978441428b636bc12d4fc89b2f7",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791424861.787
+  },
+  {
+    "screen": "after-library-back-focused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "4156be6ae0928e8f5ce6252b6286ef558e41f7fe5076316e53c717daa34c3044",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791424847.488
+  },
+  {
+    "screen": "after-archive-detail.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "5289ac0356c0e051e74cdb630247662e53ed92e9fab618709f3ad5e62d76c330",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791424846.05
+  },
+  {
+    "screen": "after-library-focused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "850678d7ed3853e6134436c9e7a1448aa793cc0c5ec60a145813d38bb90694aa",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791424843.489
+  },
+  {
+    "screen": "after-library-unfocused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "963cb05fda137111fbedee878102c36cc5fa7cf4d46db0b3c04d098a189d1acf",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791424841.68
+  },
+  {
+    "screen": "after-library-chooser-end.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "ebe716ec5d8aa8df06057ba86a12fb3e01c125ac9cb7dc5eb061f6148ce67867",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791424837.901
+  },
+  {
+    "screen": "after-library-chooser.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "dec752f0afde50df219e8bf0fc5ad86e6c8b43fd09969f3299e250bdbfd85799",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791424829.943
+  },
+  {
+    "screen": "after-many-libraries-shell.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "screenshotSHA256": "4ecea53434ca6276c01531425055f56759775b4c500480309ae2170529ae3f24",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791424825.593
+  }
+]

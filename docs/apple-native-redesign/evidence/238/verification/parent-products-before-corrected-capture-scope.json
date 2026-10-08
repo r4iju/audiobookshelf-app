@@ -1,0 +1,13 @@
+{
+  "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+  "originalManifest": "/tmp/238-builds.json",
+  "unavailableHistoricalLocations": [
+    {
+      "role": "tv_capture",
+      "phase": "before-remaining-render-cases-and-early-case-recapture",
+      "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/73A02F36-3789-4316-BCBC-C5F5390AE5F3/AudiobookshelfTV.app",
+      "status": "historical mutable container no longer addressable after reinstall; not reverified"
+    }
+  ],
+  "verification": "/tmp/native238-parent-products-before-corrected-capture.json"
+}

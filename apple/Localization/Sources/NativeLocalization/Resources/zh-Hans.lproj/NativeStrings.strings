@@ -81,7 +81,6 @@
 "Clear" = "清除";
 "Clear events" = "清除日志";
 "Clear events?" = "要清除日志吗？";
-"Clear search" = "清除搜索";
 "Close feed" = "关闭源";
 "Close playback" = "关闭播放器";
 "Close reader" = "关闭阅读器";
@@ -92,8 +91,6 @@
 "Complete" = "已完成";
 "Confirm" = "确认";
 "Connect" = "连接";
-"Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "直接连接到 Audiobookshelf。支持本地 HTTP 和受信任的 HTTPS 服务器。";
-"Connect directly to your Audiobookshelf server to stream audiobooks and podcasts." = "直接连接到你的 Audiobookshelf 服务器，串流播放有声书和播客。";
 "Connect to your library" = "连接到你的媒体库";
 "Connecting" = "正在尝试连接服务器…";
 "Connecting…" = "正在尝试连接服务器…";
@@ -177,7 +174,6 @@
 "Filter library" = "筛选媒体库";
 "Filter: {0}" = "筛选：{0}";
 "Filters" = "筛选条件";
-"Find your next chapter." = "寻找你的下一章。";
 "Find your next listen." = "寻找你下一部想听的作品。";
 "Finished" = "已听完";
 "Font" = "字体";
@@ -195,7 +191,6 @@
 "Has ebook" = "有电子书";
 "Has supplementary ebook" = "有补充电子书";
 "Highlights" = "精彩回顾";
-"Home" = "首页";
 "Idle" = "空闲";
 "Import data" = "导入数据";
 "Import needs {0}; {1} is available. Free space and retry." = "导入需要 {0}，当前可用 {1}。请释放空间后重试。";
@@ -287,7 +282,6 @@
 "Nothing to continue yet. Choose a library above to start listening." = "还没有可继续的内容。请在上方选择一个媒体库开始收听。";
 "Now Playing" = "正在播放";
 "Now listening" = "正在收听";
-"Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "现在请重启 Audiobookshelf 服务器。只有在你选择“开始服务器重启”之后进行的重启才有效。服务器重新运行后，请在这里确认。";
 "Number of episodes" = "集数";
 "Off" = "关闭";
 "Oldest first" = "最早优先";
@@ -370,6 +364,7 @@
 "Recently added" = "最近添加";
 "Refresh" = "刷新";
 "Refresh downloads" = "刷新下载";
+"Remove" = "移除";
 "Remove download" = "删除本地项目";
 "Remove {0}" = "移除“{0}”";
 "Repair and retry import" = "修复并重试导入";
@@ -377,10 +372,8 @@
 "Report" = "报告";
 "Reset timer" = "重置定时器";
 "Restart playback" = "重新开始播放";
-"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "请立即重启 Audiobookshelf 服务器，并在其重新运行后确认。在此消息之前进行的重启无效，因为未得到响应的那次保存可能在重启后才到达服务器。";
 "Restart the server" = "重启服务器";
 "Restart the server now" = "立即重启服务器";
-"Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server." = "重启 Audiobookshelf 服务器会终止未得到响应的保存。请先选择“开始服务器重启”，然后重启服务器。";
 "Restarting…" = "正在重新开始…";
 "Resume" = "继续";
 "Resume listening" = "继续收听";
@@ -413,7 +406,6 @@
 "Saving your progress…" = "正在存储你的进度…";
 "Scale elapsed time by speed" = "按速度缩放播放时间";
 "Search" = "查找";
-"Search library" = "搜索媒体库";
 "Search podcasts" = "搜索播客";
 "Searching your library…" = "正在搜索你的媒体库…";
 "Searching…" = "正在搜索…";

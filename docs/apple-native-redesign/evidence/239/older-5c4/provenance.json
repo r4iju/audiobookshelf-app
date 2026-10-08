@@ -1,0 +1,13 @@
+{
+  "source": "5c4c6aafa91589a9ca1fd27accef60cc63a056af",
+  "release_runtime_equivalent": "465c490152f9184418e5f7b8bb9b3662b38c5e88",
+  "run": 37822005861,
+  "artifact": 11570781955,
+  "artifact_sha256": "3ee20dc4fce3cde5135f0536b9b60b9aeb8da2cecdf03b4be3df939dcceec883",
+  "original_result_zip_sha256": "d366909bf8126b6e9d7a74d23dd527d8d26c1849195a453dae13167bc465b293",
+  "private_originals": "/tmp/native239-5c4-tv17",
+  "source_clean_log_empty": true,
+  "capture_helper_original_hashes_match_git": true,
+  "automatic_recording_found": true,
+  "recording_viewed_or_exported": false
+}

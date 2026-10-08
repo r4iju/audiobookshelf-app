@@ -131,7 +131,7 @@ struct ItemDetailView: View {
                             Button(l10n("Try again")) { Task { await detail.load(item.id, catalog: catalog) } }
                         }
                         if let description = metadata.description.map(Format.plainText), !description.isEmpty {
-                            Text(description).font(.body).foregroundStyle(.secondary).lineLimit(8)
+                            TVReadableText(text: description, identifier: "detail-description")
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -221,7 +221,7 @@ struct EpisodeDetailView: View {
                         }
                         if detail.item != nil { PlaybackActions(detail: detail, item: podcast, episode: episode, playIdentifier: "play-episode").focusSection() }
                         if let description = episode.description.map(Format.plainText), !description.isEmpty {
-                            Text(description).foregroundStyle(.secondary).lineLimit(10)
+                            TVReadableText(text: description, identifier: "episode-description")
                         }
                     }
                     if detail.loading && detail.item == nil { ProgressView(l10n("Loading episode…")) }

@@ -17,8 +17,8 @@ struct RelatedAuthorView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
+        ShelfList {
+            Section {
                 HStack(alignment: .center, spacing: 18) {
                     Group {
                         if let image {
@@ -38,41 +38,43 @@ struct RelatedAuthorView: View {
                     }
                 }
                 if let bio = page.author?.description?.trimmingCharacters(in: .whitespacesAndNewlines), !bio.isEmpty {
-                    Text(bio).font(.callout).foregroundColor(ShelfStyle.secondaryText).fixedSize(horizontal: false, vertical: true)
+                    Text(bio).font(.callout).foregroundColor(ShelfStyle.secondaryText).fixedSize(horizontal: false, vertical: true).frame(maxWidth: 720, alignment: .leading)
                         .accessibilityIdentifier("author-bio")
                 }
                 if let failure = page.failure {
                     RecoveryCard(message: ConnectionStore.recovery(for: failure)) { Task { await page.load() } }
                 }
-                if !page.series.isEmpty {
-                    Text(l10n("Series")).font(.headline)
+            }
+            if !page.series.isEmpty {
+                Section(header: Text(l10n("Series"))) {
                     ForEach(page.series) { series in
                         NavigationLink(destination: RelatedSeriesView(catalog: catalog, seriesID: series.id, name: series.name)) {
                             HStack {
                                 Text(series.name).foregroundColor(.primary)
                                 Spacer()
                                 if let books = series.books { Text("\(books.count)").foregroundColor(ShelfStyle.secondaryText) }
-                                Image(systemName: "chevron.right").foregroundColor(ShelfStyle.secondaryText)
-                            }.padding(18).background(appearance.card).cornerRadius(16)
-                        }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("author-series." + series.id)
+                            }.padding(.vertical, 6)
+                        }.accessibilityIdentifier("author-series." + series.id)
                     }
                 }
-                if !page.books.items.isEmpty {
-                    Text(l10n("Titles")).font(.headline)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 140, maximum: 210), spacing: 16, alignment: .top)], spacing: 22) {
-                        ForEach(page.books.items) { item in
-                            NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: nil)) {
-                                BookCard(item: item, catalog: catalog, listLayout: false)
-                            }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("author-book." + item.id)
-                                .onAppear { Task { await page.books.loadMore(after: item) } }
-                        }
+            }
+            if !page.books.items.isEmpty {
+                Section(header: Text(l10n("Titles"))) {
+                    ForEach(page.books.items) { item in
+                        NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: nil)) {
+                            BookCard(item: item, catalog: catalog, listLayout: true)
+                        }.accessibilityIdentifier("author-book." + item.id)
+                            .onAppear { Task { await page.books.loadMore(after: item) } }
                     }
                 }
-                if page.books.loading { ProgressView().frame(maxWidth: .infinity) }
-                if let error = page.books.error, !page.books.items.isEmpty {
-                    RecoveryCard(message: ConnectionStore.recovery(for: error)) { Task { await page.load() } }
-                }
-            }.padding(20).frame(maxWidth: 1000).frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if page.books.loading { ProgressView(l10n("Opening your books…")).frame(maxWidth: .infinity).padding(.vertical, 20) }
+            if !page.books.loading, page.failure == nil, page.books.error == nil, page.books.items.isEmpty {
+                CatalogStatus(title: l10n("Titles"), message: l10n("This library is empty. Add titles on your server, then refresh."), symbol: "books.vertical")
+            }
+            if let error = page.books.error, !page.books.items.isEmpty {
+                RecoveryCard(message: ConnectionStore.recovery(for: error)) { Task { await page.load() } }
+            }
         }
         .background(appearance.background).navigationTitle(page.author?.name ?? name).navigationBarTitleDisplayMode(.inline)
         .onAppear { if !started { started = true; Task { await page.load() } } }
@@ -104,36 +106,41 @@ struct RelatedSeriesView: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
+        ShelfList {
+            Section {
                 Text(page.series?.name ?? name).font(.title2.weight(.semibold)).accessibilityIdentifier("series-name")
                 if let summary = progressSummary {
                     Text(summary).font(.subheadline).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("series-progress")
                 }
                 if let description = page.series?.description?.trimmingCharacters(in: .whitespacesAndNewlines), !description.isEmpty {
-                    Text(description).font(.callout).foregroundColor(ShelfStyle.secondaryText).fixedSize(horizontal: false, vertical: true)
+                    Text(description).font(.callout).foregroundColor(ShelfStyle.secondaryText).fixedSize(horizontal: false, vertical: true).frame(maxWidth: 720, alignment: .leading)
                         .accessibilityIdentifier("series-description")
                 }
                 if let failure = page.failure {
                     RecoveryCard(message: ConnectionStore.recovery(for: failure)) { Task { await page.load() } }
                 }
+            }
+            Section(header: Text(l10n("Titles"))) {
                 ForEach(page.books.items) { item in
-                    VStack(alignment: .leading, spacing: 6) {
-                        if let sequence = page.sequence(of: item) {
-                            Text(l10n("Book {0}", sequence)).font(.caption.weight(.semibold)).foregroundColor(ShelfStyle.secondaryText)
-                                .accessibilityIdentifier("series-sequence." + item.id)
-                        }
-                        NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: nil)) {
+                    NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: nil)) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            if let sequence = page.sequence(of: item) {
+                                Text(l10n("Book {0}", sequence)).font(.caption.weight(.semibold)).foregroundColor(ShelfStyle.secondaryText)
+                                    .accessibilityIdentifier("series-sequence." + item.id)
+                            }
                             BookCard(item: item, catalog: catalog, listLayout: true)
-                        }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("series-book." + item.id)
-                    }
-                    .onAppear { Task { await page.books.loadMore(after: item) } }
+                        }
+                    }.accessibilityIdentifier("series-book." + item.id)
+                        .onAppear { Task { await page.books.loadMore(after: item) } }
                 }
-                if page.books.loading { ProgressView().frame(maxWidth: .infinity) }
+                if page.books.loading { ProgressView(l10n("Opening your books…")).frame(maxWidth: .infinity).padding(.vertical, 20) }
+                if !page.books.loading, page.failure == nil, page.books.error == nil, page.books.items.isEmpty {
+                    CatalogStatus(title: l10n("Titles"), message: l10n("This library is empty. Add titles on your server, then refresh."), symbol: "books.vertical")
+                }
                 if let error = page.books.error, !page.books.items.isEmpty {
                     RecoveryCard(message: ConnectionStore.recovery(for: error)) { Task { await page.load() } }
                 }
-            }.padding(20).frame(maxWidth: 1000).frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
         .background(appearance.background).navigationTitle(page.series?.name ?? name).navigationBarTitleDisplayMode(.inline)
         .onAppear { if !started { started = true; Task { await page.load() } } }
@@ -156,20 +163,26 @@ struct RelatedBookLinks: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForEach(series, id: \.self) { series in
-                NavigationLink(destination: RelatedSeriesView(catalog: catalog, seriesID: series.id, name: series.name)) {
-                    Label(series.sequence.map { l10n("{0} · Book {1}", series.name, $0) } ?? series.name, systemImage: "books.vertical")
-                        .font(.subheadline)
+        Group {
+            if !series.isEmpty {
+                Section(header: Text(l10n("Series"))) {
+                    ForEach(series, id: \.self) { series in
+                        NavigationLink(destination: RelatedSeriesView(catalog: catalog, seriesID: series.id, name: series.name)) {
+                            Label(series.sequence.map { l10n("{0} · Book {1}", series.name, $0) } ?? series.name, systemImage: "books.vertical")
+                        }
+                        .accessibilityIdentifier("detail-series." + series.id)
+                        .accessibilityLabel(series.sequence.map { l10n("{0}, book {1}", series.name, $0) } ?? series.name)
+                    }
                 }
-                .accessibilityIdentifier("detail-series." + series.id)
-                .accessibilityLabel(series.sequence.map { l10n("{0}, book {1}", series.name, $0) } ?? series.name)
             }
-            ForEach(authors, id: \.self) { author in
-                NavigationLink(destination: RelatedAuthorView(catalog: catalog, authorID: author.id, name: author.name)) {
-                    Label(author.name, systemImage: "person").font(.subheadline)
+            if !authors.isEmpty {
+                Section(header: Text(l10n("Authors"))) {
+                    ForEach(authors, id: \.self) { author in
+                        NavigationLink(destination: RelatedAuthorView(catalog: catalog, authorID: author.id, name: author.name)) {
+                            Label(author.name, systemImage: "person")
+                        }.accessibilityIdentifier("detail-author." + author.id)
+                    }
                 }
-                .accessibilityIdentifier("detail-author." + author.id)
             }
         }
     }

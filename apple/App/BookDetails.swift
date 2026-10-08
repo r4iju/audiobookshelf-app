@@ -51,48 +51,21 @@ struct BookDetails: View {
     private var requestedDownloads: Set<String> { serverQueue.pending(itemID: item.id) }
     @State private var detailRevision = UUID()
     private var book: LibraryItem { expanded ?? item }
+    private var canListen: Bool {
+        // Only authoritative, explicitly empty audio metadata excludes listening.
+        // An unloaded catalog summary must still allow the existing playback request.
+        !(episode == nil && book.media.ebookFile != nil && book.media.tracks?.isEmpty == true)
+    }
 
     init(item: LibraryItem, catalog: CatalogStore, progress: MediaProgress?, episode: Episode? = nil) {
         self.item = item; self.catalog = catalog; self.progress = progress; self.episode = episode
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
-                header
-                if book.mediaType != "podcast" || episode != nil {
-                Button { NativeHaptic.impact("play"); playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
-                    HStack {
-                        Image(systemName: "play.fill")
-                        Text(l10n((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening")).fontWeight(.semibold)
-                        Spacer()
-                    }.padding(18).nativeGlassControl(tint: ShelfStyle.accentFill)
-                }.disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
-                }
-                if episode != nil || book.mediaType == "book" {
-                    Button(l10n(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished"), action: toggleFinished).disabled(progressBusy)
-                    if let progress = selectedProgress, (progress.progress ?? 0) > 0 || (progress.ebookProgress ?? 0) > 0 {
-                        Button(l10n("Discard progress")) { NativeHaptic.impact("discard-progress"); progressConfirmation = .discard }
-                            .disabled(progressBusy).accessibilityIdentifier("discard-progress")
-
-                    }
-                    if progressBusy { ProgressView(l10n("Saving your progress…")) }
-                    if writesWaiting.waiting {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text(l10n("An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.")).font(.callout).foregroundColor(ShelfStyle.secondaryText)
-                            Button(l10n("Restart the server")) { askForRestart(thenDiscard: false) }.disabled(progressBusy).accessibilityIdentifier("restart-server")
-                        }
-                    }
-                }
-                if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
-                if let ebook = book.media.ebookFile, ["pdf", "epub"].contains(ebook.format), episode == nil {
-                    Button(l10n("Read {0}", ebook.format.uppercased())) {
-                        Task {
-                            do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil, progressGeneration: book.progressGeneration) }
-                            catch { recordLoadFailure(error.localizedDescription) }
-                        }
-                    }
-                }
+        ShelfList {
+            Section {
+                header.padding(.vertical, 12).buttonStyle(BorderlessButtonStyle())
+                if !regularActions, book.mediaType != "podcast" || episode != nil { detailActions }
                 if episode == nil {
                     ForEach(book.supplementaryEbooks.filter { ["pdf", "epub"].contains($0.ebook?.format ?? "") }) { file in
                         if let ebook = file.ebook {
@@ -102,45 +75,14 @@ struct BookDetails: View {
                                         do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: file.metadata?.filename ?? book.title, ebook: ebook, file: nil, fileID: file.ino) }
                                         catch { recordLoadFailure(error.localizedDescription) }
                                     }
-                                }
-                                Button(l10n("Download {0}", file.metadata?.filename ?? l10n("supplementary PDF"))) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: nil, supplementaryID: file.ino) } }
+                                }.buttonStyle(BorderlessButtonStyle())
+                                Button(l10n("Download {0}", file.metadata?.filename ?? l10n("supplementary PDF"))) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: nil, supplementaryID: file.ino) } }.buttonStyle(BorderlessButtonStyle())
                             }
                         }
                     }
                 }
-                if book.mediaType == "book" || episode != nil {
-                    Button(l10n("Download for offline")) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: episode) } }
-                    if let error = localDownloads.error { Text(error).foregroundColor(.red) }
-                }
-                if episode == nil { ItemServerActionsSection(itemID: book.id, catalog: catalog) }
-                if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
-                    VStack(alignment: .leading, spacing: 10) {
-                        ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
-                        Text(l10n("{0} listened · {1}% complete", ShelfTime.describe(progress.currentTime ?? 0), Int(progress.fraction * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
-                    }
-                }
-                if let description = episode?.description ?? book.media.metadata.description, !description.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(l10n(episode != nil ? "About this episode" : book.mediaType == "podcast" ? "About this podcast" : "About this book")).font(.title3.bold())
-                        Text(Self.plainDescription(description)).font(.body).lineSpacing(5).foregroundColor(ShelfStyle.secondaryText)
-                    }
-                }
-                if book.mediaType == "podcast", episode == nil {
-                    podcastEpisodes
-                }
-                if let chapters = book.media.chapters, !chapters.isEmpty {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text(l10n("Chapters")).font(.title3.bold())
-                        ForEach(chapters) { chapter in
-                            HStack(alignment: .top) {
-                                Text(chapter.title).font(.body)
-                                Spacer()
-                                Text(ShelfTime.describe(chapter.end - chapter.start)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
-                            }.padding(.vertical, 8)
-                            Divider()
-                        }
-                    }
-                }
+            }.listRowBackground(Color.clear)
+            Group {
                 if let error {
                     RecoveryCard(message: error.message) {
                         switch error {
@@ -150,7 +92,41 @@ struct BookDetails: View {
                         }
                     }
                 }
-            }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
+                if episode == nil, book.mediaType == "book" { RelatedBookLinks(item: book, catalog: catalog) }
+                if episode != nil || book.mediaType == "book" {
+                    if progressBusy { ProgressView(l10n("Saving your progress…")) }
+                    if writesWaiting.waiting {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(l10n("An earlier save of this title's progress got no answer, and the server may still apply it over anything newer. Newer progress is kept on this device and sent once a server restart is confirmed.")).font(.callout).foregroundColor(ShelfStyle.secondaryText)
+                            Button(l10n("Restart the server")) { askForRestart(thenDiscard: false) }.disabled(progressBusy).accessibilityIdentifier("restart-server")
+                        }
+                    }
+                }
+                if let error = player.error, player.itemID == book.id || playAttempted { Text(error).font(.callout).foregroundColor(.red) }
+                if book.mediaType == "book" || episode != nil {
+                    if let error = localDownloads.error { Text(error).foregroundColor(.red) }
+                }
+                if episode == nil { ItemServerActionsSection(itemID: book.id, catalog: catalog).buttonStyle(BorderlessButtonStyle()) }
+                if let description = episode?.description ?? book.media.metadata.description, !description.isEmpty {
+                    Section(header: Text(l10n(episode != nil ? "About this episode" : book.mediaType == "podcast" ? "About this podcast" : "About this book"))) {
+                        Text(Self.plainDescription(description)).font(.body).lineSpacing(5).foregroundColor(ShelfStyle.secondaryText).frame(maxWidth: 720, alignment: .leading)
+                    }
+                }
+                if book.mediaType == "podcast", episode == nil {
+                    podcastEpisodes
+                }
+                if let chapters = book.media.chapters, !chapters.isEmpty {
+                    Section(header: Text(l10n("Chapters"))) {
+                        ForEach(chapters) { chapter in
+                            HStack(alignment: .top) {
+                                Text(chapter.title).font(.body)
+                                Spacer()
+                                Text(ShelfTime.describe(chapter.end - chapter.start)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                            }.padding(.vertical, 8)
+                        }
+                    }
+                }
+            }.buttonStyle(BorderlessButtonStyle())
         }.background(appearance.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
             .onAppear { writesWaiting.activate(); load(monitorDownloads: true) }
             .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel(); writesWaiting.stop() }
@@ -171,7 +147,7 @@ struct BookDetails: View {
                 case .discard:
                     return Alert(title: Text(l10n("Confirm")), message: Text(l10n("Are you sure you want to reset your progress?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 case .serverRestarted:
-                    return Alert(title: Text(l10n("Restart the server now")), message: Text(l10n("Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.")), primaryButton: .destructive(Text(l10n("Server restarted")), action: confirmRestart), secondaryButton: .cancel(Text(l10n("Cancel"))))
+                    return Alert(title: Text(l10n("Restart the server now")), message: Text(l10n("Restart your server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.")), primaryButton: .destructive(Text(l10n("Server restarted")), action: confirmRestart), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 }
             }
             .onChange(of: serverQueue.revision) { _ in if book.mediaType == "podcast", episode == nil, canManagePodcasts { watchDownloads() } }
@@ -188,7 +164,10 @@ struct BookDetails: View {
         if sizeClass == .regular && !sizeCategory.isAccessibilityCategory {
             HStack(alignment: .top, spacing: 28) {
                 BookArtwork(item: book, catalog: catalog).frame(width: 200)
-                metadata(alignment: .leading)
+                VStack(alignment: .leading, spacing: 24) {
+                    metadata(alignment: .leading)
+                    if book.mediaType != "podcast" || episode != nil { detailActions }
+                }
             }
         } else {
             VStack(spacing: 20) {
@@ -197,16 +176,70 @@ struct BookDetails: View {
             }.frame(maxWidth: .infinity)
         }
     }
+    private var regularActions: Bool { sizeClass == .regular && !sizeCategory.isAccessibilityCategory }
+
+    private var detailActions: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if canListen, book.mediaType != "podcast" || episode != nil {
+                Button { NativeHaptic.impact("play"); playAttempted = true; Task { await player.start(item: book, episode: episode) } } label: {
+                    Label(l10n((selectedProgress?.currentTime ?? 0) > 0 ? "Resume listening" : episode != nil ? "Start episode" : "Start listening"), systemImage: "play.fill")
+                        .font(.body.weight(.semibold)).padding(.vertical, 10).padding(.horizontal, 12)
+                        .frame(maxWidth: regularActions ? nil : .infinity, alignment: .leading)
+                }.nativeGlassButton(prominent: true).modifier(DetailPrimaryTint()).disabled(player.preparing || progressBusy).accessibilityIdentifier("play-book")
+            }
+            readingAction
+            if regularActions, #available(iOS 15, *) {
+                ControlGroup { secondaryDetailActions }.controlGroupStyle(.navigation)
+            } else {
+                VStack(alignment: .leading, spacing: 16) { secondaryDetailActions }.buttonStyle(BorderlessButtonStyle())
+            }
+            if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
+                VStack(alignment: .leading, spacing: 10) {
+                    ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
+                    Text(l10n("{0} listened · {1}% complete", ShelfTime.describe(progress.currentTime ?? 0), Int(progress.fraction * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                }
+            }
+        }.frame(maxWidth: 560, alignment: .leading)
+    }
+
+    @ViewBuilder private var readingAction: some View {
+        if let ebook = book.media.ebookFile, ["pdf", "epub"].contains(ebook.format), episode == nil {
+            Button {
+                Task {
+                    do { reader = ReadingSource(account: try await catalog.api.currentAccount(), itemID: book.id, title: book.title, ebook: ebook, file: nil, progressGeneration: book.progressGeneration) }
+                    catch { recordLoadFailure(error.localizedDescription) }
+                }
+            } label: {
+                Label(l10n("Read {0}", ebook.format.uppercased()), systemImage: "doc.text").frame(minHeight: 44)
+            }.buttonStyle(BorderlessButtonStyle())
+        }
+    }
+
+    @ViewBuilder private var secondaryDetailActions: some View {
+        if episode != nil || book.mediaType == "book" {
+            Button(l10n(selectedProgress?.isFinished == true ? "Mark unfinished" : "Mark finished"), action: toggleFinished).disabled(progressBusy)
+            Button(l10n("Download for offline")) { NativeHaptic.impact("download"); Task { await localDownloads.enqueue(item: book, episode: episode) } }
+            if let progress = selectedProgress, (progress.progress ?? 0) > 0 || (progress.ebookProgress ?? 0) > 0 {
+                if #available(iOS 15, *) {
+                    Button(l10n("Discard progress"), role: .destructive) { NativeHaptic.impact("discard-progress"); progressConfirmation = .discard }
+                        .disabled(progressBusy).accessibilityIdentifier("discard-progress")
+                } else {
+                    Button(l10n("Discard progress")) { NativeHaptic.impact("discard-progress"); progressConfirmation = .discard }
+                        .foregroundColor(.red).disabled(progressBusy).accessibilityIdentifier("discard-progress")
+                }
+            }
+        }
+    }
+
     private func metadata(alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 8) {
             Text(episode?.title ?? book.title).font(.title2.weight(.semibold)).fixedSize(horizontal: false, vertical: true)
             if episode != nil { Text(book.title).font(.subheadline).foregroundColor(ShelfStyle.secondaryText) }
-            Text(book.author).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
+            Text(book.author.isEmpty ? l10n("Unknown author") : book.author).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
             if let duration = listeningDuration { Label(ShelfTime.describe(duration), systemImage: "headphones").font(.subheadline) }
             if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
                 Text(l10n("Narrated by {0}", narrators.joined(separator: ", "))).font(.footnote).foregroundColor(ShelfStyle.secondaryText)
             }
-            if episode == nil, book.mediaType == "book" { RelatedBookLinks(item: book, catalog: catalog) }
         }.multilineTextAlignment(alignment == .center ? .center : .leading)
             .frame(maxWidth: .infinity, alignment: alignment == .center ? .center : .leading)
     }
@@ -333,9 +366,9 @@ struct BookDetails: View {
         }
     }
     private var podcastEpisodes: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        Group {
+        Section(header: Text(l10n("Episodes"))) {
             HStack {
-                Text(l10n("Episodes")).font(.title2.bold())
                 Spacer()
                 Menu {
                     ForEach([("Published date", "publishedAt"), ("Title", "title"), ("Season", "season"), ("Episode number", "episode"), ("Filename", "filename")], id: \.1) { choice in
@@ -354,25 +387,32 @@ struct BookDetails: View {
             if canManagePodcasts, book.media.metadata.feedUrl?.isEmpty == false {
                 Button { showingFeed = true } label: { Label(l10n("Feed episodes"), systemImage: "dot.radiowaves.left.and.right") }
             }
+        }
+        if !downloads.isEmpty || serverQueue.error != nil || serverQueue.hasUnsavedResults || !serverQueue.failures(itemID: item.id).isEmpty || !requestedDownloads.isEmpty {
+            Section(header: Text(l10n("Server downloads")), footer: Text(l10n("Episodes downloaded on your server appear in this library. Device downloads are managed in Downloads."))) {
             ForEach(downloads) { download in
-                HStack {
-                    Image(systemName: download.failed ? "exclamationmark.triangle" : download.isFinished ? "checkmark.circle" : "arrow.down.circle")
-                    Text(download.episodeDisplayTitle ?? l10n("Podcast episode"))
-                    Spacer()
-                    Text(l10n(download.failed ? "Failed" : download.isFinished ? "Ready" : "Downloading on server")).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(download.episodeDisplayTitle ?? l10n("Podcast episode")).font(.headline)
+                    Label(l10n(download.failed ? "Failed" : download.isFinished ? "Ready" : "Downloading on server"), systemImage: download.failed ? "exclamationmark.triangle" : download.isFinished ? "checkmark.circle" : "arrow.down.circle").font(.callout).foregroundColor(ShelfStyle.secondaryText)
                 }
             }
             if let error = serverQueue.error { Text(error).font(.caption).foregroundColor(.red) }
             if serverQueue.hasUnsavedResults { Button(l10n("Retry saving download results"), action: serverQueue.retrySavingResults) }
             ForEach(serverQueue.failures(itemID: item.id)) { failure in
-                HStack { Image(systemName: "exclamationmark.triangle"); Text(failure.title); Spacer(); Text(l10n("Failed")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(failure.title).font(.headline)
+                    Label(l10n("Failed"), systemImage: "exclamationmark.triangle").font(.callout).foregroundColor(ShelfStyle.secondaryText)
+                }
             }
             if !serverQueue.failures(itemID: item.id).isEmpty { Button(l10n("Retry failed episodes")) { showingFeed = true } }
             if !requestedDownloads.isEmpty {
                 Text(l10n("Waiting for {0} episode(s) from your server", requestedDownloads.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("server-download-pending")
                 Button(l10n("Refresh downloads"), action: watchDownloads)
             }
-            if visibleEpisodes.isEmpty { Text(l10n("No episodes found")).foregroundColor(ShelfStyle.secondaryText) }
+            }
+        }
+        Section(header: Text(l10n("Episode list"))) {
+            if visibleEpisodes.isEmpty { CatalogStatus(title: l10n("No episodes found"), message: book.title, symbol: "waveform") }
             ForEach(visibleEpisodes) { episode in
                 NavigationLink(destination: BookDetails(item: book, catalog: catalog, progress: progress(for: episode), episode: episode)) {
                     VStack(alignment: .leading, spacing: 8) {
@@ -385,9 +425,10 @@ struct BookDetails: View {
                             ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
                             Text(progress.isFinished == true ? l10n("Finished") : l10n("{0} listened", ShelfTime.describe(progress.currentTime ?? 0))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         }
-                    }.frame(maxWidth: .infinity, alignment: .leading).padding(18).background(appearance.card).cornerRadius(16)
-                }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("episode-\(episode.id)")
+                    }.frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 6)
+                }.accessibilityIdentifier("episode-\(episode.id)")
             }
+        }
         }
     }
 
@@ -469,5 +510,12 @@ struct BookDetails: View {
             value = value.replacingOccurrences(of: entity, with: replacement)
         }
         return value.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+private struct DetailPrimaryTint: ViewModifier {
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(iOS 15, *) { content.tint(ShelfStyle.accentFill) }
+        else { content.accentColor(ShelfStyle.accentFill) }
     }
 }

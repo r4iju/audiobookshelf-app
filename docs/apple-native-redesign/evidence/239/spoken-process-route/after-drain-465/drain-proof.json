@@ -1,0 +1,8 @@
+{
+  "get_start_epoch": 1791483366.7559822,
+  "get_return_epoch": 1791483375.637325,
+  "after_wait_epoch": 1791483415.639316,
+  "wait_seconds": 40,
+  "abandoned": true,
+  "drained": true
+}

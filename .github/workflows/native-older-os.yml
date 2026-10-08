@@ -1,0 +1,116 @@
+name: Native older OS capability and TV replay
+on:
+  push:
+    branches: [feature/apple-native-redesign]
+    paths:
+      - .github/workflows/native-older-os.yml
+      - verification/older-os/**
+  workflow_dispatch:
+    inputs:
+      tv_only:
+        description: Replay TV only after unchanged mobile source has separate evidence
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: native-older-os-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  tv17:
+    runs-on: macos-14
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install project generator
+        timeout-minutes: 8
+        run: |
+          brew install xcodegen
+          xcodegen --version
+      - name: Source-pinned TV17 build and native remote replay
+        run: |
+          chmod +x verification/older-os/sim
+          python3 verification/older-os/tv17-replay.py
+      - name: Preserve actual runtime, source, binary and journey evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tv17-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/tv17-replay/*.log
+            ${{ runner.temp }}/tv17-replay/*.json
+            ${{ runner.temp }}/tv17-replay/*.txt
+            ${{ runner.temp }}/tv17-replay/*.zip
+            ${{ runner.temp }}/tv17-replay/fixture-harness.sh
+          if-no-files-found: warn
+          retention-days: 7
+  ios145-runtime:
+    if: ${{ (github.event_name != 'workflow_dispatch' || !inputs.tv_only) && vars.LEAFWAKE_NATIVE_REPLAY_SCOPE != 'tv' }}
+    runs-on: macos-14
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Probe exact original Apple runtime package
+        run: |
+          chmod +x verification/older-os/sim
+          python3 verification/older-os/runtime-probe.py
+      - name: Install app verification dependencies after stock runtime boot
+        timeout-minutes: 8
+        run: |
+          brew install xcodegen
+          npm ci --prefix verification/realtime
+      - name: Source-pinned iOS14 build and actual fallback replay
+        run: python3 verification/older-os/ios14-replay.py
+      - name: Preserve capability and original app replay evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ios145-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/ios145-capability/*.log
+            ${{ runner.temp }}/ios145-capability/*.json
+            ${{ runner.temp }}/ios145-capability/*.txt
+            ${{ runner.temp }}/ios14-replay/*.log
+            ${{ runner.temp }}/ios14-replay/*.json
+            ${{ runner.temp }}/ios14-replay/*.txt
+            ${{ runner.temp }}/ios14-replay/*.zip
+            ${{ runner.temp }}/ios14-replay/fixture-harness.sh
+          if-no-files-found: warn
+          retention-days: 7
+  ios14-binary:
+    if: ${{ (github.event_name != 'workflow_dispatch' || !inputs.tv_only) && vars.LEAFWAKE_NATIVE_REPLAY_SCOPE != 'tv' }}
+    runs-on: macos-14
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install project generator
+        timeout-minutes: 8
+        run: |
+          brew install xcodegen
+          xcodegen --version
+      - name: Independently build original iOS14 minimum with SDK18.2
+        run: python3 verification/older-os/ios14-build-independent.py
+      - name: Preserve binary minimum and source evidence without runtime claim
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ios14-binary-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/ios14-build/*.log
+            ${{ runner.temp }}/ios14-build/*.json
+            ${{ runner.temp }}/ios14-build/*.txt
+          if-no-files-found: warn
+          retention-days: 7

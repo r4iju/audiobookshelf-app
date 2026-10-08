@@ -1,0 +1,10 @@
+{
+  "source": "cbede4693b72c04009150eac544210b6a4f0253d",
+  "appleSourceBase": "77c154b1",
+  "version": "1.0.0",
+  "build": "1",
+  "binaryMinimum": "15.0",
+  "signature": "ad hoc",
+  "executableSHA256": "778839c759ac775d10bd01fb92d7b838f8e30e721a6b9c594f0c508c5bbd0a95",
+  "debugDylibSHA256": "057d913568673bfac45ce85c1b0515e5a430101c22240576c69c773d2e8e44be"
+}

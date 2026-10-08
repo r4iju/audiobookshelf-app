@@ -1,0 +1,29 @@
+{
+  "all47_installed_match": true,
+  "strict_signature": "PASS",
+  "clips": [
+    {
+      "file": "unlock-control.wav",
+      "sha256": "b5f487de68a33598a4622112bf227689fde989628b616650d464c7a265bab8e6",
+      "transcript": "Unlock player button."
+    },
+    {
+      "file": "reader-page.wav",
+      "sha256": "64e96500a4f19a368f3e8855915987aa79b74ec6249d052724186887648c8561",
+      "transcript": "Voice over on audio."
+    },
+    {
+      "file": "locked-slider.wav",
+      "sha256": "fd2e8617e5fd6ffcc86673ea6ca17ecc39a2824407f142ea2a9f4d5b2fa09471",
+      "transcript": "VoiceOver on, chapter progress, 7.232, dimmed, adjustable."
+    },
+    {
+      "file": "reader-document.wav",
+      "sha256": "f27321e54ef6e3fdb5c2307e671f8c1ee5ab3518b8f2b1181213753bcfe515c8",
+      "transcript": "you"
+    }
+  ],
+  "scope": "Actual locked-slider dimmed/adjustable and Unlock button utterances. PDF clips do not prove page or passage speech; document low content output rejected as meaningful reading. No human listening/full acceptance.",
+  "final_voiceover": false,
+  "restored_lock": "0"
+}

@@ -109,7 +109,7 @@ private struct AuthorScreen: View {
                             Text(books.total == 1 ? l10n("1 title") : l10n("{0} titles", books.total)).font(.headline).accessibilityIdentifier("author-count")
                         }
                         if let bio = page.author?.description.map(Format.plainText), !bio.isEmpty {
-                            Text(bio).foregroundStyle(.secondary).lineLimit(6).accessibilityIdentifier("author-bio")
+                            TVReadableText(text: bio, identifier: "author-bio")
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -198,7 +198,7 @@ private struct SeriesScreen: View {
                     Text(page.series?.name ?? series.name).font(.system(size: 52, weight: .bold)).accessibilityIdentifier("series-name")
                     if let progress = progressSummary { Text(progress).font(.headline).accessibilityIdentifier("series-progress") }
                     if let description = page.series?.description.map(Format.plainText), !description.isEmpty {
-                        Text(description).foregroundStyle(.secondary).lineLimit(6).accessibilityIdentifier("series-description")
+                        TVReadableText(text: description, identifier: "series-description")
                     }
                 }
                 if let error = page.failure {

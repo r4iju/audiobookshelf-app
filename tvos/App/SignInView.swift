@@ -27,7 +27,7 @@ struct SignInView: View {
                 Image(systemName: "headphones").font(.system(size: 72)).foregroundStyle(.tint).accessibilityHidden(true)
                 Text(reauthenticating ? l10n("Sign in again") : l10n("Listen on the big screen")).font(.largeTitle.bold())
                     .fixedSize(horizontal: false, vertical: true)
-                Text(l10n("Connect directly to your Audiobookshelf server to stream audiobooks and podcasts."))
+                Text(l10n("Connect directly to your Audiobook Loft or compatible Audiobookshelf server to stream audiobooks and podcasts."))
                     .font(.title3).foregroundStyle(.secondary)
                 Text(Self.supportedSignIn(l10n)).font(.callout).foregroundStyle(.secondary)
                     .accessibilityIdentifier("sign-in-modes")

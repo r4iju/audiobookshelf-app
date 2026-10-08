@@ -1,0 +1,182 @@
+[
+  {
+    "label": "source",
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "source-clean",
+    "command": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "host",
+    "command": [
+      "sw_vers"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "architecture",
+    "command": [
+      "uname",
+      "-m"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "xcode-inventory",
+    "command": [
+      "find",
+      "/Applications",
+      "-maxdepth",
+      "1",
+      "-name",
+      "Xcode*.app",
+      "-print"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "xcode",
+    "command": [
+      "xcodebuild",
+      "-version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "swift",
+    "command": [
+      "xcrun",
+      "swiftc",
+      "--version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "sdk",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphonesimulator",
+      "--show-sdk-version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "xcodegen-version",
+    "command": [
+      "xcodegen",
+      "--version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "generate",
+    "command": [
+      "xcodegen",
+      "generate",
+      "--spec",
+      "apple/project.yml"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "settings-raw",
+    "command": [
+      "xcodebuild",
+      "-project",
+      "apple/AudiobookshelfNative.xcodeproj",
+      "-scheme",
+      "AudiobookshelfNative",
+      "-configuration",
+      "Debug",
+      "-sdk",
+      "iphonesimulator",
+      "-destination",
+      "generic/platform=iOS Simulator",
+      "-derivedDataPath",
+      "/Users/runner/work/_temp/ios14-build/build",
+      "CODE_SIGNING_ALLOWED=NO",
+      "IPHONEOS_DEPLOYMENT_TARGET=14.0",
+      "-showBuildSettings",
+      "-json"
+    ],
+    "exit": 0,
+    "stderrSeparate": true
+  },
+  {
+    "label": "original-minimum-build",
+    "command": [
+      "xcodebuild",
+      "-project",
+      "apple/AudiobookshelfNative.xcodeproj",
+      "-scheme",
+      "AudiobookshelfNative",
+      "-configuration",
+      "Debug",
+      "-sdk",
+      "iphonesimulator",
+      "-destination",
+      "generic/platform=iOS Simulator",
+      "-derivedDataPath",
+      "/Users/runner/work/_temp/ios14-build/build",
+      "CODE_SIGNING_ALLOWED=NO",
+      "IPHONEOS_DEPLOYMENT_TARGET=14.0",
+      "build"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "app-info",
+    "command": [
+      "plutil",
+      "-p",
+      "/Users/runner/work/_temp/ios14-build/build/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app/Info.plist"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "binary-minimum",
+    "command": [
+      "xcrun",
+      "vtool",
+      "-show-build",
+      "/Users/runner/work/_temp/ios14-build/build/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app/AudiobookshelfNative"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "signature-inspection",
+    "command": [
+      "codesign",
+      "-d",
+      "-vvv",
+      "/Users/runner/work/_temp/ios14-build/build/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  }
+]

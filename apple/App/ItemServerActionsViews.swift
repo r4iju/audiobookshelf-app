@@ -18,15 +18,22 @@ struct ItemServerActionsSection: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        Group {
+            if !actions.loaded, actions.error == nil { ProgressView().accessibilityLabel(l10n("Opening your books…")) }
             if actions.showsFeed {
                 Button { showingFeed = true } label: {
                     Label(l10n(actions.feed == nil ? "Open RSS feed" : "RSS feed"), systemImage: "dot.radiowaves.left.and.right")
                 }.accessibilityIdentifier("item-rss-feed")
+                    .sheet(isPresented: $showingFeed) { RSSFeedSheet(actions: actions, presented: $showingFeed).nativeLocalization() }
             }
             if actions.canSendEbook {
                 Button { choosingDevice = true } label: { Label(l10n("Send ebook to device"), systemImage: "paperplane") }
                     .disabled(actions.activity != nil).accessibilityIdentifier("send-ebook")
+                    .actionSheet(isPresented: $choosingDevice) {
+                        ActionSheet(title: Text(l10n("Select a device")), buttons: actions.devices.map { device in
+                            .default(Text(device.name)) { NativeHaptic.impact("send"); Task { await actions.send(to: device) } }
+                        } + [.cancel(Text(l10n("Cancel")))])
+                    }
             }
             if case .sending(let device)? = actions.activity {
                 ProgressView(l10n("Sending to {0}…", device))
@@ -51,12 +58,7 @@ struct ItemServerActionsSection: View {
             default: break
             }
         }
-        .sheet(isPresented: $showingFeed) { RSSFeedSheet(actions: actions, presented: $showingFeed).nativeLocalization() }
-        .actionSheet(isPresented: $choosingDevice) {
-            ActionSheet(title: Text(l10n("Select a device")), buttons: actions.devices.map { device in
-                .default(Text(device.name)) { NativeHaptic.impact("send"); Task { await actions.send(to: device) } }
-            } + [.cancel(Text(l10n("Cancel")))])
-        }
+
     }
 }
 

@@ -11,7 +11,9 @@ import XCTest
         guard book.exists else { return }
         book.tap()
         XCTAssertTrue(app.staticTexts["Narrated by QA Narrator"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Opening"].exists)
+        let chapter = app.staticTexts["Opening"]
+        for _ in 0..<5 where !chapter.exists { app.swipeUp() }
+        XCTAssertTrue(chapter.exists)
         app.navigationBars.buttons["Audiobooks"].tap()
         app.buttons["Show list"].tap()
         XCTAssertTrue(app.buttons["book-book-0"].exists)
@@ -26,7 +28,7 @@ import XCTest
         let app = XCUIApplication()
         XCTAssertTrue(app.staticTexts["This library is empty. Add titles on your server, then refresh."].waitForExistence(timeout: 5))
         try await FixtureControl.configure("baseline")
-        app.buttons["account"].tap()
+        app.buttons["Library actions"].tap()
         app.buttons["Refresh"].tap()
         XCTAssertTrue(app.buttons["book-book-0"].waitForExistence(timeout: 10))
     }
@@ -38,7 +40,7 @@ import XCTest
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs")
         // Reconfigure after relaunch so the request under test owns this failure.
         try await FixtureControl.configure("catalog-error")
-        app.buttons["account"].tap()
+        app.buttons["Library actions"].tap()
         app.buttons["Refresh"].tap()
         let retry = app.buttons["Try again"]
         XCTAssertTrue(retry.waitForExistence(timeout: 5))

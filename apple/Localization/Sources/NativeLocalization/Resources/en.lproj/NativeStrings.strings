@@ -2,11 +2,13 @@
 "+{0} this year" = "+{0} this year";
 "1 book" = "1 book";
 "1 episode" = "1 episode";
+"1 podcast" = "1 podcast";
 "1 title" = "1 title";
 "A downloaded file is missing. Retry to restore it; existing files are retained." = "A downloaded file is missing. Retry to restore it; existing files are retained.";
 "A migrated file changed while it was carried over. It was not used." = "A migrated file changed while it was carried over. It was not used.";
 "A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry." = "A secure TLS connection could not be established. Check the server's certificate chain, hostname and TLS configuration. If you use a homelab CA, confirm its profile and full trust in Settings, then retry.";
 "A short banner with your book counts." = "A short banner with your book counts.";
+"About" = "About";
 "About this book" = "About this book";
 "About this episode" = "About this episode";
 "About this podcast" = "About this podcast";
@@ -40,9 +42,11 @@
 "Ask" = "Ask";
 "Ask for the server restart first, restart the Audiobookshelf server, then confirm it." = "Ask for the server restart first, restart the Audiobookshelf server, then confirm it.";
 "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions." = "Ask requests permission for each new session or download. Never uses Wi-Fi only. Changing a choice pauses current streaming and resets download cellular permissions.";
+"Audio" = "Audio";
 "Audio could not be played. Check the server connection, then reopen this item to retry." = "Audio could not be played. Check the server connection, then reopen this item to retry.";
 "Audio could not be prepared at this position. Check the server connection and try again." = "Audio could not be prepared at this position. Check the server connection and try again.";
 "Audio volume: {0}%" = "Audio volume: {0}%";
+"Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project." = "Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.";
 "Audiobooks & reading" = "Audiobooks & reading";
 "Audiobookshelf server {0} in review" = "Audiobookshelf server {0} in review";
 "Author" = "Author";
@@ -52,6 +56,7 @@
 "Automatic" = "Automatic";
 "Automatically download new episodes" = "Automatically download new episodes";
 "Available files and unresolved records remain saved, including formats this app cannot open yet." = "Available files and unresolved records remain saved, including formats this app cannot open yet.";
+"Available media" = "Available media";
 "Available offline" = "Available offline";
 "Back {0} seconds" = "Back {0} seconds";
 "Backward interval" = "Backward interval";
@@ -59,6 +64,7 @@
 "Book progress" = "Book progress";
 "Book {0}" = "Book {0}";
 "Bookmarks" = "Bookmarks";
+"Books" = "Books";
 "Books, podcasts, authors, series…" = "Books, podcasts, authors, series…";
 "Browser sign-in was canceled. Your saved account is retained." = "Browser sign-in was canceled. Your saved account is retained.";
 "Buffering" = "Buffering";
@@ -73,7 +79,9 @@
 "Chapter track" = "Chapter track";
 "Chapters" = "Chapters";
 "Choose a library to get started." = "Choose a library to get started.";
+"Choose a title from your library to start listening." = "Choose a title from your library to start listening.";
 "Choose export" = "Choose export";
+"Choose library" = "Choose library";
 "Choose the complete export package or the folder containing archive.json. An unfinished export cannot be imported." = "Choose the complete export package or the folder containing archive.json. An unfinished export cannot be imported.";
 "Choose the feedback for playback controls and library actions." = "Choose the feedback for playback controls and library actions.";
 "Choose titles" = "Choose titles";
@@ -81,7 +89,6 @@
 "Clear" = "Clear";
 "Clear events" = "Clear events";
 "Clear events?" = "Clear events?";
-"Clear search" = "Clear search";
 "Close feed" = "Close feed";
 "Close playback" = "Close playback";
 "Close reader" = "Close reader";
@@ -92,8 +99,8 @@
 "Complete" = "Complete";
 "Confirm" = "Confirm";
 "Connect" = "Connect";
-"Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported." = "Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported.";
-"Connect directly to your Audiobookshelf server to stream audiobooks and podcasts." = "Connect directly to your Audiobookshelf server to stream audiobooks and podcasts.";
+"Connect directly to your Audiobook Loft or compatible Audiobookshelf server to stream audiobooks and podcasts." = "Connect directly to your Audiobook Loft or compatible Audiobookshelf server to stream audiobooks and podcasts.";
+"Connect directly to your Audiobook Loft or compatible Audiobookshelf server. Local HTTP and trusted HTTPS servers are supported." = "Connect directly to your Audiobook Loft or compatible Audiobookshelf server. Local HTTP and trusted HTTPS servers are supported.";
 "Connect to your library" = "Connect to your library";
 "Connecting" = "Connecting";
 "Connecting…" = "Connecting…";
@@ -104,16 +111,21 @@
 "Continue Series" = "Continue Series";
 "Continue listening" = "Continue listening";
 "Continuous" = "Continuous";
+"Continuous scrolling" = "Continuous scrolling";
 "Copied" = "Copied";
 "Copy feed URL" = "Copy feed URL";
 "Copy report" = "Copy report";
 "Could not start from the beginning: {0}" = "Could not start from the beginning: {0}";
 "Couldn't open this part of your library" = "Couldn't open this part of your library";
+"Couldn’t complete this action" = "Couldn’t complete this action";
 "Create podcast" = "Create podcast";
 "Creating image" = "Creating image";
+"Current account" = "Current account";
+"Current chapter" = "Current chapter";
 "Custom duration in seconds" = "Custom duration in seconds";
 "Custom owner email" = "Custom owner email";
 "Custom owner name" = "Custom owner name";
+"Custom speed" = "Custom speed";
 "Custom speed: {0}×" = "Custom speed: {0}×";
 "Date added" = "Date added";
 "Date finished" = "Date finished";
@@ -134,6 +146,7 @@
 "Discover" = "Discover";
 "Discover a podcast" = "Discover a podcast";
 "Dismiss" = "Dismiss";
+"Display" = "Display";
 "Done" = "Done";
 "Done choosing" = "Done choosing";
 "Download for offline" = "Download for offline";
@@ -145,6 +158,7 @@
 "Downloads could not be restored: {0}" = "Downloads could not be restored: {0}";
 "Downloads could not restore network permissions: {0}" = "Downloads could not restore network permissions: {0}";
 "Duration" = "Duration";
+"Duration unavailable" = "Duration unavailable";
 "Ebook sent to {0}" = "Ebook sent to {0}";
 "Ebooks" = "Ebooks";
 "Edit" = "Edit";
@@ -157,8 +171,11 @@
 "Enter a complete HTTP or HTTPS RSS feed URL." = "Enter a complete HTTP or HTTPS RSS feed URL.";
 "Enter a podcast title that can name a folder on your server." = "Enter a podcast title that can name a folder on your server.";
 "Enter an http:// or https:// server address, without credentials, a query, or a fragment." = "Enter an http:// or https:// server address, without credentials, a query, or a fragment.";
+"Episode list" = "Episode list";
 "Episode number" = "Episode number";
+"Episode progress" = "Episode progress";
 "Episodes" = "Episodes";
+"Episodes downloaded on your server appear in this library. Device downloads are managed in Downloads." = "Episodes downloaded on your server appear in this library. Device downloads are managed in Downloads.";
 "Events stay on this device. Passwords, tokens and address credentials are removed before they are saved." = "Events stay on this device. Passwords, tokens and address credentials are removed before they are saved.";
 "Every playable title in this group is finished." = "Every playable title in this group is finished.";
 "Explicit content" = "Explicit content";
@@ -177,7 +194,6 @@
 "Filter library" = "Filter library";
 "Filter: {0}" = "Filter: {0}";
 "Filters" = "Filters";
-"Find your next chapter." = "Find your next chapter.";
 "Find your next listen." = "Find your next listen.";
 "Finished" = "Finished";
 "Font" = "Font";
@@ -187,6 +203,7 @@
 "Format" = "Format";
 "Forward interval" = "Forward interval";
 "Forward {0} seconds" = "Forward {0} seconds";
+"From your library" = "From your library";
 "Genre" = "Genre";
 "Genres" = "Genres";
 "Go to page" = "Go to page";
@@ -195,7 +212,6 @@
 "Has ebook" = "Has ebook";
 "Has supplementary ebook" = "Has supplementary ebook";
 "Highlights" = "Highlights";
-"Home" = "Home";
 "Idle" = "Idle";
 "Import data" = "Import data";
 "Import needs {0}; {1} is available. Free space and retry." = "Import needs {0}; {1} is available. Free space and retry.";
@@ -213,9 +229,12 @@
 "Language" = "Language";
 "Languages" = "Languages";
 "Library" = "Library";
+"Library actions" = "Library actions";
+"License" = "License";
 "Line spacing" = "Line spacing";
 "Line spacing {0}%" = "Line spacing {0}%";
 "Listen Again" = "Listen Again";
+"Listen Now" = "Listen Now";
 "Listen on the big screen" = "Listen on the big screen";
 "Listening" = "Listening";
 "Listening could not be saved on this device: {0}" = "Listening could not be saved on this device: {0}";
@@ -227,6 +246,7 @@
 "Loading details…" = "Loading details…";
 "Loading episode…" = "Loading episode…";
 "Loading your library…" = "Loading your library…";
+"Loading…" = "Loading…";
 "Lock player" = "Lock player";
 "Longest audiobook finished" = "Longest audiobook finished";
 "Longest book finished" = "Longest book finished";
@@ -243,12 +263,14 @@
 "Monospace" = "Monospace";
 "More titles" = "More titles";
 "Most listened month" = "Most listened month";
+"Move up" = "Move up";
 "Move {0} up" = "Move {0} up";
 "My {0} in Audiobookshelf" = "My {0} in Audiobookshelf";
 "Name" = "Name";
 "Narrated by {0}" = "Narrated by {0}";
 "Narrator" = "Narrator";
 "Narrators" = "Narrators";
+"Navigation" = "Navigation";
 "Needs attention" = "Needs attention";
 "Network preferences" = "Network preferences";
 "Never" = "Never";
@@ -264,6 +286,7 @@
 "No audio enclosure" = "No audio enclosure";
 "No bookmarks yet" = "No bookmarks yet";
 "No collections yet." = "No collections yet.";
+"No downloads yet" = "No downloads yet";
 "No episodes found" = "No episodes found";
 "No episodes have been downloaded to the server yet." = "No episodes have been downloaded to the server yet.";
 "No feed episodes found" = "No feed episodes found";
@@ -287,14 +310,17 @@
 "Nothing to continue yet. Choose a library above to start listening." = "Nothing to continue yet. Choose a library above to start listening.";
 "Now Playing" = "Now Playing";
 "Now listening" = "Now listening";
-"Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "Now restart the Audiobookshelf server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here.";
+"Now restart your server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here." = "Now restart your server. Only a restart after you chose Start server restart counts. When the server is running again, confirm it here.";
 "Number of episodes" = "Number of episodes";
 "Off" = "Off";
+"Offline listening" = "Offline listening";
 "Oldest first" = "Oldest first";
 "Open RSS feed" = "Open RSS feed";
 "Open RSS feeds" = "Open RSS feeds";
 "Open downloads" = "Open downloads";
 "Open feed" = "Open feed";
+"Open source under GPLv3, with applicable third-party licenses retained." = "Open source under GPLv3, with applicable third-party licenses retained.";
+"Open source under GPLv3, with applicable third-party licenses retained. Source and notices: https://github.com/r4iju/audiobookshelf-app/releases" = "Open source under GPLv3, with applicable third-party licenses retained. Source and notices: https://github.com/r4iju/audiobookshelf-app/releases";
 "OpenID sign-in is not enabled on this server. Use your username and password." = "OpenID sign-in is not enabled on this server. Use your username and password.";
 "Opening EPUB…" = "Opening EPUB…";
 "Opening PDF…" = "Opening PDF…";
@@ -310,6 +336,7 @@
 "Opening your year…" = "Opening your year…";
 "Opens the share sheet with this image and a text summary." = "Opens the share sheet with this image and a text summary.";
 "Page" = "Page";
+"Page actions" = "Page actions";
 "Page saved on this device. Sync follows when listening closes." = "Page saved on this device. Sync follows when listening closes.";
 "Page {0} of {1}" = "Page {0} of {1}";
 "Passage saved on this device. Sync follows when listening closes." = "Passage saved on this device. Sync follows when listening closes.";
@@ -325,7 +352,9 @@
 "Play offline" = "Play offline";
 "Play playlist" = "Play playlist";
 "Playback" = "Playback";
+"Playback controls" = "Playback controls";
 "Playback could not be restarted: {0}" = "Playback could not be restarted: {0}";
+"Playback preferences" = "Playback preferences";
 "Playback progress could not be saved: {0}" = "Playback progress could not be saved: {0}";
 "Playback settings" = "Playback settings";
 "Playback speed" = "Playback speed";
@@ -346,6 +375,7 @@
 "Previous year" = "Previous year";
 "Progress" = "Progress";
 "Progress can be discarded once playback and listening sync finish. Try again." = "Progress can be discarded once playback and listening sync finish. Try again.";
+"Progress display" = "Progress display";
 "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Ask for a restart here, restart the Audiobookshelf server, confirm it, then discard again." = "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back after it is discarded. Ask for a restart here, restart the Audiobookshelf server, confirm it, then discard again.";
 "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart." = "Progress was kept. An earlier save of this title's progress got no answer, and the server may still apply it, which would bring the progress back. Try again to be guided through a server restart.";
 "Published date" = "Published date";
@@ -361,6 +391,7 @@
 "Reading could not be saved on this device: {0}" = "Reading could not be saved on this device: {0}";
 "Reading could not be saved: {0}" = "Reading could not be saved: {0}";
 "Reading is saved on this device and waiting to sync: {0}" = "Reading is saved on this device and waiting to sync: {0}";
+"Reading preferences" = "Reading preferences";
 "Reading settings" = "Reading settings";
 "Ready" = "Ready";
 "Ready to import" = "Ready to import";
@@ -370,6 +401,7 @@
 "Recently added" = "Recently added";
 "Refresh" = "Refresh";
 "Refresh downloads" = "Refresh downloads";
+"Remove" = "Remove";
 "Remove download" = "Remove download";
 "Remove {0}" = "Remove {0}";
 "Repair and retry import" = "Repair and retry import";
@@ -377,10 +409,10 @@
 "Report" = "Report";
 "Reset timer" = "Reset timer";
 "Restart playback" = "Restart playback";
-"Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Restart the Audiobookshelf server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.";
 "Restart the server" = "Restart the server";
 "Restart the server now" = "Restart the server now";
-"Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server." = "Restarting the Audiobookshelf server ends an unanswered save. Choose Start server restart first, then restart the server.";
+"Restart your server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it." = "Restart your server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.";
+"Restarting your server ends an unanswered save. Choose Start server restart first, then restart the server." = "Restarting your server ends an unanswered save. Choose Start server restart first, then restart the server.";
 "Restarting…" = "Restarting…";
 "Resume" = "Resume";
 "Resume listening" = "Resume listening";
@@ -407,13 +439,14 @@
 "Saved listening data could not be read or updated. Keep the app's data for recovery and try again." = "Saved listening data could not be read or updated. Keep the app's data for recovery and try again.";
 "Saved listening is waiting to sync: {0}" = "Saved listening is waiting to sync: {0}";
 "Saved listening storage is full. Connect to the server to save pending listening before continuing." = "Saved listening storage is full. Connect to the server to save pending listening before continuing.";
+"Saved on this device" = "Saved on this device";
 "Saved reading could not be restored: {0}" = "Saved reading could not be restored: {0}";
 "Saves waiting" = "Saves waiting";
 "Saving changes…" = "Saving changes…";
 "Saving your progress…" = "Saving your progress…";
 "Scale elapsed time by speed" = "Scale elapsed time by speed";
 "Search" = "Search";
-"Search library" = "Search library";
+"Search all your libraries." = "Search all your libraries.";
 "Search podcasts" = "Search podcasts";
 "Searching your library…" = "Searching your library…";
 "Searching…" = "Searching…";
@@ -423,6 +456,7 @@
 "Select a device" = "Select a device";
 "Select fewer feed episodes and try again. The server accepts requests smaller than 5 MB." = "Select fewer feed episodes and try again. The server accepts requests smaller than 5 MB.";
 "Selected" = "Selected";
+"Selected episodes are downloaded to your server. Save them from your library to listen offline on this device." = "Selected episodes are downloaded to your server. Save them from your library to listen offline on this device.";
 "Send ebook to device" = "Send ebook to device";
 "Send saved listening now" = "Send saved listening now";
 "Sending to {0}…" = "Sending to {0}…";
@@ -432,6 +466,7 @@
 "Server" = "Server";
 "Server address" = "Server address";
 "Server download requests could not be restored. The original data is retained. {0}" = "Server download requests could not be restored. The original data is retained. {0}";
+"Server downloads" = "Server downloads";
 "Server folder" = "Server folder";
 "Server restarted" = "Server restarted";
 "Server totals with covers of books added this year." = "Server totals with covers of books added this year.";
@@ -479,6 +514,7 @@
 "Sort episodes" = "Sort episodes";
 "Sort library" = "Sort library";
 "Sort: {0}" = "Sort: {0}";
+"Source and license notices" = "Source and license notices";
 "Speed" = "Speed";
 "Speed {0}" = "Speed {0}";
 "Spread" = "Spread";
@@ -551,6 +587,7 @@
 "The slug had to be modified. Check it, then open the feed again." = "The slug had to be modified. Check it, then open the feed again.";
 "The username or password was not accepted." = "The username or password was not accepted.";
 "Theme" = "Theme";
+"Theme and feedback" = "Theme and feedback";
 "There is not enough storage on this device for this download. Free up space, then retry." = "There is not enough storage on this device for this download. Free up space, then retry.";
 "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address." = "This Apple TV does not trust the server’s HTTPS certificate. Install and trust your certificate authority profile on the TV, or use the server’s local HTTP address.";
 "This EPUB could not be opened: {0}" = "This EPUB could not be opened: {0}";
@@ -589,6 +626,7 @@
 "Try again" = "Try again";
 "Turn off sleep timer" = "Turn off sleep timer";
 "Two pages" = "Two pages";
+"Typography" = "Typography";
 "Unable to save the server login in Keychain ({0})." = "Unable to save the server login in Keychain ({0}).";
 "Unavailable title" = "Unavailable title";
 "Unknown author" = "Unknown author";
@@ -598,6 +636,7 @@
 "Up to {0} of additional space" = "Up to {0} of additional space";
 "Use cellular data?" = "Use cellular data?";
 "Username" = "Username";
+"Utilities" = "Utilities";
 "Version" = "Version";
 "Volume buttons" = "Volume buttons";
 "Volume navigation while listening" = "Volume navigation while listening";
@@ -611,6 +650,7 @@
 "Your books. Your server.\nListen wherever the day takes you." = "Your books. Your server.\nListen wherever the day takes you.";
 "Your libraries" = "Your libraries";
 "Your listening" = "Your listening";
+"Your next listen" = "Your next listen";
 "Your previous app and its original files stay available." = "Your previous app and its original files stay available.";
 "Your saved progress will change when this book is marked finished." = "Your saved progress will change when this book is marked finished.";
 "Your session expired. Please sign in again." = "Your session expired. Please sign in again.";
@@ -638,6 +678,7 @@
 "minute listening" = "minute listening";
 "minutes" = "minutes";
 "minutes listening" = "minutes listening";
+"sec" = "sec";
 "session" = "session";
 "sessions" = "sessions";
 "supplementary PDF" = "supplementary PDF";

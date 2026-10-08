@@ -1,0 +1,402 @@
+{
+  "runtime_source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+  "bundle_resources": "builds.json; products and installed bundles strictly verify, all47filehashes match",
+  "devices": {
+    "phone": {
+      "udid": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+      "name": "PooliPhone1",
+      "runtime": "iOS27.0",
+      "bounds": "402x874pt"
+    },
+    "ipad": {
+      "udid": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+      "name": "PooliPad1",
+      "runtime": "iOS27.0",
+      "bounds": "1210x834pt landscape"
+    }
+  },
+  "screens": [
+    {
+      "file": "ipad-author-covers.png",
+      "sha256": "a87326d4427ea831376328577a8d580c1ec1aaa8d7272920e167fc9bc7040c00",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T04:01:18.962751+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "ipad-catalog-covers.png",
+      "sha256": "5f7659893491fdd0255884ae0b99abc4fa59c1bea0ea9e0ea6267faa7a292973",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T03:59:49.615377+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "ipad-catalog-list-long-missing-art.png",
+      "sha256": "7e21895bfb0c37269793e336ede0dfc7519287d162b1397f6182bd8ce4558d4d",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T04:14:11.332999+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "edge-metadata + capture-only valid-long-metadata override (20s, no artwork)"
+    },
+    {
+      "file": "ipad-catalog-list.png",
+      "sha256": "59471d7a825dc3d73a0cf6d20aadd66cc93da397c8b454813f5f97bbf0cb9fa6",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T03:59:32.774346+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "ipad-detail-covers.png",
+      "sha256": "5f0ac716c771d3a1ec03574d7ae685c6683af070bf144b3456745a35c7528f59",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T04:00:21.051876+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "ipad-detail-long-missing-art.png",
+      "sha256": "b39141a3386964859f3d3f324a7121a2e5396891e1dc0404c59b47f0b9165753",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T04:14:17.422729+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "edge-metadata + capture-only valid-long-metadata override (20s, no artwork)"
+    },
+    {
+      "file": "ipad-search-inactive.png",
+      "sha256": "8060caae88632650065142786de4d217ec31f225faf393c3a5359d3927d3f809",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T04:04:31.654755+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "ipad-search-keyboard.png",
+      "sha256": "08a38c77b5969d2f0faf0beb67080a9c4eff2daf06ec5f310cda2f65cae03e8e",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T04:02:23.295154+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "ipad-search-results.png",
+      "sha256": "cec0942e30bde2d907b4cab1c3b116a943c5985f121853bc8fe26ae08a148e0b",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T04:09:29.204933+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "ipad-series-order-covers.png",
+      "sha256": "40c20f02b783a88de004a3053dadc58041966f02c9277d1f77fd97b779e0df0b",
+      "pixels": [
+        1210,
+        834
+      ],
+      "captured_at_utc": "2026-10-08T04:01:23.679283+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "ipad",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-author-covers.png",
+      "sha256": "39ecedb56ae354efd6e946345bb14ebea9070c40fc99f5d31ae760862560ba6d",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:08:24.115327+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-catalog-covers.png",
+      "sha256": "59de534cba94cd50553bc63bf106b1d6cea071382adae37a531f04c704291ae2",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:06:56.981186+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-catalog-empty.png",
+      "sha256": "802f356ee36bd01f6dd3b36b056812489c20805f108e560138a4bf2a7895b9bd",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:11:54.569904+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "empty"
+    },
+    {
+      "file": "phone-catalog-failure.png",
+      "sha256": "dcde6259abd245f206e5799a141fb688a1b7e6c6cfff404bd2c93e08864ca05d",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:11:58.907409+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "catalog-error (503); Retry manually restored catalog"
+    },
+    {
+      "file": "phone-catalog-list-long-missing-art.png",
+      "sha256": "fef3e43ac34dbe4f8550a7db0e00db09bb3b1e0b34662b8ccea952a8511dd37d",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:14:01.124771+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "edge-metadata + capture-only valid-long-metadata override (20s, no artwork)"
+    },
+    {
+      "file": "phone-catalog-loading.png",
+      "sha256": "7606dfb46ffef2d49befb289e71350cf79fa8bfee40029d812c44f47799c7c3e",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:11:31.332011+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline + capture-only8s catalog delay"
+    },
+    {
+      "file": "phone-detail-covers.png",
+      "sha256": "b331c253891c338174eec0e7e2dd73e4d3a96e25dec499b2ca0ab728241a79db",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:07:57.957230+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-detail-long-missing-art.png",
+      "sha256": "d19011322b4d0180ac0a09c25619583c73cde019aff0b90d3c12e1680d931714",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:14:05.613147+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "edge-metadata + capture-only valid-long-metadata override (20s, no artwork)"
+    },
+    {
+      "file": "phone-detail-related-chapters.png",
+      "sha256": "5bc3c0630fe60069c96713c388dc29dcdb57c08efccd8b1d40e58e0cd73634e5",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:08:05.797675+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-episode-detail-covers.png",
+      "sha256": "2c8700030b42737174a1a1005f9e4376eabb2e071f9339b2310752b473db873c",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:15:40.421584+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline, selected Podcasts; seeded portrait cover retained from large-cover-art"
+    },
+    {
+      "file": "phone-filter-list.png",
+      "sha256": "4276b12de10bbad419ecaadc3c9faa1ad3a752afecfde71e4f6325b0249c6f91",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:07:13.713353+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-podcast-detail-covers.png",
+      "sha256": "ecbd469dfd6be5e16a265efe2b30df20e2d14273c7807e7b0c7b4aa337cb96af",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:15:19.594981+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline, selected Podcasts; seeded portrait cover retained from large-cover-art"
+    },
+    {
+      "file": "phone-search-cleared.png",
+      "sha256": "ac48501bd6683aab2265ef451af42bf1f6536eb700afae86f02b13c4669ae799",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:09:32.975477+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-search-dismissed-restored-library.png",
+      "sha256": "a9115c6f6f8a56820d4cb994461c9a8b2eb9aba6ccda9f6dbe3f5accdc4a82aa",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:09:37.806550+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-search-failure.png",
+      "sha256": "bbbf126b5ddfbcabc3865e947eec71ceaddd15f91033d23646c4fa24a31a9e9d",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:16:19.550795+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline + capture-only search503, selected Podcasts"
+    },
+    {
+      "file": "phone-search-no-results.png",
+      "sha256": "43b166af2ef9ca42488a2db4027a4846a599021aa397060988fe9f2823936df8",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:13:07.068427+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline, selected Audiobooks; query zzzzz"
+    },
+    {
+      "file": "phone-search-podcast-results.png",
+      "sha256": "969daaa6c8c9136075609349eed92a21ac6a2e133698eb361c9c50ffe69ee6dc",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:16:22.150003+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline, selected Podcasts; retry of Evening after disabling503"
+    },
+    {
+      "file": "phone-search-results-keyboard.png",
+      "sha256": "b9715f7912b8cc24b282b7e62a73293d12fa1b640c931f449be765df45b51ae1",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:08:49.212550+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-search-submitted.png",
+      "sha256": "b278471229093aaf7525ed9d497cdb36d80db049b5dd97af12990cc9dc39c423",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:08:52.562851+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-series-order-covers.png",
+      "sha256": "ca8d1cb585eef4348f7453ce1d23b0ef3a9fdc13d25be310afcb0b9eff2934ce",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:08:28.422546+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    },
+    {
+      "file": "phone-sort-menu.png",
+      "sha256": "b78618952389316adf586fb299da1afdf8d24e623443f223e7d77688ba86380e",
+      "pixels": [
+        402,
+        874
+      ],
+      "captured_at_utc": "2026-10-08T04:06:59.862919+00:00",
+      "source": "b7038ddcdaf2adfeeae2fac6294cdb3ec1729083",
+      "device": "phone",
+      "fixture": "baseline then large-cover-art, synthetic square/portrait covers and6s/30% book progress"
+    }
+  ],
+  "synthetic_cover_files": {
+    "1.jpg": "752fcef83d10bb6bd2556faf41205f8e02b36492f6a19be93f6bc12ed110076c",
+    "0.jpg": "44fe81f8efeb2d26cb2fd98458cc6ccd538e5ed70ac355a44d0ac12649357a1a"
+  },
+  "capture_fixture_sha256": "0144b27bf9aed41fb39b0cf964b225e459349bc80f2d2b20afa5bb10b05b5632",
+  "query_notes": {
+    "ipad-search-results.png": "Actual query S; agent-device fill requested Stories but returned TEXT_ENTRY_MISMATCH. Image reflects actual field/results; no full tablet typing workflow claim.",
+    "ipad-search-keyboard.png": "Actual query qa, software keyboard, author result.",
+    "phone-search-dismissed-restored-library.png": "Native Close restored open Library series; not inactive Search."
+  }
+}

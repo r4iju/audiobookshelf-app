@@ -177,6 +177,9 @@ final class RecoveryJourney: TVJourney {
         let confirm = app.buttons["confirm-server-restarted"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["restart-instructions"].exists)
+        for _ in 0..<10 where !hasFocus(confirm) {
+            try await Task.sleep(nanoseconds: 500_000_000)
+        }
         XCTAssertTrue(hasFocus(confirm), "Focus moves to the next step")
         capture("publications-restart-requested")
 

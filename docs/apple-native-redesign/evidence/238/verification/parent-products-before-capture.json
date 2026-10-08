@@ -1,0 +1,24 @@
+[
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv",
+    "scope": "product",
+    "path": "/tmp/native238-final-17869645/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv",
+    "scope": "installed-recorded",
+    "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/036C37CC-A2DE-47A7-8060-F21308A693D7/AudiobookshelfTV.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  }
+]

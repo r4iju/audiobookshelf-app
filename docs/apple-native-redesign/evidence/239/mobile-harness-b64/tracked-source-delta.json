@@ -1,0 +1,18 @@
+{
+  "apple/AudiobookshelfNative.xcodeproj/project.pbxproj": {
+    "original": "9ac8736cdabd929208c596149aeffd463c7cd343685229b4e98432dc46891c94",
+    "private": "19574cf00734da70f900213339a4e376ce5b511bce331ca5a409b0c9f322eecd"
+  },
+  "apple/AudiobookshelfNative.xcodeproj/xcshareddata/xcschemes/AudiobookshelfNative.xcscheme": {
+    "original": "2b54aac17b192db3da9f02f9e8569d229cffcc653e082c391d75dae666dce2af",
+    "private": "6ae4b97c03638b3600648cafe56224fac14c0e041bb7835ae2d4f6b4fa7068ea"
+  },
+  "apple/AudiobookshelfNative.xcodeproj/xcshareddata/xcschemes/NativeTests.xcscheme": {
+    "original": "5f5f00d5c399537e159abebfb33f1f61f4be3b6e8aac42d214fd0bb55754b15c",
+    "private": "510d0bf3db23fcb7ad42af7386dfc0b383ab9038f9a533ae9cbb5a8373f70581"
+  },
+  "apple/UITests/NativeJourney.swift": {
+    "original": "00854f2c462bf507c79cdf897eae29a1c4b886e57294ce8c59384dd58285e000",
+    "private": "fe596ac97a9375d427e0d5d63f3a4a270721ef3dcce7fb77d6d2d0afb51c1508"
+  }
+}

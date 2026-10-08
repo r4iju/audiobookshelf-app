@@ -1,0 +1,23 @@
+[
+  {
+    "file": "settings-playback.wav",
+    "sha256": "4ee7ffad07ca0dc0a3ed98259c847847d55e2eb61594b775fb83af1b311977c6",
+    "local_machine_transcript": "VoiceOver on. Audio playback preferences. Heading.",
+    "scope": "Settings heading; Chapter Track switch on; Done button only as clip-specific utterances",
+    "limitation": "No human listening; failed targets establish no player values, selected speed, disabled controls or reader traversal; VO Off utterance separate"
+  },
+  {
+    "file": "player-progress.wav",
+    "sha256": "101838f3e3238e342934a07536b858aaab4bdfe64df44273425b047d9ebdefff",
+    "local_machine_transcript": "on audiobook loft done button",
+    "scope": "Settings heading; Chapter Track switch on; Done button only as clip-specific utterances",
+    "limitation": "No human listening; failed targets establish no player values, selected speed, disabled controls or reader traversal; VO Off utterance separate"
+  },
+  {
+    "file": "preferences-values.wav",
+    "sha256": "206482691513e59b29ef163ce0c381b93a12eede73a0450e4e1b7db55b86d1ff",
+    "local_machine_transcript": "Chapter Track, switch button, on.\nVoice over off.",
+    "scope": "Settings heading; Chapter Track switch on; Done button only as clip-specific utterances",
+    "limitation": "No human listening; failed targets establish no player values, selected speed, disabled controls or reader traversal; VO Off utterance separate"
+  }
+]

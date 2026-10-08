@@ -46,12 +46,10 @@ struct NowPlayingView: View {
                     } else if player.sleepChapterEnd != nil {
                         Label(l10n("Sleep at end of chapter"), systemImage: "moon.zzz").foregroundStyle(.secondary)
                     }
+                    transport.padding(.top, 20).focusSection()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            transport
-                .frame(maxWidth: .infinity)
-                .focusSection()
             options
                 .frame(maxWidth: .infinity)
                 .focusSection()
@@ -130,6 +128,7 @@ struct NowPlayingView: View {
                 .disabled(chapter.map { $0.index + 1 >= $0.count } ?? true)
         }
         .font(.title2)
+        .buttonStyle(.bordered)
         .disabled(busy)
     }
 

@@ -1,0 +1,30 @@
+[
+  {
+    "scheme": "AudiobookshelfNative",
+    "file": "/tmp/native-capture-off-effective-5c4-20261009/source/apple/AudiobookshelfNative.xcodeproj/xcshareddata/xcschemes/AudiobookshelfNative.xcscheme",
+    "systemAttachmentLifetime": "keepNever",
+    "testPlanReferences": 0,
+    "targets": [
+      "NativeJourneyTests"
+    ]
+  },
+  {
+    "scheme": "NativeTests",
+    "file": "/tmp/native-capture-off-effective-5c4-20261009/source/apple/AudiobookshelfNative.xcodeproj/xcshareddata/xcschemes/NativeTests.xcscheme",
+    "systemAttachmentLifetime": "keepNever",
+    "testPlanReferences": 0,
+    "targets": [
+      "NativeTests"
+    ]
+  },
+  {
+    "scheme": "AudiobookshelfTV",
+    "file": "/tmp/native-capture-off-effective-5c4-20261009/source/tvos/AudiobookshelfTV.xcodeproj/xcshareddata/xcschemes/AudiobookshelfTV.xcscheme",
+    "systemAttachmentLifetime": "keepNever",
+    "testPlanReferences": 0,
+    "targets": [
+      "TVAppTests",
+      "TVJourneyTests"
+    ]
+  }
+]

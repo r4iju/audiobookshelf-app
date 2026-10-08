@@ -1,0 +1,76 @@
+{
+  "source": "3137385eecf195348d00c871f24cc54dfc6c858e",
+  "run": 37802421109,
+  "scope": "Original actual stockTV17 selected seven; incomplete xcresult finalizer; not final-source acceptance",
+  "cases": [
+    {
+      "suite": "CatalogJourney",
+      "test": "testContinueListeningOpensDetailsAndBackRestoresFocus",
+      "status": "passed",
+      "seconds": 71.204
+    },
+    {
+      "suite": "CatalogJourney",
+      "test": "testServerSearchFindsTitlesOutsideLoadedPage",
+      "status": "passed",
+      "seconds": 58.392
+    },
+    {
+      "suite": "PlaybackJourney",
+      "test": "testResumeShowsChapterAndTotalProgressAndRemoteToggles",
+      "status": "passed",
+      "seconds": 56.544
+    },
+    {
+      "suite": "ReadinessJourney",
+      "test": "testMainScreensPassTheAccessibilityAudit",
+      "status": "passed",
+      "seconds": 86.725
+    },
+    {
+      "suite": "RecoveryJourney",
+      "test": "testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying",
+      "status": "passed",
+      "seconds": 89.334
+    },
+    {
+      "suite": "RelatedJourney",
+      "test": "testBookDetailsLeadToItsSeriesAndAuthor",
+      "status": "failed",
+      "seconds": 52.168
+    },
+    {
+      "suite": "ShellJourney",
+      "test": "testManyLibrariesKeepTheShellBoundedAndRemainSelectable",
+      "status": "failed",
+      "seconds": 132.701
+    }
+  ],
+  "originalFiles": {
+    "representative-journeys.log": {
+      "sha256": "caec30f169da973d5948f98dc7499ac01b06eadbac14c573fbe627ab809314af",
+      "bytes": 1299773
+    },
+    "representative-journeys.stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "original-results.zip": {
+      "sha256": "052f5868a3b5e21fab037a695ae2d15f83291d490ab3dbff64e108c49aba4061",
+      "bytes": 35525858
+    },
+    "source.log": {
+      "sha256": "7200552ac6e8c1bcabf31d5d8db6b8bb2c9b4465414c48ed67a1c161154a7989",
+      "bytes": 41
+    },
+    "signing-AudiobookshelfTV-strict.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "retainedAXObservation": {
+    "Related": "Series remains after Menu",
+    "Shell": "Archive10 grid remains after Select; item-book-60 focused"
+  },
+  "capturePolicy": "No new captures; original automatically retained failure data decoded only"
+}

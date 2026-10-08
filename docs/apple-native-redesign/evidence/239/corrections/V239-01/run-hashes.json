@@ -1,0 +1,44 @@
+[
+  {
+    "log": "/tmp/native239-download-label-red.log",
+    "sha256": "61e770004414da3f180f702ec5954685822dc0f16833f2c1682ac8e6e9fcc9a0",
+    "result": "PASS",
+    "notes": "Earlier diagnostic/setup history retained, exact valid regression red is partial-red-2; corrected green-2 and original-offline are acceptance scopes"
+  },
+  {
+    "log": "/tmp/native239-download-label-word-red.log",
+    "sha256": "72f205d82dfbc93e8711323c75bd1fa8477abcfa425e407754d29aa8ba1cc7b8",
+    "result": "PASS",
+    "notes": "Earlier diagnostic/setup history retained, exact valid regression red is partial-red-2; corrected green-2 and original-offline are acceptance scopes"
+  },
+  {
+    "log": "/tmp/native239-download-label-partial-red.log",
+    "sha256": "d712e9215aea06305ecda9af80ab912fe707a7dd49a10acd6daf3bbb0856bf6d",
+    "result": "FAIL",
+    "notes": "Earlier diagnostic/setup history retained, exact valid regression red is partial-red-2; corrected green-2 and original-offline are acceptance scopes"
+  },
+  {
+    "log": "/tmp/native239-download-label-partial-red-2.log",
+    "sha256": "d0613035be8ee0d055e85549cd8987b7688591c4425ef4cc28eeb9dd335b3c62",
+    "result": "FAIL",
+    "notes": "Earlier diagnostic/setup history retained, exact valid regression red is partial-red-2; corrected green-2 and original-offline are acceptance scopes"
+  },
+  {
+    "log": "/tmp/native239-download-label-f922-green.log",
+    "sha256": "17fbf628d9b829f4ee70aba25d9efbe65c8dd2956baf2ad18148f7697ba6069f",
+    "result": "FAIL",
+    "notes": "Earlier diagnostic/setup history retained, exact valid regression red is partial-red-2; corrected green-2 and original-offline are acceptance scopes"
+  },
+  {
+    "log": "/tmp/native239-download-label-f922-green-2.log",
+    "sha256": "11613e6e662152988f599ec7028666eb7ca54145d97621ae025af792a1b42e61",
+    "result": "PASS",
+    "notes": "Earlier diagnostic/setup history retained, exact valid regression red is partial-red-2; corrected green-2 and original-offline are acceptance scopes"
+  },
+  {
+    "log": "/tmp/native239-download-label-f922-original-offline.log",
+    "sha256": "d03402791ccd7b3e9e04abbb292ef5dee1c077aa9273f9d40409ad2c27c1816a",
+    "result": "PASS",
+    "notes": "Earlier diagnostic/setup history retained, exact valid regression red is partial-red-2; corrected green-2 and original-offline are acceptance scopes"
+  }
+]

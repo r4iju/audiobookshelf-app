@@ -1,0 +1,59 @@
+[
+  {
+    "test": "ReadinessJourney/testMainScreensPassTheAccessibilityAudit()",
+    "hasMediaAttachments": false,
+    "keys": [
+      "devices",
+      "duration",
+      "durationInSeconds",
+      "hasMediaAttachments",
+      "hasPerformanceMetrics",
+      "startTime",
+      "testDescription",
+      "testIdentifier",
+      "testIdentifierURL",
+      "testName",
+      "testPlanConfigurations",
+      "testResult",
+      "testRuns"
+    ]
+  },
+  {
+    "test": "RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor()",
+    "hasMediaAttachments": false,
+    "keys": [
+      "devices",
+      "duration",
+      "durationInSeconds",
+      "hasMediaAttachments",
+      "hasPerformanceMetrics",
+      "startTime",
+      "testDescription",
+      "testIdentifier",
+      "testIdentifierURL",
+      "testName",
+      "testPlanConfigurations",
+      "testResult",
+      "testRuns"
+    ]
+  },
+  {
+    "test": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "hasMediaAttachments": false,
+    "keys": [
+      "devices",
+      "duration",
+      "durationInSeconds",
+      "hasMediaAttachments",
+      "hasPerformanceMetrics",
+      "startTime",
+      "testDescription",
+      "testIdentifier",
+      "testIdentifierURL",
+      "testName",
+      "testPlanConfigurations",
+      "testResult",
+      "testRuns"
+    ]
+  }
+]
