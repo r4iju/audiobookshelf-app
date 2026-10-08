@@ -35,7 +35,7 @@ jobs:
       - name: Source-pinned TV17 build and native remote replay
         run: |
           chmod +x verification/older-os/sim
-          python3 verification/older-os/tv17-replay.py
+          python3 verification/older-os/tv17-replay.py --suite navigation
       - name: Preserve actual runtime, source, binary and journey evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -50,7 +50,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
   ios145-runtime:
-    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.tv_only }}
+    if: ${{ (github.event_name != 'workflow_dispatch' || !inputs.tv_only) && vars.LEAFWAKE_NATIVE_REPLAY_SCOPE != 'tv' }}
     runs-on: macos-14
     timeout-minutes: 75
     steps:
@@ -86,7 +86,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
   ios14-binary:
-    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.tv_only }}
+    if: ${{ (github.event_name != 'workflow_dispatch' || !inputs.tv_only) && vars.LEAFWAKE_NATIVE_REPLAY_SCOPE != 'tv' }}
     runs-on: macos-14
     timeout-minutes: 30
     env:

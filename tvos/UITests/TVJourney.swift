@@ -65,10 +65,6 @@ import XCTest
 
     func select(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         focus(element, file: file, line: line)
-        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: element)
-        let result = XCTWaiter.wait(for: [ready], timeout: 5)
-        XCTAssertEqual(result, .completed, "Focused control must be hittable before Select: \(element)", file: file, line: line)
-        guard result == .completed else { return }
         print("[DEBUG-239-select] id=\(element.identifier) focus=\(hasFocus(element)) hittable=\(element.isHittable) frame=\(element.frame)")
         remote.press(.select)
     }

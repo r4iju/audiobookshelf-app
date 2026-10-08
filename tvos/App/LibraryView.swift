@@ -106,6 +106,7 @@ struct LibraryDestination: View {
     @Environment(\.nativeStrings) private var l10n
     @State private var selectedID: String?
     @State private var choosing = false
+    @State private var pendingSelectionID: String?
 
     private var selected: Library? {
         catalog.libraries.first { $0.id == selectedID } ?? catalog.libraries.first
@@ -124,11 +125,16 @@ struct LibraryDestination: View {
                 Text(l10n("This library is empty.")).foregroundStyle(.secondary)
             }
         }
-        .sheet(isPresented: $choosing) {
+        .sheet(isPresented: $choosing, onDismiss: {
+            if let pendingSelectionID {
+                selectedID = pendingSelectionID
+                self.pendingSelectionID = nil
+            }
+        }) {
             NavigationStack {
                 List(catalog.libraries) { library in
                     Button {
-                        selectedID = library.id
+                        pendingSelectionID = library.id
                         choosing = false
                     } label: {
                         HStack(spacing: 24) {
@@ -145,6 +151,6 @@ struct LibraryDestination: View {
             }
             .tvLocalization()
         }
-        .onChange(of: catalog.accountID) { selectedID = nil; choosing = false }
+        .onChange(of: catalog.accountID) { selectedID = nil; pendingSelectionID = nil; choosing = false }
     }
 }
