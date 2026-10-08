@@ -4,6 +4,7 @@ import UIKit
 @MainActor final class LibrarySearchStore: ObservableObject {
     enum State { case idle, loading, results(SearchResponse), failed(String) }
     @Published private(set) var state: State = .idle
+    @Published var presented = false
     @Published var query = "" { didSet { schedule() } }
     private var pending: Task<Void, Never>?
     private var generation = UUID()
@@ -16,6 +17,7 @@ import UIKit
         cancelPending()
         generation = UUID()
         self.catalog = catalog
+        presented = false
         query = ""
         state = .idle
     }

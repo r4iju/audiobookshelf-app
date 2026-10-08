@@ -82,9 +82,12 @@ private struct NativeShellNavigation: View {
 
     @available(iOS 18, *) @ViewBuilder private var searchableModernTabs: some View {
         if #available(iOS 26, *) {
-            modernTabs.searchable(text: $search.query, prompt: l10n("Books, podcasts, authors, series…"))
+            modernTabs.searchable(text: $search.query, isPresented: $search.presented, prompt: l10n("Books, podcasts, authors, series…"))
                 .onSubmit(of: .search, search.submit)
                 .tabViewSearchActivation(.searchTabSelection)
+                .onChange(of: selected) { destination in
+                    if destination != .search { search.presented = false }
+                }
         } else {
             modernTabs
         }
