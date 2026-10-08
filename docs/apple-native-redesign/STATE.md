@@ -8,8 +8,9 @@ Integration branch: `feature/apple-native-redesign`, based on `77c154b1` on `for
 | #232 | Source `cb8ebda8` + `5acca8c1`, evidence `5f48fdd0`, verified integrated | [Bounded TV shell, remote checks and focused/unfocused captures](evidence/232/RESULT.md). Final source 4/4; earlier 10/10. |
 | #233 | Corrections integrated `da05a80a` + `8739a7b4`, evidence `a8e2e6d0`; independent round2 PASS | [Fresh rendered review](evidence/233/review-round-2.md) resolved D1–D3 and permits broad migration. [Actual corrected renders/checks](evidence/233/corrections-round-1/RESULT.md): final phone6/6 and wide-iPad Shell1/1. [TV portrait focus pair](evidence/233/corrections-round-1/tv-portrait/RESULT.md) captured. [Asset provenance](evidence/233/assets-provenance.md) identifies stale incremental resource sealing; clean separately verified candidates remain required. |
 | #234 | Runtime `b7038ddc`, test locators `c04f6d97`, evidence `a5888ff3`, verified integrated | [Catalog/discovery result](evidence/234/RESULT.md): scoped phone15/15, iPad3/3, server actions4/4, progress reset4/4, related4/4 and group playback1/1. Final31 actual renders use separately built, strictly verified bundles. Historical test scopes are explicit; complete visual/accessibility acceptance remains239. |
-| #235 | Ready frontier | Complete listening surface and panels, preserving the accepted slice composition. |
-| #236–237 | Pending dependency graph | Complete readers/downloads/groups and utilities/localization. |
+| #235 | Runtime `0b4733e6`, evidence `ffa1ec59`, verified integrated | [Listening result](evidence/235/RESULT.md): phone14/14 and tablet4/4 retain explicit pre-freeze display-only scope; final-source auth1/1, fresh builds and37 renders pass. Both isolated products independently strictly verified; all capture/resource hashes match. Final adaptive/accessibility acceptance remains239. |
+| #236 | Ready frontier | Readers, downloads, feeds and groups. |
+| #237 | Blocked by #236 | Accounts, utilities, authoritative preferences and complete localization. |
 | #238 | Ready frontier, queued behind sole mobile writer | Complete TV screens and remote journeys. |
 | #239 | Blocked by #237/#238 | Required adaptive, accessibility, fallback and full-screen acceptance. |
 | #240 | Blocked by #239 | Final review, merge, merged-source QA and private device candidates. |
@@ -24,6 +25,8 @@ Integration branch: `feature/apple-native-redesign`, based on `77c154b1` on `for
 - Concrete runtime-only CI files are prepared at `/tmp/native-ios14-probe/ci-experiment/`, selecting Xcode15.0.1 and the official14.5/18E182 package. No workflow was committed or triggered, runtime downloaded, or execution claimed.
 - tvOS17 deployment builds succeed. Exact official runtime download queries for17.0/21J353 returned unavailable; the legacy tvOS package URL redirected to unauthorized in both CLI and shared browser. No runtime was downloaded. Installed TV runtime/device is27.
 - Further managed official requests for17.2/21K364 and17.5/21L569, including universal and exact-build queries, also returned unavailable. Both catalog-listed package URLs redirected to Apple authorization. Disk space was sufficient; no download/import/device change occurred.
+
+- A new read-only CI investigation confirms installed tvOS17 simulators and Xcode15.0.1 on the official `macos-14` arm64 runner image. Source-pinned capability files are prepared under `/tmp/native-older-ci-preparation/`; no workflow has yet been committed or run. Ticket239 must attempt this installed-runtime route after older-SDK guards, plus the separate official iOS14.5 runtime experiment. Local authorization failures do not establish a final TV17 blocker.
 
 These are pending requirements, not accepted skips. Finish independent implementation and available verification before declaring any final blocker. Keep the integration PR draft until required gates pass. Public Apple uploads and Cast remain outside this work and rights-gated.
 
