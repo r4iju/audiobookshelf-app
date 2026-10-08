@@ -1,0 +1,16 @@
+[
+  {
+    "option": "increase_contrast",
+    "original": "disabled",
+    "restore_exit": 0,
+    "verified": "disabled",
+    "matches": true
+  },
+  {
+    "option": "content_size",
+    "original": "large",
+    "restore_exit": 0,
+    "verified": "large",
+    "matches": true
+  }
+]

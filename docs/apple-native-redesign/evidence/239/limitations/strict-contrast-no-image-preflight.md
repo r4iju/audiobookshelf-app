@@ -1,5 +1,7 @@
 # Strict audit no-image preflight, execution stopped
 
+Historical preflight. The later [public-contract investigation](strict-contrast-public-capture-contract.md) supersedes the categorical final conclusion below: documented automatic capture OFF exists, but its prevention of audit-owned issue images remains unestablished. Original RED2 is still pending, and no audit-specific permission or waiver is inferred.
+
 No device/lease/fixture/build/test/audit was started. No shared writes or images.
 
 The exact retained original contrast audit detail at /tmp/native239-contrast-detail.json reports hasMediaAttachments=true, and each Contrast failed issue has an App Screenshot_0_*.png and Element Screenshot_1_*.png attachment. These are framework-generated failure evidence, separate from the explicit NativeJourney.capture helper. The original command used -collect-test-diagnostics never; it does not suppress them.

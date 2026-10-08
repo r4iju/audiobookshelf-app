@@ -1,0 +1,61 @@
+[
+  {
+    "file": "pdf-next-element.wav",
+    "sha256": "33c7e5790b8c09981b447dff2b638fa818196a149873c00397d057791e1fe260",
+    "raw_bytes": 6135808,
+    "nonzero_float_samples": 214594,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "click",
+            "id=pdf-document"
+          ],
+          "exit": 0,
+          "out": "Tapped id=pdf-document (201, 452)\n"
+        },
+        {
+          "action": [
+            "gesture",
+            "swipe",
+            "right"
+          ],
+          "exit": 0,
+          "out": "Flung\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.465415954589844
+    }
+  },
+  {
+    "file": "pdf-next-two.wav",
+    "sha256": "e017585db73e6702c8efc57a52d3c84dcbc3d1c649c86728c2b64dc5a02d60fd",
+    "raw_bytes": 6123520,
+    "nonzero_float_samples": 69702,
+    "actions": {
+      "actions": [
+        {
+          "action": [
+            "gesture",
+            "swipe",
+            "right"
+          ],
+          "exit": 0,
+          "out": "Flung\n"
+        },
+        {
+          "action": [
+            "gesture",
+            "swipe",
+            "right"
+          ],
+          "exit": 0,
+          "out": "Flung\n"
+        }
+      ],
+      "capture_exit": 0,
+      "elapsed": 16.691247940063477
+    }
+  }
+]

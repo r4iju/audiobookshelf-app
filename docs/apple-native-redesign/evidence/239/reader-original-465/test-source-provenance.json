@@ -1,0 +1,164 @@
+[
+  {
+    "file": "apple/UITests/ArtworkJourney.swift",
+    "original_sha256": "acdebc7a47be3d2686dc5013e1346153f4ec5ae35297f78bba6e3c2181e5139c",
+    "cached_disposable_sha256": "acdebc7a47be3d2686dc5013e1346153f4ec5ae35297f78bba6e3c2181e5139c",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/CatalogRecoveryJourney.swift",
+    "original_sha256": "cc60c562eaa1221dd391467b0ded8443f1b8b48cc65a079e07bed0d88b9c061e",
+    "cached_disposable_sha256": "cc60c562eaa1221dd391467b0ded8443f1b8b48cc65a079e07bed0d88b9c061e",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/CollectionJourney.swift",
+    "original_sha256": "16e76090fb509bbf6057be03bc33caa048434dc0cb6b451497e557da12304653",
+    "cached_disposable_sha256": "16e76090fb509bbf6057be03bc33caa048434dc0cb6b451497e557da12304653",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/ConnectionJourney.swift",
+    "original_sha256": "2423a118c1893987d292e72eed4913133d73beab73b02ded4552a46e08f41eb7",
+    "cached_disposable_sha256": "2423a118c1893987d292e72eed4913133d73beab73b02ded4552a46e08f41eb7",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/DurableProgressJourney.swift",
+    "original_sha256": "cc0fd1b2c791e2afacdf87fe71d773729b5e3a36889162ea665d8756f4c0c563",
+    "cached_disposable_sha256": "cc0fd1b2c791e2afacdf87fe71d773729b5e3a36889162ea665d8756f4c0c563",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/ItemServerActionsJourney.swift",
+    "original_sha256": "3bdc59e713aaabbf2a86870ddc8f96174da68df7d3375e7744c3bf3afcc2a7d6",
+    "cached_disposable_sha256": "3bdc59e713aaabbf2a86870ddc8f96174da68df7d3375e7744c3bf3afcc2a7d6",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/LargestDownloads239Journey.swift",
+    "original_sha256": "2cee992c8e27880a3c8a4d346affe13256ff5c81e6ffdb86ac209a323b31646b",
+    "cached_disposable_sha256": "e2b3c0d3411cb503cf56723822941d4db8a556764cc29db87d9671bf634085bb",
+    "same": false
+  },
+  {
+    "file": "apple/UITests/ListeningControlsJourney.swift",
+    "original_sha256": "23acda24b1766a89f7caa38e7d2e0520c3b75626334ecca59e82e0c3fcd13391",
+    "cached_disposable_sha256": "23acda24b1766a89f7caa38e7d2e0520c3b75626334ecca59e82e0c3fcd13391",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/NativeJourney.swift",
+    "original_sha256": "00854f2c462bf507c79cdf897eae29a1c4b886e57294ce8c59384dd58285e000",
+    "cached_disposable_sha256": "fe596ac97a9375d427e0d5d63f3a4a270721ef3dcce7fb77d6d2d0afb51c1508",
+    "same": false
+  },
+  {
+    "file": "apple/UITests/OfflineJourney.swift",
+    "original_sha256": "891cf565116729056e102649561ca06bba10457c4ec7ee47fd234e6fe7127e47",
+    "cached_disposable_sha256": "891cf565116729056e102649561ca06bba10457c4ec7ee47fd234e6fe7127e47",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/OpenIDJourney.swift",
+    "original_sha256": "2df6e0d2973a385882c2ef36a67892cb52a35f5a4e99b539df32414c118985aa",
+    "cached_disposable_sha256": "2df6e0d2973a385882c2ef36a67892cb52a35f5a4e99b539df32414c118985aa",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/PausedRealtimeJourney.swift",
+    "original_sha256": "e71bd86bdceadaa6bda3253c646bda82440668c4780671c4c25faf057575cff8",
+    "cached_disposable_sha256": "e71bd86bdceadaa6bda3253c646bda82440668c4780671c4c25faf057575cff8",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/PlaybackAuthorizationJourney.swift",
+    "original_sha256": "5cf09e00ae5aa797c50f6bc0b7f100e83bc4b59fc6b39bdac1fad28a2bdb0325",
+    "cached_disposable_sha256": "5cf09e00ae5aa797c50f6bc0b7f100e83bc4b59fc6b39bdac1fad28a2bdb0325",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/PlaybackJourney.swift",
+    "original_sha256": "1d5ebe96991403fd74dbd21e6c58990a1983b38d7c6bb14a304e4ad5c772de62",
+    "cached_disposable_sha256": "1d5ebe96991403fd74dbd21e6c58990a1983b38d7c6bb14a304e4ad5c772de62",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/PodcastJourney.swift",
+    "original_sha256": "a12cf2d8ef8244db48c2dfc721c3c98ccaa464245bc6c9276ffb9f44d05f4abc",
+    "cached_disposable_sha256": "a12cf2d8ef8244db48c2dfc721c3c98ccaa464245bc6c9276ffb9f44d05f4abc",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/PreferencesJourney.swift",
+    "original_sha256": "189d7feee5f47e7d269ff942d6db46852dd4e82a44b6ec4243ce4a7ce92a8f7f",
+    "cached_disposable_sha256": "189d7feee5f47e7d269ff942d6db46852dd4e82a44b6ec4243ce4a7ce92a8f7f",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/PresentationJourney.swift",
+    "original_sha256": "d85807d021970ecf862e0936666a7045ea929b396078ec252d84452566ce83fe",
+    "cached_disposable_sha256": "d85807d021970ecf862e0936666a7045ea929b396078ec252d84452566ce83fe",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/ProgressResetJourney.swift",
+    "original_sha256": "45f51416318997604cc788370bdb8af0988fa6a47943dacb804fd7b8d2a48c94",
+    "cached_disposable_sha256": "45f51416318997604cc788370bdb8af0988fa6a47943dacb804fd7b8d2a48c94",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/PublicationRecoveryJourney.swift",
+    "original_sha256": "0149ff1a2c055b30ce640ac35fe5c8ccd582fdf33fb34dd463321d6f2509583a",
+    "cached_disposable_sha256": "0149ff1a2c055b30ce640ac35fe5c8ccd582fdf33fb34dd463321d6f2509583a",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/ReaderJourney.swift",
+    "original_sha256": "c2d59a3dd4ab5d89de064ae35eda4736247b8b40fd87f2bed389548f705e6355",
+    "cached_disposable_sha256": "8deb1df7580f7534fca86ab2bd63f0de01392950ad0be6de10d2c2373f67d8bf",
+    "same": false
+  },
+  {
+    "file": "apple/UITests/RealtimeJourney.swift",
+    "original_sha256": "20f18e3a7df6b5c67251f2af1bf7ff06df826da9c426d79dcb2b0c7d6025af47",
+    "cached_disposable_sha256": "20f18e3a7df6b5c67251f2af1bf7ff06df826da9c426d79dcb2b0c7d6025af47",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/RelatedAuthorSeriesJourney.swift",
+    "original_sha256": "45d32a4dfd342918f7c936c70476bf95648ec99e0392580633ab943d9e826d31",
+    "cached_disposable_sha256": "45d32a4dfd342918f7c936c70476bf95648ec99e0392580633ab943d9e826d31",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/RemainingQAGroupJourney.swift",
+    "original_sha256": "3b2672d11d0cc4b1fef3d89b37768e2d47890728bcc4b07719c26ab1f1923606",
+    "cached_disposable_sha256": "3b2672d11d0cc4b1fef3d89b37768e2d47890728bcc4b07719c26ab1f1923606",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/RemainingQAJourney.swift",
+    "original_sha256": "c058d43aea707759c316f2e398f91cbfa3923a89e9a59b1d042241d03a0379d8",
+    "cached_disposable_sha256": "c058d43aea707759c316f2e398f91cbfa3923a89e9a59b1d042241d03a0379d8",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/SavedConnectionsJourney.swift",
+    "original_sha256": "6368b36ee98420db391a4d64d389b83d18f3c7341fca6dec0164c8029d55d0ac",
+    "cached_disposable_sha256": "6368b36ee98420db391a4d64d389b83d18f3c7341fca6dec0164c8029d55d0ac",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/SearchJourney.swift",
+    "original_sha256": "0fb96101099b932da9a93d5fb024d9872f1ffd994797f1103c426be3c399cf5e",
+    "cached_disposable_sha256": "0fb96101099b932da9a93d5fb024d9872f1ffd994797f1103c426be3c399cf5e",
+    "same": true
+  },
+  {
+    "file": "apple/UITests/ShellJourney.swift",
+    "original_sha256": "a8b3b698bb8b51791d167c16638e49fb0d4e24f4666e8b5d2cd470aa7da1e53a",
+    "cached_disposable_sha256": "a8b3b698bb8b51791d167c16638e49fb0d4e24f4666e8b5d2cd470aa7da1e53a",
+    "same": true
+  }
+]

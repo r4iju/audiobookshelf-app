@@ -1,0 +1,21 @@
+AudiobookshelfTV: automatic screen capture disabled
+** TEST BUILD SUCCEEDED **
+AudiobookshelfTV: automatic screen capture disabled
+AudiobookshelfTV_appletvsimulator18.2-arm64.xctestrun: effective automatic capture disabled
+Test Case '-[TVJourneyTests.CatalogJourney testContinueListeningOpensDetailsAndBackRestoresFocus]' started.
+2026-10-08 19:21:56.102497+0000 TVJourneyTests-Runner[21566:58240] [Common] Snapshot request 0x600000ced500 complete with error: <NSError: 0x600000cf1140; domain: FBSSceneSnapshotErrorDomain; code: 4; "an unrelated condition or state was not satisfied"> {
+2026-10-08 19:21:56.120797+0000 TVJourneyTests-Runner[21566:58240] [Common] Snapshot request 0x600000ceeb20 complete with error: <NSError: 0x600000cee910; domain: FBSSceneSnapshotErrorDomain; code: 4; "an unrelated condition or state was not satisfied"> {
+Test Case '-[TVJourneyTests.CatalogJourney testContinueListeningOpensDetailsAndBackRestoresFocus]' passed (28.045 seconds).
+Test Case '-[TVJourneyTests.CatalogJourney testServerSearchFindsTitlesOutsideLoadedPage]' started.
+Test Case '-[TVJourneyTests.CatalogJourney testServerSearchFindsTitlesOutsideLoadedPage]' passed (39.749 seconds).
+Test Case '-[TVJourneyTests.PlaybackJourney testResumeShowsChapterAndTotalProgressAndRemoteToggles]' started.
+Test Case '-[TVJourneyTests.PlaybackJourney testResumeShowsChapterAndTotalProgressAndRemoteToggles]' passed (27.282 seconds).
+Test Case '-[TVJourneyTests.ReadinessJourney testMainScreensPassTheAccessibilityAudit]' started.
+Test Case '-[TVJourneyTests.ReadinessJourney testMainScreensPassTheAccessibilityAudit]' passed (45.497 seconds).
+Test Case '-[TVJourneyTests.RecoveryJourney testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying]' started.
+Test Case '-[TVJourneyTests.RecoveryJourney testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying]' passed (60.000 seconds).
+Test Case '-[TVJourneyTests.RelatedJourney testBookDetailsLeadToItsSeriesAndAuthor]' started.
+Test Case '-[TVJourneyTests.RelatedJourney testBookDetailsLeadToItsSeriesAndAuthor]' passed (29.899 seconds).
+Test Case '-[TVJourneyTests.ShellJourney testManyLibrariesKeepTheShellBoundedAndRemainSelectable]' started.
+Test Case '-[TVJourneyTests.ShellJourney testManyLibrariesKeepTheShellBoundedAndRemainSelectable]' passed (71.897 seconds).
+** TEST EXECUTE SUCCEEDED **

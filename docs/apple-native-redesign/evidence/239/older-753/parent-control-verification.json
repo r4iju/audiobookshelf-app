@@ -1,0 +1,41 @@
+{
+  "ledger_sha256": "047339f477709a3d02007877d3f07b08294880faed8778f849a8be445981efba",
+  "controls": {
+    "actions/permissions": {
+      "enabled": false,
+      "sha_pinning_required": false
+    },
+    "actions/permissions/workflow": {
+      "default_workflow_permissions": "read",
+      "can_approve_pull_request_reviews": false
+    },
+    "": {
+      "default_branch": "master"
+    },
+    "actions/workflows/373413394": {
+      "id": 373413394,
+      "state": "active"
+    },
+    "actions/workflows/373413395": {
+      "id": 373413395,
+      "state": "active"
+    },
+    "actions/workflows/373413401": {
+      "id": 373413401,
+      "state": "active"
+    },
+    "actions/workflows/378488585": {
+      "id": 378488585,
+      "state": "active"
+    },
+    "actions/workflows/378488586": {
+      "id": 378488586,
+      "state": "active"
+    }
+  },
+  "actual_seconds": 736,
+  "cumulative": 14861.0,
+  "finished": true,
+  "pending": [],
+  "errors": []
+}

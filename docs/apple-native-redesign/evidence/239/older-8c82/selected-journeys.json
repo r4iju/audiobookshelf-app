@@ -1,0 +1,21 @@
+{
+  "suite": "all",
+  "selected": [
+    "TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable",
+    "TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus",
+    "TVJourneyTests/CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage",
+    "TVJourneyTests/PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles",
+    "TVJourneyTests/RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor",
+    "TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit",
+    "TVJourneyTests/RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying"
+  ],
+  "all": [
+    "TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable",
+    "TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus",
+    "TVJourneyTests/CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage",
+    "TVJourneyTests/PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles",
+    "TVJourneyTests/RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor",
+    "TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit",
+    "TVJourneyTests/RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying"
+  ]
+}

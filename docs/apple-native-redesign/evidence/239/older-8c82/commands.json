@@ -1,0 +1,223 @@
+[
+  {
+    "label": "source",
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "source-clean",
+    "command": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "host",
+    "command": [
+      "sw_vers"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "architecture",
+    "command": [
+      "uname",
+      "-m"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "xcode-inventory",
+    "command": [
+      "find",
+      "/Applications",
+      "-maxdepth",
+      "1",
+      "-name",
+      "Xcode*.app",
+      "-print"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "xcode",
+    "command": [
+      "xcodebuild",
+      "-version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "swift",
+    "command": [
+      "xcrun",
+      "swiftc",
+      "--version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "sdk",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "appletvsimulator",
+      "--show-sdk-version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "xcodegen",
+    "command": [
+      "xcodegen",
+      "--version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "openssl",
+    "command": [
+      "openssl",
+      "version"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "runtimes-before",
+    "command": [
+      "xcrun",
+      "simctl",
+      "list",
+      "runtimes",
+      "-j"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "xcodebuild-help",
+    "command": [
+      "xcodebuild",
+      "-help"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "pool-acquire",
+    "command": [
+      "sim",
+      "acquire",
+      "tv",
+      "--os",
+      "17.0",
+      "--no-boot",
+      "--for",
+      "239 official TV17 execution"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "boot",
+    "command": [
+      "xcrun",
+      "simctl",
+      "bootstatus",
+      "5B147A2B-C099-49CC-8EBF-B99C9235623C",
+      "-b"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "actual-device",
+    "command": [
+      "xcrun",
+      "simctl",
+      "list",
+      "devices",
+      "-j"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "representative-journeys",
+    "command": [
+      "bash",
+      "/Users/runner/work/_temp/tv17-replay/fixture-harness.sh",
+      "CODE_SIGNING_ALLOWED=YES",
+      "CODE_SIGN_IDENTITY=-",
+      "TVOS_DEPLOYMENT_TARGET=17.0",
+      "-only-testing:TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable",
+      "-only-testing:TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus",
+      "-only-testing:TVJourneyTests/CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage",
+      "-only-testing:TVJourneyTests/PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles",
+      "-only-testing:TVJourneyTests/RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor",
+      "-only-testing:TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit",
+      "-only-testing:TVJourneyTests/RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying"
+    ],
+    "exit": 65,
+    "stderrSeparate": false
+  },
+  {
+    "label": "pool-release",
+    "command": [
+      "sim",
+      "release",
+      "5B147A2B-C099-49CC-8EBF-B99C9235623C"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "app-info",
+    "command": [
+      "plutil",
+      "-p",
+      "tvos/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/Info.plist"
+    ],
+    "exit": 0,
+    "stderrSeparate": false
+  },
+  {
+    "label": "binary-minimum",
+    "command": [
+      "xcrun",
+      "vtool",
+      "-show-build",
+      "tvos/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV"
+    ],
+    "exit": 1,
+    "stderrSeparate": false
+  },
+  {
+    "label": "signing-AudiobookshelfTV-strict",
+    "command": [
+      "codesign",
+      "--verify",
+      "--deep",
+      "--strict",
+      "tvos/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app"
+    ],
+    "exit": 1,
+    "stderrSeparate": false
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "info",
+      "voiceover",
+      "--device",
+      "97F3D534-A564-47C9-AFD4-AA20D28891DE",
+      "--timeout",
+      "10",
+      "--json-output",
+      "/tmp/native239-contrast-bounds8c82/final-vo.json"
+    ],
+    "commandType" : "devicectl.device.info.voiceover",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 5,
+    "outcome" : "success",
+    "version" : "642.16"
+  },
+  "result" : {
+    "deviceIdentifier" : "97F3D534-A564-47C9-AFD4-AA20D28891DE",
+    "enabled" : false,
+    "operation" : "query"
+  }
+}

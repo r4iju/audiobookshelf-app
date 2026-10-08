@@ -4,8 +4,6 @@ import json
 import os
 from pathlib import Path
 import re
-import signal
-import subprocess
 from ci_support import Evidence
 
 os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_16.2.app/Contents/Developer'
@@ -68,18 +66,11 @@ _, raw = e.run('pool-acquire', ['sim', 'acquire', 'tv', '--os', '17.0', '--no-bo
 udid = next(line for line in raw.splitlines() if re.fullmatch(r'[0-9A-Fa-f-]{36}', line))
 os.environ['ABS_TV_QA_SIMULATOR'] = udid
 errors = []
-navigation_trace = None
-navigation_stream = None
 try:
     e.run('boot', ['xcrun', 'simctl', 'bootstatus', udid, '-b'], seconds=180)
     _, actual = e.run('actual-device', ['xcrun', 'simctl', 'list', 'devices', '-j'])
     if not any(d['udid'] == udid and d['state'] == 'Booted' for d in json.loads(actual)['devices'].get(runtime['identifier'], [])):
         raise RuntimeError('Lease did not boot under exact selected runtime')
-    navigation_stream = (e.root / 'navigation-trace.log').open('w')
-    navigation_trace = subprocess.Popen([
-        'xcrun', 'simctl', 'spawn', udid, 'log', 'stream', '--style', 'compact',
-        '--level', 'debug', '--predicate', 'eventMessage CONTAINS "[DEBUG-239-back]"',
-    ], stdout=navigation_stream, stderr=subprocess.STDOUT, start_new_session=True)
     all_cases = [
         'TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable',
         'TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus',
@@ -102,25 +93,6 @@ try:
 except Exception as error:
     errors.append(str(error))
 finally:
-    try:
-        if navigation_trace is not None and navigation_trace.poll() is None:
-            try:
-                os.killpg(navigation_trace.pid, signal.SIGTERM)
-            except ProcessLookupError:
-                pass
-            try:
-                navigation_trace.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                os.killpg(navigation_trace.pid, signal.SIGKILL)
-                navigation_trace.wait(timeout=5)
-    except Exception as error:
-        errors.append('Navigation trace cleanup failed: ' + str(error))
-    finally:
-        try:
-            if navigation_stream is not None:
-                navigation_stream.close()
-        except Exception as error:
-            errors.append('Navigation trace stream close failed: ' + str(error))
     code, _ = e.run('pool-release', ['sim', 'release', udid], required=False)
     if code:
         errors.append('Lease release failed')

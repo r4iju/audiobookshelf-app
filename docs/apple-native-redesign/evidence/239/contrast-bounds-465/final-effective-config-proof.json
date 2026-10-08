@@ -1,0 +1,113 @@
+{
+  "origin": "/tmp/native-capture-off-effective-5c4-20261009/derived-ios-ui-modern/Build/Products/AudiobookshelfNative_iphonesimulator27.0-arm64-x86_64.xctestrun",
+  "original_sha256": "1dea7811e49b078f79ffc18b49486521686521c368f1652325c80d1a09f2ef15",
+  "private_copy": "/tmp/native239-contrast-bounds8c82/final-effective/Build/Products/AudiobookshelfNative_iphonesimulator27.0-arm64-x86_64.xctestrun",
+  "private_sha256": "30377e899a1f24a45a1a896e70e7602ae9ec77674bbdde181afb7646fce84c33",
+  "delta": [
+    {
+      "path": "/NativeJourneyTests/DependentProductPaths/0",
+      "old": "__TESTROOT__/Debug-iphonesimulator/AudiobookshelfNative.app",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app"
+    },
+    {
+      "path": "/NativeJourneyTests/DependentProductPaths/1",
+      "old": "__TESTROOT__/Debug-iphonesimulator/NativeJourneyTests-Runner.app",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/NativeJourneyTests-Runner.app"
+    },
+    {
+      "path": "/NativeJourneyTests/DependentProductPaths/2",
+      "old": "__TESTROOT__/Debug-iphonesimulator/NativeJourneyTests-Runner.app/PlugIns/NativeJourneyTests.xctest",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/NativeJourneyTests-Runner.app/PlugIns/NativeJourneyTests.xctest"
+    },
+    {
+      "path": "/NativeJourneyTests/TestHostPath",
+      "old": "__TESTROOT__/Debug-iphonesimulator/NativeJourneyTests-Runner.app",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/NativeJourneyTests-Runner.app"
+    },
+    {
+      "path": "/NativeJourneyTests/TestingEnvironmentVariables/DYLD_FRAMEWORK_PATH",
+      "old": "__TESTROOT__/Debug-iphonesimulator:__PLATFORMS__/iPhoneSimulator.platform/Developer/Library/Frameworks",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator:__PLATFORMS__/iPhoneSimulator.platform/Developer/Library/Frameworks"
+    },
+    {
+      "path": "/NativeJourneyTests/TestingEnvironmentVariables/DYLD_LIBRARY_PATH",
+      "old": "__TESTROOT__/Debug-iphonesimulator:__PLATFORMS__/iPhoneSimulator.platform/Developer/usr/lib",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator:__PLATFORMS__/iPhoneSimulator.platform/Developer/usr/lib"
+    },
+    {
+      "path": "/NativeJourneyTests/TestingEnvironmentVariables/__XCODE_BUILT_PRODUCTS_DIR_PATHS",
+      "old": "__TESTROOT__/Debug-iphonesimulator",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator"
+    },
+    {
+      "path": "/NativeJourneyTests/TestingEnvironmentVariables/__XPC_DYLD_FRAMEWORK_PATH",
+      "old": "__TESTROOT__/Debug-iphonesimulator",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator"
+    },
+    {
+      "path": "/NativeJourneyTests/TestingEnvironmentVariables/__XPC_DYLD_LIBRARY_PATH",
+      "old": "__TESTROOT__/Debug-iphonesimulator",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator"
+    },
+    {
+      "path": "/NativeJourneyTests/UITargetAppEnvironmentVariables/DYLD_FRAMEWORK_PATH",
+      "old": "__TESTROOT__/Debug-iphonesimulator",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator"
+    },
+    {
+      "path": "/NativeJourneyTests/UITargetAppEnvironmentVariables/DYLD_LIBRARY_PATH",
+      "old": "__TESTROOT__/Debug-iphonesimulator",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator"
+    },
+    {
+      "path": "/NativeJourneyTests/UITargetAppEnvironmentVariables/__XCODE_BUILT_PRODUCTS_DIR_PATHS",
+      "old": "__TESTROOT__/Debug-iphonesimulator",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator"
+    },
+    {
+      "path": "/NativeJourneyTests/UITargetAppEnvironmentVariables/__XPC_DYLD_FRAMEWORK_PATH",
+      "old": "__TESTROOT__/Debug-iphonesimulator",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator"
+    },
+    {
+      "path": "/NativeJourneyTests/UITargetAppEnvironmentVariables/__XPC_DYLD_LIBRARY_PATH",
+      "old": "__TESTROOT__/Debug-iphonesimulator",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator"
+    },
+    {
+      "path": "/NativeJourneyTests/UITargetAppPath",
+      "old": "__TESTROOT__/Debug-iphonesimulator/AudiobookshelfNative.app",
+      "new": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app"
+    }
+  ],
+  "guards": {
+    "SystemAttachmentLifetime": "keepNever",
+    "PreferredScreenCaptureFormat": "screenRecording",
+    "selected_UITest_targets": 1
+  },
+  "cached_products": "/tmp/native239-download-label-f922/Build/Products",
+  "app47": true,
+  "public_contract": "Installed man xcodebuild.xctestrun documents TestHostPath, UITargetAppPath, TestBundlePath and SystemAttachmentLifetime keepNever; public Xcode capture OFF contract accepted by parent.",
+  "test_host": {
+    "path": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/NativeJourneyTests-Runner.app",
+    "strict_exit": 0,
+    "files": {
+      "NativeJourneyTests-Runner": "e34eef15fa20eb05b7a5d9a40f620a41bb168941042a3e342a154266a4b386b7",
+      "Info.plist": "30f3faec1bb7a5d61651ae91ebd778e2a1a40f52433502d509b2ca8491f45a6f",
+      "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+      "_CodeSignature/CodeResources": "a874dbd691f460b502b1ea153aab21de29a0d2c63e436392e63f48c4dac3bd28",
+      "PlugIns/NativeJourneyTests.xctest/NativeJourneyTests": "9739ef95410e71f36728239b43170d59c87fbe219bc74a5d626d185435caf07a",
+      "PlugIns/NativeJourneyTests.xctest/Info.plist": "11bce3d6bb1b671e546e021fd88fb16bc0775b0641b1702fbfa92795bd2ce0a4",
+      "PlugIns/NativeJourneyTests.xctest/_CodeSignature/CodeResources": "1c42820e3ce4f535424338094e2a4664d48e75c1f59ffae72b31cbccb4302cc1"
+    }
+  },
+  "test_bundle": {
+    "path": "/tmp/native239-download-label-f922/Build/Products/Debug-iphonesimulator/NativeJourneyTests-Runner.app/PlugIns/NativeJourneyTests.xctest",
+    "strict_exit": 0,
+    "files": {
+      "NativeJourneyTests": "9739ef95410e71f36728239b43170d59c87fbe219bc74a5d626d185435caf07a",
+      "Info.plist": "11bce3d6bb1b671e546e021fd88fb16bc0775b0641b1702fbfa92795bd2ce0a4",
+      "_CodeSignature/CodeResources": "1c42820e3ce4f535424338094e2a4664d48e75c1f59ffae72b31cbccb4302cc1"
+    }
+  }
+}

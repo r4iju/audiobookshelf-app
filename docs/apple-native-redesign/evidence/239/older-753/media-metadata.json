@@ -1,0 +1,37 @@
+[
+  {
+    "id": "CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus()",
+    "result": "Passed",
+    "hasMediaAttachments": false
+  },
+  {
+    "id": "CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage()",
+    "result": "Passed",
+    "hasMediaAttachments": false
+  },
+  {
+    "id": "PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles()",
+    "result": "Passed",
+    "hasMediaAttachments": false
+  },
+  {
+    "id": "ReadinessJourney/testMainScreensPassTheAccessibilityAudit()",
+    "result": "Passed",
+    "hasMediaAttachments": false
+  },
+  {
+    "id": "RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying()",
+    "result": "Passed",
+    "hasMediaAttachments": false
+  },
+  {
+    "id": "RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor()",
+    "result": "Passed",
+    "hasMediaAttachments": false
+  },
+  {
+    "id": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "result": "Passed",
+    "hasMediaAttachments": false
+  }
+]

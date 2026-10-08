@@ -1,0 +1,3 @@
+AudiobookshelfTV: automatic screen capture disabled
+/Users/runner/work/audiobookshelf-app/audiobookshelf-app/tvos/App/Components.swift:213:25: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+** TEST BUILD FAILED **

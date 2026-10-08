@@ -227,16 +227,6 @@ private struct SeriesScreen: View {
             .padding(80)
         }
         .task { if page.series == nil { await load() } }
-        .onAppear {
-            #if DEBUG
-            NSLog("[DEBUG-239-back] series appear %@", series.id)
-            #endif
-        }
-        .onDisappear {
-            #if DEBUG
-            NSLog("[DEBUG-239-back] series disappear %@", series.id)
-            #endif
-        }
     }
 
     private func load() async {

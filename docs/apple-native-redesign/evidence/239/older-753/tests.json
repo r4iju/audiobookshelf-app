@@ -1,0 +1,147 @@
+{
+  "devices" : [
+    {
+      "architecture" : "arm64",
+      "deviceId" : "CEDEFFAB-4E3C-4F37-BD7E-50D319B74E7B",
+      "deviceName" : "Pool TV 1 (tvOS 17.0)",
+      "modelName" : "Apple TV 4K (3rd generation)",
+      "osBuildNumber" : "21J353",
+      "osVersion" : "17.0",
+      "platform" : "tvOS Simulator"
+    }
+  ],
+  "testNodes" : [
+    {
+      "children" : [
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "duration" : "28s",
+                  "durationInSeconds" : 28.045113921165466,
+                  "name" : "testContinueListeningOpensDetailsAndBackRestoresFocus()",
+                  "nodeIdentifier" : "CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus()",
+                  "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "duration" : "39s",
+                  "durationInSeconds" : 39.74935698509216,
+                  "name" : "testServerSearchFindsTitlesOutsideLoadedPage()",
+                  "nodeIdentifier" : "CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage()",
+                  "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                }
+              ],
+              "name" : "CatalogJourney",
+              "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/CatalogJourney",
+              "nodeType" : "Test Suite",
+              "result" : "Passed"
+            },
+            {
+              "children" : [
+                {
+                  "duration" : "27s",
+                  "durationInSeconds" : 27.282490015029907,
+                  "name" : "testResumeShowsChapterAndTotalProgressAndRemoteToggles()",
+                  "nodeIdentifier" : "PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles()",
+                  "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                }
+              ],
+              "name" : "PlaybackJourney",
+              "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/PlaybackJourney",
+              "nodeType" : "Test Suite",
+              "result" : "Passed"
+            },
+            {
+              "children" : [
+                {
+                  "duration" : "45s",
+                  "durationInSeconds" : 45.49653494358063,
+                  "name" : "testMainScreensPassTheAccessibilityAudit()",
+                  "nodeIdentifier" : "ReadinessJourney/testMainScreensPassTheAccessibilityAudit()",
+                  "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                }
+              ],
+              "name" : "ReadinessJourney",
+              "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/ReadinessJourney",
+              "nodeType" : "Test Suite",
+              "result" : "Passed"
+            },
+            {
+              "children" : [
+                {
+                  "duration" : "59s",
+                  "durationInSeconds" : 59.99958801269531,
+                  "name" : "testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying()",
+                  "nodeIdentifier" : "RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying()",
+                  "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                }
+              ],
+              "name" : "RecoveryJourney",
+              "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/RecoveryJourney",
+              "nodeType" : "Test Suite",
+              "result" : "Passed"
+            },
+            {
+              "children" : [
+                {
+                  "duration" : "29s",
+                  "durationInSeconds" : 29.899464964866638,
+                  "name" : "testBookDetailsLeadToItsSeriesAndAuthor()",
+                  "nodeIdentifier" : "RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor()",
+                  "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                }
+              ],
+              "name" : "RelatedJourney",
+              "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/RelatedJourney",
+              "nodeType" : "Test Suite",
+              "result" : "Passed"
+            },
+            {
+              "children" : [
+                {
+                  "duration" : "1m 11s",
+                  "durationInSeconds" : 71.89719903469086,
+                  "name" : "testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+                  "nodeIdentifier" : "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+                  "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                }
+              ],
+              "name" : "ShellJourney",
+              "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests/ShellJourney",
+              "nodeType" : "Test Suite",
+              "result" : "Passed"
+            }
+          ],
+          "name" : "TVJourneyTests",
+          "nodeIdentifierURL" : "test://com.apple.xcode/AudiobookshelfTV/TVJourneyTests",
+          "nodeType" : "UI test bundle",
+          "result" : "Passed"
+        }
+      ],
+      "name" : "AudiobookshelfTV",
+      "nodeType" : "Test Plan",
+      "result" : "Passed"
+    }
+  ],
+  "testPlanConfigurations" : [
+    {
+      "configurationId" : "1",
+      "configurationName" : "Test Scheme Action"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+[
+  {
+    "target": "Primary Resume",
+    "evidence": "primary-positioned1.json",
+    "identifier": "play-book",
+    "type": "Button",
+    "role": "SwiftUI.AccessibilityNode",
+    "parentIndex": 12,
+    "depth": 3,
+    "rect": {
+      "x": 32,
+      "y": 557.6666666666666,
+      "width": 338,
+      "height": 221.33333333333337
+    },
+    "enabled": true,
+    "nav_content_top": 116,
+    "bottom_chrome_top": 791,
+    "fully_contained": true
+  },
+  {
+    "target": "Related author",
+    "evidence": "author-positioned4.json",
+    "identifier": "detail-author.author",
+    "type": "Button",
+    "role": "SwiftUI.AccessibilityNode",
+    "parentIndex": 14,
+    "depth": 3,
+    "rect": {
+      "x": 16,
+      "y": 568.6666666666666,
+      "width": 370,
+      "height": 217.33333333333337
+    },
+    "enabled": true,
+    "nav_content_top": 116,
+    "bottom_chrome_top": 791,
+    "fully_contained": true
+  },
+  {
+    "target": "Narrator",
+    "evidence": "narrator-returned.json",
+    "identifier": null,
+    "type": "StaticText",
+    "role": "SwiftUI.AccessibilityNode",
+    "parentIndex": 5,
+    "depth": 3,
+    "rect": {
+      "x": 43.83333333333334,
+      "y": 342.33333333333337,
+      "width": 314.33333333333326,
+      "height": 52.66666666666663
+    },
+    "enabled": true,
+    "nav_content_top": 116,
+    "bottom_chrome_top": 791,
+    "fully_contained": true
+  },
+  {
+    "target": "Progress",
+    "evidence": "progress-native-attrs.json",
+    "identifier": null,
+    "type": "StaticText",
+    "role": "SwiftUI.AccessibilityNode",
+    "parentIndex": null,
+    "depth": 0,
+    "rect": {
+      "x": 32,
+      "y": 667.9999999999999,
+      "width": 281.3333333333333,
+      "height": 102.33333333333337
+    },
+    "enabled": true,
+    "nav_content_top": 116,
+    "bottom_chrome_top": 791,
+    "fully_contained": true
+  }
+]
