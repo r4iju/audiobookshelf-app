@@ -1,0 +1,24 @@
+[
+  {
+    "screen": "archive-detail-focused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "b968f645f0b47776b3ffc496b89dd85bb5136ea40604456fb6d0f451ab5f901b",
+      "AudiobookshelfTV.debug.dylib": "0a4ee048332d731001a766a4c0e5fa0a72caf7dd8e8f3b6ceb4466c2430ff6df"
+    },
+    "screenshotSHA256": "273debe64761e9d269d3ddc3804323a0e7608ae5e9d5ea6f80f7431069e0348d",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791426698.061
+  },
+  {
+    "screen": "archive-detail-unfocused.png",
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "installedBinariesSHA256": {
+      "AudiobookshelfTV": "b968f645f0b47776b3ffc496b89dd85bb5136ea40604456fb6d0f451ab5f901b",
+      "AudiobookshelfTV.debug.dylib": "0a4ee048332d731001a766a4c0e5fa0a72caf7dd8e8f3b6ceb4466c2430ff6df"
+    },
+    "screenshotSHA256": "22ac8b11cc9170afa16d7ba927bfd5e6d909dee6c721dc9ca4da29c7327a53ad",
+    "testIdentifier": "ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable()",
+    "timestamp": 1791426696.212
+  }
+]

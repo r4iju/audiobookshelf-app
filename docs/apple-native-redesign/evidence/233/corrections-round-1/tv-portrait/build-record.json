@@ -1,0 +1,17 @@
+{
+  "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+  "installedAppPath": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/847403F3-F624-4985-81DF-C31DF2D99E54/AudiobookshelfTV.app",
+  "buildAppPath": "/tmp/native-tv-233-portrait-unfocused/source/tvos/build/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+  "runtime": "tvOS27.0 (24J360), pooled AppleTV4K thirdgeneration",
+  "minimumOS": "17.0",
+  "installedBinariesSHA256": {
+    "AudiobookshelfTV": "b968f645f0b47776b3ffc496b89dd85bb5136ea40604456fb6d0f451ab5f901b",
+    "AudiobookshelfTV.debug.dylib": "0a4ee048332d731001a766a4c0e5fa0a72caf7dd8e8f3b6ceb4466c2430ff6df"
+  },
+  "matchingBuildBinariesSHA256": {
+    "AudiobookshelfTV": "b968f645f0b47776b3ffc496b89dd85bb5136ea40604456fb6d0f451ab5f901b",
+    "AudiobookshelfTV.debug.dylib": "0a4ee048332d731001a766a4c0e5fa0a72caf7dd8e8f3b6ceb4466c2430ff6df"
+  },
+  "machO": "cmdsize 32\n platform 8\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool 3\n  version 27037.1",
+  "signature": "Executable=/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/847403F3-F624-4985-81DF-C31DF2D99E54/AudiobookshelfTV.app/AudiobookshelfTV\nIdentifier=com.forkzed.audiobookshelf.tv\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=310 flags=0x2(adhoc) hashes=3+3 location=embedded\nSignature=adhoc\nInfo.plist entries=28\nTeamIdentifier=not set\nSealed Resources version=2 rules=10 files=36\nInternal requirements count=0 size=12\n"
+}
