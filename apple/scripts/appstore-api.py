@@ -27,7 +27,7 @@ def request(path, method='GET', data=None):
     config = 'header = "Authorization: Bearer ' + token + '"\nheader = "Content-Type: application/json"\n'
     if data is not None:
         config += 'data = ' + json.dumps(json.dumps(data)) + '\n'
-    command = ['curl', '--silent', '--show-error', '--globoff', '--max-time', '45', '--proxy', 'socks5h://192.168.0.1:1082', '--config', '-', '--request', method, '--write-out', '\n%{http_code}', 'https://api.appstoreconnect.apple.com/v1/' + path]
+    command = ['curl', '-q', '--noproxy', '', '--silent', '--show-error', '--globoff', '--max-time', '45', '--proxy', 'socks5h://192.168.0.1:1082', '--config', '-', '--request', method, '--write-out', '\n%{http_code}', 'https://api.appstoreconnect.apple.com/v1/' + path]
     result = subprocess.run(command, input=config, text=True, capture_output=True, check=True)
     body, status = result.stdout.rsplit('\n', 1)
     response = json.loads(body) if body else {}

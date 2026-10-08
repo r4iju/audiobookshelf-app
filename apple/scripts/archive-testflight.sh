@@ -18,8 +18,8 @@ from pathlib import Path
 import json,sys,plistlib
 root=Path(sys.argv[1]);source=root/'source';profiles=json.loads((root/'distribution-profiles.json').read_text())
 for product,folder in [('ios','apple'),('tv','tvos')]:
- p=source/folder/'project.yml';s=p.read_text().replace('audiobookshelf-native-preview','leafwake')
- p.write_text(s)
+ # Keep the existing browser-auth callback identical to the runtime contract.
+ # Public bundle/keychain identity is supplied explicitly to xcodebuild below.
  options={'method':'app-store-connect','teamID':'C7X9BCC7LP','signingStyle':'manual','signingCertificate':'Apple Distribution','provisioningProfiles':{'com.forkzed.leafwake':profiles[product]['uuid']},'uploadSymbols':True,'manageAppVersionAndBuildNumber':False,'testFlightInternalTestingOnly':True}
  (root/(product+'-export.plist')).write_bytes(plistlib.dumps(options))
 PY
@@ -44,7 +44,7 @@ for product in ios tv; do
     CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution' \
     CODE_SIGN_ENTITLEMENTS="$candidate_root/source/apple/AppStore.entitlements" \
     PROVISIONING_PROFILE_SPECIFIER="$profile" "${minimum[@]}" archive > "$candidate_root/$product-archive.log" 2>&1
-  xcodebuild -quiet -exportArchive -archivePath "$candidate_root/$product.xcarchive" \
+  env PATH=/usr/bin:/bin:/usr/sbin:/sbin /usr/bin/xcodebuild -quiet -exportArchive -archivePath "$candidate_root/$product.xcarchive" \
     -exportPath "$candidate_root/$product-export" -exportOptionsPlist "$candidate_root/$product-export.plist" \
     > "$candidate_root/$product-export.log" 2>&1
   echo "Prepared $product archive and internal-only distribution package."
