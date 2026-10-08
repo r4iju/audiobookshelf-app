@@ -153,14 +153,14 @@ import XCTest
         let app = XCUIApplication()
         app.buttons["Change library"].tap()
         app.buttons["library-podcasts"].tap()
-        app.buttons["account"].tap()
+        app.buttons["Library actions"].tap()
         XCTAssertFalse(app.buttons["Add podcast"].exists)
         app.buttons["Refresh"].tap()
         try await FixtureControl.configure("podcast-admin")
-        app.buttons["account"].tap()
+        app.buttons["Library actions"].tap()
         app.buttons["Refresh"].tap()
         XCTAssertTrue(app.buttons["book-podcast"].waitForExistence(timeout: 5))
-        app.buttons["account"].tap()
+        app.buttons["Library actions"].tap()
         let add = app.buttons["Add podcast"]
         XCTAssertTrue(add.waitForExistence(timeout: 3))
         guard add.exists else { return }
