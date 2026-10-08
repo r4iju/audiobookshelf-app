@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var waiting = PublicationLedger.Waiting()
     @State private var recoveryFailure: String?
     @State private var confirming = false
+    @FocusState private var signOutFocused: Bool
     @FocusState private var confirmFocused: Bool
     @State private var path: [ReturnFocus] = []
     @FocusState private var focus: ReturnFocus?
@@ -65,7 +66,11 @@ struct SettingsView: View {
                                 failure = l10n("Sign-out was cancelled so that listening is not lost: {0}", CatalogStore.recovery(for: error, in: l10n))
                             }
                         }
-                    } label: { Label(l10n("Sign out"), systemImage: "rectangle.portrait.and.arrow.right") }
+                    } label: {
+                        Label(l10n("Sign out"), systemImage: "rectangle.portrait.and.arrow.right")
+                            .foregroundStyle(signOutFocused ? Color.black : Color.red)
+                    }
+                        .focused($signOutFocused)
                         .accessibilityIdentifier("sign-out").disabled(player.preparing || player.seeking)
                     if let failure { Text(failure).foregroundStyle(.orange) }
                 }
