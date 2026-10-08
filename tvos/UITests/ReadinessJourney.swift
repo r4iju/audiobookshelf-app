@@ -19,7 +19,7 @@ final class ReadinessJourney: TVJourney {
         let license = element("notices-license")
         focus(app.cells.containing(.staticText, identifier: "notices-license").firstMatch)
         XCTAssertTrue(license.label.contains("MIT license"))
-        XCTAssertTrue(license.label.contains("third-party notices"))
+        XCTAssertTrue(license.label.contains("Bundled reader libraries retain their own licenses."))
         XCTAssertTrue(license.label.contains("https://github.com/r4iju/audiobookshelf-app/releases"))
         capture("notices-license-focused")
         remote.press(.menu)
