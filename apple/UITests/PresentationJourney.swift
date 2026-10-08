@@ -410,7 +410,9 @@ import XCTest
         let app = XCUIApplication()
         app.buttons["book-book-0"].tap()
         app.swipeUp()
-        app.buttons["play-book"].tap(); app.buttons["mini-player"].tap()
+        app.buttons["play-book"].tap()
+        XCTAssertTrue(app.buttons["mini-player"].waitForExistence(timeout: 10))
+        app.buttons["mini-player"].tap()
         XCTAssertTrue(app.buttons["Back 10 seconds"].waitForExistence(timeout: 5))
         let window = app.windows.firstMatch.frame
         for control in ["Back 10 seconds", "Forward 10 seconds", "Chapters", "Playback speed", "Bookmarks", "Sleep timer"] {

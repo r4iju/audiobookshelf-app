@@ -39,6 +39,25 @@ if '-collect-test-diagnostics' not in help_text:
         raise RuntimeError('Optional diagnostics contract changed')
     harness = harness.replace('-collect-test-diagnostics never', '')
     (e.root / 'harness-diagnostics.txt').write_text('Selected toolchain lacks collect-test-diagnostics. Removed optional diagnostics flag only.')
+# The first actual17 run rejected the synthetic chain before app launch. Preserve
+# system trust and test the bounded trustd-cache hypothesis on this owned lease.
+# Certificate metadata/chain verification are diagnostics, not a trust exception.
+trust_line = 'xcrun simctl keychain "$simulator" add-root-cert "$fixture_dir/ca.pem"'
+if harness.count(trust_line) != 1:
+    raise RuntimeError('Synthetic root-install seam changed')
+trust_diagnostics = trust_line + '\n' + '\n'.join([
+    'openssl x509 -in "$fixture_dir/ca.pem" -noout -text',
+    'openssl x509 -in "$fixture_dir/cert.pem" -noout -text',
+    'openssl verify -CAfile "$fixture_dir/ca.pem" "$fixture_dir/cert.pem"',
+    'xcrun simctl shutdown "$simulator"',
+    'xcrun simctl boot "$simulator"',
+    'xcrun simctl bootstatus "$simulator" -b',
+])
+harness = harness.replace(trust_line, trust_diagnostics)
+(e.root / 'trust-diagnostic-scope.txt').write_text(
+    'Prior sourcef635 actual17 setup: NSURLError-1202/-9814. This retry logs original certificate metadata, '
+    'verifies its unchanged chain, and restarts only the owned leased17 simulator after supported root installation. '
+    'Trustd-cache hypothesis is unconfirmed until actual replay; no app TLS exception or trust override.\n')
 copy = e.root / 'fixture-harness.sh'
 copy.write_text(harness)
 (e.root / 'harness-provenance.json').write_text(__import__('json').dumps({'source': str(harness_path), 'sourceSHA256': __import__('hashlib').sha256(original.encode()).hexdigest(), 'executedSHA256': __import__('hashlib').sha256(harness.encode()).hexdigest()}, indent=2))
