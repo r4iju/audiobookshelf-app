@@ -57,10 +57,13 @@ struct BookDetails: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
-                header
-                if !regularActions { detailActions }
+        ShelfList {
+            Section {
+                header.padding(.vertical, 12).buttonStyle(BorderlessButtonStyle())
+                if !regularActions, book.mediaType != "podcast" || episode != nil { detailActions }
+            }.listRowBackground(Color.clear)
+            Group {
+                if episode == nil, book.mediaType == "book" { RelatedBookLinks(item: book, catalog: catalog) }
                 if episode != nil || book.mediaType == "book" {
                     if progressBusy { ProgressView(l10n("Saving your progress…")) }
                     if writesWaiting.waiting {
@@ -97,26 +100,23 @@ struct BookDetails: View {
                 if book.mediaType == "book" || episode != nil {
                     if let error = localDownloads.error { Text(error).foregroundColor(.red) }
                 }
-                if episode == nil { ItemServerActionsSection(itemID: book.id, catalog: catalog) }
+                if episode == nil { ItemServerActionsSection(itemID: book.id, catalog: catalog).buttonStyle(BorderlessButtonStyle()) }
                 if let description = episode?.description ?? book.media.metadata.description, !description.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(l10n(episode != nil ? "About this episode" : book.mediaType == "podcast" ? "About this podcast" : "About this book")).font(.title3.bold())
-                        Text(Self.plainDescription(description)).font(.body).lineSpacing(5).foregroundColor(ShelfStyle.secondaryText)
+                    Section(header: Text(l10n(episode != nil ? "About this episode" : book.mediaType == "podcast" ? "About this podcast" : "About this book"))) {
+                        Text(Self.plainDescription(description)).font(.body).lineSpacing(5).foregroundColor(ShelfStyle.secondaryText).frame(maxWidth: 720, alignment: .leading)
                     }
                 }
                 if book.mediaType == "podcast", episode == nil {
                     podcastEpisodes
                 }
                 if let chapters = book.media.chapters, !chapters.isEmpty {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text(l10n("Chapters")).font(.title3.bold())
+                    Section(header: Text(l10n("Chapters"))) {
                         ForEach(chapters) { chapter in
                             HStack(alignment: .top) {
                                 Text(chapter.title).font(.body)
                                 Spacer()
                                 Text(ShelfTime.describe(chapter.end - chapter.start)).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                             }.padding(.vertical, 8)
-                            Divider()
                         }
                     }
                 }
@@ -129,7 +129,7 @@ struct BookDetails: View {
                         }
                     }
                 }
-            }.padding(24).frame(maxWidth: 900).frame(maxWidth: .infinity)
+            }.buttonStyle(BorderlessButtonStyle())
         }.background(appearance.background).navigationTitle(book.title).navigationBarTitleDisplayMode(.inline)
             .onAppear { writesWaiting.activate(); load(monitorDownloads: true) }
             .onDisappear { request?.cancel(); progressRequest?.cancel(); downloadRequest?.cancel(); writesWaiting.stop() }
@@ -169,7 +169,7 @@ struct BookDetails: View {
                 BookArtwork(item: book, catalog: catalog).frame(width: 200)
                 VStack(alignment: .leading, spacing: 24) {
                     metadata(alignment: .leading)
-                    detailActions
+                    if book.mediaType != "podcast" || episode != nil { detailActions }
                 }
             }
         } else {
@@ -193,7 +193,7 @@ struct BookDetails: View {
             if regularActions, #available(iOS 15, *) {
                 ControlGroup { secondaryDetailActions }.controlGroupStyle(.navigation)
             } else {
-                VStack(alignment: .leading, spacing: 16) { secondaryDetailActions }
+                VStack(alignment: .leading, spacing: 16) { secondaryDetailActions }.buttonStyle(BorderlessButtonStyle())
             }
             if let progress = selectedProgress, (progress.currentTime ?? 0) > 0 {
                 VStack(alignment: .leading, spacing: 10) {
@@ -224,12 +224,11 @@ struct BookDetails: View {
         VStack(alignment: alignment, spacing: 8) {
             Text(episode?.title ?? book.title).font(.title2.weight(.semibold)).fixedSize(horizontal: false, vertical: true)
             if episode != nil { Text(book.title).font(.subheadline).foregroundColor(ShelfStyle.secondaryText) }
-            Text(book.author).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
+            Text(book.author.isEmpty ? l10n("Unknown author") : book.author).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
             if let duration = listeningDuration { Label(ShelfTime.describe(duration), systemImage: "headphones").font(.subheadline) }
             if let narrators = book.media.metadata.narrators, !narrators.isEmpty {
                 Text(l10n("Narrated by {0}", narrators.joined(separator: ", "))).font(.footnote).foregroundColor(ShelfStyle.secondaryText)
             }
-            if episode == nil, book.mediaType == "book" { RelatedBookLinks(item: book, catalog: catalog) }
         }.multilineTextAlignment(alignment == .center ? .center : .leading)
             .frame(maxWidth: .infinity, alignment: alignment == .center ? .center : .leading)
     }
@@ -356,9 +355,8 @@ struct BookDetails: View {
         }
     }
     private var podcastEpisodes: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        Section(header: Text(l10n("Episodes"))) {
             HStack {
-                Text(l10n("Episodes")).font(.title2.bold())
                 Spacer()
                 Menu {
                     ForEach([("Published date", "publishedAt"), ("Title", "title"), ("Season", "season"), ("Episode number", "episode"), ("Filename", "filename")], id: \.1) { choice in
@@ -395,7 +393,7 @@ struct BookDetails: View {
                 Text(l10n("Waiting for {0} episode(s) from your server", requestedDownloads.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("server-download-pending")
                 Button(l10n("Refresh downloads"), action: watchDownloads)
             }
-            if visibleEpisodes.isEmpty { Text(l10n("No episodes found")).foregroundColor(ShelfStyle.secondaryText) }
+            if visibleEpisodes.isEmpty { CatalogStatus(title: l10n("No episodes found"), message: book.title, symbol: "waveform") }
             ForEach(visibleEpisodes) { episode in
                 NavigationLink(destination: BookDetails(item: book, catalog: catalog, progress: progress(for: episode), episode: episode)) {
                     VStack(alignment: .leading, spacing: 8) {
@@ -408,8 +406,8 @@ struct BookDetails: View {
                             ProgressView(value: progress.fraction).accentColor(ShelfStyle.accent)
                             Text(progress.isFinished == true ? l10n("Finished") : l10n("{0} listened", ShelfTime.describe(progress.currentTime ?? 0))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
                         }
-                    }.frame(maxWidth: .infinity, alignment: .leading).padding(18).background(appearance.card).cornerRadius(16)
-                }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("episode-\(episode.id)")
+                    }.frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 6)
+                }.accessibilityIdentifier("episode-\(episode.id)")
             }
         }
     }

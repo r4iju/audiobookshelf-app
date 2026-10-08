@@ -14,8 +14,8 @@ import XCTest
     private func searchAndOpen(_ text: String, result identifier: String) -> XCUIApplication {
         connectSelectAndRestore(serverURL: Self.fixture, verifyRestoration: false)
         let app = XCUIApplication()
-        XCTAssertTrue(app.buttons["Search library"].waitForExistence(timeout: 10))
-        app.buttons["Search library"].tap()
+        XCTAssertTrue(app.buttons["Search"].firstMatch.waitForExistence(timeout: 10))
+        app.buttons["Search"].firstMatch.tap()
         librarySearchField(app).tap()
         librarySearchField(app).typeText(text + "\n")
         let result = app.buttons[identifier]

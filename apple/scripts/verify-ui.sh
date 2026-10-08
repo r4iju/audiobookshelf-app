@@ -83,8 +83,9 @@ for fixture_pid in "${fixture_pids[@]}"; do
         exit 2
     fi
 done
+derived_data="${ABS_QA_DERIVED_DATA:-$apple_root/build/ui-$(printf '%s' "$simulator" | tr -c 'A-Za-z0-9-' '_')}"
 xcodegen generate --spec "$apple_root/project.yml"
 xcodebuild -project "$apple_root/AudiobookshelfNative.xcodeproj" -scheme AudiobookshelfNative \
     -destination "$destination" \
-    -derivedDataPath "$apple_root/build" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
+    -derivedDataPath "$derived_data" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
     IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never "$@" test

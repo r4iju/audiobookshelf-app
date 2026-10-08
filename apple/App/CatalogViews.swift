@@ -18,10 +18,52 @@ struct CatalogShelf: View {
         _catalog = StateObject(wrappedValue: CatalogStore(api: api, library: library, filter: filter))
     }
     var body: some View {
+        Group {
+            if listLayout, case .content(let content) = catalog.state, !listenNow {
+                list(content)
+            } else { grid }
+        }.accessibilityIdentifier("catalog").background(appearance.background)
+            .navigationTitle(listenNow ? l10n("Listen Now") : catalog.library.name)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if !listenNow {
+                        Button { libraryChooser = true } label: { Label(l10n("Change library"), systemImage: "books.vertical") }.accessibilityLabel(l10n("Change library"))
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if !listenNow { HStack {
+                        Menu {
+                            Button(l10n("Title A–Z")) { sort(.title, descending: false) }
+                            Button(l10n("Title Z–A")) { sort(.title, descending: true) }
+                            Button(l10n("Newest first")) { sort(.added, descending: true) }
+                            Divider()
+                            ForEach(CatalogSort.available(for: catalog.library.mediaType), id: \.self) { choice in Button(l10n(choice.name)) { sort(choice, descending: catalog.descending) } }
+                            Button(l10n(catalog.descending ? "Ascending order" : "Descending order")) { sort(catalog.sort, descending: !catalog.descending) }
+                        } label: { Image(systemName: "arrow.up.arrow.down").font(.body) }.accessibilityLabel(l10n("Sort library"))
+                        Button { filterOptions = true } label: { Image(systemName: catalog.filter == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill") }.accessibilityLabel(l10n("Filter library"))
+                    } }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        if catalog.library.mediaType == "podcast", case .content(let content) = catalog.state, content.user.canManagePodcasts {
+                            Button(l10n("Add podcast")) { addingPodcast = true }
+                        }
+                        Button(l10n("Refresh")) { Task { await catalog.reload() } }
+                    } label: { Image(systemName: "ellipsis") }.accessibilityLabel(l10n("Library actions"))
+                }
+            }.onAppear { Task { if case .loading = catalog.state { await catalog.reload() } else { await catalog.refreshProgressIfNeeded() } } }
+            .onReceive(realtime.events) { event in catalog.receive(event) }
+            .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
+            .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
+            .sheet(isPresented: $libraryChooser) { ShellLibraryChooser(presented: $libraryChooser) }
+
+    }
+
+    private var grid: some View {
         ScrollView {
             switch catalog.state {
             case .loading:
-                ProgressView(l10n("Opening your books…")).frame(maxWidth: .infinity).padding(60)
+                CatalogStatus(title: l10n("Opening your books…"), message: catalog.library.name, symbol: "books.vertical", loading: true).padding(24)
             case .failed(let error):
                 RecoveryCard(message: error) { Task { await catalog.reload() } }.padding(24)
             case .content(let content):
@@ -63,7 +105,7 @@ struct CatalogShelf: View {
                             .accessibilityLabel(l10n(listLayout ? "Show covers" : "Show list")) }
                     }
                     if content.items.isEmpty {
-                        Text(l10n(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue.")).foregroundColor(ShelfStyle.secondaryText)
+                        CatalogStatus(title: l10n(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue."), message: catalog.library.name, symbol: "books.vertical")
                     }
                     LazyVGrid(columns: listLayout ? [GridItem(.flexible(), alignment: .top)] : [GridItem(.adaptive(minimum: sizeCategory.isAccessibilityCategory ? 260 : 140, maximum: sizeCategory.isAccessibilityCategory ? 420 : 210), spacing: 16, alignment: .top)], spacing: 22) {
                         ForEach(listenNow ? Array(content.items.prefix(6)) : content.items) { item in
@@ -83,41 +125,54 @@ struct CatalogShelf: View {
                     }
                 }.padding(20).frame(maxWidth: 1400).frame(maxWidth: .infinity)
             }
-        }.accessibilityIdentifier("catalog").background(appearance.background)
-            .navigationTitle(listenNow ? l10n("Listen Now") : catalog.library.name)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if !listenNow {
-                        Button { libraryChooser = true } label: { Label(l10n("Change library"), systemImage: "books.vertical") }.accessibilityLabel(l10n("Change library"))
+        }
+    }
+
+    private func list(_ content: CatalogStore.Catalog) -> some View {
+        ShelfList {
+            if !content.continuing.isEmpty {
+                Section(header: Text(l10n("Continue listening"))) {
+                    ForEach(content.continuing) { item in
+                        NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: progress(item, content))) {
+                            HStack(spacing: 14) {
+                                BookArtwork(item: item, catalog: catalog).frame(width: 62)
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(item.title).font(.body.weight(.semibold)).foregroundColor(.primary)
+                                    Text(item.author.isEmpty ? l10n("Unknown author") : item.author).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
+                                    ProgressView(value: progress(item, content)?.fraction ?? 0)
+                                    Text(l10n("{0}% listened", Int((progress(item, content)?.fraction ?? 0) * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                                }
+                            }.padding(.vertical, 6)
+                        }.accessibilityIdentifier("continue-\(item.id)")
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if !listenNow { HStack {
-                        Menu {
-                            Button(l10n("Title A–Z")) { sort(.title, descending: false) }
-                            Button(l10n("Title Z–A")) { sort(.title, descending: true) }
-                            Button(l10n("Newest first")) { sort(.added, descending: true) }
-                            Divider()
-                            ForEach(CatalogSort.available(for: catalog.library.mediaType), id: \.self) { choice in Button(l10n(choice.name)) { sort(choice, descending: catalog.descending) } }
-                            Button(l10n(catalog.descending ? "Ascending order" : "Descending order")) { sort(catalog.sort, descending: !catalog.descending) }
-                        } label: { Image(systemName: "arrow.up.arrow.down").font(.body) }.accessibilityLabel(l10n("Sort library"))
-                        Button { filterOptions = true } label: { Image(systemName: catalog.filter == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill") }.accessibilityLabel(l10n("Filter library"))
-                    } }
+            }
+            Section {
+                if catalog.library.mediaType == "book" {
+                    NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .collection)) { Label(l10n("Collections"), systemImage: "square.stack") }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        if catalog.library.mediaType == "podcast", case .content(let content) = catalog.state, content.user.canManagePodcasts {
-                            Button(l10n("Add podcast")) { addingPodcast = true }
-                        }
-                        Button(l10n("Refresh")) { Task { await catalog.reload() } }
-                    } label: { Image(systemName: "ellipsis") }.accessibilityLabel(l10n("Library actions"))
+                NavigationLink(destination: AudioGroupList(catalog: catalog, kind: .playlist)) { Label(l10n("Playlists"), systemImage: "music.note.list") }
+            }
+            Section(header: HStack {
+                Text(l10n(catalog.library.mediaType == "podcast" ? "All podcasts" : "All books"))
+                Text("\(content.total)")
+                Spacer()
+                Button { NativeHaptic.impact("layout"); listLayout.toggle() } label: { Image(systemName: "square.grid.2x2").frame(minWidth: 44, minHeight: 44) }
+                    .buttonStyle(PlainButtonStyle()).accessibilityLabel(l10n("Show covers"))
+            }) {
+                if content.items.isEmpty {
+                    CatalogStatus(title: l10n(catalog.filter == nil ? "This library is empty. Add titles on your server, then refresh." : "No titles match this filter. Choose another filter to continue."), message: catalog.library.name, symbol: "books.vertical")
                 }
-            }.onAppear { Task { if case .loading = catalog.state { await catalog.reload() } else { await catalog.refreshProgressIfNeeded() } } }
-            .onReceive(realtime.events) { event in catalog.receive(event) }
-            .sheet(isPresented: $filterOptions) { CatalogFilterOptions(catalog: catalog, presented: $filterOptions) }
-            .sheet(isPresented: $addingPodcast) { AddPodcast(catalog: catalog, presented: $addingPodcast) }
-            .sheet(isPresented: $libraryChooser) { ShellLibraryChooser(presented: $libraryChooser) }
-
+                ForEach(content.items) { item in
+                    NavigationLink(destination: BookDetails(item: item, catalog: catalog, progress: progress(item, content))) {
+                        BookCard(item: item, catalog: catalog, listLayout: true)
+                    }.accessibilityIdentifier("book-\(item.id)")
+                        .onAppear { if item.id == content.items.last?.id { Task { await catalog.loadMore() } } }
+                }
+                if let error = content.pageError { RecoveryCard(message: error) { Task { await catalog.loadMore() } } }
+                else if content.hasMore { ProgressView().frame(maxWidth: .infinity).padding(20) }
+            }
+        }
     }
 
     private func sort(_ choice: CatalogSort, descending: Bool) {
@@ -143,7 +198,7 @@ struct BookArtwork: View {
                 if let image { Image(uiImage: image).resizable().scaledToFit().clipShape(RoundedRectangle(cornerRadius: 12)) }
                 else {
                     VStack(spacing: 8) {
-                        Image(systemName: "book.closed.fill").font(.title2)
+                        Image(systemName: item.mediaType == "podcast" ? "mic.fill" : "book.closed.fill").font(.title2)
                     }.foregroundColor(ShelfStyle.accent).padding(12)
                 }
             })
@@ -172,14 +227,14 @@ struct BookCard: View {
         Group {
             if listLayout {
                 HStack(spacing: 18) { BookArtwork(item: item, catalog: catalog).frame(width: 62); labels; Spacer() }
-                    .padding(14).background(appearance.card).cornerRadius(18)
+                    .padding(.vertical, 6)
             } else { VStack(alignment: .leading, spacing: 12) { BookArtwork(item: item, catalog: catalog); labels } }
         }
     }
     private var labels: some View {
         VStack(alignment: .leading, spacing: 5) {
-            metadata(title, font: .subheadline.weight(.semibold), color: .primary)
-            metadata(author.isEmpty ? l10n("Unknown author") : author, font: .caption, color: ShelfStyle.secondaryText)
+            metadata(title, font: listLayout ? .body.weight(.semibold) : .subheadline.weight(.semibold), color: .primary)
+            metadata(author.isEmpty ? l10n("Unknown author") : author, font: listLayout ? .subheadline : .caption, color: ShelfStyle.secondaryText)
             if let duration = item.media.duration { Text(ShelfTime.describe(duration)).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
         }
     }
@@ -188,7 +243,7 @@ struct BookCard: View {
             if !listLayout {
                 Text("Ag\nAg").hidden().accessibilityHidden(true)
             }
-            Text(value).foregroundColor(color).lineLimit(sizeCategory.isAccessibilityCategory ? nil : 2)
+            Text(value).foregroundColor(color).lineLimit(listLayout || sizeCategory.isAccessibilityCategory ? nil : 2)
         }.font(font).frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -212,7 +267,7 @@ struct ContinueCard: View {
             BookArtwork(item: item, catalog: catalog).frame(width: 64)
             VStack(alignment: .leading, spacing: 6) {
                 Text(title).font(.subheadline.weight(.semibold)).foregroundColor(.primary).lineLimit(sizeCategory.isAccessibilityCategory ? nil : 2)
-                Text(author).font(.caption).foregroundColor(ShelfStyle.secondaryText).lineLimit(sizeCategory.isAccessibilityCategory ? nil : 1)
+                Text(author.isEmpty ? l10n("Unknown author") : author).font(.caption).foregroundColor(ShelfStyle.secondaryText).lineLimit(sizeCategory.isAccessibilityCategory ? nil : 1)
                 ProgressView(value: progress?.fraction ?? 0).accentColor(ShelfStyle.accent)
                 Text(l10n("{0}% listened", Int((progress?.fraction ?? 0) * 100))).font(.caption).foregroundColor(ShelfStyle.secondaryText)
             }.frame(width: sizeCategory.isAccessibilityCategory ? 260 : 175, alignment: .leading)
@@ -252,5 +307,20 @@ enum ShelfTime {
         formatter.allowedUnits = safe < 60 ? [.second] : safe < 3600 ? [.minute] : [.hour, .minute]
         formatter.zeroFormattingBehavior = safe < 3600 ? .default : .dropLeading
         return formatter.string(from: TimeInterval(safe - (safe >= 60 ? safe % 60 : 0))) ?? "\(safe)"
+    }
+}
+
+struct CatalogStatus: View {
+    let title: String
+    let message: String
+    let symbol: String
+    var loading = false
+    var body: some View {
+        VStack(spacing: 14) {
+            if loading { ProgressView() }
+            else { Image(systemName: symbol).font(.largeTitle).foregroundColor(ShelfStyle.secondaryText).accessibilityHidden(true) }
+            Text(title).font(.headline).multilineTextAlignment(.center)
+            Text(message).font(.subheadline).foregroundColor(ShelfStyle.secondaryText).multilineTextAlignment(.center)
+        }.padding(.vertical, 28).frame(maxWidth: 520).frame(maxWidth: .infinity)
     }
 }

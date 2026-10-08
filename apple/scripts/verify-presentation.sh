@@ -60,7 +60,8 @@ assert text.startswith('name: AudiobookshelfNative\n')
 open(target, 'w').write(text.replace('name: AudiobookshelfNative\n', 'name: build-presentation-qa\n', 1))
 PY
 xcodegen generate --quiet --spec "$spec" --project-root "$apple_root" --project "$apple_root"
+derived_data="${ABS_QA_DERIVED_DATA:-$qa_root/derived/$simulator_id}"
 xcodebuild -project "$apple_root/build-presentation-qa.xcodeproj" -scheme AudiobookshelfNative \
     -destination "id=$simulator_id" \
-    -derivedDataPath "$qa_root/derived" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
+    -derivedDataPath "$derived_data" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual \
     IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never "${@:--only-testing:NativeJourneyTests/PresentationJourney}" test

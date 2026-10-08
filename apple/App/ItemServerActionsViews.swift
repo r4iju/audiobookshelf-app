@@ -18,7 +18,8 @@ struct ItemServerActionsSection: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        Group {
+            if !actions.loaded, actions.error == nil { ProgressView().accessibilityLabel(l10n("Opening your books…")) }
             if actions.showsFeed {
                 Button { showingFeed = true } label: {
                     Label(l10n(actions.feed == nil ? "Open RSS feed" : "RSS feed"), systemImage: "dot.radiowaves.left.and.right")

@@ -72,49 +72,70 @@ struct LibrarySearch: View {
         }
     }
     private var results: some View {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 18) {
-                    Text(search.catalog.library.name).font(.subheadline.weight(.semibold)).foregroundColor(ShelfStyle.secondaryText)
-                    switch search.state {
-                    case .idle: Text(l10n("Find your next listen.")).foregroundColor(ShelfStyle.secondaryText)
-                    case .loading: ProgressView(l10n("Searching your library…")).frame(maxWidth: .infinity)
-                    case .failed(let error): RecoveryCard(message: error) { submit() }
-                    case .results(let results):
-                        if results.isEmpty { Text(l10n("No results. Try another title, author, or series.")).foregroundColor(ShelfStyle.secondaryText) }
-                        if !results.items.isEmpty { Text(l10n(search.catalog.library.mediaType == "podcast" ? "Podcasts" : "Books")).font(.headline) }
+        ShelfList {
+            Section {
+                Text(search.catalog.library.name).font(.subheadline.weight(.semibold)).foregroundColor(ShelfStyle.secondaryText).listRowBackground(Color.clear)
+                switch search.state {
+                case .idle:
+                    CatalogStatus(title: l10n("Find your next listen."), message: l10n("Books, podcasts, authors, series…"), symbol: "magnifyingglass")
+                case .loading:
+                    ProgressView(l10n("Searching your library…")).padding(.vertical, 24).frame(maxWidth: .infinity)
+                case .failed(let error):
+                    RecoveryCard(message: error, retry: submit)
+                case .results(let results):
+                    if results.isEmpty {
+                        CatalogStatus(title: l10n("No results. Try another title, author, or series."), message: search.query, symbol: "magnifyingglass")
+                    }
+                }
+            }
+            if case .results(let results) = search.state {
+                if !results.items.isEmpty {
+                    Section(header: Text(l10n(search.catalog.library.mediaType == "podcast" ? "Podcasts" : "Books"))) {
                         ForEach(results.items) { item in
                             NavigationLink(destination: BookDetails(item: item, catalog: search.catalog, progress: nil)) {
                                 BookCard(item: item, catalog: search.catalog, listLayout: true)
-                            }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("search-\(item.id)")
+                            }.accessibilityIdentifier("search-\(item.id)")
                         }
-                        if !(results.episodes ?? []).isEmpty { Text(l10n("Episodes")).font(.headline) }
+                    }
+                }
+                if !(results.episodes ?? []).isEmpty {
+                    Section(header: Text(l10n("Episodes"))) {
                         ForEach(results.episodes ?? []) { result in
                             if let episode = result.libraryItem.recentEpisode {
                                 NavigationLink(destination: BookDetails(item: result.libraryItem, catalog: search.catalog, progress: nil, episode: episode)) {
-                                    VStack(alignment: .leading, spacing: 8) {
+                                    VStack(alignment: .leading, spacing: 6) {
                                         Text(episode.title).font(.headline).foregroundColor(.primary)
-                                        Text(result.libraryItem.title).font(.caption).foregroundColor(ShelfStyle.secondaryText)
-                                    }.padding(18).frame(maxWidth: .infinity, alignment: .leading).background(appearance.card).cornerRadius(16)
-                                }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier("search-episode-\(episode.id)")
+                                        Text(result.libraryItem.title).font(.subheadline).foregroundColor(ShelfStyle.secondaryText)
+                                        if let duration = episode.duration { Text(ShelfTime.describe(duration)).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
+                                    }.padding(.vertical, 4)
+                                }.accessibilityIdentifier("search-episode-\(episode.id)")
                             }
                         }
-                        if !(results.authors ?? []).isEmpty { Text(l10n("Authors")).font(.headline) }
+                    }
+                }
+                if !(results.authors ?? []).isEmpty {
+                    Section(header: Text(l10n("Authors"))) {
                         ForEach(results.authors ?? []) { author in
                             relatedRow(author.name, identifier: "search-author-" + author.id, destination: RelatedAuthorView(catalog: search.catalog, authorID: author.id, name: author.name))
                         }
-                        if !(results.series ?? []).isEmpty { Text(l10n("Series")).font(.headline) }
+                    }
+                }
+                if !(results.series ?? []).isEmpty {
+                    Section(header: Text(l10n("Series"))) {
                         ForEach(results.series ?? []) { series in
                             relatedRow(series.series.name, identifier: "search-series-" + series.id, destination: RelatedSeriesView(catalog: search.catalog, seriesID: series.id, name: series.series.name))
                         }
-                        if !(results.narrators ?? []).isEmpty { Text(l10n("Narrators")).font(.headline) }
-                        ForEach(results.narrators ?? []) { narrator in related(narrator.name, group: "narrators", value: narrator.name) }
-                        if !(results.tags ?? []).isEmpty { Text(l10n("Tags")).font(.headline) }
-                        ForEach(results.tags ?? []) { tag in related(tag.name, group: "tags", value: tag.name) }
-                        if search.canShowMore(results) { Button(l10n("Show more results")) { Task { await search.search(more: true) } } }
                     }
-                }.padding(20).frame(maxWidth: 1000).frame(maxWidth: .infinity, alignment: .leading)
+                }
+                if !(results.narrators ?? []).isEmpty {
+                    Section(header: Text(l10n("Narrators"))) { ForEach(results.narrators ?? []) { narrator in related(narrator.name, group: "narrators", value: narrator.name) } }
+                }
+                if !(results.tags ?? []).isEmpty {
+                    Section(header: Text(l10n("Tags"))) { ForEach(results.tags ?? []) { tag in related(tag.name, group: "tags", value: tag.name) } }
+                }
+                if search.canShowMore(results) { Button(l10n("Show more results")) { Task { await search.search(more: true) } } }
             }
-            .background(appearance.background).navigationTitle(l10n("Search"))
+        }.navigationTitle(l10n("Search"))
     }
     private func submit() { search.submit() }
     private func related(_ name: String, group: String, value: String) -> some View {
@@ -122,8 +143,8 @@ struct LibrarySearch: View {
     }
     private func relatedRow<Destination: View>(_ name: String, identifier: String, destination: Destination) -> some View {
         NavigationLink(destination: destination) {
-            HStack { Text(name); Spacer(); Image(systemName: "chevron.right") }.padding(18).background(appearance.card).cornerRadius(16)
-        }.buttonStyle(PlainButtonStyle()).accessibilityIdentifier(identifier)
+            Text(name).foregroundColor(.primary).padding(.vertical, 4)
+        }.accessibilityIdentifier(identifier)
     }
 }
 
