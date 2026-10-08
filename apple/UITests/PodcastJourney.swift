@@ -75,7 +75,10 @@ import XCTest
         app.buttons["podcast-discovery-42"].tap()
         XCTAssertTrue(app.textFields["podcast-title"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.textFields["podcast-title"].value as? String, "New Voices Discovery")
-        app.buttons["Create podcast"].tap()
+        let create = app.buttons["Create podcast"]
+        for _ in 0..<12 where !(create.exists && create.isHittable) { app.swipeUp() }
+        XCTAssertTrue(create.waitForExistence(timeout: 5))
+        create.tap()
         XCTAssertTrue(app.buttons["book-podcast-new"].waitForExistence(timeout: 10))
         let requests = try await fixtureRequests()
         XCTAssertTrue(requests.contains { $0.path == "/api/search/podcast" })

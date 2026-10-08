@@ -6,6 +6,7 @@ import XCTest
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
         mainDestination("Settings", in: app).tap()
+        for _ in 0..<8 where !app.buttons["language-settings"].exists { app.swipeUp() }
         XCTAssertTrue(app.buttons["language-settings"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.searchFields.firstMatch.exists, "Settings must not own Library search input")
         mainDestination("Search", in: app).tap()
@@ -16,6 +17,7 @@ import XCTest
         let cancelled = app.buttons["Close"].exists
         if cancelled { app.buttons["Close"].tap() }
         mainDestination("Settings", in: app).tap()
+        for _ in 0..<8 where !app.buttons["language-settings"].exists { app.swipeUp() }
         XCTAssertTrue(app.buttons["language-settings"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.searchFields.firstMatch.exists, "Leaving Search removes its input from Settings")
         mainDestination("Search", in: app).tap()
