@@ -1,0 +1,13 @@
+{
+  "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+  "binary": "/tmp/native238-capture-17869645/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV.debug.dylib",
+  "uuid": "91170A73-1B2E-3B0D-9F72-DD0DEE019848",
+  "matchingWarnings": 28,
+  "offsets": [
+    840568,
+    840416
+  ],
+  "exit": 0,
+  "symbolication": "CatalogStore.needsSignIn.setter (in AudiobookshelfTV.debug.dylib) (CatalogStore.swift:0)\nkey path setter for CatalogStore.needsSignIn : CatalogStore (in AudiobookshelfTV.debug.dylib) (/<compiler-generated>:0)\n",
+  "error": ""
+}

@@ -1,0 +1,943 @@
+{
+  "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+  "source_minimum": "17.0",
+  "build_minimum": "17.0",
+  "SDK": "tvOS27.0",
+  "products": {
+    "tv": {
+      "path": "/tmp/native238-final-17869645/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+      "device": "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+      "files": {
+        "Assets.car": "03e4158e55dcaafd20454515583fa97834189d7ce34005ff53dd9d3145c888e2",
+        "AudiobookshelfTV": "82abb42e53121a5b48b96e457a2f8530dc60bf915215c64d382634cf7e7b3c21",
+        "AudiobookshelfTV.debug.dylib": "27cca6cf5b68cde346f6bd065ed0bbedf77a2b3af4732ebdef50bea5e0c64f33",
+        "Info.plist": "320411e9ee6aa5ad369a7397d19399b49576eaf3479309b5b84be612249e40af",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "PlugIns/TVAppTests.xctest/Info.plist": "739b2de8ee43c1249a8e8e9706f95cca821309481a0b30719c30293c22a8e1a8",
+        "PlugIns/TVAppTests.xctest/TVAppTests": "2cc40deda673bbc94b61b40052061549621dbdecdd32758ac151d6391f71e47e",
+        "PlugIns/TVAppTests.xctest/_CodeSignature/CodeResources": "2a8be59da47c57ffa45af469084a42fbbd74dc9a90de821f5abeeee11e43ad90",
+        "_CodeSignature/CodeResources": "dd45c9117a01b62f6ccb31f2526be60d63086531e8b1f273f22a2392cf9ed22f",
+        "__preview.dylib": "2cbefd81ae48fce00dadfa24e66e3411b461be1609191cb6adeffe60cb54d5ff",
+        "ar.lproj/NativeStrings.strings": "b7e8b984091939317f0759fccd7c185b178ad210512e8d8010e4ce26c70a1b61",
+        "be.lproj/NativeStrings.strings": "84488c772edbc86208e04c70b5ae14e4e34b431394f04b83fd29119ee13c7eb2",
+        "bg.lproj/NativeStrings.strings": "3a7168a312ae678c2f70c666037e0865c3bbcd2cc2720e7cb7a96177c1a93988",
+        "bn.lproj/NativeStrings.strings": "d562157f0cd001208edde952905209466a76b005acec6759ad860f032fc20e96",
+        "ca.lproj/NativeStrings.strings": "ad7a1e6341e99c93e2f0c4aef57182ff4a961c6bb374c9bbb28cdf5c4ce1fd0e",
+        "cs.lproj/NativeStrings.strings": "59ba732386462c5aaa4c19dab3e89a854bc53f49aa43ff57cf598c342ad8f416",
+        "da.lproj/NativeStrings.strings": "076b05095c44376d2ca68da9018479909c5617965872c06098dc4261ff8c8376",
+        "de.lproj/NativeStrings.strings": "ddbcb96336e4e7788700a6c836bfcd71bb2ed604c4edba6fb8d8ac5e25e13008",
+        "en.lproj/NativeStrings.strings": "5d702cde03a7563c4fb0195aed4ec81156fd30287e1fe4fb2b6bd2a8b9c0e5b2",
+        "es.lproj/NativeStrings.strings": "2101d3aec75fcd685265d5f05c4d013a2fe90bf666e083cc29d17ceb7317dffe",
+        "fi.lproj/NativeStrings.strings": "b7b4569cdd4e3187035959e4f7fa92284194c755814baa03e154c3e30ef7cc42",
+        "fr.lproj/NativeStrings.strings": "ffce0361776fe61b843c7dd87d342369f4811e2b3b019a93ef3378f3c5cf13d8",
+        "he.lproj/NativeStrings.strings": "96bc1adc69fb3cf94967eef670cd95ab554594b10e270c8ededba513928d4589",
+        "hr.lproj/NativeStrings.strings": "a718d8f7e5be072d25b58528f25a25675b85e1aac58371a01423b23828904af9",
+        "hu.lproj/NativeStrings.strings": "3a09c72ac1069c5eda78bfcb821af26e1806a0c73d13d2ecc47d21453da0f5e7",
+        "it.lproj/NativeStrings.strings": "169cdd31cb7c2014688e03ce695a1b5d875d1a2fba3fc6c126f6e8f67bfff417",
+        "ko.lproj/NativeStrings.strings": "52d7929b55f2e63bd09dc718539d4dcdad587173a183f7292e318f8fd2db904b",
+        "lt.lproj/NativeStrings.strings": "c2777ecfee24d08ab707428815e60e5941bcc39086cc1cf33ebd7a3c104ad676",
+        "nb.lproj/NativeStrings.strings": "c618a3c6fea459636e60016474fef976261cb518e4b05ac30b4359d7cb0c5ce5",
+        "nl.lproj/NativeStrings.strings": "8e47cf9f27b914744bf685e46c1b4831c69b9b2d0197f0dcccd91b45137bb5da",
+        "pl.lproj/NativeStrings.strings": "0e89c678368c370608c1a20e02026e205421f8348ffe24a939542c2108e1cf12",
+        "pt-BR.lproj/NativeStrings.strings": "46d91092423f4c9f92800317efba21e7e391f8b47b4e01853ec3ffd9d427281a",
+        "ru.lproj/NativeStrings.strings": "2a74e97818228cacef601ac99114ea3adf5b31f8fd1f838ad2c9c38b301e5822",
+        "sk.lproj/NativeStrings.strings": "bba4b6ca21dd30fa1d79baaede07620b05837370d18789deb55f9266f040d4be",
+        "sl.lproj/NativeStrings.strings": "05b6ff70adc345ca826e233a05900384d91e8916e3503ea6d63a69d273d53525",
+        "sv.lproj/NativeStrings.strings": "5d90450a77a2c83a4c0fe0aeb180feec1d94334ea57640c76a135fa9708ecde6",
+        "tr.lproj/NativeStrings.strings": "939caf9024120e8ebc517a5709234a38d2cb1d2173afd9de9e8c01214686ed66",
+        "uk.lproj/NativeStrings.strings": "efdda79ad12106c8be1d378558d073fad680474d48201094f2097609aa8dfdfe",
+        "vi.lproj/NativeStrings.strings": "7cbe274b7c3a913249c9da6559d6ad6202890225d86ad8aabf815e83c9281f79",
+        "zh-Hans.lproj/NativeStrings.strings": "0c7e69d80bf898cb163938bb948b05535259aee8dad6f59d830e983099752f06"
+      },
+      "info": {
+        "BuildMachineOSBuild": "26A434",
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "Audiobook Loft",
+        "CFBundleExecutable": "AudiobookshelfTV",
+        "CFBundleIcons": {
+          "CFBundlePrimaryIcon": "App Icon"
+        },
+        "CFBundleIdentifier": "com.forkzed.audiobookshelf.tv",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "AudiobookshelfTV",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleSupportedPlatforms": [
+          "AppleTVSimulator"
+        ],
+        "CFBundleVersion": "1",
+        "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+        "DTPlatformBuild": "24J360",
+        "DTPlatformName": "appletvsimulator",
+        "DTPlatformVersion": "27.0",
+        "DTSDKBuild": "24J360",
+        "DTSDKName": "appletvsimulator27.0",
+        "DTXcode": "2700",
+        "DTXcodeBuild": "27A266a",
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSRequiresIPhoneOS": true,
+        "MinimumOSVersion": "17.0",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Connect to your Audiobook Loft or compatible Audiobookshelf server on your local network.",
+        "TVTopShelfImage": {
+          "TVTopShelfPrimaryImage": "Top Shelf",
+          "TVTopShelfPrimaryImageWide": "Top Shelf Wide"
+        },
+        "UIDeviceFamily": [
+          3
+        ],
+        "UILaunchScreen": {}
+      },
+      "strict_codesign_exit": 0,
+      "installed_checks": [
+        {
+          "phase": "after-committed-functional-tests-before-render-build",
+          "path": "/tmp/native238-installed-qa-after-tests.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/036C37CC-A2DE-47A7-8060-F21308A693D7/AudiobookshelfTV.app",
+          "scope": "immutable copy of actually verified installed QA bundle",
+          "strict_exit": 0,
+          "resources": 40,
+          "files_match": true,
+          "timestamp": "2026-10-08T11:00:20.206634+00:00"
+        }
+      ],
+      "initial_installed_check": {
+        "phase": "initial-final-run",
+        "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/036C37CC-A2DE-47A7-8060-F21308A693D7/AudiobookshelfTV.app",
+        "strict_exit": 0,
+        "files_match": true,
+        "resources": 40,
+        "timestamp": "2026-10-08T10:38:36.110492+00:00"
+      },
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e"
+    },
+    "tv_capture": {
+      "path": "/tmp/native238-capture-17869645/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+      "device": "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+      "files": {
+        "Assets.car": "03e4158e55dcaafd20454515583fa97834189d7ce34005ff53dd9d3145c888e2",
+        "AudiobookshelfTV": "b1045c98fceddbe9f1ce899d815654630be87c2598954c76a486d5ddd5a83b49",
+        "AudiobookshelfTV.debug.dylib": "a3e658ce0c94376ada48df1bd4cdba682870bc2408f8d762e399b56a16a73be2",
+        "Info.plist": "320411e9ee6aa5ad369a7397d19399b49576eaf3479309b5b84be612249e40af",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "PlugIns/TVAppTests.xctest/Info.plist": "739b2de8ee43c1249a8e8e9706f95cca821309481a0b30719c30293c22a8e1a8",
+        "PlugIns/TVAppTests.xctest/TVAppTests": "9a8824e3d1c854daf4363133651f7c112306efddd3d4b398153c3d4a2b882b0b",
+        "PlugIns/TVAppTests.xctest/_CodeSignature/CodeResources": "2a8be59da47c57ffa45af469084a42fbbd74dc9a90de821f5abeeee11e43ad90",
+        "_CodeSignature/CodeResources": "528642af4b3b275253e91990bbcaf0d4143885ac7cdef3282fafb74eb0cb16c6",
+        "__preview.dylib": "2cbefd81ae48fce00dadfa24e66e3411b461be1609191cb6adeffe60cb54d5ff",
+        "ar.lproj/NativeStrings.strings": "b7e8b984091939317f0759fccd7c185b178ad210512e8d8010e4ce26c70a1b61",
+        "be.lproj/NativeStrings.strings": "84488c772edbc86208e04c70b5ae14e4e34b431394f04b83fd29119ee13c7eb2",
+        "bg.lproj/NativeStrings.strings": "3a7168a312ae678c2f70c666037e0865c3bbcd2cc2720e7cb7a96177c1a93988",
+        "bn.lproj/NativeStrings.strings": "d562157f0cd001208edde952905209466a76b005acec6759ad860f032fc20e96",
+        "ca.lproj/NativeStrings.strings": "ad7a1e6341e99c93e2f0c4aef57182ff4a961c6bb374c9bbb28cdf5c4ce1fd0e",
+        "cs.lproj/NativeStrings.strings": "59ba732386462c5aaa4c19dab3e89a854bc53f49aa43ff57cf598c342ad8f416",
+        "da.lproj/NativeStrings.strings": "076b05095c44376d2ca68da9018479909c5617965872c06098dc4261ff8c8376",
+        "de.lproj/NativeStrings.strings": "ddbcb96336e4e7788700a6c836bfcd71bb2ed604c4edba6fb8d8ac5e25e13008",
+        "en.lproj/NativeStrings.strings": "5d702cde03a7563c4fb0195aed4ec81156fd30287e1fe4fb2b6bd2a8b9c0e5b2",
+        "es.lproj/NativeStrings.strings": "2101d3aec75fcd685265d5f05c4d013a2fe90bf666e083cc29d17ceb7317dffe",
+        "fi.lproj/NativeStrings.strings": "b7b4569cdd4e3187035959e4f7fa92284194c755814baa03e154c3e30ef7cc42",
+        "fr.lproj/NativeStrings.strings": "ffce0361776fe61b843c7dd87d342369f4811e2b3b019a93ef3378f3c5cf13d8",
+        "he.lproj/NativeStrings.strings": "96bc1adc69fb3cf94967eef670cd95ab554594b10e270c8ededba513928d4589",
+        "hr.lproj/NativeStrings.strings": "a718d8f7e5be072d25b58528f25a25675b85e1aac58371a01423b23828904af9",
+        "hu.lproj/NativeStrings.strings": "3a09c72ac1069c5eda78bfcb821af26e1806a0c73d13d2ecc47d21453da0f5e7",
+        "it.lproj/NativeStrings.strings": "169cdd31cb7c2014688e03ce695a1b5d875d1a2fba3fc6c126f6e8f67bfff417",
+        "ko.lproj/NativeStrings.strings": "52d7929b55f2e63bd09dc718539d4dcdad587173a183f7292e318f8fd2db904b",
+        "lt.lproj/NativeStrings.strings": "c2777ecfee24d08ab707428815e60e5941bcc39086cc1cf33ebd7a3c104ad676",
+        "nb.lproj/NativeStrings.strings": "c618a3c6fea459636e60016474fef976261cb518e4b05ac30b4359d7cb0c5ce5",
+        "nl.lproj/NativeStrings.strings": "8e47cf9f27b914744bf685e46c1b4831c69b9b2d0197f0dcccd91b45137bb5da",
+        "pl.lproj/NativeStrings.strings": "0e89c678368c370608c1a20e02026e205421f8348ffe24a939542c2108e1cf12",
+        "pt-BR.lproj/NativeStrings.strings": "46d91092423f4c9f92800317efba21e7e391f8b47b4e01853ec3ffd9d427281a",
+        "ru.lproj/NativeStrings.strings": "2a74e97818228cacef601ac99114ea3adf5b31f8fd1f838ad2c9c38b301e5822",
+        "sk.lproj/NativeStrings.strings": "bba4b6ca21dd30fa1d79baaede07620b05837370d18789deb55f9266f040d4be",
+        "sl.lproj/NativeStrings.strings": "05b6ff70adc345ca826e233a05900384d91e8916e3503ea6d63a69d273d53525",
+        "sv.lproj/NativeStrings.strings": "5d90450a77a2c83a4c0fe0aeb180feec1d94334ea57640c76a135fa9708ecde6",
+        "tr.lproj/NativeStrings.strings": "939caf9024120e8ebc517a5709234a38d2cb1d2173afd9de9e8c01214686ed66",
+        "uk.lproj/NativeStrings.strings": "efdda79ad12106c8be1d378558d073fad680474d48201094f2097609aa8dfdfe",
+        "vi.lproj/NativeStrings.strings": "7cbe274b7c3a913249c9da6559d6ad6202890225d86ad8aabf815e83c9281f79",
+        "zh-Hans.lproj/NativeStrings.strings": "0c7e69d80bf898cb163938bb948b05535259aee8dad6f59d830e983099752f06"
+      },
+      "info": {
+        "BuildMachineOSBuild": "26A434",
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "Audiobook Loft",
+        "CFBundleExecutable": "AudiobookshelfTV",
+        "CFBundleIcons": {
+          "CFBundlePrimaryIcon": "App Icon"
+        },
+        "CFBundleIdentifier": "com.forkzed.audiobookshelf.tv",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "AudiobookshelfTV",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleSupportedPlatforms": [
+          "AppleTVSimulator"
+        ],
+        "CFBundleVersion": "1",
+        "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+        "DTPlatformBuild": "24J360",
+        "DTPlatformName": "appletvsimulator",
+        "DTPlatformVersion": "27.0",
+        "DTSDKBuild": "24J360",
+        "DTSDKName": "appletvsimulator27.0",
+        "DTXcode": "2700",
+        "DTXcodeBuild": "27A266a",
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSRequiresIPhoneOS": true,
+        "MinimumOSVersion": "17.0",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Connect to your Audiobook Loft or compatible Audiobookshelf server on your local network.",
+        "TVTopShelfImage": {
+          "TVTopShelfPrimaryImage": "Top Shelf",
+          "TVTopShelfPrimaryImageWide": "Top Shelf Wide"
+        },
+        "UIDeviceFamily": [
+          3
+        ],
+        "UILaunchScreen": {}
+      },
+      "strict_codesign_exit": 0,
+      "verification_time_epoch": 1791457549.797238,
+      "verification_time": "2026-10-08T11:05:49.797243+00:00",
+      "installed_checks": [
+        {
+          "path": "/tmp/native238-installed-after-first-render-pass.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/73A02F36-3789-4316-BCBC-C5F5390AE5F3/AudiobookshelfTV.app",
+          "phase": "after-first-render-pass",
+          "time": "2026-10-08T11:27:54.543821+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-before-corrected-render-pass.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/ACF4281E-7E43-4F9F-822A-9DD59F29F7D4/AudiobookshelfTV.app",
+          "phase": "before-corrected-render-pass",
+          "time": "2026-10-08T11:28:29.303430+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-after-corrected-render-pass.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/C230BCAD-2EC1-487A-9EE4-DF2FD24AF10C/AudiobookshelfTV.app",
+          "phase": "after-corrected-render-pass",
+          "time": "2026-10-08T11:35:22.768610+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-before-native-row-focus-render.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/B7672AA6-6DA5-4EC9-8488-70504497DAED/AudiobookshelfTV.app",
+          "phase": "before-native-row-focus-render",
+          "time": "2026-10-08T11:36:26.109734+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-after-native-row-focus-attempt.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/2D1FC2EA-9FC4-4389-9649-903C1BED0CF2/AudiobookshelfTV.app",
+          "phase": "after-native-row-focus-attempt",
+          "time": "2026-10-08T11:38:17.821063+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-before-up-diagnostic-render.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/4EFE80C7-E9BC-4107-83CF-0FD2D665C408/AudiobookshelfTV.app",
+          "phase": "before-up-diagnostic-render",
+          "time": "2026-10-08T11:38:34.801570+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        }
+      ],
+      "test_instrumentation": {
+        "238RenderJourney.swift": "675a9f1f29dafef7df16999b73b63a76133669e31f978ac84ce5420ce5e9ca38",
+        "238LongInspectionJourney-final.swift": "45e312ef805aec214ce7368d80d2263697aaaab14870fafe6bbcd24405eeeb22",
+        "238CaptureRecoveryJourney.swift": "e039f0870331168bc69a70634c8f28d35bfd8f2969f0b47827252133d4112fe0"
+      },
+      "scope": "Ad-hoc signed simulator QA product; committed App sources17869645, render-only UITest instrumentation. Not a signed physical release candidate.",
+      "resource_history": [
+        {
+          "phase": "after-first-render-pass",
+          "previous_files_match": true
+        },
+        {
+          "phase": "before-corrected-render-pass",
+          "previous_files_match": true
+        },
+        {
+          "phase": "after-corrected-render-pass",
+          "previous_files_match": true
+        },
+        {
+          "phase": "before-native-row-focus-render",
+          "previous_files_match": true
+        },
+        {
+          "phase": "after-native-row-focus-attempt",
+          "previous_files_match": true
+        },
+        {
+          "phase": "before-up-diagnostic-render",
+          "previous_files_match": true
+        }
+      ],
+      "capture_checkpoints": [
+        {
+          "phase": "after-first-render-pass",
+          "time": "2026-10-08T11:27:54.543821+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "675a9f1f29dafef7df16999b73b63a76133669e31f978ac84ce5420ce5e9ca38",
+            "LongInspectionJourney.swift": "45e312ef805aec214ce7368d80d2263697aaaab14870fafe6bbcd24405eeeb22",
+            "CaptureRecoveryJourney.swift": "e039f0870331168bc69a70634c8f28d35bfd8f2969f0b47827252133d4112fe0"
+          }
+        },
+        {
+          "phase": "before-corrected-render-pass",
+          "time": "2026-10-08T11:28:29.303430+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "20ba2bef5328f496cc9e891764a4c7a92e73cce1b55627992ae176106433ae9f",
+            "LongInspectionJourney.swift": "45e312ef805aec214ce7368d80d2263697aaaab14870fafe6bbcd24405eeeb22",
+            "CaptureRecoveryJourney.swift": "e039f0870331168bc69a70634c8f28d35bfd8f2969f0b47827252133d4112fe0"
+          }
+        },
+        {
+          "phase": "after-corrected-render-pass",
+          "time": "2026-10-08T11:35:22.768610+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "20ba2bef5328f496cc9e891764a4c7a92e73cce1b55627992ae176106433ae9f",
+            "LongInspectionJourney.swift": "45e312ef805aec214ce7368d80d2263697aaaab14870fafe6bbcd24405eeeb22",
+            "CaptureRecoveryJourney.swift": "e039f0870331168bc69a70634c8f28d35bfd8f2969f0b47827252133d4112fe0"
+          }
+        },
+        {
+          "phase": "before-native-row-focus-render",
+          "time": "2026-10-08T11:36:26.109734+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "04d4e859fac9808fab28a7c06277e48c9ccb45bcc57390ce6519b3c93db6ee7a",
+            "LongInspectionJourney.swift": "45e312ef805aec214ce7368d80d2263697aaaab14870fafe6bbcd24405eeeb22",
+            "CaptureRecoveryJourney.swift": "e039f0870331168bc69a70634c8f28d35bfd8f2969f0b47827252133d4112fe0"
+          }
+        },
+        {
+          "phase": "after-native-row-focus-attempt",
+          "time": "2026-10-08T11:38:17.821063+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "04d4e859fac9808fab28a7c06277e48c9ccb45bcc57390ce6519b3c93db6ee7a",
+            "LongInspectionJourney.swift": "45e312ef805aec214ce7368d80d2263697aaaab14870fafe6bbcd24405eeeb22",
+            "CaptureRecoveryJourney.swift": "e039f0870331168bc69a70634c8f28d35bfd8f2969f0b47827252133d4112fe0"
+          }
+        },
+        {
+          "phase": "before-up-diagnostic-render",
+          "time": "2026-10-08T11:38:34.801570+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "96b230e9940615454eb9602d5e149905b28bad2f78eb46d7e157ca5e2bc8f34b",
+            "LongInspectionJourney.swift": "45e312ef805aec214ce7368d80d2263697aaaab14870fafe6bbcd24405eeeb22",
+            "CaptureRecoveryJourney.swift": "e039f0870331168bc69a70634c8f28d35bfd8f2969f0b47827252133d4112fe0"
+          }
+        }
+      ],
+      "historical_installed_checks": [
+        {
+          "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/73A02F36-3789-4316-BCBC-C5F5390AE5F3/AudiobookshelfTV.app",
+          "phase": "before-remaining-render-cases-and-early-case-recapture",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40,
+          "availability": "Historical live container replaced by later XCTest install; unavailable now, original checkpoint retained only."
+        }
+      ],
+      "source": "17869645d869445fcc101f8ad625522f25b2b90e"
+    },
+    "tv_settings_final": {
+      "path": "/tmp/native238-settings-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "device": "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+      "files": {
+        "Assets.car": "03e4158e55dcaafd20454515583fa97834189d7ce34005ff53dd9d3145c888e2",
+        "AudiobookshelfTV": "006a894a93594f539f08fe5e677c9ec34e85c7181788a3d4f9b817d449ec73a3",
+        "AudiobookshelfTV.debug.dylib": "4a7172ad2666c6569c8ccb0439ed04cbb257dd0947f49cbe0f2bb8a4014d8964",
+        "Info.plist": "320411e9ee6aa5ad369a7397d19399b49576eaf3479309b5b84be612249e40af",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "PlugIns/TVAppTests.xctest/Info.plist": "739b2de8ee43c1249a8e8e9706f95cca821309481a0b30719c30293c22a8e1a8",
+        "PlugIns/TVAppTests.xctest/TVAppTests": "a86f84fb3a94a861a6788889b2f753cb784c373d469c5b314a07ef89f276185c",
+        "PlugIns/TVAppTests.xctest/_CodeSignature/CodeResources": "2a8be59da47c57ffa45af469084a42fbbd74dc9a90de821f5abeeee11e43ad90",
+        "_CodeSignature/CodeResources": "6e4921a718fc9c8271a30edb591b69b865637f13b12b4859146020f06e974cd4",
+        "__preview.dylib": "2cbefd81ae48fce00dadfa24e66e3411b461be1609191cb6adeffe60cb54d5ff",
+        "ar.lproj/NativeStrings.strings": "b7e8b984091939317f0759fccd7c185b178ad210512e8d8010e4ce26c70a1b61",
+        "be.lproj/NativeStrings.strings": "84488c772edbc86208e04c70b5ae14e4e34b431394f04b83fd29119ee13c7eb2",
+        "bg.lproj/NativeStrings.strings": "3a7168a312ae678c2f70c666037e0865c3bbcd2cc2720e7cb7a96177c1a93988",
+        "bn.lproj/NativeStrings.strings": "d562157f0cd001208edde952905209466a76b005acec6759ad860f032fc20e96",
+        "ca.lproj/NativeStrings.strings": "ad7a1e6341e99c93e2f0c4aef57182ff4a961c6bb374c9bbb28cdf5c4ce1fd0e",
+        "cs.lproj/NativeStrings.strings": "59ba732386462c5aaa4c19dab3e89a854bc53f49aa43ff57cf598c342ad8f416",
+        "da.lproj/NativeStrings.strings": "076b05095c44376d2ca68da9018479909c5617965872c06098dc4261ff8c8376",
+        "de.lproj/NativeStrings.strings": "ddbcb96336e4e7788700a6c836bfcd71bb2ed604c4edba6fb8d8ac5e25e13008",
+        "en.lproj/NativeStrings.strings": "5d702cde03a7563c4fb0195aed4ec81156fd30287e1fe4fb2b6bd2a8b9c0e5b2",
+        "es.lproj/NativeStrings.strings": "2101d3aec75fcd685265d5f05c4d013a2fe90bf666e083cc29d17ceb7317dffe",
+        "fi.lproj/NativeStrings.strings": "b7b4569cdd4e3187035959e4f7fa92284194c755814baa03e154c3e30ef7cc42",
+        "fr.lproj/NativeStrings.strings": "ffce0361776fe61b843c7dd87d342369f4811e2b3b019a93ef3378f3c5cf13d8",
+        "he.lproj/NativeStrings.strings": "96bc1adc69fb3cf94967eef670cd95ab554594b10e270c8ededba513928d4589",
+        "hr.lproj/NativeStrings.strings": "a718d8f7e5be072d25b58528f25a25675b85e1aac58371a01423b23828904af9",
+        "hu.lproj/NativeStrings.strings": "3a09c72ac1069c5eda78bfcb821af26e1806a0c73d13d2ecc47d21453da0f5e7",
+        "it.lproj/NativeStrings.strings": "169cdd31cb7c2014688e03ce695a1b5d875d1a2fba3fc6c126f6e8f67bfff417",
+        "ko.lproj/NativeStrings.strings": "52d7929b55f2e63bd09dc718539d4dcdad587173a183f7292e318f8fd2db904b",
+        "lt.lproj/NativeStrings.strings": "c2777ecfee24d08ab707428815e60e5941bcc39086cc1cf33ebd7a3c104ad676",
+        "nb.lproj/NativeStrings.strings": "c618a3c6fea459636e60016474fef976261cb518e4b05ac30b4359d7cb0c5ce5",
+        "nl.lproj/NativeStrings.strings": "8e47cf9f27b914744bf685e46c1b4831c69b9b2d0197f0dcccd91b45137bb5da",
+        "pl.lproj/NativeStrings.strings": "0e89c678368c370608c1a20e02026e205421f8348ffe24a939542c2108e1cf12",
+        "pt-BR.lproj/NativeStrings.strings": "46d91092423f4c9f92800317efba21e7e391f8b47b4e01853ec3ffd9d427281a",
+        "ru.lproj/NativeStrings.strings": "2a74e97818228cacef601ac99114ea3adf5b31f8fd1f838ad2c9c38b301e5822",
+        "sk.lproj/NativeStrings.strings": "bba4b6ca21dd30fa1d79baaede07620b05837370d18789deb55f9266f040d4be",
+        "sl.lproj/NativeStrings.strings": "05b6ff70adc345ca826e233a05900384d91e8916e3503ea6d63a69d273d53525",
+        "sv.lproj/NativeStrings.strings": "5d90450a77a2c83a4c0fe0aeb180feec1d94334ea57640c76a135fa9708ecde6",
+        "tr.lproj/NativeStrings.strings": "939caf9024120e8ebc517a5709234a38d2cb1d2173afd9de9e8c01214686ed66",
+        "uk.lproj/NativeStrings.strings": "efdda79ad12106c8be1d378558d073fad680474d48201094f2097609aa8dfdfe",
+        "vi.lproj/NativeStrings.strings": "7cbe274b7c3a913249c9da6559d6ad6202890225d86ad8aabf815e83c9281f79",
+        "zh-Hans.lproj/NativeStrings.strings": "0c7e69d80bf898cb163938bb948b05535259aee8dad6f59d830e983099752f06"
+      },
+      "info": {
+        "BuildMachineOSBuild": "26A434",
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "Audiobook Loft",
+        "CFBundleExecutable": "AudiobookshelfTV",
+        "CFBundleIcons": {
+          "CFBundlePrimaryIcon": "App Icon"
+        },
+        "CFBundleIdentifier": "com.forkzed.audiobookshelf.tv",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "AudiobookshelfTV",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleSupportedPlatforms": [
+          "AppleTVSimulator"
+        ],
+        "CFBundleVersion": "1",
+        "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+        "DTPlatformBuild": "24J360",
+        "DTPlatformName": "appletvsimulator",
+        "DTPlatformVersion": "27.0",
+        "DTSDKBuild": "24J360",
+        "DTSDKName": "appletvsimulator27.0",
+        "DTXcode": "2700",
+        "DTXcodeBuild": "27A266a",
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSRequiresIPhoneOS": true,
+        "MinimumOSVersion": "17.0",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Connect to your Audiobook Loft or compatible Audiobookshelf server on your local network.",
+        "TVTopShelfImage": {
+          "TVTopShelfPrimaryImage": "Top Shelf",
+          "TVTopShelfPrimaryImageWide": "Top Shelf Wide"
+        },
+        "UIDeviceFamily": [
+          3
+        ],
+        "UILaunchScreen": {}
+      },
+      "strict_codesign_exit": 0,
+      "verification_time": "2026-10-08T11:45:07.715972+00:00",
+      "scope": "Fresh isolated ad-hoc signed simulator QA, exact committed App and test sources7c69; no render instrumentation; not signed physical release candidate.",
+      "resource_history": [
+        {
+          "phase": "before-first-final-settings-frame",
+          "previous_files_match": true
+        },
+        {
+          "phase": "after-final-settings-checks",
+          "previous_files_match": true
+        }
+      ],
+      "installed_checks": [
+        {
+          "path": "/tmp/native238-installed-before-first-final-settings-frame.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/2349C1F6-06F9-4325-889B-568EB98C8CDE/AudiobookshelfTV.app",
+          "phase": "before-first-final-settings-frame",
+          "time": "2026-10-08T11:45:28.722900+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-after-final-settings-checks.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/2349C1F6-06F9-4325-889B-568EB98C8CDE/AudiobookshelfTV.app",
+          "phase": "after-final-settings-checks",
+          "time": "2026-10-08T11:50:25.653186+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        }
+      ],
+      "capture_checkpoints": [
+        {
+          "phase": "before-first-final-settings-frame",
+          "time": "2026-10-08T11:45:28.722900+00:00",
+          "test_instrumentation": {}
+        },
+        {
+          "phase": "after-final-settings-checks",
+          "time": "2026-10-08T11:50:25.653186+00:00",
+          "test_instrumentation": {}
+        }
+      ]
+    },
+    "tv_settings_capture": {
+      "path": "/tmp/native238-capture-7c69/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+      "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+      "device": "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+      "files": {
+        "Assets.car": "03e4158e55dcaafd20454515583fa97834189d7ce34005ff53dd9d3145c888e2",
+        "AudiobookshelfTV": "4ecdaf5ab4bc64b4425041a0289b3a5357832d4e8669eefe85ecfcf61fc7081d",
+        "AudiobookshelfTV.debug.dylib": "78237df8cd6e8451c62efac2aa06a70940d0f5e42a28abf1444b3c5d94647c8d",
+        "Info.plist": "320411e9ee6aa5ad369a7397d19399b49576eaf3479309b5b84be612249e40af",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "PlugIns/TVAppTests.xctest/Info.plist": "739b2de8ee43c1249a8e8e9706f95cca821309481a0b30719c30293c22a8e1a8",
+        "PlugIns/TVAppTests.xctest/TVAppTests": "025a9f3f89e8d2d48865299465777ed62bab1a9d011a0c1fbf33b51e24ff7e83",
+        "PlugIns/TVAppTests.xctest/_CodeSignature/CodeResources": "2a8be59da47c57ffa45af469084a42fbbd74dc9a90de821f5abeeee11e43ad90",
+        "_CodeSignature/CodeResources": "2e0194c15e2a82764f074ea422048646b8ff5cd61308ccf1e93d747ce49fa979",
+        "__preview.dylib": "2cbefd81ae48fce00dadfa24e66e3411b461be1609191cb6adeffe60cb54d5ff",
+        "ar.lproj/NativeStrings.strings": "b7e8b984091939317f0759fccd7c185b178ad210512e8d8010e4ce26c70a1b61",
+        "be.lproj/NativeStrings.strings": "84488c772edbc86208e04c70b5ae14e4e34b431394f04b83fd29119ee13c7eb2",
+        "bg.lproj/NativeStrings.strings": "3a7168a312ae678c2f70c666037e0865c3bbcd2cc2720e7cb7a96177c1a93988",
+        "bn.lproj/NativeStrings.strings": "d562157f0cd001208edde952905209466a76b005acec6759ad860f032fc20e96",
+        "ca.lproj/NativeStrings.strings": "ad7a1e6341e99c93e2f0c4aef57182ff4a961c6bb374c9bbb28cdf5c4ce1fd0e",
+        "cs.lproj/NativeStrings.strings": "59ba732386462c5aaa4c19dab3e89a854bc53f49aa43ff57cf598c342ad8f416",
+        "da.lproj/NativeStrings.strings": "076b05095c44376d2ca68da9018479909c5617965872c06098dc4261ff8c8376",
+        "de.lproj/NativeStrings.strings": "ddbcb96336e4e7788700a6c836bfcd71bb2ed604c4edba6fb8d8ac5e25e13008",
+        "en.lproj/NativeStrings.strings": "5d702cde03a7563c4fb0195aed4ec81156fd30287e1fe4fb2b6bd2a8b9c0e5b2",
+        "es.lproj/NativeStrings.strings": "2101d3aec75fcd685265d5f05c4d013a2fe90bf666e083cc29d17ceb7317dffe",
+        "fi.lproj/NativeStrings.strings": "b7b4569cdd4e3187035959e4f7fa92284194c755814baa03e154c3e30ef7cc42",
+        "fr.lproj/NativeStrings.strings": "ffce0361776fe61b843c7dd87d342369f4811e2b3b019a93ef3378f3c5cf13d8",
+        "he.lproj/NativeStrings.strings": "96bc1adc69fb3cf94967eef670cd95ab554594b10e270c8ededba513928d4589",
+        "hr.lproj/NativeStrings.strings": "a718d8f7e5be072d25b58528f25a25675b85e1aac58371a01423b23828904af9",
+        "hu.lproj/NativeStrings.strings": "3a09c72ac1069c5eda78bfcb821af26e1806a0c73d13d2ecc47d21453da0f5e7",
+        "it.lproj/NativeStrings.strings": "169cdd31cb7c2014688e03ce695a1b5d875d1a2fba3fc6c126f6e8f67bfff417",
+        "ko.lproj/NativeStrings.strings": "52d7929b55f2e63bd09dc718539d4dcdad587173a183f7292e318f8fd2db904b",
+        "lt.lproj/NativeStrings.strings": "c2777ecfee24d08ab707428815e60e5941bcc39086cc1cf33ebd7a3c104ad676",
+        "nb.lproj/NativeStrings.strings": "c618a3c6fea459636e60016474fef976261cb518e4b05ac30b4359d7cb0c5ce5",
+        "nl.lproj/NativeStrings.strings": "8e47cf9f27b914744bf685e46c1b4831c69b9b2d0197f0dcccd91b45137bb5da",
+        "pl.lproj/NativeStrings.strings": "0e89c678368c370608c1a20e02026e205421f8348ffe24a939542c2108e1cf12",
+        "pt-BR.lproj/NativeStrings.strings": "46d91092423f4c9f92800317efba21e7e391f8b47b4e01853ec3ffd9d427281a",
+        "ru.lproj/NativeStrings.strings": "2a74e97818228cacef601ac99114ea3adf5b31f8fd1f838ad2c9c38b301e5822",
+        "sk.lproj/NativeStrings.strings": "bba4b6ca21dd30fa1d79baaede07620b05837370d18789deb55f9266f040d4be",
+        "sl.lproj/NativeStrings.strings": "05b6ff70adc345ca826e233a05900384d91e8916e3503ea6d63a69d273d53525",
+        "sv.lproj/NativeStrings.strings": "5d90450a77a2c83a4c0fe0aeb180feec1d94334ea57640c76a135fa9708ecde6",
+        "tr.lproj/NativeStrings.strings": "939caf9024120e8ebc517a5709234a38d2cb1d2173afd9de9e8c01214686ed66",
+        "uk.lproj/NativeStrings.strings": "efdda79ad12106c8be1d378558d073fad680474d48201094f2097609aa8dfdfe",
+        "vi.lproj/NativeStrings.strings": "7cbe274b7c3a913249c9da6559d6ad6202890225d86ad8aabf815e83c9281f79",
+        "zh-Hans.lproj/NativeStrings.strings": "0c7e69d80bf898cb163938bb948b05535259aee8dad6f59d830e983099752f06"
+      },
+      "info": {
+        "BuildMachineOSBuild": "26A434",
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "Audiobook Loft",
+        "CFBundleExecutable": "AudiobookshelfTV",
+        "CFBundleIcons": {
+          "CFBundlePrimaryIcon": "App Icon"
+        },
+        "CFBundleIdentifier": "com.forkzed.audiobookshelf.tv",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "AudiobookshelfTV",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleSupportedPlatforms": [
+          "AppleTVSimulator"
+        ],
+        "CFBundleVersion": "1",
+        "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+        "DTPlatformBuild": "24J360",
+        "DTPlatformName": "appletvsimulator",
+        "DTPlatformVersion": "27.0",
+        "DTSDKBuild": "24J360",
+        "DTSDKName": "appletvsimulator27.0",
+        "DTXcode": "2700",
+        "DTXcodeBuild": "27A266a",
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSRequiresIPhoneOS": true,
+        "MinimumOSVersion": "17.0",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Connect to your Audiobook Loft or compatible Audiobookshelf server on your local network.",
+        "TVTopShelfImage": {
+          "TVTopShelfPrimaryImage": "Top Shelf",
+          "TVTopShelfPrimaryImageWide": "Top Shelf Wide"
+        },
+        "UIDeviceFamily": [
+          3
+        ],
+        "UILaunchScreen": {}
+      },
+      "strict_codesign_exit": 0,
+      "verification_time": "2026-10-08T11:50:36.047998+00:00",
+      "scope": "Fresh isolated ad-hoc signed simulator QA, exact committed App and test sources7c69; render-only RenderJourney instrumentation; not signed physical release candidate.",
+      "resource_history": [
+        {
+          "phase": "before-final-settings-render",
+          "previous_files_match": true
+        },
+        {
+          "phase": "after-first-final-settings-render",
+          "previous_files_match": true
+        },
+        {
+          "phase": "before-correct-language-render",
+          "previous_files_match": true
+        },
+        {
+          "phase": "after-correct-language-render",
+          "previous_files_match": true
+        }
+      ],
+      "installed_checks": [
+        {
+          "path": "/tmp/native238-installed-before-final-settings-render.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/644BFD2E-ED04-4211-B253-A8D454E7D9C9/AudiobookshelfTV.app",
+          "phase": "before-final-settings-render",
+          "time": "2026-10-08T11:50:36.653482+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-after-first-final-settings-render.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/63A343C5-0A79-4D71-8179-6D7508708543/AudiobookshelfTV.app",
+          "phase": "after-first-final-settings-render",
+          "time": "2026-10-08T11:53:49.461607+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-before-correct-language-render.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/0F890567-89C0-4186-A229-2CBF6429AE33/AudiobookshelfTV.app",
+          "phase": "before-correct-language-render",
+          "time": "2026-10-08T11:53:53.688394+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-after-correct-language-render.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/A4F7EC64-EAE7-4299-8A77-1A4C6FE32015/AudiobookshelfTV.app",
+          "phase": "after-correct-language-render",
+          "time": "2026-10-08T11:55:01.594819+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        }
+      ],
+      "capture_checkpoints": [
+        {
+          "phase": "before-final-settings-render",
+          "time": "2026-10-08T11:50:36.653482+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "e21b65a97f5834c733ec220ccf849e68dfbd666b299179f86d6b04924de29ad8"
+          }
+        },
+        {
+          "phase": "after-first-final-settings-render",
+          "time": "2026-10-08T11:53:49.461607+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "e21b65a97f5834c733ec220ccf849e68dfbd666b299179f86d6b04924de29ad8"
+          }
+        },
+        {
+          "phase": "before-correct-language-render",
+          "time": "2026-10-08T11:53:53.688394+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "0733718dd1c5c45cb6413e6d4542dcaa8db99fb05cea99f72d1f2e05b9e4650f"
+          }
+        },
+        {
+          "phase": "after-correct-language-render",
+          "time": "2026-10-08T11:55:01.594819+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "0733718dd1c5c45cb6413e6d4542dcaa8db99fb05cea99f72d1f2e05b9e4650f"
+          }
+        }
+      ]
+    },
+    "tv_signout_final": {
+      "path": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+      "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+      "device": "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+      "files": {
+        "Assets.car": "03e4158e55dcaafd20454515583fa97834189d7ce34005ff53dd9d3145c888e2",
+        "AudiobookshelfTV": "ed4b899a7272b04cf66658d3fb72694de5f072aadd8187114ec51f5e7a855dac",
+        "AudiobookshelfTV.debug.dylib": "3e3a399489a38ac6847bd6819504375ac06de4056fe15b91f611ee3e616bcaba",
+        "Info.plist": "320411e9ee6aa5ad369a7397d19399b49576eaf3479309b5b84be612249e40af",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "PlugIns/TVAppTests.xctest/Info.plist": "739b2de8ee43c1249a8e8e9706f95cca821309481a0b30719c30293c22a8e1a8",
+        "PlugIns/TVAppTests.xctest/TVAppTests": "9dd9b5658106ca7aaf9c2d2e0a87cfb89af0bd337bcb0318fecc9f632bc8732f",
+        "PlugIns/TVAppTests.xctest/_CodeSignature/CodeResources": "2a8be59da47c57ffa45af469084a42fbbd74dc9a90de821f5abeeee11e43ad90",
+        "_CodeSignature/CodeResources": "0c5a391667db4d1f84585f7c8b77aa9430f6cdfcda8c07fab35d28fa93872fe7",
+        "__preview.dylib": "2cbefd81ae48fce00dadfa24e66e3411b461be1609191cb6adeffe60cb54d5ff",
+        "ar.lproj/NativeStrings.strings": "b7e8b984091939317f0759fccd7c185b178ad210512e8d8010e4ce26c70a1b61",
+        "be.lproj/NativeStrings.strings": "84488c772edbc86208e04c70b5ae14e4e34b431394f04b83fd29119ee13c7eb2",
+        "bg.lproj/NativeStrings.strings": "3a7168a312ae678c2f70c666037e0865c3bbcd2cc2720e7cb7a96177c1a93988",
+        "bn.lproj/NativeStrings.strings": "d562157f0cd001208edde952905209466a76b005acec6759ad860f032fc20e96",
+        "ca.lproj/NativeStrings.strings": "ad7a1e6341e99c93e2f0c4aef57182ff4a961c6bb374c9bbb28cdf5c4ce1fd0e",
+        "cs.lproj/NativeStrings.strings": "59ba732386462c5aaa4c19dab3e89a854bc53f49aa43ff57cf598c342ad8f416",
+        "da.lproj/NativeStrings.strings": "076b05095c44376d2ca68da9018479909c5617965872c06098dc4261ff8c8376",
+        "de.lproj/NativeStrings.strings": "ddbcb96336e4e7788700a6c836bfcd71bb2ed604c4edba6fb8d8ac5e25e13008",
+        "en.lproj/NativeStrings.strings": "5d702cde03a7563c4fb0195aed4ec81156fd30287e1fe4fb2b6bd2a8b9c0e5b2",
+        "es.lproj/NativeStrings.strings": "2101d3aec75fcd685265d5f05c4d013a2fe90bf666e083cc29d17ceb7317dffe",
+        "fi.lproj/NativeStrings.strings": "b7b4569cdd4e3187035959e4f7fa92284194c755814baa03e154c3e30ef7cc42",
+        "fr.lproj/NativeStrings.strings": "ffce0361776fe61b843c7dd87d342369f4811e2b3b019a93ef3378f3c5cf13d8",
+        "he.lproj/NativeStrings.strings": "96bc1adc69fb3cf94967eef670cd95ab554594b10e270c8ededba513928d4589",
+        "hr.lproj/NativeStrings.strings": "a718d8f7e5be072d25b58528f25a25675b85e1aac58371a01423b23828904af9",
+        "hu.lproj/NativeStrings.strings": "3a09c72ac1069c5eda78bfcb821af26e1806a0c73d13d2ecc47d21453da0f5e7",
+        "it.lproj/NativeStrings.strings": "169cdd31cb7c2014688e03ce695a1b5d875d1a2fba3fc6c126f6e8f67bfff417",
+        "ko.lproj/NativeStrings.strings": "52d7929b55f2e63bd09dc718539d4dcdad587173a183f7292e318f8fd2db904b",
+        "lt.lproj/NativeStrings.strings": "c2777ecfee24d08ab707428815e60e5941bcc39086cc1cf33ebd7a3c104ad676",
+        "nb.lproj/NativeStrings.strings": "c618a3c6fea459636e60016474fef976261cb518e4b05ac30b4359d7cb0c5ce5",
+        "nl.lproj/NativeStrings.strings": "8e47cf9f27b914744bf685e46c1b4831c69b9b2d0197f0dcccd91b45137bb5da",
+        "pl.lproj/NativeStrings.strings": "0e89c678368c370608c1a20e02026e205421f8348ffe24a939542c2108e1cf12",
+        "pt-BR.lproj/NativeStrings.strings": "46d91092423f4c9f92800317efba21e7e391f8b47b4e01853ec3ffd9d427281a",
+        "ru.lproj/NativeStrings.strings": "2a74e97818228cacef601ac99114ea3adf5b31f8fd1f838ad2c9c38b301e5822",
+        "sk.lproj/NativeStrings.strings": "bba4b6ca21dd30fa1d79baaede07620b05837370d18789deb55f9266f040d4be",
+        "sl.lproj/NativeStrings.strings": "05b6ff70adc345ca826e233a05900384d91e8916e3503ea6d63a69d273d53525",
+        "sv.lproj/NativeStrings.strings": "5d90450a77a2c83a4c0fe0aeb180feec1d94334ea57640c76a135fa9708ecde6",
+        "tr.lproj/NativeStrings.strings": "939caf9024120e8ebc517a5709234a38d2cb1d2173afd9de9e8c01214686ed66",
+        "uk.lproj/NativeStrings.strings": "efdda79ad12106c8be1d378558d073fad680474d48201094f2097609aa8dfdfe",
+        "vi.lproj/NativeStrings.strings": "7cbe274b7c3a913249c9da6559d6ad6202890225d86ad8aabf815e83c9281f79",
+        "zh-Hans.lproj/NativeStrings.strings": "0c7e69d80bf898cb163938bb948b05535259aee8dad6f59d830e983099752f06"
+      },
+      "info": {
+        "BuildMachineOSBuild": "26A434",
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "Audiobook Loft",
+        "CFBundleExecutable": "AudiobookshelfTV",
+        "CFBundleIcons": {
+          "CFBundlePrimaryIcon": "App Icon"
+        },
+        "CFBundleIdentifier": "com.forkzed.audiobookshelf.tv",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "AudiobookshelfTV",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleSupportedPlatforms": [
+          "AppleTVSimulator"
+        ],
+        "CFBundleVersion": "1",
+        "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+        "DTPlatformBuild": "24J360",
+        "DTPlatformName": "appletvsimulator",
+        "DTPlatformVersion": "27.0",
+        "DTSDKBuild": "24J360",
+        "DTSDKName": "appletvsimulator27.0",
+        "DTXcode": "2700",
+        "DTXcodeBuild": "27A266a",
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSRequiresIPhoneOS": true,
+        "MinimumOSVersion": "17.0",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Connect to your Audiobook Loft or compatible Audiobookshelf server on your local network.",
+        "TVTopShelfImage": {
+          "TVTopShelfPrimaryImage": "Top Shelf",
+          "TVTopShelfPrimaryImageWide": "Top Shelf Wide"
+        },
+        "UIDeviceFamily": [
+          3
+        ],
+        "UILaunchScreen": {}
+      },
+      "strict_codesign_exit": 0,
+      "verification_time": "2026-10-08T12:04:08.049677+00:00",
+      "scope": "Fresh isolated ad-hoc signed simulator QA, exact committed App and test sources903ea6c0; no render instrumentation; not signed physical release candidate.",
+      "resource_history": [
+        {
+          "phase": "before-final-signout-check",
+          "previous_files_match": true
+        },
+        {
+          "phase": "after-final-signout-check",
+          "previous_files_match": true
+        }
+      ],
+      "installed_checks": [
+        {
+          "path": "/tmp/native238-installed-before-final-signout-check.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/1D1FF2B5-76A9-40EA-BC24-0F2AC1888519/AudiobookshelfTV.app",
+          "phase": "before-final-signout-check",
+          "time": "2026-10-08T12:04:08.673983+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-after-final-signout-check.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/E2033B41-01C8-4366-890A-CDEB3D38AA49/AudiobookshelfTV.app",
+          "phase": "after-final-signout-check",
+          "time": "2026-10-08T12:05:46.698257+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        }
+      ],
+      "capture_checkpoints": [
+        {
+          "phase": "before-final-signout-check",
+          "time": "2026-10-08T12:04:08.673983+00:00",
+          "test_instrumentation": {}
+        },
+        {
+          "phase": "after-final-signout-check",
+          "time": "2026-10-08T12:05:46.698257+00:00",
+          "test_instrumentation": {}
+        }
+      ]
+    },
+    "tv_signout_capture": {
+      "path": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+      "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+      "device": "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+      "files": {
+        "Assets.car": "03e4158e55dcaafd20454515583fa97834189d7ce34005ff53dd9d3145c888e2",
+        "AudiobookshelfTV": "b4e9865580a2aaa58fa01296a876dc41603be7be83de8ed9553a91ce93fe7bbe",
+        "AudiobookshelfTV.debug.dylib": "8e757dbfc60c3e7ff5f5e78937ed50326e6cf13a2368047238cf4726416208be",
+        "Info.plist": "320411e9ee6aa5ad369a7397d19399b49576eaf3479309b5b84be612249e40af",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "PlugIns/TVAppTests.xctest/Info.plist": "739b2de8ee43c1249a8e8e9706f95cca821309481a0b30719c30293c22a8e1a8",
+        "PlugIns/TVAppTests.xctest/TVAppTests": "d771006fe1df7dd5e35e9df1543175d5bdc936f9d635cd4ee5d0ac80e6ce559e",
+        "PlugIns/TVAppTests.xctest/_CodeSignature/CodeResources": "2a8be59da47c57ffa45af469084a42fbbd74dc9a90de821f5abeeee11e43ad90",
+        "_CodeSignature/CodeResources": "c8e1119227bc0f5a0315c6a23e589622a6bb7af58fd839a0899501d2e16ce968",
+        "__preview.dylib": "2cbefd81ae48fce00dadfa24e66e3411b461be1609191cb6adeffe60cb54d5ff",
+        "ar.lproj/NativeStrings.strings": "b7e8b984091939317f0759fccd7c185b178ad210512e8d8010e4ce26c70a1b61",
+        "be.lproj/NativeStrings.strings": "84488c772edbc86208e04c70b5ae14e4e34b431394f04b83fd29119ee13c7eb2",
+        "bg.lproj/NativeStrings.strings": "3a7168a312ae678c2f70c666037e0865c3bbcd2cc2720e7cb7a96177c1a93988",
+        "bn.lproj/NativeStrings.strings": "d562157f0cd001208edde952905209466a76b005acec6759ad860f032fc20e96",
+        "ca.lproj/NativeStrings.strings": "ad7a1e6341e99c93e2f0c4aef57182ff4a961c6bb374c9bbb28cdf5c4ce1fd0e",
+        "cs.lproj/NativeStrings.strings": "59ba732386462c5aaa4c19dab3e89a854bc53f49aa43ff57cf598c342ad8f416",
+        "da.lproj/NativeStrings.strings": "076b05095c44376d2ca68da9018479909c5617965872c06098dc4261ff8c8376",
+        "de.lproj/NativeStrings.strings": "ddbcb96336e4e7788700a6c836bfcd71bb2ed604c4edba6fb8d8ac5e25e13008",
+        "en.lproj/NativeStrings.strings": "5d702cde03a7563c4fb0195aed4ec81156fd30287e1fe4fb2b6bd2a8b9c0e5b2",
+        "es.lproj/NativeStrings.strings": "2101d3aec75fcd685265d5f05c4d013a2fe90bf666e083cc29d17ceb7317dffe",
+        "fi.lproj/NativeStrings.strings": "b7b4569cdd4e3187035959e4f7fa92284194c755814baa03e154c3e30ef7cc42",
+        "fr.lproj/NativeStrings.strings": "ffce0361776fe61b843c7dd87d342369f4811e2b3b019a93ef3378f3c5cf13d8",
+        "he.lproj/NativeStrings.strings": "96bc1adc69fb3cf94967eef670cd95ab554594b10e270c8ededba513928d4589",
+        "hr.lproj/NativeStrings.strings": "a718d8f7e5be072d25b58528f25a25675b85e1aac58371a01423b23828904af9",
+        "hu.lproj/NativeStrings.strings": "3a09c72ac1069c5eda78bfcb821af26e1806a0c73d13d2ecc47d21453da0f5e7",
+        "it.lproj/NativeStrings.strings": "169cdd31cb7c2014688e03ce695a1b5d875d1a2fba3fc6c126f6e8f67bfff417",
+        "ko.lproj/NativeStrings.strings": "52d7929b55f2e63bd09dc718539d4dcdad587173a183f7292e318f8fd2db904b",
+        "lt.lproj/NativeStrings.strings": "c2777ecfee24d08ab707428815e60e5941bcc39086cc1cf33ebd7a3c104ad676",
+        "nb.lproj/NativeStrings.strings": "c618a3c6fea459636e60016474fef976261cb518e4b05ac30b4359d7cb0c5ce5",
+        "nl.lproj/NativeStrings.strings": "8e47cf9f27b914744bf685e46c1b4831c69b9b2d0197f0dcccd91b45137bb5da",
+        "pl.lproj/NativeStrings.strings": "0e89c678368c370608c1a20e02026e205421f8348ffe24a939542c2108e1cf12",
+        "pt-BR.lproj/NativeStrings.strings": "46d91092423f4c9f92800317efba21e7e391f8b47b4e01853ec3ffd9d427281a",
+        "ru.lproj/NativeStrings.strings": "2a74e97818228cacef601ac99114ea3adf5b31f8fd1f838ad2c9c38b301e5822",
+        "sk.lproj/NativeStrings.strings": "bba4b6ca21dd30fa1d79baaede07620b05837370d18789deb55f9266f040d4be",
+        "sl.lproj/NativeStrings.strings": "05b6ff70adc345ca826e233a05900384d91e8916e3503ea6d63a69d273d53525",
+        "sv.lproj/NativeStrings.strings": "5d90450a77a2c83a4c0fe0aeb180feec1d94334ea57640c76a135fa9708ecde6",
+        "tr.lproj/NativeStrings.strings": "939caf9024120e8ebc517a5709234a38d2cb1d2173afd9de9e8c01214686ed66",
+        "uk.lproj/NativeStrings.strings": "efdda79ad12106c8be1d378558d073fad680474d48201094f2097609aa8dfdfe",
+        "vi.lproj/NativeStrings.strings": "7cbe274b7c3a913249c9da6559d6ad6202890225d86ad8aabf815e83c9281f79",
+        "zh-Hans.lproj/NativeStrings.strings": "0c7e69d80bf898cb163938bb948b05535259aee8dad6f59d830e983099752f06"
+      },
+      "info": {
+        "BuildMachineOSBuild": "26A434",
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "Audiobook Loft",
+        "CFBundleExecutable": "AudiobookshelfTV",
+        "CFBundleIcons": {
+          "CFBundlePrimaryIcon": "App Icon"
+        },
+        "CFBundleIdentifier": "com.forkzed.audiobookshelf.tv",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "AudiobookshelfTV",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleSupportedPlatforms": [
+          "AppleTVSimulator"
+        ],
+        "CFBundleVersion": "1",
+        "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+        "DTPlatformBuild": "24J360",
+        "DTPlatformName": "appletvsimulator",
+        "DTPlatformVersion": "27.0",
+        "DTSDKBuild": "24J360",
+        "DTSDKName": "appletvsimulator27.0",
+        "DTXcode": "2700",
+        "DTXcodeBuild": "27A266a",
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSRequiresIPhoneOS": true,
+        "MinimumOSVersion": "17.0",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Connect to your Audiobook Loft or compatible Audiobookshelf server on your local network.",
+        "TVTopShelfImage": {
+          "TVTopShelfPrimaryImage": "Top Shelf",
+          "TVTopShelfPrimaryImageWide": "Top Shelf Wide"
+        },
+        "UIDeviceFamily": [
+          3
+        ],
+        "UILaunchScreen": {}
+      },
+      "strict_codesign_exit": 0,
+      "verification_time": "2026-10-08T12:05:56.272124+00:00",
+      "scope": "Fresh isolated ad-hoc signed simulator QA, exact committed App and test sources903ea6c0; render-only RenderJourney instrumentation; not signed physical release candidate.",
+      "resource_history": [
+        {
+          "phase": "before-final-signout-render",
+          "previous_files_match": true
+        },
+        {
+          "phase": "after-final-signout-render",
+          "previous_files_match": true
+        }
+      ],
+      "installed_checks": [
+        {
+          "path": "/tmp/native238-installed-before-final-signout-render.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/DCC17FB2-2401-42D2-89FA-2515CD9C6659/AudiobookshelfTV.app",
+          "phase": "before-final-signout-render",
+          "time": "2026-10-08T12:05:56.917885+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        },
+        {
+          "path": "/tmp/native238-installed-after-final-signout-render.app",
+          "original_installed_path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/9ACC6F5B-180D-44C3-823B-F8796813D69D/data/Containers/Bundle/Application/A54022CC-34C2-4464-8D21-2BB0A1332168/AudiobookshelfTV.app",
+          "phase": "after-final-signout-render",
+          "time": "2026-10-08T12:06:57.383176+00:00",
+          "strict_exit": 0,
+          "files_match": true,
+          "resources": 40
+        }
+      ],
+      "capture_checkpoints": [
+        {
+          "phase": "before-final-signout-render",
+          "time": "2026-10-08T12:05:56.917885+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "cf70e3832e0f5de4fb0db31892a872b30bf25eeb90a12c11f91c82efeef69cd0"
+          }
+        },
+        {
+          "phase": "after-final-signout-render",
+          "time": "2026-10-08T12:06:57.383176+00:00",
+          "test_instrumentation": {
+            "RenderJourney.swift": "cf70e3832e0f5de4fb0db31892a872b30bf25eeb90a12c11f91c82efeef69cd0"
+          }
+        }
+      ]
+    }
+  },
+  "final_source": "903ea6c008e5583a5c78be9d28dd09d368a02387"
+}

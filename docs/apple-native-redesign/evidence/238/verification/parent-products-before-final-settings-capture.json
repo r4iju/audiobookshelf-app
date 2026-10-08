@@ -1,0 +1,123 @@
+[
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv",
+    "scope": "product",
+    "path": "/tmp/native238-final-17869645/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv",
+    "scope": "installed-recorded",
+    "path": "/tmp/native238-installed-qa-after-tests.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv_capture",
+    "scope": "product",
+    "path": "/tmp/native238-capture-17869645/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv_capture",
+    "scope": "installed-recorded",
+    "path": "/tmp/native238-installed-after-first-render-pass.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv_capture",
+    "scope": "installed-recorded",
+    "path": "/tmp/native238-installed-before-corrected-render-pass.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv_capture",
+    "scope": "installed-recorded",
+    "path": "/tmp/native238-installed-after-corrected-render-pass.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv_capture",
+    "scope": "installed-recorded",
+    "path": "/tmp/native238-installed-before-native-row-focus-render.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv_capture",
+    "scope": "installed-recorded",
+    "path": "/tmp/native238-installed-after-native-row-focus-attempt.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "17869645d869445fcc101f8ad625522f25b2b90e",
+    "role": "tv_capture",
+    "scope": "installed-recorded",
+    "path": "/tmp/native238-installed-before-up-diagnostic-render.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+    "role": "tv_settings_final",
+    "scope": "product",
+    "path": "/tmp/native238-settings-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  },
+  {
+    "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+    "role": "tv_settings_final",
+    "scope": "installed-recorded",
+    "path": "/tmp/native238-installed-before-first-final-settings-frame.app",
+    "strict_exit": 0,
+    "resources": 40,
+    "mismatches": [],
+    "extra": [],
+    "missing": []
+  }
+]

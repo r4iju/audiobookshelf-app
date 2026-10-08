@@ -1,0 +1,26 @@
+{
+  "source": "7c69ac4caddf77237b1a777aef60ba7428f196b6",
+  "sha256": "0846b353df42f2e487434160833c8ef449b2a73b0b1b8fc127a949017d8502f5",
+  "scope": "Observed original normal-mode focused Sign out, historical defect; not final acceptance. Parent AppKit sRGB measurement.",
+  "label_rgb": [
+    255,
+    197,
+    199
+  ],
+  "row_rgb": [
+    255,
+    255,
+    255
+  ],
+  "ratio": 1.49,
+  "crop_original_px": {
+    "x": [
+      622,
+      840
+    ],
+    "y": [
+      1840,
+      1920
+    ]
+  }
+}

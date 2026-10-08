@@ -1,0 +1,94 @@
+[
+  {
+    "path": "$.actions._values[0].actionResult.issues.testWarningSummaries._values[22]",
+    "node": {
+      "_type": {
+        "_name": "TestIssueSummary",
+        "_supertype": {
+          "_name": "IssueSummary"
+        }
+      },
+      "documentLocationInCreatingWorkspace": {
+        "_type": {
+          "_name": "DocumentLocation"
+        },
+        "concreteTypeName": {
+          "_type": {
+            "_name": "String"
+          },
+          "_value": "DVTTextDocumentLocation"
+        },
+        "url": {
+          "_type": {
+            "_name": "String"
+          },
+          "_value": ""
+        }
+      },
+      "issueType": {
+        "_type": {
+          "_name": "String"
+        },
+        "_value": "Uncategorized"
+      },
+      "message": {
+        "_type": {
+          "_name": "String"
+        },
+        "_value": "Publishing changes from within view updates is not allowed, this will cause undefined behavior."
+      },
+      "testCaseName": {
+        "_type": {
+          "_name": "String"
+        },
+        "_value": "RecoveryJourney.testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying()"
+      }
+    }
+  },
+  {
+    "path": "$.issues.testWarningSummaries._values[22]",
+    "node": {
+      "_type": {
+        "_name": "TestIssueSummary",
+        "_supertype": {
+          "_name": "IssueSummary"
+        }
+      },
+      "documentLocationInCreatingWorkspace": {
+        "_type": {
+          "_name": "DocumentLocation"
+        },
+        "concreteTypeName": {
+          "_type": {
+            "_name": "String"
+          },
+          "_value": "DVTTextDocumentLocation"
+        },
+        "url": {
+          "_type": {
+            "_name": "String"
+          },
+          "_value": ""
+        }
+      },
+      "issueType": {
+        "_type": {
+          "_name": "String"
+        },
+        "_value": "Uncategorized"
+      },
+      "message": {
+        "_type": {
+          "_name": "String"
+        },
+        "_value": "Publishing changes from within view updates is not allowed, this will cause undefined behavior."
+      },
+      "testCaseName": {
+        "_type": {
+          "_name": "String"
+        },
+        "_value": "RecoveryJourney.testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying()"
+      }
+    }
+  }
+]

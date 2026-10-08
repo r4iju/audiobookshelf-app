@@ -1,0 +1,7 @@
+Frozen App17869645, actual native XCUIRemote Up after Notices Back. This trace precedes the corrective App edit.
+
+UP BEFORE Attributes: Cell, 0x128f29c50, {{260.0, 739.0}, {1400.0, 66.0}}, label: 'Source and license notices', Focused
+UP BEFORE Attributes: StaticText, 0x10586c3a0, {{280.0, 515.0}, {1360.0, 175.0}}, identifier: 'auth-modes', label: 'Sign in with an Audiobookshelf username and password. Single sign-on (OpenID) needs a browser, which Apple TV does not provide; ask the server administrator for a local account if you only use single sign-on. HTTPS addresses work when this TV trusts the certificate, including an installed homelab certificate authority, and local HTTP addresses and reverse-proxy paths are supported.', Focused
+UP BEFORE Attributes: Button, 0x12fe53430, {{1203.7, 61.3}, {151.7, 37.4}}, identifier: 'gearshape', label: 'Settings', Focused
+
+New permanent native readiness assertion then failed on178: Up reaches the earlier native Settings rows after Notices Back (27.899s), /tmp/238-up-red.log.

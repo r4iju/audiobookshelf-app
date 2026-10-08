@@ -1,0 +1,66 @@
+[
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "tv_signout_final",
+    "file": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV.debug.dylib",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV.debug.dylib:\nLoad command 10\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "tv_signout_final",
+    "file": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "tv_signout_final",
+    "file": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/__preview.dylib",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/__preview.dylib:\nLoad command 8\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "tv_signout_final",
+    "file": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/PlugIns/TVAppTests.xctest/TVAppTests",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-signout-final/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/PlugIns/TVAppTests.xctest/TVAppTests:\nLoad command 9\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "tv_signout_capture",
+    "file": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV.debug.dylib",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV.debug.dylib:\nLoad command 10\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "tv_signout_capture",
+    "file": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/AudiobookshelfTV:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "tv_signout_capture",
+    "file": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/__preview.dylib",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/__preview.dylib:\nLoad command 8\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "tv_signout_capture",
+    "file": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/PlugIns/TVAppTests.xctest/TVAppTests",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-capture-903/Build/Products/Debug-appletvsimulator/AudiobookshelfTV.app/PlugIns/TVAppTests.xctest/TVAppTests:\nLoad command 9\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOSSIMULATOR\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n"
+  },
+  {
+    "source": "903ea6c008e5583a5c78be9d28dd09d368a02387",
+    "product": "generic-unsigned-device",
+    "file": "/tmp/native238-generic-903/Build/Products/Debug-appletvos/AudiobookshelfTV.app/AudiobookshelfTV",
+    "exit": 0,
+    "LC_BUILD_VERSION": "/tmp/native238-generic-903/Build/Products/Debug-appletvos/AudiobookshelfTV.app/AudiobookshelfTV:\nLoad command 11\n      cmd LC_BUILD_VERSION\n  cmdsize 32\n platform TVOS\n    minos 17.0\n      sdk 27.0\n   ntools 1\n     tool LD\n  version 27037.1\n",
+    "scope": "Unsigned generic build only, no physical install or TV17 execution."
+  }
+]

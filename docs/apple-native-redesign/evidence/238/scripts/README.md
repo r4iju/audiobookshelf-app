@@ -1,0 +1,11 @@
+# Render-only instrumentation
+
+These three XCTest classes were temporary screenshot orchestration, not additional behavioral acceptance or permanent App/UI tests. They were compiled beside the committed tests against frozen App source `17869645`. The original functional suite remains authoritative. The scripts retain the exact local invocation/path/port configuration used; raw logs, fixture data, products and UUID attachment exports stay under `/tmp`.
+
+The first screenshot pass began before its explicit strict checkpoint. Its earlier states are excluded from the curated set and recaptured by the corrected pipeline: `build-for-testing`, strict product/resource verification, install, strict installed-resource verification, then `test-without-building`. Resource hashes are unchanged across the capture-only test rebuild. The corrected pass includes native Up traversal to the offscreen Language row and accepts the stock episode's absent description; separate long-content fixtures supply complete descriptions. No production assertion was removed.
+
+`checkpoint.py` records actual installed snapshots. The initial live container replaced by XCTest remains separately historical in builds.json; it is not claimed to be currently available. Synthetic fake covers are the same generated case as the earlier TV baseline (`/tmp/232-covers`). Capture-only long/missing/error/loading overrides never change the behavioral fixture. All text uses valid stock durations. Unbroken 1,400-character content is captured separately.
+
+The retained scripts are corrected reproduction variants. builds.json preserves the first instrumentation hash; the whole initial render source was not archived before capture-only helper corrections. Its committed App binary/resources and raw xcresult/log are preserved, and selected first-pass methods are unchanged in these reproductions. No current script is claimed to be byte-identical to the entire first-pass instrumentation file.
+
+The final native canonical Chinese ID is language-zh-cn; zh-Hans is the localization tag. Native Down activates the actual final row without changing the selected language. The last903 normal/blocked Sign out run finished before the user stopped further screenshots; do not run these scripts as a new capture requirement.
