@@ -101,6 +101,25 @@ import XCTest
         XCTAssertTrue(app.buttons["Open"].waitForExistence(timeout: 5), "Choosing another export must remain available after failure")
     }
 
+    func testDismissingExportPickerAllowsChoosingAgain() async throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--reset-preview-account"]
+        app.launch()
+        XCTAssertTrue(app.textFields["server"].waitForExistence(timeout: 8))
+        app.swipeUp()
+        app.buttons["Import previous app data"].tap()
+        let choose = app.buttons["Choose export"]
+        XCTAssertTrue(choose.waitForExistence(timeout: 5))
+        choose.tap()
+        XCTAssertTrue(app.buttons["Browse"].waitForExistence(timeout: 5))
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.09))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.8)))
+        XCTAssertTrue(choose.waitForExistence(timeout: 5))
+        choose.tap()
+        XCTAssertTrue(app.buttons["Browse"].waitForExistence(timeout: 5), "Dismissing the native picker must release the selection so another export can be chosen")
+        capture("Export picker reopened after dismissal")
+    }
+
     func testLegacyImportExplainsExportAndReauthentication() async throws {
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
