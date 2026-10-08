@@ -1,0 +1,11 @@
+Test Case '-[NativeJourneyTests.CombinedAccessibility239Journey testCombinedModesKeepPrimaryTransportAndToolsOperable]' started.
+AUDITED-CONTROL-FRAME (32.0, 196.0, 338.0, 221.33333333333331) WINDOW (0.0, 0.0, 402.0, 874.0)
+STRICT-AUDIT-ISSUE Contrast failed Contrast failed for SwiftUI.AccessibilityNode
+STRICT-AUDIT-ELEMENT Narrated by QA Narrator frame=(43.83333333333334, 46.33333333333337, 314.33333333333337, 52.66666666666663) enabled=true hittable=false
+/tmp/native239-sim-qa/apple/UITests/Acceptance239Harness.swift:58: error: -[NativeJourneyTests.CombinedAccessibility239Journey testCombinedModesKeepPrimaryTransportAndToolsOperable] : Contrast failed
+STRICT-AUDIT-ISSUE Contrast failed Contrast failed for SwiftUI.AccessibilityNode
+STRICT-AUDIT-ELEMENT 6 sec listened · 5% complete frame=(32.0, 809.3333333333334, 281.3333333333333, 102.33333333333326) enabled=true hittable=false
+/tmp/native239-sim-qa/apple/UITests/Acceptance239Harness.swift:58: error: -[NativeJourneyTests.CombinedAccessibility239Journey testCombinedModesKeepPrimaryTransportAndToolsOperable] : Contrast failed
+AUDITED-CONTROL-FRAME (154.0, 563.6666666666665, 94.0, 94.0) WINDOW (0.0, 0.0, 402.0, 874.0)
+Test Case '-[NativeJourneyTests.CombinedAccessibility239Journey testCombinedModesKeepPrimaryTransportAndToolsOperable]' failed (53.467 seconds).
+** TEST FAILED **

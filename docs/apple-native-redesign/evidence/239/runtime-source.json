@@ -1,0 +1,322 @@
+{
+  "runtimeSource": "f635a42ae8c9617409838008dfeec5645b4312b1",
+  "currentTestCIDescendant": "33d1b13ee906b0c37cc757b928ed5d0cc0acaba7",
+  "files": [
+    {
+      "file": "apple/App/NativePodcastQueue.swift",
+      "sha256": "d151e11b80693f77e59079c608e3f7386e94e0590216b4075231df5e5e16d7de",
+      "disposable_qa_sha256": "d151e11b80693f77e59079c608e3f7386e94e0590216b4075231df5e5e16d7de"
+    },
+    {
+      "file": "apple/App/DownloadsView.swift",
+      "sha256": "6a6589832dc9aa2efdfbd7f1b599b8280af249b1f76d249c00eb639bb342cf2f",
+      "disposable_qa_sha256": "6a6589832dc9aa2efdfbd7f1b599b8280af249b1f76d249c00eb639bb342cf2f"
+    },
+    {
+      "file": "apple/App/WaitingWrites.swift",
+      "sha256": "f8924106486b788fd12bbe95af58d104287f74b95bd172e524678f668d844ce0",
+      "disposable_qa_sha256": "f8924106486b788fd12bbe95af58d104287f74b95bd172e524678f668d844ce0"
+    },
+    {
+      "file": "apple/App/ItemServerActionsViews.swift",
+      "sha256": "f2d0919aced31dab6976f9b6c7e62953d8dd4f476940b55d9d66a7cc11a5e3f6",
+      "disposable_qa_sha256": "f2d0919aced31dab6976f9b6c7e62953d8dd4f476940b55d9d66a7cc11a5e3f6"
+    },
+    {
+      "file": "apple/App/OpenIDSignIn.swift",
+      "sha256": "8a877074934b2d14e5741e8f5b02458311a382261dde4e7c394c5e2045d38de7",
+      "disposable_qa_sha256": "8a877074934b2d14e5741e8f5b02458311a382261dde4e7c394c5e2045d38de7"
+    },
+    {
+      "file": "apple/App/YearReviewView.swift",
+      "sha256": "8c7d515c03af8528abc3d40260f01a22ddf517dd74e0257bf3dec0e3964bf428",
+      "disposable_qa_sha256": "8c7d515c03af8528abc3d40260f01a22ddf517dd74e0257bf3dec0e3964bf428"
+    },
+    {
+      "file": "apple/App/StatisticsView.swift",
+      "sha256": "f188e106d978b92eee184fd6566bdd1459f49919364d4fd4e9a8d5f4b1c4e923",
+      "disposable_qa_sha256": "f188e106d978b92eee184fd6566bdd1459f49919364d4fd4e9a8d5f4b1c4e923"
+    },
+    {
+      "file": "apple/App/NativeMigrationImport.swift",
+      "sha256": "b4d05797e4001a3bd0e7f0fbfb99186fcab545fffc0830dc9af52460177608ac",
+      "disposable_qa_sha256": "b4d05797e4001a3bd0e7f0fbfb99186fcab545fffc0830dc9af52460177608ac"
+    },
+    {
+      "file": "apple/App/RelatedAuthorSeriesViews.swift",
+      "sha256": "a9c5ca56a19ad1dd9ba0dad48f41dcf28defb7ea52f44ee906f7d663b3f0a0ed",
+      "disposable_qa_sha256": "a9c5ca56a19ad1dd9ba0dad48f41dcf28defb7ea52f44ee906f7d663b3f0a0ed"
+    },
+    {
+      "file": "apple/App/ReadingStore.swift",
+      "sha256": "4dc7a292ff3a949b0cb9a8431c34bc130e49b1eff3b3f776dec35643f24dc706",
+      "disposable_qa_sha256": "4dc7a292ff3a949b0cb9a8431c34bc130e49b1eff3b3f776dec35643f24dc706"
+    },
+    {
+      "file": "apple/App/PlaybackViews.swift",
+      "sha256": "a9ac3c4a6ffda0451b1532251b227644cfc2b2a50011a49587b0a4b82734f847",
+      "disposable_qa_sha256": "a9ac3c4a6ffda0451b1532251b227644cfc2b2a50011a49587b0a4b82734f847"
+    },
+    {
+      "file": "apple/App/BookDetails.swift",
+      "sha256": "933288f69e7d07caffecfea01ac62f1fd940189d6bd5ff2b189b7409afa77cad",
+      "disposable_qa_sha256": "933288f69e7d07caffecfea01ac62f1fd940189d6bd5ff2b189b7409afa77cad"
+    },
+    {
+      "file": "apple/App/NativeLanguageSettings.swift",
+      "sha256": "2075be5d5f0622e1dae18d9ca260e578a844d035cee42a4643dc194c092b2ace",
+      "disposable_qa_sha256": "2075be5d5f0622e1dae18d9ca260e578a844d035cee42a4643dc194c092b2ace"
+    },
+    {
+      "file": "apple/App/NativeDiagnosticsView.swift",
+      "sha256": "b10b552670d8e031dab4cadbda011217886b31624ccac2db5b56d68ff4d282b5",
+      "disposable_qa_sha256": "b10b552670d8e031dab4cadbda011217886b31624ccac2db5b56d68ff4d282b5"
+    },
+    {
+      "file": "apple/App/CatalogOptions.swift",
+      "sha256": "f1d2b0850972a67a7b34885188b8e628c7430330083d04b31cff7facc1c9316a",
+      "disposable_qa_sha256": "f1d2b0850972a67a7b34885188b8e628c7430330083d04b31cff7facc1c9316a"
+    },
+    {
+      "file": "apple/App/KeychainCredentials.swift",
+      "sha256": "08185a3748540e568f3704fec12d966d1afe9384cf7fcab2741a8fb5bf46c9af",
+      "disposable_qa_sha256": "08185a3748540e568f3704fec12d966d1afe9384cf7fcab2741a8fb5bf46c9af"
+    },
+    {
+      "file": "apple/App/AudioGroupViews.swift",
+      "sha256": "cfd9b65f67ddd675a69ec920eeea3106f14f9b5daefdcad6eee334cb36bd8c0f",
+      "disposable_qa_sha256": "cfd9b65f67ddd675a69ec920eeea3106f14f9b5daefdcad6eee334cb36bd8c0f"
+    },
+    {
+      "file": "apple/App/NativeSettings.swift",
+      "sha256": "d2fea1d48acd45edbe9144b6a9b64717537598814c29011f2a39762478e52dbd",
+      "disposable_qa_sha256": "d2fea1d48acd45edbe9144b6a9b64717537598814c29011f2a39762478e52dbd"
+    },
+    {
+      "file": "apple/App/ConnectionViews.swift",
+      "sha256": "d30e25ea85992f6cf72d97414d4f8d45186118af5308eb5ae124388e7d054466",
+      "disposable_qa_sha256": "d30e25ea85992f6cf72d97414d4f8d45186118af5308eb5ae124388e7d054466"
+    },
+    {
+      "file": "apple/App/NativeRealtime.swift",
+      "sha256": "428a9b6e95f7b1d1a15c9bf052ad7d04700e9e04c514ca26392c2fb9c014c9a5",
+      "disposable_qa_sha256": "428a9b6e95f7b1d1a15c9bf052ad7d04700e9e04c514ca26392c2fb9c014c9a5"
+    },
+    {
+      "file": "apple/App/FeedEpisodes.swift",
+      "sha256": "30899bb0cbc65bc3865b624532c4878995f574bbf823738c1cd648073cb106b5",
+      "disposable_qa_sha256": "30899bb0cbc65bc3865b624532c4878995f574bbf823738c1cd648073cb106b5"
+    },
+    {
+      "file": "apple/App/NativeDownloads.swift",
+      "sha256": "19e16bdf33de64ef94699a2ce24e8644892efadc26e8b6033f16eb1601f338c2",
+      "disposable_qa_sha256": "19e16bdf33de64ef94699a2ce24e8644892efadc26e8b6033f16eb1601f338c2"
+    },
+    {
+      "file": "apple/App/ReaderVolume.swift",
+      "sha256": "3e4e358fa1239bae064ba04eb81dd352013fbfd327b1c14f83c66a79fa01abc2",
+      "disposable_qa_sha256": "3e4e358fa1239bae064ba04eb81dd352013fbfd327b1c14f83c66a79fa01abc2"
+    },
+    {
+      "file": "apple/App/AddPodcast.swift",
+      "sha256": "508d06b7739f37e0ce21be967c3ca22c9aa339092042b8e9acd235fa4364af63",
+      "disposable_qa_sha256": "508d06b7739f37e0ce21be967c3ca22c9aa339092042b8e9acd235fa4364af63"
+    },
+    {
+      "file": "apple/App/CatalogViews.swift",
+      "sha256": "a932e486ec302a6c025e0994e73a657a1cbc34ceee40c0610bcc50d8903a8d55",
+      "disposable_qa_sha256": "a932e486ec302a6c025e0994e73a657a1cbc34ceee40c0610bcc50d8903a8d55"
+    },
+    {
+      "file": "apple/App/EPUBReader.swift",
+      "sha256": "f4672aba887276f28911608be0c6735b92c3d7ed6bffbe490e67de26a30c1d59",
+      "disposable_qa_sha256": "f4672aba887276f28911608be0c6735b92c3d7ed6bffbe490e67de26a30c1d59"
+    },
+    {
+      "file": "apple/App/NativeShell.swift",
+      "sha256": "8ff268d479c06cc70eac7f5e5d52ca2ecc8f113e923a02fb60bfe40eff6911ba",
+      "disposable_qa_sha256": "8ff268d479c06cc70eac7f5e5d52ca2ecc8f113e923a02fb60bfe40eff6911ba"
+    },
+    {
+      "file": "apple/App/PDFReader.swift",
+      "sha256": "5f7fc09cbe2ce806bdd0fa3d0bd7d12256fd7e0023af08371770a3b7ce844141",
+      "disposable_qa_sha256": "5f7fc09cbe2ce806bdd0fa3d0bd7d12256fd7e0023af08371770a3b7ce844141"
+    },
+    {
+      "file": "apple/App/CatalogStore.swift",
+      "sha256": "2c34770efc2989ea1f885eb490c464b988fd09a1feea51a9bcc4c02c3f6f9a31",
+      "disposable_qa_sha256": "2c34770efc2989ea1f885eb490c464b988fd09a1feea51a9bcc4c02c3f6f9a31"
+    },
+    {
+      "file": "apple/App/ConnectionStore.swift",
+      "sha256": "272607651f3a8976954aff04680826202fce454150db2db02dd86dfc4933d704",
+      "disposable_qa_sha256": "272607651f3a8976954aff04680826202fce454150db2db02dd86dfc4933d704"
+    },
+    {
+      "file": "apple/App/AudiobookshelfNativeApp.swift",
+      "sha256": "538a0c49b8e72441520963daa6348845c824ef61be7cc213ae96aa724f4c0a5d",
+      "disposable_qa_sha256": "538a0c49b8e72441520963daa6348845c824ef61be7cc213ae96aa724f4c0a5d"
+    },
+    {
+      "file": "apple/App/LibrarySearch.swift",
+      "sha256": "5f63512e7d04137be141dddaab2a26cd05ed532f0f3965d38628477600dea481",
+      "disposable_qa_sha256": "5f63512e7d04137be141dddaab2a26cd05ed532f0f3965d38628477600dea481"
+    },
+    {
+      "file": "tvos/App/TVLanguage.swift",
+      "sha256": "2fc8828059f94f3b77fc27383abdfe331070bdda276219184296497793788928",
+      "disposable_qa_sha256": "2fc8828059f94f3b77fc27383abdfe331070bdda276219184296497793788928"
+    },
+    {
+      "file": "tvos/App/SettingsView.swift",
+      "sha256": "d31280ea3222329edad7499e500708a4908f7c57dcd78ac836507b3eab8ee19a",
+      "disposable_qa_sha256": "d31280ea3222329edad7499e500708a4908f7c57dcd78ac836507b3eab8ee19a"
+    },
+    {
+      "file": "tvos/App/SearchView.swift",
+      "sha256": "0d0f20fa071bb4498f363222c177dad6fdedede1ed9b75c547e2fe8959595ee4",
+      "disposable_qa_sha256": "0d0f20fa071bb4498f363222c177dad6fdedede1ed9b75c547e2fe8959595ee4"
+    },
+    {
+      "file": "tvos/App/AudiobookshelfTVApp.swift",
+      "sha256": "90ed4356de35f5740394a97af45354c3c125b3d8082f216497074d97303cc3a4",
+      "disposable_qa_sha256": "90ed4356de35f5740394a97af45354c3c125b3d8082f216497074d97303cc3a4"
+    },
+    {
+      "file": "tvos/App/ItemDetailView.swift",
+      "sha256": "6642377703a35c6fe1d590d85e9527a6d1d1974a3e2e9fc79a9d71ba10dd680d",
+      "disposable_qa_sha256": "6642377703a35c6fe1d590d85e9527a6d1d1974a3e2e9fc79a9d71ba10dd680d"
+    },
+    {
+      "file": "tvos/App/HomeView.swift",
+      "sha256": "26349a57b4f71981914676a8e0e09bd4ccb5d91913722b69a33a16ed529972c5",
+      "disposable_qa_sha256": "26349a57b4f71981914676a8e0e09bd4ccb5d91913722b69a33a16ed529972c5"
+    },
+    {
+      "file": "tvos/App/RootView.swift",
+      "sha256": "bad20b657c8fce6bbf9c2adab013eaf903ecd3de378cd4827fa52f32068e05b7",
+      "disposable_qa_sha256": "bad20b657c8fce6bbf9c2adab013eaf903ecd3de378cd4827fa52f32068e05b7"
+    },
+    {
+      "file": "tvos/App/KeychainCredentials.swift",
+      "sha256": "55081fb9cb4eaf8649b1b76cedf2ddc7207b7e938268a1a9fddbe3d921ba30ad",
+      "disposable_qa_sha256": "55081fb9cb4eaf8649b1b76cedf2ddc7207b7e938268a1a9fddbe3d921ba30ad"
+    },
+    {
+      "file": "tvos/App/LibraryView.swift",
+      "sha256": "02b3c79b01a65af2ee1877019ba49dae1e4430586a25fe43ea392d864da42859",
+      "disposable_qa_sha256": "02b3c79b01a65af2ee1877019ba49dae1e4430586a25fe43ea392d864da42859"
+    },
+    {
+      "file": "tvos/App/MediaRestart.swift",
+      "sha256": "cc4fca4e6e46cbcaa27cc1535b30dcfeb990a589ef19a5cc57d8355e1e1012af",
+      "disposable_qa_sha256": "cc4fca4e6e46cbcaa27cc1535b30dcfeb990a589ef19a5cc57d8355e1e1012af"
+    },
+    {
+      "file": "tvos/App/SignInView.swift",
+      "sha256": "8cfaf7be4245d853dd690333276900180c41420dfb585ebe491526f3525605a6",
+      "disposable_qa_sha256": "8cfaf7be4245d853dd690333276900180c41420dfb585ebe491526f3525605a6"
+    },
+    {
+      "file": "tvos/App/TVPlayer.swift",
+      "sha256": "28ec4f73847ef27274eccdc17f533a786de5c45d26b36d26942bd08c357d427d",
+      "disposable_qa_sha256": "28ec4f73847ef27274eccdc17f533a786de5c45d26b36d26942bd08c357d427d"
+    },
+    {
+      "file": "tvos/App/NoticesView.swift",
+      "sha256": "ce517571561f58986f650a3390cc94d298b9ceaba0658b9de0119305b5342919",
+      "disposable_qa_sha256": "ce517571561f58986f650a3390cc94d298b9ceaba0658b9de0119305b5342919"
+    },
+    {
+      "file": "tvos/App/RelatedAuthorSeries.swift",
+      "sha256": "5ead920b599bc5513bf9c139c2120061c0f919ec6a5c49aa846c36512ff6e662",
+      "disposable_qa_sha256": "5ead920b599bc5513bf9c139c2120061c0f919ec6a5c49aa846c36512ff6e662"
+    },
+    {
+      "file": "tvos/App/TVDiagnostics.swift",
+      "sha256": "f4023ec609c3c8e06d02738b3b7fecf474c401a8a32625d16ed1a8852e0fb5cb",
+      "disposable_qa_sha256": "f4023ec609c3c8e06d02738b3b7fecf474c401a8a32625d16ed1a8852e0fb5cb"
+    },
+    {
+      "file": "tvos/App/NowPlayingView.swift",
+      "sha256": "51c2a6a175e2620621f9c53fd3b45054d9a51d8e124c5eb6260b1ba2b677d18a",
+      "disposable_qa_sha256": "51c2a6a175e2620621f9c53fd3b45054d9a51d8e124c5eb6260b1ba2b677d18a"
+    },
+    {
+      "file": "tvos/App/CatalogStore.swift",
+      "sha256": "70be7fac850bbebc3f91b84e86fefc8170efcc9489a7fc0a3690e2cca60174d9",
+      "disposable_qa_sha256": "70be7fac850bbebc3f91b84e86fefc8170efcc9489a7fc0a3690e2cca60174d9"
+    },
+    {
+      "file": "tvos/App/LibraryBrowser.swift",
+      "sha256": "6c73a20905f8d347332b400532192b7fd0c24de2317a3a288c9ca4bbd35029d9",
+      "disposable_qa_sha256": "6c73a20905f8d347332b400532192b7fd0c24de2317a3a288c9ca4bbd35029d9"
+    },
+    {
+      "file": "tvos/App/Components.swift",
+      "sha256": "c9a86d784ae2796e3fb0638e3e1c00f57c5927620c9bf06c062416ff270e8740",
+      "disposable_qa_sha256": "c9a86d784ae2796e3fb0638e3e1c00f57c5927620c9bf06c062416ff270e8740"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/AuthorSeries.swift",
+      "sha256": "1796bf240c720d31e371471a51c11f4eda5a25cf9e822ff5d7f824d8114abcf1",
+      "disposable_qa_sha256": "1796bf240c720d31e371471a51c11f4eda5a25cf9e822ff5d7f824d8114abcf1"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/ListeningJournal.swift",
+      "sha256": "6bbe1a4347cdf2d67e428103d1ad4348365eb0630c7f2993c600c105a71fe998",
+      "disposable_qa_sha256": "6bbe1a4347cdf2d67e428103d1ad4348365eb0630c7f2993c600c105a71fe998"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/PodcastFeedEpisode.swift",
+      "sha256": "8fa4b82d5f67bcf4f2f76412cd9aea2cab3e9cbb06a5a802a3e84f5861d1f06c",
+      "disposable_qa_sha256": "8fa4b82d5f67bcf4f2f76412cd9aea2cab3e9cbb06a5a802a3e84f5861d1f06c"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/APIClient.swift",
+      "sha256": "4e591e14bb41a974668670df84ef747d7a6233c9ad8781bc08f0378e3a2f5d65",
+      "disposable_qa_sha256": "4e591e14bb41a974668670df84ef747d7a6233c9ad8781bc08f0378e3a2f5d65"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/AudioGroups.swift",
+      "sha256": "fa2c0c874a88618260f76e33b630e04933da8311ed9075e825da0b0a877d7a77",
+      "disposable_qa_sha256": "fa2c0c874a88618260f76e33b630e04933da8311ed9075e825da0b0a877d7a77"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/ServerEvents.swift",
+      "sha256": "6a342bbd83f1cb8a35011183f2c0c04aa919004cfda8e83c54812672bacc206f",
+      "disposable_qa_sha256": "6a342bbd83f1cb8a35011183f2c0c04aa919004cfda8e83c54812672bacc206f"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/CoreText.swift",
+      "sha256": "abea41f738255b395f110680721e460d44efa8b843fcaea2835f5bc987df3a96",
+      "disposable_qa_sha256": "abea41f738255b395f110680721e460d44efa8b843fcaea2835f5bc987df3a96"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/ListeningStats.swift",
+      "sha256": "178bdea9cdae31489d6aa387c67d48cb4d7df2bd64ee982d67327f7a3b32bcc5",
+      "disposable_qa_sha256": "178bdea9cdae31489d6aa387c67d48cb4d7df2bd64ee982d67327f7a3b32bcc5"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/Models.swift",
+      "sha256": "0486b5c828c10bc251bcd8c0b3e6c8323216d98006d7282ec334e3f1039882b7",
+      "disposable_qa_sha256": "0486b5c828c10bc251bcd8c0b3e6c8323216d98006d7282ec334e3f1039882b7"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/RealtimeChange.swift",
+      "sha256": "018d4871db2313377ed0715af6afa858f8ade38fb5642878303b938c438a9508",
+      "disposable_qa_sha256": "018d4871db2313377ed0715af6afa858f8ade38fb5642878303b938c438a9508"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/ItemServerActions.swift",
+      "sha256": "2630667a3661203763f5079876c7439062d34bf64bdf88528c00609a7d6f54ee",
+      "disposable_qa_sha256": "2630667a3661203763f5079876c7439062d34bf64bdf88528c00609a7d6f54ee"
+    },
+    {
+      "file": "tvos/Core/Sources/TVCore/OfflineAudio.swift",
+      "sha256": "be258a6938ebc2a97621e5b51f38e373ba3eb8f7c032f25b04da88722df83db6",
+      "disposable_qa_sha256": "be258a6938ebc2a97621e5b51f38e373ba3eb8f7c032f25b04da88722df83db6"
+    }
+  ],
+  "qaRuntimeMismatches": []
+}

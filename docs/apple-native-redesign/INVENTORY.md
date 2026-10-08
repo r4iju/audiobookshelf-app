@@ -72,3 +72,7 @@ These are ticket236 presentation/interaction records, not substitutes for ticket
 | Import/reconciliation | Initial and authenticated native picker, Cancel and swipe-dismiss/reopen, incomplete export feedback/retry, complete owned synthetic preflight/import and saved-account reauthentication. Frozen4524 four-case journey passes. |
 
 Current Settings Search drawer remains a truthful ticket239 ownership/clearance case. Earlier237 unchanged captures are not relabeled final-candidate acceptance. Full final-source compact/spoken/older-OS/combined-mode/durability/visual gates remain239.
+
+## Final acceptance239
+
+[239 evidence](evidence/239/RESULT.md) records single native Search ownership, actual375×536 iPad transport/navigation/search actions, largest-text locator red/green, SDK contracts and original-minimum older build attempts. Runtimef635 stays frozen; test/CI follow-ups do not redesign the approved screens. The user stopped new screenshots. Strict combined native contrast, spoken traversal, stock14.5 execution and acceptedTV17 HTTPS journeys remain explicitly unresolved; no final whole-app/independent-review pass is inferred.

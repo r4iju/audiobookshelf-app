@@ -1,0 +1,5 @@
+{
+  "CFBundleIdentifier": "com.forkzed.audiobookshelf.native.preview",
+  "MinimumOSVersion": "14.0",
+  "CFBundleExecutable": "AudiobookshelfNative"
+}

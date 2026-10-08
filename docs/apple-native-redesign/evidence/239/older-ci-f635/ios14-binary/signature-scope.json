@@ -1,0 +1,5 @@
+{
+  "buildSetting": "CODE_SIGNING_ALLOWED=NO",
+  "inspectionExit": 0,
+  "scope": "Unsigned simulator build requested. Inspect actual signature log; no private signing or runtime claim."
+}

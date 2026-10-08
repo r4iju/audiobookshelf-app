@@ -1,0 +1,710 @@
+[
+  {
+    "name": "native239-phone-functional-current",
+    "source": "300+DownloadDelegate compiler guard",
+    "log": "/tmp/native239-phone-functional-current.log",
+    "sha256": "f6c7fbc5f59e234aa936c71b4097ba4492a8d7516644e40ab5fbd3e24129c9b1",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.ConnectionJourney testConnectSelectLibraryAndRestoreAccountAfterRelaunch]",
+        "passed",
+        "19.092 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testBookmarkCreateEditJumpAndDeletePersistOnServer]",
+        "passed",
+        "38.343 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testChapterSeekAndSpeedSurviveSessionRestoration]",
+        "passed",
+        "55.579 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testConfiguredSkipIntervalsSeekAcrossFilesAndPersist]",
+        "passed",
+        "34.066 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testDeletingFractionalBookmarkPreservesItsIntegerNeighbor]",
+        "passed",
+        "19.206 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testDisablingAnActiveSleepFadeRestoresActualAudioVolume]",
+        "passed",
+        "26.987 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testResumeRewindsAfterAPauseAndCanBeDisabledPersistently]",
+        "passed",
+        "42.089 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testSeekingPastChapterSleepBoundaryStopsAudioInsteadOfLeavingTimerStranded]",
+        "passed",
+        "24.120 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testShortSleepTimerActuallyStopsAndPersistsPositionAfterLeavingPlayer]",
+        "passed",
+        "28.674 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ListeningControlsJourney testTimerAdjustmentChangesActualStopAndResetKeepsOriginalDuration]",
+        "passed",
+        "36.441 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.OfflineJourney testDownloadedBookPlaysAcrossFilesOfflineAfterRelaunchAndSynchronizesOnReconnect]",
+        "passed",
+        "43.319 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.OfflineJourney testNewerRemoteRewindBecomesTheNextOfflineResumeWithoutRedownloading]",
+        "passed",
+        "41.206 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.OfflineJourney testSuccessfulHTTPErrorPageIsRejectedAndRetryRecoversTheDownload]",
+        "passed",
+        "24.799 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ReaderJourney testEPUBChapterLocationSurvivesDownloadedOfflineRelaunch]",
+        "passed",
+        "34.823 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.ReaderJourney testPDFPageRotationAndPositionSurviveDownloadedOfflineRelaunch]",
+        "passed",
+        "44.505 seconds"
+      ]
+    ],
+    "result": "FAILED"
+  },
+  {
+    "name": "native239-pad26-compact-global-11",
+    "source": "300+DownloadDelegate compiler guard",
+    "log": "/tmp/native239-pad26-compact-global-11.log",
+    "sha256": "58614602e2fac289c8ac1ad7b37695fb7f11f74981db4f777d0453c95a417e2e",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.Compact239Journey testActualNarrowWindowPreservesNavigationAndTransport]",
+        "passed",
+        "60.277 seconds"
+      ]
+    ],
+    "result": "SUCCEEDED"
+  },
+  {
+    "name": "native239-pad-native-wide-3",
+    "source": "disposable native window restoration",
+    "log": "/tmp/native239-pad-native-wide-3.log",
+    "sha256": "a551efe7b19e9760124e89a827d52e5489cb495189b40b5dd80d51a6766ea349",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.NativeWindow239Journey testRestoreWideNativeWindow]",
+        "passed",
+        "7.746 seconds"
+      ]
+    ],
+    "result": "SUCCEEDED"
+  },
+  {
+    "name": "native239-phone-presentation-scrolled",
+    "source": "300 UI runtime",
+    "log": "/tmp/native239-phone-presentation-scrolled.log",
+    "sha256": "41f49d430b711fd933e248a5de43bde1cc28cc177f7b4017b8a158c4c82b9fad",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.PresentationJourney testAccessibilityTextSizeKeepsPlayerControlsOnScreen]",
+        "passed",
+        "29.160 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.PresentationJourney testLockedPlayerPreventsAccidentalSeekingUntilUnlocked]",
+        "passed",
+        "55.326 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.PresentationJourney testRightToLeftLanguageMirrorsNativeLayout]",
+        "passed",
+        "26.436 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.PresentationJourney testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch]",
+        "failed",
+        "54.669 seconds"
+      ]
+    ],
+    "result": "FAILED"
+  },
+  {
+    "name": "native239-phone-language-largest-replay-4",
+    "source": "300 UI runtime",
+    "log": "/tmp/native239-phone-language-largest-replay-4.log",
+    "sha256": "83e9c880d55ba6f39201f41a18178bea6dbd55e81fa159ce97505f5b4807132c",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.PresentationJourney testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch]",
+        "passed",
+        "103.571 seconds"
+      ]
+    ],
+    "result": "SUCCEEDED"
+  },
+  {
+    "name": "native239-phone-publication-scrolled-retry",
+    "source": "f635",
+    "log": "/tmp/native239-phone-publication-scrolled-retry.log",
+    "sha256": "2a79ce9eb3fdb8b280212653594d59ef16d2d74325c3d6ef46065fa0f25dec4c",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.PublicationRecoveryJourney testOpenDetailsOfferARestartOnceASaveGetsNoAnswerAndSendLaterListeningAfterIt]",
+        "passed",
+        "50.684 seconds"
+      ]
+    ],
+    "result": "SUCCEEDED"
+  },
+  {
+    "name": "native239-phone-strict-combined-retry",
+    "source": "f635",
+    "log": "/tmp/native239-phone-strict-combined-retry.log",
+    "sha256": "d313b95f28b7947c75d2ccf2a26b4aa552a6db6c2dab0f13384f2fe499141c11",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.CombinedAccessibility239Journey testCombinedModesKeepPrimaryTransportAndToolsOperable]",
+        "failed",
+        "53.467 seconds"
+      ]
+    ],
+    "result": "FAILED"
+  },
+  {
+    "name": "native239-pad-largest-final",
+    "source": "f635",
+    "log": "/tmp/native239-pad-largest-final.log",
+    "sha256": "5e7d7bcdca4f1edfffcc0c5b1fdf9bf8284428501a81a0b249a4a356a848db6e",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.PresentationJourney testAccessibilityTextSizeKeepsPlayerControlsOnScreen]",
+        "failed",
+        "22.319 seconds"
+      ],
+      [
+        "-[NativeJourneyTests.PresentationJourney testLockedPlayerPreventsAccidentalSeekingUntilUnlocked]",
+        "passed",
+        "57.557 seconds"
+      ]
+    ],
+    "result": "FAILED"
+  },
+  {
+    "name": "native239-pad-largest-readiness",
+    "source": "f635",
+    "log": "/tmp/native239-pad-largest-readiness.log",
+    "sha256": "ae04ec099107ad429c2965be0ae31525cb2d35d09ab0174f45da0e178b91f991",
+    "testCases": [
+      [
+        "-[NativeJourneyTests.PresentationJourney testAccessibilityTextSizeKeepsPlayerControlsOnScreen]",
+        "passed",
+        "29.502 seconds"
+      ]
+    ],
+    "result": "SUCCEEDED"
+  },
+  {
+    "name": "native239-download-compat-units",
+    "source": "300+DownloadDelegate compiler guard",
+    "log": "/tmp/native239-download-compat-units.log",
+    "sha256": "bdb52e9102cb442debe121b412f05275937a0f2674504b4463f10f49cb76bc90",
+    "testCases": [
+      [
+        "-[NativeTests.DownloadRecoveryTests testAudioStaysPlayableOfflineWhenAPDFAddedLaterFailsToDownload]",
+        "passed",
+        "0.240 seconds"
+      ],
+      [
+        "-[NativeTests.DownloadRecoveryTests testFileWriteFailureWithoutAStorageCauseIsNotReportedAsInsufficientStorage]",
+        "passed",
+        "0.106 seconds"
+      ],
+      [
+        "-[NativeTests.DownloadRecoveryTests testUnsizedTransferShorterThanTheListedFileSizeIsNotSavedAsFinished]",
+        "passed",
+        "0.118 seconds"
+      ]
+    ],
+    "result": "SUCCEEDED"
+  },
+  {
+    "name": "native239-core-payload-compat",
+    "source": "f635",
+    "log": "/tmp/native239-core-payload-compat.log",
+    "sha256": "cbb6aa6adf716098b78f04518fd33a3c9e19bb6eb455053655900c1b40f2937b",
+    "testCases": [
+      [
+        "-[TVCoreTests.AnnualStatsTests testListenerYearKeepsServerCoverOrderAndToleratesServersWithoutCovers]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.AnnualStatsTests testOnlyAdminsAndRootMayRequestServerYear]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.AnnualStatsTests testServerYearDecodesTheAdminPayloadWithEmptySQLTotals]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.AnnualStatsTests testServerYearUsesTheAdminRouteWithBearerAndSurfacesForbidden]",
+        "passed",
+        "0.006 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testACloseAnsweredAfterAnotherClientOpenedAReplacementKeepsTheReplacement]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testActionsOpenedForOneSignInNeverRunForAnotherOrTheSameAccountAgain]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAFailedActionIsReportedAndCanBeRetried]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAFailedLoadIsReportedAndLoadingAgainRecovers]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAFeedChangeAfterASignInChangeIsIgnored]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAFeedClosedWhileTheItemLoadsIsNotReopenedByTheOlderResponse]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAFeedOpenedOrClosedElsewhereReplacesTheItemsFeed]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAnAdminClosesTheOpenFeed]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAnAdminOpensAFeedWithTheBaselinePayload]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAnAuthorizationForAnotherUserIsNotShown]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAnInvalidSlugIsRejectedBeforeAnyRequest]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAnOlderLoadAnsweredAfterANewerOneDoesNotReplaceIt]",
+        "passed",
+        "0.112 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAnOlderLoadFailingAfterANewerOneSucceededShowsNoError]",
+        "passed",
+        "0.011 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAnOpenAnsweredAfterAnotherClientClosedTheFeedKeepsItClosed]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAnOwnOpenIsNotUndoneByALoadThatReadTheItemBeforeIt]",
+        "passed",
+        "0.012 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testAPodcastFeedWarnsWhenEpisodesHaveNoPublishedDate]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testASignInChangeDuringAnActionDropsItsResult]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testLoadingReadsTheAccountDevicesAndTheItemsFeed]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testOtherUsersViewAnOpenFeedButNeverOpenOrCloseOne]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testSendingNeedsAnEbookAndADeviceTheServerListsForTheUser]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testSlugsAreSanitizedLikeTheBaseline]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testTheEbookIsSentToAnAccessibleDevice]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ItemServerActionsTests testTheFeedActionNeedsAnOpenFeedOrAnAdminWithAudio]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testAcknowledgingAnOlderSnapshotDoesNotRetireNewerListening]",
+        "passed",
+        "0.005 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testBoundedJournalEvictsOldRemoteCacheButKeepsPendingListening]",
+        "passed",
+        "0.029 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testCorruptPersistentJournalDoesNotReplayStaleFile]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testDuplicateRecordIDsAreRejectedWithoutChangingSource]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testFailedDiskWriteKeepsPreviouslySavedListening]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testOfflineResumeRetainsAcknowledgedPositionButRespectsANewerRemoteSnapshot]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testOversizedFileJournalCanDrainBeforeSwitchingToPersistentStorage]",
+        "passed",
+        "0.006 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testPersistedListeningReopensWithCumulativeTotalsAndAccountIsolation]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testPersistentCapacityFailureRetainsUnacknowledgedListening]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testPersistentJournalSurvivesFilePurgeWithoutCrossAccountReplay]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testRecoveredSessionsKeepUnsentListeningAndRemoveAcknowledgedHistory]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[TVCoreTests.ListeningJournalTests testUnreadableJournalIsPreservedForRecovery]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.PinnedCoverTests testPinnedCoverRequestsNeverRunUnderALaterAuthorizationEvenForTheSameAccount]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.RealtimeChangeTests testEventsAddressedToAnotherAccountAreRejected]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RealtimeChangeTests testItemFeedEventsCarryTheFeedOrItsClosing]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RealtimeChangeTests testLibraryItemEventsCarryTheExpandedItemOrItsIdentity]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RealtimeChangeTests testPlaylistAndCollectionEventsIdentifyTheGroup]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RealtimeChangeTests testPodcastDownloadResultsStillReachTheQueue]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RealtimeChangeTests testServer230ProgressFromAnotherSessionNamesTheChangedMedia]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RealtimeChangeTests testUnsupportedOrMalformedEventsAreIgnored]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RealtimeChangeTests testUserUpdatesForTheOwnerRequestAProgressRefresh]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedAuthorSeriesTests testAuthorAndSeriesMetadataDecode]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedAuthorSeriesTests testExpandedItemsCarryEverySeriesWithItsSequence]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedAuthorSeriesTests testItemsKnowTheirLibrarySoRelatedPagesQueryIt]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedAuthorSeriesTests testRelatedRequestsUseTheServerRoutesAndFilters]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedAuthorSeriesTests testSeriesFilteredItemsCarryOneSeriesObject]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedAuthorSeriesTests testUnexpectedSeriesShapesDoNotHideTheBook]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedLoadersTests testAFailedSeriesIsReportedAndLoadingAgainRecovers]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedLoadersTests testAnAuthorImageIsOnlyRequestedForTheSignInThePageOpenedWith]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedLoadersTests testAnAuthorPageOpenedForOneSignInNeverRequestsOrShowsAnothers]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedLoadersTests testAnAuthorWithMoreSeriesThanOnePageShowsThemAll]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedLoadersTests testAnAuthorWithoutAnImageDoesNotRequestOne]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedLoadersTests testASeriesPageOpenedForOneSignInNeverRequestsOrShowsAnothers]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedLoadersTests testAuthorLoadsBioSeriesImageAndEveryPageOfBooks]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.RelatedLoadersTests testSeriesKeepsTheServerSequenceOrderAndProgress]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testAudioTokenRefreshesBeforeLoadingAnExpiredJWT]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testExpiredTokenRefreshesAndRetriesWithoutDroppingRefreshToken]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testLibraryItemsDecodeBothFullAndMinifiedAuthorMetadata]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testLoginSupportsModernAndLegacyTokens]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testMediaURLsStayOnServerAndPreserveSubpath]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testMultiFileResumeAndSeekingAcrossTrackBoundaries]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testQueryPlusSurvivesFormDecodingForFiltersAndSearch]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testServerRejectsCredentialsAndNonHTTPAddresses]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testServerURLPreservesReverseProxyPathAndEncodesQuery]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[TVCoreTests.TVCoreTests testUnauthorizedLegacyTokenRequiresSignInAndDoesNotLoop]",
+        "passed",
+        "0.000 seconds"
+      ]
+    ],
+    "result": "see log"
+  },
+  {
+    "name": "native239-localization-856",
+    "source": "856",
+    "log": "/tmp/native239-localization-856.log",
+    "sha256": "ac8fbfde5ea68f2854ec0b754c6b84efd49e00806c9fbf56c733e16ce49a4f23",
+    "testCases": [
+      [
+        "-[NativeLocalizationTests.NativeLanguageTests testArabicAndHebrewUseRightToLeftLayout]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeLanguageTests testDeviceLanguagesMatchLegacyRegionalAndScriptVariants]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeLanguageTests testEveryLegacySelectableLanguageRemainsSelectableInLegacyOrder]",
+        "passed",
+        "0.001 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeLanguageTests testMigratedLegacyLanguageIsAdoptedOnlyWhenTheNativeAppHasNone]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeLanguageTests testSavedLegacyChoiceWinsOverDeviceLanguage]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeLanguageTests testUnknownSavedChoiceFollowsTheDevice]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeLanguageTests testUnsupportedDeviceLanguagesAreSkippedBeforeTheEnglishDefault]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testCopyForAnotherRendererCarriesOnlyTranslatedText]",
+        "passed",
+        "0.003 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testEnglishKeepsTheNativeWording]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testEquivalentNativeTextShowsTheLegacyTranslation]",
+        "passed",
+        "0.002 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testNativeWordingOfALegacyLabelShowsTheLegacyTranslation]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testPlaceholdersAreSubstitutedInOrder]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testPodcastEpisodeSortChoicesShowTheLegacyTranslations]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testSameActionUnderTheLegacyNameShowsTheLegacyTranslation]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testSharedEnglishWordingIsTranslatedByItsMeaning]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testShippedTranslationsAreTheUsableLegacyOrMaintainedTranslations]",
+        "passed",
+        "0.135 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testTextWithoutATranslationFallsBackToEnglish]",
+        "passed",
+        "0.000 seconds"
+      ],
+      [
+        "-[NativeLocalizationTests.NativeStringsTests testTranslatedPercentNeverRoundsAPartialLanguageUpToComplete]",
+        "passed",
+        "0.000 seconds"
+      ]
+    ],
+    "result": "see log"
+  }
+]

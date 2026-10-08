@@ -1,0 +1,91 @@
+[
+  {
+    "kind": "phone",
+    "queries": {
+      "voiceover": {
+        "enabled": false,
+        "operation": "query"
+      },
+      "audio": {
+        "outcome": "failed",
+        "error": {
+          "code": 1001,
+          "domain": "com.apple.dt.CoreDeviceError",
+          "userInfo": {
+            "CapabilityFeatureIdentifier": {
+              "string": "com.apple.coredevice.feature.audiooutput"
+            },
+            "CapabilityName": {
+              "string": "Audio Output Device Selection"
+            },
+            "NSLocalizedDescription": {
+              "string": "The capability \u201cAudio Output Device Selection\u201d is not supported by this device."
+            }
+          }
+        },
+        "result": null
+      },
+      "qa-app": {
+        "outcome": "success",
+        "error": null,
+        "result": {
+          "apps": [],
+          "defaultAppsIncluded": false,
+          "hiddenAppsIncluded": false,
+          "internalAppsIncluded": false,
+          "matchingBundleIdentifier": "com.forkzed.audiobookshelf.native.qa239",
+          "removableAppsIncluded": true
+        }
+      }
+    }
+  },
+  {
+    "kind": "tv",
+    "queries": {
+      "voiceover": {
+        "outcome": "failed",
+        "error": {
+          "code": 21062,
+          "domain": "com.apple.dt.CoreDeviceError",
+          "userInfo": {
+            "NSLocalizedDescription": {
+              "string": "VoiceOver is not supported on this device."
+            }
+          }
+        },
+        "result": null
+      },
+      "audio": {
+        "outcome": "failed",
+        "error": {
+          "code": 1001,
+          "domain": "com.apple.dt.CoreDeviceError",
+          "userInfo": {
+            "CapabilityFeatureIdentifier": {
+              "string": "com.apple.coredevice.feature.audiooutput"
+            },
+            "CapabilityName": {
+              "string": "Audio Output Device Selection"
+            },
+            "NSLocalizedDescription": {
+              "string": "The capability \u201cAudio Output Device Selection\u201d is not supported by this device."
+            }
+          }
+        },
+        "result": null
+      },
+      "qa-app": {
+        "outcome": "success",
+        "error": null,
+        "result": {
+          "apps": [],
+          "defaultAppsIncluded": false,
+          "hiddenAppsIncluded": false,
+          "internalAppsIncluded": false,
+          "matchingBundleIdentifier": "com.forkzed.audiobookshelf.tv.qa239",
+          "removableAppsIncluded": true
+        }
+      }
+    }
+  }
+]
