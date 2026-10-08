@@ -11,3 +11,5 @@ Actual a363 hosted diagnostics exposed duplicate critical CA Basic Constraints f
 Final V239-01 runtimef922 native Downloads label wrapping/geometry correction preserves all callbacks/IDs and older fallbacks; final-source original-minimum binary and TV17 acceptance must remain source-pinned to this descendant.
 
 Actual f31 hosted17 validCA reached app sign-in but unsigned simulator build caused Keychain -34018; execution replays now enable normal ad-hoc simulator signing and record strict seals/Xcode-generated app+runner entitlements, preserving original keychain/domain/identity contracts. Independent build-only minimum proof remains distinct.
+
+Actual source38 stockTV17 normal ad-hoc sign-in/home/detail/Back passes47.799s; next batched native Search typing loses second character, field Tmorrow61 with correct no-match result. QA-only per-character native typing waits for each observed prefix and asserts complete query before unchanged results; final older replay required. Runtimef922 unchanged.

@@ -86,7 +86,19 @@ import XCTest
         let keyboard = app.keyboards.firstMatch
         for _ in 0..<4 where !(keyboard.exists && keyboard.hasFocus) { remote.press(.down) }
         XCTAssertTrue(keyboard.hasFocus, "The search keyboard should take focus", file: file, line: line)
-        app.typeText(text)
+        let field = app.searchFields.firstMatch
+        var entered = ""
+        // Stock17's native keyboard dropped a character from one batched event.
+        // Observe each actual character before sending the next native event.
+        for character in text {
+            app.typeText(String(character))
+            entered.append(character)
+            let matches = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", entered), object: field)
+            let result = XCTWaiter.wait(for: [matches], timeout: 3)
+            XCTAssertEqual(result, .completed, "Native search input expected \(entered), got \(String(describing: field.value))", file: file, line: line)
+            guard result == .completed else { return }
+        }
+        XCTAssertEqual(field.value as? String, text, "Verify complete native query before result assertions", file: file, line: line)
     }
 
     func signIn(server: String = TVJourney.fixture, reset: Bool = true) {
