@@ -1,5 +1,7 @@
 # Audiobook Loft Apple listing preparation
 
+Current Apple internal beta preparation is documented in [independent Apple release state](../../docs/apple-independent-release/STATE.md). Build 2 packages independently implemented native Apple code under a scoped MIT grant, preserving origin disclosure and vendor notices. Root GPL and inherited code/history remain unchanged. Both build-2 packages are valid, internal-only and assigned to the owner internal group in TestFlight. Dated licensing and no-upload statements below describe earlier candidates and do not apply as blanket license claims to this independent candidate. No external TestFlight or App Store submission is claimed.
+
 Canonical store fields: [store-metadata.json](store-metadata.json), Apple `en-GB`.
 
 Name: Audiobook Loft

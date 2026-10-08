@@ -1,5 +1,7 @@
 # Audiobook Loft release status, October 5, 2026
 
+Current Apple internal beta preparation is documented in [independent Apple release state](../../docs/apple-independent-release/STATE.md). Build 2 packages independently implemented native Apple code under a scoped MIT grant, preserving origin disclosure and vendor notices. Root GPL and inherited code/history remain unchanged. Both build-2 packages are valid, internal-only and assigned to the owner internal group in TestFlight. Dated licensing and no-upload statements below describe earlier candidates and do not apply as blanket license claims to this independent candidate. No external TestFlight or App Store submission is claimed.
+
 ## Audiobook Loft rc.6, expired-session recovery, October 5, 2026
 
 Rc.6 supersedes rc.5 on the live server at `https://audiobookshelf.nginx.lan`. [The release](https://github.com/r4iju/audiobookshelf-app/releases/tag/audiobook-loft-v1.0.0-rc.6) provides the exact one-image archive, corresponding source `0eefd53f74cb4ed3457c48640670db5d50cdbaab`, materials and checksums. Archive SHA256: `f40fecd42c5011c5992cd383b9798aa6c9a1ee9cf0a1e6ebb89fcb44334442b9`. Image ID: `sha256:33842adcd49aa1de7e765f13a0552955607fcdf2bc6117969bbb04e41210a58c`; archive config digest: `sha256:e580687038536f4d8eece38840dc53b8732eee0429eb56169376e427fcb5184b`.

@@ -1,0 +1,1199 @@
+{
+  "source": "b16355f42ed6619164f85c606775c5b80b51b95d",
+  "targets": {
+    "ios": [
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/APIClient.swift",
+        "sha256": "4e591e14bb41a974668670df84ef747d7a6233c9ad8781bc08f0378e3a2f5d65"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/AddPodcast.swift",
+        "sha256": "000f6dffa68362fbc1d510fbf048211e502dc0dadf129330e2d3c113d38b0843"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Adoption/AdoptionLedger.swift",
+        "sha256": "4b257a869415613c956d09e33c4235e77795ec8d41474e7f4d25df32247baf98"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Adoption/AdoptionReport.swift",
+        "sha256": "9fec8104dc4f1a134c805a339758b9632a0a01bad33e3ae91ab5782d14d3b7bd"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Adoption/AdoptionSettings.swift",
+        "sha256": "d6f9ded258e5a5f3f2a480fb16f02c0d41527375cd96ab2266e039d6d605874a"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Adoption/AdoptionSync.swift",
+        "sha256": "d8859ece40d6d785b8d4fbcfc91de47f34238fb3c21d6772e510cd90f52c699f"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/AppleNetworkPolicy.swift",
+        "sha256": "e00d7bd97f8acb299505709f319c1b7ba25f91f006171e7e9606592663d1fbde"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/ApplePlayback.swift",
+        "sha256": "10e8da95476e4e12fbff68deca7986118275cb4ac2c6b667f539306da6cca619"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/AudioGroupViews.swift",
+        "sha256": "cfd9b65f67ddd675a69ec920eeea3106f14f9b5daefdcad6eee334cb36bd8c0f"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/AudioGroups.swift",
+        "sha256": "fa2c0c874a88618260f76e33b630e04933da8311ed9075e825da0b0a877d7a77"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/AudiobookshelfNativeApp.swift",
+        "sha256": "538a0c49b8e72441520963daa6348845c824ef61be7cc213ae96aa724f4c0a5d"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/AuthorSeries.swift",
+        "sha256": "1796bf240c720d31e371471a51c11f4eda5a25cf9e822ff5d7f824d8114abcf1"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/BookDetails.swift",
+        "sha256": "c50a08e1a4eab5fa6f7e524682e28974a1fc6346a92c7f0c02e9324ca2347902"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/CatalogOptions.swift",
+        "sha256": "f1d2b0850972a67a7b34885188b8e628c7430330083d04b31cff7facc1c9316a"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/CatalogStore.swift",
+        "sha256": "2c34770efc2989ea1f885eb490c464b988fd09a1feea51a9bcc4c02c3f6f9a31"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/CatalogViews.swift",
+        "sha256": "a932e486ec302a6c025e0994e73a657a1cbc34ceee40c0610bcc50d8903a8d55"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/ConnectionStore.swift",
+        "sha256": "272607651f3a8976954aff04680826202fce454150db2db02dd86dfc4933d704"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/ConnectionViews.swift",
+        "sha256": "d30e25ea85992f6cf72d97414d4f8d45186118af5308eb5ae124388e7d054466"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/ContainedFile.swift",
+        "sha256": "10e0fcec0054c5779e87868aeb679f967f9126028b6acddd56af52198630a51c"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/CoreText.swift",
+        "sha256": "abea41f738255b395f110680721e460d44efa8b843fcaea2835f5bc987df3a96"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/CoreTextInstallation.swift",
+        "sha256": "f4ce961d4c664aa2a0c86f1ac87fa74d32ba61e7bdd5463ce21e0ed70b9d4782"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Diagnostics/Sources/NativeDiagnostics/DiagnosticLog.swift",
+        "sha256": "08e723d02914baaee05b22696a4afc3e48f08397cee36873361ed49106277984"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Diagnostics/Sources/NativeDiagnostics/DiagnosticRedactor.swift",
+        "sha256": "748ac76249f896e041834bf7bc5252b0585d4dd08eb761cfe1af19a4443f1c1a"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Diagnostics/Sources/NativeDiagnostics/DiagnosticReport.swift",
+        "sha256": "4d1e5ff609ca3eca87b2b74eb9afbac823ed2bdd7dd9a5bdcc0d4938f1bc0450"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/DownloadsView.swift",
+        "sha256": "1de156953e151610309e05338921ecd26d7bc108cbf57da821484e6640d75bee"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/EPUBReader.swift",
+        "sha256": "ea7d8efa7de176ceac6d0ab1ca13f75f48b47d895872dd691e68ef50468a088b"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/FeedEpisodes.swift",
+        "sha256": "30899bb0cbc65bc3865b624532c4878995f574bbf823738c1cd648073cb106b5"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/ItemServerActions.swift",
+        "sha256": "2630667a3661203763f5079876c7439062d34bf64bdf88528c00609a7d6f54ee"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/ItemServerActionsViews.swift",
+        "sha256": "172f3b0ef4b3d848121e0452febaa026972931e4b5bc77045ccf1983107d6ed7"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/KeychainCredentials.swift",
+        "sha256": "08185a3748540e568f3704fec12d966d1afe9384cf7fcab2741a8fb5bf46c9af"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/LegacyArchive.swift",
+        "sha256": "bb1cf6df062aac5c11af99e4987361b03f48832420b130b6053a772fd0e3eaba"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/LegacyMigrator.swift",
+        "sha256": "ff0551d8e4787b06b06d2911f39e95f65671dca790129a78511c3008cb6f768c"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/LegacySnapshot.swift",
+        "sha256": "3fea96203df8a92f29765b50f8239e82ea0b7f955c906387d0de34a1d28b2677"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/LegacySource.swift",
+        "sha256": "57d1c73b2921f959c9b41ac5f8fe2b2252d81dc7d8e5ade4ac984573368780ed"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/LibrarySearch.swift",
+        "sha256": "5f63512e7d04137be141dddaab2a26cd05ed532f0f3965d38628477600dea481"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/ListeningJournal.swift",
+        "sha256": "6bbe1a4347cdf2d67e428103d1ad4348365eb0630c7f2993c600c105a71fe998"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/ListeningStats.swift",
+        "sha256": "178bdea9cdae31489d6aa387c67d48cb4d7df2bd64ee982d67327f7a3b32bcc5"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/ListeningStorage.swift",
+        "sha256": "0c0ae34d8998fd32f406a666ec9cfc0b75a29866ac49ab9f3e98c828be4bb0e1"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/ListeningSync.swift",
+        "sha256": "ccd3ef119aea6720b6e5fccd9fe761602f1193ca231167d2c50dcb9216e60064"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/MigrationFileSystem.swift",
+        "sha256": "9f0ce68e09420608b863a5dc17f9a57996e869ab7e2c7e63664af7524d08bca3"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/MigrationJSON.swift",
+        "sha256": "73ee719634a7568989ccf717da95fc1009e5a27a897dbcdbe02b5afce2eafc96"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/MigrationOutcome.swift",
+        "sha256": "ffe0c883ff89cbd4d43dba24336344b719dd5acc1f5242ffcee0aba1ff5b5da2"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Migration/Sources/LegacyMigration/MigrationPlan.swift",
+        "sha256": "2e6eb278861ef94dbb8ede2f4f24479a5abc12a7850cf07dea802833564585bf"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/Models.swift",
+        "sha256": "0486b5c828c10bc251bcd8c0b3e6c8323216d98006d7282ec334e3f1039882b7"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/NativeDiagnosticsView.swift",
+        "sha256": "b10b552670d8e031dab4cadbda011217886b31624ccac2db5b56d68ff4d282b5"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/NativeDownloads.swift",
+        "sha256": "19e16bdf33de64ef94699a2ce24e8644892efadc26e8b6033f16eb1601f338c2"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Presentation/NativeGlassControls.swift",
+        "sha256": "74499bb79f76d9e6312d54e70dbf11792fe7f634b60740494d5d66099df11525"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/NativeLanguage.swift",
+        "sha256": "372ccffc1becb071aef541a77548504822cbede32674ec73426865a6cfd32478"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/NativeLanguageSettings.swift",
+        "sha256": "2075be5d5f0622e1dae18d9ca260e578a844d035cee42a4643dc194c092b2ace"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Adoption/NativeMigrationAdoption.swift",
+        "sha256": "51be6e1d69d2e30d1e1fc6e21bdf2cb80e8e91efe818ccc6e3927f2dfab4f206"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/NativeMigrationImport.swift",
+        "sha256": "b4d05797e4001a3bd0e7f0fbfb99186fcab545fffc0830dc9af52460177608ac"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Presentation/NativeNavigation.swift",
+        "sha256": "0f78a2536c53fa717ed5f8d553b2dd32b5a73ebd04ebbf67d60efac043a3596a"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/NativePodcastQueue.swift",
+        "sha256": "d151e11b80693f77e59079c608e3f7386e94e0590216b4075231df5e5e16d7de"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/NativeRealtime.swift",
+        "sha256": "428a9b6e95f7b1d1a15c9bf052ad7d04700e9e04c514ca26392c2fb9c014c9a5"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Presentation/NativeSDKContract.swift",
+        "sha256": "d06a94d6e8b49849a91408da785f58355db77d1429ea33a77b6b012331c1aec8"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/NativeSettings.swift",
+        "sha256": "b3cc20f3630ab9fd18fadc53f0d23ca95c44a5e70dde55732a857e2c490d6715"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/NativeShell.swift",
+        "sha256": "8ff268d479c06cc70eac7f5e5d52ca2ecc8f113e923a02fb60bfe40eff6911ba"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/NativeStrings.swift",
+        "sha256": "2ddb1d893ff1afd02af5c0b560309d36c3ac4b3f79f230ed21905e1cc96e0429"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/OfflineAudio.swift",
+        "sha256": "be258a6938ebc2a97621e5b51f38e373ba3eb8f7c032f25b04da88722df83db6"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/OpenIDSignIn.swift",
+        "sha256": "8a877074934b2d14e5741e8f5b02458311a382261dde4e7c394c5e2045d38de7"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/PDFReader.swift",
+        "sha256": "5f7fc09cbe2ce806bdd0fa3d0bd7d12256fd7e0023af08371770a3b7ce844141"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/PlaybackViews.swift",
+        "sha256": "67e7ff79564cd56b93b2f4ba6b342b1d5ddc4d3fee9233bfb4126ebcf0fd7ecd"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/PodcastFeedEpisode.swift",
+        "sha256": "8fa4b82d5f67bcf4f2f76412cd9aea2cab3e9cbb06a5a802a3e84f5861d1f06c"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/PublicationLedger.swift",
+        "sha256": "588480f93841149a5175cb1f0f70357dc1273e5629ac9094f02e5f0a045599bb"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/ReaderVolume.swift",
+        "sha256": "3e4e358fa1239bae064ba04eb81dd352013fbfd327b1c14f83c66a79fa01abc2"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/ReadingStore.swift",
+        "sha256": "4dc7a292ff3a949b0cb9a8431c34bc130e49b1eff3b3f776dec35643f24dc706"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/RealtimeChange.swift",
+        "sha256": "018d4871db2313377ed0715af6afa858f8ade38fb5642878303b938c438a9508"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/RelatedAuthorSeriesViews.swift",
+        "sha256": "a9c5ca56a19ad1dd9ba0dad48f41dcf28defb7ea52f44ee906f7d663b3f0a0ed"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/ServerEvents.swift",
+        "sha256": "6a342bbd83f1cb8a35011183f2c0c04aa919004cfda8e83c54812672bacc206f"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/StatisticsView.swift",
+        "sha256": "4f2efbf5f95406ee589c0507d0701534baed21dd1553fa5953304874100b32ba"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/WaitingWrites.swift",
+        "sha256": "f8924106486b788fd12bbe95af58d104287f74b95bd172e524678f668d844ce0"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Export/Sources/YearExport/YearExportArtwork.swift",
+        "sha256": "04f731ffd7eba0ea84c65f8c908bf1edcb7662e9775def2b0a50a735482544dc"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Export/Sources/YearExport/YearExportComposer.swift",
+        "sha256": "8415deb0c1871be377dfe27927a9bec7a1f851fbb33882567548d4dd99097ecb"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Export/Sources/YearExport/YearExportCopy.swift",
+        "sha256": "adbf3ebaef097fa50214fafb93494253585301c1b079cb822df6db01cb47826e"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Export/Sources/YearExport/YearExportRenderer.swift",
+        "sha256": "74bbe0dd7c3c452c25ecf23996df8a9b2cbd3e2ec5deeebbebfa11fca1ef60fc"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Export/Sources/YearExport/YearExportSnapshot.swift",
+        "sha256": "935b7784f531407bb6fff5831bb3c55092dfc552ab89283f29198b407a100995"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/App/YearReviewView.swift",
+        "sha256": "8c7d515c03af8528abc3d40260f01a22ddf517dd74e0257bf3dec0e3964bf428"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AccentColor.colorset/Contents.json",
+        "sha256": "4d661e607dfa5357ae831f9ea1b750a3ab5c408cb848be8b9799eb21ebcfe55f"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Contents.json",
+        "sha256": "8419bc1dcd969cef058247e3b03a6369a8c525d0b0893ad7bc2678f989c33e1e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ios-marketing-1024-1x.png",
+        "sha256": "e6e50179e1df1358d5234da68ca00c09e879d27f7e98efbc1fc189a494f73b74"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-20-1x.png",
+        "sha256": "16a2123c57ffec8989ac571303e41c30b36f38dee922a00f1a95a6a300e3b198"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-20-2x.png",
+        "sha256": "6b50757f8287733f56d60faa95132a2a082738fbe23c61a6a09a6d2b0cd2f5b8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-29-1x.png",
+        "sha256": "7527b214baf468060bf2e370f3dbfa79c676a92aeaeef57b1fd8cf2df388e1ac"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-29-2x.png",
+        "sha256": "31fa64bcfc37c53049c5f7010ce2e7fa826ab95770bdb861c810521f9b354ff4"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-40-1x.png",
+        "sha256": "6b50757f8287733f56d60faa95132a2a082738fbe23c61a6a09a6d2b0cd2f5b8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-40-2x.png",
+        "sha256": "78bec65813ab462016759bf2a78ba987da66f299b06eadcd6c7ea3c1fa53fbbe"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-76-1x.png",
+        "sha256": "db9b63c9c9c2da8b9c7c9cdf06745130808122062d5e99e265e87f26bbee5ea2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-76-2x.png",
+        "sha256": "54233622418e2aee6808054bf6a0d8bdcea3ca03f0fa6ad9e2414dce76c4389e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-ipad-83.5-2x.png",
+        "sha256": "a24053d5231fddcd5cbe318daaacede395fbf960a99173eb25082942d10c4500"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-20-2x.png",
+        "sha256": "6b50757f8287733f56d60faa95132a2a082738fbe23c61a6a09a6d2b0cd2f5b8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-20-3x.png",
+        "sha256": "3fd46eb7f8bf541577eafca90dca9349ccaf1f8179eab37a76a5f89774f965ec"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-29-1x.png",
+        "sha256": "7527b214baf468060bf2e370f3dbfa79c676a92aeaeef57b1fd8cf2df388e1ac"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-29-2x.png",
+        "sha256": "31fa64bcfc37c53049c5f7010ce2e7fa826ab95770bdb861c810521f9b354ff4"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-29-3x.png",
+        "sha256": "273cb3d4cbf6f912ef3afdd4befa37254d4c9f3f9ffcde239778cae874ad2ff7"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-40-2x.png",
+        "sha256": "78bec65813ab462016759bf2a78ba987da66f299b06eadcd6c7ea3c1fa53fbbe"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-40-3x.png",
+        "sha256": "15ab44025673faa562ccb81071562ba6131db7babcb52ee25b66e78e0c35c0a9"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-60-2x.png",
+        "sha256": "15ab44025673faa562ccb81071562ba6131db7babcb52ee25b66e78e0c35c0a9"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/AppIcon.appiconset/Icon-iphone-60-3x.png",
+        "sha256": "537db21759e100cdb313bd9040eb93c15c4220fbd8878ec05cd5c5582d83c480"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/Assets.xcassets/Contents.json",
+        "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/NATIVE-LICENSE.txt",
+        "sha256": "6172dfaa96ec974ac89446b81f0a3e4a223ed1528d4e35fbe9b847c89f049b7d"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/ar.lproj/NativeStrings.strings",
+        "sha256": "4a01993d90d59c0dd83f41733295152e5a7905d9ae9d8a5711f9a92a4b246fde"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/be.lproj/NativeStrings.strings",
+        "sha256": "5f8cfc57eb4f6dd7d9f6d3c378a69affa46bcad211cfdd60f3672ac0ff0751aa"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/bg.lproj/NativeStrings.strings",
+        "sha256": "ea33304396ade78efcede6910f3e398c86dda2bf8d5444393277e68364663dc6"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/bn.lproj/NativeStrings.strings",
+        "sha256": "691eae18a1b12921ed07d57dfac93eb73b6067b0c1c4128f0c89ad3c45909aea"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/ca.lproj/NativeStrings.strings",
+        "sha256": "a91f59dc3c60be3e623f7b39905e68cd86a1d3bf607f6326bcabe2e7248dfa9d"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/cs.lproj/NativeStrings.strings",
+        "sha256": "3478c8f409df2d411486f7261139bd2fea7a1d25a7cdef179ae510febb98842d"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/da.lproj/NativeStrings.strings",
+        "sha256": "b047aee74012868879c6711f37fda6b2d16d3b7e2e796454d6dafcc54a6a509e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/de.lproj/NativeStrings.strings",
+        "sha256": "1ff80a5c21a994689a9558303c7dc7352d534962bd592d691bb4da37bd5994ba"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/en.lproj/NativeStrings.strings",
+        "sha256": "5f7b07238d8565defb4edb92f74475d0b758b8d4f91a4878b05d86666fbbd3f0"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/es.lproj/NativeStrings.strings",
+        "sha256": "036ca13fe357400bcab58b82779e00c271eb2c9ba3cba26f5bff66efbc3689ae"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/fi.lproj/NativeStrings.strings",
+        "sha256": "8f3437ed5a382ff03b5ef37ba9039272fc0e97c45289c4b2525b3fe251fac97e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/fr.lproj/NativeStrings.strings",
+        "sha256": "cbfbdb66e8aea5adfa88fd37102d04b57e378c682ba26dfd9dc5e96376c12ee9"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/he.lproj/NativeStrings.strings",
+        "sha256": "a6ba456d93e9f573b4b07c313ac296eed3b0468afe7773278f7718ce0c3bcbb2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/hr.lproj/NativeStrings.strings",
+        "sha256": "8798251c6d5f9921359b86c99c61d37546d1157ae12fdd5e303bccba13c5e1ed"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/hu.lproj/NativeStrings.strings",
+        "sha256": "fb0fad2a4bbc6e62917fa97ee5636f8f2e340b0796b7d2e797924c9265c6fc5e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/it.lproj/NativeStrings.strings",
+        "sha256": "fba668548709577525fe54fc774d01780c83775335a4ed3a1e7b434ffd1645d5"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/ko.lproj/NativeStrings.strings",
+        "sha256": "98d86060df6b39f01307efd3602ff47be1a9dfb6404306d30fc490fd5912db07"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/lt.lproj/NativeStrings.strings",
+        "sha256": "6ec4cb8c2e34c6f9a915bd164b9fbe9c801c490438161568a64c619658812e41"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/nb.lproj/NativeStrings.strings",
+        "sha256": "7659b7f9eabfa8db660997f5ed66250f09f92df55903813b109543c25f2c9e8c"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/nl.lproj/NativeStrings.strings",
+        "sha256": "0daa3a35578de24d50b60d57a40c06c56907dbebd002daaa647488adfa2509b2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/pl.lproj/NativeStrings.strings",
+        "sha256": "d67b92f25ca5635c884268d859353532982b5e1242badf4e127c77b6f61ad010"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/pt-BR.lproj/NativeStrings.strings",
+        "sha256": "f2773e97e71e7529dc7a1e7006b79284e564724c1dd04365ac1153bfdef693c3"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/ru.lproj/NativeStrings.strings",
+        "sha256": "cc7157be5a834c42a936e5c8a44b1a5a1b6cc07a5397650434c4ceb4bd711057"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/sk.lproj/NativeStrings.strings",
+        "sha256": "155a3e771a3824fe9896d640f58edd3b9cdbc4fcdee7cdc6c3e746cb99abb376"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/sl.lproj/NativeStrings.strings",
+        "sha256": "c6445dfee676257a1eb13b221e8c27834fc4e0b2e79944645c0f4769822edc5c"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/sv.lproj/NativeStrings.strings",
+        "sha256": "f1de1bf4b2cc1bdf1cbbf1b17690ef5d022cba3cf0a2bcf4e3721d596ef4e9ef"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/tr.lproj/NativeStrings.strings",
+        "sha256": "515f5cfa95d312522f609c6bf6dc23ab797fdfefcfb8c5e640332e2da306deb5"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/uk.lproj/NativeStrings.strings",
+        "sha256": "e76f814ca0862ec00a5b60e86d52450991ef5757ddd0b785b1802494145a1d0a"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/vi.lproj/NativeStrings.strings",
+        "sha256": "d852ca9cf1928d37642a42e2b77e438330b5b675fb62ea59d8dfea448c10f94c"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/zh-Hans.lproj/NativeStrings.strings",
+        "sha256": "69c5600cd1e6c8d0ffdb48a5f08f3f4106984cb71dfc9ae9692a288636aa564d"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/ReaderAssets/EPUBJS-LICENSE",
+        "sha256": "8663e726f4194e1a34913b223c2e4745ed06f3ec645a66a41ab70b735070b692"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/ReaderAssets/JSZIP-LICENSE",
+        "sha256": "566c953c6090b1218ca6217dd7359d45dde46581968586dc607d59a78af6a9c4"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/ReaderAssets/THIRD-PARTY-NOTICES.txt",
+        "sha256": "14d0778e53ecf8ab1a61663ba36311300d774258bd408babd9dac51e75dfcf6b"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/ReaderAssets/VENDOR-PROVENANCE.txt",
+        "sha256": "136aa3472b3ccdf0ffcee7171f24bb477c08cf9eed9dc3bc296005d6ce3ac526"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/ReaderAssets/epub.min.js",
+        "sha256": "c7a842da856d511938cba1ba64d90743c318ac02c13e47bc84ae4834fe94c945"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/ReaderAssets/jszip.min.js",
+        "sha256": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/ReaderAssets/reader.html",
+        "sha256": "51b0287510901fea7ecf76c3fd883de849f1d446b6c8425477dffbd48db3fb6a"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/App/ReaderAssets/reader.js",
+        "sha256": "ac1cae79823f43f9dc62be022ea441ca89ca590ac88f4456acb55bc2efefe6f6"
+      }
+    ],
+    "tv": [
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/APIClient.swift",
+        "sha256": "4e591e14bb41a974668670df84ef747d7a6233c9ad8781bc08f0378e3a2f5d65"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/AppleNetworkPolicy.swift",
+        "sha256": "e00d7bd97f8acb299505709f319c1b7ba25f91f006171e7e9606592663d1fbde"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/ApplePlayback.swift",
+        "sha256": "10e8da95476e4e12fbff68deca7986118275cb4ac2c6b667f539306da6cca619"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/AudioGroups.swift",
+        "sha256": "fa2c0c874a88618260f76e33b630e04933da8311ed9075e825da0b0a877d7a77"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/AudiobookshelfTVApp.swift",
+        "sha256": "90ed4356de35f5740394a97af45354c3c125b3d8082f216497074d97303cc3a4"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/AuthorSeries.swift",
+        "sha256": "1796bf240c720d31e371471a51c11f4eda5a25cf9e822ff5d7f824d8114abcf1"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/CatalogStore.swift",
+        "sha256": "70be7fac850bbebc3f91b84e86fefc8170efcc9489a7fc0a3690e2cca60174d9"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/Components.swift",
+        "sha256": "c9a86d784ae2796e3fb0638e3e1c00f57c5927620c9bf06c062416ff270e8740"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/CoreText.swift",
+        "sha256": "abea41f738255b395f110680721e460d44efa8b843fcaea2835f5bc987df3a96"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/CoreTextInstallation.swift",
+        "sha256": "f4ce961d4c664aa2a0c86f1ac87fa74d32ba61e7bdd5463ce21e0ed70b9d4782"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Diagnostics/Sources/NativeDiagnostics/DiagnosticLog.swift",
+        "sha256": "08e723d02914baaee05b22696a4afc3e48f08397cee36873361ed49106277984"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Diagnostics/Sources/NativeDiagnostics/DiagnosticRedactor.swift",
+        "sha256": "748ac76249f896e041834bf7bc5252b0585d4dd08eb761cfe1af19a4443f1c1a"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Diagnostics/Sources/NativeDiagnostics/DiagnosticReport.swift",
+        "sha256": "4d1e5ff609ca3eca87b2b74eb9afbac823ed2bdd7dd9a5bdcc0d4938f1bc0450"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/HomeView.swift",
+        "sha256": "26349a57b4f71981914676a8e0e09bd4ccb5d91913722b69a33a16ed529972c5"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/ItemDetailView.swift",
+        "sha256": "6642377703a35c6fe1d590d85e9527a6d1d1974a3e2e9fc79a9d71ba10dd680d"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/ItemServerActions.swift",
+        "sha256": "2630667a3661203763f5079876c7439062d34bf64bdf88528c00609a7d6f54ee"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/KeychainCredentials.swift",
+        "sha256": "55081fb9cb4eaf8649b1b76cedf2ddc7207b7e938268a1a9fddbe3d921ba30ad"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/LibraryBrowser.swift",
+        "sha256": "6c73a20905f8d347332b400532192b7fd0c24de2317a3a288c9ca4bbd35029d9"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/LibraryView.swift",
+        "sha256": "9eb172aa0884749d48790524f4c572a0eca3470815987020597d897b0f29dd9e"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/ListeningJournal.swift",
+        "sha256": "6bbe1a4347cdf2d67e428103d1ad4348365eb0630c7f2993c600c105a71fe998"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/ListeningStats.swift",
+        "sha256": "178bdea9cdae31489d6aa387c67d48cb4d7df2bd64ee982d67327f7a3b32bcc5"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/ListeningStorage.swift",
+        "sha256": "0c0ae34d8998fd32f406a666ec9cfc0b75a29866ac49ab9f3e98c828be4bb0e1"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/ListeningSync.swift",
+        "sha256": "ccd3ef119aea6720b6e5fccd9fe761602f1193ca231167d2c50dcb9216e60064"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/MediaRestart.swift",
+        "sha256": "cc4fca4e6e46cbcaa27cc1535b30dcfeb990a589ef19a5cc57d8355e1e1012af"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/Models.swift",
+        "sha256": "0486b5c828c10bc251bcd8c0b3e6c8323216d98006d7282ec334e3f1039882b7"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Presentation/NativeGlassControls.swift",
+        "sha256": "74499bb79f76d9e6312d54e70dbf11792fe7f634b60740494d5d66099df11525"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/NativeLanguage.swift",
+        "sha256": "372ccffc1becb071aef541a77548504822cbede32674ec73426865a6cfd32478"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Presentation/NativeNavigation.swift",
+        "sha256": "0f78a2536c53fa717ed5f8d553b2dd32b5a73ebd04ebbf67d60efac043a3596a"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Presentation/NativeSDKContract.swift",
+        "sha256": "d06a94d6e8b49849a91408da785f58355db77d1429ea33a77b6b012331c1aec8"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/NativeStrings.swift",
+        "sha256": "2ddb1d893ff1afd02af5c0b560309d36c3ac4b3f79f230ed21905e1cc96e0429"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/NoticesView.swift",
+        "sha256": "4b09a0f34e080367adb3f85636b4d9f69fcf283c9dcf4ee2483174ef6e6b69c0"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/NowPlayingView.swift",
+        "sha256": "51c2a6a175e2620621f9c53fd3b45054d9a51d8e124c5eb6260b1ba2b677d18a"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/OfflineAudio.swift",
+        "sha256": "be258a6938ebc2a97621e5b51f38e373ba3eb8f7c032f25b04da88722df83db6"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/PodcastFeedEpisode.swift",
+        "sha256": "8fa4b82d5f67bcf4f2f76412cd9aea2cab3e9cbb06a5a802a3e84f5861d1f06c"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "apple/Playback/PublicationLedger.swift",
+        "sha256": "588480f93841149a5175cb1f0f70357dc1273e5629ac9094f02e5f0a045599bb"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/RealtimeChange.swift",
+        "sha256": "018d4871db2313377ed0715af6afa858f8ade38fb5642878303b938c438a9508"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/RelatedAuthorSeries.swift",
+        "sha256": "5ead920b599bc5513bf9c139c2120061c0f919ec6a5c49aa846c36512ff6e662"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/RootView.swift",
+        "sha256": "bad20b657c8fce6bbf9c2adab013eaf903ecd3de378cd4827fa52f32068e05b7"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/SearchView.swift",
+        "sha256": "0d0f20fa071bb4498f363222c177dad6fdedede1ed9b75c547e2fe8959595ee4"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/Core/Sources/TVCore/ServerEvents.swift",
+        "sha256": "6a342bbd83f1cb8a35011183f2c0c04aa919004cfda8e83c54812672bacc206f"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/SettingsView.swift",
+        "sha256": "d31280ea3222329edad7499e500708a4908f7c57dcd78ac836507b3eab8ee19a"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/SignInView.swift",
+        "sha256": "8cfaf7be4245d853dd690333276900180c41420dfb585ebe491526f3525605a6"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/TVDiagnostics.swift",
+        "sha256": "f4023ec609c3c8e06d02738b3b7fecf474c401a8a32625d16ed1a8852e0fb5cb"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/TVLanguage.swift",
+        "sha256": "2fc8828059f94f3b77fc27383abdfe331070bdda276219184296497793788928"
+      },
+      {
+        "role": "PBXSourcesBuildPhase",
+        "path": "tvos/App/TVPlayer.swift",
+        "sha256": "28ec4f73847ef27274eccdc17f533a786de5c45d26b36d26942bd08c357d427d"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Back.imagestacklayer/Content.imageset/Back-1x.png",
+        "sha256": "1216fb23da70c89ad1ee6b41d8277e90536fb8668e9affbf093d9c78b4ddee49"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Back.imagestacklayer/Content.imageset/Back-2x.png",
+        "sha256": "fa3c9d3124a87908fa9fd241c77fbe2751f7de3e248330df1915de4dda0140d9"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Back.imagestacklayer/Content.imageset/Contents.json",
+        "sha256": "cc3366e14a0b63c32a7b735f6bad8a3d1a9d0eab2d6ff7d4770cc4eabe6417b2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Back.imagestacklayer/Contents.json",
+        "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Contents.json",
+        "sha256": "93877d7a2f7e4b19e031b18a1d1975cb5160e148f063dbaf704f4381cbeb7189"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Front.imagestacklayer/Content.imageset/Contents.json",
+        "sha256": "7b4d7d8746ce20193d8fb9d890182ab32fafdf519bae4586f9aeccc5599816a5"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Front.imagestacklayer/Content.imageset/Front-1x.png",
+        "sha256": "785fde4a4343b9522551f5cdc95ce72697317c1916a7f7d00de5569270d46e6e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Front.imagestacklayer/Content.imageset/Front-2x.png",
+        "sha256": "982941339e8a4595a92c79e22ca195c300e2c83b92586eb7fa9b409ed264d3e2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon.imagestack/Front.imagestacklayer/Contents.json",
+        "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Back.imagestacklayer/Content.imageset/Back-1x.png",
+        "sha256": "3c51d25d1b90dd60debdd7c5e17f11125fa10090028a4445c619bfbba7bf63b2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Back.imagestacklayer/Content.imageset/Contents.json",
+        "sha256": "462b71e9db4b1dc72eef11d342e4e5af42f08ced47a60713f065f79bbbc165f2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Back.imagestacklayer/Contents.json",
+        "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Contents.json",
+        "sha256": "93877d7a2f7e4b19e031b18a1d1975cb5160e148f063dbaf704f4381cbeb7189"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Front.imagestacklayer/Content.imageset/Contents.json",
+        "sha256": "4b6f1cdadd75c8d8327e77edacd203e8828c07cb4d7c20ce98e9ec9a16502b4e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Front.imagestacklayer/Content.imageset/Front-1x.png",
+        "sha256": "01b46486ab69bbaca194043e3eecb8176d16b692d84a7027147814e85739d68e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Store.imagestack/Front.imagestacklayer/Contents.json",
+        "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Contents.json",
+        "sha256": "9608617e4d5c16658194d093a7c2f5a65480bfc05253704eda911d6aa870a3fe"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf Wide.imageset/Contents.json",
+        "sha256": "89474fe82b8b16f06d52ceee35c7a0d12b661720d7d4623d0c706cd33581f7a1"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf Wide.imageset/shelf-1x.png",
+        "sha256": "a247ccfea48c61d4d91c58814663b41e623e0466598f13d0a1e6fe496e18c151"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf Wide.imageset/shelf-2x.png",
+        "sha256": "d95bfa90a8b405705619a07a337629ac62818dc92eec9500cab817e547720708"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf.imageset/Contents.json",
+        "sha256": "89474fe82b8b16f06d52ceee35c7a0d12b661720d7d4623d0c706cd33581f7a1"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf.imageset/shelf-1x.png",
+        "sha256": "86e6f8b11392063a72b8b0d0cbc9d8c8b7aba5bb1f6933fd2c42d8be60eab71f"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/App Icon & Top Shelf Image.brandassets/Top Shelf.imageset/shelf-2x.png",
+        "sha256": "9a7a89489b0fad6636103ca62ea4c40a950187e01dde5733fb8b46be74b47210"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/Assets.xcassets/Contents.json",
+        "sha256": "3068ae11b833a8ea03990d2ea2a2b5fe7b3c47fbda56de956a4b84888f6c6af8"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "tvos/App/NATIVE-LICENSE.txt",
+        "sha256": "6172dfaa96ec974ac89446b81f0a3e4a223ed1528d4e35fbe9b847c89f049b7d"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/ar.lproj/NativeStrings.strings",
+        "sha256": "4a01993d90d59c0dd83f41733295152e5a7905d9ae9d8a5711f9a92a4b246fde"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/be.lproj/NativeStrings.strings",
+        "sha256": "5f8cfc57eb4f6dd7d9f6d3c378a69affa46bcad211cfdd60f3672ac0ff0751aa"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/bg.lproj/NativeStrings.strings",
+        "sha256": "ea33304396ade78efcede6910f3e398c86dda2bf8d5444393277e68364663dc6"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/bn.lproj/NativeStrings.strings",
+        "sha256": "691eae18a1b12921ed07d57dfac93eb73b6067b0c1c4128f0c89ad3c45909aea"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/ca.lproj/NativeStrings.strings",
+        "sha256": "a91f59dc3c60be3e623f7b39905e68cd86a1d3bf607f6326bcabe2e7248dfa9d"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/cs.lproj/NativeStrings.strings",
+        "sha256": "3478c8f409df2d411486f7261139bd2fea7a1d25a7cdef179ae510febb98842d"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/da.lproj/NativeStrings.strings",
+        "sha256": "b047aee74012868879c6711f37fda6b2d16d3b7e2e796454d6dafcc54a6a509e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/de.lproj/NativeStrings.strings",
+        "sha256": "1ff80a5c21a994689a9558303c7dc7352d534962bd592d691bb4da37bd5994ba"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/en.lproj/NativeStrings.strings",
+        "sha256": "5f7b07238d8565defb4edb92f74475d0b758b8d4f91a4878b05d86666fbbd3f0"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/es.lproj/NativeStrings.strings",
+        "sha256": "036ca13fe357400bcab58b82779e00c271eb2c9ba3cba26f5bff66efbc3689ae"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/fi.lproj/NativeStrings.strings",
+        "sha256": "8f3437ed5a382ff03b5ef37ba9039272fc0e97c45289c4b2525b3fe251fac97e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/fr.lproj/NativeStrings.strings",
+        "sha256": "cbfbdb66e8aea5adfa88fd37102d04b57e378c682ba26dfd9dc5e96376c12ee9"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/he.lproj/NativeStrings.strings",
+        "sha256": "a6ba456d93e9f573b4b07c313ac296eed3b0468afe7773278f7718ce0c3bcbb2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/hr.lproj/NativeStrings.strings",
+        "sha256": "8798251c6d5f9921359b86c99c61d37546d1157ae12fdd5e303bccba13c5e1ed"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/hu.lproj/NativeStrings.strings",
+        "sha256": "fb0fad2a4bbc6e62917fa97ee5636f8f2e340b0796b7d2e797924c9265c6fc5e"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/it.lproj/NativeStrings.strings",
+        "sha256": "fba668548709577525fe54fc774d01780c83775335a4ed3a1e7b434ffd1645d5"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/ko.lproj/NativeStrings.strings",
+        "sha256": "98d86060df6b39f01307efd3602ff47be1a9dfb6404306d30fc490fd5912db07"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/lt.lproj/NativeStrings.strings",
+        "sha256": "6ec4cb8c2e34c6f9a915bd164b9fbe9c801c490438161568a64c619658812e41"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/nb.lproj/NativeStrings.strings",
+        "sha256": "7659b7f9eabfa8db660997f5ed66250f09f92df55903813b109543c25f2c9e8c"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/nl.lproj/NativeStrings.strings",
+        "sha256": "0daa3a35578de24d50b60d57a40c06c56907dbebd002daaa647488adfa2509b2"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/pl.lproj/NativeStrings.strings",
+        "sha256": "d67b92f25ca5635c884268d859353532982b5e1242badf4e127c77b6f61ad010"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/pt-BR.lproj/NativeStrings.strings",
+        "sha256": "f2773e97e71e7529dc7a1e7006b79284e564724c1dd04365ac1153bfdef693c3"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/ru.lproj/NativeStrings.strings",
+        "sha256": "cc7157be5a834c42a936e5c8a44b1a5a1b6cc07a5397650434c4ceb4bd711057"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/sk.lproj/NativeStrings.strings",
+        "sha256": "155a3e771a3824fe9896d640f58edd3b9cdbc4fcdee7cdc6c3e746cb99abb376"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/sl.lproj/NativeStrings.strings",
+        "sha256": "c6445dfee676257a1eb13b221e8c27834fc4e0b2e79944645c0f4769822edc5c"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/sv.lproj/NativeStrings.strings",
+        "sha256": "f1de1bf4b2cc1bdf1cbbf1b17690ef5d022cba3cf0a2bcf4e3721d596ef4e9ef"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/tr.lproj/NativeStrings.strings",
+        "sha256": "515f5cfa95d312522f609c6bf6dc23ab797fdfefcfb8c5e640332e2da306deb5"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/uk.lproj/NativeStrings.strings",
+        "sha256": "e76f814ca0862ec00a5b60e86d52450991ef5757ddd0b785b1802494145a1d0a"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/vi.lproj/NativeStrings.strings",
+        "sha256": "d852ca9cf1928d37642a42e2b77e438330b5b675fb62ea59d8dfea448c10f94c"
+      },
+      {
+        "role": "PBXResourcesBuildPhase",
+        "path": "apple/Localization/Sources/NativeLocalization/Resources/zh-Hans.lproj/NativeStrings.strings",
+        "sha256": "69c5600cd1e6c8d0ffdb48a5f08f3f4106984cb71dfc9ae9692a288636aa564d"
+      }
+    ]
+  }
+}
