@@ -65,7 +65,6 @@ import XCTest
 
     func select(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         focus(element, file: file, line: line)
-        print("[DEBUG-239-select] id=\(element.identifier) focus=\(hasFocus(element)) hittable=\(element.isHittable) frame=\(element.frame)")
         remote.press(.select)
     }
 

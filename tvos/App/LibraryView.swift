@@ -4,7 +4,6 @@ struct LibraryView: View {
     @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     @StateObject private var browser: LibraryBrowser
-    @State private var path: [Route] = []
     let chooseLibrary: () -> Void
 
     init(library: Library, api: APIClient, chooseLibrary: @escaping () -> Void) {
@@ -13,48 +12,45 @@ struct LibraryView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 40) {
-                    HStack(alignment: .firstTextBaseline, spacing: 24) {
-                        Button(action: chooseLibrary) {
-                            Label(browser.library.name, systemImage: "chevron.down")
-                        }
-                        .accessibilityIdentifier("library-chooser")
-                        .accessibilityLabel(browser.library.name)
-                        .accessibilityHint(l10n("Choose library"))
-                        Spacer()
-                        if browser.total > 0 {
-                            Text(browser.library.isPodcast ? (browser.total == 1 ? l10n("1 podcast") : l10n("{0} podcasts", browser.total)) : (browser.total == 1 ? l10n("1 title") : l10n("{0} titles", browser.total)))
-                                .foregroundStyle(.secondary)
-                        }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 40) {
+                HStack(alignment: .firstTextBaseline, spacing: 24) {
+                    Button(action: chooseLibrary) {
+                        Label(browser.library.name, systemImage: "chevron.down")
                     }
-                    controls.focusSection()
-                    if let error = browser.error, browser.items.isEmpty {
-                        StatusMessage(text: CatalogStore.recovery(for: error)) { Task { await browser.retry() } }
-                    } else if browser.items.isEmpty && !browser.loading && browser.started {
-                        Text(browser.filter == nil ? l10n("This library is empty.") : l10n("No titles match this filter."))
-                            .font(.title3).foregroundStyle(.secondary).padding(60)
-                    }
-                    LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
-                        ForEach(browser.items) { item in
-                            NavigationLink(value: Route.item(item)) { ItemTile(item: item) }
-                                .buttonStyle(.card)
-                                .buttonBorderShape(.roundedRectangle(radius: 14))
-                                .accessibilityIdentifier("item-\(item.id)")
-                                .onAppear { Task { await browser.loadMore(after: item) } }
-                        }
-                    }
-                    .focusSection()
-                    if browser.loading { ProgressView().frame(maxWidth: .infinity) }
-                    if let error = browser.error, !browser.items.isEmpty {
-                        StatusMessage(text: CatalogStore.recovery(for: error)) { Task { await browser.retry() } }
+                    .accessibilityIdentifier("library-chooser")
+                    .accessibilityLabel(browser.library.name)
+                    .accessibilityHint(l10n("Choose library"))
+                    Spacer()
+                    if browser.total > 0 {
+                        Text(browser.library.isPodcast ? (browser.total == 1 ? l10n("1 podcast") : l10n("{0} podcasts", browser.total)) : (browser.total == 1 ? l10n("1 title") : l10n("{0} titles", browser.total)))
+                            .foregroundStyle(.secondary)
                     }
                 }
-                .padding(.horizontal, 80)
-                .padding(.vertical, 40)
+                controls.focusSection()
+                if let error = browser.error, browser.items.isEmpty {
+                    StatusMessage(text: CatalogStore.recovery(for: error)) { Task { await browser.retry() } }
+                } else if browser.items.isEmpty && !browser.loading && browser.started {
+                    Text(browser.filter == nil ? l10n("This library is empty.") : l10n("No titles match this filter."))
+                        .font(.title3).foregroundStyle(.secondary).padding(60)
+                }
+                LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
+                    ForEach(browser.items) { item in
+                        NavigationLink(value: Route.item(item)) { ItemTile(item: item) }
+                            .buttonStyle(.card)
+                            .buttonBorderShape(.roundedRectangle(radius: 14))
+                            .accessibilityIdentifier("item-\(item.id)")
+                            .onAppear { Task { await browser.loadMore(after: item) } }
+                    }
+                }
+                .focusSection()
+                if browser.loading { ProgressView().frame(maxWidth: .infinity) }
+                if let error = browser.error, !browser.items.isEmpty {
+                    StatusMessage(text: CatalogStore.recovery(for: error)) { Task { await browser.retry() } }
+                }
             }
-            .catalogRoutes()
+            .padding(.horizontal, 80)
+            .padding(.vertical, 40)
         }
         .task { if !browser.started { await browser.reload() } }
         .onAppear { Task { await browser.refresh(progressRevision: catalog.progressRevision) } }
@@ -107,26 +103,31 @@ struct LibraryDestination: View {
     @State private var selectedID: String?
     @State private var choosing = false
     @State private var pendingSelectionID: String?
+    @State private var path: [Route] = []
 
     private var selected: Library? {
         catalog.libraries.first { $0.id == selectedID } ?? catalog.libraries.first
     }
 
     var body: some View {
-        Group {
-            if let library = selected {
-                LibraryView(library: library, api: catalog.api) { choosing = true }
-                    .id(library.id)
-            } else if let error = catalog.catalogError {
-                StatusMessage(text: error) { Task { await catalog.loadCatalog() } }
-            } else if catalog.loadingCatalog {
-                ProgressView(l10n("Loading…"))
-            } else {
-                Text(l10n("This library is empty.")).foregroundStyle(.secondary)
+        NavigationStack(path: $path) {
+            Group {
+                if let library = selected {
+                    LibraryView(library: library, api: catalog.api) { choosing = true }
+                        .id(library.id)
+                } else if let error = catalog.catalogError {
+                    StatusMessage(text: error) { Task { await catalog.loadCatalog() } }
+                } else if catalog.loadingCatalog {
+                    ProgressView(l10n("Loading…"))
+                } else {
+                    Text(l10n("This library is empty.")).foregroundStyle(.secondary)
+                }
             }
+            .catalogRoutes()
         }
         .sheet(isPresented: $choosing, onDismiss: {
             if let pendingSelectionID {
+                path.removeAll()
                 selectedID = pendingSelectionID
                 self.pendingSelectionID = nil
             }
@@ -151,6 +152,6 @@ struct LibraryDestination: View {
             }
             .tvLocalization()
         }
-        .onChange(of: catalog.accountID) { selectedID = nil; pendingSelectionID = nil; choosing = false }
+        .onChange(of: catalog.accountID) { selectedID = nil; pendingSelectionID = nil; choosing = false; path.removeAll() }
     }
 }
