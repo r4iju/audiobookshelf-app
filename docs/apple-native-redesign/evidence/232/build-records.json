@@ -1,0 +1,120 @@
+{
+  "runtime": {
+    "device": "9ACC6F5B-180D-44C3-823B-F8796813D69D",
+    "model": "Apple TV 4K (3rd generation)",
+    "os": "tvOS 27.0",
+    "osBuild": "24J360",
+    "xcode": "27.0 (27A266a)"
+  },
+  "baseline": {
+    "productionSource": "d9e92a4cff92f99db9e3959147f3e80d068450cc",
+    "bundleIdentifier": "com.forkzed.audiobookshelf.tv",
+    "version": "1.0.0",
+    "build": "1",
+    "minimumOS": "17.0",
+    "sdk": "appletvsimulator27.0",
+    "binariesSHA256": {
+      "AudiobookshelfTV": "80e4465ba114f85efc0c1ac407ac21073c6e6b617273078a326a54b01de9357a",
+      "AudiobookshelfTV.debug.dylib": "40c2e02aa9ce3228c495b3bb9b8e42fed1683a1806cb4986fe3f28278b5d87e7"
+    },
+    "machOBuild": [
+      "Load command 11",
+      "      cmd LC_BUILD_VERSION",
+      "  cmdsize 32",
+      " platform TVOSSIMULATOR",
+      "    minos 17.0",
+      "      sdk 27.0",
+      "   ntools 1",
+      "     tool LD",
+      "  version 27037.1"
+    ],
+    "signature": [
+      "Signature=adhoc",
+      "TeamIdentifier=not set"
+    ],
+    "artifactRole": "baseline simulator app"
+  },
+  "final": {
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "bundleIdentifier": "com.forkzed.audiobookshelf.tv",
+    "version": "1.0.0",
+    "build": "1",
+    "minimumOS": "17.0",
+    "sdk": "appletvsimulator27.0",
+    "binariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "machOBuild": [
+      "Load command 11",
+      "      cmd LC_BUILD_VERSION",
+      "  cmdsize 32",
+      " platform TVOSSIMULATOR",
+      "    minos 17.0",
+      "      sdk 27.0",
+      "   ntools 1",
+      "     tool LD",
+      "  version 27037.1"
+    ],
+    "signature": [
+      "Signature=adhoc",
+      "TeamIdentifier=not set"
+    ],
+    "artifactRole": "installed simulator app used for final screenshots"
+  },
+  "matchingBuild": {
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "bundleIdentifier": "com.forkzed.audiobookshelf.tv",
+    "version": "1.0.0",
+    "build": "1",
+    "minimumOS": "17.0",
+    "sdk": "appletvsimulator27.0",
+    "binariesSHA256": {
+      "AudiobookshelfTV": "f7ec2cb2b22f6cac41de42c6f1caa690f3bcf61fb0598f310a0711d735defab3",
+      "AudiobookshelfTV.debug.dylib": "0904775bd465ffd2fd70ace8c893e6ad3c84eb9bd859925de09647fa94c1e0f5"
+    },
+    "machOBuild": [
+      "Load command 11",
+      "      cmd LC_BUILD_VERSION",
+      "  cmdsize 32",
+      " platform TVOSSIMULATOR",
+      "    minos 17.0",
+      "      sdk 27.0",
+      "   ntools 1",
+      "     tool LD",
+      "  version 27037.1"
+    ],
+    "signature": [
+      "Signature=adhoc",
+      "TeamIdentifier=not set"
+    ],
+    "artifactRole": "matching simulator build product"
+  },
+  "generic": {
+    "productionSource": "5acca8c1a39cdcf9525e67874583651eef9e6900",
+    "bundleIdentifier": "com.forkzed.audiobookshelf.tv",
+    "version": "1.0.0",
+    "build": "1",
+    "minimumOS": "17.0",
+    "sdk": "appletvos27.0",
+    "binariesSHA256": {
+      "AudiobookshelfTV": "b0eb58a682e494d9e1d1f9c1b66b0598fc114504bc6400f746873e013c1a549b",
+      "AudiobookshelfTV.debug.dylib": "3ecb0e222bfbcaf08fa332cab5e394ff4e28377caaf7de6259166fb4e7d58533"
+    },
+    "machOBuild": [
+      "Load command 11",
+      "      cmd LC_BUILD_VERSION",
+      "  cmdsize 32",
+      " platform TVOS",
+      "    minos 17.0",
+      "      sdk 27.0",
+      "   ntools 1",
+      "     tool LD",
+      "  version 27037.1"
+    ],
+    "signature": [
+      "/tmp/232-generic-build/Build/Products/Debug-appletvos/AudiobookshelfTV.app: code object is not signed at all"
+    ],
+    "artifactRole": "unsigned generic tvOS build, compile only"
+  }
+}
