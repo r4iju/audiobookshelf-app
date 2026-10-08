@@ -1,0 +1,193 @@
+[
+  {
+    "scope": "phone catalog/search/shell",
+    "source": "2f455dab",
+    "count": 15,
+    "tests": [
+      {
+        "name": "-[NativeJourneyTests.ArtworkJourney testLoadedSquareAndPortraitCoversStayInsidePhoneGridColumns]",
+        "duration_seconds": 24.026
+      },
+      {
+        "name": "-[NativeJourneyTests.CatalogRecoveryJourney testCatalogFailureCanBeRetried]",
+        "duration_seconds": 25.179
+      },
+      {
+        "name": "-[NativeJourneyTests.CatalogRecoveryJourney testEmptyLibraryCanBeRefreshedWithoutSigningInAgain]",
+        "duration_seconds": 24.784
+      },
+      {
+        "name": "-[NativeJourneyTests.CatalogRecoveryJourney testFailedNextPagePreservesBooksAndRetries]",
+        "duration_seconds": 57.22
+      },
+      {
+        "name": "-[NativeJourneyTests.CatalogRecoveryJourney testLongMetadataAndMissingArtworkRemainNavigableForReadOnlyAccount]",
+        "duration_seconds": 25.282
+      },
+      {
+        "name": "-[NativeJourneyTests.ConnectionJourney testBrowsePaginatedBooksAndExpandedMetadata]",
+        "duration_seconds": 62.932
+      },
+      {
+        "name": "-[NativeJourneyTests.ConnectionJourney testConnectSelectLibraryAndRestoreAccountAfterRelaunch]",
+        "duration_seconds": 19.771
+      },
+      {
+        "name": "-[NativeJourneyTests.ConnectionJourney testContinueListeningIncludesBookOutsideFirstCatalogPage]",
+        "duration_seconds": 23.03
+      },
+      {
+        "name": "-[NativeJourneyTests.PodcastJourney testEpisodeCompletionPersistsAndFiltersThePodcastList]",
+        "duration_seconds": 30.025
+      },
+      {
+        "name": "-[NativeJourneyTests.PodcastJourney testPodcastEpisodeSelectionKeepsIndependentProgressThroughRelaunch]",
+        "duration_seconds": 41.26
+      },
+      {
+        "name": "-[NativeJourneyTests.SearchJourney testEpisodeOnlySearchNavigatesAndPlaysTheMatchingPodcastEpisode]",
+        "duration_seconds": 24.608
+      },
+      {
+        "name": "-[NativeJourneyTests.SearchJourney testSearchFindsBookBeyondFirstPageAndReturnsFromDetails]",
+        "duration_seconds": 22.275
+      },
+      {
+        "name": "-[NativeJourneyTests.SearchJourney testSelectingSearchAcceptsTypingWithoutAnotherActivation]",
+        "duration_seconds": 18.157
+      },
+      {
+        "name": "-[NativeJourneyTests.SearchJourney testSortingAndGenreFilteringUseTheServerAcrossPagination]",
+        "duration_seconds": 22.369
+      },
+      {
+        "name": "-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]",
+        "duration_seconds": 46.376
+      }
+    ],
+    "log": "/tmp/234-phone-final.log",
+    "log_sha256": "72c937a2da061a6797f09a80289c72c027d80347fc658cccf848e0622676cb02"
+  },
+  {
+    "scope": "wide iPad catalog/shell",
+    "source": "2f455dab",
+    "count": 3,
+    "tests": [
+      {
+        "name": "-[NativeJourneyTests.CatalogRecoveryJourney testLongMetadataAndMissingArtworkRemainNavigableForReadOnlyAccount]",
+        "duration_seconds": 26.014
+      },
+      {
+        "name": "-[NativeJourneyTests.ConnectionJourney testBrowsePaginatedBooksAndExpandedMetadata]",
+        "duration_seconds": 37.717
+      },
+      {
+        "name": "-[NativeJourneyTests.ShellJourney testDestinationsKeepLibrarySelectionAndDetailsWhileBrowsing]",
+        "duration_seconds": 34.758
+      }
+    ],
+    "log": "/tmp/234-ipad-final.log",
+    "log_sha256": "bcf01485409bfe8f24b7ebe5fc2b39a41d35c5a61ef1e4a967a63b0445403ec7"
+  },
+  {
+    "scope": "item server actions",
+    "source": "ee0d7694 contents before commit",
+    "count": 4,
+    "tests": [
+      {
+        "name": "-[NativeJourneyTests.ItemServerActionsJourney testAFailedSendIsReportedAndSendingAgainSucceeds]",
+        "duration_seconds": 36.849
+      },
+      {
+        "name": "-[NativeJourneyTests.ItemServerActionsJourney testAnAdminOpensCopiesAndClosesTheItemsFeed]",
+        "duration_seconds": 41.012
+      },
+      {
+        "name": "-[NativeJourneyTests.ItemServerActionsJourney testOtherUsersViewAnOpenFeedButCannotManageFeeds]",
+        "duration_seconds": 38.7
+      },
+      {
+        "name": "-[NativeJourneyTests.ItemServerActionsJourney testTheEbookIsSentToADeviceTheServerAllowsForTheUser]",
+        "duration_seconds": 32.736
+      }
+    ],
+    "log": "/tmp/234-item-actions-modal-green.log",
+    "log_sha256": "305c655938e42376059bbc4e0342a05d04edb860c5d0a1516b1f94165d1d067e"
+  },
+  {
+    "scope": "progress reset",
+    "source": "b7038ddc contents before commit",
+    "count": 4,
+    "tests": [
+      {
+        "name": "-[NativeJourneyTests.ProgressResetJourney testAConfirmedBookResetRemovesItsProgressAndPlaysFromTheStart]",
+        "duration_seconds": 31.551
+      },
+      {
+        "name": "-[NativeJourneyTests.ProgressResetJourney testAConfirmedEpisodeResetRemovesOnlyThatEpisodesProgress]",
+        "duration_seconds": 29.259
+      },
+      {
+        "name": "-[NativeJourneyTests.ProgressResetJourney testAFailedResetIsReportedAndDiscardingAgainSucceeds]",
+        "duration_seconds": 28.726
+      },
+      {
+        "name": "-[NativeJourneyTests.ProgressResetJourney testCancellingTheConfirmationKeepsProgressAndSendsNoDelete]",
+        "duration_seconds": 23.423
+      }
+    ],
+    "log": "/tmp/234-progress-recovery-green.log",
+    "log_sha256": "f7bb54bd43f42d3ca5ced7609151a85e708bc9d51695ce90700cf54676be7f9c"
+  },
+  {
+    "scope": "related author/series",
+    "source": "b7038ddc + locator-only Collection edit",
+    "count": 4,
+    "tests": [
+      {
+        "name": "-[NativeJourneyTests.RelatedAuthorSeriesJourney testBookDetailsLeadToItsSeriesAndAuthor]",
+        "duration_seconds": 24.468
+      },
+      {
+        "name": "-[NativeJourneyTests.RelatedAuthorSeriesJourney testSearchOpensAuthorWithBioSeriesAndEveryBook]",
+        "duration_seconds": 55.361
+      },
+      {
+        "name": "-[NativeJourneyTests.RelatedAuthorSeriesJourney testSeriesFailureRecoversWithRetry]",
+        "duration_seconds": 28.492
+      },
+      {
+        "name": "-[NativeJourneyTests.RelatedAuthorSeriesJourney testSeriesFollowsServerSequenceAndOpensTheIntendedBook]",
+        "duration_seconds": 30.277
+      }
+    ],
+    "log": "/tmp/234-related-pinned.log",
+    "log_sha256": "470fc23c9f7de9f8605cdb7406f6653bcb2001b8b5621c689784476b7a918e65"
+  },
+  {
+    "scope": "established collection/playlist order",
+    "source": "b7038ddc + c04f6d97 test contents",
+    "count": 1,
+    "tests": [
+      {
+        "name": "-[NativeJourneyTests.CollectionJourney testEstablishedCollectionAndPlaylistPlayInTheirOwnOrder]",
+        "duration_seconds": 28.194
+      }
+    ],
+    "log": "/tmp/234-group-order-green.log",
+    "log_sha256": "7c42c5cdc6faf3980931343242800e7261e7bf506098a314b3d90581325986c6"
+  },
+  {
+    "scope": "isolated Cancel diagnostic",
+    "source": "ee0d7694 + b7038ddc recovery contents",
+    "count": 1,
+    "tests": [
+      {
+        "name": "-[NativeJourneyTests.ProgressResetJourney testCancellingTheConfirmationKeepsProgressAndSendsNoDelete]",
+        "duration_seconds": 24.111
+      }
+    ],
+    "log": "/tmp/234-cancel-only.log",
+    "log_sha256": "609e1b74d6565ce9c71909ee8133cdb1759dba2fac01e502ae823e8081bce432"
+  }
+]

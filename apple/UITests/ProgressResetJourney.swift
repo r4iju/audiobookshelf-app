@@ -4,7 +4,7 @@ import XCTest
 /// which apple/scripts/verify-progress-reset.sh starts. The fixture seeds book-0, book-1 and both podcast episodes at 6 seconds.
 @MainActor final class ProgressResetJourney: NativeJourney {
     static let fixture = "http://127.0.0.1:27765/abs"
-    static let missingAction = "No discard-progress action in these details: the progress reset UI (docs/modernization/APPLE-PROGRESS-RESET-UI.patch) is not in this build."
+    static let missingAction = "No discard-progress action in these details after revealing the seeded progress."
 
     override func setUp() async throws {
         try await super.setUp()

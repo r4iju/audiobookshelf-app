@@ -2,6 +2,8 @@
 
 Source baseline: `77c154b1`. Mobile slice: ticket #231, accepted design corrections #233, catalog migration #234 on `feature/apple-native-redesign`. This is the destination map for the complete redesign, not a claim that every screen has visual acceptance. Runtime evidence belongs in `evidence/<ticket>/`; historical Liquid Glass evidence remains a functional reference only.
 
+Mobile234 runtime is `b7038ddc`; [result](evidence/234/RESULT.md), [31 actual captures](evidence/234/captures.json), [signed bundle resources](evidence/234/builds.json) and [scoped checks](evidence/234/checks.json) pin its evidence. Confirmed malformed extreme-duration caption remains a239 defect; valid20s long-title images do not waive it.
+
 | Existing screen or capability | Final destination / entry | Preserved behavior and installed-app seam | Visual result / status |
 | --- | --- | --- | --- |
 | Connection form, errors, OpenID browser sign-in | Initial connection and Settings → Saved connections | ConnectionJourney, OpenIDJourney, SavedConnectionsJourney; credentials and Keychain unchanged | Native form reused; #237 polish and recovery review pending |
