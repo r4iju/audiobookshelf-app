@@ -1,6 +1,6 @@
 # Actual older replay follow-up
 
-Runtime `f9224289` remains unchanged. Source-pinned QA/CI descendant38 uses normal ad-hoc simulator signing; the private stable release artifacts remain separately source-labelled and unaccepted.
+Phone runtime `f9224289` remains unchanged through the latest navigation experiment; the TV runtime changes at `bc121113`. Source-pinned QA/CI descendant38 uses normal ad-hoc simulator signing; the private stable release artifacts remain separately source-labelled and unaccepted.
 
 Sourcef31, run37795294544: the corrected synthetic CA verifies and stockTV17 boots. Both original-minimum iOS14 architectures build. The unsigned TV app reaches sign-in but Keychain returns34018; two Catalog cases fail and the1200-second harness times out. No TV journey pass is inferred. All owned jobs terminate and repository control restoration verifies; cumulative allocated time5120 seconds.
 
@@ -11,3 +11,13 @@ The next original Search case fails: the batched native keyboard event requested
 The QA-only Search helper now sends each native character and waits for the field to expose the expected prefix, then asserts the entire query. It does not rewrite app state, retry a missing character silently, change server matching or relax original result/request/detail/focus assertions. A missing prefix still fails. The original production Search binding, network behavior, Keychain, identities and callbacks are unchanged. The next source-pinned older replay remains required; this harness correction alone supplies no new functional pass.
 
 Final native combined contrast and actual spoken VoiceOver remain pending separately. No additional screenshot, recording or user-inspection gate is added, and no owner app is installed or data reset.
+
+## Actual source313 replay and navigation experiment
+
+Source `3137385e`, run [37802421109](https://github.com/r4iju/audiobookshelf-app/actions/runs/37802421109), builds and normally ad-hoc signs the actual stock tvOS17 app and test runner. Of seven original selected journeys, Catalog continuing/details/Back (71.204s), native Search (58.392s), Playback (56.544s), Readiness accessibility audit (86.725s), and Recovery (89.334s) pass. Related series/author (52.168s) and Shell many libraries (132.701s) fail. This is five scoped passes and two failures, not complete acceptance. Xcode's result finalizer subsequently hangs; the1200s harness ends with124 and the incomplete original xcresult lacks Info.plist. No valid final result summary is fabricated. Original logs and retained result data remain `/tmp/native239-ci-3137385e/tv17`.
+
+The Related journey remains on the series screen after native Menu; the Shell journey remains on Archive10's grid with item60 focused after native Select. Those observations come from decoding already-retained original accessibility snapshots, without new captures. They distinguish actual screen state from a missing text locator; they do not alone establish the cause.
+
+The next experiment `bc121113` gives Library an explicit native `[Route]` navigation path, preserving native links and Back behavior, view identity, callbacks, and domain contracts. The focused `--suite navigation` replay selects the two unchanged failing journeys plus Readiness and records that selection. Default `--suite all` retains all seven. The experiment is unproven until actual execution; a focused pass would still require the appropriate complete final-source checks. No custom Back override, weakened assertion or synthetic app-state injection is added.
+
+All eight prior Actions windows are fully terminal/restored, with original global OFF, all five workflow states and genuinely enabled hidden pinfalse confirmed. Actual cumulative allocated time is8024seconds, below the prior8700 operational ceiling. The ninth helper explicitly records a parent-selected operational ceiling revision to10800seconds to verify the demonstrated new failures, preserving every prior ledger and cap. This is an operational verification bound, not a user budget or acceptance waiver.
