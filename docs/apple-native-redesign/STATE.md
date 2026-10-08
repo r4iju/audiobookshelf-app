@@ -6,7 +6,7 @@ Integration branch: `feature/apple-native-redesign`, based on `77c154b1` on `for
 | --- | --- | --- |
 | #231 | Source `0894eb04`, evidence `f1116e66`, verified integrated | [Actual phone/tablet slice and checks](evidence/231/RESULT.md). Functional final-source phone 3/3, iPad shell 1/1 and bookmark 1/1. Full design acceptance remains #233. |
 | #232 | Source `cb8ebda8` + `5acca8c1`, evidence `5f48fdd0`, verified integrated | [Bounded TV shell, remote checks and focused/unfocused captures](evidence/232/RESULT.md). Final source 4/4; earlier 10/10. |
-| #233 | Claimed, fresh review in progress | Independent rendered phone/tablet/TV review. Check actual Search placement against Apple's current conventions. |
+| #233 | In progress; round1 checkpoint blocked by actionable design defects | [Independent actual-rendered review](evidence/233/review-round-1.md): fix phone Search placement/tab separation, wide-iPad detail action composition and phone player label wrapping; then fresh review. |
 | #234–237 | Pending dependency graph | Complete mobile screens and localization. |
 | #238 | Blocked by #233 | Complete TV screens and remote journeys. |
 | #239 | Blocked by #237/#238 | Required adaptive, accessibility, fallback and full-screen acceptance. |
