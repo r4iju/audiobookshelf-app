@@ -35,12 +35,26 @@ for port in [int(os.environ['ABS_TV_HTTP_PORT']), int(os.environ['ABS_TV_HTTPS_P
             raise SystemExit(f'TV fixture port {port} is already in use. Finish the previous TV verification first.')
 PY
 # A throwaway CA-signed certificate stands in for the trusted homelab CA: the app relies on system trust only.
+# Explicit config prevents host openssl req defaults from adding duplicate CA
+# extensions (actual stock17 hosted setup rejected that malformed certificate).
+cat > "$fixture_dir/ca.cnf" <<'CA_CONFIG'
+[req]
+distinguished_name = ca_name
+[ca_name]
+[ca_extensions]
+basicConstraints = critical,CA:TRUE
+keyUsage = critical,keyCertSign
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+CA_CONFIG
 openssl req -x509 -newkey rsa:2048 -nodes -days 2 -keyout "$fixture_dir/ca.key" -out "$fixture_dir/ca.pem" \
-    -subj "/CN=Audiobookshelf TV QA CA" -addext basicConstraints=critical,CA:TRUE -addext keyUsage=critical,keyCertSign > "$fixture_dir/tls.log" 2>&1
+    -config "$fixture_dir/ca.cnf" -extensions ca_extensions \
+    -subj "/CN=Audiobookshelf TV QA CA" > "$fixture_dir/tls.log" 2>&1
 openssl req -newkey rsa:2048 -nodes -keyout "$fixture_dir/key.pem" -out "$fixture_dir/server.csr" -subj /CN=127.0.0.1 >> "$fixture_dir/tls.log" 2>&1
 printf 'subjectAltName=IP:127.0.0.1\nextendedKeyUsage=serverAuth\n' > "$fixture_dir/server.ext"
 openssl x509 -req -in "$fixture_dir/server.csr" -CA "$fixture_dir/ca.pem" -CAkey "$fixture_dir/ca.key" -CAcreateserial \
     -days 2 -extfile "$fixture_dir/server.ext" -out "$fixture_dir/cert.pem" >> "$fixture_dir/tls.log" 2>&1
+openssl verify -CAfile "$fixture_dir/ca.pem" "$fixture_dir/cert.pem" >> "$fixture_dir/tls.log" 2>&1
 (cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port "$ABS_TV_HTTP_PORT") > "$fixture_dir/http.log" 2>&1 &
 fixture_pids+=("$!")
 (cd "$repo_root" && exec python3 tvos/scripts/related_fixture.py --port "$ABS_TV_HTTPS_PORT" --tls-cert "$fixture_dir/cert.pem" --tls-key "$fixture_dir/key.pem") > "$fixture_dir/https.log" 2>&1 &
