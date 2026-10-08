@@ -1,0 +1,7 @@
+# Independent Apple beta distribution
+
+Ship the native iPhone/iPad and tvOS clients through owner-only internal TestFlight using the owner's independent Audiobook Loft record. Remove actual inherited compiled source/resources rather than merely renaming or deleting notices. Preserve API compatibility, existing data formats, public origin disclosure, vendor notices and repository GPL history. Use an explicit scoped grant only for independently controlled Apple code. Keep Android and backend unchanged.
+
+The audit confirms inherited generated translations, not an inherited native runtime. Stop reading root translations; preserve independently maintained translations and saved language choices, with disclosed English fallback for missing text. The beta has incomplete translated coverage. Preserve original platform declarations and disclose the local SDK27 iOS15 build requirement separately from original iOS14 acceptance.
+
+Build a new numbered, distribution-signed archive for com.forkzed.leafwake. Verify compiled source/resource inputs, signing, identifiers, reader notices and targeted functional behavior. Independently review licensing boundary and source change before uploading. Upload and assign only to the owner internal group. Do not enable external groups, public links or App Store submission. Internal beta delivery does not mark the outstanding full-redesign contrast, spoken accessibility or original-minimum execution tickets complete.

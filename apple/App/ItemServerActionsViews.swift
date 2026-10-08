@@ -143,10 +143,10 @@ struct RSSFeedSheet: View {
                 TextField(l10n("Custom owner email"), text: $ownerEmail).keyboardType(.emailAddress).autocapitalization(.none).accessibilityIdentifier("rss-owner-email")
             }
             if actions.serverAddress.lowercased().hasPrefix("http://") {
-                Text(l10n("Important: most podcast apps require the RSS feed URL to use HTTPS.")).font(.footnote).foregroundColor(.orange)
+                Text(l10n("Use an HTTPS feed address for compatibility with podcast players.")).font(.footnote).foregroundColor(.orange)
             }
             if actions.hasEpisodesWithoutPubDate {
-                Text(l10n("Important: one or more of your episodes do not have a Pub Date. Some podcast apps require this.")).font(.footnote).foregroundColor(.orange)
+                Text(l10n("Some episodes lack a publication date. Add dates if your podcast player requires them.")).font(.footnote).foregroundColor(.orange)
             }
             Section {
                 Button(l10n("Open feed")) { open() }.disabled(actions.activity != nil).accessibilityIdentifier("rss-open")

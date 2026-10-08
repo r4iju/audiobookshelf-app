@@ -1,0 +1,53 @@
+#!/bin/bash
+set -euo pipefail
+repo_root="$(cd "$(dirname "$0")/../.." && pwd)"
+if [[ -n "$(git -C "$repo_root" status --porcelain)" ]]; then
+  echo 'Commit the exact candidate source before archiving.' >&2
+  exit 1
+fi
+candidate_root="$(mktemp -d /tmp/loft-testflight.XXXXXX)"
+chmod 700 "$candidate_root"
+git -C "$repo_root" rev-parse HEAD > "$candidate_root/SOURCE_SHA"
+git -C "$repo_root" archive HEAD > "$candidate_root/source.tar"
+mkdir "$candidate_root/source"
+tar -xf "$candidate_root/source.tar" -C "$candidate_root/source"
+python3 "$repo_root/apple/scripts/provision-distribution.py"
+cp /tmp/loft-independent-apple/distribution-profiles.json "$candidate_root/distribution-profiles.json"
+python3 - "$candidate_root" <<'PY'
+from pathlib import Path
+import json,sys,plistlib
+root=Path(sys.argv[1]);source=root/'source';profiles=json.loads((root/'distribution-profiles.json').read_text())
+for product,folder in [('ios','apple'),('tv','tvos')]:
+ p=source/folder/'project.yml';s=p.read_text().replace('audiobookshelf-native-preview','leafwake')
+ p.write_text(s)
+ options={'method':'app-store-connect','teamID':'C7X9BCC7LP','signingStyle':'manual','signingCertificate':'Apple Distribution','provisioningProfiles':{'com.forkzed.leafwake':profiles[product]['uuid']},'uploadSymbols':True,'manageAppVersionAndBuildNumber':False,'testFlightInternalTestingOnly':True}
+ (root/(product+'-export.plist')).write_bytes(plistlib.dumps(options))
+PY
+for product in ios tv; do
+  if [[ "$product" == ios ]]; then
+    project_folder=apple
+    scheme=AudiobookshelfNative
+    destination='generic/platform=iOS'
+    minimum=(IPHONEOS_DEPLOYMENT_TARGET=15.0)
+  else
+    project_folder=tvos
+    scheme=AudiobookshelfTV
+    destination='generic/platform=tvOS'
+    minimum=()
+  fi
+  profile="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))[sys.argv[2]]["uuid"])' "$candidate_root/distribution-profiles.json" "$product")"
+  xcodegen generate --spec "$candidate_root/source/$project_folder/project.yml" > "$candidate_root/$product-generate.log"
+  xcodebuild -quiet -jobs 2 -project "$candidate_root/source/$project_folder/$scheme.xcodeproj" \
+    -scheme "$scheme" -configuration Release -destination "$destination" \
+    -archivePath "$candidate_root/$product.xcarchive" -derivedDataPath "$candidate_root/$product-build" \
+    PRODUCT_BUNDLE_IDENTIFIER=com.forkzed.leafwake CURRENT_PROJECT_VERSION=2 \
+    CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution' \
+    CODE_SIGN_ENTITLEMENTS="$candidate_root/source/apple/AppStore.entitlements" \
+    PROVISIONING_PROFILE_SPECIFIER="$profile" "${minimum[@]}" archive > "$candidate_root/$product-archive.log" 2>&1
+  xcodebuild -quiet -exportArchive -archivePath "$candidate_root/$product.xcarchive" \
+    -exportPath "$candidate_root/$product-export" -exportOptionsPlist "$candidate_root/$product-export.plist" \
+    > "$candidate_root/$product-export.log" 2>&1
+  echo "Prepared $product archive and internal-only distribution package."
+done
+printf '%s\n' "$candidate_root" > /tmp/loft-independent-apple/latest-candidate-path
+printf 'Candidate: %s\n' "$candidate_root"

@@ -1,0 +1,16 @@
+[
+  {
+    "package": "epubjs",
+    "version": "0.3.88",
+    "license_choice": "BSD-2-Clause",
+    "distribution_sha256": "c7a842da856d511938cba1ba64d90743c318ac02c13e47bc84ae4834fe94c945",
+    "source": "https://registry.npmjs.org/epubjs/-/epubjs-0.3.88.tgz"
+  },
+  {
+    "package": "jszip",
+    "version": "3.10.1",
+    "license_choice": "MIT",
+    "distribution_sha256": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",
+    "source": "https://registry.npmjs.org/jszip/-/jszip-3.10.1.tgz"
+  }
+]

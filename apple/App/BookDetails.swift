@@ -145,7 +145,7 @@ struct BookDetails: View {
                 case .finish:
                     return Alert(title: Text(l10n("Mark book finished?")), message: Text(l10n("Your saved progress will change when this book is marked finished.")), primaryButton: .default(Text(l10n("Mark finished"))) { applyFinished(true) }, secondaryButton: .cancel(Text(l10n("Cancel"))))
                 case .discard:
-                    return Alert(title: Text(l10n("Confirm")), message: Text(l10n("Are you sure you want to reset your progress?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
+                    return Alert(title: Text(l10n("Confirm")), message: Text(l10n("Reset the saved listening position for this book?")), primaryButton: .destructive(Text(l10n("Discard progress")), action: discardProgress), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 case .serverRestarted:
                     return Alert(title: Text(l10n("Restart the server now")), message: Text(l10n("Restart your server now, and confirm once it is running again. A restart before this message does not count, because the save that got no answer may have reached the server after it.")), primaryButton: .destructive(Text(l10n("Server restarted")), action: confirmRestart), secondaryButton: .cancel(Text(l10n("Cancel"))))
                 }
@@ -406,7 +406,7 @@ struct BookDetails: View {
             }
             if !serverQueue.failures(itemID: item.id).isEmpty { Button(l10n("Retry failed episodes")) { showingFeed = true } }
             if !requestedDownloads.isEmpty {
-                Text(l10n("Waiting for {0} episode(s) from your server", requestedDownloads.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("server-download-pending")
+                Text(l10n("Your server is preparing {0} episode download(s)", requestedDownloads.count)).font(.caption).foregroundColor(ShelfStyle.secondaryText).accessibilityIdentifier("server-download-pending")
                 Button(l10n("Refresh downloads"), action: watchDownloads)
             }
             }

@@ -1,3 +1,10 @@
+# Historical localization integration handoff
+
+The handoff below describes the original integration and is retained for history.
+The independent Apple beta now uses only `translations/<code>.json` and native
+English fallback. No root `strings` inputs or legacy-equivalents mappings are used.
+Run `generate.py --check` and `test_independent_generation.py` for the current contract.
+
 # Presentation handoff for root-owned files
 
 The presentation slice (#22) did not edit `project.yml`, the app root, `ConnectionViews.swift`,

@@ -160,10 +160,10 @@ struct NativeAboutSettings: View {
     var body: some View {
         ShelfList {
             Section(header: Text("Audiobook Loft")) {
-                Text(l10n("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project."))
+                Text(l10n("Audiobook Loft began in an independently maintained Audiobookshelf fork. This native Apple client is independently implemented and connects to compatible servers. It is not affiliated with or endorsed by the Audiobookshelf project."))
             }
             Section(header: Text(l10n("License"))) {
-                Text(l10n("Open source under GPLv3, with applicable third-party licenses retained."))
+                Text(l10n("This native Apple client is available under the MIT license. Bundled reader libraries retain their own licenses."))
                 Link(l10n("Source and license notices"), destination: URL(string: "https://github.com/r4iju/audiobookshelf-app/releases")!)
             }
         }.navigationTitle(l10n("About")).navigationBarTitleDisplayMode(.inline)

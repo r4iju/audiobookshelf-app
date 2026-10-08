@@ -9,14 +9,14 @@ struct NoticesView: View {
                 Text("Audiobook Loft").font(.headline).accessibilityAddTraits(.isHeader)
                     .listRowBackground(Color.clear)
                 TVReadableText(
-                    text: l10n("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project."),
+                    text: l10n("Audiobook Loft began in an independently maintained Audiobookshelf fork. This native Apple client is independently implemented and connects to compatible servers. It is not affiliated with or endorsed by the Audiobookshelf project."),
                     identifier: "notices-origin")
             }
             Section {
                 Text(l10n("License")).font(.headline).accessibilityAddTraits(.isHeader)
                     .listRowBackground(Color.clear)
                 TVReadableText(
-                    text: l10n("Open source under GPLv3, with applicable third-party licenses retained. Source and notices: https://github.com/r4iju/audiobookshelf-app/releases"),
+                    text: l10n("This native Apple client is available under the MIT license. Bundled reader libraries retain their own licenses. Source and notices: https://github.com/r4iju/audiobookshelf-app/releases"),
                     identifier: "notices-license")
             }
         }

@@ -289,7 +289,7 @@ private struct EPUBPreferenceSections: View {
                     Text(l10n("Enabled")).tag("enabled"); Text(l10n("Mirrored")).tag("mirrored"); Text(l10n("Off")).tag("none")
                 }.accessibilityIdentifier("reader-volume-mode")
                 Toggle(l10n("While listening"), isOn: $preferences.value.volumeWhileListening)
-                    .accessibilityLabel(l10n("Volume navigation while listening"))
+                    .accessibilityLabel(l10n("Use volume buttons to navigate during playback"))
             }
             Section(header: Text(l10n("Display"))) {
                 Toggle(l10n("Keep screen awake"), isOn: $preferences.value.keepAwake)

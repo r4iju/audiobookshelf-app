@@ -471,7 +471,7 @@ struct PlaybackPreferenceSections: View {
             Section(header: Text(l10n("Playback controls"))) {
                 Toggle(l10n("Lock player"), isOn: $locked).accessibilityIdentifier("lock-player")
                 Toggle(l10n("Rewind after a pause"), isOn: $player.rewindAfterPause)
-                Toggle(l10n("Allow seeking from system media controls"), isOn: $player.allowMediaSeeking)
+                Toggle(l10n("Enable seeking with system playback controls"), isOn: $player.allowMediaSeeking)
                 Picker(l10n("Forward interval"), selection: $player.forwardInterval) {
                     ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
                 }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Forward interval")

@@ -74,7 +74,7 @@ import XCTest
         XCTAssertTrue(mode.waitForExistence(timeout: 3))
         guard mode.exists else { return }
         mode.tap(); app.buttons["Mirrored"].tap()
-        let listening = app.switches["Volume navigation while listening"]
+        let listening = app.switches["Use volume buttons to navigate during playback"]
         listening.switches.firstMatch.tap(); XCTAssertEqual(listening.value as? String, "1")
         app.terminate(); app.launchArguments = []; app.launch()
         app.buttons["book-book-0"].tap(); app.buttons["Read EPUB"].tap()
@@ -82,7 +82,7 @@ import XCTest
         app.buttons["Reading settings"].tap()
         XCTAssertTrue(app.buttons["reader-volume-mode"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["reader-volume-mode"].label.contains("Mirrored"))
-        XCTAssertEqual(app.switches["Volume navigation while listening"].value as? String, "1")
+        XCTAssertEqual(app.switches["Use volume buttons to navigate during playback"].value as? String, "1")
     }
     func testRestoredEPUBPassagePublishesCorrectedPercentage() async throws {
         try await FixtureControl.configure("epub-reader")
