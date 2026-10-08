@@ -304,9 +304,6 @@ private struct ListeningControlLabelStyle: LabelStyle {
 struct ListeningControls: View {
     @EnvironmentObject private var player: ApplePlayback
     @Binding var panel: ListeningPanel?
-    @AppStorage(PlayerDisplay.totalTrackKey) private var totalTrack = true
-    @AppStorage(PlayerDisplay.scaleElapsedKey) private var scaleElapsed = true
-    @AppStorage(PlayerDisplay.lockKey) private var locked = false
     @Environment(\.nativeStrings) private var l10n
     @State private var bookmarkTitle = ""
     @State private var editing: Bookmark?
@@ -408,28 +405,7 @@ struct ListeningControls: View {
                         Button(l10n("End of chapter")) { NativeHaptic.impact("sleep-timer"); player.setChapterSleepTimer(); panel = nil }.disabled(player.currentChapter == nil)
                     }
                 case .settings:
-                    // Turning one track off turns the other on, so progress always stays visible.
-                    Section(header: Text(l10n("Progress display"))) {
-                        Toggle(l10n("Chapter track"), isOn: Binding(get: { player.chapterTrack }, set: { player.chapterTrack = $0; if !$0 { totalTrack = true } }))
-                        .accessibilityIdentifier("chapter-track-setting")
-                        Toggle(l10n("Total track"), isOn: Binding(get: { totalTrack }, set: { totalTrack = $0; if !$0 { player.chapterTrack = true } }))
-                        .accessibilityIdentifier("total-track-setting")
-                        Toggle(l10n("Scale elapsed time by speed"), isOn: $scaleElapsed).accessibilityIdentifier("scale-elapsed-setting")
-                    }
-                    Section(header: Text(l10n("Playback controls"))) {
-                        Toggle(l10n("Lock player"), isOn: $locked).accessibilityIdentifier("lock-player")
-                        Toggle(l10n("Rewind after a pause"), isOn: $player.rewindAfterPause)
-                        Toggle(l10n("Allow seeking from system media controls"), isOn: $player.allowMediaSeeking)
-                        Picker(l10n("Forward interval"), selection: $player.forwardInterval) {
-                            ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
-                        }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Forward interval")
-                        Picker(l10n("Backward interval"), selection: $player.backwardInterval) {
-                            ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
-                        }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Backward interval")
-                    }
-                    Section(header: Text(l10n("Sleep timer"))) {
-                        Toggle(l10n("Fade audio in the last minute"), isOn: $player.fadeSleepTimer)
-                    }
+                    PlaybackPreferenceSections()
                 case nil: EmptyView()
                 }
             }.navigationTitle(l10n(panel?.title ?? "Listening"))
@@ -463,4 +439,46 @@ private struct PlaybackToggleStyle: ViewModifier {
 private struct CompactPlayerHeight: PreferenceKey {
     static var defaultValue: CGFloat = 96
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+}
+
+struct PlaybackPreferenceSections: View {
+    @EnvironmentObject private var player: ApplePlayback
+    @AppStorage(PlayerDisplay.totalTrackKey) private var totalTrack = true
+    @AppStorage(PlayerDisplay.scaleElapsedKey) private var scaleElapsed = true
+    @AppStorage(PlayerDisplay.lockKey) private var locked = false
+    @Environment(\.nativeStrings) private var l10n
+    var body: some View {
+        Group {
+            // Turning one track off turns the other on, so progress always stays visible.
+            Section(header: Text(l10n("Progress display"))) {
+                Toggle(l10n("Chapter track"), isOn: Binding(get: { player.chapterTrack }, set: { player.chapterTrack = $0; if !$0 { totalTrack = true } }))
+                .accessibilityIdentifier("chapter-track-setting")
+                Toggle(l10n("Total track"), isOn: Binding(get: { totalTrack }, set: { totalTrack = $0; if !$0 { player.chapterTrack = true } }))
+                .accessibilityIdentifier("total-track-setting")
+                Toggle(l10n("Scale elapsed time by speed"), isOn: $scaleElapsed).accessibilityIdentifier("scale-elapsed-setting")
+            }
+            Section(header: Text(l10n("Playback controls"))) {
+                Toggle(l10n("Lock player"), isOn: $locked).accessibilityIdentifier("lock-player")
+                Toggle(l10n("Rewind after a pause"), isOn: $player.rewindAfterPause)
+                Toggle(l10n("Allow seeking from system media controls"), isOn: $player.allowMediaSeeking)
+                Picker(l10n("Forward interval"), selection: $player.forwardInterval) {
+                    ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
+                }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Forward interval")
+                Picker(l10n("Backward interval"), selection: $player.backwardInterval) {
+                    ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
+                }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Backward interval")
+            }
+            Section(header: Text(l10n("Sleep timer"))) {
+                Toggle(l10n("Fade audio in the last minute"), isOn: $player.fadeSleepTimer)
+            }
+        }
+    }
+}
+
+struct NativeListeningSettings: View {
+    @Environment(\.nativeStrings) private var l10n
+    var body: some View {
+        ShelfForm { PlaybackPreferenceSections() }
+            .navigationTitle(l10n("Playback preferences")).navigationBarTitleDisplayMode(.inline)
+    }
 }

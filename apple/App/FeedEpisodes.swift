@@ -38,7 +38,7 @@ struct FeedEpisodes: View {
                             }
                         }
                     }.disabled(adding || episode.enclosureURL == nil || existing.contains(episode.enclosureURL ?? ""))
-                        .accessibilityLabel(episode.title).accessibilityValue(l10n(existing.contains(episode.enclosureURL ?? "") ? "Already on server" : episode.enclosureURL == nil ? "No audio enclosure" : selected.contains(episode.id) ? "Selected" : "Not selected"))
+                        .accessibilityLabel(episode.title).accessibilityValue(selectionValue(episode))
                 }
                 }
                 if adding { ProgressView(l10n("Queueing on your server…")) }
@@ -52,6 +52,12 @@ struct FeedEpisodes: View {
                 }
         }.onAppear(perform: load).onDisappear { request?.cancel() }
     }
+    private func selectionValue(_ episode: PodcastFeedEpisode) -> String {
+        if existing.contains(episode.enclosureURL ?? "") { return l10n("Already on server") }
+        if episode.enclosureURL == nil { return l10n("No audio enclosure") }
+        return l10n(selected.contains(episode.id) ? "Selected" : "Not selected")
+    }
+
     private func load() {
         guard !adding, let url = item.media.metadata.feedUrl else { loading = false; return }
         request?.cancel()

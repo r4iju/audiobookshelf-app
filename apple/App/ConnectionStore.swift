@@ -119,6 +119,11 @@ import Combine
         catch { managementError = Self.recovery(for: error) }
     }
 
+    var currentConnectionID: String? {
+        guard api.credentials != nil else { return nil }
+        return try? vault.activeConnection()?.id
+    }
+
     func refreshSavedConnections() {
         do { savedConnections = try vault.summaries() }
         catch { managementError = Self.recovery(for: error) }

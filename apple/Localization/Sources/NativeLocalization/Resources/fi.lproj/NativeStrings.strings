@@ -367,6 +367,7 @@
 "Recently added" = "Viimeksi lisätyt";
 "Refresh" = "Päivitä";
 "Refresh downloads" = "Päivitä lataukset";
+"Remove" = "Poista";
 "Remove download" = "Poista paikallinen sisältö";
 "Remove {0}" = "Poista {0}";
 "Repair and retry import" = "Korjaa ja yritä tuontia uudelleen";

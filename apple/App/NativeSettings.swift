@@ -80,53 +80,93 @@ enum NativeHaptic: String, CaseIterable {
 struct NativeSettings: View {
     @EnvironmentObject private var connection: ConnectionStore
     @AppStorage("previewTheme") private var theme = "system"
-    @AppStorage("previewHaptic") private var haptic = "light"
     @Environment(\.nativeStrings) private var l10n
     var body: some View {
         ShelfForm {
             Section(header: Text(l10n("Account"))) {
-                Text(connection.username).font(.headline)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(connection.username).font(.headline)
+                    Text(connection.activeAccount?.server ?? connection.api.credentials?.server ?? connection.server)
+                        .font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                }
                 Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
                 Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }.accessibilityIdentifier("account-signout")
             }
-            Section {
-                NavigationLink(destination: StatisticsView(api: connection.api)) { Label(l10n("Statistics"), systemImage: "chart.bar") }
+            Section(header: Text(l10n("Listening"))) {
+                NavigationLink(destination: NativeListeningSettings()) { Label(l10n("Playback preferences"), systemImage: "slider.horizontal.3") }.accessibilityIdentifier("listening-settings")
             }
-            Section {
+            Section(header: Text(l10n("Reading"))) {
+                NavigationLink(destination: NativeReadingSettings()) { Label(l10n("Reading preferences"), systemImage: "text.book.closed") }.accessibilityIdentifier("reading-settings")
+            }
+            Section(header: Text(l10n("Appearance"))) {
+                NavigationLink(destination: NativeAppearanceSettings()) {
+                    summary(l10n("Theme and feedback"), value: l10n((NativeAppearance(rawValue: theme) ?? .system).name, context: .theme))
+                }.accessibilityIdentifier("appearance-settings")
                 NavigationLink(destination: NativeLanguageSettings()) {
-                    HStack { Text(l10n("Language")); Spacer(); Text(l10n.language.name).foregroundColor(ShelfStyle.secondaryText) }
+                    summary(l10n("Language"), value: l10n.language.name)
                 }.accessibilityIdentifier("language-settings")
             }
-            Section(header: Text(l10n("Appearance")).foregroundColor(ShelfStyle.secondaryText)) {
+            Section(header: Text(l10n("Utilities"))) {
+                NavigationLink(destination: StatisticsView(api: connection.api)) { Label(l10n("Statistics"), systemImage: "chart.bar") }
+                NavigationLink(destination: YearReviewView(api: connection.api)) { Label(l10n("Year in review"), systemImage: "calendar") }
+                NavigationLink(destination: NativeNetworkSettings()) { Label(l10n("Network preferences"), systemImage: "network") }
+                NavigationLink(destination: NativeDiagnosticsView()) { Label(l10n("Diagnostics"), systemImage: "stethoscope") }.accessibilityIdentifier("diagnostics-settings")
+                NavigationLink(destination: NativeMigrationImport()) { Label(l10n("Import previous app data"), systemImage: "square.and.arrow.down") }
+            }
+            Section(header: Text(l10n("About"))) {
+                NavigationLink(destination: NativeAboutSettings()) { Label(l10n("Source and license notices"), systemImage: "info.circle") }
+            }
+        }.navigationTitle(l10n("Settings")).navigationBarTitleDisplayMode(.inline)
+    }
+    private func summary(_ title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+            Text(value).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+        }
+    }
+}
+
+struct NativeAppearanceSettings: View {
+    @AppStorage("previewTheme") private var theme = "system"
+    @AppStorage("previewHaptic") private var haptic = "light"
+    @Environment(\.nativeStrings) private var l10n
+    var body: some View {
+        ShelfForm {
+            Section(header: Text(l10n("Appearance"))) {
                 ForEach(NativeAppearance.allCases, id: \.self) { choice in
                     option(l10n(choice.name, context: .theme), selected: theme == choice.rawValue, id: "theme-" + choice.rawValue) {
                         theme = choice.rawValue; NativeHaptic.impact("settings")
                     }
                 }
             }
-            Section(header: Text(l10n("Haptic feedback")).foregroundColor(ShelfStyle.secondaryText), footer: Text(l10n("Choose the feedback for playback controls and library actions.")).foregroundColor(ShelfStyle.secondaryText)) {
+            Section(header: Text(l10n("Haptic feedback")), footer: Text(l10n("Choose the feedback for playback controls and library actions."))) {
                 ForEach(NativeHaptic.allCases, id: \.self) { choice in
                     option(l10n(choice.name, context: .hapticStrength), selected: haptic == choice.rawValue, id: "haptic-" + choice.rawValue) {
                         haptic = choice.rawValue; NativeHaptic.impact("settings")
                     }
                 }
             }
-            Section {
-                NavigationLink(destination: NativeNetworkSettings()) { Label(l10n("Network preferences"), systemImage: "network") }
-                NavigationLink(destination: NativeMigrationImport()) { Label(l10n("Import previous app data"), systemImage: "square.and.arrow.down") }
-                NavigationLink(destination: NativeDiagnosticsView()) { Label(l10n("Diagnostics"), systemImage: "stethoscope") }.accessibilityIdentifier("diagnostics-settings")
-            }
-            Section(header: Text("Audiobook Loft")) {
-                Text("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project.")
-                Text("Open source under GPLv3, with applicable third-party licenses retained.")
-                Link("Source and license notices", destination: URL(string: "https://github.com/r4iju/audiobookshelf-app/releases")!)
-            }
-        }.navigationTitle(l10n("Settings")).navigationBarTitleDisplayMode(.inline)
+        }.navigationTitle(l10n("Theme and feedback")).navigationBarTitleDisplayMode(.inline)
     }
     private func option(_ title: String, selected: Bool, id: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack { Text(title).foregroundColor(.primary); Spacer(); if selected { Image(systemName: "checkmark").foregroundColor(ShelfStyle.accent) } }
         }.accessibilityIdentifier(id).accessibilityValue(l10n(selected ? "Selected" : "Not selected"))
+    }
+}
+
+struct NativeAboutSettings: View {
+    @Environment(\.nativeStrings) private var l10n
+    var body: some View {
+        ShelfList {
+            Section(header: Text("Audiobook Loft")) {
+                Text(l10n("Audiobook Loft began as an independently maintained fork of the Audiobookshelf app. Its browser and backend have been rewritten. Upstream copyright and license notices are retained. It is not affiliated with or endorsed by the Audiobookshelf project."))
+            }
+            Section(header: Text(l10n("License"))) {
+                Text(l10n("Open source under GPLv3, with applicable third-party licenses retained."))
+                Link(l10n("Source and license notices"), destination: URL(string: "https://github.com/r4iju/audiobookshelf-app/releases")!)
+            }
+        }.navigationTitle(l10n("About")).navigationBarTitleDisplayMode(.inline)
     }
 }
 

@@ -22,25 +22,23 @@ struct ConnectionRoot: View {
             switch connection.screen {
             case .connection(let error): PlaybackContainer(content: ConnectionForm(error: error))
             case .loading:
-                PlaybackContainer(content: VStack(spacing: 24) {
-                    ProgressView().accessibilityLabel(l10n("Opening your library…"))
-                    Text(l10n("Opening your library…")).font(.headline)
-                    Button(l10n("Open downloads")) { downloads.presented = true }.nativeGlassButton()
-                }.padding(24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity))
+                PlaybackContainer(content: NativeNavigation {
+                    ShelfList {
+                        Section { ProgressView(l10n("Opening your library…")) }
+                        Section(header: Text(l10n("Offline listening"))) {
+                            Button(l10n("Open downloads")) { downloads.presented = true }
+                        }
+                    }.navigationTitle(l10n("Connect")).navigationBarTitleDisplayMode(.inline)
+                })
             case .libraries(let libraries): PlaybackContainer(content: LibraryChooser(libraries: libraries))
             case .shelf(let library): NativeShell(library: library)
             }
         }.background(appearance.background.edgesIgnoringSafeArea(.all))
             .sheet(isPresented: $connection.savedConnectionsPresented) { SavedConnectionsView().environmentObject(connection) }
-            .overlay(Group {
-                if let error = connection.managementError {
-                    HStack {
-                        Text(error).font(.callout)
-                        Button(l10n("Dismiss")) { connection.managementError = nil }
-                    }.padding().background(appearance.card).cornerRadius(16).padding()
-                }
-            }, alignment: .top)
+            .alert(isPresented: Binding(get: { connection.managementError != nil }, set: { if !$0 { connection.managementError = nil } })) {
+                Alert(title: Text(l10n("Couldn’t complete this action")), message: Text(connection.managementError ?? ""), dismissButton: .default(Text(l10n("Dismiss"))) { connection.managementError = nil })
+            }
+
     }
 }
 
@@ -59,8 +57,8 @@ struct ConnectionForm: View {
     @State private var panel: ConnectionFormPanel?
 
     var body: some View {
-        NavigationView {
-            Form {
+        NativeNavigation {
+            ShelfForm {
                 Section {
                     VStack(alignment: .leading, spacing: 12) {
                         Image(systemName: "books.vertical.fill")
@@ -98,9 +96,8 @@ struct ConnectionForm: View {
                         Task { await connection.connect(server: connection.server, username: connection.username, password: secret) }
                     } label: {
                         Label(l10n("Connect to your library"), systemImage: "arrow.right")
-                            .font(.headline).frame(maxWidth: .infinity).padding(16)
-                            .nativeGlassControl(tint: ShelfStyle.accentFill)
-                    }.buttonStyle(PlainButtonStyle())
+                            .font(.headline).frame(minHeight: 44)
+                    }.nativeGlassButton(prominent: true)
                         .disabled(connection.server.isEmpty || connection.username.isEmpty).accessibilityIdentifier("connect")
                     Button(l10n("Sign in with OpenID")) {
                         password = ""
@@ -113,8 +110,8 @@ struct ConnectionForm: View {
                 Section(footer: Text(l10n("Connect directly to Audiobookshelf. Local HTTP and trusted HTTPS servers are supported."))) {
                     Button(l10n("Import previous app data")) { NativeHaptic.impact("migration"); panel = .migration }
                     Button(l10n("Diagnostics")) { panel = .diagnostics }.accessibilityIdentifier("connection-diagnostics")
+                    Button(l10n("Open downloads")) { downloads.presented = true }
                     if !connection.savedConnections.isEmpty {
-                        Button(l10n("Downloads")) { downloads.presented = true }
                         Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
                     }
                 }
@@ -133,7 +130,7 @@ struct ConnectionForm: View {
                         }
                     }
                 }
-        }.navigationViewStyle(StackNavigationViewStyle())
+        }
             .sheet(item: $panel) { active in
                 NativeNavigation {
                     Group {
@@ -192,14 +189,15 @@ struct LibraryChooser: View {
                     }
                     if libraries.isEmpty { Text(l10n("No libraries are available to this account. Ask your server administrator for access.")).foregroundColor(ShelfStyle.secondaryText) }
                 }
+                Section(header: Text(l10n("Offline listening"))) {
+                    Button(l10n("Open downloads")) { downloads.presented = true }
+                }
+                Section(header: Text(l10n("Account"))) {
+                    Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
+                    Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }
+                }
             }.navigationTitle(l10n("Your libraries"))
-                .toolbar { ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button(l10n("Downloads")) { downloads.presented = true }
-                        Button(l10n("Saved connections")) { connection.refreshSavedConnections(); connection.savedConnectionsPresented = true }
-                        Button(l10n("Sign out")) { NativeHaptic.impact("sign-out"); connection.signOut() }
-                    } label: { Image(systemName: "person.crop.circle") }.accessibilityLabel(l10n("Account")).accessibilityIdentifier("account")
-                } }
+
         }
     }
 }
@@ -213,12 +211,18 @@ struct SavedConnectionsView: View {
             ShelfList {
                 ForEach(connection.savedConnections) { saved in
                     Button { NativeHaptic.impact("connect"); Task { await connection.switchConnection(saved.id) } } label: {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(saved.username).font(.headline).foregroundColor(.primary)
-                            Text(saved.server).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                        HStack(spacing: 12) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(saved.username).font(.headline).foregroundColor(.primary)
+                                Text(saved.server).font(.caption).foregroundColor(ShelfStyle.secondaryText)
+                                if saved.id == connection.currentConnectionID { Text(l10n("Current account")).font(.caption).foregroundColor(ShelfStyle.secondaryText) }
+                            }
+                            Spacer()
+                            if saved.id == connection.currentConnectionID { Image(systemName: "checkmark").accessibilityHidden(true) }
                         }.padding(.vertical, 8)
                     }.accessibilityIdentifier("connection-" + saved.server)
                         .accessibilityLabel(l10n("{0} on {1}", saved.username, saved.server))
+                        .accessibilityValue(l10n(saved.id == connection.currentConnectionID ? "Selected" : "Not selected"))
                 }
             }.listStyle(InsetGroupedListStyle()).navigationTitle(l10n("Saved connections")).navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .navigationBarLeading) {

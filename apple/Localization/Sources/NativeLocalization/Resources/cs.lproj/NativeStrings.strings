@@ -367,6 +367,7 @@
 "Recently added" = "Nedávno přidáno";
 "Refresh" = "Obnovit";
 "Refresh downloads" = "Obnovit stažené";
+"Remove" = "Odstranit";
 "Remove download" = "Smazat místní položku";
 "Remove {0}" = "Odstranit: {0}";
 "Repair and retry import" = "Opravit a zopakovat import";

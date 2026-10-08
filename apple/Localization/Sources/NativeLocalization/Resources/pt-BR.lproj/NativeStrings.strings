@@ -367,6 +367,7 @@
 "Recently added" = "Novidades";
 "Refresh" = "Atualizar";
 "Refresh downloads" = "Atualizar downloads";
+"Remove" = "Remover";
 "Remove download" = "Apagar item local";
 "Remove {0}" = "Remover {0}";
 "Repair and retry import" = "Reparar e tentar importar novamente";

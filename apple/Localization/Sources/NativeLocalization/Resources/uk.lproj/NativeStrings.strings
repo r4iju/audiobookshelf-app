@@ -367,6 +367,7 @@
 "Recently added" = "Нещодавно додані";
 "Refresh" = "Оновити";
 "Refresh downloads" = "Оновити завантаження";
+"Remove" = "Видалити";
 "Remove download" = "Видалити локальний елемент";
 "Remove {0}" = "Прибрати «{0}»";
 "Repair and retry import" = "Виправити й повторити імпорт";

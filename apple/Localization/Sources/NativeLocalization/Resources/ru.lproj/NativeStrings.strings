@@ -367,6 +367,7 @@
 "Recently added" = "Недавно добавленные";
 "Refresh" = "Обновить";
 "Refresh downloads" = "Обновить загрузки";
+"Remove" = "Удалить";
 "Remove download" = "Удалить локальный элемент";
 "Remove {0}" = "Убрать «{0}»";
 "Repair and retry import" = "Исправить и повторить импорт";

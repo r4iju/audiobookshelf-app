@@ -367,6 +367,7 @@
 "Recently added" = "Ajouts récents";
 "Refresh" = "Actualiser";
 "Refresh downloads" = "Actualiser les téléchargements";
+"Remove" = "Retirer";
 "Remove download" = "Supprimer l’élément de l’appareil";
 "Remove {0}" = "Retirer {0}";
 "Repair and retry import" = "Réparer et relancer l’importation";

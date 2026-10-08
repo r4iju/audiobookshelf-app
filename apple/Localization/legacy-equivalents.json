@@ -168,5 +168,6 @@
   "Published date": "LabelPubDate",
   "Season": "LabelSeason",
   "Episode number": "LabelEpisode",
-  "Filename": "LabelFilename"
+  "Filename": "LabelFilename",
+  "Remove": "ButtonRemove"
 }

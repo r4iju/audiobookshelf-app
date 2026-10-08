@@ -367,6 +367,7 @@
 "Recently added" = "最近添加";
 "Refresh" = "刷新";
 "Refresh downloads" = "刷新下载";
+"Remove" = "移除";
 "Remove download" = "删除本地项目";
 "Remove {0}" = "移除“{0}”";
 "Repair and retry import" = "修复并重试导入";

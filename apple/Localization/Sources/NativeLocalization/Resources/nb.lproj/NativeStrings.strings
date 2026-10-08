@@ -367,6 +367,7 @@
 "Recently added" = "Nylig tillagt";
 "Refresh" = "Oppdater";
 "Refresh downloads" = "Oppdater nedlastinger";
+"Remove" = "Fjern";
 "Remove download" = "Slett element på enheten";
 "Remove {0}" = "Fjern {0}";
 "Repair and retry import" = "Reparer og prøv importen på nytt";

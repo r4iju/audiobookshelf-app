@@ -367,6 +367,7 @@
 "Recently added" = "Son Eklenenler";
 "Refresh" = "Yenile";
 "Refresh downloads" = "İndirmeleri yenile";
+"Remove" = "Kaldır";
 "Remove download" = "Yerel öğeyi sil";
 "Remove {0}" = "{0} öğesini kaldır";
 "Repair and retry import" = "Onar ve içe aktarmayı yeniden dene";

@@ -367,6 +367,7 @@
 "Recently added" = "Nyligen tillagda";
 "Refresh" = "Uppdatera";
 "Refresh downloads" = "Uppdatera hämtningar";
+"Remove" = "Ta bort";
 "Remove download" = "Ta bort lokalt objekt";
 "Remove {0}" = "Ta bort {0}";
 "Repair and retry import" = "Reparera och försök importera igen";

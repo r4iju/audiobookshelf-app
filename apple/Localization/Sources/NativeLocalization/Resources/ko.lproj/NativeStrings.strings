@@ -367,6 +367,7 @@
 "Recently added" = "최근 추가됨";
 "Refresh" = "새로 고침";
 "Refresh downloads" = "다운로드 새로 고침";
+"Remove" = "제거";
 "Remove download" = "로컬 항목 삭제";
 "Remove {0}" = "{0} 제거";
 "Repair and retry import" = "복구 후 가져오기 재시도";

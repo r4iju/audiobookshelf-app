@@ -367,6 +367,7 @@
 "Recently added" = "Nedavno dodano";
 "Refresh" = "Osveži";
 "Refresh downloads" = "Osveži prenose";
+"Remove" = "Odstrani";
 "Remove download" = "Izbriši lokalni element";
 "Remove {0}" = "Odstrani: {0}";
 "Repair and retry import" = "Popravi in ponovi uvoz";
