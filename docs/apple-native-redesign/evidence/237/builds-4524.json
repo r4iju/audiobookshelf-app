@@ -1,0 +1,337 @@
+{
+  "source": "4524ee1635057f581174b4e770339fe995a093cb",
+  "source_minimum": "14.0",
+  "build_override_minimum": "15.0",
+  "products": {
+    "phone": {
+      "path": "/tmp/native237-phone-capture-current/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app",
+      "device": "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+      "files": {
+        "AppIcon60x60@2x.png": "15ab44025673faa562ccb81071562ba6131db7babcb52ee25b66e78e0c35c0a9",
+        "AppIcon76x76@2x~ipad.png": "54233622418e2aee6808054bf6a0d8bdcea3ca03f0fa6ad9e2414dce76c4389e",
+        "Assets.car": "5fc5a37dfc45d4f2b34974fecf51c6c16165c27832e0e1537db2bc9f70affe77",
+        "AudiobookshelfNative": "e0810b8032e4cef0b0c582226913b6e5fd281998f7a34ce28a47b45b8eaf57c5",
+        "AudiobookshelfNative.debug.dylib": "bb864f2eeca9e652c996395e0514f19ca14b8c60ba799db23e84cc5179ece7c4",
+        "Info.plist": "fe26dd8f4ec76e12d7bdc885b9b2036475b14f28b13600d784f8c071c9d4079d",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "ReaderAssets/EPUBJS-LICENSE": "8663e726f4194e1a34913b223c2e4745ed06f3ec645a66a41ab70b735070b692",
+        "ReaderAssets/JSZIP-LICENSE": "566c953c6090b1218ca6217dd7359d45dde46581968586dc607d59a78af6a9c4",
+        "ReaderAssets/THIRD-PARTY-NOTICES.txt": "14d0778e53ecf8ab1a61663ba36311300d774258bd408babd9dac51e75dfcf6b",
+        "ReaderAssets/VENDOR-PROVENANCE.txt": "23135997602acf0497e5a717d13bfe0b69986fa53d9f2c630ccd1ab258dfa7e4",
+        "ReaderAssets/epub.min.js": "c7a842da856d511938cba1ba64d90743c318ac02c13e47bc84ae4834fe94c945",
+        "ReaderAssets/jszip.min.js": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",
+        "ReaderAssets/reader.html": "51b0287510901fea7ecf76c3fd883de849f1d446b6c8425477dffbd48db3fb6a",
+        "ReaderAssets/reader.js": "ac1cae79823f43f9dc62be022ea441ca89ca590ac88f4456acb55bc2efefe6f6",
+        "_CodeSignature/CodeResources": "4842ce051d4daa1c969e8a810de9c739c0736cbe25a562bcc8051a4a17e80620",
+        "__preview.dylib": "6d94cdf44900a973afbb043066ab135c579ce43729730c91d5a58cc4909d2af1",
+        "ar.lproj/NativeStrings.strings": "b7e8b984091939317f0759fccd7c185b178ad210512e8d8010e4ce26c70a1b61",
+        "be.lproj/NativeStrings.strings": "84488c772edbc86208e04c70b5ae14e4e34b431394f04b83fd29119ee13c7eb2",
+        "bg.lproj/NativeStrings.strings": "3a7168a312ae678c2f70c666037e0865c3bbcd2cc2720e7cb7a96177c1a93988",
+        "bn.lproj/NativeStrings.strings": "d562157f0cd001208edde952905209466a76b005acec6759ad860f032fc20e96",
+        "ca.lproj/NativeStrings.strings": "ad7a1e6341e99c93e2f0c4aef57182ff4a961c6bb374c9bbb28cdf5c4ce1fd0e",
+        "cs.lproj/NativeStrings.strings": "59ba732386462c5aaa4c19dab3e89a854bc53f49aa43ff57cf598c342ad8f416",
+        "da.lproj/NativeStrings.strings": "076b05095c44376d2ca68da9018479909c5617965872c06098dc4261ff8c8376",
+        "de.lproj/NativeStrings.strings": "ddbcb96336e4e7788700a6c836bfcd71bb2ed604c4edba6fb8d8ac5e25e13008",
+        "en.lproj/NativeStrings.strings": "68835168b4446bdb796f516c8eb7fe72c67e2fa754c8c4700b0bc5fba6a4358c",
+        "es.lproj/NativeStrings.strings": "2101d3aec75fcd685265d5f05c4d013a2fe90bf666e083cc29d17ceb7317dffe",
+        "fi.lproj/NativeStrings.strings": "b7b4569cdd4e3187035959e4f7fa92284194c755814baa03e154c3e30ef7cc42",
+        "fr.lproj/NativeStrings.strings": "ffce0361776fe61b843c7dd87d342369f4811e2b3b019a93ef3378f3c5cf13d8",
+        "he.lproj/NativeStrings.strings": "96bc1adc69fb3cf94967eef670cd95ab554594b10e270c8ededba513928d4589",
+        "hr.lproj/NativeStrings.strings": "a718d8f7e5be072d25b58528f25a25675b85e1aac58371a01423b23828904af9",
+        "hu.lproj/NativeStrings.strings": "3a09c72ac1069c5eda78bfcb821af26e1806a0c73d13d2ecc47d21453da0f5e7",
+        "it.lproj/NativeStrings.strings": "169cdd31cb7c2014688e03ce695a1b5d875d1a2fba3fc6c126f6e8f67bfff417",
+        "ko.lproj/NativeStrings.strings": "52d7929b55f2e63bd09dc718539d4dcdad587173a183f7292e318f8fd2db904b",
+        "lt.lproj/NativeStrings.strings": "c2777ecfee24d08ab707428815e60e5941bcc39086cc1cf33ebd7a3c104ad676",
+        "nb.lproj/NativeStrings.strings": "c618a3c6fea459636e60016474fef976261cb518e4b05ac30b4359d7cb0c5ce5",
+        "nl.lproj/NativeStrings.strings": "8e47cf9f27b914744bf685e46c1b4831c69b9b2d0197f0dcccd91b45137bb5da",
+        "pl.lproj/NativeStrings.strings": "0e89c678368c370608c1a20e02026e205421f8348ffe24a939542c2108e1cf12",
+        "pt-BR.lproj/NativeStrings.strings": "46d91092423f4c9f92800317efba21e7e391f8b47b4e01853ec3ffd9d427281a",
+        "ru.lproj/NativeStrings.strings": "2a74e97818228cacef601ac99114ea3adf5b31f8fd1f838ad2c9c38b301e5822",
+        "sk.lproj/NativeStrings.strings": "bba4b6ca21dd30fa1d79baaede07620b05837370d18789deb55f9266f040d4be",
+        "sl.lproj/NativeStrings.strings": "05b6ff70adc345ca826e233a05900384d91e8916e3503ea6d63a69d273d53525",
+        "sv.lproj/NativeStrings.strings": "5d90450a77a2c83a4c0fe0aeb180feec1d94334ea57640c76a135fa9708ecde6",
+        "tr.lproj/NativeStrings.strings": "939caf9024120e8ebc517a5709234a38d2cb1d2173afd9de9e8c01214686ed66",
+        "uk.lproj/NativeStrings.strings": "efdda79ad12106c8be1d378558d073fad680474d48201094f2097609aa8dfdfe",
+        "vi.lproj/NativeStrings.strings": "7cbe274b7c3a913249c9da6559d6ad6202890225d86ad8aabf815e83c9281f79",
+        "zh-Hans.lproj/NativeStrings.strings": "0c7e69d80bf898cb163938bb948b05535259aee8dad6f59d830e983099752f06"
+      },
+      "info": {
+        "BuildMachineOSBuild": "26A434",
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "Audiobook Loft",
+        "CFBundleExecutable": "AudiobookshelfNative",
+        "CFBundleIcons": {
+          "CFBundlePrimaryIcon": {
+            "CFBundleIconFiles": [
+              "AppIcon60x60"
+            ],
+            "CFBundleIconName": "AppIcon"
+          }
+        },
+        "CFBundleIcons~ipad": {
+          "CFBundlePrimaryIcon": {
+            "CFBundleIconFiles": [
+              "AppIcon60x60",
+              "AppIcon76x76"
+            ],
+            "CFBundleIconName": "AppIcon"
+          }
+        },
+        "CFBundleIdentifier": "com.forkzed.audiobookshelf.native.preview",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "AudiobookshelfNative",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleSupportedPlatforms": [
+          "iPhoneSimulator"
+        ],
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "com.forkzed.audiobookshelf.native.preview.openid",
+            "CFBundleURLSchemes": [
+              "audiobookshelf-native-preview"
+            ]
+          }
+        ],
+        "CFBundleVersion": "1",
+        "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+        "DTPlatformBuild": "24A430",
+        "DTPlatformName": "iphonesimulator",
+        "DTPlatformVersion": "27.0",
+        "DTSDKBuild": "24A430",
+        "DTSDKName": "iphonesimulator27.0",
+        "DTXcode": "2700",
+        "DTXcodeBuild": "27A266a",
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSRequiresIPhoneOS": true,
+        "LSSupportsOpeningDocumentsInPlace": true,
+        "MinimumOSVersion": "15.0",
+        "NSAccentColorName": "AccentColor",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Connect directly to your Audiobook Loft or compatible Audiobookshelf server on your local network.",
+        "NSPhotoLibraryAddUsageDescription": "Save your year in review image to Photos.",
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "UIDeviceFamily": [
+          1,
+          2
+        ],
+        "UIFileSharingEnabled": true,
+        "UILaunchScreen": {},
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ],
+        "UTImportedTypeDeclarations": [
+          {
+            "UTTypeConformsTo": [
+              "com.apple.package",
+              "public.composite-content"
+            ],
+            "UTTypeDescription": "Audiobookshelf Migration Package",
+            "UTTypeIdentifier": "org.audiobookshelf.legacy-migration",
+            "UTTypeTagSpecification": {
+              "public.filename-extension": [
+                "absmigration"
+              ]
+            }
+          }
+        ]
+      },
+      "signature": "/tmp/native237-phone-capture-current/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app: valid on disk\n/tmp/native237-phone-capture-current/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+      "installed_checks": [
+        {
+          "time": "2026-10-08T08:16:11.785229+00:00",
+          "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/B9B26583-3A13-45BF-8ECC-B25E94348994/AudiobookshelfNative.app",
+          "signature": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/B9B26583-3A13-45BF-8ECC-B25E94348994/AudiobookshelfNative.app: valid on disk\n/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/B9B26583-3A13-45BF-8ECC-B25E94348994/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+          "all_files_match": 47
+        },
+        {
+          "time": "2026-10-08T08:46:06.922331+00:00",
+          "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/0AC41E9D-9132-4312-B463-B7DA8C6D7F4E/AudiobookshelfNative.app",
+          "signature": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/0AC41E9D-9132-4312-B463-B7DA8C6D7F4E/AudiobookshelfNative.app: valid on disk\n/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/0AC41E9D-9132-4312-B463-B7DA8C6D7F4E/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+          "all_files_match": 47
+        },
+        {
+          "time": "2026-10-08T08:54:47.064531+00:00",
+          "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/0AC41E9D-9132-4312-B463-B7DA8C6D7F4E/AudiobookshelfNative.app",
+          "signature": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/0AC41E9D-9132-4312-B463-B7DA8C6D7F4E/AudiobookshelfNative.app: valid on disk\n/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/0AC41E9D-9132-4312-B463-B7DA8C6D7F4E/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+          "all_files_match": 47
+        }
+      ]
+    },
+    "ipad": {
+      "path": "/tmp/native237-ipad-capture-current/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app",
+      "device": "CDFFEB30-07F5-4A50-AB64-57A46709335B",
+      "files": {
+        "AppIcon60x60@2x.png": "15ab44025673faa562ccb81071562ba6131db7babcb52ee25b66e78e0c35c0a9",
+        "AppIcon76x76@2x~ipad.png": "54233622418e2aee6808054bf6a0d8bdcea3ca03f0fa6ad9e2414dce76c4389e",
+        "Assets.car": "65cb26f02dd9ec1f1f6aff4ef2683eaface67d81562baaa5a24648969fef84a3",
+        "AudiobookshelfNative": "2cfffe0a66f348432d8f1c2b8b490f47c0a21e887c22b228665d1b7e3732f8ac",
+        "AudiobookshelfNative.debug.dylib": "9d70c314dc86e260c977cfca93dc99091881bde9e419deb01b31dc2df46cf0e5",
+        "Info.plist": "fe26dd8f4ec76e12d7bdc885b9b2036475b14f28b13600d784f8c071c9d4079d",
+        "PkgInfo": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0",
+        "ReaderAssets/EPUBJS-LICENSE": "8663e726f4194e1a34913b223c2e4745ed06f3ec645a66a41ab70b735070b692",
+        "ReaderAssets/JSZIP-LICENSE": "566c953c6090b1218ca6217dd7359d45dde46581968586dc607d59a78af6a9c4",
+        "ReaderAssets/THIRD-PARTY-NOTICES.txt": "14d0778e53ecf8ab1a61663ba36311300d774258bd408babd9dac51e75dfcf6b",
+        "ReaderAssets/VENDOR-PROVENANCE.txt": "23135997602acf0497e5a717d13bfe0b69986fa53d9f2c630ccd1ab258dfa7e4",
+        "ReaderAssets/epub.min.js": "c7a842da856d511938cba1ba64d90743c318ac02c13e47bc84ae4834fe94c945",
+        "ReaderAssets/jszip.min.js": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",
+        "ReaderAssets/reader.html": "51b0287510901fea7ecf76c3fd883de849f1d446b6c8425477dffbd48db3fb6a",
+        "ReaderAssets/reader.js": "ac1cae79823f43f9dc62be022ea441ca89ca590ac88f4456acb55bc2efefe6f6",
+        "_CodeSignature/CodeResources": "f499e4894d1b5cdedadfb694cc869ac31c788e86a672a4ac8561306c2f06ae56",
+        "__preview.dylib": "6d94cdf44900a973afbb043066ab135c579ce43729730c91d5a58cc4909d2af1",
+        "ar.lproj/NativeStrings.strings": "b7e8b984091939317f0759fccd7c185b178ad210512e8d8010e4ce26c70a1b61",
+        "be.lproj/NativeStrings.strings": "84488c772edbc86208e04c70b5ae14e4e34b431394f04b83fd29119ee13c7eb2",
+        "bg.lproj/NativeStrings.strings": "3a7168a312ae678c2f70c666037e0865c3bbcd2cc2720e7cb7a96177c1a93988",
+        "bn.lproj/NativeStrings.strings": "d562157f0cd001208edde952905209466a76b005acec6759ad860f032fc20e96",
+        "ca.lproj/NativeStrings.strings": "ad7a1e6341e99c93e2f0c4aef57182ff4a961c6bb374c9bbb28cdf5c4ce1fd0e",
+        "cs.lproj/NativeStrings.strings": "59ba732386462c5aaa4c19dab3e89a854bc53f49aa43ff57cf598c342ad8f416",
+        "da.lproj/NativeStrings.strings": "076b05095c44376d2ca68da9018479909c5617965872c06098dc4261ff8c8376",
+        "de.lproj/NativeStrings.strings": "ddbcb96336e4e7788700a6c836bfcd71bb2ed604c4edba6fb8d8ac5e25e13008",
+        "en.lproj/NativeStrings.strings": "68835168b4446bdb796f516c8eb7fe72c67e2fa754c8c4700b0bc5fba6a4358c",
+        "es.lproj/NativeStrings.strings": "2101d3aec75fcd685265d5f05c4d013a2fe90bf666e083cc29d17ceb7317dffe",
+        "fi.lproj/NativeStrings.strings": "b7b4569cdd4e3187035959e4f7fa92284194c755814baa03e154c3e30ef7cc42",
+        "fr.lproj/NativeStrings.strings": "ffce0361776fe61b843c7dd87d342369f4811e2b3b019a93ef3378f3c5cf13d8",
+        "he.lproj/NativeStrings.strings": "96bc1adc69fb3cf94967eef670cd95ab554594b10e270c8ededba513928d4589",
+        "hr.lproj/NativeStrings.strings": "a718d8f7e5be072d25b58528f25a25675b85e1aac58371a01423b23828904af9",
+        "hu.lproj/NativeStrings.strings": "3a09c72ac1069c5eda78bfcb821af26e1806a0c73d13d2ecc47d21453da0f5e7",
+        "it.lproj/NativeStrings.strings": "169cdd31cb7c2014688e03ce695a1b5d875d1a2fba3fc6c126f6e8f67bfff417",
+        "ko.lproj/NativeStrings.strings": "52d7929b55f2e63bd09dc718539d4dcdad587173a183f7292e318f8fd2db904b",
+        "lt.lproj/NativeStrings.strings": "c2777ecfee24d08ab707428815e60e5941bcc39086cc1cf33ebd7a3c104ad676",
+        "nb.lproj/NativeStrings.strings": "c618a3c6fea459636e60016474fef976261cb518e4b05ac30b4359d7cb0c5ce5",
+        "nl.lproj/NativeStrings.strings": "8e47cf9f27b914744bf685e46c1b4831c69b9b2d0197f0dcccd91b45137bb5da",
+        "pl.lproj/NativeStrings.strings": "0e89c678368c370608c1a20e02026e205421f8348ffe24a939542c2108e1cf12",
+        "pt-BR.lproj/NativeStrings.strings": "46d91092423f4c9f92800317efba21e7e391f8b47b4e01853ec3ffd9d427281a",
+        "ru.lproj/NativeStrings.strings": "2a74e97818228cacef601ac99114ea3adf5b31f8fd1f838ad2c9c38b301e5822",
+        "sk.lproj/NativeStrings.strings": "bba4b6ca21dd30fa1d79baaede07620b05837370d18789deb55f9266f040d4be",
+        "sl.lproj/NativeStrings.strings": "05b6ff70adc345ca826e233a05900384d91e8916e3503ea6d63a69d273d53525",
+        "sv.lproj/NativeStrings.strings": "5d90450a77a2c83a4c0fe0aeb180feec1d94334ea57640c76a135fa9708ecde6",
+        "tr.lproj/NativeStrings.strings": "939caf9024120e8ebc517a5709234a38d2cb1d2173afd9de9e8c01214686ed66",
+        "uk.lproj/NativeStrings.strings": "efdda79ad12106c8be1d378558d073fad680474d48201094f2097609aa8dfdfe",
+        "vi.lproj/NativeStrings.strings": "7cbe274b7c3a913249c9da6559d6ad6202890225d86ad8aabf815e83c9281f79",
+        "zh-Hans.lproj/NativeStrings.strings": "0c7e69d80bf898cb163938bb948b05535259aee8dad6f59d830e983099752f06"
+      },
+      "info": {
+        "BuildMachineOSBuild": "26A434",
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "Audiobook Loft",
+        "CFBundleExecutable": "AudiobookshelfNative",
+        "CFBundleIcons": {
+          "CFBundlePrimaryIcon": {
+            "CFBundleIconFiles": [
+              "AppIcon60x60"
+            ],
+            "CFBundleIconName": "AppIcon"
+          }
+        },
+        "CFBundleIcons~ipad": {
+          "CFBundlePrimaryIcon": {
+            "CFBundleIconFiles": [
+              "AppIcon60x60",
+              "AppIcon76x76"
+            ],
+            "CFBundleIconName": "AppIcon"
+          }
+        },
+        "CFBundleIdentifier": "com.forkzed.audiobookshelf.native.preview",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "AudiobookshelfNative",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleSupportedPlatforms": [
+          "iPhoneSimulator"
+        ],
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "com.forkzed.audiobookshelf.native.preview.openid",
+            "CFBundleURLSchemes": [
+              "audiobookshelf-native-preview"
+            ]
+          }
+        ],
+        "CFBundleVersion": "1",
+        "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+        "DTPlatformBuild": "24A430",
+        "DTPlatformName": "iphonesimulator",
+        "DTPlatformVersion": "27.0",
+        "DTSDKBuild": "24A430",
+        "DTSDKName": "iphonesimulator27.0",
+        "DTXcode": "2700",
+        "DTXcodeBuild": "27A266a",
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSRequiresIPhoneOS": true,
+        "LSSupportsOpeningDocumentsInPlace": true,
+        "MinimumOSVersion": "15.0",
+        "NSAccentColorName": "AccentColor",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "NSLocalNetworkUsageDescription": "Connect directly to your Audiobook Loft or compatible Audiobookshelf server on your local network.",
+        "NSPhotoLibraryAddUsageDescription": "Save your year in review image to Photos.",
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "UIDeviceFamily": [
+          1,
+          2
+        ],
+        "UIFileSharingEnabled": true,
+        "UILaunchScreen": {},
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ],
+        "UTImportedTypeDeclarations": [
+          {
+            "UTTypeConformsTo": [
+              "com.apple.package",
+              "public.composite-content"
+            ],
+            "UTTypeDescription": "Audiobookshelf Migration Package",
+            "UTTypeIdentifier": "org.audiobookshelf.legacy-migration",
+            "UTTypeTagSpecification": {
+              "public.filename-extension": [
+                "absmigration"
+              ]
+            }
+          }
+        ]
+      },
+      "signature": "/tmp/native237-ipad-capture-current/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app: valid on disk\n/tmp/native237-ipad-capture-current/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+      "installed_checks": [
+        {
+          "time": "2026-10-08T08:16:11.992688+00:00",
+          "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app",
+          "signature": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app: valid on disk\n/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+          "all_files_match": 47
+        },
+        {
+          "time": "2026-10-08T08:41:39.651699+00:00",
+          "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app",
+          "signature": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app: valid on disk\n/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+          "all_files_match": 47
+        },
+        {
+          "time": "2026-10-08T08:46:07.129442+00:00",
+          "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app",
+          "signature": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app: valid on disk\n/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+          "all_files_match": 47
+        },
+        {
+          "time": "2026-10-08T08:54:47.607432+00:00",
+          "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app",
+          "signature": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app: valid on disk\n/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app: satisfies its Designated Requirement\n",
+          "all_files_match": 47
+        }
+      ]
+    }
+  }
+}

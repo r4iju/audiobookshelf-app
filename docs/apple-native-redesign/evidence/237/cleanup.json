@@ -1,0 +1,43 @@
+{
+  "time": "2026-10-08T08:59:48.022838+00:00",
+  "owned_devices": [
+    "75FA9768-B15C-40B6-ACC7-790D7FCAD29C",
+    "CDFFEB30-07F5-4A50-AB64-57A46709335B"
+  ],
+  "removed_synthetic_artifacts": [
+    "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Data/Application/E662A91D-3FA5-4DE8-88E2-6EE5456C84D7/Documents/Synthetic complete export",
+    "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Data/Application/E662A91D-3FA5-4DE8-88E2-6EE5456C84D7/Documents/Synthetic invalid export.txt"
+  ],
+  "settings": {
+    "75FA9768-B15C-40B6-ACC7-790D7FCAD29C": {
+      "content_size": "large",
+      "appearance": "light"
+    },
+    "CDFFEB30-07F5-4A50-AB64-57A46709335B": {
+      "content_size": "large",
+      "appearance": "light"
+    }
+  },
+  "diagnostic_restore_record": {
+    "file": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Data/Application/E5BEC63E-1F62-4665-B1A5-F923E4A44F75/Library/Application Support/NativeDiagnostics/events.json",
+    "backup": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Data/Application/E5BEC63E-1F62-4665-B1A5-F923E4A44F75/Library/Application Support/NativeDiagnostics/events.json.saved237"
+  },
+  "fixtures": {
+    "http": {
+      "pid": 38558,
+      "command": "python3 /tmp/native237-capture-fixture.py",
+      "port": 35769
+    },
+    "realtime": {
+      "pid": 51947,
+      "command": "node verification/realtime/native-fixture.mjs 35765 35769",
+      "port": 35765
+    }
+  },
+  "diagnostic_file_restored": true,
+  "diagnostic_backup_absent": true,
+  "t3_sessions_closed": true,
+  "owned_devices_released_and_shutdown": true,
+  "owned_fixture_ports_have_no_listeners": true,
+  "pool_snapshot": "9ACC6F5B-180D-44C3-823B-F8796813D69D  Shutdown  Pool TV 1 (tvOS 27.0)            free\n7CBB617F-721C-4B2A-AF9E-F9456269191B  Shutdown  Pool iPad 1 (iOS 26.0)           free\nCDFFEB30-07F5-4A50-AB64-57A46709335B  Shutdown  Pool iPad 1 (iOS 27.0)           free\n4F7AAE48-330B-4E01-A905-1C7AF906EB3F  Booted    Pool iPad 2 (iOS 27.0)           leased to pid 53160 in /Volumes/ai-ssd/code/lexidraw until Thu Oct  8 21:45:38 2026\nB1D2244C-1D78-47FF-A7CD-027B9028051C  Shutdown  Pool iPhone 1 (iOS 26.0)         free\n75FA9768-B15C-40B6-ACC7-790D7FCAD29C  Shutdown  Pool iPhone 1 (iOS 27.0)         free\nDAF19749-8EE4-4512-A056-D11986922EC7  Booted    Pool iPhone 2 (iOS 27.0)         leased to pid 15853 in /Volumes/ai-ssd/code/lexidraw until Thu Oct  8 21:26:29 2026\n97F3D534-A564-47C9-AFD4-AA20D28891DE  Shutdown  Pool iPhone 3 (iOS 27.0)         free\n4A5CD77F-1294-4A51-A2D5-AC1568BD961D  Shutdown  Pool iPhone 4 (iOS 27.0)         free\n9C1CE5A2-0B04-4FF6-BB26-7EE840B76AB4  Shutdown  Pool iPhone 5 (iOS 27.0)         free\n"
+}

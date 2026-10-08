@@ -1,0 +1,74 @@
+[
+  {
+    "source": "d7c337590d4aab89ad25e30cc6b712a3bff9bfa2",
+    "device": "phone",
+    "scope": "product",
+    "path": "/tmp/native237-phone-capture/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app",
+    "strict_exit": 0,
+    "resources": 47,
+    "mismatches": []
+  },
+  {
+    "source": "d7c337590d4aab89ad25e30cc6b712a3bff9bfa2",
+    "device": "ipad",
+    "scope": "product",
+    "path": "/tmp/native237-ipad-capture/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app",
+    "strict_exit": 0,
+    "resources": 47,
+    "mismatches": []
+  },
+  {
+    "source": "2e2cd52f1165cceee3f5799f416da301f443eabc",
+    "device": "phone",
+    "scope": "product",
+    "path": "/tmp/native237-phone-capture-final/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app",
+    "strict_exit": 0,
+    "resources": 47,
+    "mismatches": []
+  },
+  {
+    "source": "2e2cd52f1165cceee3f5799f416da301f443eabc",
+    "device": "ipad",
+    "scope": "product",
+    "path": "/tmp/native237-ipad-capture-final/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app",
+    "strict_exit": 0,
+    "resources": 47,
+    "mismatches": []
+  },
+  {
+    "source": "4524ee1635057f581174b4e770339fe995a093cb",
+    "device": "phone",
+    "scope": "product",
+    "path": "/tmp/native237-phone-capture-current/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app",
+    "strict_exit": 0,
+    "resources": 47,
+    "mismatches": []
+  },
+  {
+    "source": "4524ee1635057f581174b4e770339fe995a093cb",
+    "device": "phone",
+    "scope": "installed",
+    "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/75FA9768-B15C-40B6-ACC7-790D7FCAD29C/data/Containers/Bundle/Application/B9B26583-3A13-45BF-8ECC-B25E94348994/AudiobookshelfNative.app",
+    "strict_exit": 0,
+    "resources": 47,
+    "mismatches": []
+  },
+  {
+    "source": "4524ee1635057f581174b4e770339fe995a093cb",
+    "device": "ipad",
+    "scope": "product",
+    "path": "/tmp/native237-ipad-capture-current/Build/Products/Debug-iphonesimulator/AudiobookshelfNative.app",
+    "strict_exit": 0,
+    "resources": 47,
+    "mismatches": []
+  },
+  {
+    "source": "4524ee1635057f581174b4e770339fe995a093cb",
+    "device": "ipad",
+    "scope": "installed",
+    "path": "/Users/emanuel/Library/Developer/CoreSimulator/Devices/CDFFEB30-07F5-4A50-AB64-57A46709335B/data/Containers/Bundle/Application/BE21825F-FBB0-4118-A1FE-9946E226ECF4/AudiobookshelfNative.app",
+    "strict_exit": 0,
+    "resources": 47,
+    "mismatches": []
+  }
+]

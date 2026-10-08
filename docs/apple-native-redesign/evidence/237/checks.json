@@ -1,0 +1,342 @@
+[
+  {
+    "name": "listening-settings-red",
+    "log": "/tmp/237-listening-settings-red.log",
+    "log_sha256": "c0c5332425c398144df7c6ee977c19b21eac85832069c9682b6a22f0ec210273",
+    "result_bundle": "/tmp/237-listening-settings-red.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-tests CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testPlaybackPreferencesCanBeChangedBeforeListeningAndSurviveRelaunch\" -resultBundlePath /tmp/237-listening-settings-red.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testPlaybackPreferencesCanBeChangedBeforeListeningAndSurviveRelaunch]' failed (23.127 seconds).",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "reading-settings-red",
+    "log": "/tmp/237-reading-settings-red.log",
+    "log_sha256": "3cdaba3a074fda195f3fc45763fe2273bf01443dc9bf0ce9869c24da36b6c5e7",
+    "result_bundle": "/tmp/237-reading-settings-red.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-tests CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testReadingPreferencesStayConsistentBetweenSettingsAndTheReader\" -resultBundlePath /tmp/237-reading-settings-red.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testReadingPreferencesStayConsistentBetweenSettingsAndTheReader]' failed (21.763 seconds).",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "reading-settings-green-2",
+    "log": "/tmp/237-reading-settings-green-2.log",
+    "log_sha256": "53a692d51c040a043531cffefa94610b7a77de5dc41fd7784baa8480f25347dd",
+    "result_bundle": "/tmp/237-reading-settings-green-2.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-tests CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testReadingPreferencesStayConsistentBetweenSettingsAndTheReader\" -resultBundlePath /tmp/237-reading-settings-green-2.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testReadingPreferencesStayConsistentBetweenSettingsAndTheReader]' passed (47.906 seconds).",
+      "** TEST SUCCEEDED **"
+    ]
+  },
+  {
+    "name": "utilities-routes-red",
+    "log": "/tmp/237-utilities-routes-red.log",
+    "log_sha256": "3ebf847e404173c4bbd9d6b23a21f7020b7c14fa8daf229ec2bf83bd6f2223dd",
+    "result_bundle": "/tmp/237-utilities-routes-red.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-tests CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testSeparateStreamingAndDownloadNetworkChoicesPersist\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testYearReviewShowsServerTotalsAndChangesYear\" \"-only-testing:NativeJourneyTests/SavedConnectionsJourney/testLegacyAccountRefreshRetainsSelectedLibraryWithoutDuplicatingConnection\" \"-only-testing:NativeJourneyTests/PresentationJourney/testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch\" \"-only-testing:NativeJourneyTests/ConnectionJourney/testInvalidServerShowsRecoveryWithoutLeavingConnectionForm\" -resultBundlePath /tmp/237-utilities-routes-red.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.ConnectionJourney testInvalidServerShowsRecoveryWithoutLeavingConnectionForm]' passed (11.466 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testSeparateStreamingAndDownloadNetworkChoicesPersist]' failed (16.124 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch]' failed (16.134 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testYearReviewShowsServerTotalsAndChangesYear]' failed (16.150 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch]' failed (0.186 seconds).",
+      "Test Case '-[NativeJourneyTests.SavedConnectionsJourney testLegacyAccountRefreshRetainsSelectedLibraryWithoutDuplicatingConnection]' failed (14.278 seconds).",
+      "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds",
+      "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "presentation-routes-red",
+    "log": "/tmp/237-presentation-routes-red.log",
+    "log_sha256": "a8c84f2771a1efa45e705a8084b97a11b6b0e4157a94db5abd657b51cfb49f1f",
+    "result_bundle": "/tmp/237-presentation-routes-red.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation-qa.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-presentation CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PresentationJourney/testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch\" \"-only-testing:NativeJourneyTests/PresentationJourney/testRightToLeftLanguageMirrorsNativeLayout\" \"-only-testing:NativeJourneyTests/PresentationJourney/testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials\" -resultBundlePath /tmp/237-presentation-routes-red.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PresentationJourney testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials]' failed (16.745 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testRightToLeftLanguageMirrorsNativeLayout]' failed (16.410 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch]' failed (16.502 seconds).",
+      "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds",
+      "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "presentation-green",
+    "log": "/tmp/237-presentation-green.log",
+    "log_sha256": "3cef9268a0a87ef0227a1b288d9f01f6b1c9e5c4c94dbc8ded252221b482a7d2",
+    "result_bundle": "/tmp/237-presentation-green.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation-qa.xcodeproj -scheme AudiobookshelfNative -destination id=CDFFEB30-07F5-4A50-AB64-57A46709335B -derivedDataPath /tmp/native237-ipad-presentation CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PresentationJourney/testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch\" \"-only-testing:NativeJourneyTests/PresentationJourney/testRightToLeftLanguageMirrorsNativeLayout\" \"-only-testing:NativeJourneyTests/PresentationJourney/testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials\" \"-only-testing:NativeJourneyTests/PresentationJourney/testChosenHapticStrengthCoversBaselineActions\" \"-only-testing:NativeJourneyTests/PresentationJourney/testOffHapticsProduceNoFeedback\" -resultBundlePath /tmp/237-presentation-green.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PresentationJourney testChosenHapticStrengthCoversBaselineActions]' failed (21.960 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials]' failed (16.457 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testOffHapticsProduceNoFeedback]' failed (19.963 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testRightToLeftLanguageMirrorsNativeLayout]' failed (20.074 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch]' failed (19.888 seconds).",
+      "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds",
+      "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "presentation-sidebar",
+    "log": "/tmp/237-presentation-sidebar.log",
+    "log_sha256": "fd388dcbd4062de43b91522d25f3fe0f94a69a890fa15d7e2a0602ee44f6d0a7",
+    "result_bundle": "/tmp/237-presentation-sidebar.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation-qa.xcodeproj -scheme AudiobookshelfNative -destination id=CDFFEB30-07F5-4A50-AB64-57A46709335B -derivedDataPath /tmp/native237-ipad-presentation CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PresentationJourney/testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch\" \"-only-testing:NativeJourneyTests/PresentationJourney/testRightToLeftLanguageMirrorsNativeLayout\" \"-only-testing:NativeJourneyTests/PresentationJourney/testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials\" \"-only-testing:NativeJourneyTests/PresentationJourney/testChosenHapticStrengthCoversBaselineActions\" \"-only-testing:NativeJourneyTests/PresentationJourney/testOffHapticsProduceNoFeedback\" -resultBundlePath /tmp/237-presentation-sidebar.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PresentationJourney testChosenHapticStrengthCoversBaselineActions]' failed (18.502 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials]' failed (42.574 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testOffHapticsProduceNoFeedback]' failed (17.866 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testRightToLeftLanguageMirrorsNativeLayout]' passed (19.691 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testSavedLanguageTranslatesNativeScreensAndSurvivesRelaunch]' passed (41.765 seconds).",
+      "Executed 2 tests, with 0 failures (0 unexpected) in 61.457 (61.460) seconds",
+      "Executed 2 tests, with 0 failures (0 unexpected) in 61.457 (61.460) seconds",
+      "Executed 2 tests, with 0 failures (0 unexpected) in 61.457 (61.461) seconds",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "presentation-actions-green",
+    "log": "/tmp/237-presentation-actions-green.log",
+    "log_sha256": "3fb838e4b987278e53166474a6164d237d267d480e3e02feb9a73a368e1a0e08",
+    "result_bundle": "/tmp/237-presentation-actions-green.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation-qa.xcodeproj -scheme AudiobookshelfNative -destination id=CDFFEB30-07F5-4A50-AB64-57A46709335B -derivedDataPath /tmp/native237-ipad-presentation CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PresentationJourney/testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials\" \"-only-testing:NativeJourneyTests/PresentationJourney/testChosenHapticStrengthCoversBaselineActions\" \"-only-testing:NativeJourneyTests/PresentationJourney/testOffHapticsProduceNoFeedback\" -resultBundlePath /tmp/237-presentation-actions-green.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PresentationJourney testChosenHapticStrengthCoversBaselineActions]' passed (51.852 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials]' failed (100.574 seconds).",
+      "Test Case '-[NativeJourneyTests.PresentationJourney testOffHapticsProduceNoFeedback]' passed (25.353 seconds).",
+      "Executed 3 tests, with 1 failure (0 unexpected) in 177.779 (177.784) seconds",
+      "Executed 3 tests, with 1 failure (0 unexpected) in 177.779 (177.785) seconds",
+      "Executed 3 tests, with 1 failure (0 unexpected) in 177.779 (177.787) seconds",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "settings-accounts-green",
+    "log": "/tmp/237-settings-accounts-green.log",
+    "log_sha256": "b893983e0d41d59ddb878e58b9a78f3d2e972149fa48dfc5fbcffb99d16bc120",
+    "result_bundle": "/tmp/237-settings-accounts-green.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-tests CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testPlaybackPreferencesCanBeChangedBeforeListeningAndSurviveRelaunch\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testReadingPreferencesStayConsistentBetweenSettingsAndTheReader\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testSeparateStreamingAndDownloadNetworkChoicesPersist\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testYearReviewShowsServerTotalsAndChangesYear\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testStatisticsShowServerListeningTotalsAndRecentSessions\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testLegacyImportExplainsExportAndReauthentication\" \"-only-testing:NativeJourneyTests/SavedConnectionsJourney\" -resultBundlePath /tmp/237-settings-accounts-green.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testLegacyImportExplainsExportAndReauthentication]' passed (21.946 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testPlaybackPreferencesCanBeChangedBeforeListeningAndSurviveRelaunch]' passed (28.874 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testReadingPreferencesStayConsistentBetweenSettingsAndTheReader]' passed (49.283 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testSeparateStreamingAndDownloadNetworkChoicesPersist]' passed (40.089 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testStatisticsShowServerListeningTotalsAndRecentSessions]' passed (22.375 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testThemeAndHapticPreferencesPersistAndRemainAvailableAfterRelaunch]' passed (39.136 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testYearReviewShowsServerTotalsAndChangesYear]' passed (25.795 seconds).",
+      "Executed 7 tests, with 0 failures (0 unexpected) in 227.498 (227.505) seconds",
+      "Test Case '-[NativeJourneyTests.SavedConnectionsJourney testAccountsOnTheSameServerKeepTheirOwnListeningPosition]' passed (58.837 seconds).",
+      "Test Case '-[NativeJourneyTests.SavedConnectionsJourney testLegacyAccountRefreshRetainsSelectedLibraryWithoutDuplicatingConnection]' passed (14.903 seconds).",
+      "Test Case '-[NativeJourneyTests.SavedConnectionsJourney testSavedServersKeepLibraryChoicesAndRecoverUnsentListeningWhenSwitchedBack]' passed (58.057 seconds).",
+      "Executed 3 tests, with 0 failures (0 unexpected) in 131.797 (131.800) seconds",
+      "Executed 10 tests, with 0 failures (0 unexpected) in 359.295 (359.306) seconds",
+      "Executed 10 tests, with 0 failures (0 unexpected) in 359.295 (359.307) seconds",
+      "** TEST SUCCEEDED **"
+    ]
+  },
+  {
+    "name": "recovery-reader-red",
+    "log": "/tmp/237-recovery-reader-red.log",
+    "log_sha256": "e62eb86f3c25d20b6cf55923e938665079c95df7c769ef1f4d0f39282de99b1d",
+    "result_bundle": "/tmp/237-recovery-reader-red.xcresult",
+    "commands": [],
+    "observed_results": []
+  },
+  {
+    "name": "recovery-reader-green",
+    "log": "/tmp/237-recovery-reader-green.log",
+    "log_sha256": "4b579f755d4f554a38008d1e69ad573975a5fed934eed8e50c0d9250618021f7",
+    "result_bundle": "/tmp/237-recovery-reader-green.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-tests CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/ConnectionJourney/testConnectSelectLibraryAndRestoreAccountAfterRelaunch\" \"-only-testing:NativeJourneyTests/ReaderJourney/testEPUBReadingWhileListeningRetainsAwakePreference\" \"-only-testing:NativeJourneyTests/ReaderJourney/testEPUBVolumeNavigationPreferencesSurviveRelaunch\" \"-only-testing:NativeJourneyTests/OfflineJourney/testDownloadedBookPlaysAcrossFilesOfflineAfterRelaunchAndSynchronizesOnReconnect\" -resultBundlePath /tmp/237-recovery-reader-green.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.ConnectionJourney testConnectSelectLibraryAndRestoreAccountAfterRelaunch]' passed (20.547 seconds).",
+      "Test Case '-[NativeJourneyTests.OfflineJourney testDownloadedBookPlaysAcrossFilesOfflineAfterRelaunchAndSynchronizesOnReconnect]' passed (45.373 seconds).",
+      "Test Case '-[NativeJourneyTests.ReaderJourney testEPUBReadingWhileListeningRetainsAwakePreference]' failed (22.994 seconds).",
+      "Test Case '-[NativeJourneyTests.ReaderJourney testEPUBVolumeNavigationPreferencesSurviveRelaunch]' passed (39.328 seconds).",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "reader-audio-replay",
+    "log": "/tmp/237-reader-audio-replay.log",
+    "log_sha256": "64a48d1d359141f2506b58308dfe7bf5b0dcdd844ae80d0b0e65cc068873b615",
+    "result_bundle": "/tmp/237-reader-audio-replay.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-tests CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/ReaderJourney/testEPUBReadingWhileListeningRetainsAwakePreference\" -resultBundlePath /tmp/237-reader-audio-replay.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.ReaderJourney testEPUBReadingWhileListeningRetainsAwakePreference]' failed (33.709 seconds).",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "reader-awake-scroll",
+    "log": "/tmp/237-reader-awake-scroll.log",
+    "log_sha256": "2a9ec98d12d097ab812a1ac90fa182d60f88a1874151a8cf500a4a629607be1e",
+    "result_bundle": "/tmp/237-reader-awake-scroll.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-phone-tests CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/ReaderJourney/testEPUBReadingWhileListeningRetainsAwakePreference\" -resultBundlePath /tmp/237-reader-awake-scroll.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.ReaderJourney testEPUBReadingWhileListeningRetainsAwakePreference]' passed (37.525 seconds).",
+      "** TEST SUCCEEDED **"
+    ]
+  },
+  {
+    "name": "diagnostics-scroll-final",
+    "log": "/tmp/237-diagnostics-scroll-final.log",
+    "log_sha256": "91f47391f744808f4c4d0250bdf9ea0e183b025e88a26ee3d38ba23eb73c997e",
+    "result_bundle": "/tmp/237-diagnostics-scroll-final.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/build-presentation-qa.xcodeproj -scheme AudiobookshelfNative -destination id=CDFFEB30-07F5-4A50-AB64-57A46709335B -derivedDataPath /tmp/native237-ipad-presentation CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PresentationJourney/testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials\" -resultBundlePath /tmp/237-diagnostics-scroll-final.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PresentationJourney testDiagnosticsExplainAConnectionFailureWithoutExposingCredentials]' passed (93.621 seconds).",
+      "** TEST SUCCEEDED **"
+    ]
+  },
+  {
+    "name": "auth-final",
+    "log": "/tmp/237-auth-final.log",
+    "log_sha256": "bbdcca94f9555878745725daeb82f8a83b8d649183016b6a02588e68a6d8a661",
+    "result_bundle": "/tmp/237-auth-final.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=CDFFEB30-07F5-4A50-AB64-57A46709335B -derivedDataPath /tmp/native237-ipad-auth CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PlaybackAuthorizationJourney\" -resultBundlePath /tmp/237-auth-final.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PlaybackAuthorizationJourney testRevokedLoginStopsPlaybackAndSigningInAgainDeliversItsListening]' passed (50.443 seconds).",
+      "** TEST SUCCEEDED **"
+    ]
+  },
+  {
+    "name": "ipad-connect-final",
+    "log": "/tmp/237-ipad-connect-final.log",
+    "log_sha256": "8202d5db4712fd33ee0ad394bbcd7abb585b5264516cceb17525e4c9f60ad5a1",
+    "result_bundle": "/tmp/237-ipad-connect-final.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=CDFFEB30-07F5-4A50-AB64-57A46709335B -derivedDataPath /tmp/native237-ipad-connect CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/ConnectionJourney/testConnectSelectLibraryAndRestoreAccountAfterRelaunch\" -resultBundlePath /tmp/237-ipad-connect-final.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.ConnectionJourney testConnectSelectLibraryAndRestoreAccountAfterRelaunch]' passed (22.757 seconds).",
+      "** TEST SUCCEEDED **"
+    ]
+  },
+  {
+    "name": "import-red-3",
+    "log": "/tmp/237-import-red-3.log",
+    "log_sha256": "4a524c39d44cde181f3edb94069605e5e09c79549d6cdafcf2dadb1e2c0753d8",
+    "result_bundle": "/tmp/237-import-red-3.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-import-red CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testIncompleteExportShowsAnErrorAndCanBeChosenAgain\" -resultBundlePath /tmp/237-import-red-3.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testIncompleteExportShowsAnErrorAndCanBeChosenAgain]' failed (29.078 seconds).",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "import-green-2",
+    "log": "/tmp/237-import-green-2.log",
+    "log_sha256": "a30782162d510fa50c21023c062ad5f3b4c3d633978c92f8149dcd8b94fabdaf",
+    "result_bundle": "/tmp/237-import-green-2.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-import-red CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testIncompleteExportShowsAnErrorAndCanBeChosenAgain\" -resultBundlePath /tmp/237-import-green-2.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testIncompleteExportShowsAnErrorAndCanBeChosenAgain]' passed (22.110 seconds).",
+      "** TEST SUCCEEDED **"
+    ]
+  },
+  {
+    "name": "import-dismiss-red",
+    "log": "/tmp/237-import-dismiss-red.log",
+    "log_sha256": "4b373a8bd66074e328a41feb543fadc0a8e90b027bbd75ee92d462ac58166ad1",
+    "result_bundle": "/tmp/237-import-dismiss-red.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-import-red CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testDismissingExportPickerAllowsChoosingAgain\" -resultBundlePath /tmp/237-import-dismiss-red.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testDismissingExportPickerAllowsChoosingAgain]' failed (23.779 seconds).",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "import-final-green",
+    "log": "/tmp/237-import-final-green.log",
+    "log_sha256": "12f53a5e73edb9451eaccbbc0f4d0a3cd7829ba1675b2c6c51e7fb9488a94087",
+    "result_bundle": "/tmp/237-import-final-green.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-import-red CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testDismissingExportPickerAllowsChoosingAgain\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testIncompleteExportShowsAnErrorAndCanBeChosenAgain\" -resultBundlePath /tmp/237-import-final-green.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testDismissingExportPickerAllowsChoosingAgain]' passed (18.688 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testIncompleteExportShowsAnErrorAndCanBeChosenAgain]' failed (28.547 seconds).",
+      "Executed 2 tests, with 1 failure (0 unexpected) in 47.235 (47.239) seconds",
+      "Executed 2 tests, with 1 failure (0 unexpected) in 47.235 (47.240) seconds",
+      "Executed 2 tests, with 1 failure (0 unexpected) in 47.235 (47.241) seconds",
+      "** TEST FAILED **"
+    ]
+  },
+  {
+    "name": "import-final-green-2",
+    "log": "/tmp/237-import-final-green-2.log",
+    "log_sha256": "96f4e51937433db1f541f041c1118f453baf0db7a0daf5623af976520cf4615e",
+    "result_bundle": "/tmp/237-import-final-green-2.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-import-red CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testDismissingExportPickerAllowsChoosingAgain\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testIncompleteExportShowsAnErrorAndCanBeChosenAgain\" -resultBundlePath /tmp/237-import-final-green-2.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testDismissingExportPickerAllowsChoosingAgain]' passed (18.796 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testIncompleteExportShowsAnErrorAndCanBeChosenAgain]' passed (21.508 seconds).",
+      "Executed 2 tests, with 0 failures (0 unexpected) in 40.304 (40.307) seconds",
+      "Executed 2 tests, with 0 failures (0 unexpected) in 40.304 (40.308) seconds",
+      "Executed 2 tests, with 0 failures (0 unexpected) in 40.304 (40.309) seconds",
+      "** TEST SUCCEEDED **"
+    ]
+  },
+  {
+    "name": "import-frozen",
+    "log": "/tmp/237-import-frozen.log",
+    "log_sha256": "29a528963a29fece894fedbe9ccbce09e6f4fc317e76e5890165080a7d8c59a7",
+    "result_bundle": "/tmp/237-import-frozen.xcresult",
+    "commands": [
+      "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project /Volumes/ai-ssd/code/leafwake-fullstack/apple/AudiobookshelfNative.xcodeproj -scheme AudiobookshelfNative -destination id=75FA9768-B15C-40B6-ACC7-790D7FCAD29C -derivedDataPath /tmp/native237-import-frozen CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual IPHONEOS_DEPLOYMENT_TARGET=15.0 -collect-test-diagnostics never \"-only-testing:NativeJourneyTests/PreferencesJourney/testDismissingExportPickerAllowsChoosingAgain\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testIncompleteExportShowsAnErrorAndCanBeChosenAgain\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testLegacyImportOpensBeforeSigningIntoAServer\" \"-only-testing:NativeJourneyTests/PreferencesJourney/testLegacyImportExplainsExportAndReauthentication\" -resultBundlePath /tmp/237-import-frozen.xcresult test"
+    ],
+    "observed_results": [
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testDismissingExportPickerAllowsChoosingAgain]' passed (23.476 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testIncompleteExportShowsAnErrorAndCanBeChosenAgain]' passed (24.698 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testLegacyImportExplainsExportAndReauthentication]' passed (20.047 seconds).",
+      "Test Case '-[NativeJourneyTests.PreferencesJourney testLegacyImportOpensBeforeSigningIntoAServer]' passed (9.889 seconds).",
+      "Executed 4 tests, with 0 failures (0 unexpected) in 78.109 (78.113) seconds",
+      "Executed 4 tests, with 0 failures (0 unexpected) in 78.109 (78.113) seconds",
+      "Executed 4 tests, with 0 failures (0 unexpected) in 78.109 (78.114) seconds",
+      "** TEST SUCCEEDED **"
+    ]
+  }
+]
