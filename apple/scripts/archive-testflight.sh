@@ -43,7 +43,7 @@ for product in ios tv; do
     PRODUCT_BUNDLE_IDENTIFIER=com.forkzed.leafwake CURRENT_PROJECT_VERSION=2 \
     CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution' \
     CODE_SIGN_ENTITLEMENTS="$candidate_root/source/apple/AppStore.entitlements" \
-    PROVISIONING_PROFILE_SPECIFIER="$profile" "${minimum[@]}" archive > "$candidate_root/$product-archive.log" 2>&1
+    PROVISIONING_PROFILE_SPECIFIER="$profile" ${minimum[@]+"${minimum[@]}"} archive > "$candidate_root/$product-archive.log" 2>&1
   env PATH=/usr/bin:/bin:/usr/sbin:/sbin /usr/bin/xcodebuild -quiet -exportArchive -archivePath "$candidate_root/$product.xcarchive" \
     -exportPath "$candidate_root/$product-export" -exportOptionsPlist "$candidate_root/$product-export.plist" \
     > "$candidate_root/$product-export.log" 2>&1
