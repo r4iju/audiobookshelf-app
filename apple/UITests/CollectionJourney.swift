@@ -159,7 +159,6 @@ import XCTest
         try await FixtureControl.configure("baseline")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["account"].tap()
         let collections = app.buttons["Collections"]
         XCTAssertTrue(collections.waitForExistence(timeout: 3))
         guard collections.exists else { return }
@@ -175,7 +174,7 @@ import XCTest
         app.buttons["Pause collection"].tap()
         XCTAssertTrue(app.buttons["mini-resume-playback"].waitForExistence(timeout: 3), "The group action must pause its currently playing member instead of restarting it")
         app.navigationBars.buttons["BackButton"].tap(); app.navigationBars.buttons["BackButton"].tap()
-        app.buttons["account"].tap(); app.buttons["Playlists"].tap()
+        app.buttons["Playlists"].tap()
         XCTAssertTrue(app.buttons["group-playlist-evening"].waitForExistence(timeout: 10))
         app.buttons["group-playlist-evening"].tap()
         XCTAssertTrue(app.buttons["Play playlist"].waitForExistence(timeout: 5))
