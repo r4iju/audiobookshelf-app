@@ -42,6 +42,7 @@ import UIKit
         let remove = app.buttons["Remove download"]
         for _ in 0..<8 where !(remove.exists && remove.isHittable) { app.swipeUp() }
         XCTAssertTrue(remove.exists); remove.tap()
+        for _ in 0..<8 where !app.staticTexts["No downloads yet"].exists { app.swipeDown() }
         XCTAssertTrue(app.staticTexts["No downloads yet"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["offline-book-0"].exists)
         XCTAssertFalse(app.buttons["Retry download"].exists)
