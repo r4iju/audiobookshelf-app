@@ -119,3 +119,7 @@ No currently available compliant tested seam resolves strict combined phone cont
 ## Final bounded spoken followthrough
 
 [Final evidence](evidence/239/spoken-process-route/b64-followthrough/RESULT.md) records continued iPad playback, system-alert-only speech, a supported text-only alert query timeout and actual physical TV read-only query failures. No full spoken pass or source defect is inferred. The historical phone report is corrected: pool release implicitly shut down the device after a session conflict. Tickets239 and240 are open/status:blocked; PR241 stays draft. Runtime source remains B64; subsequent commits record evidence only.
+
+## Explicit private owner installation
+
+After the user requested installation, exact B64 private candidates were installed on the iPhone and living-room Apple TV. iPhone launch succeeded; TV launch was refused because asleep. iPad installation was rejected because unavailable. [Actual installation evidence](evidence/240/owner-install-b64/RESULT.md) supersedes historical candidate NOT INSTALLED status for phone/TV only. Full acceptance, merge and public distribution remain incomplete.

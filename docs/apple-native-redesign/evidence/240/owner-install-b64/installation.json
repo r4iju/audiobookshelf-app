@@ -1,0 +1,30 @@
+{
+  "source": "b64cc462060ba9a5a54790bfc6303144fd527a87",
+  "devices": [
+    {
+      "device": "phone",
+      "bundle": "com.forkzed.audiobookshelf.native.preview",
+      "name": "Audiobook Loft",
+      "version": "1.0.0",
+      "build": "1",
+      "install_success": true,
+      "data_container_unchanged": false,
+      "launch_success": true,
+      "launch_limitation": null,
+      "data_preservation_verified": false
+    },
+    {
+      "device": "tv",
+      "bundle": "com.forkzed.audiobookshelf.tv",
+      "name": "Audiobook Loft",
+      "version": "1.0.0",
+      "build": "1",
+      "install_success": true,
+      "data_container_unchanged": false,
+      "launch_success": false,
+      "launch_limitation": "System is asleep, foreground app launch forbidden",
+      "data_preservation_verified": false
+    }
+  ],
+  "pad": "Unavailable; actual install rejected with CoreDeviceError4016"
+}
