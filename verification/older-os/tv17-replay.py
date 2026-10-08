@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import os
 from pathlib import Path
@@ -7,6 +8,9 @@ from ci_support import Evidence
 
 os.environ['DEVELOPER_DIR'] = '/Applications/Xcode_16.2.app/Contents/Developer'
 os.environ['PATH'] = str(Path(__file__).resolve().parent) + ':' + os.environ['PATH']
+parser = argparse.ArgumentParser()
+parser.add_argument('--suite', choices=['all', 'navigation'], default='all')
+args = parser.parse_args()
 e = Evidence('tv17-replay')
 e.source(expected_xcode="16.2", expected_swift="6.0")
 import importlib.util
@@ -67,15 +71,25 @@ try:
     _, actual = e.run('actual-device', ['xcrun', 'simctl', 'list', 'devices', '-j'])
     if not any(d['udid'] == udid and d['state'] == 'Booted' for d in json.loads(actual)['devices'].get(runtime['identifier'], [])):
         raise RuntimeError('Lease did not boot under exact selected runtime')
+    all_cases = [
+        'TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable',
+        'TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus',
+        'TVJourneyTests/CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage',
+        'TVJourneyTests/PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles',
+        'TVJourneyTests/RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor',
+        'TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit',
+        'TVJourneyTests/RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying',
+    ]
+    navigation_cases = [
+        'TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable',
+        'TVJourneyTests/RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor',
+        'TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit',
+    ]
+    selected = all_cases if args.suite == 'all' else navigation_cases
+    (e.root / 'selected-journeys.json').write_text(json.dumps({'suite': args.suite, 'selected': selected, 'all': all_cases}, indent=2))
     e.run('representative-journeys', ['bash', str(copy),
         'CODE_SIGNING_ALLOWED=YES', 'CODE_SIGN_IDENTITY=-', 'TVOS_DEPLOYMENT_TARGET=17.0',
-        '-only-testing:TVJourneyTests/ShellJourney/testManyLibrariesKeepTheShellBoundedAndRemainSelectable',
-        '-only-testing:TVJourneyTests/CatalogJourney/testContinueListeningOpensDetailsAndBackRestoresFocus',
-        '-only-testing:TVJourneyTests/CatalogJourney/testServerSearchFindsTitlesOutsideLoadedPage',
-        '-only-testing:TVJourneyTests/PlaybackJourney/testResumeShowsChapterAndTotalProgressAndRemoteToggles',
-        '-only-testing:TVJourneyTests/RelatedJourney/testBookDetailsLeadToItsSeriesAndAuthor',
-        '-only-testing:TVJourneyTests/ReadinessJourney/testMainScreensPassTheAccessibilityAudit',
-        '-only-testing:TVJourneyTests/RecoveryJourney/testSigningInAgainShowsTheWholeFormAndSendsTheHeldListeningWithoutPlaying'], seconds=1200)
+        *['-only-testing:' + case for case in selected]], seconds=1200)
 except Exception as error:
     errors.append(str(error))
 finally:

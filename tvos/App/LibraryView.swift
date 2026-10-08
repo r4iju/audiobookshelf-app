@@ -4,6 +4,7 @@ struct LibraryView: View {
     @Environment(\.nativeStrings) private var l10n
     @EnvironmentObject private var catalog: CatalogStore
     @StateObject private var browser: LibraryBrowser
+    @State private var path: [Route] = []
     let chooseLibrary: () -> Void
 
     init(library: Library, api: APIClient, chooseLibrary: @escaping () -> Void) {
@@ -12,7 +13,7 @@ struct LibraryView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 40) {
                     HStack(alignment: .firstTextBaseline, spacing: 24) {
