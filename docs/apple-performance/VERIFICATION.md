@@ -25,3 +25,11 @@ The repeatable harness passed against source b9d0f65391d68b9da6af6b1751da47c1794
 Native cover requests already ask for width500, but servers can return original pixels (the replacement server's managed-cover route currently returns the stored bytes). The client now bounds decoding independently of server resizing. The4,000-pixel fixture images are within the replacement server's supported20-million-pixel limit. This does not establish the size of the owner's actual covers or measure input latency on their devices.
 
 The default native fixture still referenced the removed Nuxt `static/book_placeholder.jpg`, closing cover connections instead of serving an image. A new HTTP test failed with `RemoteDisconnected` before the fix. Default covers now use a generated synthetic PNG, retaining the existing large-cover shapes and avoiding retired assets. All16 fixture tests pass.
+
+## Completed candidate checks and review
+
+All 94 distinct iOS unit cases passed: 88 in the regular run (`/tmp/loft-perf-ios-units.xcresult`), four with the media-authorization fixture (`/tmp/loft-perf-ios-authorization.xcresult`), and two with the disposable storage-exhaustion volume (`apple/build-remaining-qa/results/storage-Pool-iPhone-1-(iOS-27.0)-20261009-104133.xcresult`). Required fixture cases skipped in the regular run were exercised separately, not waived.
+
+An iPad candidate-only frozen replay of source116950d4 completed all16 native scrolling steps and5,635 points during synthetic playback. Peak physical memory was97,471 kB; callback p95 was17.12 ms, p99 was33.33 ms, with no gaps over50 ms. `evidence/ipad-candidate.json` records the exact source, report and metrics. There is no iPad baseline or physical rendering/input-latency claim.
+
+Fresh independent Standards and Spec reviews approved the bounded-memory release candidate after the accessibility-resolution correction. Supplementary fixture and evidence reviews approved the generated-cover repair and verified the frozen source/probe hashes against the local artifacts. These approvals do not establish resolution of the owner's physical responsiveness complaint.
