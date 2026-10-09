@@ -13,6 +13,17 @@ struct NowPlayingView: View {
     static let speeds: [Float] = [0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
 
     var body: some View {
+        ScrollView {
+            playbackContent
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .sheet(isPresented: $showChapters) { chapters.tvLocalization() }
+        .onChange(of: player.session?.id) { stopError = nil; restartError = nil }
+        .task(id: [player.itemID ?? "", player.episodeID ?? ""]) { await refreshWaiting() }
+        .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in Task { await refreshWaiting() } }
+    }
+
+    private var playbackContent: some View {
         VStack(alignment: .leading, spacing: 44) {
             HStack(alignment: .top, spacing: 70) {
                 if let id = player.itemID {
@@ -75,11 +86,6 @@ struct NowPlayingView: View {
         }
         .padding(.horizontal, 90)
         .padding(.vertical, 50)
-        .frame(maxHeight: .infinity, alignment: .top)
-        .sheet(isPresented: $showChapters) { chapters.tvLocalization() }
-        .onChange(of: player.session?.id) { stopError = nil; restartError = nil }
-        .task(id: [player.itemID ?? "", player.episodeID ?? ""]) { await refreshWaiting() }
-        .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in Task { await refreshWaiting() } }
     }
 
     private func refreshWaiting() async {

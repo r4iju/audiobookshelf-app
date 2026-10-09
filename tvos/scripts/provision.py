@@ -3,47 +3,22 @@
 import argparse
 import base64
 import json
-import os
+import importlib.util
 from pathlib import Path
 import subprocess
 import time
-import urllib.error
-import urllib.request
 
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
+from cryptography.hazmat.primitives import serialization
+
 
 BUNDLE = "com.forkzed.audiobookshelf.tv"
 
 
 def api_client():
-    key_path = Path(os.environ.get("ASC_KEY_PATH", "~/.appstoreconnect/private_keys/AuthKey_HK78P3V55N.p8")).expanduser()
-    key_id = os.environ.get("ASC_KEY_ID", "HK78P3V55N")
-    issuer = os.environ.get("ASC_ISSUER_ID", "69a6de96-923d-47e3-e053-5b8c7c11a4d1")
-    key = serialization.load_pem_private_key(key_path.read_bytes(), None)
-    encode = lambda value: base64.urlsafe_b64encode(value).rstrip(b"=")
-    now = int(time.time())
-    header = encode(json.dumps({"alg": "ES256", "kid": key_id, "typ": "JWT"}).encode())
-    payload = encode(json.dumps({"iss": issuer, "iat": now, "exp": now + 1200, "aud": "appstoreconnect-v1"}).encode())
-    message = header + b"." + payload
-    r, s = decode_dss_signature(key.sign(message, ec.ECDSA(hashes.SHA256())))
-    token = (message + b"." + encode(r.to_bytes(32, "big") + s.to_bytes(32, "big"))).decode()
-
-    def call(path, method="GET", data=None):
-        request = urllib.request.Request(
-            "https://api.appstoreconnect.apple.com/v1/" + path,
-            data=json.dumps(data).encode() if data is not None else None,
-            headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"},
-            method=method,
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=45) as response:
-                return json.load(response)
-        except urllib.error.HTTPError as error:
-            details = json.loads(error.read()).get("errors", [])
-            raise RuntimeError("; ".join(item.get("detail", item.get("title", "API error")) for item in details)) from None
-    return call
+    spec = importlib.util.spec_from_file_location('appstore_api', Path(__file__).resolve().parents[2] / 'apple/scripts/appstore-api.py')
+    api = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(api)
+    return api.request
 
 
 def provision(udid=None, inspect=False, platform="tvOS", bundle_identifier=BUNDLE, display_name="Audiobookshelf TV"):
@@ -72,7 +47,8 @@ def provision(udid=None, inspect=False, platform="tvOS", bundle_identifier=BUNDL
         if device["attributes"]["status"] == "DISABLED":
             api("devices/" + device["id"], "PATCH", {"data": {"type": "devices", "id": device["id"], "attributes": {"status": "ENABLED"}}})
 
-    bundles = api("bundleIds?filter[identifier]=" + bundle_identifier)["data"]
+    bundles = [bundle for bundle in api("bundleIds?filter[identifier]=" + bundle_identifier)["data"]
+               if bundle["attributes"]["identifier"] == bundle_identifier]
     bundle = bundles[0] if bundles else api("bundleIds", "POST", {"data": {"type": "bundleIds", "attributes": {"identifier": bundle_identifier, "name": display_name, "platform": "IOS"}}})["data"]
     local_pem = subprocess.check_output(["security", "find-certificate", "-c", "Apple Development: Emanuel Franzen", "-p"])
     from cryptography import x509
