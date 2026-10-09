@@ -4,7 +4,11 @@ This audit describes the earlier Cast-enabled preview under the Leafwake working
 
 2026-10-04. Bounded inspection of `android-native` Gradle files, Kotlin/manifest and locally cached published POMs/AARs, plus current primary distribution terms. No repository changes, credential reads, external messages or final APK inspection. Findings concern the current Cast-enabled native code; re-audit the exact final release graph and packaged files after changes.
 
-## Decision
+## Superseding independent Android candidate
+
+The October9 replacement route in [docs/android-cast](../../docs/android-cast/STATE.md) removes inherited runtime translations/artwork, scopes an MIT grant to owner-controlled native Android inputs and uses Google's Default Media Receiver. This removes the need to wait for an upstream exception for those independently implemented inputs; it does not grant one for inherited GPL code. The discussion remains unanswered. Candidate verification, receiver execution and Play disclosure gates are recorded there. Historical published Cast-free beta2 remains GPL as originally distributed.
+
+## Historical decision
 
 **Do not publish the present Cast-enabled APK as license-cleared.** Direct APK hosting avoids store contracts, but does not avoid the linked proprietary SDK problem, Cast registration obligations or third-party notices. The most concrete route within the user's request to avoid violations is a **Cast-free, independently branded GPLv3 Android beta**, with owner signing, exact corresponding source and complete third-party notices. Keep a Cast-enabled development build private until permissions/terms are resolved. Do not relabel upstream code under a new permissive license or invent a linking exception.
 

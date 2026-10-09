@@ -82,7 +82,10 @@ rm -rf "$failures_dir"
 args=()
 if (( $# > 0 )); then
     classes=""
-    for name in "$@"; do classes+="${classes:+,}com.audiobookshelf.android.journeys.$name"; done
+    for name in "$@"; do
+        if [[ "$name" == com.audiobookshelf.android.* ]]; then classes+="${classes:+,}$name"
+        else classes+="${classes:+,}com.audiobookshelf.android.journeys.$name"; fi
+    done
     args+=("-Pandroid.testInstrumentationRunnerArguments.class=$classes")
 fi
 # scripts/verify-real-server.sh names its throwaway Audiobook Loft product container; other journeys ignore it.

@@ -1,0 +1,28 @@
+{
+  "exactEnglishLong": [],
+  "exactDraftLong": [],
+  "exactCompiledLong": [
+    {
+      "path": "android-native/app/src/main/res/values-sv/strings.xml",
+      "name": "pl_scale_elapsed",
+      "value": "Justera den visade uppspelningstiden efter uppspelningshastigheten.",
+      "upstream": [
+        [
+          "strings/sv.json",
+          "LabelScaleElapsedTimeBySpeed"
+        ]
+      ]
+    },
+    {
+      "path": "android-native/app/src/main/res/values-fr/strings.xml",
+      "name": "pl_scale_elapsed",
+      "value": "Traduire le temps restant en fonction de la vitesse de lecture",
+      "upstream": [
+        [
+          "strings/fr.json",
+          "LabelScaleElapsedTimeBySpeed"
+        ]
+      ]
+    }
+  ]
+}

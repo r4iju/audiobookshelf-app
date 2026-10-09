@@ -1,0 +1,40 @@
+# Independent native Android license scope
+
+This additional MIT grant covers the independently implemented native Android
+application in android-native/app/src/main/kotlin, app/src/withCast/kotlin,
+app/src/noCast/kotlin and core/src/main/kotlin, the independently maintained
+strings and draft translations, independent leaf artwork, and fork-created
+Android build configuration and scripts.
+
+Imported upstream translations and launcher artwork are no longer compiled or
+bundled. The Material headphones notification vector (ic_small.xml) remains
+subject to Google's Apache-2.0 license. Dependencies, Google SDKs, Gradle wrapper
+distributions, their notices, legacy exporter/models and migration fixtures are
+excluded from this grant and keep their own licenses. Google Cast and Play
+Services binaries are proprietary; this grant does not relicense them.
+
+The repository-root GPLv3 license, inherited source and prior release licenses
+remain unchanged. Audiobook Loft began as an independent Audiobookshelf fork;
+this grant covers owner-controlled replacement code, not upstream rights.
+
+MIT License
+
+Copyright (c) 2026 Emanuel Franzen
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

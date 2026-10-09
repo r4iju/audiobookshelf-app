@@ -450,3 +450,12 @@ lib_search_failed	Suche fehlgeschlagen
 lib_search_idle_title	Finde etwas zum Anhören
 lib_search_idle_message	Durchsuche Titel, Autoren, Serien, Erzähler und Episoden.
 lib_search_no_match	Nichts passt zu „%1$s“. Versuche es mit weniger Wörtern oder einer anderen Schreibweise.
+
+# Independently maintained basic navigation labels.
+connect	Verbinden
+tab_library	Bibliothek
+shelf_continue_listening	Weiterhören
+action_play	Abspielen
+action_download	Herunterladen
+tab_search	Suchen
+title_settings	Einstellungen

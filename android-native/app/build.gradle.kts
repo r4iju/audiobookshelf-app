@@ -1,3 +1,6 @@
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
@@ -5,6 +8,7 @@ plugins {
 }
 
 val leafwake = providers.gradleProperty("leafwake").map { it.toBooleanStrict() }.getOrElse(false)
+val castEnabled = providers.gradleProperty("leafwakeCast").map { it.toBooleanStrict() }.getOrElse(!leafwake)
 val ownerKeystore = System.getenv("ABS_ANDROID_KEYSTORE")
 val leafwakeSourceUrl = providers.gradleProperty("leafwakeSourceUrl").getOrElse("https://github.com/r4iju/audiobookshelf-app/tree/fork/native-tv")
 gradle.taskGraph.whenReady {
@@ -27,18 +31,18 @@ android {
         applicationId = if (leafwake) "com.forkzed.leafwake" else "com.audiobookshelf.app.nativepreview"
         minSdk = 24
         targetSdk = 36
-        versionCode = if (leafwake) 2 else 200
-        versionName = if (leafwake) "1.0.0-beta.2" else "0.15.0-native-preview"
+        versionCode = if (leafwake) 3 else 200
+        versionName = if (leafwake) "1.0.0-beta.3" else "0.15.0-native-preview"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val scheme = if (leafwake) "leafwake" else "audiobookshelf-native-preview"
         manifestPlaceholders["oauthScheme"] = scheme
         manifestPlaceholders["displayName"] = if (leafwake) "Audiobook Loft" else "@string/app_name"
-        manifestPlaceholders["launcherIcon"] = if (leafwake) "@drawable/leafwake_icon" else "@mipmap/ic_launcher"
+        manifestPlaceholders["launcherIcon"] = if (leafwake) "@drawable/leafwake_icon" else "@drawable/leafwake_icon"
         buildConfigField("String", "OAUTH_REDIRECT", "\"$scheme://oauth\"")
         buildConfigField("boolean", "PUBLIC_RELEASE", leafwake.toString())
-        buildConfigField("boolean", "CAST_ENABLED", (!leafwake).toString())
+        buildConfigField("boolean", "CAST_ENABLED", castEnabled.toString())
         buildConfigField("String", "SOURCE_URL", "\"${leafwakeSourceUrl}\"")
-        resValue("string", "product_name", if (leafwake) "Audiobook Loft" else "Audiobookshelf")
+        resValue("string", "product_name", if (leafwake) "Audiobook Loft" else "Audiobook Loft Preview")
     }
 
     if (ownerKeystore != null) signingConfigs.create("owner") {
@@ -78,10 +82,10 @@ android {
 
     // The archive the legacy app's own exporter wrote, shared with the core import tests.
     sourceSets["androidTest"].assets.srcDir("../core/src/test/resources/migration")
-    if (!leafwake) sourceSets["androidTest"].kotlin.srcDir("src/withCastAndroidTest/kotlin")
-    if (leafwake) sourceSets["main"].assets.srcDir("src/noCast/assets")
-    sourceSets["main"].kotlin.srcDir(if (leafwake) "src/noCast/kotlin" else "src/withCast/kotlin")
-    if (!leafwake) {
+    if (castEnabled) sourceSets["androidTest"].kotlin.srcDir("src/withCastAndroidTest/kotlin")
+    sourceSets["main"].assets.srcDir(if (castEnabled) "src/withCast/assets" else "src/noCast/assets")
+    sourceSets["main"].kotlin.srcDir(if (castEnabled) "src/withCast/kotlin" else "src/noCast/kotlin")
+    if (castEnabled) {
         sourceSets["debug"].manifest.srcFile("src/withCast/AndroidManifest.xml")
         sourceSets["release"].manifest.srcFile("src/withCast/AndroidManifest.xml")
     }
@@ -124,7 +128,10 @@ dependencies {
     implementation("androidx.media3:media3-session:1.9.0")
     implementation("androidx.media3:media3-datasource-okhttp:1.9.0")
     implementation("androidx.media3:media3-exoplayer-hls:1.9.0")
-    if (!leafwake) implementation("androidx.media3:media3-cast:1.9.0")
+    if (castEnabled) {
+        implementation("androidx.media3:media3-cast:1.9.0")
+        implementation("com.google.android.gms:play-services-cast-framework:22.3.1")
+    }
 
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
@@ -145,6 +152,7 @@ dependencies {
 }
 
 tasks.register("writeRuntimeInventory") {
+    dependsOn(":core:jar")
     doLast {
         val artifacts = configurations.getByName("releaseRuntimeClasspath").resolvedConfiguration.resolvedArtifacts
         val output = layout.buildDirectory.file("reports/release-runtime.tsv").get().asFile
@@ -153,3 +161,22 @@ tasks.register("writeRuntimeInventory") {
         println("Runtime inventory: $output")
     }
 }
+
+val verifyNoticeVariant = tasks.register("verifyNoticeVariant") {
+    dependsOn(":core:jar")
+    doLast {
+        val noticeFile = file("src/${if (castEnabled) "withCast" else "noCast"}/assets/leafwake/runtime-inventory.json")
+        @Suppress("UNCHECKED_CAST")
+        val notices = JsonSlurper().parse(noticeFile) as List<Map<String, Any>>
+        val expected = notices.associate { it["coordinate"].toString() to it["sha256"].toString() }
+        val artifacts = configurations.getByName("releaseRuntimeClasspath").resolvedConfiguration.resolvedArtifacts
+        val actual = artifacts.associate { artifact ->
+            artifact.moduleVersion.id.toString() to MessageDigest.getInstance("SHA-256")
+                .digest(artifact.file.readBytes()).joinToString("") { "%02x".format(it) }
+        }
+        require(expected == actual) {
+            "Bundled notices do not match this runtime graph. Run :app:writeRuntimeInventory, then releases/leafwake/generate-notices.py with --cast only for leafwakeCast=true."
+        }
+    }
+}
+tasks.named("preBuild") { dependsOn(verifyNoticeVariant) }

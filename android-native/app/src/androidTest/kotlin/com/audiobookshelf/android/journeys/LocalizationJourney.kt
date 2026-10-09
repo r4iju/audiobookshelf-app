@@ -15,7 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** The main screens in the person's chosen app language, using the translations the legacy app ships. */
+/** The main screens in the person's chosen app language, using the maintained native translations. */
 @RunWith(AndroidJUnit4::class)
 class LocalizationJourney {
     @get:Rule val compose = createEmptyComposeRule()
