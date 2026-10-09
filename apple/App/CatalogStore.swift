@@ -277,12 +277,13 @@ enum CatalogSort: String, CaseIterable {
         return (result, items.count - result.count)
     }
 
-    func artwork(for item: LibraryItem) async -> UIImage? {
-        if let cached = covers.object(forKey: item.id as NSString) { return cached }
+    func artwork(for item: LibraryItem, maximumPixelDimension: Int = 640) async -> UIImage? {
+        let key = "\(item.id):\(maximumPixelDimension)" as NSString
+        if let cached = covers.object(forKey: key) { return cached }
         let account = api.signIn?.account
-        guard let data = try? await api.coverData(itemID: item.id), let image = await ArtworkImage.decode(data, maximumPixelDimension: 640),
+        guard let data = try? await api.coverData(itemID: item.id), let image = await ArtworkImage.decode(data, maximumPixelDimension: maximumPixelDimension),
               account == api.signIn?.account, !Task.isCancelled else { return nil }
-        covers.setObject(image, forKey: item.id as NSString, cost: ArtworkImage.memoryCost(image))
+        covers.setObject(image, forKey: key, cost: ArtworkImage.memoryCost(image))
         return image
     }
 

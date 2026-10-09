@@ -5,7 +5,9 @@ import XCTest
         try await FixtureControl.configure("large-cover-art")
         connectSelectAndRestore(serverURL: "http://127.0.0.1:19765/abs", verifyRestoration: false)
         let app = XCUIApplication()
-        app.buttons["Settings"].firstMatch.tap(); app.buttons["theme-black"].tap()
+        app.buttons["Settings"].firstMatch.tap()
+        app.buttons["appearance-settings"].tap()
+        app.buttons["theme-black"].tap()
         app.buttons["Library"].firstMatch.tap()
         let first = app.buttons["book-book-0"]
         XCTAssertTrue(first.waitForExistence(timeout: 8))

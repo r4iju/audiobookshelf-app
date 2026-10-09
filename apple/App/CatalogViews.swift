@@ -186,11 +186,13 @@ struct CatalogShelf: View {
 }
 
 struct BookArtwork: View {
+    @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.shelfAppearance) private var appearance
     let item: LibraryItem
     let catalog: CatalogStore
     @State private var image: UIImage?
     @State private var request: Task<Void, Never>?
+    private var pixelDimension: Int { sizeCategory.isAccessibilityCategory ? 1280 : 640 }
     var body: some View {
         RoundedRectangle(cornerRadius: 12).fill(image == nil ? appearance.card : .clear)
             .aspectRatio(1, contentMode: .fit)
@@ -204,8 +206,18 @@ struct BookArtwork: View {
             })
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .accessibilityHidden(true)
-            .onAppear { if image == nil { request = Task { image = await catalog.artwork(for: item) } } }
+            .onAppear { if image == nil { loadArtwork() } }
+            .onChange(of: pixelDimension) { _ in loadArtwork() }
             .onDisappear { request?.cancel(); request = nil }
+    }
+    private func loadArtwork() {
+        request?.cancel(); image = nil
+        let pixels = pixelDimension
+        request = Task {
+            let loaded = await catalog.artwork(for: item, maximumPixelDimension: pixels)
+            guard !Task.isCancelled else { return }
+            image = loaded
+        }
     }
 }
 

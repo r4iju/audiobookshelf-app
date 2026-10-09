@@ -30,8 +30,10 @@ import XCTest
         app.buttons["play-book"].tap()
         XCTAssertTrue(app.buttons["mini-player"].waitForExistence(timeout: 10))
         app.navigationBars.buttons["Audiobooks"].tap()
-        app.scrollViews["catalog"].swipeUp()
-        app.buttons["book-book-1"].tap()
+        let nextBook = app.buttons["book-book-1"]
+        if !nextBook.isHittable { app.scrollViews["catalog"].swipeUp() }
+        XCTAssertTrue(nextBook.isHittable)
+        nextBook.tap()
         XCTAssertTrue(app.buttons["play-book"].waitForExistence(timeout: 5))
         app.buttons["play-book"].tap()
         let pause = app.buttons["mini-pause-playback"]
@@ -107,7 +109,9 @@ import XCTest
         let app = XCUIApplication()
         app.buttons["book-book-0"].tap()
         app.buttons["play-book"].tap()
-        XCTAssertTrue(app.staticTexts["This item has no playable audio."].waitForExistence(timeout: 5))
+        let failure = app.staticTexts["This item has no playable audio."]
+        for _ in 0..<4 where !failure.exists { app.swipeUp() }
+        XCTAssertTrue(failure.waitForExistence(timeout: 5), app.debugDescription)
     }
 
     func testLatestSeekWinsWhileNextFileIsPreparing() async throws {
