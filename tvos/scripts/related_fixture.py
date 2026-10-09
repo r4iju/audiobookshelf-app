@@ -13,6 +13,7 @@ import re
 import ssl
 import struct
 import sys
+import time
 import urllib.error
 import urllib.request
 import zlib
@@ -57,7 +58,7 @@ def membership(item_id):
 def make_related_server(port, prefix='/abs', bind='127.0.0.1'):
     server, prefix = make_server(port, prefix, bind=bind)
     base = server.RequestHandlerClass
-    state = {'fail': None, 'observations': []}
+    state = {'fail': None, 'observations': [], 'syncDelay': 0}
 
     class Relay(Exception):
         def __init__(self, status, body):
@@ -103,10 +104,12 @@ def make_related_server(port, prefix='/abs', bind='127.0.0.1'):
             if path == '/__related__/configure' and self.command == 'POST':
                 body = json.loads(self.rfile.read(int(self.headers.get('Content-Length', '0'))) or b'{}')
                 state['fail'] = body.get('fail')
+                state['syncDelay'] = min(max(float(body.get('syncDelay', 0)), 0), 3)
                 state['observations'].clear()
                 self.respond(200, {})
                 return True
             if path == '/__related__/reset-progress' and self.command == 'POST':
+                state['syncDelay'] = 0
                 # Configure also runs mid-journey, so only this explicit test boundary resets secondary titles.
                 for key in list(self.progress):
                     if key[0] != 'book-0':
@@ -226,6 +229,8 @@ def make_related_server(port, prefix='/abs', bind='127.0.0.1'):
 
         def do_POST(self):
             parsed = urlparse(self.path)
+            if parsed.path == prefix + "/api/session/local-all" and state["syncDelay"]:
+                time.sleep(state["syncDelay"])
             if parsed.path in (prefix + '/__related__/configure', prefix + '/__related__/reset-progress') and self.handled(parsed.path[len(prefix):], {}):
                 return
             super().do_POST()

@@ -2,6 +2,12 @@
 set -euo pipefail
 build_number="${LEAFWAKE_APPLE_BUILD_NUMBER:-2}"
 audience="${LEAFWAKE_APPLE_AUDIENCE:-internal}"
+product_selection="${LEAFWAKE_APPLE_PRODUCTS:-all}"
+case "$product_selection" in
+  all) products=(ios tv) ;;
+  ios|tv) products=("$product_selection") ;;
+  *) echo 'Expected all, ios or tv products.' >&2; exit 1 ;;
+esac
 [[ "$build_number" =~ ^[1-9][0-9]*$ ]] || { echo 'Expected a positive Apple build number.' >&2; exit 1; }
 [[ "$audience" == internal || "$audience" == app-store ]] || { echo 'Expected internal or app-store audience.' >&2; exit 1; }
 repo_root="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -27,7 +33,7 @@ for product,folder in [('ios','apple'),('tv','tvos')]:
  options={'method':'app-store-connect','teamID':'C7X9BCC7LP','signingStyle':'manual','signingCertificate':'Apple Distribution','provisioningProfiles':{'com.forkzed.leafwake':profiles[product]['uuid']},'uploadSymbols':True,'manageAppVersionAndBuildNumber':False,'testFlightInternalTestingOnly':sys.argv[2]=='internal'}
  (root/(product+'-export.plist')).write_bytes(plistlib.dumps(options))
 PY
-for product in ios tv; do
+for product in "${products[@]}"; do
   if [[ "$product" == ios ]]; then
     project_folder=apple
     scheme=AudiobookshelfNative
