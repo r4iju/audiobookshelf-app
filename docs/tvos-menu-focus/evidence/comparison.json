@@ -1,0 +1,53 @@
+{
+  "released-speed": {
+    "source": "e24ed0b7bfdce57074acc1790b3c55b9189b861e",
+    "menu": "speed",
+    "seconds": 17.5,
+    "samples": 536,
+    "focused_row_replacements": 29,
+    "result": "/tmp/loft-menu-frozen-old/run.xcresult"
+  },
+  "candidate-speed": {
+    "source": "050af4d8330df18f33120ae41dde58a12968df20",
+    "menu": "speed",
+    "seconds": 17.5,
+    "samples": 1040,
+    "focused_row_replacements": 0,
+    "result": "/tmp/loft-menu-final-speed/run.xcresult"
+  },
+  "candidate-sleep": {
+    "source": "050af4d8330df18f33120ae41dde58a12968df20",
+    "menu": "sleep",
+    "seconds": 17.48333333339542,
+    "samples": 1047,
+    "focused_row_replacements": 0,
+    "result": "/tmp/loft-menu-final-sleep/run.xcresult"
+  },
+  "candidate-settings": {
+    "source": "050af4d8330df18f33120ae41dde58a12968df20",
+    "menu": "settings",
+    "seconds": 17.5,
+    "samples": 1046,
+    "focused_row_replacements": 0,
+    "result": "/tmp/loft-menu-settings-recovery/run.xcresult"
+  },
+  "candidate-sort": {
+    "source": "050af4d8330df18f33120ae41dde58a12968df20",
+    "menu": "sort",
+    "seconds": 17.5,
+    "samples": 1044,
+    "focused_row_replacements": 0,
+    "result": "/tmp/loft-menu-final-sort/run.xcresult"
+  },
+  "intermediate-settings": {
+    "source": "fa43c6961df1df8d7812f67f31408c2999e96ccd",
+    "menu": "settings",
+    "seconds": 17.5,
+    "samples": 1036,
+    "focused_row_replacements": 1,
+    "result": "/tmp/loft-menu-frozen-settings/run.xcresult"
+  },
+  "probe_sha256": "5c8eabe0666842ffc6b158026731ec16c221f284c1ca39a566cc5c596160b108",
+  "journey_sha256": "c9249b2a7a35fd0fd204a7a5bcc20df71405087702d2294e7c4270c886b9996c",
+  "limitation": "Native focused UIView continuity, not GPU or pixel-color/hardware refresh evidence."
+}
