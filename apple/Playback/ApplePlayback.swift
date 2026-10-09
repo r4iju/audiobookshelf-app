@@ -5,7 +5,21 @@ import UIKit
 
 @MainActor final class ApplePlayback: ObservableObject {
     @Published private(set) var session: PlaybackSession?
+    #if os(tvOS)
+    let clock = TVPlaybackClock()
+    private(set) var currentTime: Double {
+        get { clock.currentTime }
+        set {
+            let chapters = session?.chapters ?? []
+            if chapters.lastIndex(where: { $0.start <= clock.currentTime }) != chapters.lastIndex(where: { $0.start <= newValue }) {
+                objectWillChange.send()
+            }
+            clock.currentTime = newValue
+        }
+    }
+    #else
     @Published private(set) var currentTime: Double = 0
+    #endif
     @Published private(set) var playing = false
     @Published private(set) var wantsPlayback = false
     @Published private(set) var preparing = false
@@ -43,7 +57,17 @@ import UIKit
     @Published private(set) var bookmarks: [Bookmark] = []
     @Published private(set) var bookmarkBusy = false
     @Published private(set) var bookmarkError: String?
+    #if os(tvOS)
+    private(set) var sleepRemaining: Double? {
+        get { clock.sleepRemaining }
+        set {
+            if (clock.sleepRemaining == nil) != (newValue == nil) { objectWillChange.send() }
+            clock.sleepRemaining = newValue
+        }
+    }
+    #else
     @Published private(set) var sleepRemaining: Double?
+    #endif
     @Published private(set) var sleepChapterEnd: Double?
     var audioVolume: Float { player.volume }
     private var sleepTask: Task<Void, Never>?
@@ -1117,5 +1141,13 @@ extension ApplePlayback {
         try await resetProgress(account: account, itemID: itemID, episodeID: episodeID,
                                 prepare: { try await adoption.prepareProgressReset(account: account, itemID: itemID, episodeID: episodeID) })
     }
+}
+#endif
+
+#if os(tvOS)
+/// Clock updates belong to the timeline, not to the native focus and menu presentation hierarchy.
+@MainActor final class TVPlaybackClock: ObservableObject {
+    @Published var currentTime: Double = 0
+    @Published var sleepRemaining: Double?
 }
 #endif

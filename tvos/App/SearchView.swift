@@ -42,7 +42,7 @@ struct SearchView: View {
     @ViewBuilder private func related(_ title: String, routes: [Route]) -> some View {
         if !routes.isEmpty {
             VStack(alignment: .leading, spacing: 16) {
-                Text(title).font(.title3.bold())
+                Text(title).font(.title2.weight(.semibold))
                 ScrollView(.horizontal) {
                     LazyHStack(spacing: 30) {
                         ForEach(routes, id: \.self) { route in
@@ -61,12 +61,12 @@ struct SearchView: View {
     @ViewBuilder private func titles(_ title: String, results: [SearchResult]) -> some View {
         if !results.isEmpty {
             VStack(alignment: .leading, spacing: 20) {
-                Text(title).font(.title3.bold())
+                Text(title).font(.title2.weight(.semibold))
                 LazyVGrid(columns: TileGrid.columns, alignment: .leading, spacing: 56) {
                     ForEach(results) { result in
                         NavigationLink(value: result.route) { ItemTile(item: result.item, episodeID: result.episodeID) }
                             .buttonStyle(.card)
-                            .buttonBorderShape(.roundedRectangle(radius: 14))
+                            .buttonBorderShape(.roundedRectangle(radius: 24))
                             .accessibilityIdentifier("search." + result.item.id + (result.episodeID.map { "." + $0 } ?? ""))
                     }
                 }
