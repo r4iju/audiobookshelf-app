@@ -235,7 +235,8 @@ import UIKit
             try await seek(to: result.currentTime, autoplay: wantsPlayback)
             Task { @MainActor [weak self] in
                 guard let self, let data = try? await self.api.coverData(itemID: item.id),
-                      self.session?.id == result.id, let image = UIImage(data: data) else { return }
+                      self.session?.id == result.id, let image = await ArtworkImage.decode(data),
+                      self.session?.id == result.id else { return }
                 self.nowPlayingArtwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
                 self.updateNowPlaying()
             }

@@ -1,0 +1,16 @@
+{
+  "Destination": "iPhone 17 iOS Simulator 27.0",
+  "Configuration": "Test Scheme Action",
+  "Absolute Memory Physical (preview) (Average)": "2547913.072 kB",
+  "Absolute Memory Physical (preview) (Iterations)": "[2548420.976, 2547405.168]",
+  "CPU Cycles (preview) (Average)": "3918881.838 kC",
+  "CPU Cycles (preview) (Iterations)": "[4028977.54, 3808786.136]",
+  "CPU Instructions Retired (preview) (Average)": "5383821.764 kI",
+  "CPU Instructions Retired (preview) (Iterations)": "[5482800.335, 5284843.193]",
+  "CPU Time (preview) (Average)": "1.349380746 s",
+  "CPU Time (preview) (Iterations)": "[1.319012722, 1.379748769]",
+  "Memory Peak Physical (preview) (Average)": "2552164.72 kB",
+  "Memory Peak Physical (preview) (Iterations)": "[2552222.064, 2552107.376]",
+  "Memory Physical (preview) (Average)": "-65.536 kB",
+  "Memory Physical (preview) (Iterations)": "[884.736, -1015.808]"
+}

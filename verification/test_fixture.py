@@ -61,6 +61,13 @@ class ConnectionBurstJourney(FixtureJourneyBase):
 
 
 class LocalReferenceJourney(FixtureJourneyBase):
+    def test_cover_is_served_without_a_retired_browser_asset(self):
+        request = Request(self.address + '/api/items/book-0/cover?width=500', headers={'Authorization': 'Bearer fresh'})
+        with urlopen(request, timeout=3) as response:
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.headers['Content-Type'], 'image/png')
+            self.assertTrue(response.read().startswith(b'\x89PNG\r\n\x1a\n'))
+
     def test_listener_refreshes_browses_and_reports_progress(self):
         login = self.request('/login', {'username': 'qa', 'password': 'qa'})
         self.assertEqual(login['serverSettings']['version'], '2.30.0-fixture')

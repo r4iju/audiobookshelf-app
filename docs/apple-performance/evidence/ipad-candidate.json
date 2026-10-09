@@ -1,0 +1,36 @@
+{
+  "source": "116950d4df746623ba67191cd7dbb8f3fb61334a",
+  "frames": {
+    "scroll_steps": 16,
+    "over50ms": 0,
+    "samples": 869,
+    "max_ms": 33.35304162465036,
+    "scroll_distance": 5635,
+    "p95_ms": 17.120583332143724,
+    "p99_ms": 33.330791629850864
+  },
+  "metrics": {
+    "Destination": "iPad Pro 11-inch (M5) iOS Simulator 27.0",
+    "Configuration": "Test Scheme Action",
+    "Absolute Memory Physical (preview) (Average)": "94440.112 kB",
+    "Absolute Memory Physical (preview) (Iterations)": "[95111.856, 93768.368]",
+    "Absolute Memory Physical (preview) (Baseline)": "0",
+    "CPU Cycles (preview) (Average)": "3857942.064 kC",
+    "CPU Cycles (preview) (Iterations)": "[3770888.253, 3944995.875]",
+    "CPU Cycles (preview) (Baseline)": "0",
+    "CPU Instructions Retired (preview) (Average)": "7012112.027 kI",
+    "CPU Instructions Retired (preview) (Iterations)": "[7120931.905, 6903292.149]",
+    "CPU Instructions Retired (preview) (Baseline)": "0",
+    "CPU Time (preview) (Average)": "1.092261935 s",
+    "CPU Time (preview) (Iterations)": "[1.142044217, 1.042479653]",
+    "CPU Time (preview) (Baseline)": "0",
+    "Memory Peak Physical (preview) (Average)": "97471.152 kB",
+    "Memory Peak Physical (preview) (Iterations)": "[97536.688, 97405.616]",
+    "Memory Peak Physical (preview) (Baseline)": "0",
+    "Memory Physical (preview) (Average)": "-360.448 kB",
+    "Memory Physical (preview) (Iterations)": "[622.592, -1343.488]",
+    "Memory Physical (preview) (Baseline)": "0"
+  },
+  "result": "/tmp/loft-perf-frozen-ipad-after/run.xcresult",
+  "comparison": "Candidate only, no iPad baseline"
+}
