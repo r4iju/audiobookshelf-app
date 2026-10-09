@@ -1,0 +1,13 @@
+# Performance diagnosis, October 9, 2026
+
+The measured cover problem is original-size decoded images retained without a byte budget. The 61-title synthetic library with square 4,000-pixel and portrait 3,000-by-4,000 JPEGs consumed about 2.55 GB peak physical memory during iOS playback and scrolling, and 2.17 GB during TV remote navigation. No owner library or screenshots were used.
+
+The patch decodes bounded, immediately cached ImageIO thumbnails on a serial background queue. Mobile catalog images have a 640-pixel edge for cards/details up to 210 points at 3x; full-player/Now Playing images keep up to 1,200 pixels. TV keeps up to 1,024 pixels for its 460-point covers at 2x. Catalog caches have a 64 MiB decoded-byte budget and retain their previous entry limits. New suspension points recheck account/session identity and cancellation before publishing artwork. TV no longer empties its entire cache when it reaches 240 entries. Listening persistence and the preceding TV layout patch are unchanged.
+
+The same workloads measured about 78 MB peak physical memory on mobile and 110 MB on TV. CPU time per measured iteration was approximately 1.35 to 1.37 seconds on mobile and 1.12 to 1.82 seconds on TV; TV now includes cache evictions and background decodes instead of retaining gigabytes of previously decoded images. Memory reduction is the demonstrated result, not a blanket CPU-speedup claim.
+
+Early XCTest swipe measurements showed large main-thread gaps, but Time Profiler identified accessibility traversal as a dominant cost. They are excluded from app responsiveness conclusions. A native iOS scrolling driver completed 16 steps and roughly 11,000 points during each playback sample without accessibility queries in the measurement interval. Unprofiled callback samples generally had p95 near 16.7 ms and p99 near 33.3 ms before and after; they do not establish a robust frame-rate improvement. One profiled baseline exceeded the 25 ms p95 callback budget, which must not be compared as an unprofiled before/after result. TV callback timing also varied between runs. No physical 4K/60 claim is made.
+
+CoreDevice could inspect both the iPhone 14 Plus and Living Room TV, but Instruments repeatedly classified them offline or timed out waiting for them to boot. No valid physical Animation Hitches/GPU trace was obtained. The existing T3 device tooling supports simulators here. The repeatable frozen-source profiling harness lives under `verification/performance`; normal app projects have no probe, automatic scroll driver or performance test launch behavior.
+
+Final candidate functional checks, source, review, merged replay and TestFlight availability are recorded below when completed.

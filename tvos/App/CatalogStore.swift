@@ -38,13 +38,15 @@ struct HomeShelf: Identifiable {
     private var account = UUID()
     /// Changes on sign-out, so work started for one account can tell it no longer applies.
     var accountID: UUID { account }
-    private var covers: [String: UIImage] = [:]
+    private let covers = NSCache<NSString, UIImage>()
     private var missingCovers: Set<String> = []
 
     static let lastServerKey = "lastServer", lastUsernameKey = "lastUsername"
 
     init(api: APIClient) {
         self.api = api
+        covers.countLimit = 240
+        covers.totalCostLimit = 64 * 1024 * 1024
         signedIn = api.credentials != nil
     }
 
@@ -155,7 +157,7 @@ struct HomeShelf: Identifiable {
     }
 
     func cover(itemID: String) async -> UIImage? {
-        if let cached = covers[itemID] { return cached }
+        if let cached = covers.object(forKey: itemID as NSString) { return cached }
         if missingCovers.contains(itemID) { return nil }
         let request = account
         let data: Data
@@ -165,16 +167,19 @@ struct HomeShelf: Identifiable {
             return nil
         }
         guard request == account else { return nil }
-        guard let image = UIImage(data: data) else { missingCovers.insert(itemID); return nil }
-        if covers.count >= 240 { covers.removeAll() }
-        covers[itemID] = image
+        guard let image = await ArtworkImage.decode(data) else {
+            if request == account, !Task.isCancelled { missingCovers.insert(itemID) }
+            return nil
+        }
+        guard request == account, !Task.isCancelled else { return nil }
+        covers.setObject(image, forKey: itemID as NSString, cost: ArtworkImage.memoryCost(image))
         return image
     }
 
     func signOut() throws {
         try api.signOut()
         generation = UUID(); account = UUID()
-        libraries = []; shelves = []; progress = [:]; covers = [:]; missingCovers = []
+        libraries = []; shelves = []; progress = [:]; covers.removeAllObjects(); missingCovers = []
         catalogError = nil
         loadingCatalog = false
         signedIn = false

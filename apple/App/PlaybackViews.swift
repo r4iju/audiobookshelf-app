@@ -74,9 +74,12 @@ struct PlaybackContainer<Content: View>: View {
     private func loadArtwork() {
         artwork = nil
         guard let id = player.itemID else { return }
+        let account = connection.api.signIn?.account
         Task {
             guard let data = try? await connection.api.coverData(itemID: id), player.itemID == id else { return }
-            artwork = UIImage(data: data)
+            let image = await ArtworkImage.decode(data)
+            guard player.itemID == id, account == connection.api.signIn?.account, !Task.isCancelled else { return }
+            artwork = image
         }
     }
 
@@ -258,9 +261,12 @@ struct NowListening: View {
     private func loadArtwork() {
         artwork = nil
         guard let id = player.itemID else { return }
+        let account = connection.api.signIn?.account
         Task {
             guard let data = try? await connection.api.coverData(itemID: id), player.itemID == id else { return }
-            artwork = UIImage(data: data)
+            let image = await ArtworkImage.decode(data)
+            guard player.itemID == id, account == connection.api.signIn?.account, !Task.isCancelled else { return }
+            artwork = image
         }
     }
 }

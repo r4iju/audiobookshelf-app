@@ -52,6 +52,7 @@
 		A4DD27B94E49EECC148A38A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABA1E0404BA6403B2756A289 /* Assets.xcassets */; };
 		A68A56DCE1EC148EE9C11C3D /* TVPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C9CC8D7EA65AD9D300C352 /* TVPlayer.swift */; };
 		A84625D913609E565C7440F4 /* TVJourney.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEF2CDC828B2A12C335D7310 /* TVJourney.swift */; };
+		AC32246ED6E9988EC117F259 /* ArtworkImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB8369E7DCDE484B5BD66ED /* ArtworkImage.swift */; };
 		B5588A53439584F39D4D3E82 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53716A31D8B3AF4CD758EAD6 /* Models.swift */; };
 		B8964FB5A649C587A984FA9A /* MediaRestartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332457F05987951E12386A3F /* MediaRestartTests.swift */; };
 		C15F528265CAA6DD4DF54C45 /* NativeStrings.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0D20A772BBBE44F2BA0EF48D /* NativeStrings.strings */; };
@@ -118,6 +119,7 @@
 		344FE9E115B6DD1B1751B0BC /* AudiobookshelfTV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AudiobookshelfTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		380936A0F1F2B853D4DE948D /* RealtimeChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeChange.swift; sourceTree = "<group>"; };
 		3AC6D96B6346EB67302210F5 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/NativeStrings.strings"; sourceTree = "<group>"; };
+		3BB8369E7DCDE484B5BD66ED /* ArtworkImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkImage.swift; sourceTree = "<group>"; };
 		3FBB1C5D529D5EFE2F534838 /* AudiobookshelfTVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiobookshelfTVApp.swift; sourceTree = "<group>"; };
 		41C24D086B4F909DF500A65A /* ListeningStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningStorage.swift; sourceTree = "<group>"; };
 		46D1347C28F681CD8D2533F3 /* ApplePlayback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePlayback.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 			children = (
 				33CF260A393526D34AD39F20 /* AppleNetworkPolicy.swift */,
 				46D1347C28F681CD8D2533F3 /* ApplePlayback.swift */,
+				3BB8369E7DCDE484B5BD66ED /* ArtworkImage.swift */,
 				AF6886FC9D2F5AE7BE5EFE76 /* CoreTextInstallation.swift */,
 				41C24D086B4F909DF500A65A /* ListeningStorage.swift */,
 				B6AB6A2975B73CF339FA4BF2 /* ListeningSync.swift */,
@@ -649,6 +652,7 @@
 				4755673A3393723E50F062C9 /* APIClient.swift in Sources */,
 				35C5D7D134E993E156E44C5E /* AppleNetworkPolicy.swift in Sources */,
 				449DA4ED8C22A891485A8DC6 /* ApplePlayback.swift in Sources */,
+				AC32246ED6E9988EC117F259 /* ArtworkImage.swift in Sources */,
 				D93FFC82AAEBCA9267D073B3 /* AudioGroups.swift in Sources */,
 				11044CCCBB76A34268BC6521 /* AudiobookshelfTVApp.swift in Sources */,
 				FE7B5FBA00BE5AE3A19108C8 /* AuthorSeries.swift in Sources */,

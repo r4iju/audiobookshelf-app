@@ -71,6 +71,7 @@ enum CatalogSort: String, CaseIterable {
         self.library = library
         self.filter = filter
         covers.countLimit = 150
+        covers.totalCostLimit = 64 * 1024 * 1024
     }
 
     func reload() async {
@@ -278,8 +279,10 @@ enum CatalogSort: String, CaseIterable {
 
     func artwork(for item: LibraryItem) async -> UIImage? {
         if let cached = covers.object(forKey: item.id as NSString) { return cached }
-        guard let data = try? await api.coverData(itemID: item.id), !Task.isCancelled, let image = UIImage(data: data) else { return nil }
-        covers.setObject(image, forKey: item.id as NSString)
+        let account = api.signIn?.account
+        guard let data = try? await api.coverData(itemID: item.id), let image = await ArtworkImage.decode(data, maximumPixelDimension: 640),
+              account == api.signIn?.account, !Task.isCancelled else { return nil }
+        covers.setObject(image, forKey: item.id as NSString, cost: ArtworkImage.memoryCost(image))
         return image
     }
 
