@@ -57,12 +57,12 @@ Downloads, offline playback, ebook/PDF reading, collections/playlists management
 
 ### Known limitations
 
-- Settings > Language offers the legacy app's languages, but only texts with a legacy translation are translated; the rest, and the author and series pages, stay English. See [APPLE-TV-READINESS.md](../docs/modernization/APPLE-TV-READINESS.md).
+- Settings > Language offers the independently maintained native translations; incomplete translations fall back to English. See [Apple release status](../releases/leafwake/RELEASE-STATUS.md).
 - Home and Search skip a library that fails to load and show the others; they report an error only when every library fails.
 
 ## Build and verify
 
-The project has no external Swift dependencies. Xcode 27 and its tvOS SDK are installed on this Mac; the app deployment target is tvOS 17, compatible with the discovered Living Room TV running tvOS 18.6.
+The project has no external Swift dependencies. The app deployment target remains tvOS 17. The current local patch checks use Xcode 27 and tvOS 27.
 
 ```sh
 swift test --package-path tvos/Core
@@ -81,6 +81,8 @@ xcodebuild -project tvos/AudiobookshelfTV.xcodeproj \
   -destination 'generic/platform=tvOS Simulator' \
   -derivedDataPath tvos/build build
 ```
+
+Journeys omit screenshots by default. Set `ABS_TV_CAPTURE_SCREENSHOTS=1` only when screenshots are explicitly wanted. For a TV-only internal TestFlight archive, use `LEAFWAKE_APPLE_PRODUCTS=tv LEAFWAKE_APPLE_BUILD_NUMBER=<next-build> apple/scripts/archive-testflight.sh` from a clean committed checkout.
 
 `verify-ui.sh` leases a fresh pooled TV with `sim acquire tv --fresh` and releases it on exit. To retain it for inspection, lease one yourself, set `ABS_TV_QA_SIMULATOR` to its UDID, then release it with `sim release <UDID>`. Never create or clone a task simulator. The verifier refuses busy fixture ports. `ABS_TV_HTTP_PORT` and `ABS_TV_HTTPS_PORT` choose other fixture ports so a second simulator can run journeys in parallel. Debug builds accept a `--reset-tv-state` launch argument that clears the saved login, listening journal (the legacy file and the `NativeListeningJournal` defaults key), language choice and diagnostics log so each journey starts signed out; Release builds, including every signed device build, do not contain it.
 

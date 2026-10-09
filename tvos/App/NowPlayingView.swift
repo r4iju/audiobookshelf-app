@@ -75,6 +75,7 @@ struct NowPlayingView: View {
         }
         .padding(.horizontal, 90)
         .padding(.vertical, 50)
+        .frame(maxHeight: .infinity, alignment: .top)
         .sheet(isPresented: $showChapters) { chapters.tvLocalization() }
         .onChange(of: player.session?.id) { stopError = nil; restartError = nil }
         .task(id: [player.itemID ?? "", player.episodeID ?? ""]) { await refreshWaiting() }
@@ -83,7 +84,7 @@ struct NowPlayingView: View {
 
     private func refreshWaiting() async {
         guard let itemID = player.itemID, let account = try? await catalog.api.currentAccount() else { savesWaiting = false; return }
-        savesWaiting = player.publications.unresolved(account: account, itemID: itemID, episodeID: player.episodeID)
+        savesWaiting = player.publications.unanswered(account: account, itemID: itemID, episodeID: player.episodeID)
     }
 
     private var status: String {
