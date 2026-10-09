@@ -20,6 +20,13 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
 
 
+def cover_image(width=128, height=128):
+    def chunk(kind, data):
+        return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data) & 0xffffffff)
+    pixels = b''.join(b'\x00' + bytes((25, 90 + y % 100, 160)) * width for y in range(height))
+    return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(pixels)) + chunk(b'IEND', b'')
+
+
 def audio(seconds):
     data = io.BytesIO()
     with wave.open(data, 'wb') as stream:
@@ -465,15 +472,10 @@ def make_server(port=18765, prefix='/abs', scenario='baseline', auth_mode='moder
                     return self.respond(200, (Path(directory) / f'{index}.jpg').read_bytes(), 'image/jpeg')
                 if configuration['mode'] == 'large-cover-art':
                     width, height = (1800, 1800) if path.endswith('book-0/cover') else (1200, 1800)
-                    def chunk(kind, data):
-                        return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data) & 0xffffffff)
-                    pixels = b''.join(b'\x00' + bytes((25, 90 + y % 100, 160)) * width for y in range(height))
-                    image = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(pixels)) + chunk(b'IEND', b'')
-                    return self.respond(200, image, 'image/png')
+                    return self.respond(200, cover_image(width, height), 'image/png')
                 if configuration['mode'] == 'edge-metadata':
                     return self.respond(404, {})
-                image = Path(__file__).resolve().parents[1] / 'static/book_placeholder.jpg'
-                return self.respond(200, image.read_bytes(), 'image/jpeg')
+                return self.respond(200, cover_image(), 'image/png')
             if path in ('/audio/0', '/audio/1'):
                 if configuration['mode'] == 'broken-audio':
                     return self.respond(503, {})
