@@ -1147,7 +1147,7 @@ extension ApplePlayback {
 #if os(tvOS)
 /// Clock updates belong to the timeline, not to the native focus and menu presentation hierarchy.
 @MainActor final class TVPlaybackClock: ObservableObject {
-    @Published var currentTime: Double = 0
-    @Published var sleepRemaining: Double?
+    @Published fileprivate(set) var currentTime: Double = 0
+    @Published fileprivate(set) var sleepRemaining: Double?
 }
 #endif
