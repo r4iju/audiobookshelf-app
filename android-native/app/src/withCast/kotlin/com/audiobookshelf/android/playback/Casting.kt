@@ -29,8 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
 
-/** The Audiobookshelf receiver registered by the existing app. */
-private const val RECEIVER_ID = "FD1F76C5"
+private const val RECEIVER_ID = CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID
 
 class CastOptionsProvider : OptionsProvider {
     override fun getCastOptions(context: Context): CastOptions = CastOptions.Builder()

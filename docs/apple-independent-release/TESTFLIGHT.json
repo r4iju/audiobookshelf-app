@@ -1,0 +1,30 @@
+{
+  "app": "6819142007",
+  "group": "bf82b29b-63b5-4d91-9231-8287abd4c015",
+  "groupInternal": true,
+  "groupTesterCount": 1,
+  "ownerIdentityVerified": true,
+  "ownerTesterState": "INVITED",
+  "publicLink": false,
+  "hasAccessToAllBuilds": false,
+  "builds": [
+    {
+      "id": "98e1cc38-6f27-42b0-a35a-677169668e69",
+      "version": "2",
+      "minimumOS": "17.0",
+      "processingState": "VALID",
+      "buildAudienceType": "INTERNAL_ONLY",
+      "internalBuildState": "IN_BETA_TESTING",
+      "externalBuildState": "NOT_APPLICABLE"
+    },
+    {
+      "id": "4e684ab8-0f4d-4102-a839-f1d45d14805e",
+      "version": "2",
+      "minimumOS": "15.0",
+      "processingState": "VALID",
+      "buildAudienceType": "INTERNAL_ONLY",
+      "internalBuildState": "IN_BETA_TESTING",
+      "externalBuildState": "NOT_APPLICABLE"
+    }
+  ]
+}

@@ -39,7 +39,7 @@ import XCTest
     private func confirmation(in app: XCUIApplication) -> XCUIElement {
         let alert = app.alerts["Confirm"]
         XCTAssertTrue(alert.waitForExistence(timeout: 5), "Discarding asks for confirmation. " + app.debugDescription)
-        XCTAssertTrue(alert.staticTexts["Are you sure you want to reset your progress?"].exists)
+        XCTAssertTrue(alert.staticTexts["Reset the saved listening position for this book?"].exists)
         return alert
     }
 

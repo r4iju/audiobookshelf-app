@@ -16,6 +16,7 @@ fi
 export ABS_TV_HTTP_PORT="${ABS_TV_HTTP_PORT:-20765}" ABS_TV_HTTPS_PORT="${ABS_TV_HTTPS_PORT:-20767}"
 # xcodebuild hands TEST_RUNNER_ variables to the journeys without the prefix.
 export TEST_RUNNER_ABS_TV_HTTP_PORT="$ABS_TV_HTTP_PORT" TEST_RUNNER_ABS_TV_HTTPS_PORT="$ABS_TV_HTTPS_PORT"
+export TEST_RUNNER_ABS_TV_CAPTURE_SCREENSHOTS="${ABS_TV_CAPTURE_SCREENSHOTS:-0}"
 fixture_dir="$(mktemp -d)"
 fixture_pids=()
 cleanup() {

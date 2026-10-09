@@ -10,9 +10,19 @@ struct NowPlayingView: View {
     @State private var savesWaiting = false
     @State private var restartError: String?
     @State private var restarting = false
-    static let speeds: [Float] = [0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
 
     var body: some View {
+        ScrollView {
+            playbackContent
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .sheet(isPresented: $showChapters) { chapters.tvLocalization() }
+        .onChange(of: player.session?.id) { stopError = nil; restartError = nil }
+        .task(id: [player.itemID ?? "", player.episodeID ?? ""]) { await refreshWaiting() }
+        .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in Task { await refreshWaiting() } }
+    }
+
+    private var playbackContent: some View {
         VStack(alignment: .leading, spacing: 44) {
             HStack(alignment: .top, spacing: 70) {
                 if let id = player.itemID {
@@ -20,37 +30,17 @@ struct NowPlayingView: View {
                         .accessibilityHidden(true)
                 }
                 VStack(alignment: .leading, spacing: 20) {
-                    Text(status).font(.caption.bold()).tracking(3).foregroundStyle(.tint)
-                        .accessibilityIdentifier("playback-status").accessibilityLabel(status)
+                    PlaybackStatus(player: player, clock: player.clock)
                     Text(player.title).font(.system(size: 50, weight: .bold)).lineLimit(3)
                         .accessibilityIdentifier("now-playing-title")
                     Text(player.author).font(.title3).foregroundStyle(.secondary)
-                    if let chapter = chapter {
-                        Text(l10n("{0} · Chapter {1} of {2}", chapter.chapter.title, chapter.index + 1, chapter.count)).font(.headline)
-                            .accessibilityIdentifier("now-playing-chapter")
-                        let elapsed = min(max(player.currentTime - chapter.chapter.start, 0), chapter.length)
-                        progress(l10n("Chapter progress"), identifier: "chapter-progress", elapsed: elapsed, length: chapter.length)
-                    }
-                    if let session = player.session {
-                        progress(l10n("Book progress"), identifier: "total-progress", elapsed: min(player.currentTime, session.duration), length: session.duration, tint: .orange)
-                        let remaining = max(session.duration - player.currentTime, 0)
-                        HStack {
-                            Text(Format.clock(player.currentTime)).accessibilityIdentifier("now-playing-elapsed")
-                            Spacer()
-                            Text("−" + Format.clock(remaining)).accessibilityIdentifier("now-playing-remaining")
-                        }
-                        .font(.callout.monospacedDigit()).foregroundStyle(.secondary)
-                    }
-                    if let remaining = player.sleepRemaining {
-                        Label(l10n("Sleep in {0}", Format.clock(remaining)), systemImage: "moon.zzz").foregroundStyle(.secondary)
-                    } else if player.sleepChapterEnd != nil {
-                        Label(l10n("Sleep at end of chapter"), systemImage: "moon.zzz").foregroundStyle(.secondary)
-                    }
+                    PlaybackTimeline(player: player, clock: player.clock)
                     transport.padding(.top, 20).focusSection()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             options
+                .nativeGlassButton()
                 .frame(maxWidth: .infinity)
                 .focusSection()
             if savesWaiting {
@@ -75,38 +65,15 @@ struct NowPlayingView: View {
         }
         .padding(.horizontal, 90)
         .padding(.vertical, 50)
-        .sheet(isPresented: $showChapters) { chapters.tvLocalization() }
-        .onChange(of: player.session?.id) { stopError = nil; restartError = nil }
-        .task(id: [player.itemID ?? "", player.episodeID ?? ""]) { await refreshWaiting() }
-        .onReceive(NotificationCenter.default.publisher(for: PublicationLedger.changed)) { _ in Task { await refreshWaiting() } }
     }
 
     private func refreshWaiting() async {
         guard let itemID = player.itemID, let account = try? await catalog.api.currentAccount() else { savesWaiting = false; return }
-        savesWaiting = player.publications.unresolved(account: account, itemID: itemID, episodeID: player.episodeID)
+        savesWaiting = player.publications.unanswered(account: account, itemID: itemID, episodeID: player.episodeID)
     }
 
-    private var status: String {
-        guard let session = player.session else { return l10n("Stopped") }
-        if player.preparing { return l10n("Loading") }
-        if !player.wantsPlayback && player.currentTime >= session.duration - 0.5 { return l10n("Finished") }
-        if player.playing { return l10n("Playing") }
-        return player.wantsPlayback ? l10n("Buffering") : l10n("Paused")
-    }
-
-    /// One element for VoiceOver, read as the time left rather than a bare percentage.
-    private func progress(_ title: String, identifier: String, elapsed: Double, length: Double, tint: Color? = nil) -> some View {
-        ProgressView(value: elapsed, total: max(length, 1)).tint(tint)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(title)
-            .accessibilityValue(l10n("{0} remaining", Format.spoken(max(length - elapsed, 0), locale: l10n.language.locale)))
-            .accessibilityIdentifier(identifier)
-    }
-
-    private var chapter: (chapter: Chapter, index: Int, count: Int, length: Double)? {
-        guard let chapters = player.session?.chapters, !chapters.isEmpty else { return nil }
-        let index = chapters.lastIndex { $0.start <= player.currentTime } ?? 0
-        return (chapters[index], index, chapters.count, chapters[index].end - chapters[index].start)
+    private var chapter: PlaybackChapter? {
+        PlaybackChapter(chapters: player.session?.chapters, time: player.currentTime)
     }
 
     private var transport: some View {
@@ -120,6 +87,7 @@ struct NowPlayingView: View {
             Button { player.toggle() } label: {
                 Image(systemName: player.wantsPlayback ? "pause.fill" : "play.fill").frame(width: 100, height: 54)
             }
+            .nativeGlassButton(prominent: true)
             .accessibilityIdentifier("toggle-playback").accessibilityLabel(player.wantsPlayback ? l10n("Pause") : l10n("Play"))
             Button { Task { await player.skip(Double(player.forwardInterval)) } } label: { Image(systemName: Self.skipSymbol("goforward", player.forwardInterval)) }
                 .accessibilityIdentifier("skip-forward").accessibilityLabel(l10n("Forward {0} seconds", player.forwardInterval))
@@ -128,7 +96,7 @@ struct NowPlayingView: View {
                 .disabled(chapter.map { $0.index + 1 >= $0.count } ?? true)
         }
         .font(.title2)
-        .buttonStyle(.bordered)
+        .nativeGlassButton()
         .disabled(busy)
     }
 
@@ -138,23 +106,9 @@ struct NowPlayingView: View {
                 Button { showChapters = true } label: { Label(l10n("Chapters"), systemImage: "list.bullet") }
                     .accessibilityIdentifier("chapters")
             }
-            Menu {
-                ForEach(Self.speeds, id: \.self) { speed in
-                    Button(Format.speed(speed)) { player.speed = speed; player.changeSpeed() }
-                }
-            } label: { Label(l10n("Speed {0}", Format.speed(player.speed)), systemImage: "speedometer") }
-                .accessibilityIdentifier("playback-speed").accessibilityLabel(l10n("Speed {0}", Format.speed(player.speed)))
-            Menu {
-                ForEach([15, 30, 45, 60], id: \.self) { minutes in
-                    Button(l10n("{0} minutes", minutes)) { player.setSleepTimer(seconds: Double(minutes * 60)) }
-                }
-                if chapter != nil { Button(l10n("End of chapter")) { player.setChapterSleepTimer() } }
-                if player.sleepRemaining != nil || player.sleepChapterEnd != nil {
-                    Button(l10n("Turn off sleep timer"), role: .destructive) { player.cancelSleepTimer() }
-                }
-            } label: { Label(l10n("Sleep timer"), systemImage: "moon.zzz") }
-                .accessibilityIdentifier("sleep-timer")
-                .accessibilityLabel(l10n("Sleep timer"))
+            PlaybackSpeedMenu(player: player, speed: player.speed).equatable()
+            PlaybackSleepMenu(player: player, hasChapter: chapter != nil,
+                              timerActive: player.sleepRemaining != nil || player.sleepChapterEnd != nil).equatable()
             Button(role: .destructive) {
                 Task {
                     do { stopError = nil; try await player.stop() }

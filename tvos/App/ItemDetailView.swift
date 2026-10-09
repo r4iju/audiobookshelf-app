@@ -74,6 +74,7 @@ struct PlaybackActions: View {
                 } label: {
                     Label(player.preparing && !current ? l10n("Preparing…") : action, systemImage: current ? "waveform" : "play.fill")
                 }
+                .nativeGlassButton(prominent: true)
                 .accessibilityIdentifier(playIdentifier)
                 .accessibilityLabel(action)
                 .disabled(player.preparing || player.seeking || detail.busy)
@@ -86,6 +87,7 @@ struct PlaybackActions: View {
                 .accessibilityLabel(completion)
                 .disabled(detail.busy || player.preparing)
             }
+            .nativeGlassButton()
             if let failure = detail.error ?? (current ? nil : player.error) {
                 Text(failure).foregroundStyle(.orange).accessibilityIdentifier("detail-error")
             }

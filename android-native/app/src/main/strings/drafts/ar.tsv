@@ -513,3 +513,7 @@ err_no_audio	لا يحتوي هذا العنصر على صوت قابل للتش
 err_login_rejected	لم يُقبَل اسم المستخدم أو كلمة المرور.
 err_publications_unreadable	تعذّرت قراءة سجلات عمليات كتابة التقدم التي لم يصلها رد. عالجها في التشخيص أولًا.
 err_discards_unreadable	تعذّرت قراءة عمليات إلغاء التقدم المحفوظة. عالجها في التشخيص أولًا.
+
+# Independently maintained basic catalog labels.
+lib_sort_date_added	أضيفت على
+lib_filter_genre	التصنيف

@@ -1,5 +1,7 @@
 # Audiobook Loft for iPhone and iPad
 
+Current Apple internal beta preparation is documented in [independent Apple release state](../docs/apple-independent-release/STATE.md). Build 2 packages independently implemented native Apple code under a scoped MIT grant, preserving origin disclosure and vendor notices. Root GPL and inherited code/history remain unchanged. Both build-2 packages are valid, internal-only and assigned to the owner internal group in TestFlight. Dated licensing and no-upload statements below describe earlier candidates and do not apply as blanket license claims to this independent candidate. No external TestFlight or App Store submission is claimed.
+
 SwiftUI iPhone/iPad client, connecting directly to the unified Audiobook Loft backend or a compatible Audiobookshelf server through the shared production API core. The preview identity is `com.forkzed.audiobookshelf.native.preview`, team `C7X9BCC7LP`. Its explicitly scoped Keychain group keeps credentials separate from prior installations. Preview target names and signing identifiers remain stable; the public app has a separate identity.
 
 Current backend architecture, migration and release gates are in [the full-stack docs](../docs/fullstack/STATE.md) and [RELEASE-STATUS.md](../releases/leafwake/RELEASE-STATUS.md). Apple verification commands are documented below. Dated stock-2.30.0 observations below are historical compatibility evidence, not an active backend dependency or current acceptance claim.

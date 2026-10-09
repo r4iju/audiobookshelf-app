@@ -1,0 +1,35 @@
+# Performance diagnosis, October 9, 2026
+
+The measured cover problem is original-size decoded images retained without a byte budget. The 61-title synthetic library with square 4,000-pixel and portrait 3,000-by-4,000 JPEGs consumed about 2.55 GB peak physical memory during iOS playback and scrolling, and 2.17 GB during TV remote navigation. No owner library or screenshots were used.
+
+The patch decodes bounded, immediately cached ImageIO thumbnails on a serial background queue. Mobile catalog images have a 640-pixel edge for regular cards/details up to 210 points at 3x, or 1,280 pixels for accessibility cards up to 420 points at 3x. Changing Dynamic Type reloads the appropriate cached variant; full-player/Now Playing images keep up to 1,200 pixels. TV keeps up to 1,024 pixels for its 460-point covers at 2x. Catalog caches have a 64 MiB decoded-byte budget and retain their previous entry limits. New suspension points recheck account/session identity and cancellation before publishing artwork. TV no longer empties its entire cache when it reaches 240 entries. Listening persistence and the preceding TV layout patch are unchanged.
+
+The same workloads measured about 78 MB peak physical memory on mobile and 110 MB on TV. CPU time per measured iteration was approximately 1.35 to 1.37 seconds on mobile and 1.12 to 1.82 seconds on TV; TV now includes cache evictions and background decodes instead of retaining gigabytes of previously decoded images. Memory reduction is the demonstrated result, not a blanket CPU-speedup claim.
+
+Early XCTest swipe measurements showed large main-thread gaps, but Time Profiler identified accessibility traversal as a dominant cost. They are excluded from app responsiveness conclusions. A native iOS scrolling driver completed 16 steps and roughly 11,000 points during each playback sample without accessibility queries in the measurement interval. Unprofiled callback samples generally had p95 near 16.7 ms and p99 near 33.3 ms before and after; they do not establish a robust frame-rate improvement. One profiled baseline exceeded the 25 ms p95 callback budget, which must not be compared as an unprofiled before/after result. TV callback timing also varied between runs. No physical 4K/60 claim is made.
+
+CoreDevice could inspect both the iPhone 14 Plus and Living Room TV, but Instruments repeatedly classified them offline or timed out waiting for them to boot. No valid physical Animation Hitches/GPU trace was obtained. The existing T3 device tooling supports simulators here. The repeatable frozen-source profiling harness lives under `verification/performance`; normal app projects have no probe, automatic scroll driver or performance test launch behavior.
+
+Final candidate functional checks, source, review, merged replay and TestFlight availability are recorded below when completed.
+
+## Functional replay
+
+TV: all 17 existing app unit tests and all 16 selected catalog, playback and layout journeys passed, including successful/unanswered progress-save layout stability and replacing a playing title. Results: `/tmp/loft-perf-tv-units.xcresult` and `/tmp/loft-perf-tv-functional.xcresult`.
+
+iOS: the initial nine artwork/playback journeys had three harness failures: the artwork journey skipped the Theme and feedback destination, the no-audio message was below the materialized list viewport, and an unconditional swipe moved the next book's touch target out of the usable viewport. The existing journeys now follow the current settings navigation, reveal the error, and scroll only when the next book is not hittable. Their original content/playback assertions remain. Loaded square/portrait artwork and no-audio recovery passed in `/tmp/loft-perf-ios-functional-recovery.xcresult`; replacement/pause passed in `/tmp/loft-perf-ios-replace-focused.xcresult`. The other six playback journeys passed in the initial bundle `/tmp/loft-perf-ios-functional.xcresult`. No screenshot was captured.
+
+## Frozen-source isolated comparison
+
+The repeatable harness passed against source b9d0f65391d68b9da6af6b1751da47c1794a2e81 and candidate2375f00a, one platform/run at a time, no profiler or device stream. `evidence/frozen-comparison.json` pins exact source and probe hashes. TV peak physical memory:2,156,385 to110,972 kB; p95 callback gap:33.06 to21.30 ms, with over-50-ms gaps4 to0. The unchanged callback-budget command failed on the old TV report and passed on the new one. iOS peak memory:2,553,484 to77,933 kB; p95:17.36 to16.96 ms, p99 near33.34 ms on both. Its driver completed16 steps/11,187 points per final sample during synthetic playback. iOS pacing was already within the callback budget; no large mobile frame-rate gain is inferred.
+
+Native cover requests already ask for width500, but servers can return original pixels (the replacement server's managed-cover route currently returns the stored bytes). The client now bounds decoding independently of server resizing. The4,000-pixel fixture images are within the replacement server's supported20-million-pixel limit. This does not establish the size of the owner's actual covers or measure input latency on their devices.
+
+The default native fixture still referenced the removed Nuxt `static/book_placeholder.jpg`, closing cover connections instead of serving an image. A new HTTP test failed with `RemoteDisconnected` before the fix. Default covers now use a generated synthetic PNG, retaining the existing large-cover shapes and avoiding retired assets. All16 fixture tests pass.
+
+## Completed candidate checks and review
+
+All 94 distinct iOS unit cases passed: 88 in the regular run (`/tmp/loft-perf-ios-units.xcresult`), four with the media-authorization fixture (`/tmp/loft-perf-ios-authorization.xcresult`), and two with the disposable storage-exhaustion volume (`apple/build-remaining-qa/results/storage-Pool-iPhone-1-(iOS-27.0)-20261009-104133.xcresult`). Required fixture cases skipped in the regular run were exercised separately, not waived.
+
+An iPad candidate-only frozen replay of source116950d4 completed all16 native scrolling steps and5,635 points during synthetic playback. Peak physical memory was97,471 kB; callback p95 was17.12 ms, p99 was33.33 ms, with no gaps over50 ms. `evidence/ipad-candidate.json` records the exact source, report and metrics. There is no iPad baseline or physical rendering/input-latency claim.
+
+Fresh independent Standards and Spec reviews approved the bounded-memory release candidate after the accessibility-resolution correction. Supplementary fixture and evidence reviews approved the generated-cover repair and verified the frozen source/probe hashes against the local artifacts. These approvals do not establish resolution of the owner's physical responsiveness complaint.

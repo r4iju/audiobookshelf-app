@@ -73,6 +73,9 @@ import Foundation
 
     private let record: SavedRecord
     private var document: Document?
+    /// Live transmissions are barriers, but have not yet lost their answer. Not persisted:
+    /// after relaunch every retained transmission is genuinely unanswered.
+    private var active: Set<UUID> = []
 
     convenience init(file: URL) { self.init(record: SavedRecord(file: file)) }
 
@@ -109,6 +112,16 @@ import Foundation
         return document.writes.contains { $0.account == account && $0.itemID == itemID && $0.episodeID == episodeID }
     }
 
+    /// Whether this media has a save whose answer is unknown, rather than a request still running.
+    /// Presentation only: `unresolved` continues to protect ordering during live transmissions.
+    func unanswered(account: AccountIdentity, itemID: String, episodeID: String?) -> Bool {
+        guard let document else { return true }
+        if let unreadable = document.unreadableBefore, (document.restarts[account.server] ?? 0) < unreadable { return true }
+        return document.writes.contains {
+            $0.account == account && $0.itemID == itemID && $0.episodeID == episodeID && !active.contains($0.id)
+        }
+    }
+
     /// What waits for an account, for showing it.
     struct Waiting: Equatable {
         /// Titles of the account with a write that may still be applied.
@@ -121,8 +134,17 @@ import Foundation
     }
 
     func waiting(account: AccountIdentity) -> Waiting {
+        summary(account: account, excluding: [])
+    }
+
+    /// Recovery is actionable only after a transmission loses its answer, not while it is still sending.
+    func unansweredWaiting(account: AccountIdentity) -> Waiting {
+        summary(account: account, excluding: active)
+    }
+
+    private func summary(account: AccountIdentity, excluding excluded: Set<UUID>) -> Waiting {
         guard let document else { return Waiting(unreadable: true) }
-        let titles = Set(document.writes.filter { $0.account == account }.map { [$0.itemID, $0.episodeID ?? ""] }).count
+        let titles = Set(document.writes.filter { $0.account == account && !excluded.contains($0.id) }.map { [$0.itemID, $0.episodeID ?? ""] }).count
         let unreadable = document.unreadableBefore.map { (document.restarts[account.server] ?? 0) < $0 } ?? false
         return Waiting(titles: titles, unreadable: unreadable, restartRequested: document.requests?[account.server] != nil)
     }
@@ -154,9 +176,14 @@ import Foundation
         { request in
             let write = Write(id: UUID(), account: account, itemID: itemID, episodeID: episodeID, method: request.httpMethod ?? "GET",
                               path: request.url?.path ?? "", body: request.httpBody, issuedAt: Self.now)
-            try self.issue(write)
+            self.active.insert(write.id)
+            do { try self.issue(write) }
+            catch { self.active.remove(write.id); throw error }
             return { error in
+                self.active.remove(write.id)
                 if error.map(Self.settled(by:)) ?? true { try? self.resolve(write.id) }
+                // Unknown outcomes (and failed durable resolution) remain visible for recovery.
+                NotificationCenter.default.post(name: Self.changed, object: self)
             }
         }
     }

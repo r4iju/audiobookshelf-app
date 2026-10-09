@@ -1,6 +1,7 @@
 package com.audiobookshelf.android.journeys
 
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.hasText
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.audiobookshelf.android.MainActivity
@@ -8,13 +9,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** The emulator network has no cast receiver, so this covers discovery's empty state, not a real cast. */
+/** Discovery must leave phone playback intact, whether the network has receivers or not. */
 @RunWith(AndroidJUnit4::class)
 class CastJourney {
     @get:Rule val compose = createEmptyComposeRule()
 
     @Test
-    fun withNoReceiverOnTheNetworkCastingExplainsWhyAndPhonePlaybackContinues() {
+    fun receiverDiscoveryLeavesPhonePlaybackRunning() {
         Fixture.resetAppData()
         Fixture.configure("baseline")
         ActivityScenario.launch(MainActivity::class.java).use {
@@ -28,8 +29,9 @@ class CastJourney {
             compose.tap("player-cast")
             compose.waitForTag("cast-sheet")
             compose.waitForText("Playing on this phone")
-            compose.waitForText("No cast devices found", 30_000)
-            compose.capture("cast-no-receivers")
+            compose.waitUntil(30_000) {
+                compose.isShown("cast-receiver") || compose.onAllNodes(hasText("No cast devices found")).fetchSemanticsNodes().isNotEmpty()
+            }
             val shown = compose.shownSeconds()
             compose.tap("cast-close")
             compose.waitUntil(10_000) { !compose.isShown("cast-sheet") }

@@ -1,0 +1,41 @@
+{
+  "app": "6819142007",
+  "builds": [
+    {
+      "id": "d815a0b3-619e-4173-be66-58cccf072df6",
+      "build": "3",
+      "processingState": "VALID",
+      "buildAudienceType": "APP_STORE_ELIGIBLE",
+      "minimumOS": "17.0"
+    },
+    {
+      "id": "45085960-fab0-4f5d-9a78-f7d7f80d9920",
+      "build": "3",
+      "processingState": "VALID",
+      "buildAudienceType": "APP_STORE_ELIGIBLE",
+      "minimumOS": "15.0"
+    }
+  ],
+  "reviewSubmitted": false,
+  "publicApproval": false,
+  "publiclyAvailable": false,
+  "validationErrorCodes": {
+    "ios": [
+      "ENTITY_ERROR.ATTRIBUTE.REQUIRED",
+      "ENTITY_ERROR.RELATIONSHIP.INVALID",
+      "STATE_ERROR.APP_DATA_USAGES_REQUIRED",
+      "STATE_ERROR.SCREENSHOT_REQUIRED.IPAD_13_PROFILE",
+      "STATE_ERROR.SCREENSHOT_REQUIRED.IPHONE_DYNAMIC_ISLAND"
+    ],
+    "tv": [
+      "ENTITY_ERROR.ATTRIBUTE.REQUIRED",
+      "ENTITY_ERROR.RELATIONSHIP.INVALID",
+      "STATE_ERROR.APP_DATA_USAGES_REQUIRED",
+      "STATE_ERROR.SCREENSHOT_REQUIRED.TV_PROFILE"
+    ]
+  },
+  "privacyPolicyUrl": "https://r4iju.github.io/audiobookshelf-app/apple-privacy.html",
+  "policyPublishedVerified": true,
+  "policyURLSaved": true,
+  "freePriceReadback": "0.0"
+}

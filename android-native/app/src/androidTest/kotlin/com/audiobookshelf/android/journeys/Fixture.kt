@@ -156,6 +156,7 @@ object Failures {
         val name = "$test-${System.currentTimeMillis()}"
         android.util.Log.e(LOG, "$name waiting for $waitingFor")
         runCatching {
+            if (InstrumentationRegistry.getArguments().getString("absCaptureEvidence") == "false") return@runCatching
             Device.device.executeShellCommand("mkdir -p $DIRECTORY")
             Device.device.executeShellCommand("screencap -p $DIRECTORY/$name.png")
             android.util.Log.e(LOG, "screenshot $DIRECTORY/$name.png")
@@ -273,6 +274,7 @@ object Device {
 
 /** Saves the screen as visual evidence in `/data/local/tmp/abs-journeys`, which outlives the app's uninstall after a run. */
 fun ComposeTestRule.capture(name: String) {
+    if (InstrumentationRegistry.getArguments().getString("absCaptureEvidence") == "false") return
     waitForIdle()
     Device.device.executeShellCommand("mkdir -p /data/local/tmp/abs-journeys")
     Device.device.executeShellCommand("screencap -p /data/local/tmp/abs-journeys/$name.png")

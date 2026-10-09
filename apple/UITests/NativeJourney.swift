@@ -23,6 +23,7 @@ import XCTest
     }
 
     func capture(_ name: String) {
+        guard ProcessInfo.processInfo.environment["ABS_QA_CAPTURE_SCREENSHOTS"] == "1" else { return }
         let evidence = XCTAttachment(screenshot: XCUIApplication().screenshot())
         evidence.name = name
         evidence.lifetime = .keepAlways

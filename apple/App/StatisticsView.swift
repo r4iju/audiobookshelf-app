@@ -66,7 +66,7 @@ struct StatisticsView: View {
                     Text(l10n("{0} days listened", stats.days.count))
                     Text(l10n(store.finished == 1 ? "{0} title finished" : "{0} titles finished", store.finished))
                 }
-                Section(header: Text(l10n("Minutes listened in the last 7 days")).foregroundColor(ShelfStyle.secondaryText)) {
+                Section(header: Text(l10n("Listening minutes this week")).foregroundColor(ShelfStyle.secondaryText)) {
                     ForEach(recentDays, id: \.date) { day in
                         dayRow(day).accessibilityElement(children: .ignore).accessibilityLabel(l10n("{0}, {1} minutes listened", day.date, minutes(day.time)))
                     }

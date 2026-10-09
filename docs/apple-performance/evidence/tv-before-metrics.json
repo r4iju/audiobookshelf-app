@@ -1,0 +1,16 @@
+{
+  "Destination": "Apple TV 4K (3rd generation) tvOS Simulator 27.0",
+  "Configuration": "Test Scheme Action",
+  "Absolute Memory Physical (tv) (Average)": "2147996.016 kB",
+  "Absolute Memory Physical (tv) (Iterations)": "[2146996.592, 2148995.44]",
+  "CPU Cycles (tv) (Average)": "4524757.393 kC",
+  "CPU Cycles (tv) (Iterations)": "[5103917.483, 3945597.303]",
+  "CPU Instructions Retired (tv) (Average)": "10033072.51 kI",
+  "CPU Instructions Retired (tv) (Iterations)": "[11914072.019, 8152073.004]",
+  "CPU Time (tv) (Average)": "1.119454324 s",
+  "CPU Time (tv) (Iterations)": "[1.2603819840000001, 0.9785266640000001]",
+  "Memory Peak Physical (tv) (Average)": "2174194.044 kB",
+  "Memory Peak Physical (tv) (Iterations)": "[2198393.224, 2149994.864]",
+  "Memory Physical (tv) (Average)": "126853.216 kB",
+  "Memory Physical (tv) (Iterations)": "[251707.584, 1998.848]"
+}

@@ -74,9 +74,12 @@ struct PlaybackContainer<Content: View>: View {
     private func loadArtwork() {
         artwork = nil
         guard let id = player.itemID else { return }
+        let account = connection.api.signIn?.account
         Task {
             guard let data = try? await connection.api.coverData(itemID: id), player.itemID == id else { return }
-            artwork = UIImage(data: data)
+            let image = await ArtworkImage.decode(data)
+            guard player.itemID == id, account == connection.api.signIn?.account, !Task.isCancelled else { return }
+            artwork = image
         }
     }
 
@@ -258,9 +261,12 @@ struct NowListening: View {
     private func loadArtwork() {
         artwork = nil
         guard let id = player.itemID else { return }
+        let account = connection.api.signIn?.account
         Task {
             guard let data = try? await connection.api.coverData(itemID: id), player.itemID == id else { return }
-            artwork = UIImage(data: data)
+            let image = await ArtworkImage.decode(data)
+            guard player.itemID == id, account == connection.api.signIn?.account, !Task.isCancelled else { return }
+            artwork = image
         }
     }
 }
@@ -471,7 +477,7 @@ struct PlaybackPreferenceSections: View {
             Section(header: Text(l10n("Playback controls"))) {
                 Toggle(l10n("Lock player"), isOn: $locked).accessibilityIdentifier("lock-player")
                 Toggle(l10n("Rewind after a pause"), isOn: $player.rewindAfterPause)
-                Toggle(l10n("Allow seeking from system media controls"), isOn: $player.allowMediaSeeking)
+                Toggle(l10n("Enable seeking with system playback controls"), isOn: $player.allowMediaSeeking)
                 Picker(l10n("Forward interval"), selection: $player.forwardInterval) {
                     ForEach([5, 10, 15, 30, 45, 60], id: \.self) { seconds in Text(l10n("{0} seconds", seconds)).tag(seconds) }
                 }.pickerStyle(MenuPickerStyle()).accessibilityIdentifier("Forward interval")

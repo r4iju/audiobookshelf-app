@@ -10,45 +10,13 @@ final class NativeStringsTests: XCTestCase {
         NativeStrings(language: NativeLanguage.all.first { $0.code == code }!, bundle: .module)
     }
 
-    func testEquivalentNativeTextShowsTheLegacyTranslation() {
-        XCTAssertEqual(strings("de")("Settings"), "Einstellungen")
-        XCTAssertEqual(strings("fr")("Continue listening"), "Continuer l'écoute")
-        XCTAssertEqual(strings("ar")("Haptic feedback"), "ردود الفعل اللمسية")
+    func testUntranslatedNativeLabelsUseEnglishWithoutLegacyTables() {
+        XCTAssertEqual(strings("de")("Settings"), "Settings")
+        XCTAssertEqual(strings("fr")("Continue listening"), "Continue listening")
+        XCTAssertEqual(strings("ar")("Haptic feedback"), "Haptic feedback")
     }
 
-    /// Native texts whose legacy screen showed the same thing under other English wording, such as the reader settings
-    /// sheet, the podcast form, the bookmarks panel and the server download queue, keep the legacy translation.
-    func testNativeWordingOfALegacyLabelShowsTheLegacyTranslation() {
-        XCTAssertEqual(strings("de")("Reading settings"), "E-Reader Einstellungen")
-        XCTAssertEqual(strings("de")("Show server address"), "Server Adresse anzeigen")
-        XCTAssertEqual(strings("ar")("No playlists yet."), "ليس لديك أي قوائم تشغيل")
-        XCTAssertEqual(strings("fr")("Waiting for {0} episode(s) from your server", 3), "3 épisode(s) mis en file pour téléchargement")
-    }
-
-    /// The podcast episode sort menu offers the legacy choices (`EpisodesTable.vue` `episodeSortItems`), so each keeps its
-    /// legacy translation, including "Episode number" for the legacy "Episode" ordering.
-    func testPodcastEpisodeSortChoicesShowTheLegacyTranslations() {
-        XCTAssertEqual(["Published date", "Title", "Season", "Episode number", "Filename"].map { strings("de")($0) },
-                       ["Veröffentlichungsdatum", "Titel", "Staffel", "Episode", "Dateiname"])
-        XCTAssertEqual(strings("fr")("Filename"), "Nom de fichier")
-        XCTAssertEqual(strings("ar")("Season"), "الموسم")
-    }
-
-    /// Actions and states the legacy app named differently: Disconnect signed out (it cleared the active login and
-    /// returned to the connection screen, as Sign out does), and the attempt to reach the server.
-    func testSameActionUnderTheLegacyNameShowsTheLegacyTranslation() {
-        XCTAssertEqual(strings("de")("Sign out"), "Trennen")
-        XCTAssertEqual(strings("fr")("Connecting…"), "Tentative de connexion...")
-        XCTAssertEqual(strings("ar")("Not connected"), "خادم Audiobookshelf غير متصل")
-        XCTAssertEqual(strings("de")("Mark book finished?"), "Bist du sicher, dass du diesen Artikel als beendet markieren willst?")
-    }
-
-    /// "Light" is both a theme and a haptic strength. Languages that name them differently must show each meaning's own
-    /// legacy translation, and English keeps the one wording for both.
-    func testSharedEnglishWordingIsTranslatedByItsMeaning() {
-        XCTAssertEqual(strings("de")("Light", context: .theme), "Hell")
-        XCTAssertEqual(strings("de")("Light", context: .hapticStrength), "Leicht")
-        XCTAssertEqual(strings("ar")("Light", context: .theme), "فاتح")
+    func testEnglishContextsKeepTheirNativeMeanings() {
         XCTAssertEqual(strings("en-us")("Light", context: .theme), "Light")
         XCTAssertEqual(strings("en-us")("Light", context: .hapticStrength), "Light")
     }
@@ -64,7 +32,7 @@ final class NativeStringsTests: XCTestCase {
     /// Renderers outside the app, such as the year export, receive an immutable copy of only the translated texts, so
     /// anything untranslated keeps their own English default and nothing reads app resources while drawing.
     func testCopyForAnotherRendererCarriesOnlyTranslatedText() {
-        XCTAssertEqual(strings("de").copy(["Settings", "Not a native text"]), ["Settings": "Einstellungen"])
+        XCTAssertEqual(strings("de").copy(["Settings", "Not a native text"]), [:])
         XCTAssertEqual(strings("en-us").copy(["Settings"]), [:])
     }
 
@@ -81,26 +49,16 @@ final class NativeStringsTests: XCTestCase {
         XCTAssertEqual(strings("en-us")("File {0} of {1}", 1, 2), "File 1 of 2")
     }
 
-    /// Every shipped translation must be the real legacy value for its mapped key. Where the legacy app had no usable
-    /// value (none, empty, marked up, or with different placeholders), the translation maintained here for this app
-    /// (`translations/<code>.json`) is shown instead, and anything without either falls back to English.
-    func testShippedTranslationsAreTheUsableLegacyOrMaintainedTranslations() throws {
-        let mapping = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: Self.localization.appendingPathComponent("legacy-equivalents.json")))
-        XCTAssertFalse(mapping.isEmpty)
+    func testShippedTranslationsAreMaintainedHereOrUseEnglish() throws {
         let keys = try XCTUnwrap(NSDictionary(contentsOf: try XCTUnwrap(Bundle.module.url(forResource: NativeStrings.tableName, withExtension: "strings", subdirectory: nil, localization: "en"))) as? [String: String]).keys
         for language in NativeLanguage.all where language.code != "en-us" {
-            let legacy = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: Self.repository.appendingPathComponent("strings/\(language.code).json")))
-            let maintainedFile = Self.localization.appendingPathComponent("translations/\(language.code).json")
-            let maintained = FileManager.default.fileExists(atPath: maintainedFile.path)
-                ? try JSONDecoder().decode([String: String].self, from: Data(contentsOf: maintainedFile)) : [:]
+            let file = Self.localization.appendingPathComponent("translations/\(language.code).json")
+            let maintained = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: file))
             let native = strings(language.code)
-            for english in keys {
-                let candidate = mapping[english].flatMap { legacy[$0] } ?? ""
-                let usable = !candidate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !candidate.contains("<")
-                    && NativeStrings.placeholders(in: candidate) == NativeStrings.placeholders(in: english)
-                let parts = english.components(separatedBy: "::")
-                let shown = parts.count == 2 ? native(parts[1], context: try XCTUnwrap(NativeTextContext(rawValue: parts[0]))) : native(english)
-                XCTAssertEqual(shown, usable ? candidate : maintained[english] ?? parts.last!, "\(language.code): \(english)")
+            for key in keys {
+                let parts = key.components(separatedBy: "::")
+                let shown = parts.count == 2 ? native(parts[1], context: try XCTUnwrap(NativeTextContext(rawValue: parts[0]))) : native(key)
+                XCTAssertEqual(shown, maintained[key] ?? parts.last!, "\(language.code): \(key)")
             }
         }
     }

@@ -1,0 +1,619 @@
+{
+  "source": "62b880281119672743cd68bbb76a57676d9a4549",
+  "runtimeRootsOnly": true,
+  "note": "withCast and noCast roots are mutually exclusive. Legacy fixtures only enter androidTest, not these production roots. Build tooling/SDK/dependency scopes in android-native/LICENSE.",
+  "files": [
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/AbsApplication.kt",
+      "sha256": "feea9a6846fd9a63e5675aa72c02f64cd2607f775de27e1ac51708981bb510c9"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/AppGraph.kt",
+      "sha256": "c304052299409ee3ec2e6a6b9b4af61f182bc5a19a15a1277041be41463ffb47"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ErrorTexts.kt",
+      "sha256": "45e7da9c25a711b2a882b8a08790fa724430e932dd92023c7696e40e118d29d0"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/MainActivity.kt",
+      "sha256": "4827fd52fd66a0bf953cc86fa572ddd796eb9832852a23d3a0ee32c8ba9f3bbc"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/auth/OpenIdSignIn.kt",
+      "sha256": "4145f2f63d6ba2a73731459dc5af5d638d82e75bc856c336da2023d4d4c2e0d9"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/data/AccountStore.kt",
+      "sha256": "437a9572ae859a6e8aca62619589ef2f413f8409cba91ae680605cdcfd534f52"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/data/CatalogModel.kt",
+      "sha256": "eee718e38b4b48cbe75bb1eee0bab6a1f73891869b82aeff499efea06bd886ff"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/data/CredentialVault.kt",
+      "sha256": "e78002b9d82da12f95d7fb5080782468f45e362397420e65f1e1c92c17b441c3"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/data/Diagnostics.kt",
+      "sha256": "4b4493ff7b6c621c7af898825e4ac165eb655922e3daf837dd7af31ab6d20aa3"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/data/SearchModel.kt",
+      "sha256": "f34a146b9b7cc1eb13f2877142a790581d281b5e6ad97bb01567d3b986719dc2"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/data/SettingsStore.kt",
+      "sha256": "f6018a67e556cdd01fd05a2987d2f410c022eb384a01c1bc70e2094e8d1d992a"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/download/DownloadFolder.kt",
+      "sha256": "049de9a28f59fc4086a847e7071b2705654d5fefac8d61176405fbc3cd4721b9"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/download/DownloadStore.kt",
+      "sha256": "7dde625db2842d690b26eee627640ca594d594e092fc7101d717d1d043d7726c"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/download/Downloads.kt",
+      "sha256": "1e470cc8be426f141505380255d2385456a309bf6907249a7145df01780ee41d"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/migration/Migration.kt",
+      "sha256": "79ee4334e18084f323b29ce76206ae5f55d23ccda5ca5f633a06874cf3761e7e"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/playback/BrowseTree.kt",
+      "sha256": "af4f2bb0abd8f550150625568da430f661e6573bb0c52d5b66193e11adf85ffd"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/playback/CastTypes.kt",
+      "sha256": "4851e27498e1b01b8e9997e2fe680f75a1115173713251fd98fb85873bfcb2ed"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/playback/ListeningWriter.kt",
+      "sha256": "9c185b0c02f441a3383c0a478d2407a42b8287a3bab11ca9b53349cad851a519"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/playback/PlaybackEngine.kt",
+      "sha256": "fdb4638cd60ec409a39d21da0acc598efb7af1b9ee6c8027685e4d7b8212c65c"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/playback/PlaybackService.kt",
+      "sha256": "e33beff50ee6f7f575848655aeb5d56d625d55d6c01c9c84d5a263a249f1c958"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/playback/ProgressSync.kt",
+      "sha256": "c136653e19ed8c0eb74f2807dff133bc0bcea5625cd0f9b939168d124ba1961e"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/playback/SleepController.kt",
+      "sha256": "be58a39264e841f1686e736bfc4d3a9e6838c5ac3b0e675555881071c28a19c7"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/podcast/PodcastRequests.kt",
+      "sha256": "2da774860c21c0dd77f5131f0a5a32be523e439109b9d3abeb635e3251cf4b90"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/podcast/ServerEvents.kt",
+      "sha256": "ea3fdc37eec7e2a6daef1364e037da013b6b975f26e41f077144d5bd4cea3cce"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/reader/PdfDocument.kt",
+      "sha256": "fc29cb5016f680203a2d4a38906f09eafb58af786be222d752c80bf1881e2996"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/reader/ReadingStore.kt",
+      "sha256": "ce9decd964d359aa1a6eeb197b479419467a52beb8a7ff85acee39f8abd1f2a9"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/AccountsScreen.kt",
+      "sha256": "b09175111f340f58d47d2b64635447ada6192872b359f8ef586a56cc4ae8b04e"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/AppRoot.kt",
+      "sha256": "d5efcfb43253a34ec9b102163497dc60d35d2035aaad5083586c532e0eaaa79f"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/CastSheet.kt",
+      "sha256": "b2422eb39e8c9283819258ce6521baabbd4baa44b18906f1349d491a2222ee14"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/CatalogControls.kt",
+      "sha256": "69d820911a703d3630434e0c5def1f2b287fabd9cee627333098e243dd94a071"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/Components.kt",
+      "sha256": "ebce0f11d3afd742122f5f592f690607e4d4314c5f9594f555bbcb4a8eb7280c"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/ConnectScreen.kt",
+      "sha256": "fbd8e101b5eb164677dcec2d764d0cfbc37dbd7f2d023a40b438370f7b2b5747"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/DownloadScreens.kt",
+      "sha256": "367efb232e29d541550f8c4b2c3ba9837ef82100ab5b5fc50703bae181cc6d28"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/FilteredScreen.kt",
+      "sha256": "8d69e8748cff1b33a199c38fbfd800e1e27b24aa8abc7e74cd6af9147ec7b397"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/GroupScreens.kt",
+      "sha256": "09e22627b92b2988775acc348435068256fe726b51fa9522ef9cebaf3a899d7f"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/ItemActions.kt",
+      "sha256": "453744389820bbe4e12c63dd6c74bca282d12aa1b70d3c6715bf529f567b2ab8"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/ItemScreen.kt",
+      "sha256": "a2ae1fc0083ff463b4214dc9a2f5e6fc5ed3e06fc595191aca6bd08904ff811e"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/LeafwakeLegal.kt",
+      "sha256": "966af83571a9e661169a7046b83efd476eefb5c7cde570f42747d7c7266fbbe0"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/LibraryScreen.kt",
+      "sha256": "b506715594cbb9b9ae26b58c632bccf6598d6b4006e21c4e360c344e80d27532"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/MainViewModel.kt",
+      "sha256": "30bf6f100b7dcf3291b57cdbb57e10b58ec1d899f550a76acc59f1cb3290d1f7"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/MigrationScreen.kt",
+      "sha256": "2731249fad86524fad9122058a99fda2f6d5ebadf7cd0138bfdfa815f964a86c"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/PlayerScreen.kt",
+      "sha256": "9b78aecbcec5e1a578e6af6593e205e0dd446d49e3e395c49967725cc24a007a"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/PlayerTools.kt",
+      "sha256": "700c64789be588e138dd6fc1d8059d13632b2a5b2aa012bf72d139d4af77e53e"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/PodcastScreens.kt",
+      "sha256": "8be221686b21f58ef73eebbce2b8654050de47083644bd0c7436961720c7d0a0"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/ProgressActions.kt",
+      "sha256": "e3244b5568dbe12bd9d46831463712ecc6959fb34d95f99dec98259e32f43920"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/ReaderScreen.kt",
+      "sha256": "014fa4fcc9a6b5b68e5c05842fd7f8e8c4fa5e739a3c8acba983ec06583356a6"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/Screens.kt",
+      "sha256": "a2fc3157038f90e609631daee09483b566d9b7f8eaeaaca60f2fcba8f67910f4"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/SearchScreen.kt",
+      "sha256": "bc16c4c9d981ae42f5e921e76ae37bca21ea905bbd3345354bf3e8c7dbbbcc69"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/SettingsScreens.kt",
+      "sha256": "7ce5891b8c90811e03e7b0c978a1e74b25c007e90508726ca4a200ff391904cb"
+    },
+    {
+      "path": "android-native/app/src/main/kotlin/com/audiobookshelf/android/ui/Theme.kt",
+      "sha256": "c89f7edf90d96558f752c1746462205fbf19bfdaa54ad836b4796dcfdacd647f"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/ApiClient.kt",
+      "sha256": "9b5f905f3e55207ea361558e574ff6f289eded6517f46d655f8f4ebdbe13799c"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/ApiError.kt",
+      "sha256": "2c7923f15b0dde398ebb469068ffa3c407644410b665ba113cd33f9f2403c5f1"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/CarBrowsing.kt",
+      "sha256": "4f2df153d1a74403accb127c840d52bf1f5e5e26825c55a37233ed23d25f0900"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/CastMedia.kt",
+      "sha256": "fa3b43110b586c1febfee77f0bf1e874cf17c1ea1ea4ec5bfa5bb7ff00375d21"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/Credentials.kt",
+      "sha256": "96afd432c8e1aa9903cacd5d3c64ae1994e1f2a07c765b25fef1855256439d8d"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/ErrorText.kt",
+      "sha256": "28806d6f849b9feaf61b27a968240f57fda36a2b45de45e0dd85b318f4edcc38"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/ListeningJournal.kt",
+      "sha256": "28f300ffdf24a8aacf6f8a1b84f0794d18a45a68db2ec264c9514853622ea7f5"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/ListeningRecovery.kt",
+      "sha256": "79f9b9f00cf7aae72a2656386f0912d58356480616adf86125d661176e5ba8b3"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/Models.kt",
+      "sha256": "9b0aeca83bf299ffbf0cc50b4bb9514c1f3ee90ad39758eb4694db01e73ffdf8"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/ProgressResets.kt",
+      "sha256": "e3506d923331191774258b6d39277d9f9b224716b215f76a01dd3fb360016211"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/PublicationLedger.kt",
+      "sha256": "fe024d471c4e78c6412973cd7d7dca0ee7108488c7f86168f317cd4bd0807aa2"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/ServerAddress.kt",
+      "sha256": "782c8ada8ee6825c2c220b3c02102278a33fbdd4ed22188704a920772f3c216d"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/SleepTimer.kt",
+      "sha256": "9c3d5b04b2f103d97ece73da6de58af430023275489021da9bc551a0222aa1c7"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/Timeline.kt",
+      "sha256": "bbff62cc5daed2266bb7cdb48c64c8da3f5d056a6a406cb4eaed00982c8622d2"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/migration/Attachment.kt",
+      "sha256": "7869052c87c748952e97855f6709cbbbe28a591470768bd0a72af218f2b760dd"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/migration/LegacyArchive.kt",
+      "sha256": "dbaf15f490b8f439d32b4c3f3da468db23cf75f02742bde029e39e048fee49f6"
+    },
+    {
+      "path": "android-native/core/src/main/kotlin/com/audiobookshelf/core/migration/LegacyImport.kt",
+      "sha256": "9babe1972e76c0ecb362d92670eae4e5d545d0533a2b507e28ab2fd7c80ec2bc"
+    },
+    {
+      "path": "android-native/app/src/withCast/kotlin/com/audiobookshelf/android/playback/Casting.kt",
+      "sha256": "f886a16cf789c2f305f56888238fed1b3b5c30b16a24ababb649d599388b931c"
+    },
+    {
+      "path": "android-native/app/src/noCast/kotlin/com/audiobookshelf/android/playback/Casting.kt",
+      "sha256": "f757ed9943949a3aeaab4e6f4114a50e72210445a22e2e2977070efaf55fd8e5"
+    },
+    {
+      "path": "android-native/app/src/main/res/drawable/ic_small.xml",
+      "sha256": "4298f9f7318100a98a88a4dbe281f949e5dbc041864fac4eefe43c79b2d1f3f3"
+    },
+    {
+      "path": "android-native/app/src/main/res/drawable/leafwake_icon.xml",
+      "sha256": "36f8e8452277749b09e7fdbb5547fc0f2a725ba8620f2b24d574075348cb8574"
+    },
+    {
+      "path": "android-native/app/src/main/res/values/colors.xml",
+      "sha256": "9e494ab1d782ad87ea0c02013f306f392a1bb305fb84be11a41f0b7d67c850c8"
+    },
+    {
+      "path": "android-native/app/src/main/res/values/strings.xml",
+      "sha256": "d85fc30ff8082123f2655e811868b0287b759156a53b567e59369417ca4ecee9"
+    },
+    {
+      "path": "android-native/app/src/main/res/values/themes.xml",
+      "sha256": "dea02e8ee303fe6f47c3ef7a2c4f47be6303ed19ce85b5b045132c204cf1f8ce"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-ar/strings.xml",
+      "sha256": "25650a5ce943b310fb3a5ffe056142b9a4231942065e72cba7eb841e95e078f5"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-b+zh+Hant/strings.xml",
+      "sha256": "d009b89196ff5b2f9d69b6bd2752a44a69f70aeebb8dde0bda4e64f4afef5f13"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-be/strings.xml",
+      "sha256": "8b269a275af79e7791513445d5c32735dc4a35f11055de7b52fe1b49fb2c2898"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-bg/strings.xml",
+      "sha256": "b1648d654df5e74cd301d88cca5aac2e98d8abf3e8ce1bb754f168d82e5edb73"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-bn/strings.xml",
+      "sha256": "2601a41f3fb2cde9f39464dbc901efb34a092eba0a4767ff35e370f277c87dd0"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-ca/strings.xml",
+      "sha256": "110a16deaf3a10b2f13ec5ba1b0c2d865933c317fac64f7868c27e98ecc579f6"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-cs/strings.xml",
+      "sha256": "e268a88d78bab1f649620b45045159639b1697f637f72d317f3dfd7159a02e0b"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-da/strings.xml",
+      "sha256": "45ef9309585a7982185de42e11c6518c00dfbbfa47676f0276e1ae5167268000"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-de/strings.xml",
+      "sha256": "6cb5bc93d3b4990262f113b0a03b01b6f704d67acf6fdf49adcc2357c65dd00b"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-el/strings.xml",
+      "sha256": "2cbcaa662eb3853a4abbcdd1083709f153071b86b459e9fb3ce9b3e30a16d2e3"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-es/strings.xml",
+      "sha256": "8b35f924db1d35bbd98b7b82e6f21ec76b2eacc817704a365c87f5f520e5da89"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-fi/strings.xml",
+      "sha256": "15bca5d9d03e3417de3bc56205d97181f1d9e6b65c9c8e43def54dadd70f4b2d"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-fr/strings.xml",
+      "sha256": "ee6b064e2394614c58d43df50a086490bf73c0456be3fca03c7b35195550d4a2"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-hr/strings.xml",
+      "sha256": "cecbca31e43297294c4f1babe0e0d4e804629dc10a92ec63c6cd04de69c93946"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-hu/strings.xml",
+      "sha256": "15d737a537622ca73b2c3bf89452dee4546b0af3e601a58dafca128349a93858"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-it/strings.xml",
+      "sha256": "f152c65b489bd075faeacbd755e3e989a5d2701b2042b33adcf032b6b2530273"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-iw/strings.xml",
+      "sha256": "1ba4ea5ccccabcb5c3125afaa82279ee6530d0f1e84444b5543d2f1bf690b23e"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-ja/strings.xml",
+      "sha256": "dba21ad19e6ac7cf4b3ba3eafed515554bcb5279b10fbac5177de63a96209cae"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-ko/strings.xml",
+      "sha256": "7f8e466afc88a3fa2cddb4725a60e7d88f99181e24192a1ad2afbe74c1f04100"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-lt/strings.xml",
+      "sha256": "aa4c13f5259ac79e503815a303854ea0597354473af702fe7103eb232612180e"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-nb/strings.xml",
+      "sha256": "c4fcf24e7404b5bfb20a69be893f4cc85790080d43928a330b58f92fcbfa7373"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-nl/strings.xml",
+      "sha256": "e3b5ad083d2296f87211878cf5dca3c042f6acc19f93e8fb0a1a715590d4b93d"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-pl/strings.xml",
+      "sha256": "512017e7c2ebcab1100451664f5fd156c682a10d471ed7948106a048f2ea4b57"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-pt-rBR/strings.xml",
+      "sha256": "16ee62ae224ce5900d63135d622bceb198f9383266d991e3692f5ba7022b2943"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-ro/strings.xml",
+      "sha256": "5671bbcdac6800e2d43a483ce499a83e673fb8189f37d1dfef4164c792529c6b"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-ru/strings.xml",
+      "sha256": "6c8cd050e6e214b25242825fb921a478deb72c2e4181b83eb245fd3c0d5edd34"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-sk/strings.xml",
+      "sha256": "afc0eb9b62354f427c927c3a03bc8f34fe1a7adc7929260d3ef22cb53c691bf1"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-sl/strings.xml",
+      "sha256": "da9b9f48dd6c80802bd65cf8e9b8c48d6b43ba12984ecb6365a250b753e04426"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-sv/strings.xml",
+      "sha256": "87a789ac8046c0f2e064cd3016e2697f3e4279b3ac02bbfa0b56afe97abcb816"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-ta/strings.xml",
+      "sha256": "3d65f3780d133e2934fe847d5d5055dabb66f73758d94e995fe27be136cd7a6c"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-tr/strings.xml",
+      "sha256": "c8f65b5eed8020f187a594fec6348c21ab55175d5b4602518d8af480a917d4da"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-uk/strings.xml",
+      "sha256": "4f88017c5d5c51bc8180d09fe50cc9a366f02fd26befe118e338d0746cf7def0"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-vi/strings.xml",
+      "sha256": "9d9fc9aae54695e7d1cd1bc0d2506f4bccdec97d621410d787beea5e65b47b10"
+    },
+    {
+      "path": "android-native/app/src/main/res/values-zh-rCN/strings.xml",
+      "sha256": "7268e7a776f0ba716bebb0adacdbfaeec3f5feeb4f4b2e49285462a157493aca"
+    },
+    {
+      "path": "android-native/app/src/main/res/xml/automotive_app_desc.xml",
+      "sha256": "0b6e23c337b983034ff69d8823b0c26a4ccd10665889e36ab33c581cfbf772ad"
+    },
+    {
+      "path": "android-native/app/src/main/res/xml/locales_config.xml",
+      "sha256": "681fc654c79d25fb13eee737d2f8b1284cea14b959e70a6a8fc0aff869aa2f98"
+    },
+    {
+      "path": "android-native/app/src/main/res/xml/network_security_config.xml",
+      "sha256": "f677828356bc6fb4b2d661e7411b932cacc3b67ad564bcaa5f99234e794318e7"
+    },
+    {
+      "path": "android-native/app/src/main/res/xml/shared_files.xml",
+      "sha256": "4197a031200eb49c119fed4fcf35846cae975c0a4f8ffe639e0e253e865e5a64"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/ar.tsv",
+      "sha256": "a054a6304a56ddc8663dad025a6471e02590c019187378f3fa694b7350231673"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/be.tsv",
+      "sha256": "ced5019359ac2395c0e3c05616f2045681cb3949ef9690644263e4c2ce441123"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/bg.tsv",
+      "sha256": "6dfb5458f6e73fbafc6860d4e0e2f15d0582988fbdc0f80061179dc2d1e64106"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/bn.tsv",
+      "sha256": "61a45dc95fd9551103abe27a4541ee2ec6d943241efaa5a1e28bd777587bfc21"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/ca.tsv",
+      "sha256": "bf5bee9e89b8df57772072705fd0a8b85d0fbd98b97db0eee1664d26880e08e2"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/cs.tsv",
+      "sha256": "4d6e5bd7729d8a9adf4934f658193322a07ad67c821975c13077a65bc3a55cb9"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/da.tsv",
+      "sha256": "c087963ecae1021ddf1dc988df3b568abedb79e70674275b3ef8b59bc73e62fb"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/de.tsv",
+      "sha256": "829ce9ddd991c1a7b521f9df353ddcd39a3162385bc7fa926166115ae08c7312"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/el.tsv",
+      "sha256": "fcf6bd9225d21e2b8ecfa94ef8f6a47f1d0c0364eaca127bb90cd22d85f07d52"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/es.tsv",
+      "sha256": "d19f4c30f02dc8eff5bc0a75147c3ccb3c75837108565e5f8e8a0da541cbb287"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/fi.tsv",
+      "sha256": "83489910e5d27cdac09bb4c476a7c386d504aacc11e262621c0b19151098cb55"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/fr.tsv",
+      "sha256": "56eb617c473f9940dc371e9cb485a168e59d265f7cd681d7731f21bd94f45949"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/he.tsv",
+      "sha256": "9bb790796195a0c605eebc2b7c8da794ddc0db871969be9993167260a2587cbe"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/hr.tsv",
+      "sha256": "0c73a901b70d9a864cd529531d87f8c0f9da5ccfd2dd1bcbdf5ff7679f557be7"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/hu.tsv",
+      "sha256": "95fb694d4e704db9eccce3dd071ef72e772e9a66c870f0a7685dc53e63b9d3c8"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/it.tsv",
+      "sha256": "5fbf9f7981289370a64e97739daef892d4932457af24aab0ed885d561e013e63"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/ja.tsv",
+      "sha256": "5237113f618908ef7c5aa156f7baa14b6d647d1bc97d9afa7919a119ff2cbc37"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/ko.tsv",
+      "sha256": "b66d257df4c3b52fde69e02666716ab32685367edc7b840395c8fd500a34aff8"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/lt.tsv",
+      "sha256": "7046c75adb50a73ddb3fcd97a720284e6fa29f9fc6cb7c86c5658c2c10498605"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/nl.tsv",
+      "sha256": "568ed3758ecfa9063e59b64bc9346e72905445d7dbdc1e185060095c19f01327"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/no.tsv",
+      "sha256": "c0e15c1232aa87879a1279d39c8cd3675861f6ddd6be4e2242c17e7eb8e706fc"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/pl.tsv",
+      "sha256": "4ddc9a83e3e64732b596a2d170ead26c2ffdf5bdc8ea7483d8b2cd8f477884ec"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/pt-br.tsv",
+      "sha256": "b1e13f714b35c971c82aa92cb70c4872e932b482558b6cdcb79c85f2a6cdfa67"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/ro.tsv",
+      "sha256": "3f8e8f18c050c1d67e9c4d754b0b179fe1e66d24db1ff431c46e44e41c6a8798"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/ru.tsv",
+      "sha256": "57b9dcf36fd146cabae9dc618a1cf9d2e7105a06f40bf600541f8293e653fd94"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/sk.tsv",
+      "sha256": "f26a4ce2b95c1097926b9fe66d78034678fbec35ce68693850a1b9ed4cec1f8f"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/sl.tsv",
+      "sha256": "967ee0e1b37a7c3d62d76d1a2f1c679570fb09cd90293c0bfbf4bf8e4a459ac5"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/sv.tsv",
+      "sha256": "06e5c6a0c0df1299ac26753a3f9ce7c0d024ec4f14bd54cd2e1aef56763a3a03"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/ta.tsv",
+      "sha256": "86141dd830c504d0852bdec317f9495fe1fd3fc52414388db3b3456360f886ba"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/tr.tsv",
+      "sha256": "f895dcfc99f6bce28888a46c830e62fcbfb25b03c02637c5960f2fc7fff322cf"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/uk.tsv",
+      "sha256": "b74cfb17a7d373ed375fa1153b5188013d251b989b9fd0fb2bce57772b580f85"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/vi-vn.tsv",
+      "sha256": "67fc1e72a81e65c029f8219848927ee01d4701472d3a983ca27cafef11f95b62"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/zh-cn.tsv",
+      "sha256": "d5253b1463f028b0a07e4b83abd496456ec0b9ca189295a8c46beeefa227356d"
+    },
+    {
+      "path": "android-native/app/src/main/strings/drafts/zh_Hant.tsv",
+      "sha256": "3adb507af495c501dbd15a34854c0787a6f5a4b1c6a247f05428fbcaf85e7d8a"
+    },
+    {
+      "path": "android-native/app/src/main/strings/strings.tsv",
+      "sha256": "9ca6dc1f196b0d777b194f373e184ac4a6b8757e919447a2ca4d087cbb28bd71"
+    },
+    {
+      "path": "android-native/app/src/withCast/assets/leafwake/licenses.txt",
+      "sha256": "e447382976367ffe9e2467bee99c52313c1c81aaa472de6399216bf547bdba00"
+    },
+    {
+      "path": "android-native/app/src/withCast/assets/leafwake/privacy.txt",
+      "sha256": "edc5373ab79b7592ec54be9649900c0da1575fc56bf7c7b8c5d65ee110ffcc0e"
+    },
+    {
+      "path": "android-native/app/src/withCast/assets/leafwake/runtime-inventory.json",
+      "sha256": "dcacb4a80d15950ff85d7fa277f6d06354fef41b54412d225ae51196fc211f4d"
+    },
+    {
+      "path": "android-native/app/src/noCast/assets/leafwake/licenses.txt",
+      "sha256": "3993d610f96c45cc1b9f41c9f47a1812036edf8f60e6fed07e48bd1de43d758c"
+    },
+    {
+      "path": "android-native/app/src/noCast/assets/leafwake/privacy.txt",
+      "sha256": "6f64e3b36b16d861d1f7bf38e70ca541231bed79a52129fe192e395e3d461274"
+    },
+    {
+      "path": "android-native/app/src/noCast/assets/leafwake/runtime-inventory.json",
+      "sha256": "dc89470740e77864d24ebd173ed0e81d1637ab786779c338f91bfad59b3e9d6a"
+    }
+  ]
+}

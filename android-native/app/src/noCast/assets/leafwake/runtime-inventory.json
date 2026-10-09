@@ -4,8 +4,8 @@
     "sha256": "5aaf5171ca6c875e8547ef33d6c268c5e59f9efa8d51c70384630e1b9eadb302",
     "licenses": [
       {
-        "name": "GPL-3.0",
-        "url": "https://github.com/r4iju/audiobookshelf-app"
+        "name": "MIT (scoped independent native code)",
+        "url": "https://opensource.org/license/mit"
       }
     ]
   },

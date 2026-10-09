@@ -7,3 +7,7 @@ No runtime CDN requests or package downloads.
 
 epub.min.js: SHA-256 c7a842da856d511938cba1ba64d90743c318ac02c13e47bc84ae4834fe94c945
 jszip.min.js: SHA-256 acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e
+
+The bundled distributions match the official npm release tarballs byte-for-byte.
+This Apple distribution selects JSZip's MIT option. EPUB.js retains BSD-2-Clause.
+Dependency notice version labels identify their notice sources, not verified embedded versions.

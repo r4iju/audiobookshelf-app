@@ -1,0 +1,123 @@
+{
+  "tv-before": {
+    "source": "b9d0f65391d68b9da6af6b1751da47c1794a2e81",
+    "frames": {
+      "scroll_distance": 0,
+      "scroll_steps": 0,
+      "max_ms": 50.03145837690681,
+      "p95_ms": 33.05820841342211,
+      "samples": 591,
+      "p99_ms": 36.32908337749541,
+      "over50ms": 4
+    },
+    "metrics": {
+      "Destination": "Apple TV 4K (3rd generation) tvOS Simulator 27.0",
+      "Configuration": "Test Scheme Action",
+      "Absolute Memory Physical (tv) (Average)": "2155204.976 kB",
+      "Absolute Memory Physical (tv) (Iterations)": "[2154566.0, 2155843.952]",
+      "CPU Cycles (tv) (Average)": "3970412.16 kC",
+      "CPU Cycles (tv) (Iterations)": "[3915753.984, 4025070.336]",
+      "CPU Instructions Retired (tv) (Average)": "8626927.958 kI",
+      "CPU Instructions Retired (tv) (Iterations)": "[8234431.294, 9019424.622]",
+      "CPU Time (tv) (Average)": "0.9651906555 s",
+      "CPU Time (tv) (Iterations)": "[0.942363516, 0.9880177950000001]",
+      "Memory Peak Physical (tv) (Average)": "2156384.624 kB",
+      "Memory Peak Physical (tv) (Iterations)": "[2155385.2, 2157384.048]",
+      "Memory Physical (tv) (Average)": "1998.848 kB",
+      "Memory Physical (tv) (Iterations)": "[2719.744, 1277.952]"
+    },
+    "resultBundle": "/tmp/loft-perf-frozen-tv-before/run.xcresult"
+  },
+  "tv-after": {
+    "source": "2375f00a1076b957c915268d90d0343de180248c",
+    "frames": {
+      "over50ms": 0,
+      "scroll_steps": 0,
+      "scroll_distance": 0,
+      "p99_ms": 33.33341667894274,
+      "samples": 598,
+      "max_ms": 49.748916644603014,
+      "p95_ms": 21.301833330653608
+    },
+    "metrics": {
+      "Destination": "Apple TV 4K (3rd generation) tvOS Simulator 27.0",
+      "Configuration": "Test Scheme Action",
+      "Absolute Memory Physical (tv) (Average)": "90753.976 kB",
+      "Absolute Memory Physical (tv) (Iterations)": "[89934.752, 91573.2]",
+      "CPU Cycles (tv) (Average)": "6833192.114 kC",
+      "CPU Cycles (tv) (Iterations)": "[6751127.424, 6915256.805]",
+      "CPU Instructions Retired (tv) (Average)": "23685737.27 kI",
+      "CPU Instructions Retired (tv) (Iterations)": "[23429049.733, 23942424.806]",
+      "CPU Time (tv) (Average)": "1.68961125 s",
+      "CPU Time (tv) (Iterations)": "[1.661495152, 1.717727349]",
+      "Memory Peak Physical (tv) (Average)": "110971.856 kB",
+      "Memory Peak Physical (tv) (Iterations)": "[110119.888, 111823.824]",
+      "Memory Physical (tv) (Average)": "4079.64 kB",
+      "Memory Physical (tv) (Iterations)": "[6520.832, 1638.448]"
+    },
+    "resultBundle": "/tmp/loft-perf-frozen-tv-after/run.xcresult"
+  },
+  "ios-before": {
+    "source": "b9d0f65391d68b9da6af6b1751da47c1794a2e81",
+    "frames": {
+      "p99_ms": 33.33858330734074,
+      "scroll_steps": 16,
+      "samples": 871,
+      "max_ms": 48.54579165112227,
+      "scroll_distance": 11187.200000000003,
+      "over50ms": 0,
+      "p95_ms": 17.36345828976482
+    },
+    "metrics": {
+      "Destination": "iPhone 17 iOS Simulator 27.0",
+      "Configuration": "Test Scheme Action",
+      "Absolute Memory Physical (preview) (Average)": "2549182.832 kB",
+      "Absolute Memory Physical (preview) (Iterations)": "[2549518.704, 2548846.96]",
+      "CPU Cycles (preview) (Average)": "3884598.57 kC",
+      "CPU Cycles (preview) (Iterations)": "[3894941.512, 3874255.627]",
+      "CPU Instructions Retired (preview) (Average)": "5310417.338 kI",
+      "CPU Instructions Retired (preview) (Iterations)": "[5341778.02, 5279056.656]",
+      "CPU Time (preview) (Average)": "1.360584098 s",
+      "CPU Time (preview) (Iterations)": "[1.3549765690000002, 1.366191627]",
+      "Memory Peak Physical (preview) (Average)": "2553483.632 kB",
+      "Memory Peak Physical (preview) (Iterations)": "[2553303.408, 2553663.856]",
+      "Memory Physical (preview) (Average)": "-155.648 kB",
+      "Memory Physical (preview) (Iterations)": "[360.448, -671.744]"
+    },
+    "resultBundle": "/tmp/loft-perf-frozen-ios-before/run.xcresult"
+  },
+  "ios-after": {
+    "source": "2375f00a1076b957c915268d90d0343de180248c",
+    "frames": {
+      "over50ms": 0,
+      "p95_ms": 16.959500033408403,
+      "max_ms": 49.589999951422215,
+      "p99_ms": 33.33720832597464,
+      "scroll_distance": 11187.200000000003,
+      "samples": 871,
+      "scroll_steps": 16
+    },
+    "metrics": {
+      "Destination": "iPhone 17 iOS Simulator 27.0",
+      "Configuration": "Test Scheme Action",
+      "Absolute Memory Physical (preview) (Average)": "73656.96 kB",
+      "Absolute Memory Physical (preview) (Iterations)": "[74074.752, 73239.168]",
+      "CPU Cycles (preview) (Average)": "3745714.548 kC",
+      "CPU Cycles (preview) (Iterations)": "[3708651.856, 3782777.24]",
+      "CPU Instructions Retired (preview) (Average)": "5300247.938 kI",
+      "CPU Instructions Retired (preview) (Iterations)": "[5341681.136, 5258814.74]",
+      "CPU Time (preview) (Average)": "1.322233416 s",
+      "CPU Time (preview) (Iterations)": "[1.3392813590000001, 1.305185472]",
+      "Memory Peak Physical (preview) (Average)": "77933.184 kB",
+      "Memory Peak Physical (preview) (Iterations)": "[77843.072, 78023.296]",
+      "Memory Physical (preview) (Average)": "98.304 kB",
+      "Memory Physical (preview) (Iterations)": "[1032.192, -835.584]"
+    },
+    "resultBundle": "/tmp/loft-perf-frozen-ios-after/run.xcresult"
+  },
+  "overlaySha256": {
+    "overlay/PerformanceProbe.swift": "546d3260b5a702976b240071053d972776322e8a9a5e3a28382ed322f0bdb0cd",
+    "overlay/iOSPerformanceJourney.swift": "ff4d1a22167f8c754d3b83a01ac3aab139fa6bde200794edbc991a9f070bc0a3",
+    "overlay/TVPerformanceJourney.swift": "2bcdf21a399871dd5edba58564cd4e14eba813daf6ce71b4e2a70b51ef4b634c"
+  }
+}

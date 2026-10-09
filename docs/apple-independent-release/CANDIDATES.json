@@ -1,0 +1,32 @@
+[
+  {
+    "platform": "ios",
+    "source": "b16355f42ed6619164f85c606775c5b80b51b95d",
+    "bundle": "com.forkzed.leafwake",
+    "version": "1.0.0",
+    "build": "2",
+    "minimumOS": "15.0",
+    "ipa_sha256": "666f859e4481b1981050c77c9bb0c4637c0e17083f6b7400c20d9c34566725c0",
+    "ipa_bytes": 5372518,
+    "archive_and_payload_strict_verified": true,
+    "distribution_profile": true,
+    "internal_only_export": true,
+    "legacy_frameworks_absent": true,
+    "native_license_bundled": true
+  },
+  {
+    "platform": "tv",
+    "source": "b16355f42ed6619164f85c606775c5b80b51b95d",
+    "bundle": "com.forkzed.leafwake",
+    "version": "1.0.0",
+    "build": "2",
+    "minimumOS": "17.0",
+    "ipa_sha256": "048e29788ea844699a85b6bb37fd48776bf4fb0685b086eec7aa88f994a8dbae",
+    "ipa_bytes": 8913232,
+    "archive_and_payload_strict_verified": true,
+    "distribution_profile": true,
+    "internal_only_export": true,
+    "legacy_frameworks_absent": true,
+    "native_license_bundled": true
+  }
+]

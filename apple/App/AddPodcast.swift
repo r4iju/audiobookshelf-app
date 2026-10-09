@@ -59,7 +59,7 @@ struct AddPodcast: View {
                         Picker(l10n("Server folder"), selection: $folderID) {
                             ForEach(folders) { folder in Text(folder.fullPath).tag(folder.id) }
                         }
-                        Toggle(l10n("Automatically download new episodes"), isOn: $autoDownload)
+                        Toggle(l10n("Download new episodes automatically"), isOn: $autoDownload)
                         Button(l10n("Create podcast"), action: create).nativeGlassButton(prominent: true).disabled(!permitted || busy || folders.isEmpty || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }.disabled(busy)
                     if folders.isEmpty { Text(l10n("This library has no server folder. Add one in server settings before creating a podcast.")).foregroundColor(ShelfStyle.secondaryText) }

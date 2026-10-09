@@ -1,0 +1,28 @@
+{
+  "commit": "6e07b8d2476b18f72d0dd1a6db4d2ede80b5733f",
+  "matchingEntries": 5126,
+  "substantial": [
+    {
+      "path": "android-native/app/src/main/res/values-fr/strings.xml",
+      "name": "pl_scale_elapsed",
+      "value": "Traduire le temps restant en fonction de la vitesse de lecture",
+      "legacy": [
+        [
+          "strings/fr.json",
+          "LabelScaleElapsedTimeBySpeed"
+        ]
+      ]
+    },
+    {
+      "path": "android-native/app/src/main/res/values-sv/strings.xml",
+      "name": "pl_scale_elapsed",
+      "value": "Justera den visade uppspelningstiden efter uppspelningshastigheten.",
+      "legacy": [
+        [
+          "strings/sv.json",
+          "LabelScaleElapsedTimeBySpeed"
+        ]
+      ]
+    }
+  ]
+}

@@ -321,7 +321,7 @@ class Migration(
     }
 
     private companion object {
-        /** Legacy codes that differ from this app's language tags, as in scripts/import-legacy-strings.py. */
+        /** Legacy codes that differ from this app's language tags, as in scripts/generate-strings.py. */
         val LEGACY_LANGUAGES = mapOf("no" to "nb", "pt-br" to "pt-BR", "vi-vn" to "vi", "zh-cn" to "zh-CN")
     }
 }
