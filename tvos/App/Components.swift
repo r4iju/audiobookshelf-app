@@ -129,7 +129,7 @@ struct ItemTile: View {
                 }
             }
             .frame(width: width, height: width)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .clipShape(RoundedRectangle(cornerRadius: 24))
             Text(episode?.title ?? item.title).font(.system(size: 26, weight: .semibold)).lineLimit(2)
                 .frame(width: width, height: 68, alignment: .topLeading)
             Text(episode != nil ? item.title : item.author.isEmpty ? " " : item.author).font(.system(size: 21)).foregroundStyle(isFocused ? .primary : .secondary).lineLimit(1)
@@ -152,7 +152,7 @@ struct StatusMessage: View {
             Image(systemName: "wifi.exclamationmark").font(.system(size: 60)).foregroundStyle(.secondary)
             Text(text).font(.title3).multilineTextAlignment(.center).frame(maxWidth: 1100)
                 .accessibilityIdentifier(identifier)
-            Button(l10n("Try again"), action: retry).accessibilityIdentifier(retryIdentifier)
+            Button(l10n("Try again"), action: retry).nativeGlassButton().accessibilityIdentifier(retryIdentifier)
         }
         .frame(maxWidth: .infinity)
         .padding(60)
@@ -232,5 +232,26 @@ struct TVReadableText: View {
         }
         result.append(String(text[start...]))
         return result
+    }
+}
+
+/// Opaque content backdrop; native navigation and focused controls supply the glass layer.
+struct TVSceneBackground: View {
+    @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    var body: some View {
+        ZStack {
+            Color(red: 0.035, green: 0.04, blue: 0.055)
+            if contrast != .increased, !reduceTransparency {
+                RadialGradient(colors: [Color(red: 0.15, green: 0.13, blue: 0.11), .clear],
+                               center: .topLeading, startRadius: 0, endRadius: 1500)
+                RadialGradient(colors: [Color(red: 0.07, green: 0.10, blue: 0.16), .clear],
+                               center: .bottomTrailing, startRadius: 0, endRadius: 1100)
+            }
+        }
+        .ignoresSafeArea()
+        .accessibilityHidden(true)
+        .allowsHitTesting(false)
     }
 }

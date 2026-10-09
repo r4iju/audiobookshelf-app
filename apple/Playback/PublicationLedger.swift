@@ -134,8 +134,17 @@ import Foundation
     }
 
     func waiting(account: AccountIdentity) -> Waiting {
+        summary(account: account, excluding: [])
+    }
+
+    /// Recovery is actionable only after a transmission loses its answer, not while it is still sending.
+    func unansweredWaiting(account: AccountIdentity) -> Waiting {
+        summary(account: account, excluding: active)
+    }
+
+    private func summary(account: AccountIdentity, excluding excluded: Set<UUID>) -> Waiting {
         guard let document else { return Waiting(unreadable: true) }
-        let titles = Set(document.writes.filter { $0.account == account }.map { [$0.itemID, $0.episodeID ?? ""] }).count
+        let titles = Set(document.writes.filter { $0.account == account && !excluded.contains($0.id) }.map { [$0.itemID, $0.episodeID ?? ""] }).count
         let unreadable = document.unreadableBefore.map { (document.restarts[account.server] ?? 0) < $0 } ?? false
         return Waiting(titles: titles, unreadable: unreadable, restartRequested: document.requests?[account.server] != nil)
     }

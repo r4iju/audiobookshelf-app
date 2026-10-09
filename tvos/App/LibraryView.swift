@@ -18,6 +18,8 @@ struct LibraryView: View {
                     Button(action: chooseLibrary) {
                         Label(browser.library.name, systemImage: "chevron.down")
                     }
+                    .nativeGlassButton()
+                    .font(.title2.weight(.semibold))
                     .accessibilityIdentifier("library-chooser")
                     .accessibilityLabel(browser.library.name)
                     .accessibilityHint(l10n("Choose library"))
@@ -27,7 +29,7 @@ struct LibraryView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                controls.focusSection()
+                controls.nativeGlassButton().focusSection()
                 if let error = browser.error, browser.items.isEmpty {
                     StatusMessage(text: CatalogStore.recovery(for: error)) { Task { await browser.retry() } }
                 } else if browser.items.isEmpty && !browser.loading && browser.started {
@@ -38,7 +40,7 @@ struct LibraryView: View {
                     ForEach(browser.items) { item in
                         NavigationLink(value: Route.item(item)) { ItemTile(item: item) }
                             .buttonStyle(.card)
-                            .buttonBorderShape(.roundedRectangle(radius: 14))
+                            .buttonBorderShape(.roundedRectangle(radius: 24))
                             .accessibilityIdentifier("item-\(item.id)")
                             .onAppear { Task { await browser.loadMore(after: item) } }
                     }

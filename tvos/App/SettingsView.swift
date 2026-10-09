@@ -129,8 +129,11 @@ struct SettingsView: View {
     }
 
     private func refreshWaiting() async {
-        guard let account = try? await catalog.api.currentAccount() else { waiting = PublicationLedger.Waiting(); return }
-        waiting = player.publications.waiting(account: account)
+        let next: PublicationLedger.Waiting
+        if let account = try? await catalog.api.currentAccount() {
+            next = player.publications.unansweredWaiting(account: account)
+        } else { next = PublicationLedger.Waiting() }
+        if next != waiting { waiting = next }
     }
 
     private func requestRestart() {

@@ -34,13 +34,13 @@ struct HomeView: View {
                     }
                     ForEach(catalog.shelves) { shelf in
                         VStack(alignment: .leading, spacing: 20) {
-                            Text(title(shelf)).font(.title3.bold())
+                            Text(title(shelf)).font(.title2.weight(.semibold))
                             ScrollView(.horizontal) {
                                 LazyHStack(spacing: 48) {
                                     ForEach(shelf.items) { item in
                                         NavigationLink(value: Route.to(item)) { ItemTile(item: item) }
                                             .buttonStyle(.card)
-                                            .buttonBorderShape(.roundedRectangle(radius: 14))
+                                            .buttonBorderShape(.roundedRectangle(radius: 24))
                                             .accessibilityIdentifier("\(shelf.shelfID).\(item.id)")
                                     }
                                 }

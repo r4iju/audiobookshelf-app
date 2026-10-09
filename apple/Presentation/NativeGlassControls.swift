@@ -55,8 +55,14 @@ private struct NativeGlassButton: ViewModifier {
 
     @ViewBuilder private func styled(_ content: Content) -> some View {
         #if os(tvOS)
-        // Native TV buttons adopt glass when focused on supported hardware and keep remote activation intact.
+        #if ABS_SDK_26
+        if #available(tvOS 26, *), !reduceTransparency, contrast != .increased {
+            if prominent { content.buttonStyle(.glassProminent) }
+            else { content.buttonStyle(.glass) }
+        } else { content.buttonStyle(.bordered) }
+        #else
         content.buttonStyle(.bordered)
+        #endif
         #else
         #if ABS_SDK_26
         if #available(iOS 26, *), !reduceTransparency, contrast != .increased {

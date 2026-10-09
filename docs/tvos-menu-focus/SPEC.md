@@ -1,0 +1,9 @@
+# TV menu continuity and presentation
+
+The owner observes the highlighted speed-menu row blinking about once per second during playback, suspects other dropdowns, and finds the surrounding TV presentation dated. Scope is tvOS and a new internal TestFlight release. Preserve streaming, account isolation, durable progress, focused remote navigation, the earlier layout fix, and the bounded artwork decoder. No screenshots or confirmation gate.
+
+Reproduce the native menu during real synthetic playback, hold the remote idle, and measure focused native-row replacement. Compare the same instrumented workload against the released source. Keep all probes in disposable snapshots and exclude them from distribution. Check speed, active sleep countdown, settings skip interval and library sort. Replay playback/chapter/sleep-related controls, pagination, layout stability, language, settings return-focus and accessibility. Do not claim a simulator continuity measurement proves hardware frame rate.
+
+Separate frequently changing timeline state from the presentation state that owns menus/navigation. The timeline continues updating and durable listening continues recording; chapter boundaries and sleep activation/deactivation must still refresh their dependent controls. Complete native glass control styling on supported tvOS, retain accessible/older-system fallback and solid artwork/content, improve browse hierarchy and provide a restrained opaque backdrop. Follow Apple's Materials HIG: glass is a functional navigation/control layer, not a coating for all content.
+
+After fresh independent review, merge, replay the merged normal app, archive exact clean source and verify TestFlight build validity and owner-group membership. iOS, Android, backend and public App Store submission are outside this patch.
