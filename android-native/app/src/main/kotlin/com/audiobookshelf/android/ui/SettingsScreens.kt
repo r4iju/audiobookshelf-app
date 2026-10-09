@@ -172,7 +172,7 @@ fun SettingsScreen(padding: PaddingValues, onDiagnostics: () -> Unit) {
         }
 
         item { SettingsHeading(stringResource(R.string.set_heading_support)) }
-        if (com.audiobookshelf.android.BuildConfig.PUBLIC_RELEASE) item { LeafwakeLegal() }
+        item { LeafwakeLegal() }
         item {
             OutlinedButton(onClick = onDiagnostics, modifier = Modifier.fillMaxWidth().testTag("open-diagnostics")) { Text(stringResource(R.string.set_diagnostics)) }
         }

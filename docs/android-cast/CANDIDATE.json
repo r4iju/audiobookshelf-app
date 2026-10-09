@@ -1,0 +1,62 @@
+{
+  "source": "62b880281119672743cd68bbb76a57676d9a4549",
+  "audience": "Private verification candidate; not uploaded, no public rollout",
+  "ownerSigner": "Existing owner Android upload key; incompatible with Play app signing for direct updates",
+  "tests": {
+    "generatorRegression": 3,
+    "coreUnit": 64,
+    "appUnit": 6,
+    "emulatorCastLocalizationHandover": 9,
+    "failures": 0
+  },
+  "externalGates": [
+    "Confirmed Google Cast receiver media/control/return/progress execution",
+    "Google Play Cast Data safety and public Cast policy publication before rollout"
+  ],
+  "artifacts": [
+    {
+      "file": "cast-debug.apk",
+      "sha256": "14bd40d747bbc809f967d8eaf83cf2df5a85e2e13b7c2c9783a3c252ca20ac74",
+      "size": 40676605,
+      "runtimeDependencies": 156,
+      "cast": true,
+      "exactBundledNoticesPrivacyInventory": true,
+      "oldReceiverAbsent": true,
+      "copiedLauncherAbsent": true,
+      "fixtureAssetsAbsent": true
+    },
+    {
+      "file": "nocast-debug.apk",
+      "sha256": "34c4b5fde75465f4daa9719260f47b6b44becddabd87094030822e715a42f96e",
+      "size": 32774081,
+      "runtimeDependencies": 136,
+      "cast": false,
+      "exactBundledNoticesPrivacyInventory": true,
+      "oldReceiverAbsent": true,
+      "copiedLauncherAbsent": true,
+      "fixtureAssetsAbsent": true
+    },
+    {
+      "file": "cast-owner-release.apk",
+      "sha256": "11db22124b9cc6941aab67f936a5166040c247fed52bc4db1fda0507de8463e8",
+      "size": 23630737,
+      "runtimeDependencies": 156,
+      "cast": true,
+      "exactBundledNoticesPrivacyInventory": true,
+      "oldReceiverAbsent": true,
+      "copiedLauncherAbsent": true,
+      "fixtureAssetsAbsent": true
+    },
+    {
+      "file": "cast-owner-release.aab",
+      "sha256": "4040707d92089842d2a7e161684dd18a8a31e65457ebef8e1a44a21abd8892b3",
+      "size": 21414673,
+      "runtimeDependencies": 156,
+      "cast": true,
+      "exactBundledNoticesPrivacyInventory": true,
+      "oldReceiverAbsent": true,
+      "copiedLauncherAbsent": true,
+      "fixtureAssetsAbsent": true
+    }
+  ]
+}
